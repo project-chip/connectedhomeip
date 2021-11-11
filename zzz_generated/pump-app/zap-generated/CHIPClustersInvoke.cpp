@@ -30,22 +30,24 @@ using namespace Encoding::LittleEndian;
 
 namespace Controller {
 
-template <typename RequestDataT, typename ResponseDataT>
+template <typename RequestDataT>
 CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
-                                      CommandResponseSuccessCallback<ResponseDataT> successCb,
+                                      CommandResponseSuccessCallback<typename RequestDataT::ResponseType> successCb,
                                       CommandResponseFailureCallback failureCb)
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
-                                            const ResponseDataT & responseData) { successCb(context, responseData); };
+                                            const typename RequestDataT::ResponseType & responseData) {
+        successCb(context, responseData);
+    };
 
     auto onFailureCb = [context, failureCb](const app::StatusIB & aStatus, CHIP_ERROR aError) {
         failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
     };
 
-    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                               requestData, onSuccessCb, onFailureCb);
+    return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
+                                onSuccessCb, onFailureCb);
 };
 
 } // namespace Controller

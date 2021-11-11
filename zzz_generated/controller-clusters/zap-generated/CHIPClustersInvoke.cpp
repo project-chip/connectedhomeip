@@ -30,1004 +30,939 @@ using namespace Encoding::LittleEndian;
 
 namespace Controller {
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type,
-                                               chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type>(
     const chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AccountLogin::Commands::Login::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::AccountLogin::Commands::Login::Type>(
     const chip::app::Clusters::AccountLogin::Commands::Login::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::AccountLogin::Commands::Login::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
 template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type,
-                           chip::app::DataModel::NullObjectType>(
+ClusterBase::InvokeCommand<chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type>(
     const chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
 template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type,
-                           chip::app::DataModel::NullObjectType>(
+ClusterBase::InvokeCommand<chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type>(
     const chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type>(
     const chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type>(
     const chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type,
-                           chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type>(
     const chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type>(
     const chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type>(
     const chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Type>(
     const chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Type>(
     const chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type>(
     const chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Binding::Commands::Bind::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Binding::Commands::Bind::Type>(
     const chip::app::Clusters::Binding::Commands::Bind::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Binding::Commands::Bind::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Binding::Commands::Unbind::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Binding::Commands::Unbind::Type>(
     const chip::app::Clusters::Binding::Commands::Unbind::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Binding::Commands::Unbind::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::DisableAction::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::DisableAction::Type>(
     const chip::app::Clusters::BridgedActions::Commands::DisableAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::BridgedActions::Commands::DisableAction::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type>(
     const chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::EnableAction::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::EnableAction::Type>(
     const chip::app::Clusters::BridgedActions::Commands::EnableAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::BridgedActions::Commands::EnableAction::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type>(
     const chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::InstantAction::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::InstantAction::Type>(
     const chip::app::Clusters::BridgedActions::Commands::InstantAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::BridgedActions::Commands::InstantAction::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type>(
     const chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::PauseAction::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::PauseAction::Type>(
     const chip::app::Clusters::BridgedActions::Commands::PauseAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::BridgedActions::Commands::PauseAction::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type>(
     const chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type>(
     const chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::StartAction::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::StartAction::Type>(
     const chip::app::Clusters::BridgedActions::Commands::StartAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::BridgedActions::Commands::StartAction::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type>(
     const chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::StopAction::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BridgedActions::Commands::StopAction::Type>(
     const chip::app::Clusters::BridgedActions::Commands::StopAction::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::BridgedActions::Commands::StopAction::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type>(
     const chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type>(
     const chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type>(
     const chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type>(
     const chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type>(
     const chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveColor::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveColor::Type>(
     const chip::app::Clusters::ColorControl::Commands::MoveColor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::MoveColor::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type>(
     const chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveHue::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveHue::Type>(
     const chip::app::Clusters::ColorControl::Commands::MoveHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::MoveHue::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type>(
     const chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToColor::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToColor::Type>(
     const chip::app::Clusters::ColorControl::Commands::MoveToColor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::MoveToColor::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type>(
     const chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToHue::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToHue::Type>(
     const chip::app::Clusters::ColorControl::Commands::MoveToHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::MoveToHue::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type>(
     const chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type>(
     const chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepColor::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepColor::Type>(
     const chip::app::Clusters::ColorControl::Commands::StepColor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::StepColor::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type>(
     const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepHue::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepHue::Type>(
     const chip::app::Clusters::ColorControl::Commands::StepHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::StepHue::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepSaturation::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepSaturation::Type>(
     const chip::app::Clusters::ColorControl::Commands::StepSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::StepSaturation::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type>(
     const chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type,
-                           chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type>(
     const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type,
-                                               chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type>(
     const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type,
-                                               chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type>(
     const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearAllPins::Type,
-                                               chip::app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearAllPins::Type>(
     const chip::app::Clusters::DoorLock::Commands::ClearAllPins::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::ClearAllPins::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearAllRfids::Type,
-                                               chip::app::Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearAllRfids::Type>(
     const chip::app::Clusters::DoorLock::Commands::ClearAllRfids::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::ClearAllRfids::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type,
-                           chip::app::Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type>(
     const chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearPin::Type,
-                                               chip::app::Clusters::DoorLock::Commands::ClearPinResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearPin::Type>(
     const chip::app::Clusters::DoorLock::Commands::ClearPin::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearPinResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::ClearPin::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearRfid::Type,
-                                               chip::app::Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearRfid::Type>(
     const chip::app::Clusters::DoorLock::Commands::ClearRfid::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::ClearRfid::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearWeekdaySchedule::Type,
-                           chip::app::Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearWeekdaySchedule::Type>(
     const chip::app::Clusters::DoorLock::Commands::ClearWeekdaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::ClearWeekdaySchedule::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearYeardaySchedule::Type,
-                           chip::app::Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearYeardaySchedule::Type>(
     const chip::app::Clusters::DoorLock::Commands::ClearYeardaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::ClearYeardaySchedule::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type>(
     const chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetLogRecord::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetLogRecord::Type>(
     const chip::app::Clusters::DoorLock::Commands::GetLogRecord::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::GetLogRecord::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetPin::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetPinResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetPin::Type>(
     const chip::app::Clusters::DoorLock::Commands::GetPin::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetPinResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::GetPin::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetRfid::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetRfidResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetRfid::Type>(
     const chip::app::Clusters::DoorLock::Commands::GetRfid::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetRfidResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::GetRfid::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetUserType::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetUserType::Type>(
     const chip::app::Clusters::DoorLock::Commands::GetUserType::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::GetUserType::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetWeekdaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetWeekdaySchedule::Type>(
     const chip::app::Clusters::DoorLock::Commands::GetWeekdaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::GetWeekdaySchedule::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetYeardaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetYeardaySchedule::Type>(
     const chip::app::Clusters::DoorLock::Commands::GetYeardaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::GetYeardaySchedule::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::LockDoor::Type,
-                                               chip::app::Clusters::DoorLock::Commands::LockDoorResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::LockDoor::Type>(
     const chip::app::Clusters::DoorLock::Commands::LockDoor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::LockDoorResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::LockDoor::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type>(
     const chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetPin::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetPinResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetPin::Type>(
     const chip::app::Clusters::DoorLock::Commands::SetPin::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetPinResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::SetPin::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetRfid::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetRfidResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetRfid::Type>(
     const chip::app::Clusters::DoorLock::Commands::SetRfid::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetRfidResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::SetRfid::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetUserType::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetUserType::Type>(
     const chip::app::Clusters::DoorLock::Commands::SetUserType::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::SetUserType::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetWeekdaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetWeekdaySchedule::Type>(
     const chip::app::Clusters::DoorLock::Commands::SetWeekdaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::SetWeekdaySchedule::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetYeardaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetYeardaySchedule::Type>(
     const chip::app::Clusters::DoorLock::Commands::SetYeardaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::SetYeardaySchedule::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type,
-                                               chip::app::Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type>(
     const chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type,
-                                               chip::app::Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type>(
     const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type>(
     const chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type,
-                           chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType>(
-    const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type,
-                           chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type>(
+    const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type &, void *,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type::ResponseType>,
+    CommandResponseFailureCallback);
+
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type>(
     const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type &, void *,
     CommandResponseSuccessCallback<
-        chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType>,
+        typename chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type,
-                           chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type>(
     const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::AddGroup::Type,
-                                               chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::AddGroup::Type>(
     const chip::app::Clusters::Groups::Commands::AddGroup::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Groups::Commands::AddGroup::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::Type>(
     const chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::GetGroupMembership::Type,
-                                               chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::GetGroupMembership::Type>(
     const chip::app::Clusters::Groups::Commands::GetGroupMembership::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Groups::Commands::GetGroupMembership::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type>(
     const chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::RemoveGroup::Type,
-                                               chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::RemoveGroup::Type>(
     const chip::app::Clusters::Groups::Commands::RemoveGroup::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Groups::Commands::RemoveGroup::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::ViewGroup::Type,
-                                               chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::ViewGroup::Type>(
     const chip::app::Clusters::Groups::Commands::ViewGroup::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Groups::Commands::ViewGroup::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Identify::Commands::Identify::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Identify::Commands::Identify::Type>(
     const chip::app::Clusters::Identify::Commands::Identify::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Identify::Commands::Identify::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Identify::Commands::IdentifyQuery::Type,
-                                               chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Identify::Commands::IdentifyQuery::Type>(
     const chip::app::Clusters::Identify::Commands::IdentifyQuery::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Identify::Commands::IdentifyQuery::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Identify::Commands::TriggerEffect::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Identify::Commands::TriggerEffect::Type>(
     const chip::app::Clusters::Identify::Commands::TriggerEffect::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Identify::Commands::TriggerEffect::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::KeypadInput::Commands::SendKey::Type,
-                                               chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::KeypadInput::Commands::SendKey::Type>(
     const chip::app::Clusters::KeypadInput::Commands::SendKey::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::KeypadInput::Commands::SendKey::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Move::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Move::Type>(
     const chip::app::Clusters::LevelControl::Commands::Move::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::Move::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type>(
     const chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type>(
     const chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type>(
     const chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Step::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Step::Type>(
     const chip::app::Clusters::LevelControl::Commands::Step::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::Step::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type>(
     const chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Stop::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Stop::Type>(
     const chip::app::Clusters::LevelControl::Commands::Stop::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::Stop::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type>(
     const chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LowPower::Commands::Sleep::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LowPower::Commands::Sleep::Type>(
     const chip::app::Clusters::LowPower::Commands::Sleep::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LowPower::Commands::Sleep::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type>(
     const chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::RenameInput::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::RenameInput::Type>(
     const chip::app::Clusters::MediaInput::Commands::RenameInput::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaInput::Commands::RenameInput::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::SelectInput::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::SelectInput::Type>(
     const chip::app::Clusters::MediaInput::Commands::SelectInput::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaInput::Commands::SelectInput::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type>(
     const chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type,
-                           chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type>(
     const chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type>(
     const chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type>(
     const chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type>(
     const chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type>(
     const chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type>(
     const chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type>(
     const chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type,
-                           chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type>(
     const chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type,
-                           chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type>(
     const chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type>(
     const chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type>(
     const chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type>(
     const chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Type>(
     const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::Type>(
     const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type>(
     const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type>(
     const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type>(
     const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type>(
     const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::Type>(
     const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::Type>(
     const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type,
-                           chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type>(
     const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type>(
     const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type,
-                           chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type>(
     const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR
+ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type>(
     const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Off::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Off::Type>(
     const chip::app::Clusters::OnOff::Commands::Off::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::OnOff::Commands::Off::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::OffWithEffect::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::OffWithEffect::Type>(
     const chip::app::Clusters::OnOff::Commands::OffWithEffect::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::OnOff::Commands::OffWithEffect::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::On::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::On::Type>(
     const chip::app::Clusters::OnOff::Commands::On::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::OnOff::Commands::On::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type>(
     const chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type>(
     const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Toggle::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Toggle::Type>(
     const chip::app::Clusters::OnOff::Commands::Toggle::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::OnOff::Commands::Toggle::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type>(
     const chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type::ResponseType>,
     CommandResponseFailureCallback);
 
 template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type,
-                           chip::app::DataModel::NullObjectType>(
+ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type>(
     const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type,
-                           chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type>(
     const chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type::ResponseType>,
     CommandResponseFailureCallback);
 
 template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type,
-                           chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType>(
+ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type>(
     const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type>(
     const chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type>(
     const chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type::ResponseType>,
     CommandResponseFailureCallback);
 
 template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type,
-                           chip::app::DataModel::NullObjectType>(
+ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type>(
     const chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type>(
     const chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type>(
     const chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::AddScene::Type,
-                                               chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::AddScene::Type>(
     const chip::app::Clusters::Scenes::Commands::AddScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Scenes::Commands::AddScene::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::GetSceneMembership::Type,
-                                               chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::GetSceneMembership::Type>(
     const chip::app::Clusters::Scenes::Commands::GetSceneMembership::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Scenes::Commands::GetSceneMembership::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::RecallScene::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::RecallScene::Type>(
     const chip::app::Clusters::Scenes::Commands::RecallScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Scenes::Commands::RecallScene::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Type,
-                                               chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Type>(
     const chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::RemoveScene::Type,
-                                               chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::RemoveScene::Type>(
     const chip::app::Clusters::Scenes::Commands::RemoveScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Scenes::Commands::RemoveScene::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::StoreScene::Type,
-                                               chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::StoreScene::Type>(
     const chip::app::Clusters::Scenes::Commands::StoreScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Scenes::Commands::StoreScene::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::ViewScene::Type,
-                                               chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::ViewScene::Type>(
     const chip::app::Clusters::Scenes::Commands::ViewScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Scenes::Commands::ViewScene::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type>(
     const chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::ChangeChannel::Type,
-                                               chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::ChangeChannel::Type>(
     const chip::app::Clusters::TvChannel::Commands::ChangeChannel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::TvChannel::Commands::ChangeChannel::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type>(
     const chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::SkipChannel::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::SkipChannel::Type>(
     const chip::app::Clusters::TvChannel::Commands::SkipChannel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::TvChannel::Commands::SkipChannel::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type,
-                           chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type>(
     const chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::Test::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::Test::Type>(
     const chip::app::Clusters::TestCluster::Commands::Test::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::TestCluster::Commands::Test::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type,
-                                               chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type>(
     const chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type,
-                                               chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type>(
     const chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type,
-                                               chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type>(
     const chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type,
-                           chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type>(
     const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type,
-                                               chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type>(
     const chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type>(
     const chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type,
-                           chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type>(
     const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestSpecific::Type,
-                                               chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestSpecific::Type>(
     const chip::app::Clusters::TestCluster::Commands::TestSpecific::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType>,
+    CommandResponseSuccessCallback<typename chip::app::Clusters::TestCluster::Commands::TestSpecific::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type,
-                                               chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type>(
     const chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType>,
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type::ResponseType>,
     CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type>(
     const chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type>(
     const chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type>(
     const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Type>(
     const chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type>(
     const chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type>(
     const chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Type>(
     const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<
+        typename chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type>(
     const chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type>(
     const chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type>(
     const chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Type>(
     const chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type>(
     const chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Type>(
     const chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::StopMotion::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::StopMotion::Type>(
     const chip::app::Clusters::WindowCovering::Commands::StopMotion::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::WindowCovering::Commands::StopMotion::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type>(
     const chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template <typename RequestDataT, typename ResponseDataT>
+template <typename RequestDataT>
 CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
-                                      CommandResponseSuccessCallback<ResponseDataT> successCb,
+                                      CommandResponseSuccessCallback<typename RequestDataT::ResponseType> successCb,
                                       CommandResponseFailureCallback failureCb)
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
-                                            const ResponseDataT & responseData) { successCb(context, responseData); };
+                                            const typename RequestDataT::ResponseType & responseData) {
+        successCb(context, responseData);
+    };
 
     auto onFailureCb = [context, failureCb](const app::StatusIB & aStatus, CHIP_ERROR aError) {
         failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
     };
 
-    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                               requestData, onSuccessCb, onFailureCb);
+    return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
+                                onSuccessCb, onFailureCb);
 };
 
 } // namespace Controller

@@ -5753,19 +5753,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -5794,24 +5793,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveToHue::Type request;
+        RequestType request;
         request.hue             = 150;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
         request.transitionTime  = 100U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -5823,24 +5821,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveToHue::Type request;
+        RequestType request;
         request.hue             = 200;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(1);
         request.transitionTime  = 100U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -5852,24 +5849,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveToHue::Type request;
+        RequestType request;
         request.hue             = 250;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(2);
         request.transitionTime  = 100U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -5881,24 +5877,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveToHue::Type request;
+        RequestType request;
         request.hue             = 225;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(3);
         request.transitionTime  = 100U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -5910,19 +5905,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -6051,19 +6045,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -6092,23 +6085,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
         request.rate            = 50;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -6120,23 +6112,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
         request.rate            = 50;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -6148,23 +6139,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
         request.rate            = 50;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -6176,23 +6166,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
         request.rate            = 50;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -6204,19 +6193,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -6337,19 +6325,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -6378,24 +6365,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::StepHue::Type request;
+        RequestType request;
         request.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
         request.stepSize        = 5;
         request.transitionTime  = 25;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -6407,24 +6393,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::StepHue::Type request;
+        RequestType request;
         request.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(3);
         request.stepSize        = 5;
         request.transitionTime  = 25;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -6436,19 +6421,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -6565,19 +6549,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -6606,23 +6589,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type request;
+        RequestType request;
         request.saturation      = 90;
         request.transitionTime  = 10U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -6634,19 +6616,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_1 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_1 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -6767,19 +6748,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -6808,23 +6788,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(1);
         request.rate            = 5;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -6836,23 +6815,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(3);
         request.rate            = 5;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -6864,19 +6842,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -6997,19 +6974,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -7038,24 +7014,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepSaturation::Type;
 
-        chip::app::Clusters::ColorControl::Commands::StepSaturation::Type request;
+        RequestType request;
         request.stepMode        = static_cast<chip::app::Clusters::ColorControl::SaturationStepMode>(1);
         request.stepSize        = 15;
         request.transitionTime  = 10;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -7067,24 +7042,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepSaturation::Type;
 
-        chip::app::Clusters::ColorControl::Commands::StepSaturation::Type request;
+        RequestType request;
         request.stepMode        = static_cast<chip::app::Clusters::ColorControl::SaturationStepMode>(3);
         request.stepSize        = 20;
         request.transitionTime  = 10;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -7096,19 +7070,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -7225,19 +7198,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_4 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_4 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -7266,24 +7238,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type request;
+        RequestType request;
         request.hue             = 40;
         request.saturation      = 160;
         request.transitionTime  = 10U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_4 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_4 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -7295,19 +7266,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_4 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_4 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -7424,19 +7394,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -7465,24 +7434,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToColor::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToColor::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveToColor::Type request;
+        RequestType request;
         request.colorX          = 200U;
         request.colorY          = 300U;
         request.transitionTime  = 20U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -7494,19 +7462,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_1 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_1 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -7627,19 +7594,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -7668,23 +7634,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveColor::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveColor::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveColor::Type request;
+        RequestType request;
         request.rateX           = 15;
         request.rateY           = 20;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -7696,21 +7661,20 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type;
 
-        chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type request;
+        RequestType request;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -7722,19 +7686,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -7851,19 +7814,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -7892,24 +7854,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepColor::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepColor::Type;
 
-        chip::app::Clusters::ColorControl::Commands::StepColor::Type request;
+        RequestType request;
         request.stepX           = 15;
         request.stepY           = 20;
         request.transitionTime  = 50U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_3 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_3 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -7921,19 +7882,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_3 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_3 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -8050,19 +8010,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -8091,23 +8050,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type request;
+        RequestType request;
         request.colorTemperature = 100U;
         request.transitionTime   = 10U;
         request.optionsMask      = 0;
         request.optionsOverride  = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -8119,19 +8077,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_1 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_1 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -8256,19 +8213,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -8297,10 +8253,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type request;
+        RequestType request;
         request.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
         request.rate                    = 10U;
         request.colorTemperatureMinimum = 1U;
@@ -8308,14 +8263,14 @@ private:
         request.optionsMask             = 0;
         request.optionsOverride         = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -8327,10 +8282,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type request;
+        RequestType request;
         request.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
         request.rate                    = 10U;
         request.colorTemperatureMinimum = 1U;
@@ -8338,14 +8292,14 @@ private:
         request.optionsMask             = 0;
         request.optionsOverride         = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -8357,10 +8311,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
 
-        chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type request;
+        RequestType request;
         request.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
         request.rate                    = 20U;
         request.colorTemperatureMinimum = 1U;
@@ -8368,14 +8321,14 @@ private:
         request.optionsMask             = 0;
         request.optionsOverride         = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -8387,19 +8340,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -8520,19 +8472,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -8561,10 +8512,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type;
 
-        chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type request;
+        RequestType request;
         request.stepMode                = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
         request.stepSize                = 5U;
         request.transitionTime          = 50U;
@@ -8573,14 +8523,14 @@ private:
         request.optionsMask             = 0;
         request.optionsOverride         = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -8592,10 +8542,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type;
 
-        chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type request;
+        RequestType request;
         request.stepMode                = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(3);
         request.stepSize                = 5U;
         request.transitionTime          = 50U;
@@ -8604,14 +8553,14 @@ private:
         request.optionsMask             = 0;
         request.optionsOverride         = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -8623,19 +8572,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -8767,19 +8715,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -8808,24 +8755,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type request;
+        RequestType request;
         request.enhancedHue     = 1025U;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
         request.transitionTime  = 1U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -8854,19 +8800,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_1 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -8995,19 +8940,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -9036,23 +8980,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
         request.rate            = 5U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -9064,23 +9007,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
         request.rate            = 0U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -9092,23 +9034,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
         request.rate            = 50U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -9120,23 +9061,22 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
         request.rate            = 0U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -9148,19 +9088,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -9281,19 +9220,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -9322,24 +9260,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type request;
+        RequestType request;
         request.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(0);
         request.stepSize        = 50U;
         request.transitionTime  = 1U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -9351,24 +9288,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type request;
+        RequestType request;
         request.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
         request.stepSize        = 75U;
         request.transitionTime  = 1U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -9380,19 +9316,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -9509,19 +9444,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_4 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_4 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -9550,24 +9484,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type;
 
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type request;
+        RequestType request;
         request.enhancedHue     = 1200U;
         request.saturation      = 90;
         request.transitionTime  = 10U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_4 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_4 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -9579,19 +9512,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_4 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_4 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -9832,19 +9764,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -9873,10 +9804,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(14);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
@@ -9885,14 +9815,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -9972,10 +9902,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -9984,14 +9913,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_7();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -10020,10 +9949,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(6);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10032,14 +9960,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_9();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_9(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -10085,10 +10013,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
@@ -10097,14 +10024,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_12();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_12(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
@@ -10133,19 +10060,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_14();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_14(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
@@ -10536,19 +10462,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -10577,10 +10502,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10589,14 +10513,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -10625,10 +10549,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10637,14 +10560,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -10673,10 +10596,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10685,14 +10607,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -10721,10 +10643,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(8);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10733,14 +10654,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_8();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_8(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -10769,10 +10690,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10781,14 +10701,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_10();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_10(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -10817,10 +10737,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10829,14 +10748,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_12();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_12(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
@@ -10865,10 +10784,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
@@ -10877,14 +10795,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_14();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_14(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
@@ -10913,10 +10831,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10925,14 +10842,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_16();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_16(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_16(uint8_t status) { ThrowFailureResponse(); }
@@ -10961,10 +10878,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10973,14 +10889,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_18();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_18(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_18(uint8_t status) { ThrowFailureResponse(); }
@@ -11009,24 +10925,23 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
 
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type request;
+        RequestType request;
         request.enhancedHue     = 40960U;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
         request.transitionTime  = 0U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_20();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_20(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
@@ -11057,10 +10972,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11069,14 +10983,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_23();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_23(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_23(uint8_t status) { ThrowFailureResponse(); }
@@ -11105,10 +11019,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(2);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11117,14 +11030,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_25();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_25(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_25(uint8_t status) { ThrowFailureResponse(); }
@@ -11153,10 +11066,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11165,14 +11077,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_27();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_27(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_27(uint8_t status) { ThrowFailureResponse(); }
@@ -11201,10 +11113,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
@@ -11213,14 +11124,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_29();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_29(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_29(uint8_t status) { ThrowFailureResponse(); }
@@ -11249,10 +11160,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(2);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11261,14 +11171,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_31();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_31(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_31(uint8_t status) { ThrowFailureResponse(); }
@@ -11297,10 +11207,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11309,14 +11218,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_33();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_33(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_33(uint8_t status) { ThrowFailureResponse(); }
@@ -11345,19 +11254,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_35();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_35(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_35(uint8_t status) { ThrowFailureResponse(); }
@@ -11553,19 +11461,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -11594,10 +11501,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11606,14 +11512,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -11693,10 +11599,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11705,14 +11610,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_7();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -11741,10 +11646,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
@@ -11753,14 +11657,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_9();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_9(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -11789,10 +11693,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11801,14 +11704,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_11();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_11(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
@@ -11837,19 +11740,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_13();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_13(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
@@ -12045,19 +11947,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -12086,10 +11987,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -12098,14 +11998,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -12185,10 +12085,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -12197,14 +12096,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_7();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -12233,10 +12132,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -12245,14 +12143,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_9();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_9(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -12281,10 +12179,9 @@ private:
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -12293,14 +12190,14 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_11();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_11(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
@@ -12329,19 +12226,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_13();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_13(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
@@ -14080,23 +13976,22 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
-        chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type request;
+        RequestType request;
         request.level          = 64;
         request.transitionTime = 0U;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -14127,23 +14022,22 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
-        chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type request;
+        RequestType request;
         request.level          = 128;
         request.transitionTime = 1U;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -14191,23 +14085,22 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
-        chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type request;
+        RequestType request;
         request.level          = 254;
         request.transitionTime = 65535U;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_8();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_8(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -14238,23 +14131,22 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
-        chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type request;
+        RequestType request;
         request.level          = 0;
         request.transitionTime = 0U;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_11();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_11(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
@@ -14483,23 +14375,22 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Move::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
-        chip::app::Clusters::LevelControl::Commands::Move::Type request;
+        RequestType request;
         request.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(0);
         request.rate           = 200;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -14547,23 +14438,22 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Move::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
-        chip::app::Clusters::LevelControl::Commands::Move::Type request;
+        RequestType request;
         request.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(1);
         request.rate           = 250;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -14627,23 +14517,22 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Move::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
-        chip::app::Clusters::LevelControl::Commands::Move::Type request;
+        RequestType request;
         request.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(1);
         request.rate           = 255;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_11();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_11(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
@@ -14796,19 +14685,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -14820,24 +14708,23 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Step::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
-        chip::app::Clusters::LevelControl::Commands::Step::Type request;
+        RequestType request;
         request.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(0);
         request.stepSize       = 128;
         request.transitionTime = 20U;
         request.optionMask     = 0;
         request.optionOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -14868,24 +14755,23 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Step::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
-        chip::app::Clusters::LevelControl::Commands::Step::Type request;
+        RequestType request;
         request.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(1);
         request.stepSize       = 64;
         request.transitionTime = 20U;
         request.optionMask     = 0;
         request.optionOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -14916,24 +14802,23 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Step::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
-        chip::app::Clusters::LevelControl::Commands::Step::Type request;
+        RequestType request;
         request.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(0);
         request.stepSize       = 64;
         request.transitionTime = 20U;
         request.optionMask     = 0;
         request.optionOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_7();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -14964,19 +14849,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_10();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_10(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -15064,19 +14948,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -15088,24 +14971,23 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Step::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
-        chip::app::Clusters::LevelControl::Commands::Step::Type request;
+        RequestType request;
         request.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(0);
         request.stepSize       = 128;
         request.transitionTime = 20U;
         request.optionMask     = 0;
         request.optionOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -15119,23 +15001,22 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Move::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
-        chip::app::Clusters::LevelControl::Commands::Move::Type request;
+        RequestType request;
         request.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(0);
         request.rate           = 1;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -15149,21 +15030,20 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Stop::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Stop::Type;
 
-        chip::app::Clusters::LevelControl::Commands::Stop::Type request;
+        RequestType request;
         request.optionMask     = 0;
         request.optionOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -15175,19 +15055,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -15327,19 +15206,18 @@ private:
         chip::Controller::LowPowerClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LowPower::Commands::Sleep::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LowPower::Commands::Sleep::Type;
 
-        chip::app::Clusters::LowPower::Commands::Sleep::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_MC_2_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_MC_2_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -17228,19 +17106,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -17269,19 +17146,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -17310,19 +17186,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -17351,19 +17226,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Toggle::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Toggle::Type;
 
-        chip::app::Clusters::OnOff::Commands::Toggle::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -17392,19 +17266,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Toggle::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Toggle::Type;
 
-        chip::app::Clusters::OnOff::Commands::Toggle::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_8();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_8(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -17433,19 +17306,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_10();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_10(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -17474,19 +17346,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_12();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_12(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
@@ -18077,19 +17948,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -18137,19 +18007,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -18197,19 +18066,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_8();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_8(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -18291,19 +18159,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_14();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_14(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
@@ -18366,19 +18233,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_18();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_18(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_18(uint8_t status) { ThrowFailureResponse(); }
@@ -18475,19 +18341,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_24();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_24(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_24(uint8_t status) { ThrowFailureResponse(); }
@@ -18533,19 +18398,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_27();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_27(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_27(uint8_t status) { ThrowFailureResponse(); }
@@ -18625,19 +18489,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_32();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_32(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_32(uint8_t status) { ThrowFailureResponse(); }
@@ -18700,19 +18563,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_36();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_36(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_36(uint8_t status) { ThrowFailureResponse(); }
@@ -18860,19 +18722,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_45();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_45(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_45(uint8_t status) { ThrowFailureResponse(); }
@@ -24515,19 +24376,18 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
 
-        chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -24539,19 +24399,18 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
 
-        chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -24650,19 +24509,18 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
 
-        chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -24674,19 +24532,18 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
 
-        chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -24785,19 +24642,18 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
 
-        chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -24809,19 +24665,18 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::WindowCovering::Commands::StopMotion::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::WindowCovering::Commands::StopMotion::Type;
 
-        chip::app::Clusters::WindowCovering::Commands::StopMotion::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -24945,21 +24800,20 @@ private:
         chip::Controller::TargetNavigatorClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type;
-        using responseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type;
 
-        chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type request;
+        RequestType request;
         request.target = 1;
         request.data   = chip::Span<const char>("1", strlen("1"));
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_1(data.status, data.data);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_TargetNavigatorCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -25076,20 +24930,19 @@ private:
         chip::Controller::AudioOutputClusterTest cluster;
         cluster.Associate(mDevice, 2);
 
-        using requestType  = chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type;
 
-        chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type request;
+        RequestType request;
         request.index = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -25101,21 +24954,20 @@ private:
         chip::Controller::AudioOutputClusterTest cluster;
         cluster.Associate(mDevice, 2);
 
-        using requestType  = chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type;
 
-        chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type request;
+        RequestType request;
         request.index = 1;
         request.name  = chip::Span<const char>("exampleName", strlen("exampleName"));
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -25243,22 +25095,21 @@ private:
         chip::Controller::ApplicationLauncherClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type;
-        using responseType = chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType;
+        using RequestType = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type;
 
-        chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type request;
+        RequestType request;
         request.data            = chip::Span<const char>("exampleData", strlen("exampleData"));
         request.catalogVendorId = 1U;
         request.applicationId   = chip::Span<const char>("appId", strlen("appId"));
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_1(data.status, data.data);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -25360,20 +25211,19 @@ private:
         chip::Controller::KeypadInputClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::KeypadInput::Commands::SendKey::Type;
-        using responseType = chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType;
+        using RequestType = chip::app::Clusters::KeypadInput::Commands::SendKey::Type;
 
-        chip::app::Clusters::KeypadInput::Commands::SendKey::Type request;
+        RequestType request;
         request.keyCode = static_cast<chip::app::Clusters::KeypadInput::KeypadInputCecKeyCode>(3);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_KeypadInputCluster *>(context))->OnSuccessResponse_0(data.status);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_KeypadInputCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -25441,20 +25291,19 @@ private:
         chip::Controller::AccountLoginClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type;
-        using responseType = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType;
+        using RequestType = chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type;
 
-        chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type request;
+        RequestType request;
         request.tempAccountIdentifier = chip::Span<const char>("asdf", strlen("asdf"));
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_AccountLoginCluster *>(context))->OnSuccessResponse_0(data.setupPIN);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_AccountLoginCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -25466,21 +25315,20 @@ private:
         chip::Controller::AccountLoginClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::AccountLogin::Commands::Login::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::AccountLogin::Commands::Login::Type;
 
-        chip::app::Clusters::AccountLogin::Commands::Login::Type request;
+        RequestType request;
         request.tempAccountIdentifier = chip::Span<const char>("asdf", strlen("asdf"));
         request.setupPIN              = chip::Span<const char>("tempPin123", strlen("tempPin123"));
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_AccountLoginCluster *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_AccountLoginCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -25665,20 +25513,19 @@ private:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type;
 
-        chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type request;
+        RequestType request;
         request.status = static_cast<chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus>(1);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -25833,19 +25680,18 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType;
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_0(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -25861,19 +25707,18 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType;
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_1(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -25889,19 +25734,18 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType;
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_2(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -25917,19 +25761,18 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType;
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_3(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -25945,19 +25788,18 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType;
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_4(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -25973,19 +25815,18 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType;
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_5(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -26001,19 +25842,18 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType;
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_6(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -26029,19 +25869,18 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType;
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_7(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -26057,20 +25896,19 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType;
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type request;
+        RequestType request;
         request.deltaPositionMilliseconds = 100ULL;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_8(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_8(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -26086,20 +25924,19 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType;
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type request;
+        RequestType request;
         request.deltaPositionMilliseconds = 100ULL;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_9(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_9(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -26115,20 +25952,19 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType;
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type request;
+        RequestType request;
         request.position = 100ULL;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_10(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_10(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -26249,21 +26085,20 @@ private:
         chip::Controller::TvChannelClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type;
 
-        chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type request;
+        RequestType request;
         request.majorNumber = 1U;
         request.minorNumber = 2U;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_TvChannelCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -26275,20 +26110,19 @@ private:
         chip::Controller::TvChannelClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TvChannel::Commands::SkipChannel::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::TvChannel::Commands::SkipChannel::Type;
 
-        chip::app::Clusters::TvChannel::Commands::SkipChannel::Type request;
+        RequestType request;
         request.count = 1U;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_TvChannelCluster *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -26352,19 +26186,18 @@ private:
         chip::Controller::LowPowerClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::LowPower::Commands::Sleep::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::LowPower::Commands::Sleep::Type;
 
-        chip::app::Clusters::LowPower::Commands::Sleep::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_LowPowerCluster *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_LowPowerCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -26501,20 +26334,19 @@ private:
         chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::MediaInput::Commands::SelectInput::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::MediaInput::Commands::SelectInput::Type;
 
-        chip::app::Clusters::MediaInput::Commands::SelectInput::Type request;
+        RequestType request;
         request.index = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -26543,19 +26375,18 @@ private:
         chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type;
 
-        chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -26567,19 +26398,18 @@ private:
         chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type;
 
-        chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -26591,21 +26421,20 @@ private:
         chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::MediaInput::Commands::RenameInput::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::MediaInput::Commands::RenameInput::Type;
 
-        chip::app::Clusters::MediaInput::Commands::RenameInput::Type request;
+        RequestType request;
         request.index = 1;
         request.name  = chip::Span<const char>("newName", strlen("newName"));
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -28223,19 +28052,18 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::Test::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::Test::Type;
 
-        chip::app::Clusters::TestCluster::Commands::Test::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -28247,19 +28075,18 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { NextTest(); }
@@ -28271,19 +28098,18 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestSpecific::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestSpecific::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestSpecific::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))->OnSuccessResponse_2(data.returnValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestCluster *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -28299,21 +28125,20 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type request;
+        RequestType request;
         request.arg1 = 3;
         request.arg2 = 17;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))->OnSuccessResponse_3(data.returnValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestCluster *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -28329,21 +28154,20 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type request;
+        RequestType request;
         request.arg1 = 250;
         request.arg2 = 6;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))->OnSuccessResponse_4(data.returnValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestCluster *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { NextTest(); }
@@ -30339,19 +30163,18 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 200);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::Test::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::Test::Type;
 
-        chip::app::Clusters::TestCluster::Commands::Test::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))->OnSuccessResponse_121();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestCluster *>(context))->OnFailureResponse_121(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_121(uint8_t status) { NextTest(); }
@@ -30429,21 +30252,20 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type request;
+        RequestType request;
         request.arg1 = static_cast<chip::VendorId>(20003);
         request.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(101);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))->OnSuccessResponse_126(data.arg1, data.arg2);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestCluster *>(context))->OnFailureResponse_126(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_126(uint8_t status) { ThrowFailureResponse(); }
@@ -30557,10 +30379,9 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type request;
+        RequestType request;
 
         request.arg1.a = 0;
         request.arg1.b = true;
@@ -30569,14 +30390,14 @@ private:
         request.arg1.e = chip::Span<const char>("char_string", strlen("char_string"));
         request.arg1.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_0(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -30592,10 +30413,9 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type request;
+        RequestType request;
 
         request.arg1.a = 0;
         request.arg1.b = false;
@@ -30604,14 +30424,14 @@ private:
         request.arg1.e = chip::Span<const char>("char_string", strlen("char_string"));
         request.arg1.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_1(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -30627,10 +30447,9 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
+        RequestType request;
 
         uint8_t arg1List[9];
         arg1List[0]  = 1;
@@ -30644,14 +30463,14 @@ private:
         arg1List[8]  = 9;
         request.arg1 = arg1List;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_2(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -30667,10 +30486,9 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
+        RequestType request;
 
         uint8_t arg1List[10];
         arg1List[0]  = 1;
@@ -30685,14 +30503,14 @@ private:
         arg1List[9]  = 0;
         request.arg1 = arg1List;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_3(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -30708,10 +30526,9 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type request;
+        RequestType request;
 
         uint8_t arg1List[9];
         arg1List[0]  = 1;
@@ -30725,14 +30542,14 @@ private:
         arg1List[8]  = 9;
         request.arg1 = arg1List;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_4(data.arg1);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -30767,21 +30584,20 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type request;
+        RequestType request;
 
         request.arg1 = chip::app::DataModel::List<uint8_t>();
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_5(data.arg1);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -30798,10 +30614,9 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type request;
+        RequestType request;
 
         chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type arg1List[2];
 
@@ -30821,14 +30636,14 @@ private:
 
         request.arg1 = arg1List;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_6(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -30844,10 +30659,9 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type request;
+        RequestType request;
 
         chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type arg1List[2];
 
@@ -30867,14 +30681,14 @@ private:
 
         request.arg1 = arg1List;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_7(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -30890,13 +30704,12 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
+        RequestType request;
         request.arg1.Emplace().SetNonNull() = 5;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))
                 ->OnSuccessResponse_8(data.wasPresent, data.wasNull, data.value, data.originalValue);
         };
@@ -30904,7 +30717,7 @@ private:
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_8(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -30931,12 +30744,11 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))
                 ->OnSuccessResponse_9(data.wasPresent, data.wasNull, data.value, data.originalValue);
         };
@@ -30944,7 +30756,7 @@ private:
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_9(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -30962,13 +30774,12 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
 
-        chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
+        RequestType request;
         request.arg1.Emplace().SetNull();
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))
                 ->OnSuccessResponse_10(data.wasPresent, data.wasNull, data.value, data.originalValue);
         };
@@ -30976,7 +30787,7 @@ private:
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_10(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -31713,20 +31524,19 @@ private:
         chip::Controller::IdentifyClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
-        using requestType  = chip::app::Clusters::Identify::Commands::Identify::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::Identify::Commands::Identify::Type;
 
-        chip::app::Clusters::Identify::Commands::Identify::Type request;
+        RequestType request;
         request.identifyTime = 0U;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestIdentifyCluster *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestIdentifyCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -32125,20 +31935,19 @@ private:
         chip::Controller::ModeSelectClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
 
-        chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type request;
+        RequestType request;
         request.newMode = 4;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -32167,20 +31976,19 @@ private:
         chip::Controller::ModeSelectClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
 
-        chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type request;
+        RequestType request;
         request.newMode = 2;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_7();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_7(uint8_t status) { NextTest(); }
@@ -32473,19 +32281,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -32540,19 +32347,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -32583,19 +32389,18 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
+        RequestType request;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.InvokeCommand(request, this, success, failure);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }

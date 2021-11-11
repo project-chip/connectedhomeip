@@ -30,77 +30,79 @@ using namespace Encoding::LittleEndian;
 
 namespace Controller {
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Move::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Move::Type>(
     const chip::app::Clusters::LevelControl::Commands::Move::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::Move::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type>(
     const chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type,
-                                               chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type>(
     const chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type>(
     const chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Step::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Step::Type>(
     const chip::app::Clusters::LevelControl::Commands::Step::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::Step::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type>(
     const chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Stop::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Stop::Type>(
     const chip::app::Clusters::LevelControl::Commands::Stop::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::Stop::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type>(
     const chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Off::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Off::Type>(
     const chip::app::Clusters::OnOff::Commands::Off::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::OnOff::Commands::Off::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::On::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::On::Type>(
     const chip::app::Clusters::OnOff::Commands::On::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::OnOff::Commands::On::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Toggle::Type, chip::app::DataModel::NullObjectType>(
+template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Toggle::Type>(
     const chip::app::Clusters::OnOff::Commands::Toggle::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    CommandResponseSuccessCallback<typename chip::app::Clusters::OnOff::Commands::Toggle::Type::ResponseType>,
+    CommandResponseFailureCallback);
 
-template <typename RequestDataT, typename ResponseDataT>
+template <typename RequestDataT>
 CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
-                                      CommandResponseSuccessCallback<ResponseDataT> successCb,
+                                      CommandResponseSuccessCallback<typename RequestDataT::ResponseType> successCb,
                                       CommandResponseFailureCallback failureCb)
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
-                                            const ResponseDataT & responseData) { successCb(context, responseData); };
+                                            const typename RequestDataT::ResponseType & responseData) {
+        successCb(context, responseData);
+    };
 
     auto onFailureCb = [context, failureCb](const app::StatusIB & aStatus, CHIP_ERROR aError) {
         failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
     };
 
-    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                               requestData, onSuccessCb, onFailureCb);
+    return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
+                                onSuccessCb, onFailureCb);
 };
 
 } // namespace Controller

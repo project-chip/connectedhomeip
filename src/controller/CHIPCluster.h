@@ -62,9 +62,10 @@ public:
      * Success and Failure callbacks must be passed in through which the decoded response is provided as well as notification of any
      * failure.
      */
-    template <typename RequestDataT, typename ResponseDataT>
+    template <typename RequestDataT>
     CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
-                             CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb);
+                             CommandResponseSuccessCallback<typename RequestDataT::ResponseType> successCb,
+                             CommandResponseFailureCallback failureCb);
 
     /**
      * Functions for writing attributes.  We have lots of different

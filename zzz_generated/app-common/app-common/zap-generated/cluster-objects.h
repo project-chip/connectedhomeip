@@ -28,6 +28,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
+#include <app/data-model/NullObject.h>
 #include <app/util/basic-types.h>
 #include <lib/support/BitFlags.h>
 #include <protocols/interaction_model/Constants.h>
@@ -862,6 +863,31 @@ using IdentifyIdentifyType                 = EmberAfIdentifyIdentifyType;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Identify {
+struct Type;
+struct DecodableType;
+} // namespace Identify
+
+namespace IdentifyQueryResponse {
+struct Type;
+struct DecodableType;
+} // namespace IdentifyQueryResponse
+
+namespace IdentifyQuery {
+struct Type;
+struct DecodableType;
+} // namespace IdentifyQuery
+
+namespace TriggerEffect {
+struct Type;
+struct DecodableType;
+} // namespace TriggerEffect
+
+} // namespace Commands
+
+namespace Commands {
 namespace Identify {
 enum class Fields
 {
@@ -878,6 +904,8 @@ public:
     uint16_t identifyTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -906,6 +934,8 @@ public:
     uint16_t timeout;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -931,6 +961,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType;
 };
 
 struct DecodableType
@@ -960,6 +992,8 @@ public:
     IdentifyEffectVariant effectVariant;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1025,6 +1059,61 @@ struct TypeInfo
 namespace Groups {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace AddGroup {
+struct Type;
+struct DecodableType;
+} // namespace AddGroup
+
+namespace AddGroupResponse {
+struct Type;
+struct DecodableType;
+} // namespace AddGroupResponse
+
+namespace ViewGroup {
+struct Type;
+struct DecodableType;
+} // namespace ViewGroup
+
+namespace ViewGroupResponse {
+struct Type;
+struct DecodableType;
+} // namespace ViewGroupResponse
+
+namespace GetGroupMembership {
+struct Type;
+struct DecodableType;
+} // namespace GetGroupMembership
+
+namespace GetGroupMembershipResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetGroupMembershipResponse
+
+namespace RemoveGroup {
+struct Type;
+struct DecodableType;
+} // namespace RemoveGroup
+
+namespace RemoveGroupResponse {
+struct Type;
+struct DecodableType;
+} // namespace RemoveGroupResponse
+
+namespace RemoveAllGroups {
+struct Type;
+struct DecodableType;
+} // namespace RemoveAllGroups
+
+namespace AddGroupIfIdentifying {
+struct Type;
+struct DecodableType;
+} // namespace AddGroupIfIdentifying
+
+} // namespace Commands
+
+namespace Commands {
 namespace AddGroup {
 enum class Fields
 {
@@ -1043,6 +1132,8 @@ public:
     chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Groups::Commands::AddGroupResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1074,6 +1165,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1103,6 +1196,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1135,6 +1230,8 @@ public:
     chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1167,6 +1264,8 @@ public:
     DataModel::List<const uint16_t> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1200,6 +1299,8 @@ public:
     DataModel::List<const uint16_t> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1230,6 +1331,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Groups::Commands::RemoveGroupResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1260,6 +1363,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1286,6 +1391,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1315,6 +1422,8 @@ public:
     chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1400,6 +1509,106 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace AddScene {
+struct Type;
+struct DecodableType;
+} // namespace AddScene
+
+namespace AddSceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace AddSceneResponse
+
+namespace ViewScene {
+struct Type;
+struct DecodableType;
+} // namespace ViewScene
+
+namespace ViewSceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace ViewSceneResponse
+
+namespace RemoveScene {
+struct Type;
+struct DecodableType;
+} // namespace RemoveScene
+
+namespace RemoveSceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace RemoveSceneResponse
+
+namespace RemoveAllScenes {
+struct Type;
+struct DecodableType;
+} // namespace RemoveAllScenes
+
+namespace RemoveAllScenesResponse {
+struct Type;
+struct DecodableType;
+} // namespace RemoveAllScenesResponse
+
+namespace StoreScene {
+struct Type;
+struct DecodableType;
+} // namespace StoreScene
+
+namespace StoreSceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace StoreSceneResponse
+
+namespace RecallScene {
+struct Type;
+struct DecodableType;
+} // namespace RecallScene
+
+namespace GetSceneMembership {
+struct Type;
+struct DecodableType;
+} // namespace GetSceneMembership
+
+namespace GetSceneMembershipResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetSceneMembershipResponse
+
+namespace EnhancedAddScene {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedAddScene
+
+namespace EnhancedAddSceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedAddSceneResponse
+
+namespace EnhancedViewScene {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedViewScene
+
+namespace EnhancedViewSceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedViewSceneResponse
+
+namespace CopyScene {
+struct Type;
+struct DecodableType;
+} // namespace CopyScene
+
+namespace CopySceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace CopySceneResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace AddScene {
 enum class Fields
 {
@@ -1424,6 +1633,8 @@ public:
     DataModel::List<const Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::AddSceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1460,6 +1671,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1492,6 +1705,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::ViewSceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1531,6 +1746,8 @@ public:
     DataModel::List<const Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1566,6 +1783,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1599,6 +1818,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1629,6 +1850,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1659,6 +1882,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1690,6 +1915,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::StoreSceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1723,6 +1950,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1757,6 +1986,8 @@ public:
     uint16_t transitionTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1787,6 +2018,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1823,6 +2056,8 @@ public:
     DataModel::List<const uint8_t> sceneList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1863,6 +2098,8 @@ public:
     DataModel::List<const Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1899,6 +2136,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1931,6 +2170,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1970,6 +2211,8 @@ public:
     DataModel::List<const Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2011,6 +2254,8 @@ public:
     uint8_t sceneIdTo;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::CopySceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -2047,6 +2292,8 @@ public:
     uint8_t sceneIdFrom;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2199,6 +2446,66 @@ enum class OnOffControl : uint8_t
 };
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Off {
+struct Type;
+struct DecodableType;
+} // namespace Off
+
+namespace SampleMfgSpecificOffWithTransition {
+struct Type;
+struct DecodableType;
+} // namespace SampleMfgSpecificOffWithTransition
+
+namespace On {
+struct Type;
+struct DecodableType;
+} // namespace On
+
+namespace SampleMfgSpecificOnWithTransition {
+struct Type;
+struct DecodableType;
+} // namespace SampleMfgSpecificOnWithTransition
+
+namespace SampleMfgSpecificOnWithTransition2 {
+struct Type;
+struct DecodableType;
+} // namespace SampleMfgSpecificOnWithTransition2
+
+namespace Toggle {
+struct Type;
+struct DecodableType;
+} // namespace Toggle
+
+namespace SampleMfgSpecificToggleWithTransition {
+struct Type;
+struct DecodableType;
+} // namespace SampleMfgSpecificToggleWithTransition
+
+namespace SampleMfgSpecificToggleWithTransition2 {
+struct Type;
+struct DecodableType;
+} // namespace SampleMfgSpecificToggleWithTransition2
+
+namespace OffWithEffect {
+struct Type;
+struct DecodableType;
+} // namespace OffWithEffect
+
+namespace OnWithRecallGlobalScene {
+struct Type;
+struct DecodableType;
+} // namespace OnWithRecallGlobalScene
+
+namespace OnWithTimedOff {
+struct Type;
+struct DecodableType;
+} // namespace OnWithTimedOff
+
+} // namespace Commands
+
+namespace Commands {
 namespace Off {
 enum class Fields
 {
@@ -2212,6 +2519,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2236,6 +2545,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2260,6 +2571,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2284,6 +2597,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2308,6 +2623,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2332,6 +2649,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2356,6 +2675,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2380,6 +2701,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2409,6 +2732,8 @@ public:
     OnOffDelayedAllOffEffectVariant effectVariant;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2435,6 +2760,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2466,6 +2793,8 @@ public:
     uint16_t offWaitTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2682,6 +3011,51 @@ using StepMode                             = EmberAfStepMode;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace MoveToLevel {
+struct Type;
+struct DecodableType;
+} // namespace MoveToLevel
+
+namespace Move {
+struct Type;
+struct DecodableType;
+} // namespace Move
+
+namespace Step {
+struct Type;
+struct DecodableType;
+} // namespace Step
+
+namespace Stop {
+struct Type;
+struct DecodableType;
+} // namespace Stop
+
+namespace MoveToLevelWithOnOff {
+struct Type;
+struct DecodableType;
+} // namespace MoveToLevelWithOnOff
+
+namespace MoveWithOnOff {
+struct Type;
+struct DecodableType;
+} // namespace MoveWithOnOff
+
+namespace StepWithOnOff {
+struct Type;
+struct DecodableType;
+} // namespace StepWithOnOff
+
+namespace StopWithOnOff {
+struct Type;
+struct DecodableType;
+} // namespace StopWithOnOff
+
+} // namespace Commands
+
+namespace Commands {
 namespace MoveToLevel {
 enum class Fields
 {
@@ -2704,6 +3078,8 @@ public:
     uint8_t optionOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2741,6 +3117,8 @@ public:
     uint8_t optionOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2780,6 +3158,8 @@ public:
     uint8_t optionOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2814,6 +3194,8 @@ public:
     uint8_t optionOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2845,6 +3227,8 @@ public:
     uint16_t transitionTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2876,6 +3260,8 @@ public:
     uint8_t rate;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2909,6 +3295,8 @@ public:
     uint16_t transitionTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2936,6 +3324,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3131,6 +3521,41 @@ struct TypeInfo
 namespace Alarms {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetAlarm {
+struct Type;
+struct DecodableType;
+} // namespace ResetAlarm
+
+namespace Alarm {
+struct Type;
+struct DecodableType;
+} // namespace Alarm
+
+namespace ResetAllAlarms {
+struct Type;
+struct DecodableType;
+} // namespace ResetAllAlarms
+
+namespace GetAlarmResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetAlarmResponse
+
+namespace GetAlarm {
+struct Type;
+struct DecodableType;
+} // namespace GetAlarm
+
+namespace ResetAlarmLog {
+struct Type;
+struct DecodableType;
+} // namespace ResetAlarmLog
+
+} // namespace Commands
+
+namespace Commands {
 namespace ResetAlarm {
 enum class Fields
 {
@@ -3149,6 +3574,8 @@ public:
     chip::ClusterId clusterId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3180,6 +3607,8 @@ public:
     chip::ClusterId clusterId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3206,6 +3635,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3239,6 +3670,8 @@ public:
     uint32_t timeStamp;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3267,6 +3700,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Alarms::Commands::GetAlarmResponse::DecodableType;
 };
 
 struct DecodableType
@@ -3291,6 +3726,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3681,6 +4118,116 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace PowerProfileRequest {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileRequest
+
+namespace PowerProfileNotification {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileNotification
+
+namespace PowerProfileStateRequest {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileStateRequest
+
+namespace PowerProfileResponse {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileResponse
+
+namespace GetPowerProfilePriceResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetPowerProfilePriceResponse
+
+namespace PowerProfileStateResponse {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileStateResponse
+
+namespace GetOverallSchedulePriceResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetOverallSchedulePriceResponse
+
+namespace GetPowerProfilePrice {
+struct Type;
+struct DecodableType;
+} // namespace GetPowerProfilePrice
+
+namespace EnergyPhasesScheduleNotification {
+struct Type;
+struct DecodableType;
+} // namespace EnergyPhasesScheduleNotification
+
+namespace PowerProfilesStateNotification {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfilesStateNotification
+
+namespace EnergyPhasesScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace EnergyPhasesScheduleResponse
+
+namespace GetOverallSchedulePrice {
+struct Type;
+struct DecodableType;
+} // namespace GetOverallSchedulePrice
+
+namespace PowerProfileScheduleConstraintsRequest {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileScheduleConstraintsRequest
+
+namespace EnergyPhasesScheduleRequest {
+struct Type;
+struct DecodableType;
+} // namespace EnergyPhasesScheduleRequest
+
+namespace EnergyPhasesScheduleStateRequest {
+struct Type;
+struct DecodableType;
+} // namespace EnergyPhasesScheduleStateRequest
+
+namespace EnergyPhasesScheduleStateResponse {
+struct Type;
+struct DecodableType;
+} // namespace EnergyPhasesScheduleStateResponse
+
+namespace GetPowerProfilePriceExtendedResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetPowerProfilePriceExtendedResponse
+
+namespace EnergyPhasesScheduleStateNotification {
+struct Type;
+struct DecodableType;
+} // namespace EnergyPhasesScheduleStateNotification
+
+namespace PowerProfileScheduleConstraintsNotification {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileScheduleConstraintsNotification
+
+namespace PowerProfileScheduleConstraintsResponse {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileScheduleConstraintsResponse
+
+namespace GetPowerProfilePriceExtended {
+struct Type;
+struct DecodableType;
+} // namespace GetPowerProfilePriceExtended
+
+} // namespace Commands
+
+namespace Commands {
 namespace PowerProfileRequest {
 enum class Fields
 {
@@ -3697,6 +4244,8 @@ public:
     uint8_t powerProfileId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::PowerProfileResponse::DecodableType;
 };
 
 struct DecodableType
@@ -3731,6 +4280,8 @@ public:
     DataModel::List<const Structs::TransferredPhase::Type> transferredPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3759,6 +4310,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::PowerProfileStateResponse::DecodableType;
 };
 
 struct DecodableType
@@ -3792,6 +4345,8 @@ public:
     DataModel::List<const Structs::TransferredPhase::Type> transferredPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3829,6 +4384,8 @@ public:
     uint8_t priceTrailingDigit;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3862,6 +4419,8 @@ public:
     DataModel::List<const Structs::PowerProfileRecord::Type> powerProfileRecords;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3895,6 +4454,8 @@ public:
     uint8_t priceTrailingDigit;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3925,6 +4486,8 @@ public:
     uint8_t powerProfileId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::GetPowerProfilePriceResponse::DecodableType;
 };
 
 struct DecodableType
@@ -3957,6 +4520,8 @@ public:
     DataModel::List<const Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3989,6 +4554,8 @@ public:
     DataModel::List<const Structs::PowerProfileRecord::Type> powerProfileRecords;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4022,6 +4589,8 @@ public:
     DataModel::List<const Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4049,6 +4618,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::GetOverallSchedulePriceResponse::DecodableType;
 };
 
 struct DecodableType
@@ -4076,6 +4647,8 @@ public:
     uint8_t powerProfileId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::PowerProfileScheduleConstraintsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -4104,6 +4677,8 @@ public:
     uint8_t powerProfileId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::EnergyPhasesScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -4132,6 +4707,8 @@ public:
     uint8_t powerProfileId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::EnergyPhasesScheduleStateResponse::DecodableType;
 };
 
 struct DecodableType
@@ -4164,6 +4741,8 @@ public:
     DataModel::List<const Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4200,6 +4779,8 @@ public:
     uint8_t priceTrailingDigit;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4235,6 +4816,8 @@ public:
     DataModel::List<const Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4269,6 +4852,8 @@ public:
     uint16_t stopBefore;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4303,6 +4888,8 @@ public:
     uint16_t stopBefore;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4337,6 +4924,8 @@ public:
     uint16_t powerProfileStartTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::GetPowerProfilePriceExtendedResponse::DecodableType;
 };
 
 struct DecodableType
@@ -4504,6 +5093,51 @@ enum class RemoteEnableFlagsAndDeviceStatus2 : uint8_t
 };
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ExecutionOfACommand {
+struct Type;
+struct DecodableType;
+} // namespace ExecutionOfACommand
+
+namespace SignalStateResponse {
+struct Type;
+struct DecodableType;
+} // namespace SignalStateResponse
+
+namespace SignalState {
+struct Type;
+struct DecodableType;
+} // namespace SignalState
+
+namespace SignalStateNotification {
+struct Type;
+struct DecodableType;
+} // namespace SignalStateNotification
+
+namespace WriteFunctions {
+struct Type;
+struct DecodableType;
+} // namespace WriteFunctions
+
+namespace OverloadPauseResume {
+struct Type;
+struct DecodableType;
+} // namespace OverloadPauseResume
+
+namespace OverloadPause {
+struct Type;
+struct DecodableType;
+} // namespace OverloadPause
+
+namespace OverloadWarning {
+struct Type;
+struct DecodableType;
+} // namespace OverloadWarning
+
+} // namespace Commands
+
+namespace Commands {
 namespace ExecutionOfACommand {
 enum class Fields
 {
@@ -4520,6 +5154,8 @@ public:
     CommandIdentification commandId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4552,6 +5188,8 @@ public:
     ApplianceStatus applianceStatus2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4579,6 +5217,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ApplianceControl::Commands::SignalStateResponse::DecodableType;
 };
 
 struct DecodableType
@@ -4610,6 +5250,8 @@ public:
     ApplianceStatus applianceStatus2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4644,6 +5286,8 @@ public:
     DataModel::List<const uint8_t> functionData;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4671,6 +5315,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4695,6 +5341,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4722,6 +5370,8 @@ public:
     WarningEvent warningEvent;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4891,6 +5541,36 @@ struct TypeInfo
 namespace PollControl {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace CheckIn {
+struct Type;
+struct DecodableType;
+} // namespace CheckIn
+
+namespace CheckInResponse {
+struct Type;
+struct DecodableType;
+} // namespace CheckInResponse
+
+namespace FastPollStop {
+struct Type;
+struct DecodableType;
+} // namespace FastPollStop
+
+namespace SetLongPollInterval {
+struct Type;
+struct DecodableType;
+} // namespace SetLongPollInterval
+
+namespace SetShortPollInterval {
+struct Type;
+struct DecodableType;
+} // namespace SetShortPollInterval
+
+} // namespace Commands
+
+namespace Commands {
 namespace CheckIn {
 enum class Fields
 {
@@ -4904,6 +5584,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PollControl::Commands::CheckInResponse::DecodableType;
 };
 
 struct DecodableType
@@ -4933,6 +5615,8 @@ public:
     uint16_t fastPollTimeout;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4959,6 +5643,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4986,6 +5672,8 @@ public:
     uint32_t newLongPollInterval;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5014,6 +5702,8 @@ public:
     uint16_t newShortPollInterval;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5261,6 +5951,71 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace InstantAction {
+struct Type;
+struct DecodableType;
+} // namespace InstantAction
+
+namespace InstantActionWithTransition {
+struct Type;
+struct DecodableType;
+} // namespace InstantActionWithTransition
+
+namespace StartAction {
+struct Type;
+struct DecodableType;
+} // namespace StartAction
+
+namespace StartActionWithDuration {
+struct Type;
+struct DecodableType;
+} // namespace StartActionWithDuration
+
+namespace StopAction {
+struct Type;
+struct DecodableType;
+} // namespace StopAction
+
+namespace PauseAction {
+struct Type;
+struct DecodableType;
+} // namespace PauseAction
+
+namespace PauseActionWithDuration {
+struct Type;
+struct DecodableType;
+} // namespace PauseActionWithDuration
+
+namespace ResumeAction {
+struct Type;
+struct DecodableType;
+} // namespace ResumeAction
+
+namespace EnableAction {
+struct Type;
+struct DecodableType;
+} // namespace EnableAction
+
+namespace EnableActionWithDuration {
+struct Type;
+struct DecodableType;
+} // namespace EnableActionWithDuration
+
+namespace DisableAction {
+struct Type;
+struct DecodableType;
+} // namespace DisableAction
+
+namespace DisableActionWithDuration {
+struct Type;
+struct DecodableType;
+} // namespace DisableActionWithDuration
+
+} // namespace Commands
+
+namespace Commands {
 namespace InstantAction {
 enum class Fields
 {
@@ -5279,6 +6034,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5312,6 +6069,8 @@ public:
     uint16_t transitionTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5344,6 +6103,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5377,6 +6138,8 @@ public:
     uint32_t duration;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5409,6 +6172,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5440,6 +6205,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5473,6 +6240,8 @@ public:
     uint32_t duration;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5505,6 +6274,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5536,6 +6307,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5569,6 +6342,8 @@ public:
     uint32_t duration;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5601,6 +6376,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5634,6 +6411,8 @@ public:
     uint32_t duration;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5711,6 +6490,31 @@ struct TypeInfo
 namespace Basic {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace StartUp {
+struct Type;
+struct DecodableType;
+} // namespace StartUp
+
+namespace MfgSpecificPing {
+struct Type;
+struct DecodableType;
+} // namespace MfgSpecificPing
+
+namespace ShutDown {
+struct Type;
+struct DecodableType;
+} // namespace ShutDown
+
+namespace Leave {
+struct Type;
+struct DecodableType;
+} // namespace Leave
+
+} // namespace Commands
+
+namespace Commands {
 namespace StartUp {
 enum class Fields
 {
@@ -5724,6 +6528,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5748,6 +6554,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5772,6 +6580,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5796,6 +6606,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6075,6 +6887,36 @@ using OTAQueryStatus                       = EmberAfOTAQueryStatus;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace QueryImage {
+struct Type;
+struct DecodableType;
+} // namespace QueryImage
+
+namespace ApplyUpdateRequest {
+struct Type;
+struct DecodableType;
+} // namespace ApplyUpdateRequest
+
+namespace NotifyUpdateApplied {
+struct Type;
+struct DecodableType;
+} // namespace NotifyUpdateApplied
+
+namespace QueryImageResponse {
+struct Type;
+struct DecodableType;
+} // namespace QueryImageResponse
+
+namespace ApplyUpdateResponse {
+struct Type;
+struct DecodableType;
+} // namespace ApplyUpdateResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace QueryImage {
 enum class Fields
 {
@@ -6105,6 +6947,8 @@ public:
     Optional<chip::ByteSpan> metadataForProvider;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
 };
 
 struct DecodableType
@@ -6142,6 +6986,8 @@ public:
     uint32_t newVersion;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
 };
 
 struct DecodableType
@@ -6173,6 +7019,8 @@ public:
     uint32_t softwareVersion;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6216,6 +7064,8 @@ public:
     Optional<chip::ByteSpan> metadataForRequestor;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6253,6 +7103,8 @@ public:
     uint32_t delayedActionTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6309,6 +7161,16 @@ using OTAAnnouncementReason                = EmberAfOTAAnnouncementReason;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace AnnounceOtaProvider {
+struct Type;
+struct DecodableType;
+} // namespace AnnounceOtaProvider
+
+} // namespace Commands
+
+namespace Commands {
 namespace AnnounceOtaProvider {
 enum class Fields
 {
@@ -6331,6 +7193,8 @@ public:
     Optional<chip::ByteSpan> metadataForNode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6813,6 +7677,41 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ArmFailSafe {
+struct Type;
+struct DecodableType;
+} // namespace ArmFailSafe
+
+namespace ArmFailSafeResponse {
+struct Type;
+struct DecodableType;
+} // namespace ArmFailSafeResponse
+
+namespace SetRegulatoryConfig {
+struct Type;
+struct DecodableType;
+} // namespace SetRegulatoryConfig
+
+namespace SetRegulatoryConfigResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetRegulatoryConfigResponse
+
+namespace CommissioningComplete {
+struct Type;
+struct DecodableType;
+} // namespace CommissioningComplete
+
+namespace CommissioningCompleteResponse {
+struct Type;
+struct DecodableType;
+} // namespace CommissioningCompleteResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace ArmFailSafe {
 enum class Fields
 {
@@ -6833,6 +7732,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType;
 };
 
 struct DecodableType
@@ -6865,6 +7766,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6900,6 +7803,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType;
 };
 
 struct DecodableType
@@ -6933,6 +7838,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6959,6 +7866,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType;
 };
 
 struct DecodableType
@@ -6988,6 +7897,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7152,6 +8063,91 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ScanNetworks {
+struct Type;
+struct DecodableType;
+} // namespace ScanNetworks
+
+namespace ScanNetworksResponse {
+struct Type;
+struct DecodableType;
+} // namespace ScanNetworksResponse
+
+namespace AddWiFiNetwork {
+struct Type;
+struct DecodableType;
+} // namespace AddWiFiNetwork
+
+namespace AddWiFiNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace AddWiFiNetworkResponse
+
+namespace UpdateWiFiNetwork {
+struct Type;
+struct DecodableType;
+} // namespace UpdateWiFiNetwork
+
+namespace UpdateWiFiNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace UpdateWiFiNetworkResponse
+
+namespace AddThreadNetwork {
+struct Type;
+struct DecodableType;
+} // namespace AddThreadNetwork
+
+namespace AddThreadNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace AddThreadNetworkResponse
+
+namespace UpdateThreadNetwork {
+struct Type;
+struct DecodableType;
+} // namespace UpdateThreadNetwork
+
+namespace UpdateThreadNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace UpdateThreadNetworkResponse
+
+namespace RemoveNetwork {
+struct Type;
+struct DecodableType;
+} // namespace RemoveNetwork
+
+namespace RemoveNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace RemoveNetworkResponse
+
+namespace EnableNetwork {
+struct Type;
+struct DecodableType;
+} // namespace EnableNetwork
+
+namespace EnableNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace EnableNetworkResponse
+
+namespace DisableNetwork {
+struct Type;
+struct DecodableType;
+} // namespace DisableNetwork
+
+namespace DisableNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace DisableNetworkResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace ScanNetworks {
 enum class Fields
 {
@@ -7172,6 +8168,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7208,6 +8206,8 @@ public:
     DataModel::List<const Structs::ThreadInterfaceScanResult::Type> threadScanResults;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7245,6 +8245,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7278,6 +8280,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7313,6 +8317,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7346,6 +8352,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7379,6 +8387,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7411,6 +8421,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7444,6 +8456,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7476,6 +8490,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7509,6 +8525,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7541,6 +8559,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7574,6 +8594,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7606,6 +8628,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7639,6 +8663,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7671,6 +8697,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7754,6 +8782,21 @@ using LogsTransferProtocol                 = EmberAfLogsTransferProtocol;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace RetrieveLogsRequest {
+struct Type;
+struct DecodableType;
+} // namespace RetrieveLogsRequest
+
+namespace RetrieveLogsResponse {
+struct Type;
+struct DecodableType;
+} // namespace RetrieveLogsResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace RetrieveLogsRequest {
 enum class Fields
 {
@@ -7774,6 +8817,8 @@ public:
     chip::ByteSpan transferFileDesignator;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7810,6 +8855,8 @@ public:
     uint32_t timeSinceBoot;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -8114,6 +9161,16 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetWatermarks {
+struct Type;
+struct DecodableType;
+} // namespace ResetWatermarks
+
+} // namespace Commands
+
+namespace Commands {
 namespace ResetWatermarks {
 enum class Fields
 {
@@ -8127,6 +9184,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -8386,6 +9445,16 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCounts {
+struct Type;
+struct DecodableType;
+} // namespace ResetCounts
+
+} // namespace Commands
+
+namespace Commands {
 namespace ResetCounts {
 enum class Fields
 {
@@ -8399,6 +9468,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9165,6 +10236,16 @@ using WiFiVersionType                      = EmberAfWiFiVersionType;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCounts {
+struct Type;
+struct DecodableType;
+} // namespace ResetCounts
+
+} // namespace Commands
+
+namespace Commands {
 namespace ResetCounts {
 enum class Fields
 {
@@ -9178,6 +10259,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9382,6 +10465,16 @@ using PHYRateType                          = EmberAfPHYRateType;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCounts {
+struct Type;
+struct DecodableType;
+} // namespace ResetCounts
+
+} // namespace Commands
+
+namespace Commands {
 namespace ResetCounts {
 enum class Fields
 {
@@ -9395,6 +10488,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9535,6 +10630,31 @@ struct TypeInfo
 namespace BridgedDeviceBasic {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace StartUp {
+struct Type;
+struct DecodableType;
+} // namespace StartUp
+
+namespace ShutDown {
+struct Type;
+struct DecodableType;
+} // namespace ShutDown
+
+namespace Leave {
+struct Type;
+struct DecodableType;
+} // namespace Leave
+
+namespace ReachableChanged {
+struct Type;
+struct DecodableType;
+} // namespace ReachableChanged
+
+} // namespace Commands
+
+namespace Commands {
 namespace StartUp {
 enum class Fields
 {
@@ -9548,6 +10668,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9572,6 +10694,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9596,6 +10720,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9620,6 +10746,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9888,6 +11016,26 @@ using StatusCode                           = EmberAfStatusCode;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace OpenCommissioningWindow {
+struct Type;
+struct DecodableType;
+} // namespace OpenCommissioningWindow
+
+namespace OpenBasicCommissioningWindow {
+struct Type;
+struct DecodableType;
+} // namespace OpenBasicCommissioningWindow
+
+namespace RevokeCommissioning {
+struct Type;
+struct DecodableType;
+} // namespace RevokeCommissioning
+
+} // namespace Commands
+
+namespace Commands {
 namespace OpenCommissioningWindow {
 enum class Fields
 {
@@ -9914,6 +11062,8 @@ public:
     uint16_t passcodeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9947,6 +11097,8 @@ public:
     uint16_t commissioningTimeout;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9972,6 +11124,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10084,6 +11238,76 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace AttestationRequest {
+struct Type;
+struct DecodableType;
+} // namespace AttestationRequest
+
+namespace AttestationResponse {
+struct Type;
+struct DecodableType;
+} // namespace AttestationResponse
+
+namespace CertificateChainRequest {
+struct Type;
+struct DecodableType;
+} // namespace CertificateChainRequest
+
+namespace CertificateChainResponse {
+struct Type;
+struct DecodableType;
+} // namespace CertificateChainResponse
+
+namespace OpCSRRequest {
+struct Type;
+struct DecodableType;
+} // namespace OpCSRRequest
+
+namespace OpCSRResponse {
+struct Type;
+struct DecodableType;
+} // namespace OpCSRResponse
+
+namespace AddNOC {
+struct Type;
+struct DecodableType;
+} // namespace AddNOC
+
+namespace UpdateNOC {
+struct Type;
+struct DecodableType;
+} // namespace UpdateNOC
+
+namespace NOCResponse {
+struct Type;
+struct DecodableType;
+} // namespace NOCResponse
+
+namespace UpdateFabricLabel {
+struct Type;
+struct DecodableType;
+} // namespace UpdateFabricLabel
+
+namespace RemoveFabric {
+struct Type;
+struct DecodableType;
+} // namespace RemoveFabric
+
+namespace AddTrustedRootCertificate {
+struct Type;
+struct DecodableType;
+} // namespace AddTrustedRootCertificate
+
+namespace RemoveTrustedRootCertificate {
+struct Type;
+struct DecodableType;
+} // namespace RemoveTrustedRootCertificate
+
+} // namespace Commands
+
+namespace Commands {
 namespace AttestationRequest {
 enum class Fields
 {
@@ -10100,6 +11324,8 @@ public:
     chip::ByteSpan attestationNonce;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10130,6 +11356,8 @@ public:
     chip::ByteSpan signature;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10159,6 +11387,8 @@ public:
     uint8_t certificateType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10187,6 +11417,8 @@ public:
     chip::ByteSpan certificate;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10215,6 +11447,8 @@ public:
     chip::ByteSpan CSRNonce;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10245,6 +11479,8 @@ public:
     chip::ByteSpan attestationSignature;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10282,6 +11518,8 @@ public:
     uint16_t adminVendorId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10316,6 +11554,8 @@ public:
     Optional<chip::ByteSpan> ICACValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10349,6 +11589,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10379,6 +11621,8 @@ public:
     chip::CharSpan label;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10407,6 +11651,8 @@ public:
     uint8_t fabricIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10435,6 +11681,8 @@ public:
     chip::ByteSpan rootCertificate;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10463,6 +11711,8 @@ public:
     chip::ByteSpan trustedRootIdentifier;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10739,6 +11989,16 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ChangeToMode {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToMode
+
+} // namespace Commands
+
+namespace Commands {
 namespace ChangeToMode {
 enum class Fields
 {
@@ -10755,6 +12015,8 @@ public:
     uint8_t newMode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11032,6 +12294,281 @@ enum class DoorLockDayOfWeek : uint8_t
 };
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace LockDoor {
+struct Type;
+struct DecodableType;
+} // namespace LockDoor
+
+namespace LockDoorResponse {
+struct Type;
+struct DecodableType;
+} // namespace LockDoorResponse
+
+namespace UnlockDoor {
+struct Type;
+struct DecodableType;
+} // namespace UnlockDoor
+
+namespace UnlockDoorResponse {
+struct Type;
+struct DecodableType;
+} // namespace UnlockDoorResponse
+
+namespace Toggle {
+struct Type;
+struct DecodableType;
+} // namespace Toggle
+
+namespace ToggleResponse {
+struct Type;
+struct DecodableType;
+} // namespace ToggleResponse
+
+namespace UnlockWithTimeout {
+struct Type;
+struct DecodableType;
+} // namespace UnlockWithTimeout
+
+namespace UnlockWithTimeoutResponse {
+struct Type;
+struct DecodableType;
+} // namespace UnlockWithTimeoutResponse
+
+namespace GetLogRecord {
+struct Type;
+struct DecodableType;
+} // namespace GetLogRecord
+
+namespace GetLogRecordResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetLogRecordResponse
+
+namespace SetPin {
+struct Type;
+struct DecodableType;
+} // namespace SetPin
+
+namespace SetPinResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetPinResponse
+
+namespace GetPin {
+struct Type;
+struct DecodableType;
+} // namespace GetPin
+
+namespace GetPinResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetPinResponse
+
+namespace ClearPin {
+struct Type;
+struct DecodableType;
+} // namespace ClearPin
+
+namespace ClearPinResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearPinResponse
+
+namespace ClearAllPins {
+struct Type;
+struct DecodableType;
+} // namespace ClearAllPins
+
+namespace ClearAllPinsResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearAllPinsResponse
+
+namespace SetUserStatus {
+struct Type;
+struct DecodableType;
+} // namespace SetUserStatus
+
+namespace SetUserStatusResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetUserStatusResponse
+
+namespace GetUserStatus {
+struct Type;
+struct DecodableType;
+} // namespace GetUserStatus
+
+namespace GetUserStatusResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetUserStatusResponse
+
+namespace SetWeekdaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace SetWeekdaySchedule
+
+namespace SetWeekdayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetWeekdayScheduleResponse
+
+namespace GetWeekdaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace GetWeekdaySchedule
+
+namespace GetWeekdayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetWeekdayScheduleResponse
+
+namespace ClearWeekdaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace ClearWeekdaySchedule
+
+namespace ClearWeekdayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearWeekdayScheduleResponse
+
+namespace SetYeardaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace SetYeardaySchedule
+
+namespace SetYeardayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetYeardayScheduleResponse
+
+namespace GetYeardaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace GetYeardaySchedule
+
+namespace GetYeardayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetYeardayScheduleResponse
+
+namespace ClearYeardaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace ClearYeardaySchedule
+
+namespace ClearYeardayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearYeardayScheduleResponse
+
+namespace SetHolidaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace SetHolidaySchedule
+
+namespace SetHolidayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetHolidayScheduleResponse
+
+namespace GetHolidaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace GetHolidaySchedule
+
+namespace GetHolidayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetHolidayScheduleResponse
+
+namespace ClearHolidaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace ClearHolidaySchedule
+
+namespace ClearHolidayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearHolidayScheduleResponse
+
+namespace SetUserType {
+struct Type;
+struct DecodableType;
+} // namespace SetUserType
+
+namespace SetUserTypeResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetUserTypeResponse
+
+namespace GetUserType {
+struct Type;
+struct DecodableType;
+} // namespace GetUserType
+
+namespace GetUserTypeResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetUserTypeResponse
+
+namespace SetRfid {
+struct Type;
+struct DecodableType;
+} // namespace SetRfid
+
+namespace SetRfidResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetRfidResponse
+
+namespace GetRfid {
+struct Type;
+struct DecodableType;
+} // namespace GetRfid
+
+namespace GetRfidResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetRfidResponse
+
+namespace ClearRfid {
+struct Type;
+struct DecodableType;
+} // namespace ClearRfid
+
+namespace ClearRfidResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearRfidResponse
+
+namespace ClearAllRfids {
+struct Type;
+struct DecodableType;
+} // namespace ClearAllRfids
+
+namespace ClearAllRfidsResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearAllRfidsResponse
+
+namespace OperationEventNotification {
+struct Type;
+struct DecodableType;
+} // namespace OperationEventNotification
+
+namespace ProgrammingEventNotification {
+struct Type;
+struct DecodableType;
+} // namespace ProgrammingEventNotification
+
+} // namespace Commands
+
+namespace Commands {
 namespace LockDoor {
 enum class Fields
 {
@@ -11048,6 +12585,8 @@ public:
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::LockDoorResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11076,6 +12615,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11104,6 +12645,8 @@ public:
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11132,6 +12675,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11160,6 +12705,8 @@ public:
     chip::CharSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ToggleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11188,6 +12735,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11218,6 +12767,8 @@ public:
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11247,6 +12798,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11275,6 +12828,8 @@ public:
     uint16_t logIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11315,6 +12870,8 @@ public:
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11355,6 +12912,8 @@ public:
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetPinResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11386,6 +12945,8 @@ public:
     DoorLockSetPinOrIdStatus status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11414,6 +12975,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetPinResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11448,6 +13011,8 @@ public:
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11479,6 +13044,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearPinResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11507,6 +13074,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11532,6 +13101,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11559,6 +13130,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11589,6 +13162,8 @@ public:
     uint8_t userStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetUserStatusResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11618,6 +13193,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11646,6 +13223,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetUserStatusResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11676,6 +13255,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11717,6 +13298,8 @@ public:
     uint8_t endMinute;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11751,6 +13334,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11781,6 +13366,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11824,6 +13411,8 @@ public:
     uint8_t endMinute;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11861,6 +13450,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11890,6 +13481,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11924,6 +13517,8 @@ public:
     uint32_t localEndTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11955,6 +13550,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11985,6 +13582,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12022,6 +13621,8 @@ public:
     uint32_t localEndTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12056,6 +13657,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12085,6 +13688,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12119,6 +13724,8 @@ public:
     uint8_t operatingModeDuringHoliday;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12150,6 +13757,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12178,6 +13787,8 @@ public:
     uint8_t scheduleId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12214,6 +13825,8 @@ public:
     uint8_t operatingModeDuringHoliday;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12246,6 +13859,8 @@ public:
     uint8_t scheduleId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12274,6 +13889,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12304,6 +13921,8 @@ public:
     DoorLockUserType userType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12333,6 +13952,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12361,6 +13982,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12391,6 +14014,8 @@ public:
     DoorLockUserType userType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12426,6 +14051,8 @@ public:
     chip::ByteSpan id;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetRfidResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12457,6 +14084,8 @@ public:
     DoorLockSetPinOrIdStatus status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12485,6 +14114,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetRfidResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12519,6 +14150,8 @@ public:
     chip::ByteSpan rfid;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12550,6 +14183,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12578,6 +14213,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12603,6 +14240,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12630,6 +14269,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12668,6 +14309,8 @@ public:
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12715,6 +14358,8 @@ public:
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13283,6 +14928,46 @@ enum class WcSafetyStatus : uint16_t
 };
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace UpOrOpen {
+struct Type;
+struct DecodableType;
+} // namespace UpOrOpen
+
+namespace DownOrClose {
+struct Type;
+struct DecodableType;
+} // namespace DownOrClose
+
+namespace StopMotion {
+struct Type;
+struct DecodableType;
+} // namespace StopMotion
+
+namespace GoToLiftValue {
+struct Type;
+struct DecodableType;
+} // namespace GoToLiftValue
+
+namespace GoToLiftPercentage {
+struct Type;
+struct DecodableType;
+} // namespace GoToLiftPercentage
+
+namespace GoToTiltValue {
+struct Type;
+struct DecodableType;
+} // namespace GoToTiltValue
+
+namespace GoToTiltPercentage {
+struct Type;
+struct DecodableType;
+} // namespace GoToTiltPercentage
+
+} // namespace Commands
+
+namespace Commands {
 namespace UpOrOpen {
 enum class Fields
 {
@@ -13296,6 +14981,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13320,6 +15007,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13344,6 +15033,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13371,6 +15062,8 @@ public:
     uint16_t liftValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13401,6 +15094,8 @@ public:
     uint16_t liftPercent100thsValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13430,6 +15125,8 @@ public:
     uint16_t tiltValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13460,6 +15157,8 @@ public:
     uint16_t tiltPercent100thsValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13800,6 +15499,21 @@ struct TypeInfo
 namespace BarrierControl {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace BarrierControlGoToPercent {
+struct Type;
+struct DecodableType;
+} // namespace BarrierControlGoToPercent
+
+namespace BarrierControlStop {
+struct Type;
+struct DecodableType;
+} // namespace BarrierControlStop
+
+} // namespace Commands
+
+namespace Commands {
 namespace BarrierControlGoToPercent {
 enum class Fields
 {
@@ -13816,6 +15530,8 @@ public:
     uint8_t percentOpen;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13841,6 +15557,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -14838,6 +16556,46 @@ enum class ModeForSequence : uint8_t
 };
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SetpointRaiseLower {
+struct Type;
+struct DecodableType;
+} // namespace SetpointRaiseLower
+
+namespace CurrentWeeklySchedule {
+struct Type;
+struct DecodableType;
+} // namespace CurrentWeeklySchedule
+
+namespace SetWeeklySchedule {
+struct Type;
+struct DecodableType;
+} // namespace SetWeeklySchedule
+
+namespace RelayStatusLog {
+struct Type;
+struct DecodableType;
+} // namespace RelayStatusLog
+
+namespace GetWeeklySchedule {
+struct Type;
+struct DecodableType;
+} // namespace GetWeeklySchedule
+
+namespace ClearWeeklySchedule {
+struct Type;
+struct DecodableType;
+} // namespace ClearWeeklySchedule
+
+namespace GetRelayStatusLog {
+struct Type;
+struct DecodableType;
+} // namespace GetRelayStatusLog
+
+} // namespace Commands
+
+namespace Commands {
 namespace SetpointRaiseLower {
 enum class Fields
 {
@@ -14856,6 +16614,8 @@ public:
     int8_t amount;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -14891,6 +16651,8 @@ public:
     DataModel::List<const uint8_t> payload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -14928,6 +16690,8 @@ public:
     DataModel::List<const uint8_t> payload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -14969,6 +16733,8 @@ public:
     uint16_t unreadEntries;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15004,6 +16770,8 @@ public:
     chip::BitFlags<ModeForSequence> modeToReturn;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15030,6 +16798,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15054,6 +16824,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15913,6 +17685,106 @@ enum class ColorLoopUpdateFlags : uint8_t
 };
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace MoveToHue {
+struct Type;
+struct DecodableType;
+} // namespace MoveToHue
+
+namespace MoveHue {
+struct Type;
+struct DecodableType;
+} // namespace MoveHue
+
+namespace StepHue {
+struct Type;
+struct DecodableType;
+} // namespace StepHue
+
+namespace MoveToSaturation {
+struct Type;
+struct DecodableType;
+} // namespace MoveToSaturation
+
+namespace MoveSaturation {
+struct Type;
+struct DecodableType;
+} // namespace MoveSaturation
+
+namespace StepSaturation {
+struct Type;
+struct DecodableType;
+} // namespace StepSaturation
+
+namespace MoveToHueAndSaturation {
+struct Type;
+struct DecodableType;
+} // namespace MoveToHueAndSaturation
+
+namespace MoveToColor {
+struct Type;
+struct DecodableType;
+} // namespace MoveToColor
+
+namespace MoveColor {
+struct Type;
+struct DecodableType;
+} // namespace MoveColor
+
+namespace StepColor {
+struct Type;
+struct DecodableType;
+} // namespace StepColor
+
+namespace MoveToColorTemperature {
+struct Type;
+struct DecodableType;
+} // namespace MoveToColorTemperature
+
+namespace EnhancedMoveToHue {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedMoveToHue
+
+namespace EnhancedMoveHue {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedMoveHue
+
+namespace EnhancedStepHue {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedStepHue
+
+namespace EnhancedMoveToHueAndSaturation {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedMoveToHueAndSaturation
+
+namespace ColorLoopSet {
+struct Type;
+struct DecodableType;
+} // namespace ColorLoopSet
+
+namespace StopMoveStep {
+struct Type;
+struct DecodableType;
+} // namespace StopMoveStep
+
+namespace MoveColorTemperature {
+struct Type;
+struct DecodableType;
+} // namespace MoveColorTemperature
+
+namespace StepColorTemperature {
+struct Type;
+struct DecodableType;
+} // namespace StepColorTemperature
+
+} // namespace Commands
+
+namespace Commands {
 namespace MoveToHue {
 enum class Fields
 {
@@ -15937,6 +17809,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15975,6 +17849,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16014,6 +17890,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16052,6 +17930,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16089,6 +17969,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16128,6 +18010,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16168,6 +18052,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16208,6 +18094,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16246,6 +18134,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16285,6 +18175,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16323,6 +18215,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16362,6 +18256,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16400,6 +18296,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16439,6 +18337,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16479,6 +18379,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16523,6 +18425,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16559,6 +18463,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16598,6 +18504,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16643,6 +18551,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20243,6 +22153,46 @@ enum class IasZoneStatus : uint16_t
 };
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ZoneEnrollResponse {
+struct Type;
+struct DecodableType;
+} // namespace ZoneEnrollResponse
+
+namespace ZoneStatusChangeNotification {
+struct Type;
+struct DecodableType;
+} // namespace ZoneStatusChangeNotification
+
+namespace InitiateNormalOperationMode {
+struct Type;
+struct DecodableType;
+} // namespace InitiateNormalOperationMode
+
+namespace ZoneEnrollRequest {
+struct Type;
+struct DecodableType;
+} // namespace ZoneEnrollRequest
+
+namespace InitiateTestMode {
+struct Type;
+struct DecodableType;
+} // namespace InitiateTestMode
+
+namespace InitiateNormalOperationModeResponse {
+struct Type;
+struct DecodableType;
+} // namespace InitiateNormalOperationModeResponse
+
+namespace InitiateTestModeResponse {
+struct Type;
+struct DecodableType;
+} // namespace InitiateTestModeResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace ZoneEnrollResponse {
 enum class Fields
 {
@@ -20261,6 +22211,8 @@ public:
     uint8_t zoneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20296,6 +22248,8 @@ public:
     uint16_t delay;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20324,6 +22278,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasZone::Commands::InitiateNormalOperationModeResponse::DecodableType;
 };
 
 struct DecodableType
@@ -20353,6 +22309,8 @@ public:
     uint16_t manufacturerCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasZone::Commands::ZoneEnrollResponse::DecodableType;
 };
 
 struct DecodableType
@@ -20384,6 +22342,8 @@ public:
     uint8_t currentZoneSensitivityLevel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasZone::Commands::InitiateTestModeResponse::DecodableType;
 };
 
 struct DecodableType
@@ -20410,6 +22370,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20434,6 +22396,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20713,6 +22677,106 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Arm {
+struct Type;
+struct DecodableType;
+} // namespace Arm
+
+namespace ArmResponse {
+struct Type;
+struct DecodableType;
+} // namespace ArmResponse
+
+namespace Bypass {
+struct Type;
+struct DecodableType;
+} // namespace Bypass
+
+namespace GetZoneIdMapResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetZoneIdMapResponse
+
+namespace Emergency {
+struct Type;
+struct DecodableType;
+} // namespace Emergency
+
+namespace GetZoneInformationResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetZoneInformationResponse
+
+namespace Fire {
+struct Type;
+struct DecodableType;
+} // namespace Fire
+
+namespace ZoneStatusChanged {
+struct Type;
+struct DecodableType;
+} // namespace ZoneStatusChanged
+
+namespace Panic {
+struct Type;
+struct DecodableType;
+} // namespace Panic
+
+namespace PanelStatusChanged {
+struct Type;
+struct DecodableType;
+} // namespace PanelStatusChanged
+
+namespace GetZoneIdMap {
+struct Type;
+struct DecodableType;
+} // namespace GetZoneIdMap
+
+namespace GetPanelStatusResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetPanelStatusResponse
+
+namespace GetZoneInformation {
+struct Type;
+struct DecodableType;
+} // namespace GetZoneInformation
+
+namespace SetBypassedZoneList {
+struct Type;
+struct DecodableType;
+} // namespace SetBypassedZoneList
+
+namespace GetPanelStatus {
+struct Type;
+struct DecodableType;
+} // namespace GetPanelStatus
+
+namespace BypassResponse {
+struct Type;
+struct DecodableType;
+} // namespace BypassResponse
+
+namespace GetBypassedZoneList {
+struct Type;
+struct DecodableType;
+} // namespace GetBypassedZoneList
+
+namespace GetZoneStatusResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetZoneStatusResponse
+
+namespace GetZoneStatus {
+struct Type;
+struct DecodableType;
+} // namespace GetZoneStatus
+
+} // namespace Commands
+
+namespace Commands {
 namespace Arm {
 enum class Fields
 {
@@ -20733,6 +22797,8 @@ public:
     uint8_t zoneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasAce::Commands::ArmResponse::DecodableType;
 };
 
 struct DecodableType
@@ -20763,6 +22829,8 @@ public:
     IasAceArmNotification armNotification;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20795,6 +22863,8 @@ public:
     chip::CharSpan armDisarmCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasAce::Commands::BypassResponse::DecodableType;
 };
 
 struct DecodableType
@@ -20855,6 +22925,8 @@ public:
     uint16_t section15;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20895,6 +22967,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20928,6 +23002,8 @@ public:
     chip::CharSpan zoneLabel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20956,6 +23032,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20989,6 +23067,8 @@ public:
     chip::CharSpan zoneLabel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21017,6 +23097,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21050,6 +23132,8 @@ public:
     IasAceAlarmStatus alarmStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21078,6 +23162,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasAce::Commands::GetZoneIdMapResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21111,6 +23197,8 @@ public:
     IasAceAlarmStatus alarmStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21142,6 +23230,8 @@ public:
     uint8_t zoneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasAce::Commands::GetZoneInformationResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21172,6 +23262,8 @@ public:
     DataModel::List<const uint8_t> zoneIds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21198,6 +23290,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasAce::Commands::GetPanelStatusResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21227,6 +23321,8 @@ public:
     DataModel::List<const IasAceBypassResult> bypassResult;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21253,6 +23349,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21284,6 +23382,8 @@ public:
     DataModel::List<const Structs::IasAceZoneStatusResult::Type> zoneStatusResult;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21320,6 +23420,8 @@ public:
     uint16_t zoneStatusMask;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasAce::Commands::GetZoneStatusResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21381,6 +23483,21 @@ enum class WarningInfo : uint8_t
 };
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace StartWarning {
+struct Type;
+struct DecodableType;
+} // namespace StartWarning
+
+namespace Squawk {
+struct Type;
+struct DecodableType;
+} // namespace Squawk
+
+} // namespace Commands
+
+namespace Commands {
 namespace StartWarning {
 enum class Fields
 {
@@ -21403,6 +23520,8 @@ public:
     uint8_t strobeLevel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21434,6 +23553,8 @@ public:
     chip::BitFlags<SquawkInfo> squawkInfo;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21601,6 +23722,31 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ChangeChannel {
+struct Type;
+struct DecodableType;
+} // namespace ChangeChannel
+
+namespace ChangeChannelResponse {
+struct Type;
+struct DecodableType;
+} // namespace ChangeChannelResponse
+
+namespace ChangeChannelByNumber {
+struct Type;
+struct DecodableType;
+} // namespace ChangeChannelByNumber
+
+namespace SkipChannel {
+struct Type;
+struct DecodableType;
+} // namespace SkipChannel
+
+} // namespace Commands
+
+namespace Commands {
 namespace ChangeChannel {
 enum class Fields
 {
@@ -21617,6 +23763,8 @@ public:
     chip::CharSpan match;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21647,6 +23795,8 @@ public:
     TvChannelErrorType errorType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21678,6 +23828,8 @@ public:
     uint16_t minorNumber;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21707,6 +23859,8 @@ public:
     uint16_t count;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21818,6 +23972,21 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace NavigateTarget {
+struct Type;
+struct DecodableType;
+} // namespace NavigateTarget
+
+namespace NavigateTargetResponse {
+struct Type;
+struct DecodableType;
+} // namespace NavigateTargetResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace NavigateTarget {
 enum class Fields
 {
@@ -21836,6 +24005,8 @@ public:
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21867,6 +24038,8 @@ public:
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21985,6 +24158,121 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace MediaPlay {
+struct Type;
+struct DecodableType;
+} // namespace MediaPlay
+
+namespace MediaPlayResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaPlayResponse
+
+namespace MediaPause {
+struct Type;
+struct DecodableType;
+} // namespace MediaPause
+
+namespace MediaPauseResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaPauseResponse
+
+namespace MediaStop {
+struct Type;
+struct DecodableType;
+} // namespace MediaStop
+
+namespace MediaStopResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaStopResponse
+
+namespace MediaStartOver {
+struct Type;
+struct DecodableType;
+} // namespace MediaStartOver
+
+namespace MediaStartOverResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaStartOverResponse
+
+namespace MediaPrevious {
+struct Type;
+struct DecodableType;
+} // namespace MediaPrevious
+
+namespace MediaPreviousResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaPreviousResponse
+
+namespace MediaNext {
+struct Type;
+struct DecodableType;
+} // namespace MediaNext
+
+namespace MediaNextResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaNextResponse
+
+namespace MediaRewind {
+struct Type;
+struct DecodableType;
+} // namespace MediaRewind
+
+namespace MediaRewindResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaRewindResponse
+
+namespace MediaFastForward {
+struct Type;
+struct DecodableType;
+} // namespace MediaFastForward
+
+namespace MediaFastForwardResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaFastForwardResponse
+
+namespace MediaSkipForward {
+struct Type;
+struct DecodableType;
+} // namespace MediaSkipForward
+
+namespace MediaSkipForwardResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaSkipForwardResponse
+
+namespace MediaSkipBackward {
+struct Type;
+struct DecodableType;
+} // namespace MediaSkipBackward
+
+namespace MediaSkipBackwardResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaSkipBackwardResponse
+
+namespace MediaSeek {
+struct Type;
+struct DecodableType;
+} // namespace MediaSeek
+
+namespace MediaSeekResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaSeekResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace MediaPlay {
 enum class Fields
 {
@@ -21998,6 +24286,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22025,6 +24315,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22050,6 +24342,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22077,6 +24371,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22102,6 +24398,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22129,6 +24427,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22154,6 +24454,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22181,6 +24483,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22206,6 +24510,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22233,6 +24539,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22258,6 +24566,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22285,6 +24595,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22310,6 +24622,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22337,6 +24651,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22362,6 +24678,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22389,6 +24707,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22417,6 +24737,8 @@ public:
     uint64_t deltaPositionMilliseconds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22445,6 +24767,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22473,6 +24797,8 @@ public:
     uint64_t deltaPositionMilliseconds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22501,6 +24827,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22529,6 +24857,8 @@ public:
     uint64_t position;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22557,6 +24887,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22736,6 +25068,31 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SelectInput {
+struct Type;
+struct DecodableType;
+} // namespace SelectInput
+
+namespace ShowInputStatus {
+struct Type;
+struct DecodableType;
+} // namespace ShowInputStatus
+
+namespace HideInputStatus {
+struct Type;
+struct DecodableType;
+} // namespace HideInputStatus
+
+namespace RenameInput {
+struct Type;
+struct DecodableType;
+} // namespace RenameInput
+
+} // namespace Commands
+
+namespace Commands {
 namespace SelectInput {
 enum class Fields
 {
@@ -22752,6 +25109,8 @@ public:
     uint8_t index;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22777,6 +25136,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22801,6 +25162,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22830,6 +25193,8 @@ public:
     chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22895,6 +25260,16 @@ struct TypeInfo
 namespace LowPower {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Sleep {
+struct Type;
+struct DecodableType;
+} // namespace Sleep
+
+} // namespace Commands
+
+namespace Commands {
 namespace Sleep {
 enum class Fields
 {
@@ -22908,6 +25283,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23058,6 +25435,21 @@ using KeypadInputStatus                    = EmberAfKeypadInputStatus;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SendKey {
+struct Type;
+struct DecodableType;
+} // namespace SendKey
+
+namespace SendKeyResponse {
+struct Type;
+struct DecodableType;
+} // namespace SendKeyResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace SendKey {
 enum class Fields
 {
@@ -23074,6 +25466,8 @@ public:
     KeypadInputCecKeyCode keyCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType;
 };
 
 struct DecodableType
@@ -23102,6 +25496,8 @@ public:
     KeypadInputStatus status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23325,6 +25721,31 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace LaunchContent {
+struct Type;
+struct DecodableType;
+} // namespace LaunchContent
+
+namespace LaunchContentResponse {
+struct Type;
+struct DecodableType;
+} // namespace LaunchContentResponse
+
+namespace LaunchURL {
+struct Type;
+struct DecodableType;
+} // namespace LaunchURL
+
+namespace LaunchURLResponse {
+struct Type;
+struct DecodableType;
+} // namespace LaunchURLResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace LaunchContent {
 enum class Fields
 {
@@ -23343,6 +25764,8 @@ public:
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType;
 };
 
 struct DecodableType
@@ -23374,6 +25797,8 @@ public:
     ContentLaunchStatus contentLaunchStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23405,6 +25830,8 @@ public:
     chip::CharSpan displayString;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType;
 };
 
 struct DecodableType
@@ -23436,6 +25863,8 @@ public:
     ContentLaunchStatus contentLaunchStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23542,6 +25971,21 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SelectOutput {
+struct Type;
+struct DecodableType;
+} // namespace SelectOutput
+
+namespace RenameOutput {
+struct Type;
+struct DecodableType;
+} // namespace RenameOutput
+
+} // namespace Commands
+
+namespace Commands {
 namespace SelectOutput {
 enum class Fields
 {
@@ -23558,6 +26002,8 @@ public:
     uint8_t index;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23588,6 +26034,8 @@ public:
     chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23689,6 +26137,21 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace LaunchApp {
+struct Type;
+struct DecodableType;
+} // namespace LaunchApp
+
+namespace LaunchAppResponse {
+struct Type;
+struct DecodableType;
+} // namespace LaunchAppResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace LaunchApp {
 enum class Fields
 {
@@ -23709,6 +26172,8 @@ public:
     chip::CharSpan applicationId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType;
 };
 
 struct DecodableType
@@ -23741,6 +26206,8 @@ public:
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23831,6 +26298,16 @@ using ApplicationBasicStatus               = EmberAfApplicationBasicStatus;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ChangeStatus {
+struct Type;
+struct DecodableType;
+} // namespace ChangeStatus
+
+} // namespace Commands
+
+namespace Commands {
 namespace ChangeStatus {
 enum class Fields
 {
@@ -23847,6 +26324,8 @@ public:
     ApplicationBasicStatus status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23966,6 +26445,26 @@ struct TypeInfo
 namespace AccountLogin {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace GetSetupPIN {
+struct Type;
+struct DecodableType;
+} // namespace GetSetupPIN
+
+namespace GetSetupPINResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetSetupPINResponse
+
+namespace Login {
+struct Type;
+struct DecodableType;
+} // namespace Login
+
+} // namespace Commands
+
+namespace Commands {
 namespace GetSetupPIN {
 enum class Fields
 {
@@ -23982,6 +26481,8 @@ public:
     chip::CharSpan tempAccountIdentifier;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24010,6 +26511,8 @@ public:
     chip::CharSpan setupPIN;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24040,6 +26543,8 @@ public:
     chip::CharSpan setupPIN;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24295,6 +26800,141 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Test {
+struct Type;
+struct DecodableType;
+} // namespace Test
+
+namespace TestSpecificResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestSpecificResponse
+
+namespace TestNotHandled {
+struct Type;
+struct DecodableType;
+} // namespace TestNotHandled
+
+namespace TestAddArgumentsResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestAddArgumentsResponse
+
+namespace TestSpecific {
+struct Type;
+struct DecodableType;
+} // namespace TestSpecific
+
+namespace TestSimpleArgumentResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestSimpleArgumentResponse
+
+namespace TestUnknownCommand {
+struct Type;
+struct DecodableType;
+} // namespace TestUnknownCommand
+
+namespace TestStructArrayArgumentResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestStructArrayArgumentResponse
+
+namespace TestAddArguments {
+struct Type;
+struct DecodableType;
+} // namespace TestAddArguments
+
+namespace TestListInt8UReverseResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestListInt8UReverseResponse
+
+namespace TestSimpleArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestSimpleArgumentRequest
+
+namespace TestEnumsResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestEnumsResponse
+
+namespace TestStructArrayArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestStructArrayArgumentRequest
+
+namespace TestNullableOptionalResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestNullableOptionalResponse
+
+namespace TestStructArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestStructArgumentRequest
+
+namespace TestComplexNullableOptionalResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestComplexNullableOptionalResponse
+
+namespace TestNestedStructArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestNestedStructArgumentRequest
+
+namespace BooleanResponse {
+struct Type;
+struct DecodableType;
+} // namespace BooleanResponse
+
+namespace TestListStructArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestListStructArgumentRequest
+
+namespace TestListInt8UArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestListInt8UArgumentRequest
+
+namespace TestNestedStructListArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestNestedStructListArgumentRequest
+
+namespace TestListNestedStructListArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestListNestedStructListArgumentRequest
+
+namespace TestListInt8UReverseRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestListInt8UReverseRequest
+
+namespace TestEnumsRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestEnumsRequest
+
+namespace TestNullableOptionalRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestNullableOptionalRequest
+
+namespace TestComplexNullableOptionalRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestComplexNullableOptionalRequest
+
+} // namespace Commands
+
+namespace Commands {
 namespace Test {
 enum class Fields
 {
@@ -24308,6 +26948,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24335,6 +26977,8 @@ public:
     uint8_t returnValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24360,6 +27004,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24387,6 +27033,8 @@ public:
     uint8_t returnValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24412,6 +27060,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24439,6 +27089,8 @@ public:
     bool returnValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24464,6 +27116,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24501,6 +27155,8 @@ public:
     bool arg6;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24536,6 +27192,8 @@ public:
     uint8_t arg2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24565,6 +27223,8 @@ public:
     DataModel::List<const uint8_t> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24593,6 +27253,8 @@ public:
     bool arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestSimpleArgumentResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24623,6 +27285,8 @@ public:
     SimpleEnum arg2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24662,6 +27326,8 @@ public:
     bool arg6;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24701,6 +27367,8 @@ public:
     Optional<DataModel::Nullable<uint8_t>> originalValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24732,6 +27400,8 @@ public:
     Structs::SimpleStruct::Type arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24814,6 +27484,8 @@ public:
     Optional<DataModel::List<const SimpleEnum>> nullableOptionalListValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24869,6 +27541,8 @@ public:
     Structs::NestedStruct::Type arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24897,6 +27571,8 @@ public:
     bool value;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24925,6 +27601,8 @@ public:
     DataModel::List<const Structs::SimpleStruct::Type> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24953,6 +27631,8 @@ public:
     DataModel::List<const uint8_t> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24981,6 +27661,8 @@ public:
     Structs::NestedStructList::Type arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 };
 
 struct DecodableType
@@ -25009,6 +27691,8 @@ public:
     DataModel::List<const Structs::NestedStructList::Type> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25037,6 +27721,8 @@ public:
     DataModel::List<const uint8_t> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
 };
 
 struct DecodableType
@@ -25067,6 +27753,8 @@ public:
     SimpleEnum arg2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -25096,6 +27784,8 @@ public:
     Optional<DataModel::Nullable<uint8_t>> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
 };
 
 struct DecodableType
@@ -25146,6 +27836,8 @@ public:
     Optional<DataModel::Nullable<DataModel::List<const SimpleEnum>>> nullableOptionalList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType;
 };
 
 struct DecodableType
@@ -25711,6 +28403,46 @@ enum class MessagingExtendedControlMask : uint8_t
 };
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace DisplayMessage {
+struct Type;
+struct DecodableType;
+} // namespace DisplayMessage
+
+namespace GetLastMessage {
+struct Type;
+struct DecodableType;
+} // namespace GetLastMessage
+
+namespace CancelMessage {
+struct Type;
+struct DecodableType;
+} // namespace CancelMessage
+
+namespace MessageConfirmation {
+struct Type;
+struct DecodableType;
+} // namespace MessageConfirmation
+
+namespace DisplayProtectedMessage {
+struct Type;
+struct DecodableType;
+} // namespace DisplayProtectedMessage
+
+namespace GetMessageCancellation {
+struct Type;
+struct DecodableType;
+} // namespace GetMessageCancellation
+
+namespace CancelAllMessages {
+struct Type;
+struct DecodableType;
+} // namespace CancelAllMessages
+
+} // namespace Commands
+
+namespace Commands {
 namespace DisplayMessage {
 enum class Fields
 {
@@ -25737,6 +28469,8 @@ public:
     chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25767,6 +28501,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25796,6 +28532,8 @@ public:
     chip::BitFlags<MessagingControlMask> messageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25831,6 +28569,8 @@ public:
     chip::ByteSpan messageResponse;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25872,6 +28612,8 @@ public:
     chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25905,6 +28647,8 @@ public:
     uint32_t earliestImplementationTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25933,6 +28677,8 @@ public:
     uint32_t implementationDateTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -26323,6 +29069,31 @@ enum class AlertStructure : uint32_t
 };
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace GetAlerts {
+struct Type;
+struct DecodableType;
+} // namespace GetAlerts
+
+namespace GetAlertsResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetAlertsResponse
+
+namespace AlertsNotification {
+struct Type;
+struct DecodableType;
+} // namespace AlertsNotification
+
+namespace EventsNotification {
+struct Type;
+struct DecodableType;
+} // namespace EventsNotification
+
+} // namespace Commands
+
+namespace Commands {
 namespace GetAlerts {
 enum class Fields
 {
@@ -26336,6 +29107,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ApplianceEventsAndAlert::Commands::GetAlertsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -26365,6 +29138,8 @@ public:
     DataModel::List<const chip::BitFlags<AlertStructure>> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -26396,6 +29171,8 @@ public:
     DataModel::List<const chip::BitFlags<AlertStructure>> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -26427,6 +29204,8 @@ public:
     EventIdentification eventId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -26470,6 +29249,41 @@ struct TypeInfo
 namespace ApplianceStatistics {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace LogNotification {
+struct Type;
+struct DecodableType;
+} // namespace LogNotification
+
+namespace LogRequest {
+struct Type;
+struct DecodableType;
+} // namespace LogRequest
+
+namespace LogResponse {
+struct Type;
+struct DecodableType;
+} // namespace LogResponse
+
+namespace LogQueueRequest {
+struct Type;
+struct DecodableType;
+} // namespace LogQueueRequest
+
+namespace LogQueueResponse {
+struct Type;
+struct DecodableType;
+} // namespace LogQueueResponse
+
+namespace StatisticsAvailable {
+struct Type;
+struct DecodableType;
+} // namespace StatisticsAvailable
+
+} // namespace Commands
+
+namespace Commands {
 namespace LogNotification {
 enum class Fields
 {
@@ -26492,6 +29306,8 @@ public:
     DataModel::List<const uint8_t> logPayload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -26523,6 +29339,8 @@ public:
     uint32_t logId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ApplianceStatistics::Commands::LogResponse::DecodableType;
 };
 
 struct DecodableType
@@ -26557,6 +29375,8 @@ public:
     DataModel::List<const uint8_t> logPayload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -26585,6 +29405,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ApplianceStatistics::Commands::LogQueueResponse::DecodableType;
 };
 
 struct DecodableType
@@ -26614,6 +29436,8 @@ public:
     DataModel::List<const uint32_t> logIds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -26645,6 +29469,8 @@ public:
     DataModel::List<const uint32_t> logIds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -26710,6 +29536,31 @@ struct TypeInfo
 namespace ElectricalMeasurement {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace GetProfileInfoResponseCommand {
+struct Type;
+struct DecodableType;
+} // namespace GetProfileInfoResponseCommand
+
+namespace GetProfileInfoCommand {
+struct Type;
+struct DecodableType;
+} // namespace GetProfileInfoCommand
+
+namespace GetMeasurementProfileResponseCommand {
+struct Type;
+struct DecodableType;
+} // namespace GetMeasurementProfileResponseCommand
+
+namespace GetMeasurementProfileCommand {
+struct Type;
+struct DecodableType;
+} // namespace GetMeasurementProfileCommand
+
+} // namespace Commands
+
+namespace Commands {
 namespace GetProfileInfoResponseCommand {
 enum class Fields
 {
@@ -26732,6 +29583,8 @@ public:
     DataModel::List<const uint16_t> listOfAttributes;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -26760,6 +29613,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -26797,6 +29652,8 @@ public:
     DataModel::List<const uint8_t> intervals;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -26834,6 +29691,8 @@ public:
     uint8_t numberOfIntervals;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -28286,6 +31145,21 @@ struct TypeInfo
 namespace Binding {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Bind {
+struct Type;
+struct DecodableType;
+} // namespace Bind
+
+namespace Unbind {
+struct Type;
+struct DecodableType;
+} // namespace Unbind
+
+} // namespace Commands
+
+namespace Commands {
 namespace Bind {
 enum class Fields
 {
@@ -28308,6 +31182,8 @@ public:
     chip::ClusterId clusterId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -28345,6 +31221,8 @@ public:
     chip::ClusterId clusterId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -28502,6 +31380,16 @@ struct TypeInfo
 namespace SampleMfgSpecificCluster {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace CommandOne {
+struct Type;
+struct DecodableType;
+} // namespace CommandOne
+
+} // namespace Commands
+
+namespace Commands {
 namespace CommandOne {
 enum class Fields
 {
@@ -28518,6 +31406,8 @@ public:
     uint8_t argOne;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -28582,6 +31472,16 @@ struct TypeInfo
 namespace SampleMfgSpecificCluster2 {
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace CommandTwo {
+struct Type;
+struct DecodableType;
+} // namespace CommandTwo
+
+} // namespace Commands
+
+namespace Commands {
 namespace CommandTwo {
 enum class Fields
 {
@@ -28598,6 +31498,8 @@ public:
     uint8_t argOne;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
