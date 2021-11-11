@@ -137,9 +137,6 @@ class {{filename}}: public TestCommand
 
     CHIP_ERROR {{>testCommand}}()
     {
-        chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
-        cluster.Associate(mDevice, {{endpoint}});
-
         {{#if isCommand}}
         using RequestType = chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type;
 
@@ -155,8 +152,13 @@ class {{filename}}: public TestCommand
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(status);
         };
-        {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.InvokeCommand(request, this, success, failure){{#if async}}){{/if}};
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, {{endpoint}}, request));
+        {{#unless async}}return CHIP_NO_ERROR;{{/unless}}
         {{else}}
+        chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
+        cluster.Associate(mDevice, {{endpoint}});
+
         {{#chip_tests_item_parameters}}
         {{zapTypeToEncodableClusterObjectType type ns=parent.cluster}} {{asLowerCamelCase name}}Argument;
         {{>commandValue ns=parent.cluster container=(concat (asLowerCamelCase name) "Argument") definedValue=definedValue}}
