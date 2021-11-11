@@ -57,22 +57,21 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+
     esp_err_t err;
     // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
     Internal::ESP32Utils::RegisterESP32ErrorFormatter();
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    wifi_init_config_t cfg;
-    uint8_t ap_mac[6];
-    wifi_mode_t mode;
     // Make sure the LwIP core lock has been initialized
     ReturnErrorOnFailure(Internal::InitLwIPCoreLock());
+
     err = esp_netif_init();
     if (err != ESP_OK)
     {
         goto exit;
     }
-#endif
+
     // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
     err = esp_event_loop_create_default();
     if (err != ESP_OK)
@@ -81,31 +80,37 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    esp_netif_create_default_wifi_ap();
-    esp_netif_create_default_wifi_sta();
-
-    esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-    esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-    mStartTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
-
-    // Initialize the ESP WiFi layer.
-    cfg = WIFI_INIT_CONFIG_DEFAULT();
-    err = esp_wifi_init(&cfg);
-    if (err != ESP_OK)
     {
-        goto exit;
-    }
+        wifi_init_config_t cfg;
+        uint8_t ap_mac[6];
+        wifi_mode_t mode;
 
-    esp_wifi_get_mode(&mode);
-    if ((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
-    {
-        esp_fill_random(ap_mac, sizeof(ap_mac));
-        /* Bit 0 of the first octet of MAC Address should always be 0 */
-        ap_mac[0] &= (uint8_t) ~0x01;
-        err = esp_wifi_set_mac(WIFI_IF_AP, ap_mac);
+        esp_netif_create_default_wifi_ap();
+        esp_netif_create_default_wifi_sta();
+
+        esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
+        esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
+        mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+        // Initialize the ESP WiFi layer.
+        cfg = WIFI_INIT_CONFIG_DEFAULT();
+        err = esp_wifi_init(&cfg);
         if (err != ESP_OK)
         {
             goto exit;
+        }
+
+        esp_wifi_get_mode(&mode);
+        if ((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
+        {
+            esp_fill_random(ap_mac, sizeof(ap_mac));
+            /* Bit 0 of the first octet of MAC Address should always be 0 */
+            ap_mac[0] &= (uint8_t) ~0x01;
+            err = esp_wifi_set_mac(WIFI_IF_AP, ap_mac);
+            if (err != ESP_OK)
+            {
+                goto exit;
+            }
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -128,9 +133,9 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     {
         uint32_t totalOperationalHours = 0;
 
-        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgrImpl().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
@@ -167,7 +172,7 @@ CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
 {
     uint32_t count = 0;
 
-    CHIP_ERROR err = ConfigurationMgrImpl().GetRebootCount(count);
+    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -180,11 +185,11 @@ CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
 
 CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
 {
-    uint64_t currentTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
+    System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
-    if (currentTimeMilliseconds >= mStartTimeMilliseconds)
+    if (currentTime >= mStartTime)
     {
-        upTime = (currentTimeMilliseconds - mStartTimeMilliseconds) / 1000;
+        upTime = std::chrono::duration_cast<System::Clock::Seconds64>(currentTime - mStartTime).count();
         return CHIP_NO_ERROR;
     }
 
@@ -198,7 +203,7 @@ CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperat
     if (_GetUpTime(upTime) == CHIP_NO_ERROR)
     {
         uint32_t totalHours = 0;
-        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
+        if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
         {
             VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
             totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);

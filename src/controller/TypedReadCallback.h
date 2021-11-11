@@ -35,37 +35,37 @@ namespace Controller {
  *  2. Automatic decoding of attribute data provided in the TLVReader by InteractionModelDelegate::OnReportData into a decoded
  *     cluster object.
  */
-template <typename AttributeTypeInfo>
-class TypedReadCallback final : public app::InteractionModelDelegate
+template <typename DecodableAttributeType>
+class TypedReadCallback final : public app::ReadClient::Callback
 {
 public:
     using OnSuccessCallbackType =
-        std::function<void(const app::ConcreteAttributePath & aPath, const typename AttributeTypeInfo::DecodableType & aData)>;
+        std::function<void(const app::ConcreteAttributePath & aPath, const DecodableAttributeType & aData)>;
     using OnErrorCallbackType = std::function<void(const app::ConcreteAttributePath * aPath,
                                                    Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError)>;
     using OnDoneCallbackType  = std::function<void(app::ReadClient * client, TypedReadCallback * callback)>;
 
-    TypedReadCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
-        mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
+    TypedReadCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
+                      OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
+        mClusterId(aClusterId),
+        mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
     {}
 
 private:
-    void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
-                      Protocols::InteractionModel::Status status) override
+    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & status) override
     {
-        CHIP_ERROR err                           = CHIP_NO_ERROR;
-        app::ConcreteAttributePath attributePath = { aPath.mEndpointId, aPath.mClusterId, aPath.mFieldId };
-        typename AttributeTypeInfo::DecodableType value;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        DecodableAttributeType value;
 
-        VerifyOrExit(status == Protocols::InteractionModel::Status::Success, err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
-        VerifyOrExit(aPath.mClusterId == AttributeTypeInfo::GetClusterId() && aPath.mFieldId == AttributeTypeInfo::GetAttributeId(),
-                     CHIP_ERROR_SCHEMA_MISMATCH);
+        VerifyOrExit(status.mStatus == Protocols::InteractionModel::Status::Success, err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+        VerifyOrExit(aPath.mClusterId == mClusterId && aPath.mAttributeId == mAttributeId, err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         err = app::DataModel::Decode(*apData, value);
         SuccessOrExit(err);
 
-        mOnSuccess(attributePath, value);
+        mOnSuccess(aPath, value);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -73,28 +73,25 @@ private:
             //
             // Override status to indicate an error if something bad happened above.
             //
-            if (status == Protocols::InteractionModel::Status::Success)
+            Protocols::InteractionModel::Status imStatus = status.mStatus;
+            if (status.mStatus == Protocols::InteractionModel::Status::Success)
             {
-                status = Protocols::InteractionModel::Status::Failure;
+                imStatus = Protocols::InteractionModel::Status::Failure;
             }
 
-            mOnError(&attributePath, status, err);
+            mOnError(&aPath, imStatus, err);
         }
     }
 
-    CHIP_ERROR ReadError(app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
         mOnError(nullptr, Protocols::InteractionModel::Status::Failure, aError);
-        mOnDone(apReadClient, this);
-        return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReadDone(app::ReadClient * apReadClient) override
-    {
-        mOnDone(apReadClient, this);
-        return CHIP_NO_ERROR;
-    }
+    void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
 
+    ClusterId mClusterId;
+    AttributeId mAttributeId;
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;

@@ -836,7 +836,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
@@ -1496,14 +1496,6 @@
             {
               "name": "DisableNetwork",
               "code": 14,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "GetLastNetworkCommissioningResult",
-              "code": 16,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -7499,7 +7491,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
@@ -8090,14 +8082,6 @@
             {
               "name": "DisableNetwork",
               "code": 14,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "GetLastNetworkCommissioningResult",
-              "code": 16,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,

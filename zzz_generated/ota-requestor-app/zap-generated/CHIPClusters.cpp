@@ -126,10 +126,10 @@ exit:
 }
 
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t vendorId,
-                                                        uint16_t productId, uint16_t hardwareVersion, uint32_t softwareVersion,
-                                                        uint8_t protocolsSupported, chip::CharSpan location,
-                                                        bool requestorCanConsent, chip::ByteSpan metadataForProvider)
+                                                        Callback::Cancelable * onFailureCallback, chip::VendorId vendorId,
+                                                        uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
+                                                        uint16_t hardwareVersion, chip::CharSpan location, bool requestorCanConsent,
+                                                        chip::ByteSpan metadataForProvider)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -153,16 +153,16 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // vendorId: int16u
+    // vendorId: vendorId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
     // productId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), productId));
-    // hardwareVersion: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
     // softwareVersion: int32u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), softwareVersion));
     // protocolsSupported: OTADownloadProtocol
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
+    // hardwareVersion: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
     // location: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), location.data()));
     // requestorCanConsent: boolean
@@ -189,10 +189,9 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReadAttributeClusterRevision(Callba
                                                                           Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000FFFD;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }

@@ -163,3 +163,6 @@
 	path = third_party/pybind11/repo
 	url = https://github.com/pybind/pybind11
 	branch  = stable
+[submodule "p6/lwip"]
+	path = third_party/p6/p6_sdk/libs/lwip
+	url = https://git.savannah.nongnu.org/git/lwip

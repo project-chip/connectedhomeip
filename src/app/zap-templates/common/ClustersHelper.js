@@ -448,8 +448,11 @@ function enhancedAttributes(attributes, globalAttributes, types)
       type : attribute.type,
       size : attribute.size,
       isList : attribute.isList,
+      isArray : attribute.isList,
+      isNullable : attribute.isNullable,
       chipType : attribute.chipType,
-      chipCallback : attribute.chipCallback
+      chipCallback : attribute.chipCallback,
+      label : attribute.name,
     };
     attribute.arguments = [ argument ];
     attribute.response  = { arguments : [ argument ] };

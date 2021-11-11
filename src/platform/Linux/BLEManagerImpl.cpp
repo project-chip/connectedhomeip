@@ -92,6 +92,14 @@ exit:
     return err;
 }
 
+CHIP_ERROR BLEManagerImpl::_Shutdown()
+{
+    // ensure scan resources are cleared (e.g. timeout timers)
+    mDeviceScanner.reset();
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

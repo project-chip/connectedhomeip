@@ -1,0 +1,23 @@
+{{> header}}
+
+#pragma once
+
+#include "TestCommand.h"
+
+{{#if (getTests)}}
+{{>test_cluster tests=(getTests)}}
+{{/if}}
+
+std::unique_ptr<TestCommand>GetTestCommand(std::string testName)
+{
+  {{#if (getTests)}}
+  {{#chip_tests (getTests)}}
+  if (testName == "{{filename}}")
+  {
+      return std::unique_ptr<{{filename}}>(new {{filename}}());
+  }
+  {{/chip_tests}}
+  {{/if}}
+
+  return nullptr;
+}

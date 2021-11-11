@@ -24,6 +24,7 @@ from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
+from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
 
 
 class Target:
@@ -143,6 +144,7 @@ def Efr32Targets():
 
     yield efr_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
     yield efr_target.Extend('lock', app=Efr32App.LOCK)
+    yield efr_target.Extend('unit-test', app=Efr32App.UNIT_TEST)
 
     rpc_aware_targets = [
         efr_target.Extend('light', app=Efr32App.LIGHT),
@@ -189,6 +191,37 @@ def AndroidTargets():
     yield target.Extend('androidstudio-arm64-chip-tool', board=AndroidBoard.AndroidStudio_ARM64, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('androidstudio-x86-chip-tool', board=AndroidBoard.AndroidStudio_X86, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('androidstudio-x64-chip-tool', board=AndroidBoard.AndroidStudio_X64, app=AndroidApp.CHIP_TOOL)
+    yield target.Extend('arm64-chip-tvserver', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TVServer)
+
+
+def MbedTargets():
+    target = Target('mbed', MbedBuilder)
+
+    targets = [
+        target.Extend('CY8CPROTO_062_4343W',
+                      board=MbedBoard.CY8CPROTO_062_4343W),
+    ]
+
+    app_targets = []
+    for target in targets:
+        app_targets.append(target.Extend('lock', app=MbedApp.LOCK))
+        app_targets.append(target.Extend('light', app=MbedApp.LIGHT))
+        app_targets.append(target.Extend(
+            'all-clusters', app=MbedApp.ALL_CLUSTERS))
+        app_targets.append(target.Extend('pigweed', app=MbedApp.PIGWEED))
+        app_targets.append(target.Extend('shell', app=MbedApp.SHELL))
+
+    for target in app_targets:
+        yield target.Extend('release', profile=MbedProfile.RELEASE)
+        yield target.Extend('develop', profile=MbedProfile.DEVELOP).GlobBlacklist('Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
+        yield target.Extend('debug', profile=MbedProfile.DEBUG).GlobBlacklist('Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html')
+
+
+def InfineonTargets():
+    target = Target('infineon', InfineonBuilder)
+
+    yield target.Extend('p6-lock', board=InfineonBoard.P6BOARD, app=InfineonApp.LOCK)
+    yield target.Extend('p6-all-clusters', board=InfineonBoard.P6BOARD, app=InfineonApp.ALL_CLUSTERS)
 
 
 ALL = []
@@ -199,6 +232,9 @@ target_generators = [
     Efr32Targets(),
     NrfTargets(),
     AndroidTargets(),
+    MbedTargets(),
+    InfineonTargets()
+
 ]
 
 for generator in target_generators:
@@ -209,8 +245,6 @@ for generator in target_generators:
 ALL.append(Target('qpg-qpg6100-lock', QpgBuilder))
 ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
-ALL.append(Target('infineon-p6-lock', InfineonBuilder,
-                  board=InfineonBoard.P6BOARD, app=InfineonApp.LOCK))
 ALL.append(Target('tizen-arm-light', TizenBuilder,
                   board=TizenBoard.ARM, app=TizenApp.LIGHT))
 ALL.append(Target('ameba-amebad-all-clusters', AmebaBuilder,

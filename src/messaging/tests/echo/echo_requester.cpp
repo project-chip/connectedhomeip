@@ -62,7 +62,7 @@ chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPen
 chip::Inet::IPAddress gDestAddr;
 
 // The last time a CHIP Echo was attempted to be sent.
-chip::System::Clock::Timestamp gLastEchoTime{ 0 };
+chip::System::Clock::Timestamp gLastEchoTime = chip::System::Clock::kZero;
 
 // Count of the number of EchoRequests sent.
 uint64_t gEchoCount = 0;
@@ -228,7 +228,7 @@ int main(int argc, char * argv[])
 
     if (gUseTCP)
     {
-        err = gTCPManager.Init(chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer)
+        err = gTCPManager.Init(chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer())
                                    .SetAddressType(chip::Inet::IPAddressType::kIPv6)
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
@@ -238,7 +238,7 @@ int main(int argc, char * argv[])
     }
     else
     {
-        err = gUDPManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
+        err = gUDPManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer())
                                    .SetAddressType(chip::Inet::IPAddressType::kIPv6)
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
@@ -263,10 +263,12 @@ int main(int argc, char * argv[])
     // Arrange to get a callback whenever an Echo Response is received.
     gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
-    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Zero, EchoTimerHandler, NULL);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::kZero, EchoTimerHandler, NULL);
     SuccessOrExit(err);
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+
+    gUDPManager.Close();
 
     Shutdown();
 

@@ -116,6 +116,35 @@
 #define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 1
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_SED
+ *
+ * Enable support for sleepy end device behavior.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_SED
+#define CHIP_DEVICE_CONFIG_ENABLE_SED 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL
+ *
+ * The default amount of time in milliseconds that the sleepy end device will use as a slow-polling interval.
+ * This interval is used by the device to periodically wake up and poll the data in the idle mode.
+ */
+#ifndef CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL
+#define CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL 5000
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL
+ *
+ * The default amount of time in milliseconds that the sleepy end device will use as a fast-polling interval.
+ * This interval is used by the device to periodically wake up and poll the data in the active mode.
+ */
+#ifndef CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL
+#define CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL 200
+#endif
+
 // -------------------- Device Identification Configuration --------------------
 
 /**
@@ -728,21 +757,6 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_TRAIT_MANAGER
 #define CHIP_DEVICE_CONFIG_ENABLE_TRAIT_MANAGER 0
-#endif
-
-// -------------------- Test Configuration --------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
- *
- * Enables the use of a hard-coded default chip device id and credentials if no device id
- * is found in chip NV storage.  The value specifies which of 10 identities, numbered 1 through 10,
- * is to be used.  A value of 0 disables use of a default identity.
- *
- * This option is for testing only and should be disabled in production releases.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 0
 #endif
 
 // -------------------- Network Telemetry Configuration --------------------

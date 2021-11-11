@@ -42,9 +42,6 @@ namespace DeviceLayer {
 
 namespace Internal {
 
-extern chip::System::Layer * gSystemLayer;
-extern chip::System::LayerImpl gSystemLayerImpl;
-
 extern CHIP_ERROR InitEntropy();
 
 template <class ImplClass>
@@ -67,6 +64,15 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     }
     SuccessOrExit(err);
 
+    // Initialize the CHIP system layer.
+    err = SystemLayer().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+
+    // Initialize the Configuration Manager.
     err = ConfigurationMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -74,20 +80,8 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     }
     SuccessOrExit(err);
 
-    // Initialize the CHIP system layer.
-    if (gSystemLayer == nullptr)
-    {
-        gSystemLayer = &gSystemLayerImpl;
-    }
-    err = gSystemLayer->Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
-    }
-    SuccessOrExit(err);
-
     // Initialize the CHIP Inet layer.
-    err = InetLayer.Init(*gSystemLayer, nullptr);
+    err = InetLayer().Init(SystemLayer(), nullptr);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "InetLayer initialization failed: %s", ErrorStr(err));
@@ -137,15 +131,15 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
     CHIP_ERROR err;
     ChipLogError(DeviceLayer, "Inet Layer shutdown");
-    err = InetLayer.Shutdown();
+    err = InetLayer().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    ChipLogError(DeviceLayer, "BLE layer shutdown");
-    err = BLEMgr().GetBleLayer()->Shutdown();
+    ChipLogError(DeviceLayer, "BLE shutdown");
+    err = BLEMgr().Shutdown();
 #endif
 
     ChipLogError(DeviceLayer, "System Layer shutdown");
-    err = gSystemLayer->Shutdown();
+    err = SystemLayer().Shutdown();
 
     return err;
 }
@@ -218,7 +212,7 @@ template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent * event)
 {
 #if CHIP_PROGRESS_LOGGING
-    uint64_t startUS = System::SystemClock().GetMonotonicMicroseconds();
+    System::Clock::Timestamp start = System::SystemClock().GetMonotonicTimestamp();
 #endif // CHIP_PROGRESS_LOGGING
 
     switch (event->Type)
@@ -227,13 +221,8 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
         // Do nothing for no-op events.
         break;
 
-    case DeviceEventType::kChipSystemLayerEvent:
-        // If the event is a CHIP System or Inet Layer event, deliver it to the System::Layer event handler.
-        Impl()->DispatchEventToSystemLayer(event);
-        break;
-
     case DeviceEventType::kChipLambdaEvent:
-        event->LambdaEvent.LambdaProxy(static_cast<const void *>(event->LambdaEvent.LambdaBody));
+        event->LambdaEvent();
         break;
 
     case DeviceEventType::kCallWorkFunct:
@@ -257,30 +246,12 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 
     // TODO: make this configurable
 #if CHIP_PROGRESS_LOGGING
-    uint32_t delta = static_cast<uint32_t>((System::SystemClock().GetMonotonicMicroseconds() - startUS) / 1000);
-    if (delta > 100)
+    uint32_t deltaMs = System::Clock::Milliseconds32(System::SystemClock().GetMonotonicTimestamp() - start).count();
+    if (deltaMs > 100)
     {
-        ChipLogError(DeviceLayer, "Long dispatch time: %" PRIu32 " ms, for event type %d", delta, event->Type);
+        ChipLogError(DeviceLayer, "Long dispatch time: %" PRIu32 " ms, for event type %d", deltaMs, event->Type);
     }
 #endif // CHIP_PROGRESS_LOGGING
-}
-
-template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const ChipDeviceEvent * event)
-{
-    // TODO(#788): remove ifdef LWIP once System::Layer event APIs are generally available
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // Invoke the System Layer's event handler function.
-    err = static_cast<System::LayerImplLwIP &>(SystemLayer())
-              .HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
-                           event->ChipSystemLayerEvent.Argument);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Error handling CHIP System Layer event (type %d): %s", event->Type, ErrorStr(err));
-    }
-#endif
 }
 
 template <class ImplClass>
@@ -314,10 +285,6 @@ void GenericPlatformManagerImpl<ImplClass>::HandleMessageLayerActivityChanged(bo
     if (messageLayerIsActive != self.mMsgLayerWasActive)
     {
         self.mMsgLayerWasActive = messageLayerIsActive;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        ThreadStackMgr().OnMessageLayerActivityChanged(messageLayerIsActive);
-#endif
     }
 }
 

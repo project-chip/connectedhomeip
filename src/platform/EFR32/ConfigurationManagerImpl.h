@@ -34,14 +34,18 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the EFR32 platform.
  */
-class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-                                       private Internal::EFR32Config
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+                                 private Internal::EFR32Config
 {
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 #endif
+
+public:
+    // This returns an instance of this class.
+    static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
@@ -55,39 +59,10 @@ private:
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
-    // ===== Members for internal use by the following friends.
-
-    friend ConfigurationManager & ConfigurationMgr(void);
-    friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
-
-    static ConfigurationManagerImpl sInstance;
-
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
 };
-
-/**
- * Returns the public interface of the ConfigurationManager singleton object.
- *
- * Chip applications should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
- */
-inline ConfigurationManager & ConfigurationMgr(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
- *
- * Chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the ESP32 platform.
- */
-inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
 
 inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {

@@ -210,7 +210,7 @@ CHIP_ERROR LayerImplLibevent::ScheduleWork(TimerCompleteCallback onComplete, voi
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    return StartTimer(Clock::Zero, onComplete, appState);
+    return StartTimer(Clock::kZero, onComplete, appState);
 }
 
 // static

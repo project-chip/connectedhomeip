@@ -158,9 +158,5 @@ limitations under the License.
             <arg name="errorCode" type="INT8U"/>
             <arg name="debugText" type="CHAR_STRING"/>
         </command>
-        <command source="client" code="0x10" name="GetLastNetworkCommissioningResult" optional="false" cli="chip network_commissioning getlastnetworkcommissioningresult">
-            <description>TODO</description>
-            <arg name="timeoutMs" type="INT32U"/>
-        </command>
     </cluster>
 </configurator>

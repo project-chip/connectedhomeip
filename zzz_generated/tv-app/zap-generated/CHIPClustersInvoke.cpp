@@ -67,12 +67,6 @@ ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::
     CommandResponseFailureCallback);
 
 template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
 ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type,
                            chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType>(
     const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type &, void *,
@@ -136,7 +130,6 @@ CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * c
                                       CommandResponseFailureCallback failureCb)
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
 
     auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
                                             const ResponseDataT & responseData) { successCb(context, responseData); };

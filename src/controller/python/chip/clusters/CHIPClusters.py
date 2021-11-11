@@ -2377,13 +2377,6 @@ class ChipClusters:
                     "timeoutMs": "int",
                 },
             },
-            0x00000010: {
-                "commandId": 0x00000010,
-                "commandName": "GetLastNetworkCommissioningResult",
-                "args": {
-                    "timeoutMs": "int",
-                },
-            },
             0x0000000A: {
                 "commandId": 0x0000000A,
                 "commandName": "RemoveNetwork",
@@ -2461,9 +2454,9 @@ class ChipClusters:
                 "args": {
                     "vendorId": "int",
                     "productId": "int",
-                    "hardwareVersion": "int",
                     "softwareVersion": "int",
                     "protocolsSupported": "int",
+                    "hardwareVersion": "int",
                     "location": "str",
                     "requestorCanConsent": "bool",
                     "metadataForProvider": "bytes",
@@ -3166,6 +3159,16 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MultiPressMax",
+                "attributeId": 0x00000002,
+                "type": "int",
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
@@ -5103,11 +5106,6 @@ class ChipClusters:
                 networkID), breadcrumb, timeoutMs
         )
 
-    def ClusterNetworkCommissioning_CommandGetLastNetworkCommissioningResult(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, timeoutMs: int):
-        return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult(
-            device, ZCLendpoint, ZCLgroupid, timeoutMs
-        )
-
     def ClusterNetworkCommissioning_CommandRemoveNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_RemoveNetwork(
             device, ZCLendpoint, ZCLgroupid, networkID, len(
@@ -5144,10 +5142,10 @@ class ChipClusters:
                 updateToken), softwareVersion
         )
 
-    def ClusterOtaSoftwareUpdateProvider_CommandQueryImage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int, productId: int, hardwareVersion: int, softwareVersion: int, protocolsSupported: int, location: str, requestorCanConsent: bool, metadataForProvider: bytes):
+    def ClusterOtaSoftwareUpdateProvider_CommandQueryImage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int, productId: int, softwareVersion: int, protocolsSupported: int, hardwareVersion: int, location: str, requestorCanConsent: bool, metadataForProvider: bytes):
         location = location.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
-            device, ZCLendpoint, ZCLgroupid, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported, location, len(
+            device, ZCLendpoint, ZCLgroupid, vendorId, productId, softwareVersion, protocolsSupported, hardwareVersion, location, len(
                 location), requestorCanConsent, metadataForProvider, len(metadataForProvider)
         )
 
@@ -6504,6 +6502,12 @@ class ChipClusters:
 
     def ClusterSwitch_SubscribeAttributeCurrentPosition(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_Switch_CurrentPosition(device, ZCLendpoint, minInterval, maxInterval)
+
+    def ClusterSwitch_ReadAttributeMultiPressMax(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Switch_MultiPressMax(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterSwitch_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Switch_FeatureMap(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterSwitch_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Switch_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -8678,10 +8682,6 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_EnableNetwork.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_EnableNetwork.restype = ctypes.c_uint32
-        # Cluster NetworkCommissioning Command GetLastNetworkCommissioningResult
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning Command RemoveNetwork
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_RemoveNetwork.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
@@ -8717,7 +8717,7 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_NotifyUpdateApplied.restype = ctypes.c_uint32
         # Cluster OtaSoftwareUpdateProvider Command QueryImage
         self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_bool, ctypes.c_char_p, ctypes.c_uint32]
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_bool, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage.restype = ctypes.c_uint32
         # Cluster OtaSoftwareUpdateProvider ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision.argtypes = [
@@ -9207,6 +9207,14 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_Switch_CurrentPosition.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_Switch_CurrentPosition.restype = ctypes.c_uint32
+        # Cluster Switch ReadAttribute MultiPressMax
+        self._chipLib.chip_ime_ReadAttribute_Switch_MultiPressMax.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Switch_MultiPressMax.restype = ctypes.c_uint32
+        # Cluster Switch ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_Switch_FeatureMap.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Switch_FeatureMap.restype = ctypes.c_uint32
         # Cluster Switch ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Switch_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

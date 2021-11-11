@@ -32,13 +32,15 @@ public:
     void SetOTAFilePath(const char * path);
 
     // Inherited from OTAProviderDelegate
-    EmberAfStatus HandleQueryImage(chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId,
-                                   uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported,
-                                   const chip::Span<const char> & location, bool requestorCanConsent,
-                                   const chip::ByteSpan & metadataForServer) override;
-    EmberAfStatus HandleApplyUpdateRequest(chip::app::CommandHandler * commandObj, const chip::ByteSpan & updateToken,
-                                           uint32_t newVersion) override;
-    EmberAfStatus HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t softwareVersion) override;
+    EmberAfStatus HandleQueryImage(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) override;
+    EmberAfStatus HandleApplyUpdateRequest(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData) override;
+    EmberAfStatus HandleNotifyUpdateApplied(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
 
     enum queryImageBehaviorType
     {

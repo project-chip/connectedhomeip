@@ -49,13 +49,12 @@
 
 #include <inet/InetConfig.h>
 
+#include <inet/EndPointBasis.h>
 #include <inet/IANAConstants.h>
 #include <inet/IPAddress.h>
 #include <inet/IPPrefix.h>
 #include <inet/InetError.h>
 #include <inet/InetInterface.h>
-#include <inet/InetLayerBasis.h>
-#include <inet/InetLayerEvents.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>
@@ -70,24 +69,6 @@
 
 #include <lib/support/DLLUtil.h>
 #include <lib/support/ObjectLifeCycle.h>
-
-#if INET_CONFIG_MAX_DROPPABLE_EVENTS
-
-#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-#include <pthread.h>
-#include <semaphore.h>
-#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-
-#if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-#if defined(ESP_PLATFORM)
-#include "freertos/FreeRTOS.h"
-#else
-#include <FreeRTOS.h>
-#endif
-#include <semphr.h>
-#endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-
-#endif // INET_CONFIG_MAX_DROPPABLE_EVENTS
 
 #include <stdint.h>
 
@@ -151,64 +132,8 @@ public:
     CHIP_ERROR GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr);
     bool MatchLocalIPv6Subnet(const IPAddress & addr);
 
-    static void UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot);
-
     void * GetPlatformData();
     void SetPlatformData(void * aPlatformData);
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static CHIP_ERROR HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType, uintptr_t aArgument);
-
-    static chip::System::LayerLwIP::EventHandlerDelegate sInetEventHandlerDelegate;
-
-    // In some implementations, there may be a shared event / message
-    // queue for the InetLayer used by other system events / messages.
-    //
-    // If the length of that queue is considerably longer than the
-    // number of packet buffers available, it may lead to buffer
-    // exhaustion. As a result, using the queue itself to implement
-    // backpressure is insufficient, and we need an external mechanism
-    // to prevent buffer starvation in the rest of the system and
-    // getting into deadlock situations.
-
-    // For both UDP and raw network transport traffic we can easily
-    // drop incoming packets without impacting the correctness of
-    // higher level protocols.
-
-#if INET_CONFIG_MAX_DROPPABLE_EVENTS
-    inline static bool IsDroppableEvent(chip::System::EventType type)
-    {
-        return
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-            type == kInetEvent_UDPDataReceived ||
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-            false;
-    }
-
-    CHIP_ERROR InitQueueLimiter(void);
-    bool CanEnqueueDroppableEvent(void);
-    void DroppableEventDequeued(void);
-
-#if CHIP_SYSTEM_CONFIG_NO_LOCKING
-    volatile int32_t mDroppableEvents;
-#elif CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-    sem_t mDroppableEvents;
-#elif CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-#if (configSUPPORT_STATIC_ALLOCATION == 1)
-    StaticSemaphore_t mDroppableEventsObj;
-#endif // (configSUPPORT_STATIC_ALLOCATION == 1)
-    SemaphoreHandle_t mDroppableEvents;
-#endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-
-#else  // !INET_CONFIG_MAX_DROPPABLE_EVENTS
-
-    inline static bool IsDroppableEvent(chip::System::EventType aType) { return false; }
-
-    inline CHIP_ERROR InitQueueLimiter(void) { return CHIP_NO_ERROR; }
-    inline bool CanEnqueueDroppableEvent(void) { return true; }
-    inline void DroppableEventDequeued(void) { return; }
-#endif // !INET_CONFIG_MAX_DROPPABLE_EVENTS
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
     static void HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState);

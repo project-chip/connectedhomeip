@@ -435,6 +435,11 @@ config("size_default") {
     "-ffunction-sections",
     "-fdata-sections",
   ]
+
+  # do not export functions in jni, or --gc-sections will not work and will be some undefined issues
+  if (current_os == "android") {
+    cflags += [ "-fvisibility=hidden" ]
+  }
 }
 
 config("stack_protector_default") {

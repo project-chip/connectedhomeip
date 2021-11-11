@@ -959,8 +959,6 @@ public:
                               chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
     CHIP_ERROR EnableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                              chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR GetLastNetworkCommissioningResult(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint32_t timeoutMs);
     CHIP_ERROR RemoveNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                              chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
     CHIP_ERROR ScanNetworks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
@@ -988,9 +986,10 @@ public:
                                   chip::ByteSpan updateToken, uint32_t newVersion);
     CHIP_ERROR NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                    chip::ByteSpan updateToken, uint32_t softwareVersion);
-    CHIP_ERROR QueryImage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t vendorId,
-                          uint16_t productId, uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported,
-                          chip::CharSpan location, bool requestorCanConsent, chip::ByteSpan metadataForProvider);
+    CHIP_ERROR QueryImage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                          chip::VendorId vendorId, uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
+                          uint16_t hardwareVersion, chip::CharSpan location, bool requestorCanConsent,
+                          chip::ByteSpan metadataForProvider);
 
     // Cluster Attributes
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -1291,6 +1290,8 @@ public:
     // Cluster Attributes
     CHIP_ERROR ReadAttributeNumberOfPositions(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeCurrentPosition(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMultiPressMax(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeCurrentPosition(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);

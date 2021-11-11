@@ -10,16 +10,8 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && git clone --depth 1 --recursive -b v4.3 https://github.com/espressif/esp-idf.git /tmp/esp-idf \
-    && : # last line
-
-# TODO: Remove this patch once https://github.com/espressif/esp-idf/pull/7632 is available
-COPY 0001-esp_crt_bundle-remove-EC-ACC-certificate.patch /tmp/esp-idf/0001-esp_crt_bundle-remove-EC-ACC-certificate.patch
-
-WORKDIR /tmp/esp-idf
-RUN set -x \
-    && git apply /tmp/esp-idf/0001-esp_crt_bundle-remove-EC-ACC-certificate.patch \
-    && rm -f /tmp/esp-idf/0001-esp_crt_bundle-remove-EC-ACC-certificate.patch \
+    && git clone --depth 1 --recursive -b release/v4.4 https://github.com/espressif/esp-idf.git /tmp/esp-idf \
+    && git -C /tmp/esp-idf checkout 6a7d83af1984b93ebaefa7ca9be36304806c3dc8 \
     && : # last line
 
 FROM connectedhomeip/chip-build:${VERSION}

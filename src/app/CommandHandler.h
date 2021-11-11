@@ -26,7 +26,6 @@
 
 #include <app/Command.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/MessageDef/CommandDataIB.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -38,6 +37,9 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
+
+#include <app/MessageDef/InvokeRequestMessage.h>
+#include <app/MessageDef/InvokeResponseMessage.h>
 
 namespace chip {
 namespace app {
@@ -54,7 +56,19 @@ public:
          * Method that signals to a registered callback that this object
          * has completed doing useful work and is now safe for release/destruction.
          */
-        virtual void OnDone(CommandHandler * apCommandObj) = 0;
+        virtual void OnDone(CommandHandler & apCommandObj) = 0;
+
+        /*
+         * Upon processing of a CommandDataIB, this method is invoked to dispatch the command
+         * to the right server-side handler provided by the application.
+         */
+        virtual void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                     TLV::TLVReader & apPayload) = 0;
+
+        /*
+         * Check to see if a command implementation exists for a specific concrete command path.
+         */
+        virtual bool CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
     };
 
     /*
@@ -78,6 +92,13 @@ public:
 
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus) override;
 
+    CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload);
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
+    CHIP_ERROR FinishCommand(bool aStartDataStruct = true);
+    CHIP_ERROR PrepareStatus(const CommandPathParams & aCommandPathParams);
+    CHIP_ERROR FinishStatus();
+    TLV::TLVWriter * GetCommandDataIBTLVWriter();
+
     /**
      * API for adding a data response.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
@@ -94,12 +115,21 @@ public:
         ReturnErrorOnFailure(PrepareResponse(aRequestCommandPath, CommandData::GetCommandId()));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::kCsTag_Data), aData));
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
 
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
 private:
+    friend class TestCommandInteraction;
+    /*
+     * Allocates a packet buffer used for encoding an invoke response payload.
+     *
+     * This can be called multiple times safely, as it will only allocate the buffer once for the lifetime
+     * of this object.
+     */
+    CHIP_ERROR AllocateBuffer();
+
     //
     // Called internally to signal the completion of all work on this object, gracefully close the
     // exchange (by calling into the base class) and finally, signal to a registerd callback that it's
@@ -107,14 +137,18 @@ private:
     //
     void Close();
 
-    friend class TestCommandInteraction;
+    CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement);
     CHIP_ERROR SendCommandResponse();
-    CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement) override;
     CHIP_ERROR PrepareResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommand);
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
                                  const Optional<ClusterStatus> & aClusterStatus);
 
     Callback * mpCallback = nullptr;
+    InvokeResponseMessage::Builder mInvokeResponseBuilder;
+    TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
+    bool mSuppressResponse                 = false;
+    bool mTimedRequest                     = false;
 };
+
 } // namespace app
 } // namespace chip

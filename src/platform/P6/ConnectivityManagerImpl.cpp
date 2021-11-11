@@ -131,7 +131,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
 {
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
-        mLastAPDemandTime = System::Clock::Zero;
+        mLastAPDemandTime = System::Clock::kZero;
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
@@ -182,8 +182,8 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err                = CHIP_NO_ERROR;
     cy_rslt_t result              = CY_RSLT_SUCCESS;
-    mLastStationConnectFailTime   = System::Clock::Zero;
-    mLastAPDemandTime             = System::Clock::Zero;
+    mLastStationConnectFailTime   = System::Clock::kZero;
+    mLastAPDemandTime             = System::Clock::kZero;
     mWiFiStationMode              = kWiFiStationMode_Disabled;
     mWiFiStationState             = kWiFiStationState_NotConnected;
     mWiFiAPMode                   = kWiFiAPMode_Disabled;
@@ -404,7 +404,7 @@ void ConnectivityManagerImpl::DriveAPState()
         {
             System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
-            if (mLastAPDemandTime != System::Clock::Zero && now < (mLastAPDemandTime + mWiFiAPIdleTimeout))
+            if (mLastAPDemandTime != System::Clock::kZero && now < (mLastAPDemandTime + mWiFiAPIdleTimeout))
             {
                 targetState = kWiFiAPState_Active;
 
@@ -502,7 +502,7 @@ void ConnectivityManagerImpl::DriveStationState()
         {
             ChangeWiFiStationState(kWiFiStationState_Connected);
             ChipLogProgress(DeviceLayer, "WiFi station interface connected");
-            mLastStationConnectFailTime = System::Clock::Zero;
+            mLastStationConnectFailTime = System::Clock::kZero;
         }
 
         // If the WiFi station interface is no longer enabled, or no longer provisioned,
@@ -537,7 +537,7 @@ void ConnectivityManagerImpl::DriveStationState()
             if (prevState != kWiFiStationState_Connecting_Failed)
             {
                 ChipLogProgress(DeviceLayer, "WiFi station interface disconnected");
-                mLastStationConnectFailTime = System::Clock::Zero;
+                mLastStationConnectFailTime = System::Clock::kZero;
             }
             else
             {
@@ -551,7 +551,7 @@ void ConnectivityManagerImpl::DriveStationState()
         {
             // Initiate a connection to the AP if we haven't done so before, or if enough
             // time has passed since the last attempt.
-            if (mLastStationConnectFailTime == System::Clock::Zero ||
+            if (mLastStationConnectFailTime == System::Clock::kZero ||
                 now >= mLastStationConnectFailTime + mWiFiStationReconnectInterval)
             {
                 ChangeWiFiStationState(kWiFiStationState_Connecting);

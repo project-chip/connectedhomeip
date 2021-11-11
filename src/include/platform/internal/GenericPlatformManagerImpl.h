@@ -69,7 +69,6 @@ protected:
 
     // ===== Support methods that can be overridden by the implementation subclass.
 
-    void DispatchEventToSystemLayer(const ChipDeviceEvent * event);
     void DispatchEventToDeviceLayer(const ChipDeviceEvent * event);
     void DispatchEventToApplication(const ChipDeviceEvent * event);
     static void HandleMessageLayerActivityChanged(bool messageLayerIsActive);

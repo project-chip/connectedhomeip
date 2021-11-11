@@ -16,7 +16,12 @@
 # limitations under the License.
 #
 
+# Fail if one of our sub-commands fails.
 set -e
+
+# Fail if anything in a pipeline fails, not just the last command (which for
+# us tends to be 'tee').
+set -o pipefail
 
 declare -i iterations=2
 declare -i delay=0
@@ -58,7 +63,7 @@ else
     application="all-clusters"
     declare test_filenames="${single_case-Test*}.yaml"
 fi
-declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -exec basename {} .yaml \;))"
+declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -not -name "*Simulated*" -exec basename {} .yaml \;))"
 
 if [[ $iterations == 0 ]]; then
     echo "Invalid iteration count: '$1'"
@@ -84,6 +89,9 @@ echo ""
 
 ulimit -c unlimited || true
 
+rm -rf /tmp/test_suites_app_logs
+mkdir -p /tmp/test_suites_app_logs
+
 declare -a iter_array="($(seq "$iterations"))"
 for j in "${iter_array[@]}"; do
     echo " ===== Iteration $j starting"
@@ -107,16 +115,18 @@ for j in "${iter_array[@]}"; do
         # tee expeditiously; otherwise it will buffer things up and we
         # will never see the string we want.
 
-        # Clear out our temp files so we don't accidentally do a stale
-        # read from them before we write to them.
-        rm -rf /tmp/"$application"-log
-        touch /tmp/"$application"-log
+        application_log_file=/tmp/test_suites_app_logs/"$application-$i-$j"-log
+        pairing_log_file=/tmp/test_suites_app_logs/pairing-"$application-$i-$j"-log
+        chip_tool_log_file=/tmp/test_suites_app_logs/chip-tool-"$application-$i-$j"-log
+        touch "$application_log_file"
+        touch "$pairing_log_file"
+        touch "$chip_tool_log_file"
         rm -rf /tmp/pid
         (
             stdbuf -o0 "${test_case_wrapper[@]}" out/debug/standalone/chip-"$application"-app &
             echo $! >&3
-        ) 3>/tmp/pid | tee /tmp/"$application"-log &
-        while ! grep -q "Server Listening" /tmp/"$application"-log; do
+        ) 3>/tmp/pid | tee "$application_log_file" &
+        while ! grep -q "Server Listening" "$application_log_file"; do
             :
         done
         # Now read $background_pid from /tmp/pid; presumably it's
@@ -124,10 +134,16 @@ for j in "${iter_array[@]}"; do
         # kicking off the subshell, sometimes we try to do it before
         # the data is there yet.
         background_pid="$(</tmp/pid)"
+        # Only look for commissionable nodes if dns-sd is available
+        if command -v dns-sd &>/dev/null; then
+            echo "          * [CI DEBUG] Looking for commissionable Nodes"
+            # Ignore the error that timeout generates
+            cat <(timeout 1 dns-sd -B _matterc._udp)
+        fi
         echo "          * Pairing to device"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00 | tee "$pairing_log_file"
         echo "          * Starting test run: $i"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$node_id" "$delay"
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$node_id" "$delay" | tee "$chip_tool_log_file"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0

@@ -116,8 +116,8 @@ typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(v
                                                                                chip::CharSpan debugText);
 typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
                                                                              chip::CharSpan debugText);
-typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback)(void * context, uint8_t action,
-                                                                                   uint32_t delayedActionTime);
+typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback)(void * context, uint8_t action,
+                                                                            uint32_t delayedActionTime);
 typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(
     void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI, uint32_t softwareVersion,
     chip::CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
@@ -142,6 +142,7 @@ typedef void (*TvChannelClusterChangeChannelResponseCallback)(void * context,
                                                               /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch,
                                                               uint8_t ErrorType);
 typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
+typedef void (*TestClusterClusterBooleanResponseCallback)(void * context, bool value);
 typedef void (*TestClusterClusterTestAddArgumentsResponseCallback)(void * context, uint8_t returnValue);
 typedef void (*TestClusterClusterTestEnumsResponseCallback)(void * context, chip::VendorId arg1, uint8_t arg2);
 typedef void (*TestClusterClusterTestListInt8UReverseResponseCallback)(void * context,

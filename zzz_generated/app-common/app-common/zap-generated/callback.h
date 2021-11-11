@@ -12895,11 +12895,11 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
     chip::CharSpan imageURI, uint32_t softwareVersion, chip::CharSpan softwareVersionString, chip::ByteSpan updateToken,
     bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 /**
- * @brief OTA Software Update Provider Cluster ApplyUpdateRequestResponse Command callback (from server)
+ * @brief OTA Software Update Provider Cluster ApplyUpdateResponse Command callback (from server)
  */
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(chip::EndpointId endpoint,
-                                                                               chip::app::CommandSender * commandObj,
-                                                                               uint8_t action, uint32_t delayedActionTime);
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(chip::EndpointId endpoint,
+                                                                        chip::app::CommandSender * commandObj, uint8_t action,
+                                                                        uint32_t delayedActionTime);
 /**
  * @brief OTA Software Update Requestor Cluster AnnounceOtaProvider Command callback (from client)
  */
@@ -13038,12 +13038,6 @@ bool emberAfNetworkCommissioningClusterDisableNetworkCallback(
 bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(chip::EndpointId endpoint,
                                                                       chip::app::CommandSender * commandObj, uint8_t errorCode,
                                                                       chip::CharSpan debugText);
-/**
- * @brief Network Commissioning Cluster GetLastNetworkCommissioningResult Command callback (from client)
- */
-bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::DecodableType & commandData);
 /**
  * @brief Diagnostic Logs Cluster RetrieveLogsRequest Command callback (from client)
  */
@@ -14242,6 +14236,10 @@ bool emberAfTestClusterClusterTestComplexNullableOptionalResponseCallback(
 bool emberAfTestClusterClusterTestNestedStructArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster BooleanResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterBooleanResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, bool value);
 /**
  * @brief Test Cluster Cluster TestListStructArgumentRequest Command callback (from client)
  */

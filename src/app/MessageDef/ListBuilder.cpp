@@ -15,11 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines List builder in CHIP interaction model
- *
- */
 
 #include "ListBuilder.h"
 
@@ -27,27 +22,22 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-using namespace chip;
-using namespace chip::TLV;
-
 namespace chip {
 namespace app {
-ListBuilder::ListBuilder() {}
-
-CHIP_ERROR ListBuilder::Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
+CHIP_ERROR ListBuilder::Init(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
 {
     mpWriter = apWriter;
-    mError   = mpWriter->StartContainer(chip::TLV::ContextTag(aContextTagToUse), chip::TLV::kTLVType_Array, mOuterContainerType);
+    mError   = mpWriter->StartContainer(TLV::ContextTag(aContextTagToUse), TLV::kTLVType_List, mOuterContainerType);
 
     return mError;
 }
 
-CHIP_ERROR ListBuilder::Init(chip::TLV::TLVWriter * const apWriter)
+CHIP_ERROR ListBuilder::Init(TLV::TLVWriter * const apWriter)
 {
     mpWriter = apWriter;
-    mError   = mpWriter->StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Array, mOuterContainerType);
+    mError   = mpWriter->StartContainer(TLV::AnonymousTag, TLV::kTLVType_List, mOuterContainerType);
 
     return mError;
 }
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

@@ -65,14 +65,23 @@ class AndroidBoard(Enum):
 class AndroidApp(Enum):
     CHIP_TOOL = auto()
     CHIP_TEST = auto()
+    CHIP_TVServer = auto()
 
     def AppName(self):
         if self == AndroidApp.CHIP_TOOL:
             return "CHIPTool"
         elif self == AndroidApp.CHIP_TEST:
             return "CHIPTest"
+        elif self == AndroidApp.CHIP_TVServer:
+            return "CHIPTVServer"
         else:
             raise Exception('Unknown app type: %r' % self)
+
+    def AppGnArgs(self):
+        gn_args = {}
+        if self == AndroidApp.CHIP_TVServer:
+            gn_args['chip_config_network_layer_ble'] = False
+        return gn_args
 
 
 class AndroidBuilder(Builder):
@@ -91,9 +100,13 @@ class AndroidBuilder(Builder):
         # SDK manager must be runnable to 'accept licenses'
         sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'tools', 'bin',
                                    'sdkmanager')
-        if not (os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)):
-            raise Exception("'%s' is not executable by the current user" %
-                            sdk_manager)
+
+        # New SDK manager at cmdline-tools/latest/bin/
+        new_sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest',
+                                       'bin', 'sdkmanager')
+        if not (os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)) and not (os.path.isfile(new_sdk_manager) and os.access(new_sdk_manager, os.X_OK)):
+            raise Exception("'%s' and '%s' is not executable by the current user" %
+                            (sdk_manager, new_sdk_manager))
 
         # In order to accept a license, the licenses folder is updated with the hash of the
         # accepted license
@@ -130,12 +143,19 @@ class AndroidBuilder(Builder):
             gn_args['target_cpu'] = self.board.TargetCpuName()
             gn_args['android_ndk_root'] = os.environ['ANDROID_NDK_HOME']
             gn_args['android_sdk_root'] = os.environ['ANDROID_HOME']
-            gn_args['chip_use_clusters_for_ip_commissioning'] = 'true'
+            gn_args['chip_use_clusters_for_ip_commissioning'] = True
+            gn_args.update(self.app.AppGnArgs())
 
-            args = '--args=%s' % (' '.join([
-                '%s="%s"' % (key, shlex.quote(value))
-                for key, value in gn_args.items()
-            ]))
+            args_str = ""
+            for key, value in gn_args.items():
+                if type(value) == bool:
+                    if value:
+                        args_str += '%s=true ' % (key)
+                    else:
+                        args_str += '%s=false ' % (key)
+                else:
+                    args_str += '%s="%s" ' % (key, shlex.quote(value))
+            args = '--args=%s' % (args_str)
 
             gn_gen = [
                 'gn', 'gen', '--check', '--fail-on-unused-args', self.output_dir, args,
@@ -146,12 +166,24 @@ class AndroidBuilder(Builder):
 
             self._Execute(gn_gen, title='Generating ' + self.identifier)
 
-            self._Execute([
-                'bash', '-c',
-                'yes | %s/tools/bin/sdkmanager --licenses >/dev/null' %
-                os.environ['ANDROID_HOME']
-            ],
-                title='Accepting NDK licenses')
+            new_sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest',
+                                           'bin', 'sdkmanager')
+            if (os.path.isfile(new_sdk_manager) and os.access(new_sdk_manager, os.X_OK)):
+                self._Execute([
+                    'bash', '-c',
+                    'yes | %s --licenses >/dev/null' %
+                    new_sdk_manager
+                ],
+                    title='Accepting NDK licenses @ cmdline-tools')
+            else:
+                sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'tools', 'bin',
+                                           'sdkmanager')
+                self._Execute([
+                    'bash', '-c',
+                    'yes | %s --licenses >/dev/null' %
+                    sdk_manager
+                ],
+                    title='Accepting NDK licenses @ tools')
 
     def _build(self):
         if self.board.IsIde():
@@ -193,16 +225,17 @@ class AndroidBuilder(Builder):
             #
             #   If we unify the JNI libraries, libc++_shared.so may not be needed anymore, which could
             # be another path of resolving this inconsistency.
-            for libName in ['libSetupPayloadParser.so', 'libCHIPController.so', 'libc++_shared.so']:
+            for libName in ['libSetupPayloadParser.so', 'libCHIPController.so', 'libc++_shared.so', 'libCHIPAppServer.so']:
                 self._Execute(['cp', os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(
                 ), libName), os.path.join(jnilibs_dir, libName)])
 
             jars = {
                 'CHIPController.jar': 'src/controller/java/CHIPController.jar',
                 'SetupPayloadParser.jar': 'src/setup_payload/java/SetupPayloadParser.jar',
-                'AndroidPlatform.jar': 'src/platform/android/AndroidPlatform.jar'
-
+                'AndroidPlatform.jar': 'src/platform/android/AndroidPlatform.jar',
+                'CHIPAppServer.jar': 'src/app/server/java/CHIPAppServer.jar',
             }
+
             for jarName in jars.keys():
                 self._Execute(['cp', os.path.join(
                     self.output_dir, 'lib', jars[jarName]), os.path.join(libs_dir, jarName)])

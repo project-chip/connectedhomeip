@@ -1374,14 +1374,6 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 0
-            },
-            {
-              "name": "GetLastNetworkCommissioningResult",
-              "code": 16,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 0
             }
           ],
           "attributes": []

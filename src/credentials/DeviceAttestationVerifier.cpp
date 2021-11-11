@@ -44,6 +44,14 @@ public:
         (void) attestationNonce;
         return AttestationVerificationResult::kNotImplemented;
     }
+
+    AttestationVerificationResult ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
+                                                                            ByteSpan & certDeclBuffer) override
+    {
+        (void) cmsEnvelopeBuffer;
+        (void) certDeclBuffer;
+        return AttestationVerificationResult::kNotImplemented;
+    }
 };
 
 // Default to avoid nullptr on getter and cleanly handle new products/clients before

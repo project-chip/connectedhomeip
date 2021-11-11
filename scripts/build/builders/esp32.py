@@ -129,7 +129,7 @@ class Esp32Builder(Builder):
 
         if not self.enable_ipv4:
             self._Execute(
-                ['bash', '-c', 'echo CONFIG_DISABLE_IPV4=y >>%s' % shlex.quote(defaults_out)])
+                ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
 
         cmd = "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} reconfigure".format(
             defaults=shlex.quote(defaults_out),

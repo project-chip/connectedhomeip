@@ -210,6 +210,11 @@ public class ChipDeviceController {
     return isActive(deviceControllerPtr, deviceId);
   }
 
+  /* Shutdown all cluster attribute subscriptions for a given device */
+  public void shutdownSubscriptions(long devicePtr) {
+    shutdownSubscriptions(deviceControllerPtr, devicePtr);
+  }
+
   /**
    * Generates a new PASE verifier and passcode ID for the given setup PIN code.
    *
@@ -270,6 +275,8 @@ public class ChipDeviceController {
       long setupPinCode);
 
   private native boolean isActive(long deviceControllerPtr, long deviceId);
+
+  private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 
   static {
     System.loadLibrary("CHIPController");

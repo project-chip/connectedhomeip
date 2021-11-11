@@ -2217,6 +2217,51 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS           CHIP_CORE_ERROR(0xcb)
 
 /**
+ * @def CHIP_ERROR_IM_MALFORMED_COMMAND_STATUS_IB
+ *
+ * @brief
+ *   The CommandStatusCodeIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_COMMAND_STATUS_IB         CHIP_CORE_ERROR(0xcb)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB
+ *
+ * @brief
+ *   The InvokeResponseIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB         CHIP_CORE_ERROR(0xcc)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The InvokeResponseMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xcd)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The InvokeResponseMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE    CHIP_CORE_ERROR(0xce)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE
+ *
+ * @brief
+ *   The InvokeResponseMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE    CHIP_CORE_ERROR(0xcf)
+
+/**
  *  @}
  */
 

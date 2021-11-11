@@ -36,12 +36,18 @@ namespace Controller {
  * GetAttributeId() methods is expected to work.
  *
  */
-template <typename AttributeTypeInfo>
+
+/**
+ * To avoid instantiating all the complicated code on a per-attribute basis, we
+ * have a helper that's just templated on the type.
+ */
+template <typename DecodableAttributeType>
 CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
-                         typename TypedReadCallback<AttributeTypeInfo>::OnSuccessCallbackType onSuccessCb,
-                         typename TypedReadCallback<AttributeTypeInfo>::OnErrorCallbackType onErrorCb)
+                         ClusterId clusterId, AttributeId attributeId,
+                         typename TypedReadCallback<DecodableAttributeType>::OnSuccessCallbackType onSuccessCb,
+                         typename TypedReadCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb)
 {
-    app::AttributePathParams attributePath(endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId());
+    app::AttributePathParams attributePath(endpointId, clusterId, attributeId);
     app::ReadPrepareParams readParams(sessionHandle);
     app::ReadClient * readClient         = nullptr;
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
@@ -50,14 +56,15 @@ CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const Sessio
     readParams.mpAttributePathParamsList    = &attributePath;
     readParams.mAttributePathParamsListSize = 1;
 
-    auto onDone = [](app::ReadClient * apReadClient, TypedReadCallback<AttributeTypeInfo> * callback) {
+    auto onDone = [](app::ReadClient * apReadClient, TypedReadCallback<DecodableAttributeType> * callback) {
         chip::Platform::Delete(callback);
     };
 
-    auto callback = chip::Platform::MakeUnique<TypedReadCallback<AttributeTypeInfo>>(onSuccessCb, onErrorCb, onDone);
+    auto callback = chip::Platform::MakeUnique<TypedReadCallback<DecodableAttributeType>>(clusterId, attributeId, onSuccessCb,
+                                                                                          onErrorCb, onDone);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, 0, callback.get()));
+    ReturnErrorOnFailure(engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, callback.get()));
 
     err = readClient->SendReadRequest(readParams);
     if (err != CHIP_NO_ERROR)
@@ -73,6 +80,16 @@ CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const Sessio
     //
     callback.release();
     return err;
+}
+
+template <typename AttributeTypeInfo>
+CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+                         typename TypedReadCallback<typename AttributeTypeInfo::DecodableType>::OnSuccessCallbackType onSuccessCb,
+                         typename TypedReadCallback<typename AttributeTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb)
+{
+    return ReadAttribute<typename AttributeTypeInfo::DecodableType>(aExchangeMgr, sessionHandle, endpointId,
+                                                                    AttributeTypeInfo::GetClusterId(),
+                                                                    AttributeTypeInfo::GetAttributeId(), onSuccessCb, onErrorCb);
 }
 
 } // namespace Controller

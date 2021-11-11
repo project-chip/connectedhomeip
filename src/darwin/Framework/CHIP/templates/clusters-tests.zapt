@@ -171,6 +171,7 @@ CHIPDevice * GetConnectedDevice()
 {{#chip_client_clusters}}
 {{#unless (isStrEqual "Test Cluster" name)}}
 {{#unless (isStrEqual "Basic" name)}}
+{{#unless (isStrEqual "Thermostat" name)}}
 {{#chip_server_cluster_attributes}}
 - (void)testSendCluster{{asUpperCamelCase parent.name}}ReadAttribute{{asUpperCamelCase name}}WithResponseHandler
 {
@@ -211,6 +212,7 @@ CHIPDevice * GetConnectedDevice()
 }
 {{/if}}
 {{/chip_server_cluster_attributes}}
+{{/unless}}
 {{/unless}}
 {{/unless}}
 {{/chip_client_clusters}}

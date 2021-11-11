@@ -28,15 +28,18 @@
  */
 
 #define __APPLE_USE_RFC_3542
-#include "UDPEndPoint.h"
+#include <inet/UDPEndPoint.h>
 
-#include "InetFaultInjection.h"
+#include <inet/InetFaultInjection.h>
 #include <inet/InetLayer.h>
-
+#include <inet/arpa-inet-compatibility.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
+
+#include <cstring>
+#include <utility>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if CHIP_HAVE_CONFIG_H
@@ -79,7 +82,7 @@
 #include <sys/socket.h>
 #endif // HAVE_SYS_SOCKET_H
 
-#include <errno.h>
+#include <cerrno>
 #include <net/if.h>
 #include <netinet/in.h>
 #include <sys/ioctl.h>
@@ -124,111 +127,65 @@
 #define INET_PORTSTRLEN 6
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-#include "arpa-inet-compatibility.h"
-
-#include <string.h>
-#include <utility>
-
 namespace chip {
 namespace Inet {
 
-chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPoint::sPool;
+BitMapObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPoint::sPool;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-static CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress & aAddress)
+namespace {
+
+CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
     VerifyOrReturnError(aInterfaceId.IsPresent(), INET_ERROR_UNKNOWN_INTERFACE);
     VerifyOrReturnError(aAddress.IsMulticast(), INET_ERROR_WRONG_ADDRESS_TYPE);
     return CHIP_NO_ERROR;
 }
+
+} // anonymous namespace
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-namespace {
-
-/*
- * Note that for LwIP InterfaceId is already defined to be 'struct
- * netif'; consequently, some of the checking performed here could
- * conceivably be optimized out and the HAVE_LWIP_UDP_BIND_NETIF case
- * could simply be:
- *
- *   udp_bind_netif(aUDP, intfId);
- *
- */
-CHIP_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
-{
-    CHIP_ERROR res = CHIP_NO_ERROR;
-
-#if HAVE_LWIP_UDP_BIND_NETIF
-    if (!intfId.IsPresent())
-        udp_bind_netif(aUDP, NULL);
-    else
-    {
-        struct netif * netifp = UDPEndPoint::FindNetifFromInterfaceId(intfId);
-
-        if (netifp == NULL)
-            res = INET_ERROR_UNKNOWN_INTERFACE;
-        else
-            udp_bind_netif(aUDP, netifp);
-    }
-#else
-    if (!intfId.IsPresent())
-        aUDP->intf_filter = NULL;
-    else
-    {
-        struct netif * netifp = FindNetifFromInterfaceId(intfId);
-
-        if (netifp == NULL)
-            res = INET_ERROR_UNKNOWN_INTERFACE;
-        else
-            aUDP->intf_filter = netifp;
-    }
-#endif // HAVE_LWIP_UDP_BIND_NETIF
-
-    return res;
-}
-
-} // anonymous namespace
-
-CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId)
+CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port, InterfaceId interfaceId)
 {
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
     // Make sure we have the appropriate type of PCB.
-    CHIP_ERROR res = GetPCB(addrType);
+    CHIP_ERROR res = GetPCB(addressType);
 
     // Bind the PCB to the specified address/port.
     if (res == CHIP_NO_ERROR)
     {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-        ip_addr_t ipAddr = addr.ToLwIPAddr();
+        ip_addr_t ipAddr = address.ToLwIPAddr();
 
-        // TODO: IPAddress ANY has only one constant state, however addrType
+        // TODO: IPAddress ANY has only one constant state, however addressType
         // has separate IPV4 and IPV6 'any' settings. This tries to correct
         // for this as LWIP default if IPv4 is compiled in is to consider
         // 'any == any_v4'
         //
         // We may want to consider having separate AnyV4 and AnyV6 constants
         // inside CHIP to resolve this ambiguity
-        if ((addr.Type() == IPAddressType::kAny) && (addrType == IPAddressType::kIPv6))
+        if ((address.Type() == IPAddressType::kAny) && (addressType == IPAddressType::kIPv6))
         {
             ipAddr = *IP6_ADDR_ANY;
         }
 
         res = chip::System::MapErrorLwIP(udp_bind(mUDP, &ipAddr, port));
 #else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-        if (addrType == IPAddressType::kIPv6)
+        if (addressType == IPAddressType::kIPv6)
         {
-            ip6_addr_t ipv6Addr = addr.ToIPv6();
+            ip6_addr_t ipv6Addr = address.ToIPv6();
             res                 = chip::System::MapErrorLwIP(udp_bind_ip6(mUDP, &ipv6Addr, port));
         }
 #if INET_CONFIG_ENABLE_IPV4
-        else if (addrType == IPAddressType::kIPv4)
+        else if (addressType == IPAddressType::kIPv4)
         {
-            ip4_addr_t ipv4Addr = addr.ToIPv4();
+            ip4_addr_t ipv4Addr = address.ToIPv4();
             res                 = chip::System::MapErrorLwIP(udp_bind(mUDP, &ipv4Addr, port));
         }
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -239,7 +196,7 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
 
     if (res == CHIP_NO_ERROR)
     {
-        res = LwIPBindInterface(mUDP, intfId);
+        res = LwIPBindInterface(mUDP, interfaceId);
     }
 
     // Unlock LwIP stack
@@ -268,7 +225,23 @@ CHIP_ERROR UDPEndPoint::BindInterfaceImpl(IPAddressType addrType, InterfaceId in
     return err;
 }
 
-InterfaceId UDPEndPoint::GetBoundInterface()
+CHIP_ERROR UDPEndPoint::LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
+{
+    struct netif * netifp = nullptr;
+    if (intfId.IsPresent())
+    {
+        netifp = UDPEndPoint::FindNetifFromInterfaceId(intfId);
+        if (netifp == nullptr)
+        {
+            return INET_ERROR_UNKNOWN_INTERFACE;
+        }
+    }
+
+    udp_bind_netif(aUDP, netifp);
+    return CHIP_NO_ERROR;
+}
+
+InterfaceId UDPEndPoint::GetBoundInterface() const
 {
 #if HAVE_LWIP_UDP_BIND_NETIF
     return InterfaceId(netif_get_by_index(mUDP->netif_idx));
@@ -277,7 +250,7 @@ InterfaceId UDPEndPoint::GetBoundInterface()
 #endif
 }
 
-uint16_t UDPEndPoint::GetBoundPort()
+uint16_t UDPEndPoint::GetBoundPort() const
 {
     return mUDP->local_port;
 }
@@ -291,9 +264,13 @@ CHIP_ERROR UDPEndPoint::ListenImpl()
     udp_recv(mUDP, LwIPReceiveUDPMessage, this);
 #else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
     if (PCB_ISIPV6(mUDP))
+    {
         udp_recv_ip6(mUDP, LwIPReceiveUDPMessage, this);
+    }
     else
+    {
         udp_recv(mUDP, LwIPReceiveUDPMessage, this);
+    }
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
 
     // Unlock LwIP stack
@@ -353,10 +330,14 @@ CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::Packet
     }
 
     if (intfId.IsPresent())
+    {
         lwipErr = udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort,
                                 intfId.GetPlatformInterface());
+    }
     else
+    {
         lwipErr = udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
+    }
 
     ip_addr_copy(mUDP->local_ip, boundAddr);
 
@@ -376,10 +357,14 @@ CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::Packet
         }
 
         if (intfId.IsPresent())
+        {
             lwipErr =
                 udp_sendto_if_ip6(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
+        }
         else
+        {
             lwipErr = udp_sendto_ip6(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
+        }
     }
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -396,9 +381,13 @@ CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::Packet
         }
 
         if (intfId.IsPresent())
+        {
             lwipErr = udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
+        }
         else
+        {
             lwipErr = udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
+        }
     }
 
     ipX_addr_copy(mUDP->local_ip, boundAddr);
@@ -410,7 +399,9 @@ CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::Packet
     UNLOCK_TCPIP_CORE();
 
     if (lwipErr != ERR_OK)
+    {
         res = chip::System::MapErrorLwIP(lwipErr);
+    }
 
     return res;
 }
@@ -423,10 +414,10 @@ void UDPEndPoint::CloseImpl()
 
     // Since UDP PCB is released synchronously here, but UDP endpoint itself might have to wait
     // for destruction asynchronously, there could be more allocated UDP endpoints than UDP PCBs.
-    if (mUDP != NULL)
+    if (mUDP != nullptr)
     {
         udp_remove(mUDP);
-        mUDP              = NULL;
+        mUDP              = nullptr;
         mLwIPEndPointType = LwIPEndPointType::Unknown;
     }
 
@@ -437,30 +428,27 @@ void UDPEndPoint::CloseImpl()
 void UDPEndPoint::Free()
 {
     Close();
-    DeferredFree(kReleaseDeferralErrorTactic_Die);
+    Release();
 }
 
 void UDPEndPoint::HandleDataReceived(System::PacketBufferHandle && msg)
 {
-    IpHandleDataReceived(std::move(msg));
-}
-
-void UDPEndPoint::IpHandleDataReceived(System::PacketBufferHandle && aBuffer)
-{
-    if ((mState == State::kListening) && (OnMessageReceived != NULL))
+    if ((mState == State::kListening) && (OnMessageReceived != nullptr))
     {
-        const IPPacketInfo * pktInfo = GetPacketInfo(aBuffer);
+        const IPPacketInfo * pktInfo = GetPacketInfo(msg);
 
-        if (pktInfo != NULL)
+        if (pktInfo != nullptr)
         {
             const IPPacketInfo pktInfoCopy = *pktInfo; // copy the address info so that the app can free the
                                                        // PacketBuffer without affecting access to address info.
-            OnMessageReceived(this, std::move(aBuffer), &pktInfoCopy);
+            OnMessageReceived(this, std::move(msg), &pktInfoCopy);
         }
         else
         {
-            if (OnReceiveError != NULL)
-                OnReceiveError(this, CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG, NULL);
+            if (OnReceiveError != nullptr)
+            {
+                OnReceiveError(this, CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG, nullptr);
+            }
         }
     }
 }
@@ -470,7 +458,7 @@ CHIP_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
     // IMPORTANT: This method MUST be called with the LwIP stack LOCKED!
 
     // If a PCB hasn't been allocated yet...
-    if (mUDP == NULL)
+    if (mUDP == nullptr)
     {
         // Allocate a PCB of the appropriate type.
         if (addrType == IPAddressType::kIPv6)
@@ -497,7 +485,7 @@ CHIP_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
         }
 
         // Fail if the system has run out of PCBs.
-        if (mUDP == NULL)
+        if (mUDP == nullptr)
         {
             ChipLogError(Inet, "Unable to allocate UDP PCB");
             return CHIP_ERROR_NO_MEMORY;
@@ -548,10 +536,10 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
 void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port)
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 {
-    UDPEndPoint * ep                 = static_cast<UDPEndPoint *>(arg);
-    System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
-    IPPacketInfo * pktInfo           = NULL;
-    System::PacketBufferHandle buf   = System::PacketBufferHandle::Adopt(p);
+    UDPEndPoint * ep               = static_cast<UDPEndPoint *>(arg);
+    System::Layer * lSystemLayer   = ep->Layer().SystemLayer();
+    IPPacketInfo * pktInfo         = nullptr;
+    System::PacketBufferHandle buf = System::PacketBufferHandle::Adopt(p);
     if (buf->HasChainedBuffer())
     {
         // Try the simple expedient of flattening in-place.
@@ -572,7 +560,7 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
     }
 
     pktInfo = GetPacketInfo(buf);
-    if (pktInfo != NULL)
+    if (pktInfo != nullptr)
     {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         pktInfo->SrcAddress  = IPAddress(*addr);
@@ -597,106 +585,59 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
         pktInfo->DestPort  = pcb->local_port;
     }
 
-    const CHIP_ERROR error =
-        lSystemLayer->PostEvent(*ep, kInetEvent_UDPDataReceived, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf));
-    if (error == CHIP_NO_ERROR)
+    ep->Retain();
+    CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf)] {
+        ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
+        ep->Release();
+    });
+    if (err == CHIP_NO_ERROR)
     {
-        // If PostEvent() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
+        // If ScheduleLambda() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
         static_cast<void>(std::move(buf).UnsafeRelease());
+    }
+    else
+    {
+        ep->Release();
     }
 }
 
 CHIP_ERROR UDPEndPoint::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
 {
-    CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
-
-#if !HAVE_LWIP_MULTICAST_LOOP
-    lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#else
-    if (aLoopback)
+#if HAVE_LWIP_MULTICAST_LOOP
+    if (mLwIPEndPointType == LwIPEndPointType::UDP)
     {
-        switch (mLwIPEndPointType)
+        if (aLoopback)
         {
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        case LwIPEndPointType::UDP:
             udp_set_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
-            break;
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-        default:
-            lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-            break;
         }
-    }
-    else
-    {
-        switch (mLwIPEndPointType)
+        else
         {
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        case LwIPEndPointType::UDP:
             udp_clear_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
-            break;
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-        default:
-            lRetval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-            break;
         }
+        return CHIP_NO_ERROR;
     }
-
-    lRetval = CHIP_NO_ERROR;
-#endif // !HAVE_LWIP_MULTICAST_LOOP
-    return (lRetval);
+#endif // HAVE_LWIP_MULTICAST_LOOP
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 void UDPEndPoint::InitImpl() {}
-
-#if INET_CONFIG_ENABLE_IPV4
-#if LWIP_IPV4 && LWIP_IGMP
-static CHIP_ERROR LwIPIPv4JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress,
-                                                  err_t (*aMethod)(struct netif *, const ip4_addr_t *))
-{
-    struct netif * const lNetif = UDPEndPoint::FindNetifFromInterfaceId(aInterfaceId);
-    VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
-
-    const ip4_addr_t lIPv4Address = aAddress.ToIPv4();
-    const err_t lStatus           = aMethod(lNetif, &lIPv4Address);
-
-    if (lStatus == ERR_MEM)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    return chip::System::MapErrorLwIP(lStatus);
-}
-#endif // LWIP_IPV4 && LWIP_IGMP
-#endif // INET_CONFIG_ENABLE_IPV4
-
-#ifdef HAVE_IPV6_MULTICAST
-static CHIP_ERROR LwIPIPv6JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress,
-                                                  err_t (*aMethod)(struct netif *, const ip6_addr_t *))
-{
-    struct netif * const lNetif = UDPEndPoint::FindNetifFromInterfaceId(aInterfaceId);
-    VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
-
-    const ip6_addr_t lIPv6Address = aAddress.ToIPv6();
-    const err_t lStatus           = aMethod(lNetif, &lIPv6Address);
-
-    if (lStatus == ERR_MEM)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    return chip::System::MapErrorLwIP(lStatus);
-}
-#endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
 
 #if INET_CONFIG_ENABLE_IPV4
 CHIP_ERROR UDPEndPoint::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
 #if LWIP_IPV4 && LWIP_IGMP
     const auto method = join ? igmp_joingroup_netif : igmp_leavegroup_netif;
-    return LwIPIPv4JoinLeaveMulticastGroup(aInterfaceId, aAddress, method);
+
+    struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
+    VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+
+    const ip4_addr_t lIPv4Address = aAddress.ToIPv4();
+    const err_t lStatus           = method(lNetif, &lIPv4Address);
+    if (lStatus == ERR_MEM)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return chip::System::MapErrorLwIP(lStatus);
 #else  // LWIP_IPV4 && LWIP_IGMP
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // LWIP_IPV4 && LWIP_IGMP
@@ -707,7 +648,18 @@ CHIP_ERROR UDPEndPoint::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId
 {
 #ifdef HAVE_IPV6_MULTICAST
     const auto method = join ? mld6_joingroup_netif : mld6_leavegroup_netif;
-    return LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, method);
+
+    struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
+    VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+
+    const ip6_addr_t lIPv6Address = aAddress.ToIPv6();
+    const err_t lStatus           = method(lNetif, &lIPv6Address);
+    if (lStatus == ERR_MEM)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    return chip::System::MapErrorLwIP(lStatus);
 #else  // HAVE_IPV6_MULTICAST
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // HAVE_IPV6_MULTICAST
@@ -715,16 +667,18 @@ CHIP_ERROR UDPEndPoint::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId
 
 struct netif * UDPEndPoint::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
 {
-    struct netif * lRetval = NULL;
+    struct netif * lRetval = nullptr;
 
 #if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
     NETIF_FOREACH(lRetval)
     {
         if (lRetval == aInterfaceId.GetPlatformInterface())
+        {
             break;
+        }
     }
 #else  // LWIP_VERSION_MAJOR < 2 || !defined(NETIF_FOREACH)
-    for (lRetval = netif_list; lRetval != NULL && lRetval != aInterfaceId.GetPlatformInterface(); lRetval = lRetval->next)
+    for (lRetval = netif_list; lRetval != nullptr && lRetval != aInterfaceId.GetPlatformInterface(); lRetval = lRetval->next)
         ;
 #endif // LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
 
@@ -733,41 +687,129 @@ struct netif * UDPEndPoint::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
 
 IPPacketInfo * UDPEndPoint::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
 {
-    uintptr_t lStart;
-    uintptr_t lPacketInfoStart;
-    IPPacketInfo * lPacketInfo = NULL;
-
     if (!aBuffer->EnsureReservedSize(sizeof(IPPacketInfo) + 3))
-        goto done;
+    {
+        return nullptr;
+    }
 
-    lStart           = (uintptr_t) aBuffer->Start();
-    lPacketInfoStart = lStart - sizeof(IPPacketInfo);
+    uintptr_t lStart           = (uintptr_t) aBuffer->Start();
+    uintptr_t lPacketInfoStart = lStart - sizeof(IPPacketInfo);
 
     // Align to a 4-byte boundary
-
-    lPacketInfo = reinterpret_cast<IPPacketInfo *>(lPacketInfoStart & ~(sizeof(uint32_t) - 1));
-
-done:
-    return (lPacketInfo);
+    return reinterpret_cast<IPPacketInfo *>(lPacketInfoStart & ~(sizeof(uint32_t) - 1));
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+namespace {
+
+CHIP_ERROR IPv6Bind(int socket, const IPAddress & address, uint16_t port, InterfaceId interface)
+{
+    struct sockaddr_in6 sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sin6_family                        = AF_INET6;
+    sa.sin6_port                          = htons(port);
+    sa.sin6_addr                          = address.ToIPv6();
+    InterfaceId::PlatformType interfaceId = interface.GetPlatformInterface();
+    if (!CanCastTo<decltype(sa.sin6_scope_id)>(interfaceId))
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    sa.sin6_scope_id = static_cast<decltype(sa.sin6_scope_id)>(interfaceId);
+
+    CHIP_ERROR status = CHIP_NO_ERROR;
+    if (bind(socket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
+    {
+        status = CHIP_ERROR_POSIX(errno);
+    }
+    else
+    {
+#ifdef IPV6_MULTICAST_IF
+        // Instruct the kernel that any messages to multicast destinations should be
+        // sent down the interface specified by the caller.
+        setsockopt(socket, IPPROTO_IPV6, IPV6_MULTICAST_IF, &interfaceId, sizeof(interfaceId));
+#endif // defined(IPV6_MULTICAST_IF)
+    }
+
+#ifdef IPV6_MULTICAST_HOPS
+    // Instruct the kernel that any messages to multicast destinations should be
+    // set with the configured hop limit value.
+    int hops = INET_CONFIG_IP_MULTICAST_HOP_LIMIT;
+    setsockopt(socket, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops, sizeof(hops));
+#endif // defined(IPV6_MULTICAST_HOPS)
+
+    return status;
+}
+
+#if INET_CONFIG_ENABLE_IPV4
+CHIP_ERROR IPv4Bind(int socket, const IPAddress & address, uint16_t port)
+{
+    struct sockaddr_in sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sin_family = AF_INET;
+    sa.sin_port   = htons(port);
+    sa.sin_addr   = address.ToIPv4();
+
+    CHIP_ERROR status = CHIP_NO_ERROR;
+    if (bind(socket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
+    {
+        status = CHIP_ERROR_POSIX(errno);
+    }
+    else
+    {
+        // Allow socket transmitting broadcast packets.
+        constexpr int enable = 1;
+        setsockopt(socket, SOL_SOCKET, SO_BROADCAST, &enable, sizeof(enable));
+
+#ifdef IP_MULTICAST_IF
+        // Instruct the kernel that any messages to multicast destinations should be
+        // sent down the interface to which the specified IPv4 address is bound.
+        setsockopt(socket, IPPROTO_IP, IP_MULTICAST_IF, &sa, sizeof(sa));
+#endif // defined(IP_MULTICAST_IF)
+    }
+
+#ifdef IP_MULTICAST_TTL
+    // Instruct the kernel that any messages to multicast destinations should be
+    // set with the configured hop limit value.
+    constexpr int ttl = INET_CONFIG_IP_MULTICAST_HOP_LIMIT;
+    setsockopt(socket, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl));
+#endif // defined(IP_MULTICAST_TTL)
+
+    return status;
+}
+#endif // INET_CONFIG_ENABLE_IPV4
+
+} // anonymous namespace
+
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 UDPEndPoint::MulticastGroupHandler UDPEndPoint::sJoinMulticastGroupHandler;
 UDPEndPoint::MulticastGroupHandler UDPEndPoint::sLeaveMulticastGroupHandler;
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 
-CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId)
+CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addressType, const IPAddress & addr, uint16_t port, InterfaceId interface)
 {
     // Make sure we have the appropriate type of socket.
-    ReturnErrorOnFailure(GetSocket(addrType));
-    ReturnErrorOnFailure(IpBind(addrType, addr, port, intfId));
+    ReturnErrorOnFailure(GetSocket(addressType));
+
+    if (addressType == IPAddressType::kIPv6)
+    {
+        ReturnErrorOnFailure(IPv6Bind(mSocket, addr, port, interface));
+    }
+#if INET_CONFIG_ENABLE_IPV4
+    else if (addressType == IPAddressType::kIPv4)
+    {
+        ReturnErrorOnFailure(IPv4Bind(mSocket, addr, port));
+    }
+#endif // INET_CONFIG_ENABLE_IPV4
+    else
+    {
+        return INET_ERROR_WRONG_ADDRESS_TYPE;
+    }
 
     mBoundPort   = port;
-    mBoundIntfId = intfId;
+    mBoundIntfId = interface;
 
     // If an ephemeral port was requested, retrieve the actual bound port.
     if (port == 0)
@@ -807,136 +849,53 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UDPEndPoint::IpBind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, InterfaceId aInterfaceId)
-{
-    CHIP_ERROR lRetval = CHIP_NO_ERROR;
-
-    if (aAddressType == IPAddressType::kIPv6)
-    {
-        struct sockaddr_in6 sa;
-
-        memset(&sa, 0, sizeof(sa));
-
-        sa.sin6_family                        = AF_INET6;
-        sa.sin6_port                          = htons(aPort);
-        sa.sin6_addr                          = aAddress.ToIPv6();
-        InterfaceId::PlatformType interfaceId = aInterfaceId.GetPlatformInterface();
-        if (!CanCastTo<decltype(sa.sin6_scope_id)>(interfaceId))
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-        sa.sin6_scope_id = static_cast<decltype(sa.sin6_scope_id)>(interfaceId);
-
-        if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
-            lRetval = CHIP_ERROR_POSIX(errno);
-
-            // Instruct the kernel that any messages to multicast destinations should be
-            // sent down the interface specified by the caller.
-#ifdef IPV6_MULTICAST_IF
-        if (lRetval == CHIP_NO_ERROR)
-            setsockopt(mSocket, IPPROTO_IPV6, IPV6_MULTICAST_IF, &aInterfaceId, sizeof(aInterfaceId));
-#endif // defined(IPV6_MULTICAST_IF)
-
-            // Instruct the kernel that any messages to multicast destinations should be
-            // set with the configured hop limit value.
-#ifdef IPV6_MULTICAST_HOPS
-        int hops = INET_CONFIG_IP_MULTICAST_HOP_LIMIT;
-        setsockopt(mSocket, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops, sizeof(hops));
-#endif // defined(IPV6_MULTICAST_HOPS)
-    }
-#if INET_CONFIG_ENABLE_IPV4
-    else if (aAddressType == IPAddressType::kIPv4)
-    {
-        struct sockaddr_in sa;
-        int enable = 1;
-
-        memset(&sa, 0, sizeof(sa));
-
-        sa.sin_family = AF_INET;
-        sa.sin_port   = htons(aPort);
-        sa.sin_addr   = aAddress.ToIPv4();
-
-        if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
-            lRetval = CHIP_ERROR_POSIX(errno);
-
-            // Instruct the kernel that any messages to multicast destinations should be
-            // sent down the interface to which the specified IPv4 address is bound.
-#ifdef IP_MULTICAST_IF
-        if (lRetval == CHIP_NO_ERROR)
-            setsockopt(mSocket, IPPROTO_IP, IP_MULTICAST_IF, &sa, sizeof(sa));
-#endif // defined(IP_MULTICAST_IF)
-
-            // Instruct the kernel that any messages to multicast destinations should be
-            // set with the configured hop limit value.
-#ifdef IP_MULTICAST_TTL
-        int ttl = INET_CONFIG_IP_MULTICAST_HOP_LIMIT;
-        setsockopt(mSocket, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl));
-#endif // defined(IP_MULTICAST_TTL)
-
-        // Allow socket transmitting broadcast packets.
-        if (lRetval == CHIP_NO_ERROR)
-            setsockopt(mSocket, SOL_SOCKET, SO_BROADCAST, &enable, sizeof(enable));
-    }
-#endif // INET_CONFIG_ENABLE_IPV4
-    else
-        lRetval = INET_ERROR_WRONG_ADDRESS_TYPE;
-
-    return (lRetval);
-}
-
-CHIP_ERROR UDPEndPoint::BindInterfaceImpl(IPAddressType addrType, InterfaceId intfId)
+CHIP_ERROR UDPEndPoint::BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId)
 {
     // Make sure we have the appropriate type of socket.
-    ReturnErrorOnFailure(GetSocket(addrType));
-    return IpBindInterface(addrType, intfId);
-}
-
-CHIP_ERROR UDPEndPoint::IpBindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId)
-{
-    CHIP_ERROR lRetval = CHIP_NO_ERROR;
+    ReturnErrorOnFailure(GetSocket(addressType));
 
 #if HAVE_SO_BINDTODEVICE
-    if (!aInterfaceId.IsPresent())
+    CHIP_ERROR status = CHIP_NO_ERROR;
+
+    if (interfaceId.IsPresent())
+    {
+        // Start filtering on the passed interface.
+        char interfaceName[IF_NAMESIZE];
+        if (if_indextoname(interfaceId.GetPlatformInterface(), interfaceName) == nullptr)
+        {
+            status = CHIP_ERROR_POSIX(errno);
+        }
+        else if (setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, interfaceName, socklen_t(strlen(interfaceName))) == -1)
+        {
+            status = CHIP_ERROR_POSIX(errno);
+        }
+    }
+    else
     {
         // Stop interface-based filtering.
         if (setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, "", 0) == -1)
         {
-            lRetval = CHIP_ERROR_POSIX(errno);
+            status = CHIP_ERROR_POSIX(errno);
         }
     }
-    else
+
+    if (status == CHIP_NO_ERROR)
     {
-        // Start filtering on the passed interface.
-        char lInterfaceName[IF_NAMESIZE];
-
-        if (if_indextoname(aInterfaceId.GetPlatformInterface(), lInterfaceName) == NULL)
-        {
-            lRetval = CHIP_ERROR_POSIX(errno);
-        }
-
-        if (lRetval == CHIP_NO_ERROR &&
-            setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, lInterfaceName, socklen_t(strlen(lInterfaceName))) == -1)
-        {
-            lRetval = CHIP_ERROR_POSIX(errno);
-        }
+        mBoundIntfId = interfaceId;
     }
 
-    if (lRetval == CHIP_NO_ERROR)
-        mBoundIntfId = aInterfaceId;
-
+    return status;
 #else  // !HAVE_SO_BINDTODEVICE
-    lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // HAVE_SO_BINDTODEVICE
-
-    return (lRetval);
 }
 
-InterfaceId UDPEndPoint::GetBoundInterface()
+InterfaceId UDPEndPoint::GetBoundInterface() const
 {
     return mBoundIntfId;
 }
 
-uint16_t UDPEndPoint::GetBoundPort()
+uint16_t UDPEndPoint::GetBoundPort() const
 {
     return mBoundPort;
 }
@@ -944,31 +903,26 @@ uint16_t UDPEndPoint::GetBoundPort()
 CHIP_ERROR UDPEndPoint::ListenImpl()
 {
     // Wait for ability to read on this endpoint.
-    auto layer = static_cast<System::LayerSockets *>(Layer().SystemLayer());
+    auto * layer = static_cast<System::LayerSockets *>(Layer().SystemLayer());
     ReturnErrorOnFailure(layer->SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
     return layer->RequestCallbackOnPendingRead(mWatch);
 }
 
-CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
+CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * aPktInfo, System::PacketBufferHandle && msg)
 {
     // Make sure we have the appropriate type of socket based on the
     // destination address.
-    ReturnErrorOnFailure(GetSocket(pktInfo->DestAddress.Type()));
+    ReturnErrorOnFailure(GetSocket(aPktInfo->DestAddress.Type()));
 
-    return IpSendMsg(pktInfo, std::move(msg));
-}
-
-CHIP_ERROR UDPEndPoint::IpSendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer)
-{
     // Ensure the destination address type is compatible with the endpoint address type.
     VerifyOrReturnError(mAddrType == aPktInfo->DestAddress.Type(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // For now the entire message must fit within a single buffer.
-    VerifyOrReturnError(!aBuffer->HasChainedBuffer(), CHIP_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrReturnError(!msg->HasChainedBuffer(), CHIP_ERROR_MESSAGE_TOO_LONG);
 
     struct iovec msgIOV;
-    msgIOV.iov_base = aBuffer->Start();
-    msgIOV.iov_len  = aBuffer->DataLength();
+    msgIOV.iov_base = msg->Start();
+    msgIOV.iov_len  = msg->DataLength();
 
 #if defined(IP_PKTINFO) || defined(IPV6_PKTINFO)
     uint8_t controlData[256];
@@ -1012,7 +966,9 @@ CHIP_ERROR UDPEndPoint::IpSendMsg(const IPPacketInfo * aPktInfo, chip::System::P
     // the socket being bound.
     InterfaceId intf = aPktInfo->Interface;
     if (!intf.IsPresent())
+    {
         intf = mBoundIntfId;
+    }
 
     // If the packet should be sent over a specific interface, or with a specific source
     // address, construct an IP_PKTINFO/IPV6_PKTINFO "control message" to that effect
@@ -1036,7 +992,7 @@ CHIP_ERROR UDPEndPoint::IpSendMsg(const IPPacketInfo * aPktInfo, chip::System::P
             controlHdr->cmsg_type  = IP_PKTINFO;
             controlHdr->cmsg_len   = CMSG_LEN(sizeof(in_pktinfo));
 
-            struct in_pktinfo * pktInfo = reinterpret_cast<struct in_pktinfo *> CMSG_DATA(controlHdr);
+            auto * pktInfo = reinterpret_cast<struct in_pktinfo *> CMSG_DATA(controlHdr);
             if (!CanCastTo<decltype(pktInfo->ipi_ifindex)>(intfId))
             {
                 return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -1060,7 +1016,7 @@ CHIP_ERROR UDPEndPoint::IpSendMsg(const IPPacketInfo * aPktInfo, chip::System::P
             controlHdr->cmsg_type  = IPV6_PKTINFO;
             controlHdr->cmsg_len   = CMSG_LEN(sizeof(in6_pktinfo));
 
-            struct in6_pktinfo * pktInfo = reinterpret_cast<struct in6_pktinfo *> CMSG_DATA(controlHdr);
+            auto * pktInfo = reinterpret_cast<struct in6_pktinfo *> CMSG_DATA(controlHdr);
             if (!CanCastTo<decltype(pktInfo->ipi6_ifindex)>(intfId))
             {
                 return CHIP_ERROR_UNEXPECTED_EVENT;
@@ -1082,9 +1038,13 @@ CHIP_ERROR UDPEndPoint::IpSendMsg(const IPPacketInfo * aPktInfo, chip::System::P
     // Send IP packet.
     const ssize_t lenSent = sendmsg(mSocket, &msgHeader, 0);
     if (lenSent == -1)
+    {
         return CHIP_ERROR_POSIX(errno);
-    if (lenSent != aBuffer->DataLength())
+    }
+    if (lenSent != msg->DataLength())
+    {
         return CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG;
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -1112,22 +1072,16 @@ void UDPEndPoint::Free()
     Release();
 }
 
-CHIP_ERROR UDPEndPoint::GetSocket(IPAddressType aAddressType)
-{
-    constexpr int lType     = (SOCK_DGRAM | SOCK_CLOEXEC);
-    constexpr int lProtocol = 0;
-
-    return IpGetSocket(aAddressType, lType, lProtocol);
-}
-
-CHIP_ERROR UDPEndPoint::IpGetSocket(IPAddressType aAddressType, int aType, int aProtocol)
+CHIP_ERROR UDPEndPoint::GetSocket(IPAddressType addressType)
 {
     if (mSocket == kInvalidSocketFd)
     {
-        const int one = 1;
-        int family;
+        constexpr int type     = (SOCK_DGRAM | SOCK_CLOEXEC);
+        constexpr int protocol = 0;
 
-        switch (aAddressType)
+        int family = PF_UNSPEC;
+
+        switch (addressType)
         {
         case IPAddressType::kIPv6:
             family = PF_INET6;
@@ -1143,12 +1097,14 @@ CHIP_ERROR UDPEndPoint::IpGetSocket(IPAddressType aAddressType, int aType, int a
             return INET_ERROR_WRONG_ADDRESS_TYPE;
         }
 
-        mSocket = ::socket(family, aType, aProtocol);
+        mSocket = ::socket(family, type, protocol);
         if (mSocket == -1)
+        {
             return CHIP_ERROR_POSIX(errno);
+        }
         ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->StartWatchingSocket(mSocket, &mWatch));
 
-        mAddrType = aAddressType;
+        mAddrType = addressType;
 
         // NOTE WELL: the errors returned by setsockopt() here are not
         // returned as Inet layer CHIP_ERROR_POSIX(errno)
@@ -1159,7 +1115,8 @@ CHIP_ERROR UDPEndPoint::IpGetSocket(IPAddressType aAddressType, int aType, int a
         // logic up to check for implementations of these options and
         // to provide appropriate HAVE_xxxxx definitions accordingly.
 
-        int res = setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+        constexpr int one = 1;
+        int res           = setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
         static_cast<void>(res);
 
 #ifdef SO_REUSEPORT
@@ -1175,7 +1132,7 @@ CHIP_ERROR UDPEndPoint::IpGetSocket(IPAddressType aAddressType, int aType, int a
         // the same port, one for IPv4 and one for IPv6.
 
 #ifdef IPV6_V6ONLY
-        if (aAddressType == IPAddressType::kIPv6)
+        if (addressType == IPAddressType::kIPv6)
         {
             res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_V6ONLY, &one, sizeof(one));
             if (res != 0)
@@ -1187,7 +1144,7 @@ CHIP_ERROR UDPEndPoint::IpGetSocket(IPAddressType aAddressType, int aType, int a
 
 #if INET_CONFIG_ENABLE_IPV4
 #ifdef IP_PKTINFO
-        if (aAddressType == IPAddressType::kIPv4)
+        if (addressType == IPAddressType::kIPv4)
         {
             res = setsockopt(mSocket, IPPROTO_IP, IP_PKTINFO, &one, sizeof(one));
             if (res != 0)
@@ -1199,7 +1156,7 @@ CHIP_ERROR UDPEndPoint::IpGetSocket(IPAddressType aAddressType, int aType, int a
 #endif // INET_CONFIG_ENABLE_IPV4
 
 #ifdef IPV6_RECVPKTINFO
-        if (aAddressType == IPAddressType::kIPv6)
+        if (addressType == IPAddressType::kIPv6)
         {
             res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_RECVPKTINFO, &one, sizeof(one));
             if (res != 0)
@@ -1223,7 +1180,7 @@ CHIP_ERROR UDPEndPoint::IpGetSocket(IPAddressType aAddressType, int aType, int a
         }
 #endif // defined(SO_NOSIGPIPE)
     }
-    else if (mAddrType != aAddressType)
+    else if (mAddrType != addressType)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -1239,22 +1196,17 @@ void UDPEndPoint::HandlePendingIO(System::SocketEvents events, intptr_t data)
 
 void UDPEndPoint::HandlePendingIO(System::SocketEvents events)
 {
-    if (mState == State::kListening && OnMessageReceived != nullptr && events.Has(System::SocketEventFlags::kRead))
+    if (mState != State::kListening || OnMessageReceived == nullptr || !events.Has(System::SocketEventFlags::kRead))
     {
-        const uint16_t lPort = mBoundPort;
-
-        IpHandlePendingIO(lPort);
+        return;
     }
-}
 
-void UDPEndPoint::IpHandlePendingIO(uint16_t aPort)
-{
     CHIP_ERROR lStatus = CHIP_NO_ERROR;
     IPPacketInfo lPacketInfo;
     System::PacketBufferHandle lBuffer;
 
     lPacketInfo.Clear();
-    lPacketInfo.DestPort = aPort;
+    lPacketInfo.DestPort = mBoundPort;
 
     lBuffer = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
 
@@ -1320,7 +1272,7 @@ void UDPEndPoint::IpHandlePendingIO(uint16_t aPort)
 #ifdef IP_PKTINFO
                 if (controlHdr->cmsg_level == IPPROTO_IP && controlHdr->cmsg_type == IP_PKTINFO)
                 {
-                    struct in_pktinfo * inPktInfo = reinterpret_cast<struct in_pktinfo *> CMSG_DATA(controlHdr);
+                    auto * inPktInfo = reinterpret_cast<struct in_pktinfo *> CMSG_DATA(controlHdr);
                     if (!CanCastTo<InterfaceId::PlatformType>(inPktInfo->ipi_ifindex))
                     {
                         lStatus = CHIP_ERROR_INCORRECT_STATE;
@@ -1336,7 +1288,7 @@ void UDPEndPoint::IpHandlePendingIO(uint16_t aPort)
 #ifdef IPV6_PKTINFO
                 if (controlHdr->cmsg_level == IPPROTO_IPV6 && controlHdr->cmsg_type == IPV6_PKTINFO)
                 {
-                    struct in6_pktinfo * in6PktInfo = reinterpret_cast<struct in6_pktinfo *> CMSG_DATA(controlHdr);
+                    auto * in6PktInfo = reinterpret_cast<struct in6_pktinfo *> CMSG_DATA(controlHdr);
                     if (!CanCastTo<InterfaceId::PlatformType>(in6PktInfo->ipi6_ifindex))
                     {
                         lStatus = CHIP_ERROR_INCORRECT_STATE;
@@ -1372,7 +1324,7 @@ void UDPEndPoint::IpHandlePendingIO(uint16_t aPort)
 #if IP_MULTICAST_LOOP || IPV6_MULTICAST_LOOP
 static CHIP_ERROR SocketsSetMulticastLoopback(int aSocket, bool aLoopback, int aProtocol, int aOption)
 {
-    const unsigned int lValue = aLoopback;
+    const unsigned int lValue = static_cast<unsigned int>(aLoopback);
     if (setsockopt(aSocket, aProtocol, aOption, &lValue, sizeof(lValue)) != 0)
     {
         return CHIP_ERROR_POSIX(errno);
@@ -1429,8 +1381,7 @@ void UDPEndPoint::InitImpl()
 
 #if INET_CONFIG_ENABLE_IPV4
 
-static CHIP_ERROR SocketsIPv4JoinLeaveMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress,
-                                                     int aCommand)
+CHIP_ERROR UDPEndPoint::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
     IPAddress lInterfaceAddress;
     bool lInterfaceAddressFound = false;
@@ -1449,7 +1400,6 @@ static CHIP_ERROR SocketsIPv4JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
             }
         }
     }
-
     VerifyOrReturnError(lInterfaceAddressFound, INET_ERROR_ADDRESS_NOT_FOUND);
 
     struct ip_mreq lMulticastRequest;
@@ -1457,40 +1407,15 @@ static CHIP_ERROR SocketsIPv4JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
     lMulticastRequest.imr_interface = lInterfaceAddress.ToIPv4();
     lMulticastRequest.imr_multiaddr = aAddress.ToIPv4();
 
-    if (setsockopt(aSocket, IPPROTO_IP, aCommand, &lMulticastRequest, sizeof(lMulticastRequest)) != 0)
+    const int command = join ? IP_ADD_MEMBERSHIP : IP_DROP_MEMBERSHIP;
+    if (setsockopt(mSocket, IPPROTO_IP, command, &lMulticastRequest, sizeof(lMulticastRequest)) != 0)
     {
         return CHIP_ERROR_POSIX(errno);
     }
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR UDPEndPoint::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
-{
-    return SocketsIPv4JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, join ? IP_ADD_MEMBERSHIP : IP_DROP_MEMBERSHIP);
 }
 
 #endif // INET_CONFIG_ENABLE_IPV4
-
-#if INET_IPV6_ADD_MEMBERSHIP || INET_IPV6_DROP_MEMBERSHIP
-static CHIP_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aInterfaceId, const IPAddress & aAddress,
-                                                     int aCommand)
-{
-    const InterfaceId::PlatformType lIfIndex = aInterfaceId.GetPlatformInterface();
-
-    struct ipv6_mreq lMulticastRequest;
-    memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
-    VerifyOrReturnError(CanCastTo<decltype(lMulticastRequest.ipv6mr_interface)>(lIfIndex), CHIP_ERROR_UNEXPECTED_EVENT);
-
-    lMulticastRequest.ipv6mr_interface = static_cast<decltype(lMulticastRequest.ipv6mr_interface)>(lIfIndex);
-    lMulticastRequest.ipv6mr_multiaddr = aAddress.ToIPv6();
-
-    if (setsockopt(aSocket, IPPROTO_IPV6, aCommand, &lMulticastRequest, sizeof(lMulticastRequest)) != 0)
-    {
-        return CHIP_ERROR_POSIX(errno);
-    }
-    return CHIP_NO_ERROR;
-}
-#endif // INET_IPV6_ADD_MEMBERSHIP || INET_IPV6_DROP_MEMBERSHIP
 
 CHIP_ERROR UDPEndPoint::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
@@ -1501,9 +1426,23 @@ CHIP_ERROR UDPEndPoint::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId
         return handler(aInterfaceId, aAddress);
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+
 #if defined(INET_IPV6_ADD_MEMBERSHIP) && defined(INET_IPV6_DROP_MEMBERSHIP)
-    return SocketsIPv6JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress,
-                                              join ? INET_IPV6_ADD_MEMBERSHIP : INET_IPV6_DROP_MEMBERSHIP);
+    const InterfaceId::PlatformType lIfIndex = aInterfaceId.GetPlatformInterface();
+
+    struct ipv6_mreq lMulticastRequest;
+    memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
+    VerifyOrReturnError(CanCastTo<decltype(lMulticastRequest.ipv6mr_interface)>(lIfIndex), CHIP_ERROR_UNEXPECTED_EVENT);
+
+    lMulticastRequest.ipv6mr_interface = static_cast<decltype(lMulticastRequest.ipv6mr_interface)>(lIfIndex);
+    lMulticastRequest.ipv6mr_multiaddr = aAddress.ToIPv6();
+
+    const int command = join ? INET_IPV6_ADD_MEMBERSHIP : INET_IPV6_DROP_MEMBERSHIP;
+    if (setsockopt(mSocket, IPPROTO_IPV6, command, &lMulticastRequest, sizeof(lMulticastRequest)) != 0)
+    {
+        return CHIP_ERROR_POSIX(errno);
+    }
+    return CHIP_NO_ERROR;
 #else  // defined(INET_IPV6_ADD_MEMBERSHIP) && defined(INET_IPV6_DROP_MEMBERSHIP)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // defined(INET_IPV6_ADD_MEMBERSHIP) && defined(INET_IPV6_DROP_MEMBERSHIP)
@@ -1513,7 +1452,7 @@ CHIP_ERROR UDPEndPoint::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId)
+CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port, InterfaceId intfId)
 {
     nw_parameters_configure_protocol_block_t configure_tls;
     nw_parameters_t parameters;
@@ -1525,41 +1464,31 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
 
     configure_tls = NW_PARAMETERS_DISABLE_PROTOCOL;
     parameters    = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
+    VerifyOrReturnError(parameters != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(IpBind(addrType, addr, port, parameters));
+    ReturnErrorOnFailure(ConfigureProtocol(addressType, parameters));
 
-    mParameters = parameters;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR UDPEndPoint::IpBind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
-                               const nw_parameters_t & aParameters)
-{
     nw_endpoint_t endpoint = nullptr;
-
-    VerifyOrReturnError(aParameters != NULL, CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(ConfigureProtocol(aAddressType, aParameters));
-
-    CHIP_ERROR res = GetEndPoint(endpoint, aAddressType, aAddress, aPort);
-    nw_parameters_set_local_endpoint(aParameters, endpoint);
+    CHIP_ERROR res         = GetEndPoint(endpoint, addressType, address, port);
+    nw_parameters_set_local_endpoint(parameters, endpoint);
     nw_release(endpoint);
     ReturnErrorOnFailure(res);
 
     mDispatchQueue = dispatch_queue_create("inet_dispatch_global", DISPATCH_QUEUE_CONCURRENT);
-    VerifyOrReturnError(mDispatchQueue != NULL, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mDispatchQueue != nullptr, CHIP_ERROR_NO_MEMORY);
     dispatch_retain(mDispatchQueue);
 
     mConnectionSemaphore = dispatch_semaphore_create(0);
-    VerifyOrReturnError(mConnectionSemaphore != NULL, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mConnectionSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
     dispatch_retain(mConnectionSemaphore);
 
     mSendSemaphore = dispatch_semaphore_create(0);
-    VerifyOrReturnError(mSendSemaphore != NULL, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mSendSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
     dispatch_retain(mSendSemaphore);
 
-    mAddrType   = aAddressType;
-    mConnection = NULL;
+    mAddrType   = addressType;
+    mConnection = nullptr;
+    mParameters = parameters;
 
     return CHIP_NO_ERROR;
 }
@@ -1569,12 +1498,12 @@ CHIP_ERROR UDPEndPoint::BindInterfaceImpl(IPAddressType addrType, InterfaceId in
     return INET_ERROR_UNKNOWN_INTERFACE;
 }
 
-InterfaceId UDPEndPoint::GetBoundInterface()
+InterfaceId UDPEndPoint::GetBoundInterface() const
 {
     return InterfaceId::Null();
 }
 
-uint16_t UDPEndPoint::GetBoundPort()
+uint16_t UDPEndPoint::GetBoundPort() const
 {
     nw_endpoint_t endpoint = nw_parameters_copy_local_endpoint(mParameters);
     return nw_endpoint_get_port(endpoint);
@@ -1587,23 +1516,18 @@ CHIP_ERROR UDPEndPoint::ListenImpl()
 
 CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
 {
-    return IpSendMsg(pktInfo, std::move(msg));
-}
-
-CHIP_ERROR UDPEndPoint::IpSendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer)
-{
     dispatch_data_t content;
 
     // Ensure the destination address type is compatible with the endpoint address type.
-    VerifyOrReturnError(mAddrType == aPktInfo->DestAddress.Type(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mAddrType == pktInfo->DestAddress.Type(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // For now the entire message must fit within a single buffer.
-    VerifyOrReturnError(aBuffer->Next() == NULL, CHIP_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrReturnError(msg->Next() == nullptr, CHIP_ERROR_MESSAGE_TOO_LONG);
 
-    ReturnErrorOnFailure(GetConnection(aPktInfo));
+    ReturnErrorOnFailure(GetConnection(pktInfo));
 
     // Send a message, and wait for it to be dispatched.
-    content = dispatch_data_create(aBuffer->Start(), aBuffer->DataLength(), mDispatchQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
+    content = dispatch_data_create(msg->Start(), msg->DataLength(), mDispatchQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
 
     // If there is a current message pending and the state of the network connection change (e.g switch to a
     // different network) the connection will enter a nw_connection_state_failed state and the completion handler
@@ -1638,8 +1562,8 @@ void UDPEndPoint::CloseImpl()
 void UDPEndPoint::ReleaseAll()
 {
 
-    OnMessageReceived = NULL;
-    OnReceiveError    = NULL;
+    OnMessageReceived = nullptr;
+    OnReceiveError    = nullptr;
 
     ReleaseConnection();
     ReleaseListener();
@@ -1647,39 +1571,39 @@ void UDPEndPoint::ReleaseAll()
     if (mParameters)
     {
         nw_release(mParameters);
-        mParameters = NULL;
+        mParameters = nullptr;
     }
 
     if (mDispatchQueue)
     {
         dispatch_suspend(mDispatchQueue);
         dispatch_release(mDispatchQueue);
-        mDispatchQueue = NULL;
+        mDispatchQueue = nullptr;
     }
 
     if (mConnectionSemaphore)
     {
         dispatch_release(mConnectionSemaphore);
-        mConnectionSemaphore = NULL;
+        mConnectionSemaphore = nullptr;
     }
 
     if (mListenerQueue)
     {
         dispatch_suspend(mListenerQueue);
         dispatch_release(mListenerQueue);
-        mListenerQueue = NULL;
+        mListenerQueue = nullptr;
     }
 
     if (mListenerSemaphore)
     {
         dispatch_release(mListenerSemaphore);
-        mListenerSemaphore = NULL;
+        mListenerSemaphore = nullptr;
     }
 
     if (mSendSemaphore)
     {
         dispatch_release(mSendSemaphore);
-        mSendSemaphore = NULL;
+        mSendSemaphore = nullptr;
     }
 }
 
@@ -1691,8 +1615,7 @@ void UDPEndPoint::Free()
 
 CHIP_ERROR UDPEndPoint::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
 {
-    CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
-    return (lRetval);
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -1771,17 +1694,17 @@ CHIP_ERROR UDPEndPoint::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddressTy
     snprintf(portStr, sizeof(portStr), "%u", aPort);
 
     aEndPoint = nw_endpoint_create_host(addrStr, portStr);
-    VerifyOrReturnError(aEndPoint != NULL, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aEndPoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR UDPEndPoint::GetConnection(const IPPacketInfo * aPktInfo)
 {
-    VerifyOrReturnError(mParameters != NULL, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mParameters != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    nw_endpoint_t endpoint     = NULL;
-    nw_connection_t connection = NULL;
+    nw_endpoint_t endpoint     = nullptr;
+    nw_connection_t connection = nullptr;
 
     if (mConnection)
     {
@@ -1800,7 +1723,7 @@ CHIP_ERROR UDPEndPoint::GetConnection(const IPPacketInfo * aPktInfo)
     connection = nw_connection_create(endpoint, mParameters);
     nw_release(endpoint);
 
-    VerifyOrReturnError(connection != NULL, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(connection != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     return StartConnection(connection);
 }
@@ -1810,19 +1733,19 @@ CHIP_ERROR UDPEndPoint::StartListener()
     __block CHIP_ERROR res = CHIP_NO_ERROR;
     nw_listener_t listener;
 
-    VerifyOrReturnError(mListener == NULL, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mListenerSemaphore == NULL, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mListenerQueue == NULL, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mListener == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mListenerSemaphore == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mListenerQueue == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     listener = nw_listener_create(mParameters);
-    VerifyOrReturnError(listener != NULL, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(listener != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mListenerSemaphore = dispatch_semaphore_create(0);
-    VerifyOrReturnError(mListenerSemaphore != NULL, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mListenerSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
     dispatch_retain(mListenerSemaphore);
 
     mListenerQueue = dispatch_queue_create("inet_dispatch_listener", DISPATCH_QUEUE_CONCURRENT);
-    VerifyOrReturnError(mListenerQueue != NULL, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mListenerQueue != nullptr, CHIP_ERROR_NO_MEMORY);
     dispatch_retain(mListenerQueue);
 
     nw_listener_set_queue(listener, mListenerQueue);
@@ -1860,7 +1783,9 @@ CHIP_ERROR UDPEndPoint::StartListener()
         case nw_listener_state_cancelled:
             ChipLogDetail(Inet, "Listener: Cancelled");
             if (res == CHIP_NO_ERROR)
+            {
                 res = CHIP_ERROR_CONNECTION_ABORTED;
+            }
 
             dispatch_semaphore_signal(mListenerSemaphore);
             break;
@@ -1916,7 +1841,9 @@ CHIP_ERROR UDPEndPoint::StartConnection(nw_connection_t & aConnection)
         case nw_connection_state_cancelled:
             ChipLogDetail(Inet, "Connection: Cancelled");
             if (res == CHIP_NO_ERROR)
+            {
                 res = CHIP_ERROR_CONNECTION_ABORTED;
+            }
 
             dispatch_semaphore_signal(mConnectionSemaphore);
             break;
@@ -1929,21 +1856,21 @@ CHIP_ERROR UDPEndPoint::StartConnection(nw_connection_t & aConnection)
 
     mConnection = aConnection;
     nw_retain(mConnection);
-    IpHandleDataReceived(mConnection);
+    HandleDataReceived(mConnection);
 
     return res;
 }
 
-void UDPEndPoint::IpHandleDataReceived(const nw_connection_t & aConnection)
+void UDPEndPoint::HandleDataReceived(const nw_connection_t & aConnection)
 {
     nw_connection_receive_completion_t handler =
         ^(dispatch_data_t content, nw_content_context_t context, bool is_complete, nw_error_t receive_error) {
             dispatch_block_t schedule_next_receive = ^{
-                if (receive_error == NULL)
+                if (receive_error == nullptr)
                 {
-                    IpHandleDataReceived(aConnection);
+                    HandleDataReceived(aConnection);
                 }
-                else if (OnReceiveError != NULL)
+                else if (OnReceiveError != nullptr)
                 {
                     nw_error_domain_t error_domain = nw_error_get_error_domain(receive_error);
                     errno                          = nw_error_get_error_code(receive_error);
@@ -1959,7 +1886,7 @@ void UDPEndPoint::IpHandleDataReceived(const nw_connection_t & aConnection)
                 }
             };
 
-            if (content != NULL && OnMessageReceived != NULL)
+            if (content != nullptr && OnMessageReceived != nullptr)
             {
                 size_t count                              = dispatch_data_get_size(content);
                 System::PacketBufferHandle * packetBuffer = System::PacketBufferHandle::New(count);
@@ -1991,7 +1918,7 @@ CHIP_ERROR UDPEndPoint::ReleaseListener()
     nw_listener_cancel(mListener);
     dispatch_semaphore_wait(mListenerSemaphore, DISPATCH_TIME_FOREVER);
     nw_release(mListener);
-    mListener = NULL;
+    mListener = nullptr;
 
     return CHIP_NO_ERROR;
 }
@@ -2005,7 +1932,7 @@ CHIP_ERROR UDPEndPoint::ReleaseConnection()
     nw_connection_cancel(mConnection);
     dispatch_semaphore_wait(mConnectionSemaphore, DISPATCH_TIME_FOREVER);
     nw_release(mConnection);
-    mConnection = NULL;
+    mConnection = nullptr;
 
     return CHIP_NO_ERROR;
 }
@@ -2059,7 +1986,7 @@ CHIP_ERROR UDPEndPoint::Listen(OnMessageReceivedFunct onMessageReceived, OnRecei
 
     OnMessageReceived = onMessageReceived;
     OnReceiveError    = onReceiveError;
-    AppState          = appState;
+    mAppState         = appState;
 
     ReturnErrorOnFailure(ListenImpl());
 
@@ -2097,17 +2024,6 @@ void UDPEndPoint::Close()
         CloseImpl();
         mState = State::kClosed;
     }
-}
-
-void UDPEndPoint::Init(InetLayer * inetLayer)
-{
-    IpInit(inetLayer);
-}
-
-void UDPEndPoint::IpInit(InetLayer * aInetLayer)
-{
-    InitEndPointBasis(*aInetLayer);
-    InitImpl();
 }
 
 CHIP_ERROR UDPEndPoint::JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)

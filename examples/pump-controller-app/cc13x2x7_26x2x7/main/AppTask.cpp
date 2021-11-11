@@ -89,7 +89,6 @@ int AppTask::Init()
 {
     LED_Params ledParams;
     Button_Params buttonParams;
-    ConnectivityManager::ThreadPollingConfig pollingConfig;
 
     cc13x2_26x2LogInit();
 
@@ -116,18 +115,6 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
-        while (1)
-            ;
-    }
-
-    pollingConfig.Clear();
-    pollingConfig.ActivePollingIntervalMS   = 5000; // ms
-    pollingConfig.InactivePollingIntervalMS = 5000; // ms
-
-    ret = ConnectivityMgr().SetThreadPollingConfig(pollingConfig);
-    if (ret != CHIP_NO_ERROR)
-    {
-        PLAT_LOG("ConnectivityMgr().SetThreadPollingConfig() failed");
         while (1)
             ;
     }
@@ -277,7 +264,7 @@ void AppTask::ActionInitiated(PumpManager::Action_t aAction, int32_t aActor)
     LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
 }
 
-void AppTask::ActionCompleted(PumpManager::Action_t aAction)
+void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
 {
     // if the action has been completed by the pump, update the pump trait.
     // Turn on the pump state LED if in a STARTED state OR
@@ -297,6 +284,10 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction)
         LED_setOff(sAppGreenHandle);
         LED_stopBlinking(sAppRedHandle);
         LED_setOff(sAppRedHandle);
+    }
+    if (aActor == AppEvent::kEventType_ButtonLeft)
+    {
+        sAppTask.UpdateClusterState();
     }
 }
 

@@ -158,7 +158,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand stop WiFi AP");
-        mLastAPDemandTime = System::Clock::Zero;
+        mLastAPDemandTime = System::Clock::kZero;
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else

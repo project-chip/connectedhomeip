@@ -39,8 +39,8 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <app/Command.h>
-#include <app/MessageDef/CommandPathIB.h>
-#include <app/MessageDef/StatusIB.h>
+#include <app/MessageDef/InvokeRequestMessage.h>
+#include <app/MessageDef/InvokeResponseMessage.h>
 
 #define COMMON_STATUS_SUCCESS 0
 
@@ -64,12 +64,12 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apCommandSender: The command sender object that initiated the command transaction.
-         * @param[in] aPath: The command path field in invoke command response.
-         * @param[in] aStatusIB: It will always have a success status. If apData is null, it can be any success status, including
-         *                       possibly a cluster-specific one.   If apData is not null it aStatusIB will always be a generic
-         * SUCCESS status with no-cluster specific information.
-         * @param[in] aData: The command data, will be nullptr if the server returns a StatusIB.
+         * @param[in] apCommandSender The command sender object that initiated the command transaction.
+         * @param[in] aPath           The command path field in invoke command response.
+         * @param[in] aStatusIB       It will always have a success status. If apData is null, it can be any success status,
+         *                            including possibly a cluster-specific one. If apData is not null it aStatusIB will always
+         *                            be a generic SUCCESS status with no-cluster specific information.
+         * @param[in] apData          The command data, will be nullptr if the server returns a StatusIB.
          */
         virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
                                 TLV::TLVReader * apData)
@@ -89,9 +89,9 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy and free the object.
          *
-         * @param[in] apCommandSender: The command sender object that initiated the command transaction.
-         * @param[in] aStatusIB: The status code including IM status code and optional cluster status code
-         * @param[in] aError: A system error code that conveys the overall error code.
+         * @param[in] apCommandSender The command sender object that initiated the command transaction.
+         * @param[in] aStatusIB       The status code including IM status code and optional cluster status code
+         * @param[in] aError          A system error code that conveys the overall error code.
          */
         virtual void OnError(const CommandSender * apCommandSender, const StatusIB & aStatusIB, CHIP_ERROR aError) {}
 
@@ -117,7 +117,9 @@ public:
      * The callback passed in has to outlive this CommandSender object.
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr);
-
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
+    CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
+    TLV::TLVWriter * GetCommandDataIBTLVWriter();
     /**
      * API for adding a data request.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
@@ -133,7 +135,7 @@ public:
         ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::kCsTag_Data), aData));
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
@@ -156,6 +158,16 @@ public:
     CHIP_ERROR SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
 
 private:
+    friend class TestCommandInteraction;
+
+    /*
+     * Allocates a packet buffer used for encoding an invoke request payload.
+     *
+     * This can be called multiple times safely, as it will only allocate the buffer once for the lifetime
+     * of this object.
+     */
+    CHIP_ERROR AllocateBuffer();
+
     // ExchangeDelegate interface implementation.  Private so people won't
     // accidentally call it on us when we're not being treated as an actual
     // ExchangeDelegate.
@@ -170,10 +182,15 @@ private:
     //
     void Close();
 
-    CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement) override;
+    CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload);
+    CHIP_ERROR ProcessInvokeResponseIB(InvokeResponseIB::Parser & aInvokeResponse);
 
     Callback * mpCallback                      = nullptr;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
+    InvokeRequestMessage::Builder mInvokeRequestBuilder;
+    TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
+    bool mSuppressResponse                 = false;
+    bool mTimedRequest                     = false;
 };
 
 } // namespace app

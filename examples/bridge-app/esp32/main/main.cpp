@@ -47,9 +47,6 @@ static const int kUserLabelSize = 32;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 static const int kDescriptorAttributeArraySize = 254;
 static const int kFixedLabelAttributeArraySize = 254;
-// Four attributes in descriptor cluster: DeviceTypeList, ServerList, ClientList, PartsList
-static const int kDescriptorAttributeCount          = 4;
-static const int kFixedLabelElementsOctetStringSize = 16;
 
 static EndpointId gCurrentEndpointId;
 static EndpointId gFirstDynamicEndpointId;
@@ -60,9 +57,6 @@ static Device gLight1("Light 1", "Office");
 static Device gLight2("Light 2", "Office");
 static Device gLight3("Light 3", "Kitchen");
 static Device gLight4("Light 4", "Den");
-
-// Descriptor attribute storage on dynamic endpoint
-static uint8_t gDescriptorAttrStorage[DYNAMIC_ENDPOINT_COUNT][kDescriptorAttributeCount][kDescriptorAttributeArraySize];
 
 // (taken from chip-devices.xml)
 #define DEVICE_TYPE_CHIP_BRIDGE 0x0a0b
@@ -80,27 +74,27 @@ static uint8_t gDescriptorAttrStorage[DYNAMIC_ENDPOINT_COUNT][kDescriptorAttribu
 
 // Declare On/Off cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(onOffAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(ZCL_ON_OFF_ATTRIBUTE_ID, BOOLEAN, 1, 0) /* on/off */
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+DECLARE_DYNAMIC_ATTRIBUTE(ZCL_ON_OFF_ATTRIBUTE_ID, BOOLEAN, 1, 0), /* on/off */
+    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Descriptor cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(descriptorAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_DEVICE_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0),     /* device list */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_SERVER_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0), /* server list */
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CLIENT_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0), /* client list */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_PARTS_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0)   /* parts list */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_PARTS_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0),  /* parts list */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Bridged Device Basic information cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ZCL_USER_LABEL_ATTRIBUTE_ID, CHAR_STRING, kUserLabelSize, 0), /* UserLabel */
-    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_REACHABLE_ATTRIBUTE_ID, BOOLEAN, 1, 0)                /* Reachable */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_REACHABLE_ATTRIBUTE_ID, BOOLEAN, 1, 0),               /* Reachable */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Fixed Label cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(fixedLabelAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(ZCL_LABEL_LIST_ATTRIBUTE_ID, ARRAY, kFixedLabelAttributeArraySize, 0) /* label list */
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+DECLARE_DYNAMIC_ATTRIBUTE(ZCL_LABEL_LIST_ATTRIBUTE_ID, ARRAY, kFixedLabelAttributeArraySize, 0), /* label list */
+    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Cluster List for Bridged Light endpoint
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedLightClusters)
@@ -217,25 +211,6 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus HandleReadDescriptorAttribute(uint16_t endpointIndex, chip::AttributeId attributeId, uint8_t * buffer,
-                                            uint16_t maxReadLength)
-{
-    if ((maxReadLength <= kDescriptorAttributeArraySize) && (attributeId < kDescriptorAttributeCount))
-    {
-        memcpy(buffer, &gDescriptorAttrStorage[endpointIndex][attributeId][0], maxReadLength);
-    }
-    else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
-    {
-        *buffer = (uint16_t) ZCL_DESCRIPTOR_CLUSTER_REVISION;
-    }
-    else
-    {
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
-
 EmberAfStatus HandleReadFixedLabelAttribute(Device * dev, EmberAfAttributeMetadata * am, uint8_t * buffer, uint16_t maxReadLength)
 {
     if ((am->attributeId == ZCL_LABEL_LIST_ATTRIBUTE_ID) && (maxReadLength <= kFixedLabelAttributeArraySize))
@@ -283,20 +258,6 @@ EmberAfStatus HandleWriteOnOffAttribute(Device * dev, chip::AttributeId attribut
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus HandleWriteDescriptorAttribute(uint16_t endpointIndex, EmberAfAttributeMetadata * am, uint8_t * buffer,
-                                             uint16_t length, int32_t index)
-{
-    chip::AttributeId attributeId = am->attributeId;
-
-    if (emberAfCopyList(ZCL_DESCRIPTOR_CLUSTER_ID, am, true, &gDescriptorAttrStorage[endpointIndex][attributeId][0], buffer,
-                        index) > 0)
-    {
-        return EMBER_ZCL_STATUS_SUCCESS;
-    }
-
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                    uint8_t * buffer, uint16_t maxReadLength, int32_t index)
@@ -310,10 +271,6 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
         if (clusterId == ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID)
         {
             return HandleReadBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
-        }
-        else if (clusterId == ZCL_DESCRIPTOR_CLUSTER_ID)
-        {
-            return HandleReadDescriptorAttribute(endpointIndex, attributeMetadata->attributeId, buffer, maxReadLength);
         }
         else if (clusterId == ZCL_FIXED_LABEL_CLUSTER_ID)
         {
@@ -341,10 +298,6 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
         if ((dev->IsReachable()) && (clusterId == ZCL_ON_OFF_CLUSTER_ID))
         {
             return HandleWriteOnOffAttribute(dev, attributeMetadata->attributeId, buffer);
-        }
-        else if (clusterId == ZCL_DESCRIPTOR_CLUSTER_ID)
-        {
-            return HandleWriteDescriptorAttribute(endpointIndex, attributeMetadata, buffer, attributeMetadata->size, index);
         }
     }
 

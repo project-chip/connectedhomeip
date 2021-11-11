@@ -60,27 +60,27 @@ void SignalHandler(int signum)
     switch (signum)
     {
     case SIGINT:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET);
+        ConfigurationMgr().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGHUP:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET);
+        ConfigurationMgr().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGTERM:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT);
+        ConfigurationMgr().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGUSR1:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET);
+        ConfigurationMgr().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGUSR2:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET);
+        ConfigurationMgr().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGTSTP:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED);
+        ConfigurationMgr().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     default:
@@ -209,12 +209,15 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
-    mStartTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+    ScheduleWork(HandleDeviceRebooted, 0);
 
 exit:
     return err;
@@ -228,9 +231,9 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     {
         uint32_t totalOperationalHours = 0;
 
-        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgrImpl().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
@@ -287,7 +290,7 @@ CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
 {
     uint32_t count = 0;
 
-    CHIP_ERROR err = ConfigurationMgrImpl().GetRebootCount(count);
+    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -300,11 +303,11 @@ CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
 
 CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
 {
-    uint64_t currentTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
+    System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
-    if (currentTimeMilliseconds >= mStartTimeMilliseconds)
+    if (currentTime >= mStartTime)
     {
-        upTime = (currentTimeMilliseconds - mStartTimeMilliseconds) / 1000;
+        upTime = std::chrono::duration_cast<System::Clock::Seconds64>(currentTime - mStartTime).count();
         return CHIP_NO_ERROR;
     }
 
@@ -318,7 +321,7 @@ CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperat
     if (_GetUpTime(upTime) == CHIP_NO_ERROR)
     {
         uint32_t totalHours = 0;
-        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
+        if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
         {
             VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
             totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
@@ -332,7 +335,7 @@ CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
 {
     uint32_t reason = 0;
 
-    CHIP_ERROR err = ConfigurationMgrImpl().GetBootReasons(reason);
+    CHIP_ERROR err = ConfigurationMgr().GetBootReasons(reason);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -341,6 +344,16 @@ CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
     }
 
     return err;
+}
+
+void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
+{
+    PlatformManagerDelegate * delegate = PlatformMgr().GetDelegate();
+
+    if (delegate != nullptr)
+    {
+        delegate->OnDeviceRebooted();
+    }
 }
 
 #if CHIP_WITH_GIO

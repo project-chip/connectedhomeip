@@ -114,7 +114,7 @@ CHIP_ERROR AppTask::Init()
 void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
-    Clock::MonotonicMicroseconds mLastChangeTimeUS = 0;
+    Clock::Timestamp lastChangeTime = Clock::kZero;
 
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
@@ -170,12 +170,12 @@ void AppTask::AppTaskMain(void * pvParameter)
         sStatusLED.Animate();
         sLockLED.Animate();
 
-        Clock::MonotonicMicroseconds nowUS            = SystemClock().GetMonotonicMicroseconds();
-        Clock::MonotonicMicroseconds nextChangeTimeUS = mLastChangeTimeUS + (5 * 1000 * 1000UL);
+        Clock::Timestamp now            = SystemClock().GetMonotonicTimestamp();
+        Clock::Timestamp nextChangeTime = lastChangeTime + Clock::Seconds16(5);
 
-        if (nextChangeTimeUS < nowUS)
+        if (nextChangeTime < now)
         {
-            mLastChangeTimeUS = nowUS;
+            lastChangeTime = now;
         }
         if (lockButton.Poll())
         {

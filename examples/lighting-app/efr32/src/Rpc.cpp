@@ -20,6 +20,7 @@
 #include "FreeRTOS.h"
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
+#include "pigweed/rpc_services/Attributes.h"
 #include "pigweed/rpc_services/Button.h"
 #include "pigweed/rpc_services/Device.h"
 #include "pigweed/rpc_services/Lighting.h"
@@ -58,15 +59,17 @@ static TaskHandle_t sRpcTaskHandle;
 StaticTask_t sRpcTaskBuffer;
 StackType_t sRpcTaskStack[RPC_TASK_STACK_SIZE];
 
-chip::rpc::Efr32Button button_service;
-chip::rpc::Lighting lighting_service;
-chip::rpc::Efr32Device device_service;
+Attributes attributes_service;
+Efr32Button button_service;
+Efr32Device device_service;
+Lighting lighting_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
-    server.RegisterService(lighting_service);
+    server.RegisterService(attributes_service);
     server.RegisterService(button_service);
     server.RegisterService(device_service);
+    server.RegisterService(lighting_service);
 }
 
 } // namespace

@@ -46,6 +46,7 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-StorageDelegate.h",
     "chip/clusters/CHIPClusters.cpp",
     "chip/clusters/command.cpp",
+    "chip/clusters/write.cpp",
     "chip/discovery/NodeResolution.cpp",
     "chip/interaction_model/Delegate.cpp",
     "chip/interaction_model/Delegate.h",
@@ -111,6 +112,7 @@ pw_python_action("python") {
         "chip/ble/library_handle.py",
         "chip/ble/scan_devices.py",
         "chip/ble/types.py",
+        "chip/clusters/Attribute.py",
         "chip/clusters/CHIPClusters.py",
         "chip/clusters/ClusterObjects.py",
         "chip/clusters/Command.py",
@@ -172,7 +174,7 @@ pw_python_action("python") {
 
   if (current_cpu == "x64") {
     cpu_tag = "x86_64"
-  } else if (current_cpu == "arm64") {
+  } else if (current_cpu == "arm64" && current_os == "linux") {
     cpu_tag = "aarch64"
   } else {
     cpu_tag = current_cpu
