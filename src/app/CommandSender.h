@@ -69,7 +69,7 @@ public:
          * @param[in] aStatusIB       It will always have a success status. If apData is null, it can be any success status,
          *                            including possibly a cluster-specific one. If apData is not null it aStatusIB will always
          *                            be a generic SUCCESS status with no-cluster specific information.
-         * @param[in] aData           The command data, will be nullptr if the server returns a StatusIB.
+         * @param[in] apData          The command data, will be nullptr if the server returns a StatusIB.
          */
         virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
                                 TLV::TLVReader * apData)

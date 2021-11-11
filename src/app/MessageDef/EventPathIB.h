@@ -112,7 +112,7 @@ public:
     /**
      *  @brief Get a TLVReader for the bool isUrgent. Next() must be called before accessing them.
      *
-     *  @param [in] apISUrgent  A pointer to apIsUrgent
+     *  @param [in] apIsUrgent  A pointer to apIsUrgent
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
