@@ -85,6 +85,9 @@ netns_setup() {
     ${privileged_run} ip netns exec tool ip link set dev lo up
     ${privileged_run} ip link set dev eth-tool-switch up
 
+    # TODO(andreilitvin): broadcasts and communication on ipv6 does not work in netns
+    ${privileged_run} ip netns exec tool ip -6 addr flush eth-tool
+    ${privileged_run} ip netns exec app ip -6 addr flush eth-app
 }
 
 netns_cleanup() {
