@@ -906,6 +906,9 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     err = mIDAllocator.Allocate(keyID);
     SuccessOrExit(err);
 
+    // TODO - Remove use of SetActive/IsActive from CommissioneeDeviceProxy
+    device->SetActive(true);
+
     err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), keyID, exchangeCtxt, this);
     // Immediately persist the updted mNextKeyID value
     // TODO maybe remove FreeRendezvousSession() since mNextKeyID is always persisted immediately
