@@ -1019,6 +1019,27 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    target.flags == (Target::kCluster | Target::kDeviceType) && target.cluster == 0xAAAA5555 &&
                        target.deviceType == 0xBBBB6666);
+
+    NL_TEST_ASSERT(inSuite, entry.RemoveSubject(1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(count) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, count == 2);
+    NL_TEST_ASSERT(inSuite, entry.GetSubject(0, subject) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, subject == 0x11111111AAAAAAAA);
+    NL_TEST_ASSERT(inSuite, entry.GetSubject(1, subject) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, subject == 0x33333333CCCCCCCC);
+    NL_TEST_ASSERT(inSuite, entry.GetSubject(2, subject) != CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, entry.RemoveTarget(1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.GetTargetCount(count) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, count == 2);
+    NL_TEST_ASSERT(inSuite, entry.GetTarget(0, target) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 11 && target.endpoint == 22);
+    NL_TEST_ASSERT(inSuite, entry.GetTarget(1, target) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   target.flags == (Target::kCluster | Target::kDeviceType) && target.cluster == 0xAAAA5555 &&
+                       target.deviceType == 0xBBBB6666);
+    NL_TEST_ASSERT(inSuite, entry.GetTarget(2, target) != CHIP_NO_ERROR);
 }
 
 void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)

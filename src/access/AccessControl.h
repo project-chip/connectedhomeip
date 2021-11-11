@@ -30,6 +30,11 @@ namespace Access {
 class AccessControl
 {
 public:
+    /**
+     * Handle to an entry in the access control list.
+     * 
+     * Must be prepared (`AccessControl::PrepareEntry`) or read (`AccessControl::ReadEntry`) before first use.
+     */
     class Entry
     {
     public:
@@ -99,18 +104,80 @@ public:
         CHIP_ERROR SetFabricIndex(FabricIndex fabricIndex) { return mDelegate->SetFabricIndex(fabricIndex); }
         CHIP_ERROR SetPrivilege(Privilege privilege) { return mDelegate->SetPrivilege(privilege); }
 
-        // Subjects
+        /**
+         * Gets the number of subjects.
+         * 
+         * @param [out] count   The number of subjects.
+         */
         CHIP_ERROR GetSubjectCount(size_t & count) const { return mDelegate->GetSubjectCount(count); }
+
+        /**
+         * Gets the specified subject.
+         * 
+         * @param [in]  index       The index of the subject to get.
+         * @param [out] subject     The subject into which to get.
+         */
         CHIP_ERROR GetSubject(size_t index, NodeId & subject) const { return mDelegate->GetSubject(index, subject); }
+
+        /**
+         * Sets the specified subject.
+         * 
+         * @param [in] index        The index of the subject to set.
+         * @param [in] subject      The subject from which to set.
+         */
         CHIP_ERROR SetSubject(size_t index, NodeId subject) { return mDelegate->SetSubject(index, subject); }
+
+        /**
+         * Adds the specified subject.
+         * 
+         * @param [out] index       The index of the added subject, if not null.
+         * @param [in]  subject     The subject to add.
+         */
         CHIP_ERROR AddSubject(size_t * index, NodeId subject) { return mDelegate->AddSubject(index, subject); }
+
+        /**
+         * Removes the specified subject.
+         * 
+         * @param [in] index        The index of the subject to delete.
+         */
         CHIP_ERROR RemoveSubject(size_t index) { return mDelegate->RemoveSubject(index); }
 
-        // Targets
+        /**
+         * Gets the number of targets.
+         * 
+         * @param [out] count   The number of targets.
+         */
         CHIP_ERROR GetTargetCount(size_t & count) const { return mDelegate->GetTargetCount(count); }
+
+        /**
+         * Gets the specified target.
+         * 
+         * @param [in]  index       The index of the target to get.
+         * @param [out] target      The target into which to get.
+         */
         CHIP_ERROR GetTarget(size_t index, Target & target) const { return mDelegate->GetTarget(index, target); }
+
+        /**
+         * Sets the specified target.
+         * 
+         * @param [in] index        The index of the target to set.
+         * @param [in] target       The target from which to set.
+         */
         CHIP_ERROR SetTarget(size_t index, const Target & target) { return mDelegate->SetTarget(index, target); }
+
+        /**
+         * Adds the specified target.
+         * 
+         * @param [out] index       The index of the added target, if not null.
+         * @param [in]  target      The target to add.
+         */
         CHIP_ERROR AddTarget(size_t * index, const Target & target) { return mDelegate->AddTarget(index, target); }
+
+        /**
+         * Removes the specified target.
+         * 
+         * @param [in] index        The index of the target to delete.
+         */
         CHIP_ERROR RemoveTarget(size_t index) { return mDelegate->RemoveTarget(index); }
 
     public:
@@ -135,6 +202,11 @@ public:
         Delegate * mDelegate = &mDefaultDelegate;
     };
 
+    /**
+     * Handle to an entry iterator in the access control list.
+     * 
+     * Must be initialized (`AccessControl::Entries`) before first use.
+     */
     class EntryIterator
     {
     public:
@@ -279,28 +351,66 @@ public:
     // Capabilities
     CHIP_ERROR GetMaxEntries(int & value) const { return mDelegate.GetMaxEntries(value); }
 
-    // Preparation
+    /**
+     * Prepares an entry. An entry must be prepared or read before use.
+     * 
+     * @param [in] entry        Entry to prepare.
+     */
     CHIP_ERROR PrepareEntry(Entry & entry) { return mDelegate.PrepareEntry(entry); }
 
-    // CRUD
+    /**
+     * Creates an entry in the access control list.
+     * 
+     * @param [out] index       Entry index of created entry, if not null. May be relative to `fabricIndex`.
+     * @param [in]  entry       Entry from which to copy.
+     * @param [out] fabricIndex Fabric index of created entry, if not null, in which case entry `index` will be relative to fabric.
+     */
     CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, FabricIndex * fabricIndex = nullptr)
     {
         return mDelegate.CreateEntry(index, entry, fabricIndex);
     }
+
+    /**
+     * Reads an entry from the access control list.
+     * 
+     * @param [in]  index       Entry index of entry to read. May be relative to `fabricIndex`.
+     * @param [out] entry       Entry into which to copy.
+     * @param [in]  fabricIndex Fabric to which entry `index` is relative, if not null.
+     */
     CHIP_ERROR ReadEntry(size_t index, Entry & entry, const FabricIndex * fabricIndex = nullptr) const
     {
         return mDelegate.ReadEntry(index, entry, fabricIndex);
     }
+
+    /**
+     * Updates an entry in the access control list.
+     * 
+     * @param [in] index        Entry index of entry to update, if not null. May be relative to `fabricIndex`.
+     * @param [in] entry        Entry from which to copy.
+     * @param [in] fabricIndex  Fabric to which entry `index` is relative, if not null.
+     */
     CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex = nullptr)
     {
         return mDelegate.UpdateEntry(index, entry, fabricIndex);
     }
+
+    /**
+     * Deletes an entry from the access control list.
+     * 
+     * @param [in] index        Entry index of entry to delete. May be relative to `fabricIndex`.
+     * @param [in] fabricIndex  Fabric to which entry `index` is relative, if not null.
+     */
     CHIP_ERROR DeleteEntry(size_t index, const FabricIndex * fabricIndex = nullptr)
     {
         return mDelegate.DeleteEntry(index, fabricIndex);
     }
 
-    // Iteration
+    /**
+     * Iterates over entries in the access control list.
+     * 
+     * @param [out] iterator    Iterator controlling the iteration.
+     * @param [in]  fabricIndex Iteration is confined to fabric, if not null.
+     */
     CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex = nullptr) const
     {
         return mDelegate.Entries(iterator, fabricIndex);

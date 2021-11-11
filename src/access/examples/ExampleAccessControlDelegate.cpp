@@ -20,6 +20,7 @@
 
 #include <lib/core/CHIPConfig.h>
 
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <type_traits>
@@ -337,10 +338,11 @@ class EntryStorage
 {
 public:
     // ACL support
-    static constexpr int kNumberOfFabrics  = 4; // TODO: get from config
+    static constexpr int kNumberOfFabrics  = CHIP_CONFIG_MAX_DEVICE_ADMINS;
     static constexpr int kEntriesPerFabric = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
     static EntryStorage acl[kNumberOfFabrics * kEntriesPerFabric];
 
+    // Find the next unused entry storage in the access control list, if one exists.
     static EntryStorage * FindUnusedInAcl()
     {
         for (auto & storage : acl)
@@ -353,6 +355,7 @@ public:
         return nullptr;
     }
 
+    // Find the specified used entry storage in the access control list, if it exists.
     static EntryStorage * FindUsedInAcl(size_t index, const FabricIndex * fabricIndex)
     {
         if (fabricIndex != nullptr)
@@ -374,6 +377,9 @@ public:
     // Pool support
     static EntryStorage pool[kEntryStoragePoolSize];
 
+    // Find an unused entry storage in the pool, if one is available.
+    // The candidate is preferred if provided and it is in the pool,
+    // regardless of whether it is already in use.
     static EntryStorage * Find(EntryStorage * candidate)
     {
         if (candidate && candidate->InPool())
@@ -441,30 +447,52 @@ public:
         kRelativeToAbsolute
     };
 
+    // Entries have a position in the access control list, denoted by an "absolute" index.
+    // Because entries are scoped to a fabric, a "fabric relative" index can be inferred.
+    //
+    // For example: suppose there are 8 entries for fabrics A, B, and C (as fabric indexes 1, 2, 3).
+    //
+    //        0   1   2   3   4   5   6   7     ABSOLUTE INDEX
+    //      +---+---+---+---+---+---+---+---+
+    //      | A0| A1| B0| A2| B1| B2| C0| C1|   FABRIC RELATIVE INDEX
+    //      +---+---+---+---+---+---+---+---+
+    //
+    // While the entry at (absolute) index 2 is the third entry, it is the first entry scoped to
+    // fabric B. So relative to fabric index 2, the entry is at (relative) index 0.
+    //
+    // The opposite is true: the second entry scoped to fabric B, at (relative) index 1, is the
+    // fifth entry overall, at (absolute) index 4.
+    //
+    // Not all conversions are possible. For example, absolute index 3 is not scoped to fabric B, so
+    // attempting to convert it to be relative to fabric index 2 will fail. Likewise, fabric B does
+    // not contain a fourth entry, so attempting to convert index 3 (relative to fabric index 2) to
+    // an absolute index will also fail. Such failures are denoted by use of an index that is one
+    // past the end of the access control list. (So in this example, failure produces index 8.)
     static void ConvertIndex(size_t & index, const FabricIndex fabricIndex, ConvertDirection direction)
     {
         size_t absoluteIndex = 0;
         size_t relativeIndex = 0;
         size_t & fromIndex   = (direction == ConvertDirection::kAbsoluteToRelative) ? absoluteIndex : relativeIndex;
         size_t & toIndex     = (direction == ConvertDirection::kAbsoluteToRelative) ? relativeIndex : absoluteIndex;
+        bool found           = false;
         for (const auto & storage : acl)
         {
             if (!storage.InUse())
             {
-                index = ArraySize(acl);
-                return;
+                break;
             }
             if (storage.mFabricIndex == fabricIndex)
             {
                 if (index == fromIndex)
                 {
+                    found = true;
                     break;
                 }
                 relativeIndex++;
             }
             absoluteIndex++;
         }
-        index = toIndex;
+        index = found ? toIndex : ArraySize(acl);
     }
 
 public:
@@ -485,6 +513,9 @@ public:
     // Pool support
     static EntryDelegate pool[kEntryDelegatePoolSize];
 
+    // Find an unused entry delegate in the pool, if one is available.
+    // The candidate is preferred if it is in the pool, regardless of whether
+    // it is already in use.
     static EntryDelegate * Find(Entry::Delegate & candidate)
     {
         if (InPool(candidate))
@@ -535,21 +566,21 @@ public:
 
     CHIP_ERROR SetAuthMode(AuthMode authMode) override
     {
-        ReturnErrorCodeIf(EnsureInPool(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(EnsureStorageInPool());
         mStorage->mAuthMode = authMode;
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR SetFabricIndex(FabricIndex fabricIndex) override
     {
-        ReturnErrorCodeIf(EnsureInPool(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(EnsureStorageInPool());
         mStorage->mFabricIndex = fabricIndex;
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR SetPrivilege(Privilege privilege) override
     {
-        ReturnErrorCodeIf(EnsureInPool(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(EnsureStorageInPool());
         mStorage->mPrivilege = privilege;
         return CHIP_NO_ERROR;
     }
@@ -579,7 +610,7 @@ public:
 
     CHIP_ERROR SetSubject(size_t index, NodeId subject) override
     {
-        ReturnErrorCodeIf(EnsureInPool(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(EnsureStorageInPool());
         if (index < EntryStorage::kMaxSubjects)
         {
             return mStorage->mSubjects[index].Set(subject);
@@ -589,7 +620,7 @@ public:
 
     CHIP_ERROR AddSubject(size_t * index, NodeId subject) override
     {
-        ReturnErrorCodeIf(EnsureInPool(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(EnsureStorageInPool());
         size_t count;
         GetSubjectCount(count);
         if (count < EntryStorage::kMaxSubjects)
@@ -606,19 +637,23 @@ public:
 
     CHIP_ERROR RemoveSubject(size_t index) override
     {
-        ReturnErrorCodeIf(EnsureInPool(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(EnsureStorageInPool());
         size_t count;
         GetSubjectCount(count);
         if (index < count)
         {
+            // The storage at the specified index will be deleted by copying any subsequent storage
+            // over it, ideally also including one unused storage past the ones in use. If all
+            // storage was in use, this isn't possible, so the final storage is manually cleared.
             auto * dest       = mStorage->mSubjects + index;
             const auto * src  = dest + 1;
-            const auto bytes  = (count - index - 1) * sizeof(*dest);
-            memmove(dest, src, bytes);
+            const auto n      = std::min(int(count), EntryStorage::kMaxSubjects - 1) - index;
+            memmove(dest, src, n * sizeof(*dest));
             if (count == EntryStorage::kMaxSubjects)
             {
                 mStorage->mSubjects[EntryStorage::kMaxSubjects - 1].Clear();
             }
+            return CHIP_NO_ERROR;
         }
         return CHIP_ERROR_SENTINEL;
     }
@@ -648,7 +683,7 @@ public:
 
     CHIP_ERROR SetTarget(size_t index, const Target & target) override
     {
-        ReturnErrorCodeIf(EnsureInPool(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(EnsureStorageInPool());
         if (index < EntryStorage::kMaxTargets)
         {
             return mStorage->mTargets[index].Set(target);
@@ -658,7 +693,7 @@ public:
 
     CHIP_ERROR AddTarget(size_t * index, const Target & target) override
     {
-        ReturnErrorCodeIf(EnsureInPool(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(EnsureStorageInPool());
         size_t count;
         GetTargetCount(count);
         if (count < EntryStorage::kMaxTargets)
@@ -675,19 +710,23 @@ public:
 
     CHIP_ERROR RemoveTarget(size_t index) override
     {
-        ReturnErrorCodeIf(EnsureInPool(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(EnsureStorageInPool());
         size_t count;
         GetTargetCount(count);
         if (index < count)
         {
+            // The storage at the specified index will be deleted by copying any subsequent storage
+            // over it, ideally also including one unused storage past the ones in use. If all
+            // storage was in use, this isn't possible, so the final storage is manually cleared.
             auto * dest       = mStorage->mTargets + index;
             const auto * src  = dest + 1;
-            const auto bytes  = (count - index - 1) * sizeof(*dest);
-            memmove(dest, src, bytes);
+            const auto n      = std::min(int(count), EntryStorage::kMaxTargets - 1) - index;
+            memmove(dest, src, n * sizeof(*dest));
             if (count == EntryStorage::kMaxTargets)
             {
                 mStorage->mTargets[EntryStorage::kMaxTargets - 1].Clear();
             }
+            return CHIP_NO_ERROR;
         }
         return CHIP_ERROR_SENTINEL;
     }
@@ -721,19 +760,21 @@ public:
         }
     }
 
-    bool EnsureInPool()
+    // Ensure the delegate is using storage from the pool (not the access control list),
+    // by copying (from the access control list to the pool) if necessary.
+    CHIP_ERROR EnsureStorageInPool()
     {
         if (mStorage->InPool())
         {
-            return false;
+            return CHIP_NO_ERROR;
         }
         else if (auto * storage = EntryStorage::Find(nullptr))
         {
             *storage = *mStorage;
             mStorage = storage;
-            return false;
+            return CHIP_NO_ERROR;
         }
-        return true;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
 private:
@@ -747,6 +788,9 @@ public:
     // Pool support
     static EntryIteratorDelegate pool[kEntryIteratorDelegatePoolSize];
 
+    // Find an unused entry iterator delegate in the pool, if one is available.
+    // The candidate is preferred if it is in the pool, regardless of whether
+    // it is already in use.
     static EntryIteratorDelegate * Find(EntryIterator::Delegate & candidate)
     {
         if (InPool(candidate))
@@ -780,23 +824,28 @@ public:
         {
             if (mStorage == nullptr)
             {
+                // Start at beginning of access control list...
                 mStorage = acl;
             }
             else if (mStorage < end)
             {
+                // ...and continue iterating entries...
                 mStorage++;
             }
             if (mStorage == end || !mStorage->InUse())
             {
+                // ...but only used ones...
                 mStorage = end;
                 break;
             }
             if (mFabricFiltered && mStorage->mFabricIndex != mFabricIndex)
             {
+                // ...skipping those that aren't scoped to a specified fabric...
                 continue;
             }
             if (auto * delegate = EntryDelegate::Find(entry.GetDelegate()))
             {
+                // ...returning any next entry via a delegate.
                 delegate->Init(entry, *mStorage);
                 return CHIP_NO_ERROR;
             }
@@ -1002,18 +1051,22 @@ public:
         {
             constexpr auto & acl = EntryStorage::acl;
             constexpr auto * end = acl + ArraySize(acl);
+            // Go through the access control list starting at the deleted storage...
             for (auto * next = storage + 1; storage < end; ++storage, ++next)
             {
+                // ...copying over each storage with its next one...
                 if (next < end && next->InUse())
                 {
                     *storage = *next;
                 }
                 else
                 {
+                    // ...clearing the last previously used one...
                     storage->Clear();
                     break;
                 }
             }
+            // ...then fix up all the delegates so they still use the proper storage.
             storage = acl + index;
             for (auto & delegate : EntryDelegate::pool)
             {
