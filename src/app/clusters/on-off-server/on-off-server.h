@@ -20,16 +20,57 @@
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 
-/** @brief On/off Cluster Set Value
- *
- * This function is called when the on/off value needs to be set, either through
- * normal channels or as a result of a level change.
- *
- * @param endpoint   Ver.: always
- * @param command   Ver.: always
- * @param initiatedByLevelChange   Ver.: always
- */
-EmberAfStatus emberAfOnOffClusterSetValueCallback(chip::EndpointId endpoint, uint8_t command, bool initiatedByLevelChange);
+class OnOffServer
+{
+public:
+    /**********************************************************
+     * Enums
+     *********************************************************/
+
+    enum EffectIdentifier
+    {
+        IDENTIFIER_DELAYED_OFF = 0x00,
+        IDENTIFIER_DYING_LIGHT = 0x01,
+    };
+
+    enum EffectVariant
+    {
+        VARIANT_DEFAULT  = 0x00,
+        VARIANT_EFFECT_1 = 0x01,
+        VARIANT_EFFECT_2 = 0x02,
+    };
+
+    /**********************************************************
+     * Functions Definitions
+     *********************************************************/
+
+    static OnOffServer & Instance();
+
+    bool offCommand();
+    bool onCommand();
+    bool toggleCommand();
+    void initOnOffServer(chip::EndpointId endpoint);
+    EmberAfStatus setOnOffValue(chip::EndpointId endpoint, uint8_t command, bool initiatedByLevelChange);
+
+private:
+    /**********************************************************
+     * Functions Definitions
+     *********************************************************/
+
+#ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+    bool areStartUpOnOffServerAttributesTokenized(chip::EndpointId endpoint);
+#endif // ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+
+    /**********************************************************
+     * Attributes Decleration
+     *********************************************************/
+
+    static OnOffServer instance;
+};
+
+/**********************************************************
+ * Global
+ *********************************************************/
 
 /** @brief On/off Cluster Level Control Effect
  *
@@ -41,6 +82,10 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(chip::EndpointId endpoint, uin
  * @param newValue   Ver.: always
  */
 void emberAfOnOffClusterLevelControlEffectCallback(chip::EndpointId endpoint, bool newValue);
+
+/**********************************************************
+ * Callbacks
+ *********************************************************/
 
 /** @brief On/off Cluster Server Post Init
  *
