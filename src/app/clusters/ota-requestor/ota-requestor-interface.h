@@ -29,9 +29,9 @@ class OTARequestorInterface
 {
 public:
     // Handler for the AnnounceOTAProvider command
-    virtual bool HandleAnnounceOTAProvider(ip::app::CommandHandler *commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath,
-                                           const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData ch) = 0;
+    virtual bool HandleAnnounceOTAProvider(
+        ip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData ch) = 0;
 
     // Handler for the QueryImageResponse command
     virtual bool HandleQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, CharSpan imageURI,
