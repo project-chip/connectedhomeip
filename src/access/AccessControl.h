@@ -32,7 +32,7 @@ class AccessControl
 public:
     /**
      * Handle to an entry in the access control list.
-     * 
+     *
      * Must be prepared (`AccessControl::PrepareEntry`) or read (`AccessControl::ReadEntry`) before first use.
      */
     class Entry
@@ -106,14 +106,14 @@ public:
 
         /**
          * Gets the number of subjects.
-         * 
+         *
          * @param [out] count   The number of subjects.
          */
         CHIP_ERROR GetSubjectCount(size_t & count) const { return mDelegate->GetSubjectCount(count); }
 
         /**
          * Gets the specified subject.
-         * 
+         *
          * @param [in]  index       The index of the subject to get.
          * @param [out] subject     The subject into which to get.
          */
@@ -121,7 +121,7 @@ public:
 
         /**
          * Sets the specified subject.
-         * 
+         *
          * @param [in] index        The index of the subject to set.
          * @param [in] subject      The subject from which to set.
          */
@@ -129,7 +129,7 @@ public:
 
         /**
          * Adds the specified subject.
-         * 
+         *
          * @param [out] index       The index of the added subject, if not null.
          * @param [in]  subject     The subject to add.
          */
@@ -137,21 +137,21 @@ public:
 
         /**
          * Removes the specified subject.
-         * 
+         *
          * @param [in] index        The index of the subject to delete.
          */
         CHIP_ERROR RemoveSubject(size_t index) { return mDelegate->RemoveSubject(index); }
 
         /**
          * Gets the number of targets.
-         * 
+         *
          * @param [out] count   The number of targets.
          */
         CHIP_ERROR GetTargetCount(size_t & count) const { return mDelegate->GetTargetCount(count); }
 
         /**
          * Gets the specified target.
-         * 
+         *
          * @param [in]  index       The index of the target to get.
          * @param [out] target      The target into which to get.
          */
@@ -159,7 +159,7 @@ public:
 
         /**
          * Sets the specified target.
-         * 
+         *
          * @param [in] index        The index of the target to set.
          * @param [in] target       The target from which to set.
          */
@@ -167,7 +167,7 @@ public:
 
         /**
          * Adds the specified target.
-         * 
+         *
          * @param [out] index       The index of the added target, if not null.
          * @param [in]  target      The target to add.
          */
@@ -175,7 +175,7 @@ public:
 
         /**
          * Removes the specified target.
-         * 
+         *
          * @param [in] index        The index of the target to delete.
          */
         CHIP_ERROR RemoveTarget(size_t index) { return mDelegate->RemoveTarget(index); }
@@ -204,7 +204,7 @@ public:
 
     /**
      * Handle to an entry iterator in the access control list.
-     * 
+     *
      * Must be initialized (`AccessControl::Entries`) before first use.
      */
     class EntryIterator
@@ -353,14 +353,14 @@ public:
 
     /**
      * Prepares an entry. An entry must be prepared or read before use.
-     * 
+     *
      * @param [in] entry        Entry to prepare.
      */
     CHIP_ERROR PrepareEntry(Entry & entry) { return mDelegate.PrepareEntry(entry); }
 
     /**
      * Creates an entry in the access control list.
-     * 
+     *
      * @param [out] index       Entry index of created entry, if not null. May be relative to `fabricIndex`.
      * @param [in]  entry       Entry from which to copy.
      * @param [out] fabricIndex Fabric index of created entry, if not null, in which case entry `index` will be relative to fabric.
@@ -372,7 +372,7 @@ public:
 
     /**
      * Reads an entry from the access control list.
-     * 
+     *
      * @param [in]  index       Entry index of entry to read. May be relative to `fabricIndex`.
      * @param [out] entry       Entry into which to copy.
      * @param [in]  fabricIndex Fabric to which entry `index` is relative, if not null.
@@ -384,7 +384,7 @@ public:
 
     /**
      * Updates an entry in the access control list.
-     * 
+     *
      * @param [in] index        Entry index of entry to update, if not null. May be relative to `fabricIndex`.
      * @param [in] entry        Entry from which to copy.
      * @param [in] fabricIndex  Fabric to which entry `index` is relative, if not null.
@@ -396,7 +396,7 @@ public:
 
     /**
      * Deletes an entry from the access control list.
-     * 
+     *
      * @param [in] index        Entry index of entry to delete. May be relative to `fabricIndex`.
      * @param [in] fabricIndex  Fabric to which entry `index` is relative, if not null.
      */
@@ -407,7 +407,7 @@ public:
 
     /**
      * Iterates over entries in the access control list.
-     * 
+     *
      * @param [out] iterator    Iterator controlling the iteration.
      * @param [in]  fabricIndex Iteration is confined to fabric, if not null.
      */
