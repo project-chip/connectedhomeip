@@ -54,7 +54,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     bool failSafeArmed;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<K32W0Config>::Init();
+    err = Internal::GenericConfigurationManagerImpl<K32WConfig>::Init();
     SuccessOrExit(err);
 
     // TODO: Initialize the global GroupKeyStore object here
@@ -87,7 +87,7 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
 {
     CHIP_ERROR err;
 
-    err = ReadConfigValueCounter(persistedStorageKey, value);
+    err = K32WConfig::ReadConfigValueCounter(persistedStorageKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -105,7 +105,7 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
     // (where persistedStorageKey represents an index to the counter).
     CHIP_ERROR err;
 
-    err = WriteConfigValueCounter(persistedStorageKey, value);
+    err = K32WConfig::WriteConfigValueCounter(persistedStorageKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -116,64 +116,64 @@ exit:
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(K32W0Config::Key key, bool & val)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(K32WConfig::Key key, bool & val)
 {
-    return K32W0Config::ReadConfigValue(key, val);
+    return K32WConfig::ReadConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(K32W0Config::Key key, uint32_t & val)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(K32WConfig::Key key, uint32_t & val)
 {
-    return K32W0Config::ReadConfigValue(key, val);
+    return K32WConfig::ReadConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(K32W0Config::Key key, uint64_t & val)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(K32WConfig::Key key, uint64_t & val)
 {
-    return K32W0Config::ReadConfigValue(key, val);
+    return K32WConfig::ReadConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(K32W0Config::Key key, char * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(K32WConfig::Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    return K32W0Config::ReadConfigValueStr(key, buf, bufSize, outLen);
+    return K32WConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(K32W0Config::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(K32WConfig::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    return K32W0Config::ReadConfigValueBin(key, buf, bufSize, outLen);
+    return K32WConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(K32W0Config::Key key, bool val)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(K32WConfig::Key key, bool val)
 {
-    return K32W0Config::WriteConfigValue(key, val);
+    return K32WConfig::WriteConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(K32W0Config::Key key, uint32_t val)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(K32WConfig::Key key, uint32_t val)
 {
-    return K32W0Config::WriteConfigValue(key, val);
+    return K32WConfig::WriteConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(K32W0Config::Key key, uint64_t val)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(K32WConfig::Key key, uint64_t val)
 {
-    return K32W0Config::WriteConfigValue(key, val);
+    return K32WConfig::WriteConfigValue(key, val);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(K32W0Config::Key key, const char * str)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(K32WConfig::Key key, const char * str)
 {
-    return K32W0Config::WriteConfigValueStr(key, str);
+    return K32WConfig::WriteConfigValueStr(key, str);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(K32W0Config::Key key, const char * str, size_t strLen)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(K32WConfig::Key key, const char * str, size_t strLen)
 {
-    return K32W0Config::WriteConfigValueStr(key, str, strLen);
+    return K32WConfig::WriteConfigValueStr(key, str, strLen);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(K32W0Config::Key key, const uint8_t * data, size_t dataLen)
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(K32WConfig::Key key, const uint8_t * data, size_t dataLen)
 {
-    return K32W0Config::WriteConfigValueBin(key, data, dataLen);
+    return K32WConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
 void ConfigurationManagerImpl::RunConfigUnitTest(void)
 {
-    K32W0Config::RunConfigUnitTest();
+    K32WConfig::RunConfigUnitTest();
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
@@ -182,7 +182,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = K32W0Config::FactoryResetConfig();
+    err = K32WConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));

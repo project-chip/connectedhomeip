@@ -59,7 +59,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipCounters);
     SuccessOrExit(err);
 
-    if (ConfigValueExists(kCounterKey_RebootCount))
+    if (AmebaConfig::ConfigValueExists(AmebaConfig::kCounterKey_RebootCount))
     {
         err = GetRebootCount(rebootCount);
         SuccessOrExit(err);
@@ -74,13 +74,13 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!ConfigValueExists(kCounterKey_TotalOperationalHours))
+    if (!AmebaConfig::ConfigValueExists(kAmebaConfig::CounterKey_TotalOperationalHours))
     {
         err = StoreTotalOperationalHours(0);
         SuccessOrExit(err);
     }
 
-    if (!ConfigValueExists(kCounterKey_BootReason))
+    if (!AmebaConfig::ConfigValueExists(AmebaConfig::kCounterKey_BootReason))
     {
         err = StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
         SuccessOrExit(err);
@@ -104,32 +104,32 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 {
-    return ReadConfigValue(kCounterKey_RebootCount, rebootCount);
+    return ReadConfigValue(AmebaConfig::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
 {
-    return WriteConfigValue(kCounterKey_RebootCount, rebootCount);
+    return WriteConfigValue(AmebaConfig::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    return ReadConfigValue(kCounterKey_TotalOperationalHours, totalOperationalHours);
+    return ReadConfigValue(AmebaConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
 {
-    return WriteConfigValue(kCounterKey_TotalOperationalHours, totalOperationalHours);
+    return WriteConfigValue(AmebaConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetBootReasons(uint32_t & bootReasons)
 {
-    return ReadConfigValue(kCounterKey_BootReason, bootReasons);
+    return ReadConfigValue(AmebaConfig::kCounterKey_BootReason, bootReasons);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreBootReasons(uint32_t bootReasons)
 {
-    return WriteConfigValue(kCounterKey_BootReason, bootReasons);
+    return WriteConfigValue(AmebaConfig::kCounterKey_BootReason, bootReasons);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
@@ -242,7 +242,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
     // Erase all values in the chip-config NVS namespace.
-    err = AmebaConfig::ClearNamespace(kConfigNamespace_ChipConfig);
+    err = AmebaConfig::ClearNamespace(AmebaConfig::kConfigNamespace_ChipConfig);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %s", chip::ErrorStr(err));

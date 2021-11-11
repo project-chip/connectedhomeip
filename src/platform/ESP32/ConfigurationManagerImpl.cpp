@@ -66,14 +66,14 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     bool failSafeArmed;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
-    err = EnsureNamespace(ESP32Config::kConfigNamespace_ChipFactory);
+    err = ESP32Config::EnsureNamespace(ESP32Config::kConfigNamespace_ChipFactory);
     SuccessOrExit(err);
-    err = EnsureNamespace(ESP32Config::kConfigNamespace_ChipConfig);
+    err = ESP32Config::EnsureNamespace(ESP32Config::kConfigNamespace_ChipConfig);
     SuccessOrExit(err);
-    err = EnsureNamespace(ESP32Config::kConfigNamespace_ChipCounters);
+    err = ESP32Config::EnsureNamespace(ESP32Config::kConfigNamespace_ChipCounters);
     SuccessOrExit(err);
 
-    if (ConfigValueExists(ESP32Config::kCounterKey_RebootCount))
+    if (ESP32Config::ConfigValueExists(ESP32Config::kCounterKey_RebootCount))
     {
         err = GetRebootCount(rebootCount);
         SuccessOrExit(err);
@@ -88,7 +88,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!ConfigValueExists(ESP32Config::kCounterKey_TotalOperationalHours))
+    if (!ESP32Config::ConfigValueExists(ESP32Config::kCounterKey_TotalOperationalHours))
     {
         err = StoreTotalOperationalHours(0);
         SuccessOrExit(err);

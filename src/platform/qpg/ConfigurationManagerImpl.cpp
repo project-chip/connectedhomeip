@@ -117,6 +117,66 @@ exit:
     return err;
 }
 
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(QPGConfig::Key key, bool & val)
+{
+    return QPGConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(QPGConfig::Key key, uint32_t & val)
+{
+    return QPGConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(QPGConfig::Key key, uint64_t & val)
+{
+    return QPGConfig::ReadConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(QPGConfig::Key key, char * buf, size_t bufSize, size_t & outLen)
+{
+    return QPGConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(QPGConfig::Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+{
+    return QPGConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(QPGConfig::Key key, bool val)
+{
+    return QPGConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(QPGConfig::Key key, uint32_t val)
+{
+    return QPGConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(QPGConfig::Key key, uint64_t val)
+{
+    return QPGConfig::WriteConfigValue(key, val);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(QPGConfig::Key key, const char * str)
+{
+    return QPGConfig::WriteConfigValueStr(key, str);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(QPGConfig::Key key, const char * str, size_t strLen)
+{
+    return QPGConfig::WriteConfigValueStr(key, str, strLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(QPGConfig::Key key, const uint8_t * data, size_t dataLen)
+{
+    return QPGConfig::WriteConfigValueBin(key, data, dataLen);
+}
+
+void ConfigurationManagerImpl::RunConfigUnitTest(void)
+{
+    QPGConfig::RunConfigUnitTest();
+}
+
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;

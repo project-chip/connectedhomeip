@@ -77,12 +77,12 @@ inline bool ConfigurationManagerImpl::CanFactoryReset()
 
 inline CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    return ReadConfigValueCounter(key, value);
+    return Internal::ZephyrConfig::ReadConfigValueCounter(key, value);
 }
 
 inline CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    return WriteConfigValueCounter(key, value);
+    return Internal::ZephyrConfig::WriteConfigValueCounter(key, value);
 }
 
 inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * /* buf */)
