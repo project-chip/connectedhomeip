@@ -9128,10 +9128,175 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace HardwareFaultChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kCurrent  = 0,
+    kPrevious = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
+    static constexpr EventId eventId             = 0x00000000;
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    DataModel::List<const HardwareFaultType> current;
+    DataModel::List<const HardwareFaultType> previous;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    DataModel::DecodableList<HardwareFaultType> current;
+    DataModel::DecodableList<HardwareFaultType> previous;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace HardwareFaultChange
+namespace RadioFaultChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kCurrent  = 0,
+    kPrevious = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
+    static constexpr EventId eventId             = 0x00000001;
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    DataModel::List<const RadioFaultType> current;
+    DataModel::List<const RadioFaultType> previous;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    DataModel::DecodableList<RadioFaultType> current;
+    DataModel::DecodableList<RadioFaultType> previous;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace RadioFaultChange
+namespace NetworkFaultChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000002;
+
+enum class Fields
+{
+    kCurrent  = 0,
+    kPrevious = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
+    static constexpr EventId eventId             = 0x00000002;
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    DataModel::List<const NetworkFaultType> current;
+    DataModel::List<const NetworkFaultType> previous;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    DataModel::DecodableList<NetworkFaultType> current;
+    DataModel::DecodableList<NetworkFaultType> previous;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace NetworkFaultChange
+namespace BootReason {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000003;
+
+enum class Fields
+{
+    kBootReason = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
+    static constexpr EventId eventId             = 0x00000003;
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    BootReasonType bootReason;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    BootReasonType bootReason;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace BootReason
+} // namespace Events
 } // namespace GeneralDiagnostics
 namespace SoftwareDiagnostics {
 
 namespace Structs {
+namespace SoftwareFault {
+enum class Fields
+{
+    kId             = 0,
+    kName           = 1,
+    kFaultRecording = 2,
+};
+
+struct Type
+{
+public:
+    uint64_t id;
+    chip::CharSpan name;
+    chip::ByteSpan faultRecording;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace SoftwareFault
 namespace ThreadMetrics {
 enum class Fields
 {
@@ -9267,6 +9432,41 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace SoftwareFault {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kSoftwareFault = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000000;
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+
+    Structs::SoftwareFault::Type softwareFault;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+
+    Structs::SoftwareFault::DecodableType softwareFault;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SoftwareFault
+} // namespace Events
 } // namespace SoftwareDiagnostics
 namespace ThreadNetworkDiagnostics {
 // Need to convert consumers to using the new enum classes, so we
@@ -9299,6 +9499,18 @@ enum class RoutingRole : uint8_t
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using RoutingRole                          = EmberAfRoutingRole;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ThreadConnectionStatus
+enum class ThreadConnectionStatus : uint8_t
+{
+    kConnected    = 0x00,
+    kNotConnected = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ThreadConnectionStatus               = EmberAfThreadConnectionStatus;
 #endif
 
 namespace Structs {
@@ -10200,8 +10412,57 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace ConnectionStatus {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kConnectionStatus = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000000;
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+
+    ThreadConnectionStatus connectionStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+
+    ThreadConnectionStatus connectionStatus;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ConnectionStatus
+} // namespace Events
 } // namespace ThreadNetworkDiagnostics
 namespace WiFiNetworkDiagnostics {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for AssociationFailureCause
+enum class AssociationFailureCause : uint8_t
+{
+    kUnknown              = 0x00,
+    kAssociationFailed    = 0x01,
+    kAuthenticationFailed = 0x02,
+    kSsidNotFound         = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using AssociationFailureCause              = EmberAfAssociationFailureCause;
+#endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -10217,6 +10478,18 @@ enum class SecurityType : uint8_t
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using SecurityType                         = EmberAfSecurityType;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for WiFiConnectionStatus
+enum class WiFiConnectionStatus : uint8_t
+{
+    kConnected    = 0x00,
+    kNotConnected = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using WiFiConnectionStatus                 = EmberAfWiFiConnectionStatus;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -10441,6 +10714,110 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace Disconnection {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kReasonCode = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000000;
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+
+    uint16_t reasonCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+
+    uint16_t reasonCode;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace Disconnection
+namespace AssociationFailure {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kAssociationFailure = 0,
+    kStatus             = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000001;
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+
+    AssociationFailureCause associationFailure;
+    uint16_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+
+    AssociationFailureCause associationFailure;
+    uint16_t status;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AssociationFailure
+namespace ConnectionStatus {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000002;
+
+enum class Fields
+{
+    kConnectionStatus = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000002;
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+
+    WiFiConnectionStatus connectionStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+
+    WiFiConnectionStatus connectionStatus;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ConnectionStatus
+} // namespace Events
 } // namespace WiFiNetworkDiagnostics
 namespace EthernetNetworkDiagnostics {
 // Need to convert consumers to using the new enum classes, so we

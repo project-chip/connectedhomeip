@@ -61,6 +61,8 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType & value);
@@ -632,6 +634,38 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Type'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("Id", indent + 1, value.id);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Id'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FaultRecording", indent + 1, value.faultRecording);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FaultRecording'",
+                            IndentStr(indent + 1).c_str());
             return err;
         }
     }

@@ -398,6 +398,14 @@ typedef struct _SemanticTag
     uint16_t Value;
 } SemanticTag;
 
+// Struct for SoftwareFault
+typedef struct _SoftwareFault
+{
+    uint64_t Id;
+    chip::CharSpan Name;
+    chip::ByteSpan FaultRecording;
+} SoftwareFault;
+
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet
 {
