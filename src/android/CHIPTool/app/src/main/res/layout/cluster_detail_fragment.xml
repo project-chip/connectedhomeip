@@ -39,12 +39,12 @@
   <ScrollView
       android:layout_width="fill_parent"
       android:layout_height="wrap_content">
-      <LinearLayout
-          android:id="@+id/callbackList"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginBottom="8dp"
-          android:layout_below="@+id/invokeCommand"
-          android:orientation="vertical" />
+    <LinearLayout
+        android:id="@+id/callbackList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_below="@+id/invokeCommand"
+        android:orientation="vertical" />
   </ScrollView>
 </LinearLayout>

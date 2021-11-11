@@ -1,3 +1,5 @@
+
+
 package com.google.chip.chiptool.clusterclient.clusterinteraction
 
 import android.os.Bundle
@@ -13,8 +15,6 @@ import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.endpointList
