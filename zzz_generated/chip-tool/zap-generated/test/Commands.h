@@ -615,26 +615,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 8;
 
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, bool presentValue)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, bool outOfService)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t statusFlags)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_3{ OnFailureCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, bool presentValue)> mOnSuccessCallback_3{ OnSuccessCallback_3, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, bool outOfService)> mOnSuccessCallback_4{ OnSuccessCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t statusFlags)> mOnSuccessCallback_5{ OnSuccessCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t statusFlags)> mOnSuccessCallback_6{ OnSuccessCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_7{ OnFailureCallback_7, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t statusFlags)> mOnSuccessCallback_7{ OnSuccessCallback_7, this };
-
-    static void OnFailureCallback_0(void * context, uint8_t status)
+    static void OnFailureCallback_0(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_0(status);
+        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_0(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_0(void * context, bool presentValue)
@@ -642,9 +625,9 @@ private:
         (static_cast<Test_TC_BI_2_2 *>(context))->OnSuccessResponse_0(presentValue);
     }
 
-    static void OnFailureCallback_1(void * context, uint8_t status)
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_1(status);
+        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_1(void * context, bool outOfService)
@@ -652,9 +635,9 @@ private:
         (static_cast<Test_TC_BI_2_2 *>(context))->OnSuccessResponse_1(outOfService);
     }
 
-    static void OnFailureCallback_2(void * context, uint8_t status)
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_2(status);
+        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_2(void * context, uint8_t statusFlags)
@@ -662,9 +645,9 @@ private:
         (static_cast<Test_TC_BI_2_2 *>(context))->OnSuccessResponse_2(statusFlags);
     }
 
-    static void OnFailureCallback_3(void * context, uint8_t status)
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_3(status);
+        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_3(void * context, bool presentValue)
@@ -672,9 +655,9 @@ private:
         (static_cast<Test_TC_BI_2_2 *>(context))->OnSuccessResponse_3(presentValue);
     }
 
-    static void OnFailureCallback_4(void * context, uint8_t status)
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_4(status);
+        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_4(void * context, bool outOfService)
@@ -682,9 +665,9 @@ private:
         (static_cast<Test_TC_BI_2_2 *>(context))->OnSuccessResponse_4(outOfService);
     }
 
-    static void OnFailureCallback_5(void * context, uint8_t status)
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_5(status);
+        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_5(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_5(void * context, uint8_t statusFlags)
@@ -692,9 +675,9 @@ private:
         (static_cast<Test_TC_BI_2_2 *>(context))->OnSuccessResponse_5(statusFlags);
     }
 
-    static void OnFailureCallback_6(void * context, uint8_t status)
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_6(status);
+        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_6(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_6(void * context, uint8_t statusFlags)
@@ -702,9 +685,9 @@ private:
         (static_cast<Test_TC_BI_2_2 *>(context))->OnSuccessResponse_6(statusFlags);
     }
 
-    static void OnFailureCallback_7(void * context, uint8_t status)
+    static void OnFailureCallback_7(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_7(status);
+        (static_cast<Test_TC_BI_2_2 *>(context))->OnFailureResponse_7(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_7(void * context, uint8_t statusFlags)
@@ -721,7 +704,8 @@ private:
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributePresentValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
+            this, OnSuccessCallback_0, OnFailureCallback_0);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -737,7 +721,8 @@ private:
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeOutOfService(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -753,7 +738,8 @@ private:
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeStatusFlags(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -769,7 +755,8 @@ private:
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributePresentValue(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3);
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -785,7 +772,8 @@ private:
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeOutOfService(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -801,7 +789,8 @@ private:
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeStatusFlags(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -817,7 +806,8 @@ private:
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeStatusFlags(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6);
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -833,7 +823,8 @@ private:
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeStatusFlags(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7);
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -21012,141 +21003,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 60;
 
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t localTemperature)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t absMinHeatSetpointLimit)> mOnSuccessCallback_1{ OnSuccessCallback_1,
-                                                                                                              this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t absMinHeatSetpointLimit)> mOnSuccessCallback_2{ OnSuccessCallback_2,
-                                                                                                              this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_4{ OnFailureCallback_4, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t absMinHeatSetpointLimit)> mOnSuccessCallback_4{ OnSuccessCallback_4,
-                                                                                                              this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_5{ OnFailureCallback_5, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t absMaxHeatSetpointLimit)> mOnSuccessCallback_5{ OnSuccessCallback_5,
-                                                                                                              this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_6{ OnFailureCallback_6, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t absMaxHeatSetpointLimit)> mOnSuccessCallback_6{ OnSuccessCallback_6,
-                                                                                                              this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_8{ OnFailureCallback_8, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t absMaxHeatSetpointLimit)> mOnSuccessCallback_8{ OnSuccessCallback_8,
-                                                                                                              this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_9{ OnFailureCallback_9, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t absMinCoolSetpointLimit)> mOnSuccessCallback_9{ OnSuccessCallback_9,
-                                                                                                              this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_10{ OnFailureCallback_10, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t absMinCoolSetpointLimit)> mOnSuccessCallback_10{ OnSuccessCallback_10,
-                                                                                                               this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_12{ OnFailureCallback_12, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t absMinCoolSetpointLimit)> mOnSuccessCallback_12{ OnSuccessCallback_12,
-                                                                                                               this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_13{ OnFailureCallback_13, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t absMaxCoolSetpointLimit)> mOnSuccessCallback_13{ OnSuccessCallback_13,
-                                                                                                               this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_14{ OnFailureCallback_14, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t absMaxCoolSetpointLimit)> mOnSuccessCallback_14{ OnSuccessCallback_14,
-                                                                                                               this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_16{ OnFailureCallback_16, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t absMaxCoolSetpointLimit)> mOnSuccessCallback_16{ OnSuccessCallback_16,
-                                                                                                               this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_17{ OnFailureCallback_17, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t occupiedCoolingSetpoint)> mOnSuccessCallback_17{ OnSuccessCallback_17,
-                                                                                                               this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_18{ OnFailureCallback_18, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t occupiedCoolingSetpoint)> mOnSuccessCallback_18{ OnSuccessCallback_18,
-                                                                                                               this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_20{ OnFailureCallback_20, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t occupiedCoolingSetpoint)> mOnSuccessCallback_20{ OnSuccessCallback_20,
-                                                                                                               this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_21{ OnFailureCallback_21, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t occupiedHeatingSetpoint)> mOnSuccessCallback_21{ OnSuccessCallback_21,
-                                                                                                               this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_22{ OnFailureCallback_22, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t occupiedHeatingSetpoint)> mOnSuccessCallback_22{ OnSuccessCallback_22,
-                                                                                                               this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_24{ OnFailureCallback_24, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t occupiedHeatingSetpoint)> mOnSuccessCallback_24{ OnSuccessCallback_24,
-                                                                                                               this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_25{ OnFailureCallback_25, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t minHeatSetpointLimit)> mOnSuccessCallback_25{ OnSuccessCallback_25,
-                                                                                                            this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_26{ OnFailureCallback_26, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t minHeatSetpointLimit)> mOnSuccessCallback_26{ OnSuccessCallback_26,
-                                                                                                            this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_28{ OnFailureCallback_28, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t minHeatSetpointLimit)> mOnSuccessCallback_28{ OnSuccessCallback_28,
-                                                                                                            this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_29{ OnFailureCallback_29, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t maxHeatSetpointLimit)> mOnSuccessCallback_29{ OnSuccessCallback_29,
-                                                                                                            this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_30{ OnFailureCallback_30, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t maxHeatSetpointLimit)> mOnSuccessCallback_30{ OnSuccessCallback_30,
-                                                                                                            this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_32{ OnFailureCallback_32, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t maxHeatSetpointLimit)> mOnSuccessCallback_32{ OnSuccessCallback_32,
-                                                                                                            this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_33{ OnFailureCallback_33, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t minCoolSetpointLimit)> mOnSuccessCallback_33{ OnSuccessCallback_33,
-                                                                                                            this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_34{ OnFailureCallback_34, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t minCoolSetpointLimit)> mOnSuccessCallback_34{ OnSuccessCallback_34,
-                                                                                                            this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_36{ OnFailureCallback_36, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t minCoolSetpointLimit)> mOnSuccessCallback_36{ OnSuccessCallback_36,
-                                                                                                            this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_37{ OnFailureCallback_37, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t maxCoolSetpointLimit)> mOnSuccessCallback_37{ OnSuccessCallback_37,
-                                                                                                            this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_38{ OnFailureCallback_38, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t maxCoolSetpointLimit)> mOnSuccessCallback_38{ OnSuccessCallback_38,
-                                                                                                            this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_40{ OnFailureCallback_40, this };
-    chip::Callback::Callback<void (*)(void * context, int16_t maxCoolSetpointLimit)> mOnSuccessCallback_40{ OnSuccessCallback_40,
-                                                                                                            this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_41{ OnFailureCallback_41, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t controlSequenceOfOperation)> mOnSuccessCallback_41{
-        OnSuccessCallback_41, this
-    };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_42{ OnFailureCallback_42, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t controlSequenceOfOperation)> mOnSuccessCallback_42{
-        OnSuccessCallback_42, this
-    };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_44{ OnFailureCallback_44, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t controlSequenceOfOperation)> mOnSuccessCallback_44{
-        OnSuccessCallback_44, this
-    };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_45{ OnFailureCallback_45, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t systemMode)> mOnSuccessCallback_45{ OnSuccessCallback_45, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_46{ OnFailureCallback_46, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t systemMode)> mOnSuccessCallback_46{ OnSuccessCallback_46, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_48{ OnFailureCallback_48, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t systemMode)> mOnSuccessCallback_48{ OnSuccessCallback_48, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_49{ OnFailureCallback_49, this };
-    chip::Callback::Callback<void (*)(void * context, int8_t minSetpointDeadBand)> mOnSuccessCallback_49{ OnSuccessCallback_49,
-                                                                                                          this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_50{ OnFailureCallback_50, this };
-    chip::Callback::Callback<void (*)(void * context, int8_t minSetpointDeadBand)> mOnSuccessCallback_50{ OnSuccessCallback_50,
-                                                                                                          this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_52{ OnFailureCallback_52, this };
-    chip::Callback::Callback<void (*)(void * context, int8_t minSetpointDeadBand)> mOnSuccessCallback_52{ OnSuccessCallback_52,
-                                                                                                          this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_53{ OnFailureCallback_53, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t startOfWeek)> mOnSuccessCallback_53{ OnSuccessCallback_53, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_55{ OnFailureCallback_55, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t startOfWeek)> mOnSuccessCallback_55{ OnSuccessCallback_55, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_56{ OnFailureCallback_56, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t numberOfWeeklyTransitions)> mOnSuccessCallback_56{
-        OnSuccessCallback_56, this
-    };
-    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_58{ OnFailureCallback_58, this };
-    chip::Callback::Callback<void (*)(void * context, uint8_t numberOfDailyTransitions)> mOnSuccessCallback_58{
-        OnSuccessCallback_58, this
-    };
-
-    static void OnFailureCallback_0(void * context, uint8_t status)
+    static void OnFailureCallback_0(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_0(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_0(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_0(void * context, int16_t localTemperature)
@@ -21154,9 +21013,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_0(localTemperature);
     }
 
-    static void OnFailureCallback_1(void * context, uint8_t status)
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_1(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_1(void * context, int16_t absMinHeatSetpointLimit)
@@ -21164,9 +21023,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_1(absMinHeatSetpointLimit);
     }
 
-    static void OnFailureCallback_2(void * context, uint8_t status)
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_2(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_2(void * context, int16_t absMinHeatSetpointLimit)
@@ -21181,9 +21040,9 @@ private:
 
     static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_3(); }
 
-    static void OnFailureCallback_4(void * context, uint8_t status)
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_4(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_4(void * context, int16_t absMinHeatSetpointLimit)
@@ -21191,9 +21050,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_4(absMinHeatSetpointLimit);
     }
 
-    static void OnFailureCallback_5(void * context, uint8_t status)
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_5(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_5(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_5(void * context, int16_t absMaxHeatSetpointLimit)
@@ -21201,9 +21060,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_5(absMaxHeatSetpointLimit);
     }
 
-    static void OnFailureCallback_6(void * context, uint8_t status)
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_6(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_6(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_6(void * context, int16_t absMaxHeatSetpointLimit)
@@ -21218,9 +21077,9 @@ private:
 
     static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_7(); }
 
-    static void OnFailureCallback_8(void * context, uint8_t status)
+    static void OnFailureCallback_8(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_8(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_8(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_8(void * context, int16_t absMaxHeatSetpointLimit)
@@ -21228,9 +21087,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_8(absMaxHeatSetpointLimit);
     }
 
-    static void OnFailureCallback_9(void * context, uint8_t status)
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_9(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_9(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_9(void * context, int16_t absMinCoolSetpointLimit)
@@ -21238,9 +21097,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_9(absMinCoolSetpointLimit);
     }
 
-    static void OnFailureCallback_10(void * context, uint8_t status)
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_10(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_10(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_10(void * context, int16_t absMinCoolSetpointLimit)
@@ -21255,9 +21114,9 @@ private:
 
     static void OnSuccessCallback_11(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_11(); }
 
-    static void OnFailureCallback_12(void * context, uint8_t status)
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_12(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_12(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_12(void * context, int16_t absMinCoolSetpointLimit)
@@ -21265,9 +21124,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_12(absMinCoolSetpointLimit);
     }
 
-    static void OnFailureCallback_13(void * context, uint8_t status)
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_13(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_13(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_13(void * context, int16_t absMaxCoolSetpointLimit)
@@ -21275,9 +21134,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_13(absMaxCoolSetpointLimit);
     }
 
-    static void OnFailureCallback_14(void * context, uint8_t status)
+    static void OnFailureCallback_14(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_14(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_14(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_14(void * context, int16_t absMaxCoolSetpointLimit)
@@ -21292,9 +21151,9 @@ private:
 
     static void OnSuccessCallback_15(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_15(); }
 
-    static void OnFailureCallback_16(void * context, uint8_t status)
+    static void OnFailureCallback_16(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_16(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_16(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_16(void * context, int16_t absMaxCoolSetpointLimit)
@@ -21302,9 +21161,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_16(absMaxCoolSetpointLimit);
     }
 
-    static void OnFailureCallback_17(void * context, uint8_t status)
+    static void OnFailureCallback_17(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_17(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_17(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_17(void * context, int16_t occupiedCoolingSetpoint)
@@ -21312,9 +21171,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_17(occupiedCoolingSetpoint);
     }
 
-    static void OnFailureCallback_18(void * context, uint8_t status)
+    static void OnFailureCallback_18(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_18(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_18(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_18(void * context, int16_t occupiedCoolingSetpoint)
@@ -21329,9 +21188,9 @@ private:
 
     static void OnSuccessCallback_19(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_19(); }
 
-    static void OnFailureCallback_20(void * context, uint8_t status)
+    static void OnFailureCallback_20(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_20(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_20(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_20(void * context, int16_t occupiedCoolingSetpoint)
@@ -21339,9 +21198,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_20(occupiedCoolingSetpoint);
     }
 
-    static void OnFailureCallback_21(void * context, uint8_t status)
+    static void OnFailureCallback_21(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_21(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_21(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_21(void * context, int16_t occupiedHeatingSetpoint)
@@ -21349,9 +21208,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_21(occupiedHeatingSetpoint);
     }
 
-    static void OnFailureCallback_22(void * context, uint8_t status)
+    static void OnFailureCallback_22(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_22(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_22(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_22(void * context, int16_t occupiedHeatingSetpoint)
@@ -21366,9 +21225,9 @@ private:
 
     static void OnSuccessCallback_23(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_23(); }
 
-    static void OnFailureCallback_24(void * context, uint8_t status)
+    static void OnFailureCallback_24(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_24(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_24(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_24(void * context, int16_t occupiedHeatingSetpoint)
@@ -21376,9 +21235,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_24(occupiedHeatingSetpoint);
     }
 
-    static void OnFailureCallback_25(void * context, uint8_t status)
+    static void OnFailureCallback_25(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_25(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_25(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_25(void * context, int16_t minHeatSetpointLimit)
@@ -21386,9 +21245,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_25(minHeatSetpointLimit);
     }
 
-    static void OnFailureCallback_26(void * context, uint8_t status)
+    static void OnFailureCallback_26(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_26(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_26(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_26(void * context, int16_t minHeatSetpointLimit)
@@ -21403,9 +21262,9 @@ private:
 
     static void OnSuccessCallback_27(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_27(); }
 
-    static void OnFailureCallback_28(void * context, uint8_t status)
+    static void OnFailureCallback_28(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_28(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_28(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_28(void * context, int16_t minHeatSetpointLimit)
@@ -21413,9 +21272,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_28(minHeatSetpointLimit);
     }
 
-    static void OnFailureCallback_29(void * context, uint8_t status)
+    static void OnFailureCallback_29(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_29(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_29(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_29(void * context, int16_t maxHeatSetpointLimit)
@@ -21423,9 +21282,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_29(maxHeatSetpointLimit);
     }
 
-    static void OnFailureCallback_30(void * context, uint8_t status)
+    static void OnFailureCallback_30(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_30(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_30(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_30(void * context, int16_t maxHeatSetpointLimit)
@@ -21440,9 +21299,9 @@ private:
 
     static void OnSuccessCallback_31(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_31(); }
 
-    static void OnFailureCallback_32(void * context, uint8_t status)
+    static void OnFailureCallback_32(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_32(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_32(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_32(void * context, int16_t maxHeatSetpointLimit)
@@ -21450,9 +21309,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_32(maxHeatSetpointLimit);
     }
 
-    static void OnFailureCallback_33(void * context, uint8_t status)
+    static void OnFailureCallback_33(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_33(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_33(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_33(void * context, int16_t minCoolSetpointLimit)
@@ -21460,9 +21319,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_33(minCoolSetpointLimit);
     }
 
-    static void OnFailureCallback_34(void * context, uint8_t status)
+    static void OnFailureCallback_34(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_34(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_34(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_34(void * context, int16_t minCoolSetpointLimit)
@@ -21477,9 +21336,9 @@ private:
 
     static void OnSuccessCallback_35(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_35(); }
 
-    static void OnFailureCallback_36(void * context, uint8_t status)
+    static void OnFailureCallback_36(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_36(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_36(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_36(void * context, int16_t minCoolSetpointLimit)
@@ -21487,9 +21346,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_36(minCoolSetpointLimit);
     }
 
-    static void OnFailureCallback_37(void * context, uint8_t status)
+    static void OnFailureCallback_37(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_37(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_37(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_37(void * context, int16_t maxCoolSetpointLimit)
@@ -21497,9 +21356,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_37(maxCoolSetpointLimit);
     }
 
-    static void OnFailureCallback_38(void * context, uint8_t status)
+    static void OnFailureCallback_38(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_38(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_38(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_38(void * context, int16_t maxCoolSetpointLimit)
@@ -21514,9 +21373,9 @@ private:
 
     static void OnSuccessCallback_39(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_39(); }
 
-    static void OnFailureCallback_40(void * context, uint8_t status)
+    static void OnFailureCallback_40(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_40(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_40(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_40(void * context, int16_t maxCoolSetpointLimit)
@@ -21524,9 +21383,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_40(maxCoolSetpointLimit);
     }
 
-    static void OnFailureCallback_41(void * context, uint8_t status)
+    static void OnFailureCallback_41(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_41(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_41(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_41(void * context, uint8_t controlSequenceOfOperation)
@@ -21534,9 +21393,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_41(controlSequenceOfOperation);
     }
 
-    static void OnFailureCallback_42(void * context, uint8_t status)
+    static void OnFailureCallback_42(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_42(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_42(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_42(void * context, uint8_t controlSequenceOfOperation)
@@ -21551,9 +21410,9 @@ private:
 
     static void OnSuccessCallback_43(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_43(); }
 
-    static void OnFailureCallback_44(void * context, uint8_t status)
+    static void OnFailureCallback_44(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_44(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_44(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_44(void * context, uint8_t controlSequenceOfOperation)
@@ -21561,9 +21420,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_44(controlSequenceOfOperation);
     }
 
-    static void OnFailureCallback_45(void * context, uint8_t status)
+    static void OnFailureCallback_45(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_45(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_45(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_45(void * context, uint8_t systemMode)
@@ -21571,9 +21430,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_45(systemMode);
     }
 
-    static void OnFailureCallback_46(void * context, uint8_t status)
+    static void OnFailureCallback_46(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_46(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_46(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_46(void * context, uint8_t systemMode)
@@ -21588,9 +21447,9 @@ private:
 
     static void OnSuccessCallback_47(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_47(); }
 
-    static void OnFailureCallback_48(void * context, uint8_t status)
+    static void OnFailureCallback_48(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_48(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_48(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_48(void * context, uint8_t systemMode)
@@ -21598,9 +21457,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_48(systemMode);
     }
 
-    static void OnFailureCallback_49(void * context, uint8_t status)
+    static void OnFailureCallback_49(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_49(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_49(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_49(void * context, int8_t minSetpointDeadBand)
@@ -21608,9 +21467,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_49(minSetpointDeadBand);
     }
 
-    static void OnFailureCallback_50(void * context, uint8_t status)
+    static void OnFailureCallback_50(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_50(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_50(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_50(void * context, int8_t minSetpointDeadBand)
@@ -21625,9 +21484,9 @@ private:
 
     static void OnSuccessCallback_51(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_51(); }
 
-    static void OnFailureCallback_52(void * context, uint8_t status)
+    static void OnFailureCallback_52(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_52(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_52(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_52(void * context, int8_t minSetpointDeadBand)
@@ -21635,9 +21494,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_52(minSetpointDeadBand);
     }
 
-    static void OnFailureCallback_53(void * context, uint8_t status)
+    static void OnFailureCallback_53(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_53(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_53(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_53(void * context, uint8_t startOfWeek)
@@ -21652,9 +21511,9 @@ private:
 
     static void OnSuccessCallback_54(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_54(); }
 
-    static void OnFailureCallback_55(void * context, uint8_t status)
+    static void OnFailureCallback_55(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_55(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_55(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_55(void * context, uint8_t startOfWeek)
@@ -21662,9 +21521,9 @@ private:
         (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_55(startOfWeek);
     }
 
-    static void OnFailureCallback_56(void * context, uint8_t status)
+    static void OnFailureCallback_56(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_56(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_56(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_56(void * context, uint8_t numberOfWeeklyTransitions)
@@ -21679,9 +21538,9 @@ private:
 
     static void OnSuccessCallback_57(void * context) { (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnSuccessResponse_57(); }
 
-    static void OnFailureCallback_58(void * context, uint8_t status)
+    static void OnFailureCallback_58(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_58(status);
+        (static_cast<Test_TC_TSTAT_2_1 *>(context))->OnFailureResponse_58(chip::to_underlying(status));
     }
 
     static void OnSuccessCallback_58(void * context, uint8_t numberOfDailyTransitions)
@@ -21705,7 +21564,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeLocalTemperature(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::LocalTemperature::TypeInfo>(
+            this, OnSuccessCallback_0, OnFailureCallback_0);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -21721,7 +21581,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeAbsMinHeatSetpointLimit(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -21737,7 +21598,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeAbsMinHeatSetpointLimit(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -21771,7 +21633,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeAbsMinHeatSetpointLimit(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4);
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -21787,7 +21650,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeAbsMaxHeatSetpointLimit(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -21803,7 +21667,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeAbsMaxHeatSetpointLimit(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6);
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -21837,7 +21702,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeAbsMaxHeatSetpointLimit(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8);
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -21853,7 +21719,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeAbsMinCoolSetpointLimit(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_9, OnFailureCallback_9);
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -21869,7 +21736,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeAbsMinCoolSetpointLimit(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_10, OnFailureCallback_10);
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -21903,7 +21771,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeAbsMinCoolSetpointLimit(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_12, OnFailureCallback_12);
     }
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
@@ -21919,7 +21788,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeAbsMaxCoolSetpointLimit(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_13, OnFailureCallback_13);
     }
 
     void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
@@ -21935,7 +21805,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeAbsMaxCoolSetpointLimit(mOnSuccessCallback_14.Cancel(), mOnFailureCallback_14.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_14, OnFailureCallback_14);
     }
 
     void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
@@ -21969,7 +21840,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeAbsMaxCoolSetpointLimit(mOnSuccessCallback_16.Cancel(), mOnFailureCallback_16.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_16, OnFailureCallback_16);
     }
 
     void OnFailureResponse_16(uint8_t status) { ThrowFailureResponse(); }
@@ -21985,7 +21857,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeOccupiedCoolingSetpoint(mOnSuccessCallback_17.Cancel(), mOnFailureCallback_17.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            this, OnSuccessCallback_17, OnFailureCallback_17);
     }
 
     void OnFailureResponse_17(uint8_t status) { ThrowFailureResponse(); }
@@ -22001,7 +21874,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeOccupiedCoolingSetpoint(mOnSuccessCallback_18.Cancel(), mOnFailureCallback_18.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            this, OnSuccessCallback_18, OnFailureCallback_18);
     }
 
     void OnFailureResponse_18(uint8_t status) { ThrowFailureResponse(); }
@@ -22035,7 +21909,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeOccupiedCoolingSetpoint(mOnSuccessCallback_20.Cancel(), mOnFailureCallback_20.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            this, OnSuccessCallback_20, OnFailureCallback_20);
     }
 
     void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
@@ -22051,7 +21926,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeOccupiedHeatingSetpoint(mOnSuccessCallback_21.Cancel(), mOnFailureCallback_21.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            this, OnSuccessCallback_21, OnFailureCallback_21);
     }
 
     void OnFailureResponse_21(uint8_t status) { ThrowFailureResponse(); }
@@ -22067,7 +21943,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeOccupiedHeatingSetpoint(mOnSuccessCallback_22.Cancel(), mOnFailureCallback_22.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            this, OnSuccessCallback_22, OnFailureCallback_22);
     }
 
     void OnFailureResponse_22(uint8_t status) { ThrowFailureResponse(); }
@@ -22101,7 +21978,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeOccupiedHeatingSetpoint(mOnSuccessCallback_24.Cancel(), mOnFailureCallback_24.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            this, OnSuccessCallback_24, OnFailureCallback_24);
     }
 
     void OnFailureResponse_24(uint8_t status) { ThrowFailureResponse(); }
@@ -22117,7 +21995,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMinHeatSetpointLimit(mOnSuccessCallback_25.Cancel(), mOnFailureCallback_25.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_25, OnFailureCallback_25);
     }
 
     void OnFailureResponse_25(uint8_t status) { ThrowFailureResponse(); }
@@ -22133,7 +22012,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMinHeatSetpointLimit(mOnSuccessCallback_26.Cancel(), mOnFailureCallback_26.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_26, OnFailureCallback_26);
     }
 
     void OnFailureResponse_26(uint8_t status) { ThrowFailureResponse(); }
@@ -22167,7 +22047,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMinHeatSetpointLimit(mOnSuccessCallback_28.Cancel(), mOnFailureCallback_28.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_28, OnFailureCallback_28);
     }
 
     void OnFailureResponse_28(uint8_t status) { ThrowFailureResponse(); }
@@ -22183,7 +22064,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMaxHeatSetpointLimit(mOnSuccessCallback_29.Cancel(), mOnFailureCallback_29.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_29, OnFailureCallback_29);
     }
 
     void OnFailureResponse_29(uint8_t status) { ThrowFailureResponse(); }
@@ -22199,7 +22081,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMaxHeatSetpointLimit(mOnSuccessCallback_30.Cancel(), mOnFailureCallback_30.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_30, OnFailureCallback_30);
     }
 
     void OnFailureResponse_30(uint8_t status) { ThrowFailureResponse(); }
@@ -22233,7 +22116,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMaxHeatSetpointLimit(mOnSuccessCallback_32.Cancel(), mOnFailureCallback_32.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_32, OnFailureCallback_32);
     }
 
     void OnFailureResponse_32(uint8_t status) { ThrowFailureResponse(); }
@@ -22249,7 +22133,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMinCoolSetpointLimit(mOnSuccessCallback_33.Cancel(), mOnFailureCallback_33.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_33, OnFailureCallback_33);
     }
 
     void OnFailureResponse_33(uint8_t status) { ThrowFailureResponse(); }
@@ -22265,7 +22150,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMinCoolSetpointLimit(mOnSuccessCallback_34.Cancel(), mOnFailureCallback_34.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_34, OnFailureCallback_34);
     }
 
     void OnFailureResponse_34(uint8_t status) { ThrowFailureResponse(); }
@@ -22299,7 +22185,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMinCoolSetpointLimit(mOnSuccessCallback_36.Cancel(), mOnFailureCallback_36.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_36, OnFailureCallback_36);
     }
 
     void OnFailureResponse_36(uint8_t status) { ThrowFailureResponse(); }
@@ -22315,7 +22202,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMaxCoolSetpointLimit(mOnSuccessCallback_37.Cancel(), mOnFailureCallback_37.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_37, OnFailureCallback_37);
     }
 
     void OnFailureResponse_37(uint8_t status) { ThrowFailureResponse(); }
@@ -22331,7 +22219,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMaxCoolSetpointLimit(mOnSuccessCallback_38.Cancel(), mOnFailureCallback_38.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_38, OnFailureCallback_38);
     }
 
     void OnFailureResponse_38(uint8_t status) { ThrowFailureResponse(); }
@@ -22365,7 +22254,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMaxCoolSetpointLimit(mOnSuccessCallback_40.Cancel(), mOnFailureCallback_40.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_40, OnFailureCallback_40);
     }
 
     void OnFailureResponse_40(uint8_t status) { ThrowFailureResponse(); }
@@ -22381,7 +22271,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeControlSequenceOfOperation(mOnSuccessCallback_41.Cancel(), mOnFailureCallback_41.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
+            this, OnSuccessCallback_41, OnFailureCallback_41);
     }
 
     void OnFailureResponse_41(uint8_t status) { ThrowFailureResponse(); }
@@ -22397,7 +22288,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeControlSequenceOfOperation(mOnSuccessCallback_42.Cancel(), mOnFailureCallback_42.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
+            this, OnSuccessCallback_42, OnFailureCallback_42);
     }
 
     void OnFailureResponse_42(uint8_t status) { ThrowFailureResponse(); }
@@ -22430,7 +22322,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeControlSequenceOfOperation(mOnSuccessCallback_44.Cancel(), mOnFailureCallback_44.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
+            this, OnSuccessCallback_44, OnFailureCallback_44);
     }
 
     void OnFailureResponse_44(uint8_t status) { ThrowFailureResponse(); }
@@ -22446,7 +22339,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeSystemMode(mOnSuccessCallback_45.Cancel(), mOnFailureCallback_45.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(this, OnSuccessCallback_45,
+                                                                                                        OnFailureCallback_45);
     }
 
     void OnFailureResponse_45(uint8_t status) { ThrowFailureResponse(); }
@@ -22462,7 +22356,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeSystemMode(mOnSuccessCallback_46.Cancel(), mOnFailureCallback_46.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(this, OnSuccessCallback_46,
+                                                                                                        OnFailureCallback_46);
     }
 
     void OnFailureResponse_46(uint8_t status) { ThrowFailureResponse(); }
@@ -22495,7 +22390,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeSystemMode(mOnSuccessCallback_48.Cancel(), mOnFailureCallback_48.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(this, OnSuccessCallback_48,
+                                                                                                        OnFailureCallback_48);
     }
 
     void OnFailureResponse_48(uint8_t status) { ThrowFailureResponse(); }
@@ -22511,7 +22407,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMinSetpointDeadBand(mOnSuccessCallback_49.Cancel(), mOnFailureCallback_49.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
+            this, OnSuccessCallback_49, OnFailureCallback_49);
     }
 
     void OnFailureResponse_49(uint8_t status) { ThrowFailureResponse(); }
@@ -22527,7 +22424,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMinSetpointDeadBand(mOnSuccessCallback_50.Cancel(), mOnFailureCallback_50.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
+            this, OnSuccessCallback_50, OnFailureCallback_50);
     }
 
     void OnFailureResponse_50(uint8_t status) { ThrowFailureResponse(); }
@@ -22560,7 +22458,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeMinSetpointDeadBand(mOnSuccessCallback_52.Cancel(), mOnFailureCallback_52.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
+            this, OnSuccessCallback_52, OnFailureCallback_52);
     }
 
     void OnFailureResponse_52(uint8_t status) { ThrowFailureResponse(); }
@@ -22576,7 +22475,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeStartOfWeek(mOnSuccessCallback_53.Cancel(), mOnFailureCallback_53.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo>(this, OnSuccessCallback_53,
+                                                                                                         OnFailureCallback_53);
     }
 
     void OnFailureResponse_53(uint8_t status) { ThrowFailureResponse(); }
@@ -22609,7 +22509,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeStartOfWeek(mOnSuccessCallback_55.Cancel(), mOnFailureCallback_55.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo>(this, OnSuccessCallback_55,
+                                                                                                         OnFailureCallback_55);
     }
 
     void OnFailureResponse_55(uint8_t status) { ThrowFailureResponse(); }
@@ -22625,7 +22526,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeNumberOfWeeklyTransitions(mOnSuccessCallback_56.Cancel(), mOnFailureCallback_56.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfWeeklyTransitions::TypeInfo>(
+            this, OnSuccessCallback_56, OnFailureCallback_56);
     }
 
     void OnFailureResponse_56(uint8_t status) { ThrowFailureResponse(); }
@@ -22657,7 +22559,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttributeNumberOfDailyTransitions(mOnSuccessCallback_58.Cancel(), mOnFailureCallback_58.Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfDailyTransitions::TypeInfo>(
+            this, OnSuccessCallback_58, OnFailureCallback_58);
     }
 
     void OnFailureResponse_58(uint8_t status) { ThrowFailureResponse(); }
