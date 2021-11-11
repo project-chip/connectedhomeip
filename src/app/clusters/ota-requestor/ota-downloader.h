@@ -29,22 +29,30 @@
 
 // A class that abstracts the image download functionality from the particular
 // protocol used for that (BDX or possibly HTTPS)
-class OTADownloader : public BlockWriter
-{
+class OTADownloader {
 public:
     // API declarations start
 
     // Application calls this method to direct OTADownloader to begin the download
-    void BeginDownload();
+    void virtual BeginDownload();
 
     // Platform calls this method upon the completion of PrepareDownload() processing
-    void OnDownloadPrepared();
+    void virtual OnPreparedForDownload();
+
+    // Action parameter type for the OnBlockProcessed()
+    enum blockActionType {
+                          kGetNext,
+                          kEnd
+    };
 
     // Platform calls this method upon the completion of ProcessBlock() processing
-    void OnBlockProcessed(action);
+    void virtual  OnBlockProcessed(blockActionType action);
+
+    // A setter for the delegate class pointer
+    void setImageProcessorDelegate(OTAImageProcessor   *delegate)
 
     // API declarations end
 
-    // Invoked by an incoming block
-    void HandleBlock();
+private:
+   OTAImageProcessor   *imageProcessorDelegate;
 };
