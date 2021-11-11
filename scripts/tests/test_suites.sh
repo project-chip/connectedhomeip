@@ -27,6 +27,8 @@ declare -i iterations=2
 declare -i delay=0
 declare -i node_id=0x12344321
 declare -i background_pid=0
+declare -i use_netns=0
+declare -i pre_clean_netns=0
 declare test_case_wrapper=()
 
 usage() {
@@ -38,12 +40,69 @@ usage() {
     echo "  -s CASE_NAME: runs single test case name (e.g. Test_TC_OO_2_2"
     echo "                for Test_TC_OO_2_2.yaml) (by default, all are run)"
     echo "  -w COMMAND: prefix all instantiations with a command (e.g. valgrind) (default: '')"
+    echo "  -n Use linux netns to isolate app and tool executables"
+    echo "  -c execute a netns cleanup and exit"
     echo ""
     exit 0
 }
 
+declare privileged_run=""
+
+if [[ `whoami` != "root" ]]; then
+  privileged_run='sudo'
+fi
+
+declare app_run_prefix=""
+declare tool_run_prefix=""
+declare rm_run_prefix=""
+
+netns_setup() {
+     # 2 virtual hosts: for app and for the tool
+     ${privileged_run} ip netns add app
+     ${privileged_run} ip netns add tool
+
+
+
+     # create links for switch to net connections
+     ${privileged_run} ip link add eth-app type veth peer name eth-app-switch
+     ${privileged_run} ip link add eth-tool type veth peer name eth-tool-switch
+
+     # link the connections together
+     ${privileged_run} ip link set eth-app netns app
+     ${privileged_run} ip link set eth-tool netns tool
+
+     ${privileged_run} ip link add name br1 type bridge
+     ${privileged_run} ip link set br1 up
+     ${privileged_run} ip link set eth-app-switch master br1
+     ${privileged_run} ip link set eth-tool-switch master br1
+
+     # mark connections up
+     ${privileged_run} ip netns exec app ip addr add 10.10.10.1/24 dev eth-app
+     ${privileged_run} ip netns exec app ip link set dev eth-app up
+     ${privileged_run} ip netns exec app ip link set dev lo up
+     ${privileged_run} ip link set dev eth-app-switch up
+
+     ${privileged_run} ip netns exec tool ip addr add 10.10.10.2/24 dev eth-tool
+     ${privileged_run} ip netns exec tool ip link set dev eth-tool up
+     ${privileged_run} ip netns exec tool ip link set dev lo up
+     ${privileged_run} ip link set dev eth-tool-switch up
+
+}
+
+netns_cleanup() {
+   ${privileged_run} ip netns del app || true
+   ${privileged_run} ip netns del tool || true
+   ${privileged_run} ip link del br1 || true
+
+   # attempt  to delete orphaned items just in case
+   ${privileged_run} ip link del eth-tool || true
+   ${privileged_run} ip link del eth-tool-switch || true
+   ${privileged_run} ip link del eth-app || true
+   ${privileged_run} ip link del eth-app-switch || true
+}
+
 # read shell arguments
-while getopts a:d:i:hs:w: flag; do
+while getopts a:d:i:hs:w:nc flag; do
     case "$flag" in
         a) application=$OPTARG ;;
         d) delay=$OPTARG ;;
@@ -51,8 +110,29 @@ while getopts a:d:i:hs:w: flag; do
         i) iterations=$OPTARG ;;
         s) single_case=$OPTARG ;;
         w) test_case_wrapper=("$OPTARG") ;;
+        n) use_netns=1 ;;
+        c) pre_clean_netns=1 ;;
     esac
 done
+
+if [[ $pre_clean_netns != 0 ]]; then
+   echo "Cleaning netowrk namespaces"
+   netns_cleanup
+   exit 0
+fi
+
+if [[ $use_netns != 0 ]]; then
+   echo "Using Netowrk namespaces"
+   netns_setup
+
+   app_run_prefix="${privileged_run} ip netns exec app"
+   tool_run_prefix="${privileged_run} ip netns exec tool"
+
+   # APPs run privileged
+   rm_run_prefix="${privileged_run}"
+
+   trap netns_cleanup EXIT
+fi
 
 if [[ $application == "tv" ]]; then
     declare test_filenames="${single_case-TV_*}.yaml"
@@ -98,7 +178,7 @@ for j in "${iter_array[@]}"; do
     for i in "${test_array[@]}"; do
         echo "  ===== Running test: $i"
         echo "          * Starting cluster server"
-        rm -rf /tmp/chip_tool_config.ini
+        ${rm_run_prefix} rm -rf /tmp/chip_tool_config.ini
         # This part is a little complicated.  We want to
         # 1) Start chip-app in the background
         # 2) Pipe its output through tee so we can wait until it's ready for a
@@ -123,7 +203,7 @@ for j in "${iter_array[@]}"; do
         touch "$chip_tool_log_file"
         rm -rf /tmp/pid
         (
-            stdbuf -o0 "${test_case_wrapper[@]}" out/debug/standalone/chip-"$application"-app &
+            ${app_run_prefix} stdbuf -o0 "${test_case_wrapper[@]}" out/debug/standalone/chip-"$application"-app &
             echo $! >&3
         ) 3>/tmp/pid | tee "$application_log_file" &
         while ! grep -q "Server Listening" "$application_log_file"; do
@@ -141,9 +221,9 @@ for j in "${iter_array[@]}"; do
             cat <(timeout 1 dns-sd -B _matterc._udp)
         fi
         echo "          * Pairing to device"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00 | tee "$pairing_log_file"
+        "${test_case_wrapper[@]}" ${tool_run_prefix} out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00 | tee "$pairing_log_file"
         echo "          * Starting test run: $i"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$node_id" "$delay" | tee "$chip_tool_log_file"
+        "${test_case_wrapper[@]}" ${tool_run_prefix} out/debug/standalone/chip-tool tests "$i" "$node_id" "$delay" | tee "$chip_tool_log_file"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0
