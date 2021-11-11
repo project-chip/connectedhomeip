@@ -253,11 +253,6 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340-light -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect'
 
-# Generating nrf-nrf5340-light-rpc
-bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-light-rpc -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
-
 # Generating nrf-nrf5340-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
@@ -514,9 +509,6 @@ ninja -C {out}/nrf-nrf52840-shell
 
 # Building nrf-nrf5340-light
 ninja -C {out}/nrf-nrf5340-light
-
-# Building nrf-nrf5340-light-rpc
-ninja -C {out}/nrf-nrf5340-light-rpc
 
 # Building nrf-nrf5340-lock
 ninja -C {out}/nrf-nrf5340-lock
