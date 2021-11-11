@@ -380,7 +380,7 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
 
 bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
 {
-    return nodeData.mPeerId == PeerId{} && nodeData.mAddress == Inet::IPAddress::Any && nodeData.mPort == 0 &&
+    return nodeData.mPeerId == PeerId{} && nodeData.mNumIPs == 0 && nodeData.mPort == 0 &&
         nodeData.mMrpRetryIntervalIdle == kUndefinedRetryInterval && nodeData.mMrpRetryIntervalActive == kUndefinedRetryInterval &&
         !nodeData.mSupportsTcp;
 }
