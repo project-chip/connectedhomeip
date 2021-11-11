@@ -692,8 +692,7 @@ void TestFabricFilteredCreateEntry(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, ClearAccessControl(accessControl) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1, count) == CHIP_NO_ERROR);
 
-            constexpr size_t expectedIndexes[][ArraySize(entryData1)] =
-            {
+            constexpr size_t expectedIndexes[][ArraySize(entryData1)] = {
                 { 0, 1, 2, 2, 3, 3 },
                 { 0, 0, 0, 1, 1, 2 },
                 { 0, 0, 0, 0, 0, 0 },
@@ -704,7 +703,7 @@ void TestFabricFilteredCreateEntry(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
 
-            size_t outIndex = 999;
+            size_t outIndex            = 999;
             FabricIndex outFabricIndex = 123;
             NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&outIndex, entry, &outFabricIndex) == CHIP_NO_ERROR);
 
@@ -723,9 +722,8 @@ void TestFabricFilteredReadEntry(nlTestSuite * inSuite, void * inContext)
         constexpr size_t indexes[] = { 0, 1, 2, 3 };
         for (auto & index : indexes)
         {
-            constexpr size_t illegalIndex = ArraySize(entryData1);
-            constexpr size_t expectedIndexes[][ArraySize(indexes)] =
-            {
+            constexpr size_t illegalIndex                          = ArraySize(entryData1);
+            constexpr size_t expectedIndexes[][ArraySize(indexes)] = {
                 { 0, 1, 3, illegalIndex },
                 { 2, 4, 5, illegalIndex },
                 { illegalIndex, illegalIndex, illegalIndex, illegalIndex },

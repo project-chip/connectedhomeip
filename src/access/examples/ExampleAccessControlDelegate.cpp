@@ -445,8 +445,8 @@ public:
     {
         size_t absoluteIndex = 0;
         size_t relativeIndex = 0;
-        size_t & fromIndex = (direction == ConvertDirection::kAbsoluteToRelative) ? absoluteIndex : relativeIndex;
-        size_t & toIndex = (direction == ConvertDirection::kAbsoluteToRelative) ? relativeIndex : absoluteIndex;
+        size_t & fromIndex   = (direction == ConvertDirection::kAbsoluteToRelative) ? absoluteIndex : relativeIndex;
+        size_t & toIndex     = (direction == ConvertDirection::kAbsoluteToRelative) ? relativeIndex : absoluteIndex;
         for (auto & storage : acl)
         {
             if (!storage.InUse())
