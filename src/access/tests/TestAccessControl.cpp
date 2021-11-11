@@ -54,7 +54,7 @@ constexpr NodeId kGroup8 = 0xFFFFFFFFFFFF'0008;
 
 constexpr AuthMode authModes[] = { AuthMode::kPase, AuthMode::kCase, AuthMode::kGroup };
 
-constexpr FabricIndex fabricIndexes[] = { kUndefinedFabricIndex, 1, 2 };
+constexpr FabricIndex fabricIndexes[] = { 1, 2, 3 };
 
 constexpr Privilege privileges[] = { Privilege::kView, Privilege::kProxyView, Privilege::kOperate, Privilege::kManage,
                                      Privilege::kAdminister };
@@ -683,6 +683,71 @@ void TestDeleteEntry(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void TestFabricFilteredCreateEntry(nlTestSuite * inSuite, void * inContext)
+{
+    for (auto & fabricIndex : fabricIndexes)
+    {
+        for (size_t count = 0; count < ArraySize(entryData1); ++count)
+        {
+            NL_TEST_ASSERT(inSuite, ClearAccessControl(accessControl) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1, count) == CHIP_NO_ERROR);
+
+            constexpr size_t expectedIndexes[][ArraySize(entryData1)] =
+            {
+                { 0, 1, 2, 2, 3, 3 },
+                { 0, 0, 0, 1, 1, 2 },
+                { 0, 0, 0, 0, 0, 0 },
+            };
+            const size_t expectedIndex = expectedIndexes[&fabricIndex - fabricIndexes][count];
+
+            Entry entry;
+            NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
+
+            size_t outIndex = 999;
+            FabricIndex outFabricIndex = 123;
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&outIndex, entry, &outFabricIndex) == CHIP_NO_ERROR);
+
+            NL_TEST_ASSERT(inSuite, outIndex == expectedIndex);
+            NL_TEST_ASSERT(inSuite, outFabricIndex == fabricIndex);
+        }
+    }
+}
+
+void TestFabricFilteredReadEntry(nlTestSuite * inSuite, void * inContext)
+{
+    NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1, ArraySize(entryData1)) == CHIP_NO_ERROR);
+
+    for (auto & fabricIndex : fabricIndexes)
+    {
+        constexpr size_t indexes[] = { 0, 1, 2, 3 };
+        for (auto & index : indexes)
+        {
+            constexpr size_t illegalIndex = ArraySize(entryData1);
+            constexpr size_t expectedIndexes[][ArraySize(indexes)] =
+            {
+                { 0, 1, 3, illegalIndex },
+                { 2, 4, 5, illegalIndex },
+                { illegalIndex, illegalIndex, illegalIndex, illegalIndex },
+            };
+            const size_t expectedIndex = expectedIndexes[&fabricIndex - fabricIndexes][&index - indexes];
+
+            Entry entry;
+            CHIP_ERROR err = accessControl.ReadEntry(index, entry, &fabricIndex);
+
+            if (expectedIndex != illegalIndex)
+            {
+                NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, CompareEntry(entry, entryData1[expectedIndex]) == CHIP_NO_ERROR);
+            }
+            else
+            {
+                NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+            }
+        }
+    }
+}
+
 void TestIterator(nlTestSuite * inSuite, void * inContext)
 {
     LoadAccessControl(accessControl, entryData1, ArraySize(entryData1));
@@ -1029,6 +1094,8 @@ int TestAccessControl()
         NL_TEST_DEF("TestDeleteEntry", TestDeleteEntry),
         NL_TEST_DEF("TestSubjectsTargets", TestSubjectsTargets),
         NL_TEST_DEF("TestIterator", TestIterator),
+        NL_TEST_DEF("TestFabricFilteredReadEntry", TestFabricFilteredReadEntry),
+        NL_TEST_DEF("TestFabricFilteredCreateEntry", TestFabricFilteredCreateEntry),
         NL_TEST_DEF("TestCheck", TestCheck),
         NL_TEST_SENTINEL()
     };

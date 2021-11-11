@@ -227,7 +227,7 @@ public:
         virtual CHIP_ERROR PrepareEntry(Entry & entry) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
         // CRUD
-        virtual CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, const FabricIndex * fabricIndex)
+        virtual CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, FabricIndex * fabricIndex)
         {
             return CHIP_ERROR_NOT_IMPLEMENTED;
         }
@@ -283,7 +283,7 @@ public:
     CHIP_ERROR PrepareEntry(Entry & entry) { return mDelegate.PrepareEntry(entry); }
 
     // CRUD
-    CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, const FabricIndex * fabricIndex = nullptr)
+    CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, FabricIndex * fabricIndex = nullptr)
     {
         return mDelegate.CreateEntry(index, entry, fabricIndex);
     }

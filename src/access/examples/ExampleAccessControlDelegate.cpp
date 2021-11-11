@@ -341,34 +341,12 @@ public:
     static constexpr int kEntriesPerFabric = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
     static EntryStorage acl[kNumberOfFabrics * kEntriesPerFabric];
 
-    static EntryStorage * FindUnusedInAcl(size_t * index, const FabricIndex * fabricIndex)
+    static EntryStorage * FindUnusedInAcl()
     {
         for (auto & storage : acl)
         {
             if (!storage.InUse())
             {
-                if (index != nullptr)
-                {
-                    if (fabricIndex != nullptr)
-                    {
-                        *index = 0;
-                        for (auto & storage2 : acl)
-                        {
-                            if (&storage2 == &storage)
-                            {
-                                break;
-                            }
-                            else if (storage2.mFabricIndex == storage.mFabricIndex)
-                            {
-                                (*index)++;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        *index = &storage - acl;
-                    }
-                }
                 return &storage;
             }
         }
@@ -377,7 +355,10 @@ public:
 
     static EntryStorage * FindUsedInAcl(size_t index, const FabricIndex * fabricIndex)
     {
-        index = FilterIndex(index, fabricIndex);
+        if (fabricIndex != nullptr)
+        {
+            ConvertIndex(index, *fabricIndex, ConvertDirection::kRelativeToAbsolute);
+        }
         if (index < ArraySize(acl))
         {
             auto storage = acl + index;
@@ -453,32 +434,37 @@ public:
         }
     }
 
-private:
-    static size_t FilterIndex(size_t index, const FabricIndex * fabricIndex)
+public:
+    enum class ConvertDirection
     {
-        if (fabricIndex != nullptr)
+        kAbsoluteToRelative,
+        kRelativeToAbsolute
+    };
+
+    static void ConvertIndex(size_t & index, const FabricIndex fabricIndex, ConvertDirection direction)
+    {
+        size_t absoluteIndex = 0;
+        size_t relativeIndex = 0;
+        size_t & fromIndex = (direction == ConvertDirection::kAbsoluteToRelative) ? absoluteIndex : relativeIndex;
+        size_t & toIndex = (direction == ConvertDirection::kAbsoluteToRelative) ? relativeIndex : absoluteIndex;
+        for (auto & storage : acl)
         {
-            size_t unfiltered = 0;
-            size_t filtered   = 0;
-            for (auto & storage : acl)
+            if (!storage.InUse())
             {
-                if (storage.InUse())
-                {
-                    return ArraySize(acl);
-                }
-                if (storage.mFabricIndex == *fabricIndex)
-                {
-                    if (filtered == index)
-                    {
-                        break;
-                    }
-                    filtered++;
-                }
-                unfiltered++;
+                index = ArraySize(acl);
+                return;
             }
-            return unfiltered;
+            if (storage.mFabricIndex == fabricIndex)
+            {
+                if (index == fromIndex)
+                {
+                    break;
+                }
+                relativeIndex++;
+            }
+            absoluteIndex++;
         }
-        return index;
+        index = toIndex;
     }
 
 public:
@@ -962,11 +948,27 @@ public:
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, const FabricIndex * fabricIndex) override
+    CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, FabricIndex * fabricIndex) override
     {
-        if (auto storage = EntryStorage::FindUnusedInAcl(index, fabricIndex))
+        if (auto storage = EntryStorage::FindUnusedInAcl())
         {
-            return Copy(entry, *storage);
+            CHIP_ERROR err = Copy(entry, *storage);
+            if (err == CHIP_NO_ERROR)
+            {
+                if (fabricIndex != nullptr)
+                {
+                    *fabricIndex = storage->mFabricIndex;
+                }
+                if (index != nullptr)
+                {
+                    *index = storage - EntryStorage::acl;
+                    if (fabricIndex != nullptr)
+                    {
+                        EntryStorage::ConvertIndex(*index, *fabricIndex, EntryStorage::ConvertDirection::kAbsoluteToRelative);
+                    }
+                }
+            }
+            return err;
         }
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
