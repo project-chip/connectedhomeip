@@ -85,9 +85,11 @@ netns_setup() {
     ${privileged_run} ip netns exec tool ip link set dev lo up
     ${privileged_run} ip link set dev eth-tool-switch up
 
-    # TODO(andreilitvin): broadcasts and communication on ipv6 does not work in netns
+    # Force IPv6 to use ULAs that we control
     ${privileged_run} ip netns exec tool ip -6 addr flush eth-tool
     ${privileged_run} ip netns exec app ip -6 addr flush eth-app
+    ${privileged_run} ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev eth-tool
+    ${privileged_run} ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev eth-app
 }
 
 netns_cleanup() {
@@ -117,13 +119,13 @@ while getopts a:d:i:hs:w:nc flag; do
 done
 
 if [[ $pre_clean_netns != 0 ]]; then
-    echo "Cleaning netowrk namespaces"
+    echo "Cleaning network namespaces"
     netns_cleanup
     exit 0
 fi
 
 if [[ $use_netns != 0 ]]; then
-    echo "Using Netowrk namespaces"
+    echo "Using network namespaces"
     netns_setup
 
     app_run_prefix="${privileged_run} ip netns exec app"
@@ -226,9 +228,9 @@ for j in "${iter_array[@]}"; do
             cat <(timeout 1 dns-sd -B _matterc._udp)
         fi
         echo "          * Pairing to device"
-        "${test_case_wrapper[@]}" ${tool_run_prefix} out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00 | tee "$pairing_log_file"
+        ${tool_run_prefix} "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00 | tee "$pairing_log_file"
         echo "          * Starting test run: $i"
-        "${test_case_wrapper[@]}" ${tool_run_prefix} out/debug/standalone/chip-tool tests "$i" "$node_id" "$delay" | tee "$chip_tool_log_file"
+        ${tool_run_prefix} "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$node_id" "$delay" | tee "$chip_tool_log_file"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0
