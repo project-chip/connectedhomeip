@@ -91,7 +91,7 @@ public:
     /**
      * Returns if the iterator is valid (not exhausted). An iterator is exhausted if and only if:
      * - Next() is called after iterating last path.
-     * - Iterator is initialized wirh a null ClusterInfo.
+     * - Iterator is initialized with a null ClusterInfo.
      */
     inline bool Valid() const { return mpClusterInfo != nullptr; }
 
