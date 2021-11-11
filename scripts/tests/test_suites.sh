@@ -158,6 +158,10 @@ cleanup() {
         # In case we died on a failure before we cleaned up our background task.
         kill -9 "$background_pid" || true
     fi
+
+    if [[ $use_netns != 0 ]]; then
+        netns_cleanup
+    fi
 }
 trap cleanup EXIT
 
@@ -233,7 +237,3 @@ for j in "${iter_array[@]}"; do
     done
     echo " ===== Iteration $j completed"
 done
-
-if [[ $use_netns != 0 ]]; then
-    netns_cleanup
-fi
