@@ -35,7 +35,7 @@ public:
     public:
         struct Target
         {
-            using Flags                        = int;
+            using Flags                        = unsigned;
             static constexpr Flags kCluster    = 1 << 0;
             static constexpr Flags kEndpoint   = 1 << 1;
             static constexpr Flags kDeviceType = 1 << 2;

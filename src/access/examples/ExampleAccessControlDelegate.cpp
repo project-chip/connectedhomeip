@@ -185,8 +185,8 @@ public:
 private:
     static bool IsValidCluster(ClusterId cluster)
     {
-        const auto & id     = cluster & kClusterIdMask;
-        const auto & vendor = cluster & kClusterVendorMask;
+        const auto id     = cluster & kClusterIdMask;
+        const auto vendor = cluster & kClusterVendorMask;
         return ((kClusterIdMinStd <= id && id <= kClusterIdMaxStd) || (kClusterIdMinMs <= id && id <= kClusterIdMaxMs)) &&
             (kClusterVendorMin <= vendor && vendor <= kClusterVendorMax);
     }
@@ -195,8 +195,8 @@ private:
 
     static bool IsValidDeviceType(DeviceTypeId deviceType)
     {
-        const auto & id     = deviceType & kDeviceTypeIdMask;
-        const auto & vendor = deviceType & kDeviceTypeVendorMask;
+        const auto id     = deviceType & kDeviceTypeIdMask;
+        const auto vendor = deviceType & kDeviceTypeVendorMask;
         return (kDeviceTypeIdMin <= id && id <= kDeviceTypeIdMax) &&
             (kDeviceTypeVendorMin <= vendor && vendor <= kDeviceTypeVendorMax);
     }
@@ -242,10 +242,10 @@ private:
 
     void Encode(const Target & target)
     {
-        const auto & flags      = target.flags;
-        const auto & cluster    = target.cluster;
-        const auto & endpoint   = target.endpoint;
-        const auto & deviceType = target.deviceType;
+        const auto flags      = target.flags;
+        const auto cluster    = target.cluster;
+        const auto endpoint   = target.endpoint;
+        const auto deviceType = target.deviceType;
         assert(IsValid(target));
         if (flags & Target::kCluster)
         {
@@ -361,7 +361,7 @@ public:
         }
         if (index < ArraySize(acl))
         {
-            auto storage = acl + index;
+            auto * storage = acl + index;
             if (storage->InUse())
             {
                 return storage;
@@ -392,7 +392,7 @@ public:
 
     bool InPool() const
     {
-        constexpr auto end = pool + ArraySize(pool);
+        constexpr auto * end = pool + ArraySize(pool);
         return pool <= this && this < end;
     }
 
@@ -447,7 +447,7 @@ public:
         size_t relativeIndex = 0;
         size_t & fromIndex   = (direction == ConvertDirection::kAbsoluteToRelative) ? absoluteIndex : relativeIndex;
         size_t & toIndex     = (direction == ConvertDirection::kAbsoluteToRelative) ? relativeIndex : absoluteIndex;
-        for (auto & storage : acl)
+        for (const auto & storage : acl)
         {
             if (!storage.InUse())
             {
@@ -503,7 +503,7 @@ public:
 
     static bool InPool(const Entry::Delegate & delegate)
     {
-        constexpr auto end = pool + ArraySize(pool);
+        constexpr auto * end = pool + ArraySize(pool);
         return pool <= &delegate && &delegate < end;
     }
 
@@ -611,9 +611,9 @@ public:
         GetSubjectCount(count);
         if (index < count)
         {
-            const auto & dest = mStorage->mSubjects + index;
-            const auto & src  = dest + 1;
-            auto bytes        = (count - index - 1) * sizeof(*dest);
+            auto * dest       = mStorage->mSubjects + index;
+            const auto * src  = dest + 1;
+            const auto bytes  = (count - index - 1) * sizeof(*dest);
             memmove(dest, src, bytes);
             if (count == EntryStorage::kMaxSubjects)
             {
@@ -680,9 +680,9 @@ public:
         GetTargetCount(count);
         if (index < count)
         {
-            const auto & dest = mStorage->mTargets + index;
-            const auto & src  = dest + 1;
-            auto bytes        = (count - index - 1) * sizeof(*dest);
+            auto * dest       = mStorage->mTargets + index;
+            const auto * src  = dest + 1;
+            const auto bytes  = (count - index - 1) * sizeof(*dest);
             memmove(dest, src, bytes);
             if (count == EntryStorage::kMaxTargets)
             {
@@ -710,7 +710,7 @@ public:
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
-        constexpr auto end   = acl + ArraySize(acl);
+        constexpr auto * end = acl + ArraySize(acl);
         if (mStorage == &storage)
         {
             mEntry->ResetDelegate();
@@ -727,7 +727,7 @@ public:
         {
             return false;
         }
-        else if (auto storage = EntryStorage::Find(nullptr))
+        else if (auto * storage = EntryStorage::Find(nullptr))
         {
             *storage = *mStorage;
             mStorage = storage;
@@ -765,7 +765,7 @@ public:
 
     static bool InPool(const EntryIterator::Delegate & delegate)
     {
-        constexpr auto end = pool + ArraySize(pool);
+        constexpr auto * end = pool + ArraySize(pool);
         return pool <= &delegate && &delegate < end;
     }
 
@@ -775,7 +775,7 @@ public:
     CHIP_ERROR Next(Entry & entry) override
     {
         constexpr auto & acl = EntryStorage::acl;
-        constexpr auto end   = acl + ArraySize(acl);
+        constexpr auto * end = acl + ArraySize(acl);
         while (true)
         {
             if (mStorage == nullptr)
@@ -795,7 +795,7 @@ public:
             {
                 continue;
             }
-            if (auto delegate = EntryDelegate::Find(entry.GetDelegate()))
+            if (auto * delegate = EntryDelegate::Find(entry.GetDelegate()))
             {
                 delegate->Init(entry, *mStorage);
                 return CHIP_NO_ERROR;
@@ -823,7 +823,7 @@ public:
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
-        constexpr auto end   = acl + ArraySize(acl);
+        constexpr auto * end = acl + ArraySize(acl);
         if (&storage <= mStorage && mStorage < end)
         {
             if (mStorage == acl)
@@ -937,9 +937,9 @@ public:
 
     CHIP_ERROR PrepareEntry(Entry & entry) override
     {
-        if (auto delegate = EntryDelegate::Find(entry.GetDelegate()))
+        if (auto * delegate = EntryDelegate::Find(entry.GetDelegate()))
         {
-            if (auto storage = EntryStorage::Find(delegate->GetStorage()))
+            if (auto * storage = EntryStorage::Find(delegate->GetStorage()))
             {
                 delegate->Init(entry, *storage);
                 return CHIP_NO_ERROR;
@@ -950,7 +950,7 @@ public:
 
     CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, FabricIndex * fabricIndex) override
     {
-        if (auto storage = EntryStorage::FindUnusedInAcl())
+        if (auto * storage = EntryStorage::FindUnusedInAcl())
         {
             CHIP_ERROR err = Copy(entry, *storage);
             if (err == CHIP_NO_ERROR)
@@ -975,9 +975,9 @@ public:
 
     CHIP_ERROR ReadEntry(size_t index, Entry & entry, const FabricIndex * fabricIndex) const override
     {
-        if (auto storage = EntryStorage::FindUsedInAcl(index, fabricIndex))
+        if (auto * storage = EntryStorage::FindUsedInAcl(index, fabricIndex))
         {
-            if (auto delegate = EntryDelegate::Find(entry.GetDelegate()))
+            if (auto * delegate = EntryDelegate::Find(entry.GetDelegate()))
             {
                 delegate->Init(entry, *storage);
                 return CHIP_NO_ERROR;
@@ -989,7 +989,7 @@ public:
 
     CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex) override
     {
-        if (auto storage = EntryStorage::FindUsedInAcl(index, fabricIndex))
+        if (auto * storage = EntryStorage::FindUsedInAcl(index, fabricIndex))
         {
             return Copy(entry, *storage);
         }
@@ -998,11 +998,11 @@ public:
 
     CHIP_ERROR DeleteEntry(size_t index, const FabricIndex * fabricIndex) override
     {
-        if (auto storage = EntryStorage::FindUsedInAcl(index, fabricIndex))
+        if (auto * storage = EntryStorage::FindUsedInAcl(index, fabricIndex))
         {
             constexpr auto & acl = EntryStorage::acl;
-            constexpr auto end   = acl + ArraySize(acl);
-            for (auto next = storage + 1; storage < end; ++storage, ++next)
+            constexpr auto * end = acl + ArraySize(acl);
+            for (auto * next = storage + 1; storage < end; ++storage, ++next)
             {
                 if (next < end && next->InUse())
                 {
@@ -1030,7 +1030,7 @@ public:
 
     CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex) const override
     {
-        if (auto delegate = EntryIteratorDelegate::Find(iterator.GetDelegate()))
+        if (auto * delegate = EntryIteratorDelegate::Find(iterator.GetDelegate()))
         {
             delegate->Init(iterator, fabricIndex);
             return CHIP_NO_ERROR;
