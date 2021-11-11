@@ -139,8 +139,9 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // Treat unknown peer address as "not UDP", because we have no idea whether
     // it's safe to do MRP there.
     bool isUDPTransport = peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
-    bool reliableTransmissionRequested =
-        isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
+
+    // this check is ignored by the ExchangeMsgDispatch if !AutoRequestAck()
+    bool reliableTransmissionRequested = isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
 
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
