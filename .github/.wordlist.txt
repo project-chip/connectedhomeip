@@ -486,7 +486,6 @@ IPv
 ISCAN
 itemName
 iterable
-jdk
 jinja
 jlink
 jre
