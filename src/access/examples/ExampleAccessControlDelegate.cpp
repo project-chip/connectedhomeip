@@ -645,9 +645,9 @@ public:
             // The storage at the specified index will be deleted by copying any subsequent storage
             // over it, ideally also including one unused storage past the ones in use. If all
             // storage was in use, this isn't possible, so the final storage is manually cleared.
-            auto * dest       = mStorage->mSubjects + index;
-            const auto * src  = dest + 1;
-            const auto n      = std::min(int(count), EntryStorage::kMaxSubjects - 1) - index;
+            auto * dest      = mStorage->mSubjects + index;
+            const auto * src = dest + 1;
+            const auto n     = std::min(int(count), EntryStorage::kMaxSubjects - 1) - index;
             memmove(dest, src, n * sizeof(*dest));
             if (count == EntryStorage::kMaxSubjects)
             {
@@ -718,9 +718,9 @@ public:
             // The storage at the specified index will be deleted by copying any subsequent storage
             // over it, ideally also including one unused storage past the ones in use. If all
             // storage was in use, this isn't possible, so the final storage is manually cleared.
-            auto * dest       = mStorage->mTargets + index;
-            const auto * src  = dest + 1;
-            const auto n      = std::min(int(count), EntryStorage::kMaxTargets - 1) - index;
+            auto * dest      = mStorage->mTargets + index;
+            const auto * src = dest + 1;
+            const auto n     = std::min(int(count), EntryStorage::kMaxTargets - 1) - index;
             memmove(dest, src, n * sizeof(*dest));
             if (count == EntryStorage::kMaxTargets)
             {
