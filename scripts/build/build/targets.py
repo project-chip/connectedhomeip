@@ -135,10 +135,12 @@ def NrfTargets():
     for target in targets:
         yield target.Extend('lock', app=NrfApp.LOCK)
         yield target.Extend('light', app=NrfApp.LIGHT)
-        yield target.Extend('light-rpc', app=NrfApp.LIGHT, enable_rpcs=True)
         yield target.Extend('shell', app=NrfApp.SHELL)
         yield target.Extend('pump', app=NrfApp.PUMP)
         yield target.Extend('pump-controller', app=NrfApp.PUMP_CONTROLLER)
+
+    # NRF5340 does not compile with rpcs right now (requires pigweed fix)
+    yield targets[1].Extend('light-rpc', app=NrfApp.LIGHT, enable_rpcs=True)
 
 
 def AndroidTargets():
