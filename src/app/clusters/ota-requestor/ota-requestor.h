@@ -36,7 +36,7 @@ public:
     void TriggerImmediateQuery();
 
     // A setter for the delegate class pointer
-    void setOtaRequestorDriver(OTARequestorDriver * driver);
+    void SetOtaRequestorDriver(OTARequestorDriver * driver);
 
     // Application interface declarations end
 
