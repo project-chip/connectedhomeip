@@ -13833,6 +13833,144 @@ private:
     }
 };
 
+class Test_TC_ILL_1_1 : public TestCommand
+{
+public:
+    Test_TC_ILL_1_1() : TestCommand("Test_TC_ILL_1_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_ILL_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_ILL_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 1 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    static void OnFailureCallback_0(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnFailureResponse_0(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
+    }
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_1(); }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
+    {
+        chip::Controller::IlluminanceMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_0, OnFailureCallback_0);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 2U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
+    {
+        chip::Controller::IlluminanceMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 1U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_1() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
+    {
+        chip::Controller::IlluminanceMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 2U));
+        NextTest();
+    }
+};
+
 class Test_TC_LVL_1_1 : public TestCommand
 {
 public:
@@ -32662,6 +32800,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_FLW_1_1>(),
         make_unique<Test_TC_FLW_2_1>(),
         make_unique<Test_TC_FLW_2_2>(),
+        make_unique<Test_TC_ILL_1_1>(),
         make_unique<Test_TC_LVL_1_1>(),
         make_unique<Test_TC_LVL_2_1>(),
         make_unique<Test_TC_LVL_3_1>(),
