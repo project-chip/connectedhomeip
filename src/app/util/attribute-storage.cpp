@@ -40,6 +40,7 @@
  ******************************************************************************/
 
 #include "app/util/common.h"
+#include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -970,6 +971,10 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                     (cluster->mask & CLUSTER_MASK_CLIENT ? EMBER_AF_CLIENT_CLUSTER_TICK : EMBER_AF_SERVER_CLUSTER_TICK));
             }
 
+            // Clear out any command handler overrides registered for this
+            // endpoint.
+            chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandlers(endpoint);
+
             // Clear out any attribute access overrides registered for this
             // endpoint.
             app::AttributeAccessInterface * prev = nullptr;
@@ -977,7 +982,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
             while (cur)
             {
                 app::AttributeAccessInterface * next = cur->GetNext();
-                if (cur->MatchesExactly(endpoint))
+                if (cur->MatchesEndpoint(endpoint))
                 {
                     // Remove it from the list
                     if (prev)
@@ -988,6 +993,8 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                     {
                         gAttributeAccessOverrides = next;
                     }
+
+                    cur->SetNext(nullptr);
 
                     // Do not change prev in this case.
                 }

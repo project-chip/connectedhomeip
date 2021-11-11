@@ -91,7 +91,9 @@
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(attrListName) EmberAfAttributeMetadata attrListName[] = {
 
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()                                                                                       \
-    , { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() } /* cluster revision */            \
+    {                                                                                                                              \
+        0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT()                                     \
+    } /* cluster revision */                                                                                                       \
     }
 
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \

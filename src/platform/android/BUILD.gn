@@ -28,6 +28,7 @@ static_library("android") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../SingletonConfigurationManager.cpp",
     "AndroidChipPlatform-JNI.cpp",
     "AndroidConfig.cpp",
     "AndroidConfig.h",

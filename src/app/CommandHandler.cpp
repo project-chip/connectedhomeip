@@ -129,7 +129,7 @@ void CommandHandler::Close()
 
     if (mpCallback)
     {
-        mpCallback->OnDone(this);
+        mpCallback->OnDone(*this);
     }
 }
 
@@ -171,7 +171,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 
     err = commandPath.GetEndpointId(&endpointId);
     SuccessOrExit(err);
-    VerifyOrExit(ServerClusterCommandExists(ConcreteCommandPath(endpointId, clusterId, commandId)),
+    VerifyOrExit(mpCallback->CommandExists(ConcreteCommandPath(endpointId, clusterId, commandId)),
                  err = CHIP_ERROR_INVALID_PROFILE_ID);
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
@@ -189,7 +189,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
                       endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
         const ConcreteCommandPath concretePath(endpointId, clusterId, commandId);
         SuccessOrExit(MatterPreCommandReceivedCallback(concretePath));
-        DispatchSingleClusterCommand(concretePath, commandDataReader, this);
+        mpCallback->DispatchCommand(*this, ConcreteCommandPath(endpointId, clusterId, commandId), commandDataReader);
         MatterPostCommandReceivedCallback(concretePath);
     }
 

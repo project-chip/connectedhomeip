@@ -779,7 +779,8 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
 CHIP_ERROR DeviceCommissioner::GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                   Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
-    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == deviceId)
+    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == deviceId &&
+        mDeviceBeingCommissioned->IsSecureConnected())
     {
         onConnection->mCall(onConnection->mContext, mDeviceBeingCommissioned);
         return CHIP_NO_ERROR;
@@ -957,17 +958,6 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
     FreeRendezvousSession();
 
-    if (mDeviceBeingCommissioned != nullptr)
-    {
-        // Let's release the device that's being paired.
-        // If pairing was successful, its information is
-        // already persisted. The application will use GetDevice()
-        // method to get access to the device, which will fetch
-        // the device information from the persistent storage.
-        ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
-        mDeviceBeingCommissioned = nullptr;
-    }
-
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnPairingComplete(status);
@@ -984,6 +974,12 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
     }
 
     RendezvousCleanup(err);
+
+    if (mDeviceBeingCommissioned != nullptr)
+    {
+        ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
+        mDeviceBeingCommissioned = nullptr;
+    }
 }
 
 void DeviceCommissioner::OnSessionEstablished()
@@ -1627,6 +1623,14 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
                     ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
     VerifyOrReturn(mState == State::Initialized);
 
+    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == nodeData.mPeerId.GetNodeId())
+    {
+        // Let's release the device that's being paired, if pairing was successful,
+        // and the device is available on the operational network.
+        ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
+        mDeviceBeingCommissioned = nullptr;
+    }
+
     GetOperationalDeviceWithAddress(nodeData.mPeerId.GetNodeId(), ToPeerAddress(nodeData), &mOnDeviceConnectedCallback,
                                     &mOnDeviceConnectionFailureCallback);
 
@@ -1875,6 +1879,11 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
             mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
         }
         RendezvousCleanup(CHIP_NO_ERROR);
+        if (mDeviceBeingCommissioned != nullptr)
+        {
+            ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
+            mDeviceBeingCommissioned = nullptr;
+        }
         break;
     case CommissioningStage::kSecurePairing:
     case CommissioningStage::kError:

@@ -84,9 +84,9 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 }
 
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
-void ExchangeContext::UpdateSEDPollingMode(Transport::Type transportType)
+void ExchangeContext::UpdateSEDPollingMode()
 {
-    if (transportType != Transport::Type::kBle)
+    if (GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager())->GetTransportType() != Transport::Type::kBle)
     {
         if (!IsResponseExpected() && !IsSendExpected() && (mExchangeMgr->GetNumActiveExchanges() == 1))
         {
@@ -488,8 +488,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 void ExchangeContext::MessageHandled()
 {
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
-    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
-    UpdateSEDPollingMode(peerAddress->GetTransportType());
+    UpdateSEDPollingMode();
 #endif
 
     if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected())

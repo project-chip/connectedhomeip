@@ -30,6 +30,7 @@
 #include <app/DeviceProxy.h>
 #include <app/util/error-mapping.h>
 #include <controller/InvokeInteraction.h>
+#include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>
 
 namespace chip {
@@ -40,6 +41,9 @@ using CommandResponseSuccessCallback = void(void * context, const T & responseOb
 using CommandResponseFailureCallback = void(void * context, EmberAfStatus status);
 using WriteResponseSuccessCallback   = void (*)(void * context);
 using WriteResponseFailureCallback   = void (*)(void * context, EmberAfStatus status);
+template <typename T>
+using ReadResponseSuccessCallback = void (*)(void * context, T responseData);
+using ReadResponseFailureCallback = void (*)(void * context, EmberAfStatus status);
 
 class DLL_EXPORT ClusterBase
 {
@@ -62,9 +66,81 @@ public:
     CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
                              CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb);
 
+    /**
+     * Functions for writing attributes.  We have lots of different
+     * AttributeInfo but a fairly small set of types that get written.  So we
+     * want to keep the template on AttributeInfo very small, and put all the
+     * work in the template with a small number of instantiations (one per
+     * type).
+     */
+    template <typename AttrType>
+    CHIP_ERROR WriteAttribute(const AttrType & requestData, void * context, ClusterId clusterId, AttributeId attributeId,
+                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath) {
+            if (successCb != nullptr)
+            {
+                successCb(context);
+            }
+        };
+
+        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
+                                                CHIP_ERROR aError) {
+            if (failureCb != nullptr)
+            {
+                failureCb(context, app::ToEmberAfStatus(status.mStatus));
+            }
+        };
+
+        return chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId,
+                                                          requestData, onSuccessCb, onFailureCb);
+    }
+
     template <typename AttributeInfo>
     CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
-                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb);
+                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
+    {
+        return WriteAttribute(requestData, context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb,
+                              failureCb);
+    }
+
+    /**
+     * Read an attribute and get a type-safe callback with the attribute value.
+     */
+    template <typename AttributeInfo>
+    CHIP_ERROR ReadAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> successCb,
+                             ReadResponseFailureCallback failureCb)
+    {
+        return ReadAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
+            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb, failureCb);
+    }
+
+    template <typename DecodableType, typename DecodableArgType>
+    CHIP_ERROR ReadAttribute(void * context, ClusterId clusterId, AttributeId attributeId,
+                             ReadResponseSuccessCallback<DecodableArgType> successCb, ReadResponseFailureCallback failureCb)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath, const DecodableType & aData) {
+            if (successCb != nullptr)
+            {
+                successCb(context, aData);
+            }
+        };
+
+        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
+                                                CHIP_ERROR aError) {
+            if (failureCb != nullptr)
+            {
+                failureCb(context, app::ToEmberAfStatus(status.mStatus));
+            }
+        };
+
+        return Controller::ReadAttribute<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
+                                                        mEndpoint, clusterId, attributeId, onSuccessCb, onFailureCb);
+    }
 
 protected:
     ClusterBase(uint16_t cluster) : mClusterId(cluster) {}

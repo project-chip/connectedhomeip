@@ -407,6 +407,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
         Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissionable Node %d", i);
+        ChipLogProgress(Discovery, "\tInstance name:\t\t%s", dnsSdInfo->instanceName);
         ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->hostName);
         ChipLogProgress(Discovery, "\tPort:\t\t\t%u", dnsSdInfo->port);
         ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->longDiscriminator);
@@ -417,7 +418,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
         ChipLogProgress(Discovery, "\tDevice Name\t\t%s", dnsSdInfo->deviceName);
         ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
         ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
-        ChipLogProgress(Discovery, "\tPairing Hint\t\t0x%x", dnsSdInfo->pairingHint);
+        ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->pairingHint);
         if (dnsSdInfo->GetMrpRetryIntervalIdle().HasValue())
         {
             ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", dnsSdInfo->GetMrpRetryIntervalIdle().Value());

@@ -514,6 +514,7 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, DnssdService * res
     DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
     DiscoveredNodeData data;
     Platform::CopyString(data.hostName, result->mHostName);
+    Platform::CopyString(data.instanceName, result->mName);
 
     if (result->mAddress.HasValue() && data.numIPs < DiscoveredNodeData::kMaxIPAddresses)
     {
