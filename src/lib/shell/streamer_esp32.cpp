@@ -73,7 +73,7 @@ int streamer_esp32_init(streamer_t * streamer)
     linenoiseHistorySetMaxLen(100);
 
     if (linenoiseProbe())
-	{
+    {
         // Set if terminal does not recognize escape sequences.
         linenoiseSetDumbMode(1);
     }
