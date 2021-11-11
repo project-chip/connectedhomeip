@@ -29,6 +29,9 @@ class ConfigurationManagerImpl : public ConfigurationManager
 {
 public:
     virtual ~ConfigurationManagerImpl() = default;
+    // NOTE: This method is required by the tests.
+    // This returns an instance of this class.
+    static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
@@ -104,14 +107,6 @@ private:
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 };
-
-ConfigurationManager & ConfigurationMgr()
-{
-    static ConfigurationManagerImpl sInstance;
-    return sInstance;
-}
-
-void SetConfigurationMgr(ConfigurationManagerImpl * configurationManager) {}
 
 } // namespace DeviceLayer
 } // namespace chip
