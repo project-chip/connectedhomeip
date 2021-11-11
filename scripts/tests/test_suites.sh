@@ -233,3 +233,7 @@ for j in "${iter_array[@]}"; do
     done
     echo " ===== Iteration $j completed"
 done
+
+if [[ $use_netns != 0 ]]; then
+    netns_cleanup
+fi
