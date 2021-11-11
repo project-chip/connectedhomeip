@@ -69,15 +69,15 @@ jobs:
             - name: Build all clusters app
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN} chip_mdns=\"platform\"
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
             - name: Build TV app
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/tv-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN} chip_mdns=\"platform\"
+                  scripts/examples/gn_build_example.sh examples/tv-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
             - name: Build chip-tool
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP} chip_mdns=\"platform\"
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
             - name: Copy objdir
               run: |
                   # The idea is to not upload our objdir unless builds have
