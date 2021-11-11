@@ -156,18 +156,18 @@ public:
      */
     static bool MatchLocalIPv6Subnet(const IPAddress & addr);
 
-/**
- *  Get the link local IPv6 address.
- *
- *  @param[out]   llAddr  The link local IPv6 address for the link.
- *
- *  @retval    #CHIP_ERROR_NOT_IMPLEMENTED      If IPv6 is not supported.
- *  @retval    #CHIP_ERROR_INVALID_ARGUMENT     If the link local address
- *                                              is nullptr.
- *  @retval    #INET_ERROR_ADDRESS_NOT_FOUND    If the link does not have
- *                                              any address configured.
- *  @retval    #CHIP_NO_ERROR                   On success.
- */
+    /**
+     *  Get the link local IPv6 address.
+     *
+     *  @param[out]   llAddr  The link local IPv6 address for the link.
+     *
+     *  @retval    #CHIP_ERROR_NOT_IMPLEMENTED      If IPv6 is not supported.
+     *  @retval    #CHIP_ERROR_INVALID_ARGUMENT     If the link local address
+     *                                              is nullptr.
+     *  @retval    #INET_ERROR_ADDRESS_NOT_FOUND    If the link does not have
+     *                                              any address configured.
+     *  @retval    #CHIP_NO_ERROR                   On success.
+     */
     CHIP_ERROR GetLinkLocalAddr(IPAddress * llAddr);
 
 private:
