@@ -72,6 +72,12 @@ int streamer_esp32_init(streamer_t * streamer)
     linenoiseSetMultiLine(1);
     linenoiseHistorySetMaxLen(100);
 
+    if (linenoiseProbe())
+	{
+        // Set if terminal does not recognize escape sequences.
+        linenoiseSetDumbMode(1);
+    }
+
     esp_console_cmd_t command = { .command = "chip", .help = "CHIP utilities", .func = chip_command_handler };
     ESP_ERROR_CHECK(esp_console_cmd_register(&command));
     return 0;
@@ -84,7 +90,7 @@ ssize_t streamer_esp32_read(streamer_t * streamer, char * buf, size_t len)
 
 ssize_t streamer_esp32_write(streamer_t * streamer, const char * buf, size_t len)
 {
-    return fprintf(stdout, buf, len);
+    return uart_write_bytes(UART_NUM_0, buf, len);
 }
 
 static streamer_t streamer_stdio = {
