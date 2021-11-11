@@ -280,13 +280,14 @@ JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jl
 JNI_METHOD(jlong, getDeviceBeingCommissionedPointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     CommissioneeDeviceProxy * commissioneeDevice = nullptr;
     err = wrapper->Controller()->GetDeviceBeingCommissioned(static_cast<NodeId>(nodeId), &commissioneeDevice);
 
-    if (commissioneeDevice == nullptr) {
+    if (commissioneeDevice == nullptr)
+    {
         ChipLogError(Controller, "Commissionee device was nullptr");
         err = CHIP_ERROR_INCORRECT_STATE;
     }
