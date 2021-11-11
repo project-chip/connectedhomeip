@@ -192,12 +192,13 @@ class ClusterDetailFragment : Fragment() {
             val objectCallback =
               inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
             objectCallback.clusterCallbackNameTv.text = variableNameType.name + "[$index]"
+            val objectDeserializationString = it.toString()
             val callbackClassName = it!!.javaClass.toString().split('$').last()
             objectCallback.clusterCallbackDataTv.text = callbackClassName
             objectCallback.clusterCallbackDataTv.setOnClickListener {
               AlertDialog.Builder(requireContext())
                 .setTitle(callbackClassName)
-                .setMessage(it.toString())
+                .setMessage(objectDeserializationString)
                 .create()
                 .show()
             }
