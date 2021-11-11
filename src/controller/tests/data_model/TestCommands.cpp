@@ -275,8 +275,10 @@ void TestCommandInteraction::TestAsyncResponse(nlTestSuite * apSuite, void * apC
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, !onSuccessWasCalled && !onFailureWasCalled && !statusCheck);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
 
     CommandHandler * commandHandle = asyncHandle.Get();
     NL_TEST_ASSERT(apSuite, commandHandle != nullptr);
@@ -289,6 +291,8 @@ void TestCommandInteraction::TestAsyncResponse(nlTestSuite * apSuite, void * apC
     commandHandle->AddStatus(ConcreteCommandPath(kTestEndpointId, request.GetClusterId(), request.GetCommandId()),
                              Protocols::InteractionModel::Status::Success);
     asyncHandle.Release();
+
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled && statusCheck);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);

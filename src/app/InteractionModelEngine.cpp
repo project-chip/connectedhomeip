@@ -82,8 +82,9 @@ void InteractionModelEngine::Shutdown()
     mMagic++;
 
     mCommandHandlerObjs.ForEachActiveObject([this](CommandHandler * obj) -> bool {
-        // Modifying the pool during iteration is generally frowned upon, this should not be a issue since we are running in the
-        // main loop.
+        // Modifying the pool during iteration is generally frowned upon.
+        // This is almost safe since mCommandHandlerObjs is a BitMapObjectPool which won't malfunction when modifying the inner
+        // record while during traversal. But this behavior is not guranteed, so we should fix this by implementing DeallocateAll.
         //
         // TODO(@kghost, #10332) Implement DeallocateAll and replace this.
 

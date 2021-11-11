@@ -133,8 +133,6 @@ public:
 
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus) override;
 
-    size_t RefCount() const { return mRefCount; }
-
     CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload);
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
     CHIP_ERROR FinishCommand(bool aStartDataStruct = true);
@@ -168,18 +166,18 @@ private:
     friend class CommandHandler::Handle;
 
     /**
-     * IncRef will increase the inner refcount of the CommandHandler.
+     * IncrementHoldOff will increase the inner refcount of the CommandHandler.
      *
      * Users should use CommandHandler::Handle for management the lifespan of the CommandHandler.
      * DefRef should be released in reasonable time, and Close() should only be called when the refcount reached 0.
      */
-    void IncRef();
+    void IncrementHoldOff();
 
     /**
-     * DefRef is used by CommandHandler::Handle for decreasing the refcount of the CommandHandler.
+     * DecrementHoldOff is used by CommandHandler::Handle for decreasing the refcount of the CommandHandler.
      * When refcount reached 0, CommandHandler will send the response to the peer and shutdown.
      */
-    void DecRef();
+    void DecrementHoldOff();
 
     /*
      * Allocates a packet buffer used for encoding an invoke response payload.
@@ -205,7 +203,7 @@ private:
     Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
-    size_t mRefCount                       = 0;
+    size_t mPendingWork                    = 0;
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
 };

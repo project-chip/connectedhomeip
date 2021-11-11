@@ -72,7 +72,7 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
     // Exchange Manager for unsolicited InvokeCommand Requests.
     mpExchangeCtx = ec;
 
-    // Use the RAII feature, if this is the only Handle when this function returns, DecRef will trigger sending response.
+    // Use the RAII feature, if this is the only Handle when this function returns, DecrementHoldOff will trigger sending response.
     Handle workHandle(this);
     ReturnErrorOnFailure(ProcessInvokeRequest(std::move(payload)));
     mpExchangeCtx->WillSendMessage();
@@ -122,8 +122,8 @@ void CommandHandler::Close()
     // We must finish all async work before we can shut down a CommandHandler. The actual CommandHandler MUST finish their work
     // in reasonable time or there is a bug. The only case for releasing CommandHandler without CommandHandler::Handle releasing its
     // reference is the stack shutting down, in which case Close() is not called. So the below check should always pass.
-    VerifyOrDieWithMsg(mRefCount == 0, DataManagement, "CommandHandler::Close() called with %zu unfinished async work items",
-                       mRefCount);
+    VerifyOrDieWithMsg(mPendingWork == 0, DataManagement, "CommandHandler::Close() called with %zu unfinished async work items",
+                       mPendingWork);
 
     Command::Close();
 
@@ -133,16 +133,16 @@ void CommandHandler::Close()
     }
 }
 
-void CommandHandler::IncRef()
+void CommandHandler::IncrementHoldOff()
 {
-    mRefCount++;
+    mPendingWork++;
 }
 
-void CommandHandler::DecRef()
+void CommandHandler::DecrementHoldOff()
 {
-    mRefCount--;
-    ChipLogDetail(DataManagement, "Decreasing reference count for CommandHandler, remaining %zu", mRefCount);
-    if (mRefCount != 0)
+    mPendingWork--;
+    ChipLogDetail(DataManagement, "Decreasing reference count for CommandHandler, remaining %zu", mPendingWork);
+    if (mPendingWork != 0)
     {
         return;
     }
@@ -163,7 +163,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
 {
     System::PacketBufferHandle commandPacket;
 
-    VerifyOrReturnError(mRefCount == 0, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mPendingWork == 0, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == CommandState::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -381,7 +381,7 @@ void CommandHandler::Handle::Release()
     {
         if (mMagic == InteractionModelEngine::GetInstance()->GetMagicNumber())
         {
-            mpHandler->DecRef();
+            mpHandler->DecrementHoldOff();
         }
         mpHandler = nullptr;
         mMagic    = 0;
@@ -392,7 +392,7 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
 {
     if (handle != nullptr)
     {
-        handle->IncRef();
+        handle->IncrementHoldOff();
         mpHandler = handle;
         mMagic    = InteractionModelEngine::GetInstance()->GetMagicNumber();
     }
