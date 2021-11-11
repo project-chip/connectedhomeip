@@ -208,6 +208,7 @@ if (chip_device_platform != "none") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_AMEBA=1",
         "CHIP_DEVICE_LAYER_TARGET=Ameba",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
     }
   }
@@ -284,9 +285,8 @@ if (chip_device_platform != "none") {
       "GeneralUtils.cpp",
       "Globals.cpp",
       "LockTracker.cpp",
-      "LwIPEventSupport.cpp",
       "PersistedStorage.cpp",
-      "TestIdentity.cpp",
+      "PlatformEventSupport.cpp",
     ]
 
     cflags = [ "-Wconversion" ]

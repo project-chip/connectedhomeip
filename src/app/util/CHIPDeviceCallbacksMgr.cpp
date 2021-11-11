@@ -32,6 +32,12 @@
 namespace chip {
 namespace app {
 
+CHIPDeviceCallbacksMgr & CHIPDeviceCallbacksMgr::GetInstance()
+{
+    static CHIPDeviceCallbacksMgr instance;
+    return instance;
+}
+
 CHIP_ERROR CHIPDeviceCallbacksMgr::AddResponseCallback(NodeId nodeId, uint8_t sequenceNumber,
                                                        Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, TLVDataFilter filter)

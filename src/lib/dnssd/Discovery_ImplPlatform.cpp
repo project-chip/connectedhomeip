@@ -514,6 +514,7 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, DnssdService * res
     DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
     DiscoveredNodeData data;
     Platform::CopyString(data.hostName, result->mHostName);
+    Platform::CopyString(data.instanceName, result->mName);
 
     if (result->mAddress.HasValue() && data.numIPs < DiscoveredNodeData::kMaxIPAddresses)
     {
@@ -589,7 +590,8 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     // TODO --  define appropriate TTL, for now use 2000 msec (rfc default)
     // figure out way to use TTL value from mDNS packet in  future update
-    error = mgr->sDnssdCache.Insert(nodeData.mPeerId, result->mAddress.Value(), result->mPort, result->mInterface, 2 * 1000);
+    error = mgr->sDnssdCache.Insert(nodeData.mPeerId, result->mAddress.Value(), result->mPort, result->mInterface,
+                                    System::Clock::Seconds16(2));
 
     if (CHIP_NO_ERROR != error)
     {

@@ -79,18 +79,6 @@
 namespace chip {
 namespace Inet {
 
-void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
-{
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    TCPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumTCPEps],
-                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumTCPEps]);
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    UDPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumUDPEps],
-                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumUDPEps]);
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-}
-
 /**
  *  This is the InetLayer default constructor.
  *
@@ -99,17 +87,7 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
  *  method must be called successfully prior to using the object.
  *
  */
-InetLayer::InetLayer()
-{
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (!sInetEventHandlerDelegate.IsInitialized())
-        sInetEventHandlerDelegate.Init(HandleInetLayerEvent);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-}
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-chip::System::LayerLwIP::EventHandlerDelegate InetLayer::sInetEventHandlerDelegate;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+InetLayer::InetLayer() {}
 
 #if INET_CONFIG_MAX_DROPPABLE_EVENTS && CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -248,8 +226,6 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     ReturnErrorOnFailure(InitQueueLimiter());
-
-    static_cast<System::LayerLwIP *>(mSystemLayer)->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     mLayerState.SetInitialized();
@@ -274,7 +250,7 @@ CHIP_ERROR InetLayer::Shutdown()
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Abort all TCP endpoints owned by this instance.
     TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        if ((lEndPoint != nullptr) && &lEndPoint->Layer() == this)
         {
             lEndPoint->Abort();
         }
@@ -285,7 +261,7 @@ CHIP_ERROR InetLayer::Shutdown()
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     // Close all UDP endpoints owned by this instance.
     UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
-        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        if ((lEndPoint != nullptr) && &lEndPoint->Layer() == this)
         {
             lEndPoint->Close();
         }
@@ -453,14 +429,13 @@ CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = TCPEndPoint::sPool.TryCreate();
+    *retEndPoint = TCPEndPoint::sPool.CreateObject(*this);
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "TCP");
         return CHIP_ERROR_ENDPOINT_POOL_FULL;
     }
 
-    (*retEndPoint)->Init(this);
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumTCPEps);
 
     return CHIP_NO_ERROR;
@@ -493,14 +468,13 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = UDPEndPoint::sPool.TryCreate();
+    *retEndPoint = UDPEndPoint::sPool.CreateObject(*this);
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "UDP");
         return CHIP_ERROR_ENDPOINT_POOL_FULL;
     }
 
-    (*retEndPoint)->Init(this);
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumUDPEps);
 
     return CHIP_NO_ERROR;
@@ -582,7 +556,7 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
     bool lTimerRequired    = lInetLayer.IsIdleTimerRunning();
 
     TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-        if (!lEndPoint->IsCreatedByInetLayer(lInetLayer))
+        if (&lEndPoint->Layer() != &lInetLayer)
             return true;
         if (!lEndPoint->IsConnected())
             return true;
@@ -608,64 +582,6 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
     }
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-CHIP_ERROR InetLayer::HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType, uintptr_t aArgument)
-{
-    assertChipStackLockedByCurrentThread();
-
-    VerifyOrReturnError(INET_IsInetEvent(aEventType), CHIP_ERROR_UNEXPECTED_EVENT);
-
-    // Dispatch the event according to its type.
-    switch (aEventType)
-    {
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    case kInetEvent_TCPConnectComplete:
-        static_cast<TCPEndPoint &>(aTarget).HandleConnectComplete(static_cast<CHIP_ERROR>(aArgument));
-        break;
-
-    case kInetEvent_TCPConnectionReceived:
-        static_cast<TCPEndPoint &>(aTarget).HandleIncomingConnection(reinterpret_cast<TCPEndPoint *>(aArgument));
-        break;
-
-    case kInetEvent_TCPDataReceived:
-        static_cast<TCPEndPoint &>(aTarget).HandleDataReceived(
-            System::PacketBufferHandle::Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
-        break;
-
-    case kInetEvent_TCPDataSent:
-        static_cast<TCPEndPoint &>(aTarget).HandleDataSent(static_cast<uint16_t>(aArgument));
-        break;
-
-    case kInetEvent_TCPError:
-        static_cast<TCPEndPoint &>(aTarget).HandleError(static_cast<CHIP_ERROR>(aArgument));
-        break;
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    case kInetEvent_UDPDataReceived:
-        static_cast<UDPEndPoint &>(aTarget).HandleDataReceived(
-            System::PacketBufferHandle::Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
-        break;
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-    default:
-        return CHIP_ERROR_UNEXPECTED_EVENT;
-    }
-
-    // If the event was droppable, record the fact that it has been dequeued.
-    if (IsDroppableEvent(aEventType))
-    {
-        EndPointBasis & lBasis = static_cast<EndPointBasis &>(aTarget);
-        InetLayer & lInetLayer = lBasis.Layer();
-
-        lInetLayer.DroppableEventDequeued();
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**
  *  Reset the members of the IPPacketInfo object.

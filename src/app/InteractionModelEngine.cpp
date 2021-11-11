@@ -61,6 +61,21 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
 void InteractionModelEngine::Shutdown()
 {
+    CommandHandlerInterface * handlerIter = mCommandHandlerList;
+
+    //
+    // Walk our list of command handlers and de-register them, before finally
+    // nulling out the list entirely.
+    //
+    while (handlerIter)
+    {
+        CommandHandlerInterface * next = handlerIter->GetNext();
+        handlerIter->SetNext(nullptr);
+        handlerIter = next;
+    }
+
+    mCommandHandlerList = nullptr;
+
     //
     // Since modifying the pool during iteration is generally frowned upon,
     // I've chosen to just destroy the object but not necessarily de-allocate it.
@@ -277,9 +292,9 @@ CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext *
     return err;
 }
 
-void InteractionModelEngine::OnDone(CommandHandler * apCommandObj)
+void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 {
-    mCommandHandlerObjs.ReleaseObject(apCommandObj);
+    mCommandHandlerObjs.ReleaseObject(&apCommandObj);
 }
 
 CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
@@ -516,8 +531,8 @@ bool InteractionModelEngine::MergeOverlappedAttributePath(ClusterInfo * apAttrib
         }
         if (aAttributePath.IsAttributePathSupersetOf(*runner))
         {
-            runner->mListIndex = aAttributePath.mListIndex;
-            runner->mFieldId   = aAttributePath.mFieldId;
+            runner->mListIndex   = aAttributePath.mListIndex;
+            runner->mAttributeId = aAttributePath.mAttributeId;
             return true;
         }
         runner = runner->mpNext;
@@ -543,6 +558,120 @@ bool InteractionModelEngine::IsOverlappedAttributePath(ClusterInfo & aAttributeP
         }
     }
     return false;
+}
+
+void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                             TLV::TLVReader & apPayload)
+{
+    CommandHandlerInterface * handler = FindCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+
+    if (handler)
+    {
+        CommandHandlerInterface::HandlerContext context(apCommandObj, aCommandPath, apPayload);
+        handler->InvokeCommand(context);
+
+        //
+        // If the command was handled, don't proceed any further and return successfully.
+        //
+        if (context.mCommandHandled)
+        {
+            return;
+        }
+    }
+
+    DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
+}
+
+bool InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
+{
+    return ServerClusterCommandExists(aCommandPath);
+}
+
+CHIP_ERROR InteractionModelEngine::RegisterCommandHandler(CommandHandlerInterface * handler)
+{
+    VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(*handler))
+        {
+            ChipLogError(InteractionModel, "Duplicate command handler registration failed");
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+    }
+
+    handler->SetNext(mCommandHandlerList);
+    mCommandHandlerList = handler;
+
+    return CHIP_NO_ERROR;
+}
+
+void InteractionModelEngine::UnregisterCommandHandlers(EndpointId endpointId)
+{
+    CommandHandlerInterface * prev = nullptr;
+
+    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
+    {
+        if (cur->MatchesEndpoint(endpointId))
+        {
+            if (prev == nullptr)
+            {
+                mCommandHandlerList = cur->GetNext();
+            }
+            else
+            {
+                prev->SetNext(cur->GetNext());
+            }
+
+            cur->SetNext(nullptr);
+        }
+        else
+        {
+            prev = cur;
+        }
+    }
+}
+
+CHIP_ERROR InteractionModelEngine::UnregisterCommandHandler(CommandHandlerInterface * handler)
+{
+    VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    CommandHandlerInterface * prev = nullptr;
+
+    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(*handler))
+        {
+            if (prev == nullptr)
+            {
+                mCommandHandlerList = cur->GetNext();
+            }
+            else
+            {
+                prev->SetNext(cur->GetNext());
+            }
+
+            cur->SetNext(nullptr);
+
+            return CHIP_NO_ERROR;
+        }
+
+        prev = cur;
+    }
+
+    return CHIP_ERROR_KEY_NOT_FOUND;
+}
+
+CommandHandlerInterface * InteractionModelEngine::FindCommandHandler(EndpointId endpointId, ClusterId clusterId)
+{
+    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(endpointId, clusterId))
+        {
+            return cur;
+        }
+    }
+
+    return nullptr;
 }
 
 } // namespace app

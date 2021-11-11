@@ -58,11 +58,13 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
-                                 bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+                                 AttributeReportIB::Builder & aAttributeReport)
 {
+
     if (responseDirective == kSendDataResponse)
     {
+        AttributeDataIB::Builder attributeData = aAttributeReport.CreateAttributeData();
         TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
         TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
 
@@ -75,13 +77,27 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
             i++;
         }
 
-        ReturnErrorOnFailure(DataModel::Encode(*apWriter, chip::TLV::ContextTag(AttributeDataElement::kCsTag_Data), value));
-        return apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), static_cast<uint64_t>(0));
+        AttributePathIB::Builder attributePath = attributeData.CreatePath();
+        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        ReturnErrorOnFailure(attributePath.GetError());
+
+        ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()),
+                                               chip::TLV::ContextTag(chip::to_underlying(AttributeDataIB::Tag::kData)), value));
+        attributeData.DataVersion(0);
+        return CHIP_NO_ERROR;
     }
     else
     {
-        return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                             chip::Protocols::InteractionModel::Status::Busy);
+        AttributeStatusIB::Builder attributeStatus = aAttributeReport.CreateAttributeStatus();
+        AttributePathIB::Builder attributePath     = attributeStatus.CreatePath();
+        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        ReturnErrorOnFailure(attributePath.GetError());
+
+        StatusIB::Builder errorStatus = attributeStatus.CreateErrorStatus();
+        errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
+        attributeStatus.EndOfAttributeStatusIB();
+        ReturnErrorOnFailure(attributeStatus.GetError());
+        return CHIP_NO_ERROR;
     }
 
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -144,7 +160,9 @@ void TestReadInteraction::TestDataResponse(nlTestSuite * apSuite, void * apConte
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
+    ctx.DrainAndServiceIO();
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
@@ -177,7 +195,9 @@ void TestReadInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCon
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
+    ctx.DrainAndServiceIO();
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
@@ -210,10 +230,14 @@ void TestReadInteraction::TestReadTimeout(nlTestSuite * apSuite, void * apContex
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 1);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
 
     ctx.GetExchangeManager().OnConnectionExpired(ctx.GetSessionBobToAlice());
+
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
@@ -223,7 +247,9 @@ void TestReadInteraction::TestReadTimeout(nlTestSuite * apSuite, void * apContex
     //
     // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
 
+    ctx.DrainAndServiceIO();
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
 
     ctx.GetExchangeManager().OnConnectionExpired(ctx.GetSessionAliceToBob());
 
@@ -250,7 +276,7 @@ nlTestSuite sSuite =
 {
     "TestRead",
     &sTests[0],
-    TestContext::Initialize,
+    TestContext::InitializeAsync,
     TestContext::Finalize
 };
 // clang-format on

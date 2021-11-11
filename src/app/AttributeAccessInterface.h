@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
-#include <app/MessageDef/AttributeDataElement.h>
+#include <app/MessageDef/AttributeDataIB.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h> // So we can encode lists
 #include <app/data-model/TagBoundEncoder.h>
@@ -44,7 +44,8 @@ class AttributeValueEncoder : protected TagBoundEncoder
 {
 public:
     AttributeValueEncoder(TLV::TLVWriter * aWriter, FabricIndex aAccessingFabricIndex) :
-        TagBoundEncoder(aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data)), mAccessingFabricIndex(aAccessingFabricIndex)
+        TagBoundEncoder(aWriter, TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData))),
+        mAccessingFabricIndex(aAccessingFabricIndex)
     {}
 
     template <typename... Ts>
@@ -148,7 +149,7 @@ public:
      * specific endpoint.  This is used to clean up overrides registered for an
      * endpoint that becomes disabled.
      */
-    bool MatchesExactly(EndpointId aEndpointId) const { return mEndpointId.HasValue() && mEndpointId.Value() == aEndpointId; }
+    bool MatchesEndpoint(EndpointId aEndpointId) const { return mEndpointId.HasValue() && mEndpointId.Value() == aEndpointId; }
 
     /**
      * Check whether another AttributeAccessInterface wants to handle the same set of

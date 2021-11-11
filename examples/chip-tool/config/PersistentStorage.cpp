@@ -37,6 +37,10 @@ constexpr const char kDefaultSectionName[] = "Default";
 constexpr const char kPortKey[]            = "ListenPort";
 constexpr const char kLoggingKey[]         = "LoggingLevel";
 constexpr const char kLocalNodeIdKey[]     = "LocalNodeId";
+constexpr const char kFabricIdKey[]        = "LocalFabricId";
+constexpr const FabricId kFabricAlpha      = 1;
+constexpr const FabricId kFabricBeta       = 2;
+constexpr const FabricId kFabricGamma      = 3;
 constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Detail;
 
 namespace {
@@ -156,9 +160,11 @@ exit:
 uint16_t PersistentStorage::GetListenPort()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    // By default chip-tool listens on CHIP_PORT + 1. This is done in order to avoid
+
+    // By default chip-tool listens on CHIP_PORT + N. This is done in order to avoid
     // having 2 servers listening on CHIP_PORT when one runs an accessory server locally.
-    uint16_t chipListenPort = CHIP_PORT + 1;
+    FabricId N              = GetFabricId();
+    uint16_t chipListenPort = static_cast<uint16_t>(CHIP_PORT + N);
 
     char value[6];
     uint16_t size = static_cast<uint16_t>(sizeof(value));
@@ -227,4 +233,44 @@ CHIP_ERROR PersistentStorage::SetLocalNodeId(NodeId value)
 {
     uint64_t nodeId = Encoding::LittleEndian::HostSwap64(value);
     return SyncSetKeyValue(kLocalNodeIdKey, &nodeId, sizeof(nodeId));
+}
+
+FabricId PersistentStorage::GetFabricId()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    uint64_t fabricId;
+    uint16_t size = static_cast<uint16_t>(sizeof(fabricId));
+    err           = SyncGetKeyValue(kFabricIdKey, &fabricId, size);
+    if (err == CHIP_NO_ERROR)
+    {
+        return static_cast<FabricId>(Encoding::LittleEndian::HostSwap64(fabricId));
+    }
+
+    return kFabricAlpha;
+}
+
+CHIP_ERROR PersistentStorage::SetFabric(const char * fabricName)
+{
+    uint64_t fabricId = kFabricAlpha;
+
+    if (strcasecmp(fabricName, "alpha") == 0)
+    {
+        fabricId = kFabricAlpha;
+    }
+    else if (strcasecmp(fabricName, "beta") == 0)
+    {
+        fabricId = kFabricBeta;
+    }
+    else if (strcasecmp(fabricName, "gamma") == 0)
+    {
+        fabricId = kFabricGamma;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    fabricId = Encoding::LittleEndian::HostSwap64(fabricId);
+    return SyncSetKeyValue(kFabricIdKey, &fabricId, sizeof(fabricId));
 }

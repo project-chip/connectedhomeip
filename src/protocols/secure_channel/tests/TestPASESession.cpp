@@ -175,7 +175,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
         NL_TEST_ASSERT(inSuite, rc != nullptr);
 
         rc->SetConfig({
-            1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+            1, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
             1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
         });
         gLoopback.mContext = &ctx;
@@ -245,7 +245,7 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     rc->SetConfig({
-        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
         1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
     gLoopback.mContext = &ctx;

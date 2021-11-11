@@ -63,7 +63,7 @@ public:
     CHIP_ERROR StoreProductRevision(uint16_t productRev) override;
     CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev) override;
-    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen) override;
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
@@ -97,6 +97,12 @@ public:
     CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override;
     CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) override;
     CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb) override;
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    CHIP_ERROR GetBootReasons(uint32_t & bootReasons) override;
+    CHIP_ERROR StoreBootReasons(uint32_t bootReasons) override;
 #if !defined(NDEBUG)
     CHIP_ERROR RunUnitTests(void) override;
 #endif

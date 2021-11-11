@@ -42,14 +42,8 @@ public:
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
-    // LayerLwIP overrides.
-    CHIP_ERROR AddEventHandlerDelegate(EventHandlerDelegate & aDelegate);
-    CHIP_ERROR ScheduleLambdaBridge(const LambdaBridge & bridge) override;
-    CHIP_ERROR PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
-
 public:
     // Platform implementation.
-    CHIP_ERROR HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
     CHIP_ERROR HandlePlatformTimer(void);
 
 private:
@@ -59,7 +53,6 @@ private:
 
     Timer::MutexedList mTimerList;
     bool mHandlingTimerComplete; // true while handling any timer completion
-    const EventHandlerDelegate * mEventDelegateList;
     ObjectLifeCycle mLayerState;
 };
 

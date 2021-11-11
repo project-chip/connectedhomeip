@@ -139,6 +139,13 @@ public:
     }
 
     PeerId GetPeerId() const { return mOperationalId; }
+    PeerId GetPeerIdForNode(const NodeId node) const
+    {
+        PeerId peer = mOperationalId;
+        peer.SetNodeId(node);
+        return peer;
+    }
+
     FabricId GetFabricId() const { return mFabricId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
     uint16_t GetVendorId() const { return mVendorId; }

@@ -40,7 +40,7 @@ static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
  *   - PeerAddress represents how to talk to the peer
  *   - PeerNodeId is the unique ID of the peer
  *   - SendMessageIndex is an ever increasing index for sending messages
- *   - LastActivityTimeMs is a monotonic timestamp of when this connection was
+ *   - LastActivityTime is a monotonic timestamp of when this connection was
  *     last used. Inactive connections can expire.
  *   - CryptoContext contains the encryption context of a connection
  *
@@ -49,10 +49,12 @@ static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
 class SecureSession
 {
 public:
-    SecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric, uint64_t currentTime) :
-        mPeerNodeId(peerNodeId), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mFabric(fabric)
+    SecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric,
+                  System::Clock::Timestamp currentTime) :
+        mPeerNodeId(peerNodeId),
+        mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mFabric(fabric)
     {
-        SetLastActivityTimeMs(currentTime);
+        SetLastActivityTime(currentTime);
     }
 
     SecureSession(SecureSession &&)      = delete;
@@ -65,12 +67,25 @@ public:
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
+
+    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval)
+    {
+        idleInterval   = mMRPIdleInterval;
+        activeInterval = mMRPActiveInterval;
+    }
+
+    void SetMRPIntervals(uint32_t idleInterval, uint32_t activeInterval)
+    {
+        mMRPIdleInterval   = idleInterval;
+        mMRPActiveInterval = activeInterval;
+    }
+
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
 
-    uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
-    void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
+    System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
+    void SetLastActivityTime(System::Clock::Timestamp value) { mLastActivityTime = value; }
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
@@ -95,7 +110,9 @@ private:
     const FabricIndex mFabric;
 
     PeerAddress mPeerAddress;
-    uint64_t mLastActivityTimeMs = 0;
+    System::Clock::Timestamp mLastActivityTime = System::Clock::kZero;
+    uint32_t mMRPIdleInterval                  = 0;
+    uint32_t mMRPActiveInterval                = 0;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
 };

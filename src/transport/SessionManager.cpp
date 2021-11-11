@@ -284,6 +284,8 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    session->SetMRPIntervals(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL, CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
+
     ReturnErrorOnFailure(pairing->DeriveSecureSession(session->GetCryptoContext(), direction));
 
     if (mCB != nullptr)
@@ -459,57 +461,62 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
     SessionManagerDelegate::DuplicateMessage isDuplicate = SessionManagerDelegate::DuplicateMessage::No;
+    FabricIndex fabricIndex = 0; // TODO : remove initialization once GroupDataProvider->Decrypt is implemented
     // Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
-    // MCSP check
-    if (packetHeader.IsSecureSessionControlMsg())
+    // Check if Message Header is valid first
+    if (!(packetHeader.IsValidMCSPMsg() || packetHeader.IsValidGroupMsg()))
     {
-        if (packetHeader.GetDestinationNodeId().HasValue() && packetHeader.HasPrivacyFlag())
-        {
-            // TODO
-            // if (packetHeader.GetDestinationNodeId().Value() == ThisDeviceNodeID)
-            // {
-            //     MCSP processing..
-            // }
-        }
-        else
-        {
-            ChipLogError(Inet, "Invalid condition found in packet header");
-            ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
-        }
+        ChipLogError(Inet, "Invalid condition found in packet header");
+        ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    // Trial decryption with GroupDataProvider. TODO: Implement the GroupDataProvider Class
+    // TODO retrieve also the fabricIndex with the GroupDataProvider.
+    // VerifyOrExit(CHIP_NO_ERROR == groups->DecryptMessage(packetHeader, payloadHeader, msg),
+    //     ChipLogError(Inet, "Secure transport received group message, but failed to decode it, discarding"));
+
+    // MCSP check
+    if (packetHeader.IsValidMCSPMsg())
+    {
+        // TODO
+        // if (packetHeader.GetDestinationNodeId().Value() == ThisDeviceNodeID)
+        // {
+        //     MCSP processing..
+        // }
+
+        ExitNow(err = CHIP_NO_ERROR);
+    }
+
+    // Group Messages should never send an Ack
+    if (payloadHeader.NeedsAck())
+    {
+        ChipLogError(Inet, "Unexpected ACK requested for group message");
+        ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
     }
 
     // TODO: Handle Group message counter here spec 4.7.3
     // spec 4.5.1.2 for msg counter
 
-    // Trial decryption with GroupDataProvider. TODO: Implement the GroupDataProvider Class
-    // VerifyOrExit(CHIP_NO_ERROR == groups->DecryptMessage(packetHeader, payloadHeader, msg),
-    //     ChipLogError(Inet, "Secure transport received group message, but failed to decode it, discarding"));
-
-    if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
+    if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes)
     {
         ChipLogDetail(Inet,
                       "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
                       " on exchange " ChipLogFormatExchangeId,
                       packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
-        if (!payloadHeader.NeedsAck())
-        {
-            // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
-            // cycles on further message processing.
-            ExitNow(err = CHIP_NO_ERROR);
-        }
+
+        // If it's a duplicate message, let's drop it right here to save CPU cycles
+        ExitNow(err = CHIP_NO_ERROR);
     }
 
     // TODO: Commit Group Message Counter
 
     if (mCB != nullptr)
     {
-        // TODO: Update Session Handle for Group messages.
-        // SessionHandle session(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(),
-        //                       session->GetFabricIndex());
-        // mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, isDuplicate, std::move(msg));
+        SessionHandle session(packetHeader.GetSourceNodeId().Value(), packetHeader.GetDestinationGroupId().Value(), fabricIndex);
+        mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, isDuplicate, std::move(msg));
     }
 
 exit:

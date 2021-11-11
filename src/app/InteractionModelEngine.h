@@ -40,6 +40,7 @@
 
 #include <app/ClusterInfo.h>
 #include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
@@ -187,19 +188,24 @@ public:
     bool MergeOverlappedAttributePath(ClusterInfo * apAttributePathList, ClusterInfo & aAttributePath);
     bool IsOverlappedAttributePath(ClusterInfo & aAttributePath);
 
+    CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
+    CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
+    CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
+    void UnregisterCommandHandlers(EndpointId endpointId);
+
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
 
-    void OnDone(CommandHandler * apCommandObj);
+    void OnDone(CommandHandler & apCommandObj) override;
 
     CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                 System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                       System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                 System::PacketBufferHandle && aPayload);
-    void OnResponseTimeout(Messaging::ExchangeContext * ec);
+                                 System::PacketBufferHandle && aPayload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
@@ -222,8 +228,14 @@ private:
     CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                        System::PacketBufferHandle && aPayload);
 
+    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+                         TLV::TLVReader & apPayload) override;
+    bool CommandExists(const ConcreteCommandPath & aCommandPath) override;
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
+
+    CommandHandlerInterface * mCommandHandlerList = nullptr;
 
     // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
     // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.
@@ -255,26 +267,23 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
 bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
 
 /**
- *  Fetch attribute value and version info and write to the TLVWriter provided.
+ *  Fetch attribute value and version info and write to the AttributeReport provided.
  *  When the endpoint / cluster / attribute / event data specified by aClusterInfo does not exist, corresponding interaction model
- * error code will be put into the writer, and CHIP_NO_ERROR will be returned and apDataExists will be set to false.
- *  If the data exists on the server, the data (with tag kCsTag_Data) and the data version (with tag kCsTag_DataVersion) will be put
- * into the TLVWriter and apDataExists will be set to true. TLVWriter error will be returned if any error occurred during encoding
+ * error code will be put into the writer, and CHIP_NO_ERROR will be returned.
+ *  If the data exists on the server, the data (with tag kData) and the data version (with tag kDataVersion) will be put
+ * into the TLVWriter. TLVWriter error will be returned if any error occurred during encoding
  * these values.
  *  This function is implemented by CHIP as a part of cluster data storage & management.
  * The apWriter and apDataExists can be nullptr.
  *
  *  @param[in]    aAccessingFabricIndex The accessing fabric index for the read.
  *  @param[in]    aPath             The concrete path of the data being read.
- *  @param[in]    apWriter          The TLVWriter for holding cluster data. Can be a nullptr if the caller does not care
- *                                  the exact value of the attribute.
- *  @param[out]   apDataExists      Tell whether the cluster data exist on server. Can be a nullptr if the caller does not care
- *                                  whether the data exists.
+ *  @param[in]    aAttributeReport  The TLV Builder for Cluter attribute builder.
  *
  *  @retval  CHIP_NO_ERROR on success
  */
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
-                                 bool * apDataExists);
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+                                 AttributeReportIB::Builder & aAttributeReport);
 
 /**
  * TODO: Document.

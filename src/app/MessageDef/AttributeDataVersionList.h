@@ -25,7 +25,7 @@
 
 #include "ArrayBuilder.h"
 #include "ArrayParser.h"
-#include "AttributeDataElement.h"
+#include "AttributeDataIB.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -107,7 +107,7 @@ public:
     AttributeDataVersionList::Builder & EndOfAttributeDataVersionList();
 
 private:
-    AttributeDataElement::Builder mAttributeDataElementBuilder;
+    AttributeDataIB::Builder mAttributeDataIBBuilder;
 };
 }; // namespace AttributeDataVersionList
 }; // namespace app

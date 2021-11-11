@@ -232,9 +232,7 @@ void MatterOperationalCredentialsPluginServerInitCallback(void)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.");
 
-#if CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
     registerAttributeAccessOverride(&gAttrAccess);
-#endif
 
     Server::GetInstance().GetFabricTable().SetFabricDelegate(&gFabricDelegate);
 }
