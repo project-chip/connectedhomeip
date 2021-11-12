@@ -12098,8 +12098,8 @@ public class ClusterInfoMapping {
     // read attribute
     Map<String, CommandParameterInfo> readSoftwareDiagnosticsThreadMetricsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandInfo readSoftwareDiagnosticsThreadMetricsAttributeCommandInfo =
-        new CommandInfo(
+    InteractionInfo readSoftwareDiagnosticsThreadMetricsAttributeInteractionInfo =
+        new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.SoftwareDiagnosticsCluster) cluster)
                   .readThreadMetricsAttribute(
@@ -12108,8 +12108,8 @@ public class ClusterInfoMapping {
             },
             () -> new DelegatedThreadMetricsAttributeCallback(),
             readSoftwareDiagnosticsThreadMetricsCommandParams);
-    readSoftwareDiagnosticsCommandInfo.put(
-        "readThreadMetricsAttribute", readSoftwareDiagnosticsThreadMetricsAttributeCommandInfo);
+    readSoftwareDiagnosticsInteractionInfo.put(
+        "readThreadMetricsAttribute", readSoftwareDiagnosticsThreadMetricsAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readSoftwareDiagnosticsCurrentHeapFreeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readSoftwareDiagnosticsCurrentHeapFreeAttributeInteractionInfo =
