@@ -110,7 +110,7 @@ void UdpReceiver(void * pvParameters)
                 continue;
 
             n = recvfrom(sockfd, buf, kUdpBufferSize, 0, reinterpret_cast<struct sockaddr *>(&clientaddr),
-                         reinterpret_cast<socklen_t*>(&clientlen));
+                         reinterpret_cast<socklen_t *>(&clientlen));
             if (n < 0)
                 continue;
             // Echo back
