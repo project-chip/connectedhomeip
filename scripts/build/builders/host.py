@@ -151,9 +151,9 @@ class HostBuilder(GnBuilder):
             if os.path.isdir(path):
                 for root, dirs, files in os.walk(path):
                     for file in files:
-                       outputs.update({
-                           file: os.path.join(root, file)
-                       })
+                        outputs.update({
+                            file: os.path.join(root, file)
+                        })
             else:
                 outputs.update({
                     name: os.path.join(self.output_dir, name)
