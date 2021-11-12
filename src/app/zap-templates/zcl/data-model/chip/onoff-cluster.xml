@@ -76,19 +76,16 @@ limitations under the License.
 
     <command source="client" code="0x00" name="Off" optional="false">
       <description>On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0.</description>
-      <access op="invoke" privilege="view"/>
       <access op="invoke" privilege="operate"/>
     </command>
 
     <command source="client" code="0x01" name="On" optional="false">
       <description>On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0.</description>
-      <access op="invoke" privilege="view"/>
       <access op="invoke" privilege="operate"/>
     </command>
 
     <command source="client" code="0x02" name="Toggle" optional="false">
       <description>On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0.</description>
-      <access op="invoke" privilege="view"/>
       <access op="invoke" privilege="operate"/>
     </command>
 
@@ -96,13 +93,11 @@ limitations under the License.
       <description>The OffWithEffect command allows devices to be turned off using enhanced ways of fading.</description>
       <arg name="EffectId" type="OnOffEffectIdentifier"/>
       <arg name="EffectVariant" type="OnOffDelayedAllOffEffectVariant"/>
-      <access op="invoke" privilege="view"/>
       <access op="invoke" privilege="operate"/>
     </command>
 
     <command source="client" code="0x41" name="OnWithRecallGlobalScene" optional="true">
       <description>The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off.</description>
-      <access op="invoke" privilege="view"/>
       <access op="invoke" privilege="operate"/>
     </command>
 
@@ -111,7 +106,6 @@ limitations under the License.
       <arg name="OnOffControl" type="OnOffControl"/>
       <arg name="OnTime" type="int16u"/><!-- min:0 max:0xfe -->
       <arg name="OffWaitTime" type="int16u"/><!-- min:0 max:0xfe -->
-      <access op="invoke" privilege="view"/>
       <access op="invoke" privilege="operate"/>
     </command>
 
