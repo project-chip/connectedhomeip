@@ -42,6 +42,12 @@ TestCommand * GetTargetTest()
         return nullptr;
     }
 
+    const char * PICSFilePath = LinuxDeviceOptions::GetInstance().PICS;
+    if (PICSFilePath != nullptr)
+    {
+        test->PICS.SetValue(PICSBooleanReader::Read(PICSFilePath));
+    }
+
     return test.get();
 }
 

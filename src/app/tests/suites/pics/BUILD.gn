@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: PICS Items
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
-PICS:
-    - label: "Does the device support discovery over Bluetooth Low Power (BLE)"
-      id: BLE
+static_library("pics") {
+  output_name = "libPICS"
 
-    - label: "Does the device support discovery over WiFi?"
-      id: WIFI
+  sources = [
+    "PICSBooleanExpressionParser.cpp",
+    "PICSBooleanExpressionParser.h",
+    "PICSBooleanReader.cpp",
+    "PICSBooleanReader.h",
+  ]
 
-    - label: "Does the device support manufacturing date"
-      id: MANF_DATE
+  cflags = [ "-Wconversion" ]
 
-    - label: "Does the device support part number"
-      id: PART_NUM
-
-    - label: "Does the device support Intermediate CA Certificate"
-      id: DM_ICACERT
+  public_deps = [ "${chip_root}/src/lib/support" ]
+}
