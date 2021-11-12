@@ -13957,6 +13957,1140 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_TSTAT_2_2_000000_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:
+                  @"Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies that the value is within range"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOccupiedCoolingSetpointWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(
+            @"Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies that the value is within range Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] shortValue], 2600);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000001_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes a value back that is different but valid for OccupiedCoolingSetpoint attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedCoolingSetpointArgument = 2000;
+    [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Writes a value back that is different but valid for "
+                                                      @"OccupiedCoolingSetpoint attribute Error: %@",
+                                                    err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self
+        expectationWithDescription:@"Reads it back again to confirm the successful write of OccupiedCoolingSetpoint attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOccupiedCoolingSetpointWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads it back again to confirm the successful write of OccupiedCoolingSetpoint attribute Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] shortValue], 2000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000003_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedCoolingSetpointArgument = 1600;
+    [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint "
+                                                      @"attribute Error: %@",
+                                                    err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000004_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedCoolingSetpointArgument = 2600;
+    [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint "
+                                                      @"attribute Error: %@",
+                                                    err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000005_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:
+                  @"Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies that the value is within range"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOccupiedHeatingSetpointWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(
+            @"Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies that the value is within range Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] shortValue], 2000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000006_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes a value back that is different but valid for OccupiedHeatingSetpoint attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedHeatingSetpointArgument = 2100;
+    [cluster writeAttributeOccupiedHeatingSetpointWithValue:occupiedHeatingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Writes a value back that is different but valid for "
+                                                      @"OccupiedHeatingSetpoint attribute Error: %@",
+                                                    err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000007_ReadAttribute
+{
+    XCTestExpectation * expectation = [self
+        expectationWithDescription:@"Reads it back again to confirm the successful write of OccupiedHeatingSetpoint attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOccupiedHeatingSetpointWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads it back again to confirm the successful write of OccupiedHeatingSetpoint attribute Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] shortValue], 2100);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000008_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedHeatingSetpointArgument = 700;
+    [cluster writeAttributeOccupiedHeatingSetpointWithValue:occupiedHeatingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint "
+                                                      @"attribute Error: %@",
+                                                    err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000009_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedHeatingSetpointArgument = 3000;
+    [cluster writeAttributeOccupiedHeatingSetpointWithValue:occupiedHeatingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint "
+                                                      @"attribute Error: %@",
+                                                    err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000010_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:
+                  @"Reads MinHeatSetpointLimit attribute from Server DUT and verifies that the value is within range"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMinHeatSetpointLimitWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads MinHeatSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] shortValue], 700);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000011_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes a value back that is different but valid for MinHeatSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t minHeatSetpointLimitArgument = 2000;
+    [cluster writeAttributeMinHeatSetpointLimitWithValue:minHeatSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes a value back that is different but valid for MinHeatSetpointLimit "
+                                                   @"attribute Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000012_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Reads it back again to confirm the successful write of MinHeatSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMinHeatSetpointLimitWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads it back again to confirm the successful write of MinHeatSetpointLimit attribute Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] shortValue], 2000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000013_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t minHeatSetpointLimitArgument = 700;
+    [cluster writeAttributeMinHeatSetpointLimitWithValue:minHeatSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit attribute "
+                                                   @"Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000014_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t minHeatSetpointLimitArgument = 3000;
+    [cluster writeAttributeMinHeatSetpointLimitWithValue:minHeatSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit attribute "
+                                                   @"Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000015_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:
+                  @"Reads MaxHeatSetpointLimit attribute from Server DUT and verifies that the value is within range"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMaxHeatSetpointLimitWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads MaxHeatSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] shortValue], 3000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000016_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes a value back that is different but valid for MaxHeatSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t maxHeatSetpointLimitArgument = 2000;
+    [cluster writeAttributeMaxHeatSetpointLimitWithValue:maxHeatSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes a value back that is different but valid for MaxHeatSetpointLimit "
+                                                   @"attribute Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000017_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Reads it back again to confirm the successful write of MaxHeatSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMaxHeatSetpointLimitWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads it back again to confirm the successful write of MaxHeatSetpointLimit attribute Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] shortValue], 2000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000018_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes the limit of AbsMinHeatSetpointLimit to MaxHeatSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t maxHeatSetpointLimitArgument = 700;
+    [cluster writeAttributeMaxHeatSetpointLimitWithValue:maxHeatSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes the limit of AbsMinHeatSetpointLimit to MaxHeatSetpointLimit attribute "
+                                                   @"Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000019_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t maxHeatSetpointLimitArgument = 3000;
+    [cluster writeAttributeMaxHeatSetpointLimitWithValue:maxHeatSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit attribute "
+                                                   @"Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000020_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:
+                  @"Reads MinCoolSetpointLimit attribute from Server DUT and verifies that the value is within range"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMinCoolSetpointLimitWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads MinCoolSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] shortValue], 1600);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000021_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes a value back that is different but valid for MinCoolSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t minCoolSetpointLimitArgument = 2000;
+    [cluster writeAttributeMinCoolSetpointLimitWithValue:minCoolSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes a value back that is different but valid for MinCoolSetpointLimit "
+                                                   @"attribute Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000022_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Reads it back again to confirm the successful write of MinCoolSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMinCoolSetpointLimitWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads it back again to confirm the successful write of MinCoolSetpointLimit attribute Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] shortValue], 2000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000023_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t minCoolSetpointLimitArgument = 1600;
+    [cluster writeAttributeMinCoolSetpointLimitWithValue:minCoolSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit attribute "
+                                                   @"Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000024_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t minCoolSetpointLimitArgument = 3200;
+    [cluster
+        writeAttributeMinCoolSetpointLimitWithValue:minCoolSetpointLimitArgument
+                                    responseHandler:^(NSError * err, NSDictionary * values) {
+                                        NSLog(
+                                            @"Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute Error: %@",
+                                            err);
+
+                                        XCTAssertEqual(err.code, 0);
+
+                                        [expectation fulfill];
+                                    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000025_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:
+                  @"Reads MaxCoolSetpointLimit attribute from Server DUT and verifies that the value is within range"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMaxCoolSetpointLimitWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads MaxCoolSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] shortValue], 3200);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000026_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes a value back that is different but valid for MaxCoolSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t maxCoolSetpointLimitArgument = 2000;
+    [cluster writeAttributeMaxCoolSetpointLimitWithValue:maxCoolSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes a value back that is different but valid for MaxCoolSetpointLimit "
+                                                   @"attribute Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000027_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Reads it back again to confirm the successful write of MaxCoolSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMaxCoolSetpointLimitWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads it back again to confirm the successful write of MaxCoolSetpointLimit attribute Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] shortValue], 2000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000028_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t maxCoolSetpointLimitArgument = 1600;
+    [cluster writeAttributeMaxCoolSetpointLimitWithValue:maxCoolSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit attribute "
+                                                   @"Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000029_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t maxCoolSetpointLimitArgument = 3200;
+    [cluster
+        writeAttributeMaxCoolSetpointLimitWithValue:maxCoolSetpointLimitArgument
+                                    responseHandler:^(NSError * err, NSDictionary * values) {
+                                        NSLog(
+                                            @"Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute Error: %@",
+                                            err);
+
+                                        XCTAssertEqual(err.code, 0);
+
+                                        [expectation fulfill];
+                                    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000030_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes (sets back) the limit of MinHeatSetpointLimit to MinHeatSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t minHeatSetpointLimitArgument = 700;
+    [cluster writeAttributeMinHeatSetpointLimitWithValue:minHeatSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes (sets back) the limit of MinHeatSetpointLimit to MinHeatSetpointLimit "
+                                                   @"attribute Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000031_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes (sets back) the limit of MaxHeatSetpointLimit to MinHeatSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t minHeatSetpointLimitArgument = 3000;
+    [cluster writeAttributeMinHeatSetpointLimitWithValue:minHeatSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes (sets back) the limit of MaxHeatSetpointLimit to MinHeatSetpointLimit "
+                                                   @"attribute Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000032_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes (sets back) the limit of MinHeatSetpointLimit to MaxHeatSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t maxHeatSetpointLimitArgument = 700;
+    [cluster writeAttributeMaxHeatSetpointLimitWithValue:maxHeatSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes (sets back) the limit of MinHeatSetpointLimit to MaxHeatSetpointLimit "
+                                                   @"attribute Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000033_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes (sets back) the limit of MaxHeatSetpointLimit to MaxHeatSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t maxHeatSetpointLimitArgument = 3000;
+    [cluster writeAttributeMaxHeatSetpointLimitWithValue:maxHeatSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes (sets back) the limit of MaxHeatSetpointLimit to MaxHeatSetpointLimit "
+                                                   @"attribute Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000034_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes (sets back) the limit of MinCoolSetpointLimit to MinCoolSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t minCoolSetpointLimitArgument = 1600;
+    [cluster writeAttributeMinCoolSetpointLimitWithValue:minCoolSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes (sets back) the limit of MinCoolSetpointLimit to MinCoolSetpointLimit "
+                                                   @"attribute Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000035_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes (sets back) the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t minCoolSetpointLimitArgument = 3200;
+    [cluster writeAttributeMinCoolSetpointLimitWithValue:minCoolSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes (sets back) the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit "
+                                                   @"attribute Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000036_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes (sets back) the limit of MinCoolSetpointLimit to MaxCoolSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t maxCoolSetpointLimitArgument = 1600;
+    [cluster writeAttributeMaxCoolSetpointLimitWithValue:maxCoolSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes (sets back) the limit of MinCoolSetpointLimit to MaxCoolSetpointLimit "
+                                                   @"attribute Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000037_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Writes (sets back) the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t maxCoolSetpointLimitArgument = 3200;
+    [cluster writeAttributeMaxCoolSetpointLimitWithValue:maxCoolSetpointLimitArgument
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Writes (sets back) the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit "
+                                                   @"attribute Error: %@",
+                                                 err);
+
+                                             XCTAssertEqual(err.code, 0);
+
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000038_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Reads ControlSequenceOfOperation from Server DUT and verifies that the value is valid"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeControlSequenceOfOperationWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads ControlSequenceOfOperation from Server DUT and verifies that the value is valid Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 4);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000039_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write Attribute command for ControlSequenceOfOperation with a new valid value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t controlSequenceOfOperationArgument = 2;
+    [cluster writeAttributeControlSequenceOfOperationWithValue:controlSequenceOfOperationArgument
+                                               responseHandler:^(NSError * err, NSDictionary * values) {
+                                                   NSLog(@"Write Attribute command for ControlSequenceOfOperation with a new valid "
+                                                         @"value Error: %@",
+                                                       err);
+
+                                                   XCTAssertEqual(err.code, 0);
+
+                                                   [expectation fulfill];
+                                               }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000040_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read it back again to confirm the successful write"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeControlSequenceOfOperationWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read it back again to confirm the successful write Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 2);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000041_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sets OccupiedHeatingSetpoint to default value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedHeatingSetpointArgument = 2000;
+    [cluster writeAttributeOccupiedHeatingSetpointWithValue:occupiedHeatingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Sets OccupiedHeatingSetpoint to default value Error: %@", err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000042_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sets OccupiedHeatingSetpoint to default value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedHeatingSetpointArgument = 2000;
+    [cluster writeAttributeOccupiedHeatingSetpointWithValue:occupiedHeatingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Sets OccupiedHeatingSetpoint to default value Error: %@", err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000043_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sets OccupiedCoolingSetpoint to default value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedCoolingSetpointArgument = 2600;
+    [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000044_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sets OccupiedCoolingSetpoint to default value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedCoolingSetpointArgument = 2600;
+    [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000045_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sets OccupiedCoolingSetpoint to default value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedCoolingSetpointArgument = 2600;
+    [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000046_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sets OccupiedHeatingSetpoint to default value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedHeatingSetpointArgument = 2000;
+    [cluster writeAttributeOccupiedHeatingSetpointWithValue:occupiedHeatingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Sets OccupiedHeatingSetpoint to default value Error: %@", err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000047_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sets OccupiedCoolingSetpoint to default value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedCoolingSetpointArgument = 2600;
+    [cluster writeAttributeOccupiedCoolingSetpointWithValue:occupiedCoolingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_2_2_000048_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sets OccupiedHeatingSetpoint to default value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    int16_t occupiedHeatingSetpointArgument = 2000;
+    [cluster writeAttributeOccupiedHeatingSetpointWithValue:occupiedHeatingSetpointArgument
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Sets OccupiedHeatingSetpoint to default value Error: %@", err);
+
+                                                XCTAssertEqual(err.code, 0);
+
+                                                [expectation fulfill];
+                                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTest_TC_TSUIC_1_1_000000_WriteAttribute
 {
     XCTestExpectation * expectation =
@@ -14942,6 +16076,210 @@ CHIPDevice * GetConnectedDevice()
         XCTAssertEqual(err.code, 0);
 
         XCTAssertEqual([values[@"value"] unsignedCharValue], 7);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_WNCV_2_3_000000_UpOrOpen
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"sends UpOrOpen command to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster upOrOpen:^(NSError * err, NSDictionary * values) {
+        NSLog(@"sends UpOrOpen command to DUT Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_3_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads OperationalStatus"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads OperationalStatus Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 9);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_3_000002_StopMotion
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"sends StopMotion command to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster stopMotion:^(NSError * err, NSDictionary * values) {
+        NSLog(@"sends StopMotion command to DUT Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_3_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads OperationalStatus"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads OperationalStatus Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 9);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_3_000004_DownOrClose
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"sends DownOrClose command to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster downOrClose:^(NSError * err, NSDictionary * values) {
+        NSLog(@"sends DownOrClose command to DUT Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_3_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads OperationalStatus"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads OperationalStatus Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 9);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_3_000006_StopMotion
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"sends StopMotion command to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster stopMotion:^(NSError * err, NSDictionary * values) {
+        NSLog(@"sends StopMotion command to DUT Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_3_000007_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads OperationalStatus"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads OperationalStatus Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 9);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_WNCV_2_4_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads Type attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads Type attribute from DUT Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_4_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads Type attribute constraints"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads Type attribute constraints Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 9);
 
         [expectation fulfill];
     }];
