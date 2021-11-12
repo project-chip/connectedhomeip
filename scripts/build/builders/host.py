@@ -25,6 +25,7 @@ class HostApp(Enum):
     CHIP_TOOL = auto()
     THERMOSTAT = auto()
     RPC_CONSOLE = auto()
+    MIN_MDNS = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -35,6 +36,8 @@ class HostApp(Enum):
             return 'thermostat/linux'
         elif self == HostApp.RPC_CONSOLE:
             return 'common/pigweed/rpc_console'
+        if self == HostApp.MIN_MDNS:
+            return 'minimal-mdns'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -47,6 +50,8 @@ class HostApp(Enum):
             return 'thermostat-app'
         elif self == HostApp.RPC_CONSOLE:
             return 'rpc-console'
+        elif self == HostApp.MIN_MDNS:
+            return 'FIXME' # FIXME: multiple names?
         else:
             raise Exception('Unknown app type: %r' % self)
 
