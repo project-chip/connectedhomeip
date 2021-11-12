@@ -8,6 +8,8 @@
 #import "CHIPClustersObjc_internal.h"
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
+#import "CHIPStructsObjc.h"
+#import "CHIPCommandPayloadsObjc.h"
 
 #include <set>
 #include <type_traits>
@@ -63,16 +65,12 @@ struct ListFreer {
 
 {{#chip_cluster_commands}}
 {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}DefaultSuccess{{/if}}{{/inline}}
-{{#if (zcl_command_arguments_count this.id)}}
-- (void){{asLowerCamelCase name}}:{{#chip_cluster_command_arguments_with_structs_expanded}}{{#not_first}}{{asLowerCamelCase label}}:{{/not_first}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_cluster_command_arguments_with_structs_expanded}}responseHandler:(ResponseHandler)responseHandler
-{{else}}
-- (void){{asLowerCamelCase name}}:(ResponseHandler)responseHandler
-{{/if}}
+- (void){{asLowerCamelCase name}}:(CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Payload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
     ListFreer listFreer;
     {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
     {{#chip_cluster_command_arguments}}
-    {{>encode_value target=(concat "request ." (asLowerCamelCase label)) source=(asLowerCamelCase label) cluster=parent.parent.name}}
+    {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "payload." (asUpperCamelCase label)) cluster=parent.parent.name}}
     {{/chip_cluster_command_arguments}}
 
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
