@@ -16,31 +16,30 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *     This file contains the constants for the mocked attribute-storage.cpp
+ */
+
 #pragma once
 
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
-namespace app {
+namespace Test {
+constexpr EndpointId kMockEndpoint1 = 0xFFFE;
+constexpr EndpointId kMockEndpoint2 = 0xFFFD;
+constexpr EndpointId kMockEndpoint3 = 0xFFFC;
 
-/**
- * A representation of a concrete attribute path.
- */
-struct ConcreteAttributePath
+constexpr AttributeId MockAttributeId(const uint16_t & id)
 {
-    ConcreteAttributePath() {}
-    ConcreteAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mAttributeId(aAttributeId)
-    {}
+    return (0xFFF1'0000 | id);
+}
 
-    bool operator==(const ConcreteAttributePath & other) const
-    {
-        return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mAttributeId == other.mAttributeId;
-    }
+constexpr AttributeId MockClusterId(const uint16_t & id)
+{
+    return (0xFFF1'0000 | id);
+}
 
-    EndpointId mEndpointId   = 0;
-    ClusterId mClusterId     = 0;
-    AttributeId mAttributeId = 0;
-};
-} // namespace app
+} // namespace Test
 } // namespace chip
