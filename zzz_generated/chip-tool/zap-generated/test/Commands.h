@@ -28718,7 +28718,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         ChipLogError(chipTool, "Using endpoint: %u", endpoint);
-        using RequestType               = chip::app::Clusters::TestCluster::Commands::Test::Type;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::Test::Type;
 
         RequestType request;
 
