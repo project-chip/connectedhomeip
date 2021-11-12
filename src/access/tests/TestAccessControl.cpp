@@ -197,25 +197,25 @@ struct EntryData
 
 CHIP_ERROR CompareEntry(const Entry & entry, const EntryData & entryData)
 {
-    AuthMode authMode;
+    AuthMode authMode = AuthMode::kNone;
     ReturnErrorOnFailure(entry.GetAuthMode(authMode));
     ReturnErrorCodeIf(authMode != entryData.authMode, CHIP_ERROR_INCORRECT_STATE);
-    FabricIndex fabricIndex;
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
     ReturnErrorOnFailure(entry.GetFabricIndex(fabricIndex));
     ReturnErrorCodeIf(fabricIndex != entryData.fabricIndex, CHIP_ERROR_INCORRECT_STATE);
-    Privilege privilege;
+    Privilege privilege = Privilege::kView;
     ReturnErrorOnFailure(entry.GetPrivilege(privilege));
     ReturnErrorCodeIf(privilege != entryData.privilege, CHIP_ERROR_INCORRECT_STATE);
-    size_t subjectCount;
+    size_t subjectCount = 0;
     ReturnErrorOnFailure(entry.GetSubjectCount(subjectCount));
     ReturnErrorCodeIf(subjectCount != entryData.GetSubjectCount(), CHIP_ERROR_INCORRECT_STATE);
     for (size_t i = 0; i < subjectCount; ++i)
     {
-        NodeId subject;
+        NodeId subject = kUndefinedNodeId;
         ReturnErrorOnFailure(entry.GetSubject(i, subject));
         ReturnErrorCodeIf(subject != entryData.subjects[i], CHIP_ERROR_INCORRECT_STATE);
     }
-    size_t targetCount;
+    size_t targetCount = 0;
     ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
     ReturnErrorCodeIf(targetCount != entryData.GetTargetCount(), CHIP_ERROR_INCORRECT_STATE);
     for (size_t i = 0; i < targetCount; ++i)

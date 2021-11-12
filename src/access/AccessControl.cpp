@@ -89,28 +89,28 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     Entry entry;
     while (iterator.Next(entry) == CHIP_NO_ERROR)
     {
-        AuthMode authMode;
+        AuthMode authMode = AuthMode::kNone;
         ReturnErrorOnFailure(entry.GetAuthMode(authMode));
         if (authMode != subjectDescriptor.authMode)
         {
             continue;
         }
 
-        Privilege privilege;
+        Privilege privilege = Privilege::kView;
         ReturnErrorOnFailure(entry.GetPrivilege(privilege));
         if (!CheckRequestPrivilegeAgainstEntryPrivilege(requestPrivilege, privilege))
         {
             continue;
         }
 
-        size_t subjectCount;
+        size_t subjectCount = 0;
         ReturnErrorOnFailure(entry.GetSubjectCount(subjectCount));
         if (subjectCount > 0)
         {
             bool subjectMatched = false;
-            NodeId subject;
             for (size_t i = 0; i < subjectCount; ++i)
             {
+                NodeId subject = kUndefinedNodeId;
                 ReturnErrorOnFailure(entry.GetSubject(i, subject));
                 if (subject == subjectDescriptor.subjects[0])
                 {
@@ -125,14 +125,14 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
             }
         }
 
-        size_t targetCount;
+        size_t targetCount = 0;
         ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
         if (targetCount > 0)
         {
             bool targetMatched = false;
-            Entry::Target target;
             for (size_t i = 0; i < targetCount; ++i)
             {
+                Entry::Target target;
                 ReturnErrorOnFailure(entry.GetTarget(i, target));
                 if ((target.flags & Entry::Target::kCluster) && target.cluster != requestPath.cluster)
                 {
@@ -152,20 +152,17 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
             }
         }
 
+        // Entry passed all checks: access is allowed.
         return CHIP_NO_ERROR;
     }
 
+    // No entry was found which passed all checks: access is denied.
     return CHIP_ERROR_ACCESS_DENIED;
 }
 
 AccessControl & GetAccessControl()
 {
     return *globalAccessControl;
-}
-
-void ResetAccessControl()
-{
-    globalAccessControl = &defaultAccessControl;
 }
 
 void SetAccessControl(AccessControl & accessControl)

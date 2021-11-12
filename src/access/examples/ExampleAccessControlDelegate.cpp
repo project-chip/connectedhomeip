@@ -327,8 +327,8 @@ class EntryStorage
 {
 public:
     // ACL support
-    static constexpr int kNumberOfFabrics  = CHIP_CONFIG_MAX_DEVICE_ADMINS;
-    static constexpr int kEntriesPerFabric = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
+    static constexpr size_t kNumberOfFabrics  = CHIP_CONFIG_MAX_DEVICE_ADMINS;
+    static constexpr size_t kEntriesPerFabric = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
     static EntryStorage acl[kNumberOfFabrics * kEntriesPerFabric];
 
     // Find the next unused entry storage in the access control list, if one exists.
@@ -609,7 +609,7 @@ public:
     CHIP_ERROR AddSubject(size_t * index, NodeId subject) override
     {
         ReturnErrorOnFailure(EnsureStorageInPool());
-        size_t count;
+        size_t count = 0;
         GetSubjectCount(count);
         if (count < EntryStorage::kMaxSubjects)
         {
@@ -626,7 +626,7 @@ public:
     CHIP_ERROR RemoveSubject(size_t index) override
     {
         ReturnErrorOnFailure(EnsureStorageInPool());
-        size_t count;
+        size_t count = 0;
         GetSubjectCount(count);
         if (index < count)
         {
@@ -682,7 +682,7 @@ public:
     CHIP_ERROR AddTarget(size_t * index, const Target & target) override
     {
         ReturnErrorOnFailure(EnsureStorageInPool());
-        size_t count;
+        size_t count = 0;
         GetTargetCount(count);
         if (count < EntryStorage::kMaxTargets)
         {
@@ -699,7 +699,7 @@ public:
     CHIP_ERROR RemoveTarget(size_t index) override
     {
         ReturnErrorOnFailure(EnsureStorageInPool());
-        size_t count;
+        size_t count = 0;
         GetTargetCount(count);
         if (index < count)
         {
@@ -889,29 +889,29 @@ CHIP_ERROR CopyViaInterface(const Entry & entry, EntryStorage & storage)
     EntryStorage temp;
     temp.Clear();
 
-    FabricIndex fabricIndex;
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
     ReturnErrorOnFailure(entry.GetFabricIndex(fabricIndex));
     temp.mFabricIndex = fabricIndex;
 
-    AuthMode authMode;
+    AuthMode authMode = AuthMode::kNone;
     ReturnErrorOnFailure(entry.GetAuthMode(authMode));
     temp.mAuthMode = authMode;
 
-    Privilege privilege;
+    Privilege privilege = Privilege::kView;
     ReturnErrorOnFailure(entry.GetPrivilege(privilege));
     temp.mPrivilege = privilege;
 
-    size_t subjectCount;
+    size_t subjectCount = 0;
     ReturnErrorOnFailure(entry.GetSubjectCount(subjectCount));
     ReturnErrorCodeIf(subjectCount > EntryStorage::kMaxSubjects, CHIP_ERROR_BUFFER_TOO_SMALL);
     for (size_t i = 0; i < subjectCount; ++i)
     {
-        NodeId subject;
+        NodeId subject = kUndefinedNodeId;
         ReturnErrorOnFailure(entry.GetSubject(i, subject));
         temp.mSubjects[i].Add(subject);
     }
 
-    size_t targetCount;
+    size_t targetCount = 0;
     ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
     ReturnErrorCodeIf(targetCount > EntryStorage::kMaxTargets, CHIP_ERROR_BUFFER_TOO_SMALL);
     for (size_t i = 0; i < targetCount; ++i)
