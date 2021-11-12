@@ -12218,11 +12218,11 @@ public:
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : Query ManufacturingDate\n");
-            err = TestQueryManufacturingDate_11();
+            err = ShouldSkip("MANF_DATE") ? CHIP_NO_ERROR : TestQueryManufacturingDate_11();
             break;
         case 12:
             ChipLogProgress(chipTool, " ***** Test Step 12 : Query PartNumber\n");
-            err = TestQueryPartNumber_12();
+            err = ShouldSkip("PART_NUM") ? CHIP_NO_ERROR : TestQueryPartNumber_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : Query ProductURL\n");
