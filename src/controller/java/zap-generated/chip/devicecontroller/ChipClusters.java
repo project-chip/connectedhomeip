@@ -19,8 +19,8 @@
 
 package chip.devicecontroller;
 
-import java.util.Arrays;
 import androidx.annotation.Nullable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
