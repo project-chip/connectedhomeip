@@ -43,10 +43,10 @@ class HostApp(Enum):
 
     def OutputNames(self):
         if self == HostApp.ALL_CLUSTERS:
-            yield 'chip-all-clusters-app' 
+            yield 'chip-all-clusters-app'
             yield 'chip-all-clusters-app.map'
         elif self == HostApp.CHIP_TOOL:
-            yield 'chip-tool' 
+            yield 'chip-tool'
             yield 'chip-tool.map'
         elif self == HostApp.THERMOSTAT:
             yield 'thermostat-app'
