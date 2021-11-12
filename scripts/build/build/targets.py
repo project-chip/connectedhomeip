@@ -105,14 +105,17 @@ def HostTargets():
         targets.append(target.Extend('arm64', board=HostBoard.ARM64))
 
     app_targets = []
+
+    # RPC console compilation only for native
+    app_targets.append(
+        targets[0].Extend('rpc-console', app=HostApp.RPC_CONSOLE))
+
     for target in targets:
         app_targets.append(target.Extend(
             'all-clusters', app=HostApp.ALL_CLUSTERS))
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
-        app_targets.append(target.Extend(
-            'rpc-console', app=HostApp.RPC_CONSOLE))
 
     for target in app_targets:
         yield target
