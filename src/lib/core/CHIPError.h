@@ -2262,6 +2262,15 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE    CHIP_CORE_ERROR(0xcf)
 
 /**
+ * @def CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB
+ *
+ * @brief
+ *   The EventReport is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB             CHIP_CORE_ERROR(0xd0)
+
+/**
  *  @}
  */
 

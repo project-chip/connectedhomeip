@@ -432,10 +432,6 @@ void ParseEventStatusIB(nlTestSuite * apSuite, EventStatusIB::Parser & aEventSta
 
 void BuildEventReportIB(nlTestSuite * apSuite, EventReportIB::Builder & aEventReportIBBuilder)
 {
-    EventStatusIB::Builder eventStatusIBBuilder = aEventReportIBBuilder.CreateEventStatus();
-    NL_TEST_ASSERT(apSuite, aEventReportIBBuilder.GetError() == CHIP_NO_ERROR);
-    BuildEventStatusIB(apSuite, eventStatusIBBuilder);
-
     EventDataIB::Builder eventDataIBBuilder = aEventReportIBBuilder.CreateEventData();
     NL_TEST_ASSERT(apSuite, aEventReportIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventDataIB(apSuite, eventDataIBBuilder);
@@ -454,8 +450,7 @@ void ParseEventReportIB(nlTestSuite * apSuite, EventReportIB::Parser & aEventRep
     err = aEventReportIBParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
-    err = aEventReportIBParser.GetEventStatus(&eventStatusParser);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
     err = aEventReportIBParser.GetEventData(&eventDataParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }

@@ -23,7 +23,6 @@
  */
 
 #pragma once
-
 #include <app/AttributePathParams.h>
 #include <app/EventHeader.h>
 #include <app/EventPathParams.h>
@@ -33,6 +32,7 @@
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
 #include <app/ReadPrepareParams.h>
+#include <app/data-model/Decode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -62,23 +62,18 @@ public:
         virtual ~Callback() = default;
 
         /**
-         * OnResponse will be called when a report data response has been received and processed for the given path.
-         *
          * The ReadClient object MUST continue to exist after this call is completed.
          *
-         * This callback will be called when:
-         *   - Receiving event data as response of Read interactions
-         *   - Receiving event data as reports of subscriptions
-         *   - Receiving event data as initial reports of subscriptions
+         * This callback will be called when receiving event data received in the Read and Subscribe interactions
          *
          * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
          * @param[in] aEventHeader: The event header in report response.
          * @param[in] apData: The event data of the given path, will be a nullptr if status is not Success.
-         * @param[in] aStatus: Event-specific status, containing an InteractionModel::Status code as well as an optional
+         * @param[in] apStatus: Event-specific status, containing an InteractionModel::Status code as well as an optional
          *                     cluster-specific status code.
          */
         virtual void OnEventData(const ReadClient * apReadClient, const EventHeader & aEventHeader, TLV::TLVReader * apData,
-                                 const StatusIB & aStatus)
+                                 const StatusIB * apStatus)
         {}
 
         /**
@@ -262,11 +257,25 @@ private:
     void CancelLivenessCheckTimer();
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ClusterInfo & aClusterInfo);
-    CHIP_ERROR ProcessEventPath(EventPathIB::Parser & aEventPath, ClusterInfo & aClusterInfo);
-    CHIP_ERROR ProcessEventTimestamp(EventDataIB::Parser & aEventData, EventHeader & aEventHeader);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;
+
+    /**
+     * Validate that the Event ID and Cluster ID in the header match that of the type information present in the object before
+     * decoding the data. The template parameter T is generally expected to be a ClusterName::Events::EventName::Type struct
+     *
+     * @param [in] aEventHeader  The header of the event being validated.
+     * @param [in] aEvent         The event data.
+     */
+    template <typename EventDataT>
+    CHIP_ERROR CheckEventHeaderWithClusterObject(const EventHeader & aEventHeader, const EventDataT & aEvent)
+    {
+        VerifyOrReturnError((aEventHeader.mPath.mEventId == aEvent.GetEventId()) &&
+                                (aEventHeader.mPath.mClusterId == aEvent.GetClusterId()),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        return CHIP_NO_ERROR;
+    }
 
     /**
      * Internal shutdown method that we use when we know what's going on with
@@ -285,6 +294,7 @@ private:
     NodeId mPeerNodeId                         = kUndefinedNodeId;
     FabricIndex mFabricIndex                   = kUndefinedFabricIndex;
     InteractionType mInteractionType           = InteractionType::Read;
+    Timestamp mEventTimestamp;
 };
 
 }; // namespace app

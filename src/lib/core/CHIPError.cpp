@@ -668,6 +668,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE.AsInteger():
         desc = "Malformed Interaction Model Attribute Report MESSAGE";
         break;
+    case CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB.AsInteger():
+        desc = "Malformed Interaction Model Event Report IB";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 

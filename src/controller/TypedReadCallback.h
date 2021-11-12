@@ -114,12 +114,10 @@ public:
 
 private:
     void OnEventData(const app::ReadClient * apReadClient, const app::EventHeader & aEventHeader, TLV::TLVReader * apData,
-                     const app::StatusIB & aStatus) override
+                     const app::StatusIB * apStatus) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableEventTypeInfo value;
-
-        VerifyOrExit(aStatus.mStatus == Protocols::InteractionModel::Status::Success, err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
         VerifyOrExit(aEventHeader.mPath.mClusterId == DecodableEventTypeInfo::GetClusterId() &&
                          aEventHeader.mPath.mEventId == DecodableEventTypeInfo::GetEventId(),
                      CHIP_ERROR_SCHEMA_MISMATCH);
@@ -133,16 +131,7 @@ private:
     exit:
         if (err != CHIP_NO_ERROR)
         {
-            //
-            // Override status to indicate an error if something bad happened above.
-            //
-            Protocols::InteractionModel::Status imStatus = aStatus.mStatus;
-            if (aStatus.mStatus == Protocols::InteractionModel::Status::Success)
-            {
-                imStatus = Protocols::InteractionModel::Status::Failure;
-            }
-
-            mOnError(&aEventHeader, imStatus, err);
+            mOnError(&aEventHeader, Protocols::InteractionModel::Status::Failure, err);
         }
     }
 

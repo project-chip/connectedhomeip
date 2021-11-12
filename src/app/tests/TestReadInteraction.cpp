@@ -157,7 +157,7 @@ class MockInteractionModelApp : public chip::app::ReadClient::Callback, public c
 {
 public:
     void OnEventData(const chip::app::ReadClient * apReadClient, const chip::app::EventHeader & aEventHeader,
-                     chip::TLV::TLVReader * apData, const chip::app::StatusIB & aStatus) override
+                     chip::TLV::TLVReader * apData, const chip::app::StatusIB * apStatus) override
     {
         static int numDataElementIndex = 0;
 

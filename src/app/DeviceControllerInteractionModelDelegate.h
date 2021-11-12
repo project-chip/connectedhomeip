@@ -69,7 +69,7 @@ public:
     void OnDone(app::WriteClient * apWriteClient) override {}
 
     void OnEventData(const app::ReadClient * apReadClient, const app::EventHeader & aEventHeader, TLV::TLVReader * apData,
-                     const app::StatusIB & aStatus) override
+                     const app::StatusIB * apStatus) override
     {}
 
     void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath, TLV::TLVReader * apData,

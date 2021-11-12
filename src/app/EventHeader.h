@@ -30,7 +30,6 @@ struct EventHeader
     EventNumber mEventNumber     = 0;
     PriorityLevel mPriorityLevel = PriorityLevel::Invalid;
     Timestamp mTimestamp;
-    Timestamp mDeltaTimestamp;
 };
 } // namespace app
 } // namespace chip

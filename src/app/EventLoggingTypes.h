@@ -129,6 +129,10 @@ struct Timestamp
         return timestamp;
     }
 
+    bool IsValid() { return mType != Type::kInvalid; }
+    bool IsSystem() { return mType == Type::kSystem; }
+    bool IsEpoch() { return mType == Type::kEpoch; }
+
     Type mType      = Type::kInvalid;
     uint64_t mValue = 0;
 };
