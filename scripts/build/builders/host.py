@@ -43,23 +43,23 @@ class HostApp(Enum):
 
     def OutputNames(self):
         if self == HostApp.ALL_CLUSTERS:
-            return ['chip-all-clusters-app', 'chip-all-clusters-app.map']
+            yield 'chip-all-clusters-app' 
+            yield 'chip-all-clusters-app.map'
         elif self == HostApp.CHIP_TOOL:
-            return ['chip-tool', 'chip-tool.map']
+            yield 'chip-tool' 
+            yield 'chip-tool.map'
         elif self == HostApp.THERMOSTAT:
-            return ['thermostat-app', 'thermostat-app.map']
+            yield 'thermostat-app'
+            yield 'thermostat-app.map'
         elif self == HostApp.RPC_CONSOLE:
-            return ['chip_rpc_console_wheels']
+            yield 'chip_rpc_console_wheels'
         elif self == HostApp.MIN_MDNS:
-            return [
-                'mdns-advertiser',
-                'mdns-advertiser.map',
-                'minimal-mdns-client',
-                'minimal-mdns-client.map',
-                'minimal-mdns-server',
-                'minimal-mdns-server.map',
-            ]
-            return 'FIXME' # FIXME: multiple names?
+            yield 'mdns-advertiser'
+            yield 'mdns-advertiser.map'
+            yield 'minimal-mdns-client'
+            yield 'minimal-mdns-client.map'
+            yield 'minimal-mdns-server'
+            yield 'minimal-mdns-server.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
