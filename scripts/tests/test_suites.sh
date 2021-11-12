@@ -23,6 +23,8 @@ set -e
 # us tends to be 'tee').
 set -o pipefail
 
+declare INPUT_ARGS=$*
+
 declare -i iterations=2
 declare -i delay=0
 declare -i node_id=0x12344321
@@ -46,65 +48,68 @@ usage() {
     exit 0
 }
 
-declare privileged_run=""
-
-if [[ $(whoami) != "root" ]]; then
-    privileged_run='sudo'
-fi
-
 declare app_run_prefix=""
 declare tool_run_prefix=""
-declare rm_run_prefix=""
 
 netns_setup() {
+    if [[ `id -u` -ne 0 ]]; then
+        echo 'Running as non-root user, restarting in unshare environment'
+        echo 'Executing: ' $0 $INPUT_ARGS
+        unshare --map-root-user -n -m $0 $INPUT_ARGS
+        exit 0
+    fi
+
+    echo 'Creating a separate mount'
+    mount --make-private /
+    mount -t tmpfs tmpfs /run
+
     # 2 virtual hosts: for app and for the tool
-    ${privileged_run} ip netns add app
-    ${privileged_run} ip netns add tool
+    ip netns add app
+    ip netns add tool
 
     # create links for switch to net connections
-    ${privileged_run} ip link add eth-app type veth peer name eth-app-switch
-    ${privileged_run} ip link add eth-tool type veth peer name eth-tool-switch
+    ip link add eth-app type veth peer name eth-app-switch
+    ip link add eth-tool type veth peer name eth-tool-switch
 
     # link the connections together
-    ${privileged_run} ip link set eth-app netns app
-    ${privileged_run} ip link set eth-tool netns tool
+    ip link set eth-app netns app
+    ip link set eth-tool netns tool
 
-    ${privileged_run} ip link add name br1 type bridge
-    ${privileged_run} ip link set br1 up
-    ${privileged_run} ip link set eth-app-switch master br1
-    ${privileged_run} ip link set eth-tool-switch master br1
+    ip link add name br1 type bridge
+    ip link set br1 up
+    ip link set eth-app-switch master br1
+    ip link set eth-tool-switch master br1
 
     # mark connections up
-    ${privileged_run} ip netns exec app ip addr add 10.10.10.1/24 dev eth-app
-    ${privileged_run} ip netns exec app ip link set dev eth-app up
-    ${privileged_run} ip netns exec app ip link set dev lo up
-    ${privileged_run} ip link set dev eth-app-switch up
+    ip netns exec app ip addr add 10.10.10.1/24 dev eth-app
+    ip netns exec app ip link set dev eth-app up
+    ip netns exec app ip link set dev lo up
+    ip link set dev eth-app-switch up
 
-    ${privileged_run} ip netns exec tool ip addr add 10.10.10.2/24 dev eth-tool
-    ${privileged_run} ip netns exec tool ip link set dev eth-tool up
-    ${privileged_run} ip netns exec tool ip link set dev lo up
-    ${privileged_run} ip link set dev eth-tool-switch up
+    ip netns exec tool ip addr add 10.10.10.2/24 dev eth-tool
+    ip netns exec tool ip link set dev eth-tool up
+    ip netns exec tool ip link set dev lo up
+    ip link set dev eth-tool-switch up
 
     # Force IPv6 to use ULAs that we control
-    ${privileged_run} ip netns exec tool ip -6 addr flush eth-tool
-    ${privileged_run} ip netns exec app ip -6 addr flush eth-app
-    ${privileged_run} ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev eth-tool
-    ${privileged_run} ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev eth-app
+    ip netns exec tool ip -6 addr flush eth-tool
+    ip netns exec app ip -6 addr flush eth-app
+    ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev eth-tool
+    ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev eth-app
 }
 
 netns_cleanup() {
-    ${privileged_run} ip netns del app || true
-    ${privileged_run} ip netns del tool || true
-    ${privileged_run} ip link del br1 || true
+    ip netns del app || true
+    ip netns del tool || true
+    ip link del br1 || true
 
     # attempt  to delete orphaned items just in case
-    ${privileged_run} ip link del eth-tool || true
-    ${privileged_run} ip link del eth-tool-switch || true
-    ${privileged_run} ip link del eth-app || true
-    ${privileged_run} ip link del eth-app-switch || true
+    ip link del eth-tool || true
+    ip link del eth-tool-switch || true
+    ip link del eth-app || true
+    ip link del eth-app-switch || true
 }
 
-# read shell arguments
 while getopts a:d:i:hs:w:nc flag; do
     case "$flag" in
     a) application=$OPTARG ;;
@@ -128,11 +133,8 @@ if [[ $use_netns != 0 ]]; then
     echo "Using network namespaces"
     netns_setup
 
-    app_run_prefix="${privileged_run} ip netns exec app"
-    tool_run_prefix="${privileged_run} ip netns exec tool"
-
-    # APPs run privileged
-    rm_run_prefix="${privileged_run}"
+    app_run_prefix="ip netns exec app"
+    tool_run_prefix="ip netns exec tool"
 
     trap netns_cleanup EXIT
 fi
@@ -185,7 +187,7 @@ for j in "${iter_array[@]}"; do
     for i in "${test_array[@]}"; do
         echo "  ===== Running test: $i"
         echo "          * Starting cluster server"
-        ${rm_run_prefix} rm -rf /tmp/chip_tool_config.ini
+        rm -rf /tmp/chip_tool_config.ini
         # This part is a little complicated.  We want to
         # 1) Start chip-app in the background
         # 2) Pipe its output through tee so we can wait until it's ready for a
