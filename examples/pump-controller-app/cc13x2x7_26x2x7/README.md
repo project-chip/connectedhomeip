@@ -126,7 +126,7 @@ Ninja to build the executable.
     `C:\ti`.
 
     ```
-    $ cd ~/connectedhomeip/examples/lock-app/cc13x2x7_26x2x7
+    $ cd ~/connectedhomeip/examples/pump-controller-app/cc13x2x7_26x2x7
     $ export TI_SIMPLELINK_SDK_ROOT=$HOME/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng
     $ export TI_SYSCONFIG_ROOT=$HOME/ti/sysconfig_1.10.0
     $ gn gen out/debug --args="ti_simplelink_sdk_root=\"${TI_SIMPLELINK_SDK_ROOT}\" ti_sysconfig_root=\"${TI_SYSCONFIG_ROOT}\""
