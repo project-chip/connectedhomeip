@@ -583,6 +583,8 @@ class CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback
 public:
     CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback(jobject javaCallback);
 
+    ~CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback();
+
     static void CallbackFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
