@@ -35,6 +35,10 @@ public:
     // and download the new image if available
     void TriggerImmediateQuery();
 
+    // Application directs the Requestor to abort any processing related to
+    // the image update
+    void AbortImageUpdate();
+
     // A setter for the delegate class pointer
     void SetOtaRequestorDriver(OTARequestorDriver * driver);
 
