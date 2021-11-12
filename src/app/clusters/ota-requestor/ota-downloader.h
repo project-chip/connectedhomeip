@@ -55,6 +55,6 @@ public:
 
     // API declarations end
 
-private :
+private:
     OTAImageProcessorDriver * mImageProcessorDelegate;
 };
