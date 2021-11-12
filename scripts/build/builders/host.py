@@ -108,7 +108,7 @@ class HostBuilder(GnBuilder):
         self.board = board
         self.extra_gn_options = []
 
-        if (app != HostApp.RPC_CONSOLE) and not enable_ipv4:
+        if not enable_ipv4:
             self.extra_gn_options.append('chip_inet_config_enable_ipv4=false')
 
     def GnBuildArgs(self):
@@ -118,17 +118,11 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.extend(
                 [
                     'target_cpu="arm64"',
-                    'is_clang=true'
+                    'is_clang=true',
+                    'chip_crypto="mbedtls"',
+                    'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
                 ]
             )
-
-            if self.app != HostApp.RPC_CONSOLE:
-                self.extra_gn_options.extend(
-                    [
-                        'chip_crypto="mbedtls"',
-                        'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
-                    ]
-                )
 
             return self.extra_gn_options
         else:
@@ -153,8 +147,16 @@ class HostBuilder(GnBuilder):
         outputs = {}
 
         for name in self.app.OutputNames():
-            outputs.update({
-                name: os.path.join(self.output_dir, name)
-            })
+            path = os.path.join(self.output_dir, name)
+            if os.path.isdir(path):
+                for root, dirs, files in os.walk(path):
+                    for file in files:
+                       outputs.update({
+                           file: os.path.join(root, file)
+                       })
+            else:
+                outputs.update({
+                    name: os.path.join(self.output_dir, name)
+                })
 
         return outputs
