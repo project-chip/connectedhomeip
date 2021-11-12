@@ -12,28 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Target Navigator Cluster Tests
+name: 71.1.1. [TC-ILL-1.1] Global attributes with server as DUT
 
 config:
-    cluster: "Target Navigator"
+    cluster: "Illuminance Measurement"
     endpoint: 1
 
 tests:
-    - label: "Read attribute Target Navigator list"
+    - label: "read the global attribute: ClusterRevision"
       command: "readAttribute"
-      attribute: "Target Navigator List"
+      attribute: "ClusterRevision"
       response:
-          value:
-              [
-                  { identifier: 1, name: "exampleName" },
-                  { identifier: 2, name: "exampleName" },
-              ]
+          value: 2
 
-    - label: "Navigate Target Command"
-      command: "NavigateTarget"
+    - label:
+          "write the default values to mandatory global attribute:
+          ClusterRevision"
+      command: "writeAttribute"
+      attribute: "ClusterRevision"
       arguments:
-          values:
-              - name: "target"
-                value: 1
-              - name: "data"
-                value: "1"
+          value: 1
+      response:
+          error: 1
+
+    - label: "reads back global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 2

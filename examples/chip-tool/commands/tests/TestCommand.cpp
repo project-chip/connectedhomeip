@@ -109,25 +109,23 @@ bool TestCommand::CheckConstraintMaxLength(const char * itemName, uint64_t curre
     return true;
 }
 
-bool TestCommand::CheckValueAsString(const char * itemName, const chip::ByteSpan current, const char * expected)
+bool TestCommand::CheckValueAsString(const char * itemName, chip::ByteSpan current, chip::ByteSpan expected)
 {
-    const chip::ByteSpan expectedArgument = chip::ByteSpan(chip::Uint8::from_const_char(expected), strlen(expected));
-
-    if (!current.data_equal(expectedArgument))
+    if (!current.data_equal(expected))
     {
-        Exit(std::string(itemName) + " value mismatch, expecting " + std::string(expected));
+        Exit(std::string(itemName) + " value mismatch, expecting " +
+             std::string(chip::Uint8::to_const_char(expected.data()), expected.size()));
         return false;
     }
 
     return true;
 }
 
-bool TestCommand::CheckValueAsString(const char * itemName, const chip::CharSpan current, const char * expected)
+bool TestCommand::CheckValueAsString(const char * itemName, chip::CharSpan current, chip::CharSpan expected)
 {
-    const chip::CharSpan expectedArgument(expected, strlen(expected));
-    if (!current.data_equal(expectedArgument))
+    if (!current.data_equal(expected))
     {
-        Exit(std::string(itemName) + " value mismatch, expected '" + expected + "' but got '" +
+        Exit(std::string(itemName) + " value mismatch, expected '" + std::string(expected.data(), expected.size()) + "' but got '" +
              std::string(current.data(), current.size()) + "'");
         return false;
     }

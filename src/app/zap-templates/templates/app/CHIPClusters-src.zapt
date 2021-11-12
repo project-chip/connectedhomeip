@@ -49,7 +49,7 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
 {{/first}}
     // {{asLowerCamelCase label}}: {{asLowerCamelCase type}}
 {{#if (isCharString type)}}
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}.data()));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}));
 {{else}}
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}));
 {{/if}}

@@ -79,7 +79,7 @@ public:
      * commission the given node, and obtain the setup code to allow commissioning to proceed,
      * and then invoke commissioning on the given Node (using CHIP Device Controller, for example)
      *
-     * @param nodeData DNS-SD node information for the client requesting commissioning
+     *  @param[in]    state           The state for the UDC Client.
      *
      */
     virtual void OnUserDirectedCommissioningRequest(UDCClientState state) = 0;

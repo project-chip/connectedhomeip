@@ -219,6 +219,11 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
   pw_trace_tokenized.protos.nanopb_rpc
 )
 
+target_link_options(${COMPONENT_LIB}
+  PUBLIC
+    "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
+)
+
 set_property(TARGET ${chip_lib} APPEND PROPERTY LINK_LIBRARIES ${COMPONENT_LIB})
 target_include_directories(${chip_lib} PUBLIC
                           "$<TARGET_FILE_DIR:${chip_lib}>/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb_rpc"

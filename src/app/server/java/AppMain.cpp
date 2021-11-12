@@ -45,9 +45,6 @@ CHIP_ERROR ChipAndroidAppInit(void)
     err = chip::Platform::MemoryInit();
     SuccessOrExit(err);
 
-    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
-    SuccessOrExit(err);
-
     ConfigurationMgr().LogDeviceConfig();
 
     // Init ZCL Data Model and CHIP App Server

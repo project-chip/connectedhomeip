@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <commands/common/CommandInvoker.h>
 #include <commands/tests/TestCommand.h>
 
 class Test_TC_BI_1_1 : public TestCommand
@@ -5750,22 +5751,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -5791,27 +5790,25 @@ private:
 
     CHIP_ERROR TestMoveToHueShortestDistanceCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveToHue::Type request;
+        RequestType request;
         request.hue             = 150;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
         request.transitionTime  = 100U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -5820,27 +5817,25 @@ private:
 
     CHIP_ERROR TestMoveToHueLongestDistanceCommand_3()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveToHue::Type request;
+        RequestType request;
         request.hue             = 200;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(1);
         request.transitionTime  = 100U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -5849,27 +5844,25 @@ private:
 
     CHIP_ERROR TestMoveToHueUpCommand_4()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveToHue::Type request;
+        RequestType request;
         request.hue             = 250;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(2);
         request.transitionTime  = 100U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -5878,27 +5871,25 @@ private:
 
     CHIP_ERROR TestMoveToHueDownCommand_5()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveToHue::Type request;
+        RequestType request;
         request.hue             = 225;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(3);
         request.transitionTime  = 100U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -5907,22 +5898,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_6()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -6048,22 +6037,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -6089,26 +6076,24 @@ private:
 
     CHIP_ERROR TestMoveHueUpCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
         request.rate            = 50;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -6117,26 +6102,24 @@ private:
 
     CHIP_ERROR TestMoveHueStopCommand_3()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
         request.rate            = 50;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -6145,26 +6128,24 @@ private:
 
     CHIP_ERROR TestMoveHueDownCommand_4()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
         request.rate            = 50;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -6173,26 +6154,24 @@ private:
 
     CHIP_ERROR TestMoveHueStopCommand_5()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
         request.rate            = 50;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -6201,22 +6180,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_6()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -6334,22 +6311,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -6375,27 +6350,25 @@ private:
 
     CHIP_ERROR TestStepHueUpCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::StepHue::Type request;
+        RequestType request;
         request.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
         request.stepSize        = 5;
         request.transitionTime  = 25;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -6404,27 +6377,25 @@ private:
 
     CHIP_ERROR TestStepHueDownCommand_3()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::StepHue::Type request;
+        RequestType request;
         request.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(3);
         request.stepSize        = 5;
         request.transitionTime  = 25;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -6433,22 +6404,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -6562,22 +6531,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -6603,26 +6570,24 @@ private:
 
     CHIP_ERROR TestMoveToSaturationCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type request;
+        RequestType request;
         request.saturation      = 90;
         request.transitionTime  = 10U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -6631,22 +6596,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_3()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_1 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_1 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -6764,22 +6727,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -6805,26 +6766,24 @@ private:
 
     CHIP_ERROR TestMoveSaturationUpCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(1);
         request.rate            = 5;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -6833,26 +6792,24 @@ private:
 
     CHIP_ERROR TestMoveSaturationDownCommand_3()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(3);
         request.rate            = 5;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -6861,22 +6818,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -6994,22 +6949,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -7035,27 +6988,25 @@ private:
 
     CHIP_ERROR TestStepSaturationUpCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepSaturation::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::StepSaturation::Type request;
+        RequestType request;
         request.stepMode        = static_cast<chip::app::Clusters::ColorControl::SaturationStepMode>(1);
         request.stepSize        = 15;
         request.transitionTime  = 10;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -7064,27 +7015,25 @@ private:
 
     CHIP_ERROR TestStepSaturationDownCommand_3()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepSaturation::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::StepSaturation::Type request;
+        RequestType request;
         request.stepMode        = static_cast<chip::app::Clusters::ColorControl::SaturationStepMode>(3);
         request.stepSize        = 20;
         request.transitionTime  = 10;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -7093,22 +7042,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -7222,22 +7169,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_4 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_4 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -7263,27 +7208,25 @@ private:
 
     CHIP_ERROR TestMoveToCurrentHueAndSaturationCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type request;
+        RequestType request;
         request.hue             = 40;
         request.saturation      = 160;
         request.transitionTime  = 10U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_4 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_4 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -7292,22 +7235,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_3()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_4 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_4_4 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -7421,22 +7362,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -7462,27 +7401,25 @@ private:
 
     CHIP_ERROR TestMoveToColorCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToColor::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToColor::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveToColor::Type request;
+        RequestType request;
         request.colorX          = 200U;
         request.colorY          = 300U;
         request.transitionTime  = 20U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -7491,22 +7428,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_3()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_1 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_1 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -7624,22 +7559,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -7665,26 +7598,24 @@ private:
 
     CHIP_ERROR TestMoveColorCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveColor::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveColor::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveColor::Type request;
+        RequestType request;
         request.rateX           = 15;
         request.rateY           = 20;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -7693,24 +7624,22 @@ private:
 
     CHIP_ERROR TestStopMoveStepCommand_3()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type request;
+        RequestType request;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -7719,22 +7648,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -7848,22 +7775,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -7889,27 +7814,25 @@ private:
 
     CHIP_ERROR TestStepColorCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepColor::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepColor::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::StepColor::Type request;
+        RequestType request;
         request.stepX           = 15;
         request.stepY           = 20;
         request.transitionTime  = 50U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_3 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_3 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -7918,22 +7841,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_3()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_5_3 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_5_3 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -8047,22 +7968,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -8088,26 +8007,24 @@ private:
 
     CHIP_ERROR TestMoveToColorTemperatureCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type request;
+        RequestType request;
         request.colorTemperature = 100U;
         request.transitionTime   = 10U;
         request.optionsMask      = 0;
         request.optionsOverride  = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -8116,22 +8033,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_3()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_1 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_1 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -8253,22 +8168,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -8294,13 +8207,9 @@ private:
 
     CHIP_ERROR TestMoveUpColorTemperatureCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type request;
+        RequestType request;
         request.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
         request.rate                    = 10U;
         request.colorTemperatureMinimum = 1U;
@@ -8308,14 +8217,16 @@ private:
         request.optionsMask             = 0;
         request.optionsOverride         = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -8324,13 +8235,9 @@ private:
 
     CHIP_ERROR TestStopColorTemperatureCommand_3()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type request;
+        RequestType request;
         request.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
         request.rate                    = 10U;
         request.colorTemperatureMinimum = 1U;
@@ -8338,14 +8245,16 @@ private:
         request.optionsMask             = 0;
         request.optionsOverride         = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -8354,13 +8263,9 @@ private:
 
     CHIP_ERROR TestMoveDownColorTemperatureCommand_4()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type request;
+        RequestType request;
         request.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
         request.rate                    = 20U;
         request.colorTemperatureMinimum = 1U;
@@ -8368,14 +8273,16 @@ private:
         request.optionsMask             = 0;
         request.optionsOverride         = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -8384,22 +8291,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -8517,22 +8422,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -8558,13 +8461,9 @@ private:
 
     CHIP_ERROR TestStepUpColorTemperatureCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type request;
+        RequestType request;
         request.stepMode                = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
         request.stepSize                = 5U;
         request.transitionTime          = 50U;
@@ -8573,14 +8472,16 @@ private:
         request.optionsMask             = 0;
         request.optionsOverride         = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -8589,13 +8490,9 @@ private:
 
     CHIP_ERROR TestStepDownColorTemperatureCommand_3()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type request;
+        RequestType request;
         request.stepMode                = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(3);
         request.stepSize                = 5U;
         request.transitionTime          = 50U;
@@ -8604,14 +8501,16 @@ private:
         request.optionsMask             = 0;
         request.optionsOverride         = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -8620,22 +8519,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -8764,22 +8661,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -8805,27 +8700,25 @@ private:
 
     CHIP_ERROR TestEnhancedMoveToHueCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type request;
+        RequestType request;
         request.enhancedHue     = 1025U;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
         request.transitionTime  = 1U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -8851,22 +8744,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_1 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -8992,22 +8883,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -9033,26 +8922,24 @@ private:
 
     CHIP_ERROR TestEnhancedMoveHueDownCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
         request.rate            = 5U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -9061,26 +8948,24 @@ private:
 
     CHIP_ERROR TestEnhancedMoveHueStopCommand_3()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
         request.rate            = 0U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -9089,26 +8974,24 @@ private:
 
     CHIP_ERROR TestEnhancedMoveHueUpCommand_4()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
         request.rate            = 50U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -9117,26 +9000,24 @@ private:
 
     CHIP_ERROR TestEnhancedMoveHueStopCommand_5()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type request;
+        RequestType request;
         request.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
         request.rate            = 0U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -9145,22 +9026,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_6()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -9278,22 +9157,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -9319,27 +9196,25 @@ private:
 
     CHIP_ERROR TestEnhancedStepHueUpCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type request;
+        RequestType request;
         request.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(0);
         request.stepSize        = 50U;
         request.transitionTime  = 1U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -9348,27 +9223,25 @@ private:
 
     CHIP_ERROR TestEnhancedStepHueDownCommand_3()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type request;
+        RequestType request;
         request.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
         request.stepSize        = 75U;
         request.transitionTime  = 1U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -9377,22 +9250,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -9506,22 +9377,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_4 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_4 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -9547,27 +9416,25 @@ private:
 
     CHIP_ERROR TestEnhancedMoveToHueAndSaturationCommand_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type request;
+        RequestType request;
         request.enhancedHue     = 1200U;
         request.saturation      = 90;
         request.transitionTime  = 10U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_4 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_4 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -9576,22 +9443,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_3()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_7_4 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_7_4 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -9829,22 +9694,20 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -9870,13 +9733,9 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandSetAllAttributs_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(14);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
@@ -9885,14 +9744,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -9969,13 +9830,9 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_7()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -9984,14 +9841,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_7();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -10017,13 +9876,9 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandSetDirectionAndTimeWhileRunning_9()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(6);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10032,14 +9887,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_9();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_9(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -10082,13 +9939,9 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandSetDirectionWhileRunning_12()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
@@ -10097,14 +9950,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_12();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_12(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
@@ -10130,22 +9985,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_14()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_14();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_14(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
@@ -10533,22 +10386,20 @@ private:
 
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -10574,13 +10425,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10589,14 +10436,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -10622,13 +10471,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_4()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10637,14 +10482,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -10670,13 +10517,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_6()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10685,14 +10528,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -10718,13 +10563,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_8()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(8);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10733,14 +10574,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_8();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_8(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -10766,13 +10609,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_10()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10781,14 +10620,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_10();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_10(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -10814,13 +10655,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_12()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10829,14 +10666,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_12();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_12(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
@@ -10862,13 +10701,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_14()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
@@ -10877,14 +10712,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_14();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_14(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
@@ -10910,13 +10747,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_16()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10925,14 +10758,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_16();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_16(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_16(uint8_t status) { ThrowFailureResponse(); }
@@ -10958,13 +10793,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_18()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -10973,14 +10804,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_18();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_18(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_18(uint8_t status) { ThrowFailureResponse(); }
@@ -11006,27 +10839,25 @@ private:
 
     CHIP_ERROR TestEnhancedMoveToHueCommand10_20()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type request;
+        RequestType request;
         request.enhancedHue     = 40960U;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
         request.transitionTime  = 0U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_20();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_20(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
@@ -11054,13 +10885,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_23()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11069,14 +10896,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_23();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_23(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_23(uint8_t status) { ThrowFailureResponse(); }
@@ -11102,13 +10931,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_25()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(2);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11117,14 +10942,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_25();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_25(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_25(uint8_t status) { ThrowFailureResponse(); }
@@ -11150,13 +10977,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_27()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11165,14 +10988,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_27();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_27(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_27(uint8_t status) { ThrowFailureResponse(); }
@@ -11198,13 +11023,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_29()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
@@ -11213,14 +11034,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_29();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_29(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_29(uint8_t status) { ThrowFailureResponse(); }
@@ -11246,13 +11069,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_31()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(2);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11261,14 +11080,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_31();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_31(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_31(uint8_t status) { ThrowFailureResponse(); }
@@ -11294,13 +11115,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_33()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11309,14 +11126,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_33();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_33(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_33(uint8_t status) { ThrowFailureResponse(); }
@@ -11342,22 +11161,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightForColorControlTests_35()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_35();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_35(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_35(uint8_t status) { ThrowFailureResponse(); }
@@ -11550,22 +11367,20 @@ private:
 
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -11591,13 +11406,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11606,14 +11417,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -11690,13 +11503,9 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_7()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11705,14 +11514,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_7();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -11738,13 +11549,9 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_9()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(1);
@@ -11753,14 +11560,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_9();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_9(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -11786,13 +11595,9 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_11()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -11801,14 +11606,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_11();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_11(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
@@ -11834,22 +11641,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightForColorControlTests_13()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_13();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_13(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
@@ -12042,22 +11847,20 @@ private:
 
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -12083,13 +11886,9 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_2()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -12098,14 +11897,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -12182,13 +11983,9 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_7()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -12197,14 +11994,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_7();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -12230,13 +12029,9 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_9()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -12245,14 +12040,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_9();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_9(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -12278,13 +12075,9 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_11()
     {
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
-        using requestType  = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
+        RequestType request;
         request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
         request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
         request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
@@ -12293,14 +12086,16 @@ private:
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_11();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_11(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
@@ -12326,22 +12121,20 @@ private:
 
     CHIP_ERROR TestTurnOffLightForColorControlTests_13()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_13();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_13(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
@@ -13833,6 +13626,144 @@ private:
     }
 };
 
+class Test_TC_ILL_1_1 : public TestCommand
+{
+public:
+    Test_TC_ILL_1_1() : TestCommand("Test_TC_ILL_1_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_ILL_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_ILL_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 1 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    static void OnFailureCallback_0(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnFailureResponse_0(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
+    }
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_1(); }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
+    {
+        chip::Controller::IlluminanceMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_0, OnFailureCallback_0);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 2U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
+    {
+        chip::Controller::IlluminanceMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        uint16_t clusterRevisionArgument;
+        clusterRevisionArgument = 1U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_1() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
+    {
+        chip::Controller::IlluminanceMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 2U));
+        NextTest();
+    }
+};
+
 class Test_TC_LVL_1_1 : public TestCommand
 {
 public:
@@ -14077,26 +14008,24 @@ private:
 
     CHIP_ERROR TestSendsAMoveToLevelCommand_1()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type request;
+        RequestType request;
         request.level          = 64;
         request.transitionTime = 0U;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -14124,26 +14053,24 @@ private:
 
     CHIP_ERROR TestSendsAMoveToLevelCommand_4()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type request;
+        RequestType request;
         request.level          = 128;
         request.transitionTime = 1U;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -14188,26 +14115,24 @@ private:
 
     CHIP_ERROR TestSendsAMoveToLevelCommand_8()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type request;
+        RequestType request;
         request.level          = 254;
         request.transitionTime = 65535U;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_8();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_8(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -14235,26 +14160,24 @@ private:
 
     CHIP_ERROR TestResetLevelTo0_11()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type request;
+        RequestType request;
         request.level          = 0;
         request.transitionTime = 0U;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_11();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_11(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
@@ -14480,26 +14403,24 @@ private:
 
     CHIP_ERROR TestSendsAMoveUpCommand_2()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Move::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::Move::Type request;
+        RequestType request;
         request.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(0);
         request.rate           = 200;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -14544,26 +14465,24 @@ private:
 
     CHIP_ERROR TestSendsAMoveDownCommand_6()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Move::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::Move::Type request;
+        RequestType request;
         request.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(1);
         request.rate           = 250;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -14624,26 +14543,24 @@ private:
 
     CHIP_ERROR TestSendsAMoveUpCommandAtDefaultMoveRate_11()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Move::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::Move::Type request;
+        RequestType request;
         request.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(1);
         request.rate           = 255;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_11();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_11(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
@@ -14793,22 +14710,20 @@ private:
 
     CHIP_ERROR TestSendingOnCommand_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -14817,27 +14732,25 @@ private:
 
     CHIP_ERROR TestPreconditionDutLevelIsSetTo0x80_1()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Step::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::Step::Type request;
+        RequestType request;
         request.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(0);
         request.stepSize       = 128;
         request.transitionTime = 20U;
         request.optionMask     = 0;
         request.optionOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -14865,27 +14778,25 @@ private:
 
     CHIP_ERROR TestSendsStepDownCommandToDut_4()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Step::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::Step::Type request;
+        RequestType request;
         request.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(1);
         request.stepSize       = 64;
         request.transitionTime = 20U;
         request.optionMask     = 0;
         request.optionOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -14913,27 +14824,25 @@ private:
 
     CHIP_ERROR TestSendsAStepUpCommand_7()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Step::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::Step::Type request;
+        RequestType request;
         request.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(0);
         request.stepSize       = 64;
         request.transitionTime = 20U;
         request.optionMask     = 0;
         request.optionOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_7();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -14961,22 +14870,20 @@ private:
 
     CHIP_ERROR TestSendingOffCommand_10()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_10();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_10(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -15061,22 +14968,20 @@ private:
 
     CHIP_ERROR TestSendingOnCommand_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -15085,27 +14990,25 @@ private:
 
     CHIP_ERROR TestPreconditionDutLevelIsSetTo0x80_1()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Step::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::Step::Type request;
+        RequestType request;
         request.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(0);
         request.stepSize       = 128;
         request.transitionTime = 20U;
         request.optionMask     = 0;
         request.optionOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -15116,26 +15019,24 @@ private:
 
     CHIP_ERROR TestSendsAMoveUpCommandToDut_3()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Move::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::Move::Type request;
+        RequestType request;
         request.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(0);
         request.rate           = 1;
         request.optionMask     = 1;
         request.optionOverride = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -15146,24 +15047,22 @@ private:
 
     CHIP_ERROR TestSendsStopCommandToDut_5()
     {
-        chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LevelControl::Commands::Stop::Type;
 
-        using requestType  = chip::app::Clusters::LevelControl::Commands::Stop::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::LevelControl::Commands::Stop::Type request;
+        RequestType request;
         request.optionMask     = 0;
         request.optionOverride = 0;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -15172,22 +15071,20 @@ private:
 
     CHIP_ERROR TestSendingOffCommand_6()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -15324,22 +15221,20 @@ private:
 
     CHIP_ERROR TestPutTheDeviceIntoLowPowerMode_0()
     {
-        chip::Controller::LowPowerClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LowPower::Commands::Sleep::Type;
 
-        using requestType  = chip::app::Clusters::LowPower::Commands::Sleep::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::LowPower::Commands::Sleep::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_MC_2_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_MC_2_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -17225,22 +17120,20 @@ private:
 
     CHIP_ERROR TestSendOffCommand_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -17266,22 +17159,20 @@ private:
 
     CHIP_ERROR TestSendOnCommand_2()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -17307,22 +17198,20 @@ private:
 
     CHIP_ERROR TestSendOffCommand_4()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -17348,22 +17237,20 @@ private:
 
     CHIP_ERROR TestSendToggleCommand_6()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Toggle::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Toggle::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Toggle::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_6();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -17389,22 +17276,20 @@ private:
 
     CHIP_ERROR TestSendToggleCommand_8()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Toggle::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Toggle::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Toggle::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_8();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_8(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -17430,22 +17315,20 @@ private:
 
     CHIP_ERROR TestSendOnCommand_10()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_10();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_10(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -17471,22 +17354,20 @@ private:
 
     CHIP_ERROR TestSendOffCommand_12()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnSuccessResponse_12();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_12(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
@@ -18074,22 +17955,20 @@ private:
 
     CHIP_ERROR TestSendOnCommand_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -18134,22 +18013,20 @@ private:
 
     CHIP_ERROR TestSendOnCommand_4()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -18194,22 +18071,20 @@ private:
 
     CHIP_ERROR TestSendOnCommand_8()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_8();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_8(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -18288,22 +18163,20 @@ private:
 
     CHIP_ERROR TestSendOnCommand_14()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_14();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_14(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
@@ -18363,22 +18236,20 @@ private:
 
     CHIP_ERROR TestSendOffCommand_18()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_18();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_18(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_18(uint8_t status) { ThrowFailureResponse(); }
@@ -18472,22 +18343,20 @@ private:
 
     CHIP_ERROR TestSendOnCommand_24()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_24();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_24(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_24(uint8_t status) { ThrowFailureResponse(); }
@@ -18530,22 +18399,20 @@ private:
 
     CHIP_ERROR TestSendOffCommand_27()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_27();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_27(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_27(uint8_t status) { ThrowFailureResponse(); }
@@ -18622,22 +18489,20 @@ private:
 
     CHIP_ERROR TestSendOnCommand_32()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_32();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_32(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_32(uint8_t status) { ThrowFailureResponse(); }
@@ -18697,22 +18562,20 @@ private:
 
     CHIP_ERROR TestSendOffCommand_36()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_36();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_36(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_36(uint8_t status) { ThrowFailureResponse(); }
@@ -18857,22 +18720,20 @@ private:
 
     CHIP_ERROR TestSendOffCommand_45()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnSuccessResponse_45();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_45(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_45(uint8_t status) { ThrowFailureResponse(); }
@@ -24512,22 +24373,20 @@ private:
 
     CHIP_ERROR Test1aThAdjustsTheTheDutToANonOpenPosition_0()
     {
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
 
-        using requestType  = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -24536,22 +24395,20 @@ private:
 
     CHIP_ERROR Test2aThSendsUpOrOpenCommandToDut_1()
     {
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
 
-        using requestType  = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -24647,22 +24504,20 @@ private:
 
     CHIP_ERROR Test1aThAdjustsTheTheDutToANonClosedPosition_0()
     {
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
 
-        using requestType  = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -24671,22 +24526,20 @@ private:
 
     CHIP_ERROR Test2aThSendsDownOrCloseCommandToDut_1()
     {
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
 
-        using requestType  = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -24782,22 +24635,20 @@ private:
 
     CHIP_ERROR Test1aThAdjustsTheTheDutToANonOpenPosition_0()
     {
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
 
-        using requestType  = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -24806,22 +24657,20 @@ private:
 
     CHIP_ERROR Test2aThSendsStopMotionCommandToDut_1()
     {
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::WindowCovering::Commands::StopMotion::Type;
 
-        using requestType  = chip::app::Clusters::WindowCovering::Commands::StopMotion::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::WindowCovering::Commands::StopMotion::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -24932,34 +24781,32 @@ private:
         auto iter = targetNavigatorList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(targetNavigatorList)>("targetNavigatorList", iter, 0));
         VerifyOrReturn(CheckValue<>("targetNavigatorList[0].identifier", iter.GetValue().identifier, 1));
-        VerifyOrReturn(CheckValueAsString("targetNavigatorList[0].name", iter.GetValue().name, "exampleName"));
+        VerifyOrReturn(CheckValueAsString("targetNavigatorList[0].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(targetNavigatorList)>("targetNavigatorList", iter, 1));
         VerifyOrReturn(CheckValue<>("targetNavigatorList[1].identifier", iter.GetValue().identifier, 2));
-        VerifyOrReturn(CheckValueAsString("targetNavigatorList[1].name", iter.GetValue().name, "exampleName"));
+        VerifyOrReturn(CheckValueAsString("targetNavigatorList[1].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
         VerifyOrReturn(CheckNoMoreListItems<decltype(targetNavigatorList)>("targetNavigatorList", iter, 2));
         NextTest();
     }
 
     CHIP_ERROR TestNavigateTargetCommand_1()
     {
-        chip::Controller::TargetNavigatorClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type;
 
-        using requestType  = chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type;
-        using responseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType;
-
-        chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type request;
+        RequestType request;
         request.target = 1;
-        request.data   = chip::Span<const char>("1", strlen("1"));
+        request.data   = chip::Span<const char>("1garbage: not in length on purpose", 1);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_1(data.status, data.data);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_TargetNavigatorCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -25058,38 +24905,36 @@ private:
         VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter, 0));
         VerifyOrReturn(CheckValue<>("audioOutputList[0].index", iter.GetValue().index, 1));
         VerifyOrReturn(CheckValue<>("audioOutputList[0].outputType", iter.GetValue().outputType, 0));
-        VerifyOrReturn(CheckValueAsString("audioOutputList[0].name", iter.GetValue().name, "exampleName"));
+        VerifyOrReturn(CheckValueAsString("audioOutputList[0].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter, 1));
         VerifyOrReturn(CheckValue<>("audioOutputList[1].index", iter.GetValue().index, 2));
         VerifyOrReturn(CheckValue<>("audioOutputList[1].outputType", iter.GetValue().outputType, 0));
-        VerifyOrReturn(CheckValueAsString("audioOutputList[1].name", iter.GetValue().name, "exampleName"));
+        VerifyOrReturn(CheckValueAsString("audioOutputList[1].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter, 2));
         VerifyOrReturn(CheckValue<>("audioOutputList[2].index", iter.GetValue().index, 3));
         VerifyOrReturn(CheckValue<>("audioOutputList[2].outputType", iter.GetValue().outputType, 0));
-        VerifyOrReturn(CheckValueAsString("audioOutputList[2].name", iter.GetValue().name, "exampleName"));
+        VerifyOrReturn(CheckValueAsString("audioOutputList[2].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
         VerifyOrReturn(CheckNoMoreListItems<decltype(audioOutputList)>("audioOutputList", iter, 3));
         NextTest();
     }
 
     CHIP_ERROR TestSelectOutputCommand_1()
     {
-        chip::Controller::AudioOutputClusterTest cluster;
-        cluster.Associate(mDevice, 2);
+        using RequestType = chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type;
 
-        using requestType  = chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type request;
+        RequestType request;
         request.index = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 2, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -25098,24 +24943,22 @@ private:
 
     CHIP_ERROR TestRenameOutputCommand_2()
     {
-        chip::Controller::AudioOutputClusterTest cluster;
-        cluster.Associate(mDevice, 2);
+        using RequestType = chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type;
 
-        using requestType  = chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type request;
+        RequestType request;
         request.index = 1;
-        request.name  = chip::Span<const char>("exampleName", strlen("exampleName"));
+        request.name  = chip::Span<const char>("exampleNamegarbage: not in length on purpose", 11);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 2, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -25240,25 +25083,23 @@ private:
 
     CHIP_ERROR TestLaunchAppCommand_1()
     {
-        chip::Controller::ApplicationLauncherClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type;
 
-        using requestType  = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type;
-        using responseType = chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType;
-
-        chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type request;
-        request.data            = chip::Span<const char>("exampleData", strlen("exampleData"));
+        RequestType request;
+        request.data            = chip::Span<const char>("exampleDatagarbage: not in length on purpose", 11);
         request.catalogVendorId = 1U;
-        request.applicationId   = chip::Span<const char>("appId", strlen("appId"));
+        request.applicationId   = chip::Span<const char>("appIdgarbage: not in length on purpose", 5);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_1(data.status, data.data);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -25357,23 +25198,21 @@ private:
 
     CHIP_ERROR TestSendKeyCommand_0()
     {
-        chip::Controller::KeypadInputClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::KeypadInput::Commands::SendKey::Type;
 
-        using requestType  = chip::app::Clusters::KeypadInput::Commands::SendKey::Type;
-        using responseType = chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType;
-
-        chip::app::Clusters::KeypadInput::Commands::SendKey::Type request;
+        RequestType request;
         request.keyCode = static_cast<chip::app::Clusters::KeypadInput::KeypadInputCecKeyCode>(3);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_KeypadInputCluster *>(context))->OnSuccessResponse_0(data.status);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_KeypadInputCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -25438,23 +25277,21 @@ private:
 
     CHIP_ERROR TestGetSetupPinCommand_0()
     {
-        chip::Controller::AccountLoginClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type;
 
-        using requestType  = chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type;
-        using responseType = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType;
+        RequestType request;
+        request.tempAccountIdentifier = chip::Span<const char>("asdfgarbage: not in length on purpose", 4);
 
-        chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type request;
-        request.tempAccountIdentifier = chip::Span<const char>("asdf", strlen("asdf"));
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_AccountLoginCluster *>(context))->OnSuccessResponse_0(data.setupPIN);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_AccountLoginCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -25463,24 +25300,22 @@ private:
 
     CHIP_ERROR TestLoginCommand_1()
     {
-        chip::Controller::AccountLoginClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::AccountLogin::Commands::Login::Type;
 
-        using requestType  = chip::app::Clusters::AccountLogin::Commands::Login::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
+        request.tempAccountIdentifier = chip::Span<const char>("asdfgarbage: not in length on purpose", 4);
+        request.setupPIN              = chip::Span<const char>("tempPin123garbage: not in length on purpose", 10);
 
-        chip::app::Clusters::AccountLogin::Commands::Login::Type request;
-        request.tempAccountIdentifier = chip::Span<const char>("asdf", strlen("asdf"));
-        request.setupPIN              = chip::Span<const char>("tempPin123", strlen("tempPin123"));
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_AccountLoginCluster *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_AccountLoginCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -25562,7 +25397,7 @@ private:
 
     void OnSuccessResponse_0(chip::CharSpan wakeOnLanMacAddress)
     {
-        VerifyOrReturn(CheckValueAsString("wakeOnLanMacAddress", wakeOnLanMacAddress, "00:00:00:00:00"));
+        VerifyOrReturn(CheckValueAsString("wakeOnLanMacAddress", wakeOnLanMacAddress, chip::CharSpan("00:00:00:00:00", 14)));
         NextTest();
     }
 };
@@ -25662,23 +25497,21 @@ private:
 
     CHIP_ERROR TestChangeStatusCommand_0()
     {
-        chip::Controller::ApplicationBasicClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type;
 
-        using requestType  = chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type request;
+        RequestType request;
         request.status = static_cast<chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus>(1);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -25830,22 +25663,20 @@ private:
 
     CHIP_ERROR TestMediaPlaybackPlayCommand_0()
     {
-        chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type;
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType;
+        RequestType request;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_0(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -25858,22 +25689,20 @@ private:
 
     CHIP_ERROR TestMediaPlaybackPauseCommand_1()
     {
-        chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type;
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType;
+        RequestType request;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_1(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -25886,22 +25715,20 @@ private:
 
     CHIP_ERROR TestMediaPlaybackStopCommand_2()
     {
-        chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type;
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType;
+        RequestType request;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_2(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -25914,22 +25741,20 @@ private:
 
     CHIP_ERROR TestMediaPlaybackStartOverCommand_3()
     {
-        chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type;
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType;
+        RequestType request;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_3(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -25942,22 +25767,20 @@ private:
 
     CHIP_ERROR TestMediaPlaybackPreviousCommand_4()
     {
-        chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type;
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType;
+        RequestType request;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_4(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -25970,22 +25793,20 @@ private:
 
     CHIP_ERROR TestMediaPlaybackNextCommand_5()
     {
-        chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type;
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType;
+        RequestType request;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_5(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -25998,22 +25819,20 @@ private:
 
     CHIP_ERROR TestMediaPlaybackRewindCommand_6()
     {
-        chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type;
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType;
+        RequestType request;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_6(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -26026,22 +25845,20 @@ private:
 
     CHIP_ERROR TestMediaPlaybackFastForwardCommand_7()
     {
-        chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type;
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType;
+        RequestType request;
 
-        chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_7(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -26054,23 +25871,21 @@ private:
 
     CHIP_ERROR TestMediaPlaybackSkipForwardCommand_8()
     {
-        chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type;
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType;
-
-        chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type request;
+        RequestType request;
         request.deltaPositionMilliseconds = 100ULL;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_8(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_8(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -26083,23 +25898,21 @@ private:
 
     CHIP_ERROR TestMediaPlaybackSkipBackwardCommand_9()
     {
-        chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type;
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType;
-
-        chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type request;
+        RequestType request;
         request.deltaPositionMilliseconds = 100ULL;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_9(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_9(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -26112,23 +25925,21 @@ private:
 
     CHIP_ERROR TestMediaPlaybackSeekCommand_10()
     {
-        chip::Controller::MediaPlaybackClusterTest cluster;
-        cluster.Associate(mDevice, 3);
+        using RequestType = chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type;
 
-        using requestType  = chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type;
-        using responseType = chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType;
-
-        chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type request;
+        RequestType request;
         request.position = 100ULL;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_10(data.mediaPlaybackStatus);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_10(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 3, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -26231,39 +26042,41 @@ private:
         VerifyOrReturn(CheckNextListItemDecodes<decltype(tvChannelList)>("tvChannelList", iter, 0));
         VerifyOrReturn(CheckValue<>("tvChannelList[0].majorNumber", iter.GetValue().majorNumber, 1U));
         VerifyOrReturn(CheckValue<>("tvChannelList[0].minorNumber", iter.GetValue().minorNumber, 2U));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[0].name", iter.GetValue().name, "exampleName"));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[0].callSign", iter.GetValue().callSign, "exampleCSign"));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[0].affiliateCallSign", iter.GetValue().affiliateCallSign, "exampleASign"));
+        VerifyOrReturn(CheckValueAsString("tvChannelList[0].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
+        VerifyOrReturn(
+            CheckValueAsString("tvChannelList[0].callSign", iter.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
+        VerifyOrReturn(CheckValueAsString("tvChannelList[0].affiliateCallSign", iter.GetValue().affiliateCallSign,
+                                          chip::CharSpan("exampleASign", 12)));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(tvChannelList)>("tvChannelList", iter, 1));
         VerifyOrReturn(CheckValue<>("tvChannelList[1].majorNumber", iter.GetValue().majorNumber, 2U));
         VerifyOrReturn(CheckValue<>("tvChannelList[1].minorNumber", iter.GetValue().minorNumber, 3U));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[1].name", iter.GetValue().name, "exampleName"));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[1].callSign", iter.GetValue().callSign, "exampleCSign"));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[1].affiliateCallSign", iter.GetValue().affiliateCallSign, "exampleASign"));
+        VerifyOrReturn(CheckValueAsString("tvChannelList[1].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
+        VerifyOrReturn(
+            CheckValueAsString("tvChannelList[1].callSign", iter.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
+        VerifyOrReturn(CheckValueAsString("tvChannelList[1].affiliateCallSign", iter.GetValue().affiliateCallSign,
+                                          chip::CharSpan("exampleASign", 12)));
         VerifyOrReturn(CheckNoMoreListItems<decltype(tvChannelList)>("tvChannelList", iter, 2));
         NextTest();
     }
 
     CHIP_ERROR TestChangeChannelByNumberCommand_1()
     {
-        chip::Controller::TvChannelClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type;
 
-        using requestType  = chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type request;
+        RequestType request;
         request.majorNumber = 1U;
         request.minorNumber = 2U;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_TvChannelCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -26272,23 +26085,21 @@ private:
 
     CHIP_ERROR TestSkipChannelCommand_2()
     {
-        chip::Controller::TvChannelClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TvChannel::Commands::SkipChannel::Type;
 
-        using requestType  = chip::app::Clusters::TvChannel::Commands::SkipChannel::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::TvChannel::Commands::SkipChannel::Type request;
+        RequestType request;
         request.count = 1U;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_TvChannelCluster *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -26349,22 +26160,20 @@ private:
 
     CHIP_ERROR TestSleepInputStatusCommand_0()
     {
-        chip::Controller::LowPowerClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::LowPower::Commands::Sleep::Type;
 
-        using requestType  = chip::app::Clusters::LowPower::Commands::Sleep::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::LowPower::Commands::Sleep::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_LowPowerCluster *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_LowPowerCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -26485,36 +26294,36 @@ private:
         VerifyOrReturn(CheckNextListItemDecodes<decltype(mediaInputList)>("mediaInputList", iter, 0));
         VerifyOrReturn(CheckValue<>("mediaInputList[0].index", iter.GetValue().index, 1));
         VerifyOrReturn(CheckValue<>("mediaInputList[0].inputType", iter.GetValue().inputType, 4));
-        VerifyOrReturn(CheckValueAsString("mediaInputList[0].name", iter.GetValue().name, "exampleName"));
-        VerifyOrReturn(CheckValueAsString("mediaInputList[0].description", iter.GetValue().description, "exampleDescription"));
+        VerifyOrReturn(CheckValueAsString("mediaInputList[0].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
+        VerifyOrReturn(CheckValueAsString("mediaInputList[0].description", iter.GetValue().description,
+                                          chip::CharSpan("exampleDescription", 18)));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(mediaInputList)>("mediaInputList", iter, 1));
         VerifyOrReturn(CheckValue<>("mediaInputList[1].index", iter.GetValue().index, 2));
         VerifyOrReturn(CheckValue<>("mediaInputList[1].inputType", iter.GetValue().inputType, 4));
-        VerifyOrReturn(CheckValueAsString("mediaInputList[1].name", iter.GetValue().name, "exampleName"));
-        VerifyOrReturn(CheckValueAsString("mediaInputList[1].description", iter.GetValue().description, "exampleDescription"));
+        VerifyOrReturn(CheckValueAsString("mediaInputList[1].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
+        VerifyOrReturn(CheckValueAsString("mediaInputList[1].description", iter.GetValue().description,
+                                          chip::CharSpan("exampleDescription", 18)));
         VerifyOrReturn(CheckNoMoreListItems<decltype(mediaInputList)>("mediaInputList", iter, 2));
         NextTest();
     }
 
     CHIP_ERROR TestSelectInputCommand_1()
     {
-        chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::MediaInput::Commands::SelectInput::Type;
 
-        using requestType  = chip::app::Clusters::MediaInput::Commands::SelectInput::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::MediaInput::Commands::SelectInput::Type request;
+        RequestType request;
         request.index = 1;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -26540,22 +26349,20 @@ private:
 
     CHIP_ERROR TestHideInputStatusCommand_3()
     {
-        chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type;
 
-        using requestType  = chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -26564,22 +26371,20 @@ private:
 
     CHIP_ERROR TestShowInputStatusCommand_4()
     {
-        chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type;
 
-        using requestType  = chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -26588,24 +26393,22 @@ private:
 
     CHIP_ERROR TestRenameInputCommand_5()
     {
-        chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::MediaInput::Commands::RenameInput::Type;
 
-        using requestType  = chip::app::Clusters::MediaInput::Commands::RenameInput::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::MediaInput::Commands::RenameInput::Type request;
+        RequestType request;
         request.index = 1;
-        request.name  = chip::Span<const char>("newName", strlen("newName"));
+        request.name  = chip::Span<const char>("newNamegarbage: not in length on purpose", 7);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -27000,12 +26803,12 @@ public:
             err = TestReadAttributeOctetStringDefaultValue_88();
             break;
         case 89:
-            ChipLogProgress(chipTool, " ***** Test Step 89 : Write attribute OCTET_STRING\n");
-            err = TestWriteAttributeOctetString_89();
+            ChipLogProgress(chipTool, " ***** Test Step 89 : Write attribute OCTET_STRING with embedded null\n");
+            err = TestWriteAttributeOctetStringWithEmbeddedNull_89();
             break;
         case 90:
-            ChipLogProgress(chipTool, " ***** Test Step 90 : Read attribute OCTET_STRING\n");
-            err = TestReadAttributeOctetString_90();
+            ChipLogProgress(chipTool, " ***** Test Step 90 : Read attribute OCTET_STRING with embedded null\n");
+            err = TestReadAttributeOctetStringWithEmbeddedNull_90();
             break;
         case 91:
             ChipLogProgress(chipTool, " ***** Test Step 91 : Write attribute OCTET_STRING\n");
@@ -27020,136 +26823,132 @@ public:
             err = TestWriteAttributeOctetString_93();
             break;
         case 94:
-            ChipLogProgress(chipTool, " ***** Test Step 94 : Read attribute LONG_OCTET_STRING Default Value\n");
-            err = TestReadAttributeLongOctetStringDefaultValue_94();
+            ChipLogProgress(chipTool, " ***** Test Step 94 : Read attribute OCTET_STRING\n");
+            err = TestReadAttributeOctetString_94();
             break;
         case 95:
-            ChipLogProgress(chipTool, " ***** Test Step 95 : Write attribute LONG_OCTET_STRING\n");
-            err = TestWriteAttributeLongOctetString_95();
+            ChipLogProgress(chipTool, " ***** Test Step 95 : Write attribute OCTET_STRING\n");
+            err = TestWriteAttributeOctetString_95();
             break;
         case 96:
-            ChipLogProgress(chipTool, " ***** Test Step 96 : Read attribute LONG_OCTET_STRING\n");
-            err = TestReadAttributeLongOctetString_96();
+            ChipLogProgress(chipTool, " ***** Test Step 96 : Read attribute LONG_OCTET_STRING Default Value\n");
+            err = TestReadAttributeLongOctetStringDefaultValue_96();
             break;
         case 97:
             ChipLogProgress(chipTool, " ***** Test Step 97 : Write attribute LONG_OCTET_STRING\n");
             err = TestWriteAttributeLongOctetString_97();
             break;
         case 98:
-            ChipLogProgress(chipTool, " ***** Test Step 98 : Read attribute CHAR_STRING Default Value\n");
-            err = TestReadAttributeCharStringDefaultValue_98();
+            ChipLogProgress(chipTool, " ***** Test Step 98 : Read attribute LONG_OCTET_STRING\n");
+            err = TestReadAttributeLongOctetString_98();
             break;
         case 99:
-            ChipLogProgress(chipTool, " ***** Test Step 99 : Write attribute CHAR_STRING\n");
-            err = TestWriteAttributeCharString_99();
+            ChipLogProgress(chipTool, " ***** Test Step 99 : Write attribute LONG_OCTET_STRING\n");
+            err = TestWriteAttributeLongOctetString_99();
             break;
         case 100:
-            ChipLogProgress(chipTool, " ***** Test Step 100 : Write attribute CHAR_STRING - Value too long\n");
-            err = TestWriteAttributeCharStringValueTooLong_100();
+            ChipLogProgress(chipTool, " ***** Test Step 100 : Read attribute CHAR_STRING Default Value\n");
+            err = TestReadAttributeCharStringDefaultValue_100();
             break;
         case 101:
-            ChipLogProgress(chipTool, " ***** Test Step 101 : Write attribute CHAR_STRING - Empty\n");
-            err = TestWriteAttributeCharStringEmpty_101();
+            ChipLogProgress(chipTool, " ***** Test Step 101 : Write attribute CHAR_STRING\n");
+            err = TestWriteAttributeCharString_101();
             break;
         case 102:
-            ChipLogProgress(chipTool, " ***** Test Step 102 : Read attribute LONG_CHAR_STRING Default Value\n");
-            err = TestReadAttributeLongCharStringDefaultValue_102();
+            ChipLogProgress(chipTool, " ***** Test Step 102 : Write attribute CHAR_STRING - Value too long\n");
+            err = TestWriteAttributeCharStringValueTooLong_102();
             break;
         case 103:
-            ChipLogProgress(chipTool, " ***** Test Step 103 : Write attribute LONG_CHAR_STRING\n");
-            err = TestWriteAttributeLongCharString_103();
+            ChipLogProgress(chipTool, " ***** Test Step 103 : Write attribute CHAR_STRING - Empty\n");
+            err = TestWriteAttributeCharStringEmpty_103();
             break;
         case 104:
-            ChipLogProgress(chipTool, " ***** Test Step 104 : Read attribute LONG_CHAR_STRING\n");
-            err = TestReadAttributeLongCharString_104();
+            ChipLogProgress(chipTool, " ***** Test Step 104 : Read attribute LONG_CHAR_STRING Default Value\n");
+            err = TestReadAttributeLongCharStringDefaultValue_104();
             break;
         case 105:
             ChipLogProgress(chipTool, " ***** Test Step 105 : Write attribute LONG_CHAR_STRING\n");
             err = TestWriteAttributeLongCharString_105();
             break;
         case 106:
-            ChipLogProgress(chipTool, " ***** Test Step 106 : Read attribute LIST\n");
-            err = TestReadAttributeList_106();
+            ChipLogProgress(chipTool, " ***** Test Step 106 : Read attribute LONG_CHAR_STRING\n");
+            err = TestReadAttributeLongCharString_106();
             break;
         case 107:
-            ChipLogProgress(chipTool, " ***** Test Step 107 : Read attribute LIST_OCTET_STRING\n");
-            err = TestReadAttributeListOctetString_107();
+            ChipLogProgress(chipTool, " ***** Test Step 107 : Write attribute LONG_CHAR_STRING\n");
+            err = TestWriteAttributeLongCharString_107();
             break;
         case 108:
-            ChipLogProgress(chipTool, " ***** Test Step 108 : Read attribute LIST_STRUCT_OCTET_STRING\n");
-            err = TestReadAttributeListStructOctetString_108();
+            ChipLogProgress(chipTool, " ***** Test Step 108 : Read attribute EPOCH_US Default Value\n");
+            err = TestReadAttributeEpochUsDefaultValue_108();
             break;
         case 109:
-            ChipLogProgress(chipTool, " ***** Test Step 109 : Read attribute EPOCH_US Default Value\n");
-            err = TestReadAttributeEpochUsDefaultValue_109();
+            ChipLogProgress(chipTool, " ***** Test Step 109 : Write attribute EPOCH_US Max Value\n");
+            err = TestWriteAttributeEpochUsMaxValue_109();
             break;
         case 110:
-            ChipLogProgress(chipTool, " ***** Test Step 110 : Write attribute EPOCH_US Max Value\n");
-            err = TestWriteAttributeEpochUsMaxValue_110();
+            ChipLogProgress(chipTool, " ***** Test Step 110 : Read attribute EPOCH_US Max Value\n");
+            err = TestReadAttributeEpochUsMaxValue_110();
             break;
         case 111:
-            ChipLogProgress(chipTool, " ***** Test Step 111 : Read attribute EPOCH_US Max Value\n");
-            err = TestReadAttributeEpochUsMaxValue_111();
+            ChipLogProgress(chipTool, " ***** Test Step 111 : Write attribute EPOCH_US Min Value\n");
+            err = TestWriteAttributeEpochUsMinValue_111();
             break;
         case 112:
-            ChipLogProgress(chipTool, " ***** Test Step 112 : Write attribute EPOCH_US Min Value\n");
-            err = TestWriteAttributeEpochUsMinValue_112();
+            ChipLogProgress(chipTool, " ***** Test Step 112 : Read attribute EPOCH_US Min Value\n");
+            err = TestReadAttributeEpochUsMinValue_112();
             break;
         case 113:
-            ChipLogProgress(chipTool, " ***** Test Step 113 : Read attribute EPOCH_US Min Value\n");
-            err = TestReadAttributeEpochUsMinValue_113();
+            ChipLogProgress(chipTool, " ***** Test Step 113 : Read attribute EPOCH_S Default Value\n");
+            err = TestReadAttributeEpochSDefaultValue_113();
             break;
         case 114:
-            ChipLogProgress(chipTool, " ***** Test Step 114 : Read attribute EPOCH_S Default Value\n");
-            err = TestReadAttributeEpochSDefaultValue_114();
+            ChipLogProgress(chipTool, " ***** Test Step 114 : Write attribute EPOCH_S Max Value\n");
+            err = TestWriteAttributeEpochSMaxValue_114();
             break;
         case 115:
-            ChipLogProgress(chipTool, " ***** Test Step 115 : Write attribute EPOCH_S Max Value\n");
-            err = TestWriteAttributeEpochSMaxValue_115();
+            ChipLogProgress(chipTool, " ***** Test Step 115 : Read attribute EPOCH_S Max Value\n");
+            err = TestReadAttributeEpochSMaxValue_115();
             break;
         case 116:
-            ChipLogProgress(chipTool, " ***** Test Step 116 : Read attribute EPOCH_S Max Value\n");
-            err = TestReadAttributeEpochSMaxValue_116();
+            ChipLogProgress(chipTool, " ***** Test Step 116 : Write attribute EPOCH_S Min Value\n");
+            err = TestWriteAttributeEpochSMinValue_116();
             break;
         case 117:
-            ChipLogProgress(chipTool, " ***** Test Step 117 : Write attribute EPOCH_S Min Value\n");
-            err = TestWriteAttributeEpochSMinValue_117();
+            ChipLogProgress(chipTool, " ***** Test Step 117 : Read attribute EPOCH_S Min Value\n");
+            err = TestReadAttributeEpochSMinValue_117();
             break;
         case 118:
-            ChipLogProgress(chipTool, " ***** Test Step 118 : Read attribute EPOCH_S Min Value\n");
-            err = TestReadAttributeEpochSMinValue_118();
+            ChipLogProgress(chipTool, " ***** Test Step 118 : Read attribute UNSUPPORTED\n");
+            err = TestReadAttributeUnsupported_118();
             break;
         case 119:
-            ChipLogProgress(chipTool, " ***** Test Step 119 : Read attribute UNSUPPORTED\n");
-            err = TestReadAttributeUnsupported_119();
+            ChipLogProgress(chipTool, " ***** Test Step 119 : Writeattribute UNSUPPORTED\n");
+            err = TestWriteattributeUnsupported_119();
             break;
         case 120:
-            ChipLogProgress(chipTool, " ***** Test Step 120 : Writeattribute UNSUPPORTED\n");
-            err = TestWriteattributeUnsupported_120();
+            ChipLogProgress(chipTool, " ***** Test Step 120 : Send Test Command to unsupported endpoint\n");
+            err = TestSendTestCommandToUnsupportedEndpoint_120();
             break;
         case 121:
-            ChipLogProgress(chipTool, " ***** Test Step 121 : Send Test Command to unsupported endpoint\n");
-            err = TestSendTestCommandToUnsupportedEndpoint_121();
+            ChipLogProgress(chipTool, " ***** Test Step 121 : Read attribute vendor_id Default Value\n");
+            err = TestReadAttributeVendorIdDefaultValue_121();
             break;
         case 122:
-            ChipLogProgress(chipTool, " ***** Test Step 122 : Read attribute vendor_id Default Value\n");
-            err = TestReadAttributeVendorIdDefaultValue_122();
+            ChipLogProgress(chipTool, " ***** Test Step 122 : Write attribute vendor_id\n");
+            err = TestWriteAttributeVendorId_122();
             break;
         case 123:
-            ChipLogProgress(chipTool, " ***** Test Step 123 : Write attribute vendor_id\n");
-            err = TestWriteAttributeVendorId_123();
+            ChipLogProgress(chipTool, " ***** Test Step 123 : Read attribute vendor_id\n");
+            err = TestReadAttributeVendorId_123();
             break;
         case 124:
-            ChipLogProgress(chipTool, " ***** Test Step 124 : Read attribute vendor_id\n");
-            err = TestReadAttributeVendorId_124();
+            ChipLogProgress(chipTool, " ***** Test Step 124 : Restore attribute vendor_id\n");
+            err = TestRestoreAttributeVendorId_124();
             break;
         case 125:
-            ChipLogProgress(chipTool, " ***** Test Step 125 : Restore attribute vendor_id\n");
-            err = TestRestoreAttributeVendorId_125();
-            break;
-        case 126:
-            ChipLogProgress(chipTool, " ***** Test Step 126 : Send a command with a vendor_id and enum\n");
-            err = TestSendACommandWithAVendorIdAndEnum_126();
+            ChipLogProgress(chipTool, " ***** Test Step 125 : Send a command with a vendor_id and enum\n");
+            err = TestSendACommandWithAVendorIdAndEnum_125();
             break;
         }
 
@@ -27162,7 +26961,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 127;
+    const uint16_t mTestCount = 126;
 
     static void OnFailureCallback_5(void * context, EmberAfStatus status)
     {
@@ -27948,9 +27747,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_94(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_94(void * context, chip::ByteSpan longOctetString)
+    static void OnSuccessCallback_94(void * context, chip::ByteSpan octetString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_94(longOctetString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_94(octetString);
     }
 
     static void OnFailureCallback_95(void * context, EmberAfStatus status)
@@ -27982,9 +27781,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_98(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_98(void * context, chip::CharSpan charString)
+    static void OnSuccessCallback_98(void * context, chip::ByteSpan longOctetString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_98(charString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_98(longOctetString);
     }
 
     static void OnFailureCallback_99(void * context, EmberAfStatus status)
@@ -27999,7 +27798,10 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_100(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_100(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_100(); }
+    static void OnSuccessCallback_100(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_100(charString);
+    }
 
     static void OnFailureCallback_101(void * context, EmberAfStatus status)
     {
@@ -28013,10 +27815,7 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_102(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_102(void * context, chip::CharSpan longCharString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_102(longCharString);
-    }
+    static void OnSuccessCallback_102(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_102(); }
 
     static void OnFailureCallback_103(void * context, EmberAfStatus status)
     {
@@ -28047,9 +27846,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_106(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_106(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    static void OnSuccessCallback_106(void * context, chip::CharSpan longCharString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_106(listInt8u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_106(longCharString);
     }
 
     static void OnFailureCallback_107(void * context, EmberAfStatus status)
@@ -28057,22 +27856,16 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_107(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_107(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & listOctetString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_107(listOctetString);
-    }
+    static void OnSuccessCallback_107(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_107(); }
 
     static void OnFailureCallback_108(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_108(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_108(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
-            listStructOctetString)
+    static void OnSuccessCallback_108(void * context, uint64_t epochUs)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_108(listStructOctetString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_108(epochUs);
     }
 
     static void OnFailureCallback_109(void * context, EmberAfStatus status)
@@ -28080,43 +27873,43 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_109(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_109(void * context, uint64_t epochUs)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_109(epochUs);
-    }
+    static void OnSuccessCallback_109(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_109(); }
 
     static void OnFailureCallback_110(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_110(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_110(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_110(); }
+    static void OnSuccessCallback_110(void * context, uint64_t epochUs)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_110(epochUs);
+    }
 
     static void OnFailureCallback_111(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_111(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_111(void * context, uint64_t epochUs)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_111(epochUs);
-    }
+    static void OnSuccessCallback_111(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_111(); }
 
     static void OnFailureCallback_112(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_112(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_112(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_112(); }
+    static void OnSuccessCallback_112(void * context, uint64_t epochUs)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_112(epochUs);
+    }
 
     static void OnFailureCallback_113(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_113(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_113(void * context, uint64_t epochUs)
+    static void OnSuccessCallback_113(void * context, uint32_t epochS)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_113(epochUs);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_113(epochS);
     }
 
     static void OnFailureCallback_114(void * context, EmberAfStatus status)
@@ -28124,43 +27917,43 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_114(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_114(void * context, uint32_t epochS)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_114(epochS);
-    }
+    static void OnSuccessCallback_114(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_114(); }
 
     static void OnFailureCallback_115(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_115(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_115(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_115(); }
+    static void OnSuccessCallback_115(void * context, uint32_t epochS)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_115(epochS);
+    }
 
     static void OnFailureCallback_116(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_116(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_116(void * context, uint32_t epochS)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_116(epochS);
-    }
+    static void OnSuccessCallback_116(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_116(); }
 
     static void OnFailureCallback_117(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_117(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_117(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_117(); }
+    static void OnSuccessCallback_117(void * context, uint32_t epochS)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_117(epochS);
+    }
 
     static void OnFailureCallback_118(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_118(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_118(void * context, uint32_t epochS)
+    static void OnSuccessCallback_118(void * context, bool unsupported)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_118(epochS);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_118(unsupported);
     }
 
     static void OnFailureCallback_119(void * context, EmberAfStatus status)
@@ -28168,51 +27961,41 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_119(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_119(void * context, bool unsupported)
+    static void OnSuccessCallback_119(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_119(); }
+
+    static void OnFailureCallback_121(void * context, EmberAfStatus status)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_119(unsupported);
+        (static_cast<TestCluster *>(context))->OnFailureResponse_121(chip::to_underlying(status));
     }
 
-    static void OnFailureCallback_120(void * context, EmberAfStatus status)
+    static void OnSuccessCallback_121(void * context, chip::VendorId vendorId)
     {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_120(chip::to_underlying(status));
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_121(vendorId);
     }
-
-    static void OnSuccessCallback_120(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_120(); }
 
     static void OnFailureCallback_122(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_122(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_122(void * context, chip::VendorId vendorId)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_122(vendorId);
-    }
+    static void OnSuccessCallback_122(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_122(); }
 
     static void OnFailureCallback_123(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_123(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_123(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_123(); }
+    static void OnSuccessCallback_123(void * context, chip::VendorId vendorId)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_123(vendorId);
+    }
 
     static void OnFailureCallback_124(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_124(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_124(void * context, chip::VendorId vendorId)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_124(vendorId);
-    }
-
-    static void OnFailureCallback_125(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_125(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_125(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_125(); }
+    static void OnSuccessCallback_124(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_124(); }
 
     //
     // Tests methods
@@ -28220,22 +28003,20 @@ private:
 
     CHIP_ERROR TestSendTestCommand_0()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::Test::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::Test::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::TestCluster::Commands::Test::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -28244,22 +28025,20 @@ private:
 
     CHIP_ERROR TestSendTestNotHandledCommand_1()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestCluster *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { NextTest(); }
@@ -28268,22 +28047,20 @@ private:
 
     CHIP_ERROR TestSendTestSpecificCommand_2()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestSpecific::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestSpecific::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType;
+        RequestType request;
 
-        chip::app::Clusters::TestCluster::Commands::TestSpecific::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))->OnSuccessResponse_2(data.returnValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestCluster *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -28296,24 +28073,22 @@ private:
 
     CHIP_ERROR TestSendTestAddArgumentsCommand_3()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type request;
+        RequestType request;
         request.arg1 = 3;
         request.arg2 = 17;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))->OnSuccessResponse_3(data.returnValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestCluster *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -28326,24 +28101,22 @@ private:
 
     CHIP_ERROR TestSendFailingTestAddArgumentsCommand_4()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type request;
+        RequestType request;
         request.arg1 = 250;
         request.arg2 = 6;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))->OnSuccessResponse_4(data.returnValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestCluster *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { NextTest(); }
@@ -29740,17 +29513,17 @@ private:
 
     void OnSuccessResponse_88(chip::ByteSpan octetString)
     {
-        VerifyOrReturn(CheckValueAsString("octetString", octetString, ""));
+        VerifyOrReturn(CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeOctetString_89()
+    CHIP_ERROR TestWriteAttributeOctetStringWithEmbeddedNull_89()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         chip::ByteSpan octetStringArgument;
-        octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), strlen("TestValue"));
+        octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("Tes\x00ti\x00nggarbage: not in length on purpose"), 9);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
             octetStringArgument, this, OnSuccessCallback_89, OnFailureCallback_89);
@@ -29760,7 +29533,7 @@ private:
 
     void OnSuccessResponse_89() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeOctetString_90()
+    CHIP_ERROR TestReadAttributeOctetStringWithEmbeddedNull_90()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -29773,7 +29546,8 @@ private:
 
     void OnSuccessResponse_90(chip::ByteSpan octetString)
     {
-        VerifyOrReturn(CheckValueAsString("octetString", octetString, "TestValue"));
+        VerifyOrReturn(
+            CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("Tes\x00ti\x00ng"), 9)));
         NextTest();
     }
 
@@ -29783,16 +29557,15 @@ private:
         cluster.Associate(mDevice, 1);
 
         chip::ByteSpan octetStringArgument;
-        octetStringArgument =
-            chip::ByteSpan(chip::Uint8::from_const_char("TestValueLongerThan10"), strlen("TestValueLongerThan10"));
+        octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("TestValuegarbage: not in length on purpose"), 9);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
             octetStringArgument, this, OnSuccessCallback_91, OnFailureCallback_91);
     }
 
-    void OnFailureResponse_91(uint8_t status) { NextTest(); }
+    void OnFailureResponse_91(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_91() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_91() { NextTest(); }
 
     CHIP_ERROR TestReadAttributeOctetString_92()
     {
@@ -29807,7 +29580,8 @@ private:
 
     void OnSuccessResponse_92(chip::ByteSpan octetString)
     {
-        VerifyOrReturn(CheckValueAsString("octetString", octetString, "TestValue"));
+        VerifyOrReturn(
+            CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), 9)));
         NextTest();
     }
 
@@ -29817,57 +29591,52 @@ private:
         cluster.Associate(mDevice, 1);
 
         chip::ByteSpan octetStringArgument;
-        octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
+        octetStringArgument =
+            chip::ByteSpan(chip::Uint8::from_const_char("TestValueLongerThan10garbage: not in length on purpose"), 21);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
             octetStringArgument, this, OnSuccessCallback_93, OnFailureCallback_93);
     }
 
-    void OnFailureResponse_93(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_93(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_93() { NextTest(); }
+    void OnSuccessResponse_93() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeLongOctetStringDefaultValue_94()
+    CHIP_ERROR TestReadAttributeOctetString_94()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
             this, OnSuccessCallback_94, OnFailureCallback_94);
     }
 
     void OnFailureResponse_94(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_94(chip::ByteSpan longOctetString)
+    void OnSuccessResponse_94(chip::ByteSpan octetString)
     {
-        VerifyOrReturn(CheckValueAsString("longOctetString", longOctetString, ""));
+        VerifyOrReturn(
+            CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), 9)));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeLongOctetString_95()
+    CHIP_ERROR TestWriteAttributeOctetString_95()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::ByteSpan longOctetStringArgument;
-        longOctetStringArgument = chip::ByteSpan(
-            chip::Uint8::from_const_char(
-                "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                "111111111111111111111111111111111111111111111111111111111111111111111111"),
-            strlen("111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                   "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                   "111111111111111111111111111111111111111111111111111111111111111111111111111111"));
+        chip::ByteSpan octetStringArgument;
+        octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
-            longOctetStringArgument, this, OnSuccessCallback_95, OnFailureCallback_95);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            octetStringArgument, this, OnSuccessCallback_95, OnFailureCallback_95);
     }
 
     void OnFailureResponse_95(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_95() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeLongOctetString_96()
+    CHIP_ERROR TestReadAttributeLongOctetStringDefaultValue_96()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -29880,11 +29649,7 @@ private:
 
     void OnSuccessResponse_96(chip::ByteSpan longOctetString)
     {
-        VerifyOrReturn(CheckValueAsString(
-            "longOctetString", longOctetString,
-            "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-            "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-            "1111111111111111111111111111111111111111111111111111111111111111"));
+        VerifyOrReturn(CheckValueAsString("longOctetString", longOctetString, chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
         NextTest();
     }
 
@@ -29894,7 +29659,12 @@ private:
         cluster.Associate(mDevice, 1);
 
         chip::ByteSpan longOctetStringArgument;
-        longOctetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
+        longOctetStringArgument = chip::ByteSpan(
+            chip::Uint8::from_const_char(
+                "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                "111111111111111111111111111111111111111111111111111111111111111111111111garbage: not in length on purpose"),
+            300);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
             longOctetStringArgument, this, OnSuccessCallback_97, OnFailureCallback_97);
@@ -29904,62 +29674,70 @@ private:
 
     void OnSuccessResponse_97() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeCharStringDefaultValue_98()
+    CHIP_ERROR TestReadAttributeLongOctetString_98()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(this, OnSuccessCallback_98,
-                                                                                                         OnFailureCallback_98);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
+            this, OnSuccessCallback_98, OnFailureCallback_98);
     }
 
     void OnFailureResponse_98(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_98(chip::CharSpan charString)
+    void OnSuccessResponse_98(chip::ByteSpan longOctetString)
     {
-        VerifyOrReturn(CheckValueAsString("charString", charString, ""));
+        VerifyOrReturn(CheckValueAsString(
+            "longOctetString", longOctetString,
+            chip::ByteSpan(
+                chip::Uint8::from_const_char(
+                    "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                    "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                    "11111111111111111111111111111111111111111111111111111111111111111111111111111111"),
+                300)));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeCharString_99()
+    CHIP_ERROR TestWriteAttributeLongOctetString_99()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::CharSpan charStringArgument;
-        charStringArgument = chip::Span<const char>("☉T☉", strlen("☉T☉"));
+        chip::ByteSpan longOctetStringArgument;
+        longOctetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            charStringArgument, this, OnSuccessCallback_99, OnFailureCallback_99);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
+            longOctetStringArgument, this, OnSuccessCallback_99, OnFailureCallback_99);
     }
 
     void OnFailureResponse_99(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_99() { NextTest(); }
 
-    CHIP_ERROR TestWriteAttributeCharStringValueTooLong_100()
+    CHIP_ERROR TestReadAttributeCharStringDefaultValue_100()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::CharSpan charStringArgument;
-        charStringArgument = chip::Span<const char>("☉TestValueLongerThan10☉", strlen("☉TestValueLongerThan10☉"));
-
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            charStringArgument, this, OnSuccessCallback_100, OnFailureCallback_100);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_100, OnFailureCallback_100);
     }
 
-    void OnFailureResponse_100(uint8_t status) { NextTest(); }
+    void OnFailureResponse_100(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_100() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_100(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckValueAsString("charString", charString, chip::CharSpan("", 0)));
+        NextTest();
+    }
 
-    CHIP_ERROR TestWriteAttributeCharStringEmpty_101()
+    CHIP_ERROR TestWriteAttributeCharString_101()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         chip::CharSpan charStringArgument;
-        charStringArgument = chip::Span<const char>("", strlen(""));
+        charStringArgument = chip::Span<const char>("☉T☉garbage: not in length on purpose", 3);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
             charStringArgument, this, OnSuccessCallback_101, OnFailureCallback_101);
@@ -29969,46 +29747,39 @@ private:
 
     void OnSuccessResponse_101() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeLongCharStringDefaultValue_102()
+    CHIP_ERROR TestWriteAttributeCharStringValueTooLong_102()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-            this, OnSuccessCallback_102, OnFailureCallback_102);
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("☉TestValueLongerThan10☉garbage: not in length on purpose", 23);
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_102, OnFailureCallback_102);
     }
 
-    void OnFailureResponse_102(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_102(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_102(chip::CharSpan longCharString)
-    {
-        VerifyOrReturn(CheckValueAsString("longCharString", longCharString, ""));
-        NextTest();
-    }
+    void OnSuccessResponse_102() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestWriteAttributeLongCharString_103()
+    CHIP_ERROR TestWriteAttributeCharStringEmpty_103()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        chip::CharSpan longCharStringArgument;
-        longCharStringArgument = chip::Span<const char>(
-            "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-            "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-            "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉",
-            strlen("☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-                   "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-                   "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"));
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-            longCharStringArgument, this, OnSuccessCallback_103, OnFailureCallback_103);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_103, OnFailureCallback_103);
     }
 
     void OnFailureResponse_103(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_103() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeLongCharString_104()
+    CHIP_ERROR TestReadAttributeLongCharStringDefaultValue_104()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -30021,11 +29792,7 @@ private:
 
     void OnSuccessResponse_104(chip::CharSpan longCharString)
     {
-        VerifyOrReturn(CheckValueAsString(
-            "longCharString", longCharString,
-            "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-            "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-            "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"));
+        VerifyOrReturn(CheckValueAsString("longCharString", longCharString, chip::CharSpan("", 0)));
         NextTest();
     }
 
@@ -30035,7 +29802,11 @@ private:
         cluster.Associate(mDevice, 1);
 
         chip::CharSpan longCharStringArgument;
-        longCharStringArgument = chip::Span<const char>("", strlen(""));
+        longCharStringArgument = chip::Span<const char>(
+            "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+            "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+            "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉garbage: not in length on purpose",
+            300);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
             longCharStringArgument, this, OnSuccessCallback_105, OnFailureCallback_105);
@@ -30045,108 +29816,62 @@ private:
 
     void OnSuccessResponse_105() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeList_106()
+    CHIP_ERROR TestReadAttributeLongCharString_106()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_106,
-                                                                                                        OnFailureCallback_106);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
+            this, OnSuccessCallback_106, OnFailureCallback_106);
     }
 
     void OnFailureResponse_106(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_106(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    void OnSuccessResponse_106(chip::CharSpan longCharString)
     {
-        auto iter = listInt8u.begin();
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 0));
-        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[0]", iter.GetValue(), 1));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 1));
-        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[1]", iter.GetValue(), 2));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 2));
-        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[2]", iter.GetValue(), 3));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 3));
-        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[3]", iter.GetValue(), 4));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(listInt8u)>("listInt8u", iter, 4));
+        VerifyOrReturn(CheckValueAsString(
+            "longCharString", longCharString,
+            chip::CharSpan("☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+                           "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+                           "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉",
+                           300)));
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeListOctetString_107()
+    CHIP_ERROR TestWriteAttributeLongCharString_107()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo>(
-            this, OnSuccessCallback_107, OnFailureCallback_107);
+        chip::CharSpan longCharStringArgument;
+        longCharStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
+            longCharStringArgument, this, OnSuccessCallback_107, OnFailureCallback_107);
     }
 
     void OnFailureResponse_107(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_107(const chip::app::DataModel::DecodableList<chip::ByteSpan> & listOctetString)
-    {
-        auto iter = listOctetString.begin();
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 0));
-        VerifyOrReturn(CheckValueAsString("listOctetString[0]", iter.GetValue(), "Test0"));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 1));
-        VerifyOrReturn(CheckValueAsString("listOctetString[1]", iter.GetValue(), "Test1"));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 2));
-        VerifyOrReturn(CheckValueAsString("listOctetString[2]", iter.GetValue(), "Test2"));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 3));
-        VerifyOrReturn(CheckValueAsString("listOctetString[3]", iter.GetValue(), "Test3"));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(listOctetString)>("listOctetString", iter, 4));
-        NextTest();
-    }
+    void OnSuccessResponse_107() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeListStructOctetString_108()
+    CHIP_ERROR TestReadAttributeEpochUsDefaultValue_108()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-            this, OnSuccessCallback_108, OnFailureCallback_108);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_108,
+                                                                                                      OnFailureCallback_108);
     }
 
     void OnFailureResponse_108(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_108(
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
-            listStructOctetString)
-    {
-        auto iter = listStructOctetString.begin();
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 0));
-        VerifyOrReturn(CheckValue<>("listStructOctetString[0].fabricIndex", iter.GetValue().fabricIndex, 0ULL));
-        VerifyOrReturn(CheckValueAsString("listStructOctetString[0].operationalCert", iter.GetValue().operationalCert, "Test0"));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 1));
-        VerifyOrReturn(CheckValue<>("listStructOctetString[1].fabricIndex", iter.GetValue().fabricIndex, 1ULL));
-        VerifyOrReturn(CheckValueAsString("listStructOctetString[1].operationalCert", iter.GetValue().operationalCert, "Test1"));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 2));
-        VerifyOrReturn(CheckValue<>("listStructOctetString[2].fabricIndex", iter.GetValue().fabricIndex, 2ULL));
-        VerifyOrReturn(CheckValueAsString("listStructOctetString[2].operationalCert", iter.GetValue().operationalCert, "Test2"));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 3));
-        VerifyOrReturn(CheckValue<>("listStructOctetString[3].fabricIndex", iter.GetValue().fabricIndex, 3ULL));
-        VerifyOrReturn(CheckValueAsString("listStructOctetString[3].operationalCert", iter.GetValue().operationalCert, "Test3"));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(listStructOctetString)>("listStructOctetString", iter, 4));
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadAttributeEpochUsDefaultValue_109()
-    {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_109,
-                                                                                                      OnFailureCallback_109);
-    }
-
-    void OnFailureResponse_109(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_109(uint64_t epochUs)
+    void OnSuccessResponse_108(uint64_t epochUs)
     {
         VerifyOrReturn(CheckValue<uint64_t>("epochUs", epochUs, 0ULL));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeEpochUsMaxValue_110()
+    CHIP_ERROR TestWriteAttributeEpochUsMaxValue_109()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -30155,31 +29880,31 @@ private:
         epochUsArgument = 18446744073709551615ULL;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            epochUsArgument, this, OnSuccessCallback_110, OnFailureCallback_110);
+            epochUsArgument, this, OnSuccessCallback_109, OnFailureCallback_109);
     }
 
-    void OnFailureResponse_110(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_109(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_110() { NextTest(); }
+    void OnSuccessResponse_109() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEpochUsMaxValue_111()
+    CHIP_ERROR TestReadAttributeEpochUsMaxValue_110()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_111,
-                                                                                                      OnFailureCallback_111);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_110,
+                                                                                                      OnFailureCallback_110);
     }
 
-    void OnFailureResponse_111(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_110(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_111(uint64_t epochUs)
+    void OnSuccessResponse_110(uint64_t epochUs)
     {
         VerifyOrReturn(CheckValue<uint64_t>("epochUs", epochUs, 18446744073709551615ULL));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeEpochUsMinValue_112()
+    CHIP_ERROR TestWriteAttributeEpochUsMinValue_111()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -30188,48 +29913,48 @@ private:
         epochUsArgument = 0ULL;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            epochUsArgument, this, OnSuccessCallback_112, OnFailureCallback_112);
+            epochUsArgument, this, OnSuccessCallback_111, OnFailureCallback_111);
     }
 
-    void OnFailureResponse_112(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_111(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_112() { NextTest(); }
+    void OnSuccessResponse_111() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEpochUsMinValue_113()
+    CHIP_ERROR TestReadAttributeEpochUsMinValue_112()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_113,
-                                                                                                      OnFailureCallback_113);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_112,
+                                                                                                      OnFailureCallback_112);
     }
 
-    void OnFailureResponse_113(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_112(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_113(uint64_t epochUs)
+    void OnSuccessResponse_112(uint64_t epochUs)
     {
         VerifyOrReturn(CheckValue<uint64_t>("epochUs", epochUs, 0ULL));
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeEpochSDefaultValue_114()
+    CHIP_ERROR TestReadAttributeEpochSDefaultValue_113()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_114,
-                                                                                                     OnFailureCallback_114);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_113,
+                                                                                                     OnFailureCallback_113);
     }
 
-    void OnFailureResponse_114(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_113(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_114(uint32_t epochS)
+    void OnSuccessResponse_113(uint32_t epochS)
     {
         VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 0UL));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeEpochSMaxValue_115()
+    CHIP_ERROR TestWriteAttributeEpochSMaxValue_114()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -30238,31 +29963,31 @@ private:
         epochSArgument = 4294967295UL;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            epochSArgument, this, OnSuccessCallback_115, OnFailureCallback_115);
+            epochSArgument, this, OnSuccessCallback_114, OnFailureCallback_114);
     }
 
-    void OnFailureResponse_115(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_114(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_115() { NextTest(); }
+    void OnSuccessResponse_114() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEpochSMaxValue_116()
+    CHIP_ERROR TestReadAttributeEpochSMaxValue_115()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_116,
-                                                                                                     OnFailureCallback_116);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_115,
+                                                                                                     OnFailureCallback_115);
     }
 
-    void OnFailureResponse_116(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_115(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_116(uint32_t epochS)
+    void OnSuccessResponse_115(uint32_t epochS)
     {
         VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 4294967295UL));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeEpochSMinValue_117()
+    CHIP_ERROR TestWriteAttributeEpochSMinValue_116()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -30271,51 +29996,51 @@ private:
         epochSArgument = 0UL;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            epochSArgument, this, OnSuccessCallback_117, OnFailureCallback_117);
+            epochSArgument, this, OnSuccessCallback_116, OnFailureCallback_116);
     }
 
-    void OnFailureResponse_117(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_116(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_117() { NextTest(); }
+    void OnSuccessResponse_116() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEpochSMinValue_118()
+    CHIP_ERROR TestReadAttributeEpochSMinValue_117()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_118,
-                                                                                                     OnFailureCallback_118);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_117,
+                                                                                                     OnFailureCallback_117);
     }
 
-    void OnFailureResponse_118(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_117(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_118(uint32_t epochS)
+    void OnSuccessResponse_117(uint32_t epochS)
     {
         VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 0UL));
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeUnsupported_119()
+    CHIP_ERROR TestReadAttributeUnsupported_118()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(
-            this, OnSuccessCallback_119, OnFailureCallback_119);
+            this, OnSuccessCallback_118, OnFailureCallback_118);
     }
 
-    void OnFailureResponse_119(uint8_t status)
+    void OnFailureResponse_118(uint8_t status)
     {
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_119(bool unsupported)
+    void OnSuccessResponse_118(bool unsupported)
     {
         VerifyOrReturn(CheckValue<bool>("unsupported", unsupported, 0));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteattributeUnsupported_120()
+    CHIP_ERROR TestWriteattributeUnsupported_119()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -30324,58 +30049,56 @@ private:
         unsupportedArgument = 0;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(
-            unsupportedArgument, this, OnSuccessCallback_120, OnFailureCallback_120);
+            unsupportedArgument, this, OnSuccessCallback_119, OnFailureCallback_119);
     }
 
-    void OnFailureResponse_120(uint8_t status)
+    void OnFailureResponse_119(uint8_t status)
     {
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_120() { NextTest(); }
+    void OnSuccessResponse_119() { NextTest(); }
 
-    CHIP_ERROR TestSendTestCommandToUnsupportedEndpoint_121()
+    CHIP_ERROR TestSendTestCommandToUnsupportedEndpoint_120()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 200);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::Test::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::Test::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::TestCluster::Commands::Test::Type request;
-
-        auto success = [](void * context, const responseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_121();
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_120();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_121(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_120(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 200, request));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_121(uint8_t status) { NextTest(); }
+    void OnFailureResponse_120(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_121() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_120() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeVendorIdDefaultValue_122()
+    CHIP_ERROR TestReadAttributeVendorIdDefaultValue_121()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_122,
-                                                                                                       OnFailureCallback_122);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_121,
+                                                                                                       OnFailureCallback_121);
     }
 
-    void OnFailureResponse_122(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_121(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_122(chip::VendorId vendorId)
+    void OnSuccessResponse_121(chip::VendorId vendorId)
     {
         VerifyOrReturn(CheckValue<chip::VendorId>("vendorId", vendorId, 0U));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeVendorId_123()
+    CHIP_ERROR TestWriteAttributeVendorId_122()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -30384,31 +30107,31 @@ private:
         vendorIdArgument = static_cast<chip::VendorId>(17);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            vendorIdArgument, this, OnSuccessCallback_123, OnFailureCallback_123);
+            vendorIdArgument, this, OnSuccessCallback_122, OnFailureCallback_122);
     }
 
-    void OnFailureResponse_123(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_122(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_123() { NextTest(); }
+    void OnSuccessResponse_122() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeVendorId_124()
+    CHIP_ERROR TestReadAttributeVendorId_123()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_124,
-                                                                                                       OnFailureCallback_124);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_123,
+                                                                                                       OnFailureCallback_123);
     }
 
-    void OnFailureResponse_124(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_123(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_124(chip::VendorId vendorId)
+    void OnSuccessResponse_123(chip::VendorId vendorId)
     {
         VerifyOrReturn(CheckValue<chip::VendorId>("vendorId", vendorId, 17U));
         NextTest();
     }
 
-    CHIP_ERROR TestRestoreAttributeVendorId_125()
+    CHIP_ERROR TestRestoreAttributeVendorId_124()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
@@ -30417,38 +30140,36 @@ private:
         vendorIdArgument = static_cast<chip::VendorId>(0);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            vendorIdArgument, this, OnSuccessCallback_125, OnFailureCallback_125);
+            vendorIdArgument, this, OnSuccessCallback_124, OnFailureCallback_124);
+    }
+
+    void OnFailureResponse_124(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_124() { NextTest(); }
+
+    CHIP_ERROR TestSendACommandWithAVendorIdAndEnum_125()
+    {
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type;
+
+        RequestType request;
+        request.arg1 = static_cast<chip::VendorId>(20003);
+        request.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(101);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_125(data.arg1, data.arg2);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestCluster *>(context))->OnFailureResponse_125(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_125(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_125() { NextTest(); }
-
-    CHIP_ERROR TestSendACommandWithAVendorIdAndEnum_126()
-    {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type request;
-        request.arg1 = static_cast<chip::VendorId>(20003);
-        request.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(101);
-
-        auto success = [](void * context, const responseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_126(data.arg1, data.arg2);
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_126(status);
-        };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
-    }
-
-    void OnFailureResponse_126(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_126(chip::VendorId arg1, chip::app::Clusters::TestCluster::SimpleEnum arg2)
+    void OnSuccessResponse_125(chip::VendorId arg1, chip::app::Clusters::TestCluster::SimpleEnum arg2)
     {
         VerifyOrReturn(CheckValue<chip::VendorId>("arg1", arg1, 20003U));
 
@@ -30524,16 +30245,41 @@ public:
             err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Send Test Command with optional arg set.\n");
-            err = TestSendTestCommandWithOptionalArgSet_8();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 8 : Write attribute LIST With List of INT8U and none of them is set to 0\n");
+            err = TestWriteAttributeListWithListOfInt8uAndNoneOfThemIsSetTo0_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Send Test Command without its optional arg.\n");
-            err = TestSendTestCommandWithoutItsOptionalArg_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Read attribute LIST With List of INT8U\n");
+            err = TestReadAttributeListWithListOfInt8u_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Send Test Command with optional arg set to null.\n");
-            err = TestSendTestCommandWithOptionalArgSetToNull_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Write attribute LIST With List of OCTET_STRING\n");
+            err = TestWriteAttributeListWithListOfOctetString_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Read attribute LIST With List of OCTET_STRING\n");
+            err = TestReadAttributeListWithListOfOctetString_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Write attribute LIST With List of LIST_STRUCT_OCTET_STRING\n");
+            err = TestWriteAttributeListWithListOfListStructOctetString_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Read attribute LIST With List of LIST_STRUCT_OCTET_STRING\n");
+            err = TestReadAttributeListWithListOfListStructOctetString_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Send Test Command with optional arg set.\n");
+            err = TestSendTestCommandWithOptionalArgSet_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Send Test Command without its optional arg.\n");
+            err = TestSendTestCommandWithoutItsOptionalArg_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Send Test Command with optional arg set to null.\n");
+            err = TestSendTestCommandWithOptionalArgSetToNull_16();
             break;
         }
 
@@ -30546,7 +30292,61 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 11;
+    const uint16_t mTestCount = 17;
+
+    static void OnFailureCallback_8(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_8(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_8(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_8(); }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_9(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_9(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_9(listInt8u);
+    }
+
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_10(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_10(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_10(); }
+
+    static void OnFailureCallback_11(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_11(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_11(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & listOctetString)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_11(listOctetString);
+    }
+
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_12(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_12(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_12(); }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_13(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_13(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+            listStructOctetString)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_13(listStructOctetString);
+    }
 
     //
     // Tests methods
@@ -30554,29 +30354,27 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithStructArgumentAndArg1bIsTrue_0()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type request;
+        RequestType request;
 
         request.arg1.a = 0;
         request.arg1.b = true;
         request.arg1.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
-        request.arg1.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_string"), strlen("octet_string"));
-        request.arg1.e = chip::Span<const char>("char_string", strlen("char_string"));
+        request.arg1.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
+        request.arg1.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
         request.arg1.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_0(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -30589,29 +30387,27 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithStructArgumentAndArg1bIsFalse_1()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type request;
+        RequestType request;
 
         request.arg1.a = 0;
         request.arg1.b = false;
         request.arg1.c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
-        request.arg1.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_string"), strlen("octet_string"));
-        request.arg1.e = chip::Span<const char>("char_string", strlen("char_string"));
+        request.arg1.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
+        request.arg1.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
         request.arg1.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_1(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_1(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -30624,13 +30420,9 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithListOfInt8uAndNoneOfThemIsSetTo0_2()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
+        RequestType request;
 
         uint8_t arg1List[9];
         arg1List[0]  = 1;
@@ -30644,14 +30436,16 @@ private:
         arg1List[8]  = 9;
         request.arg1 = arg1List;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_2(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_2(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -30664,13 +30458,9 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithListOfInt8uAndOneOfThemIsSetTo0_3()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
+        RequestType request;
 
         uint8_t arg1List[10];
         arg1List[0]  = 1;
@@ -30685,14 +30475,16 @@ private:
         arg1List[9]  = 0;
         request.arg1 = arg1List;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_3(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -30705,13 +30497,9 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithListOfInt8uAndGetItReversed_4()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type request;
+        RequestType request;
 
         uint8_t arg1List[9];
         arg1List[0]  = 1;
@@ -30725,14 +30513,16 @@ private:
         arg1List[8]  = 9;
         request.arg1 = arg1List;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_4(data.arg1);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_4(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -30764,24 +30554,22 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithEmptyListOfInt8uAndGetAnEmptyListBack_5()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type request;
+        RequestType request;
 
         request.arg1 = chip::app::DataModel::List<uint8_t>();
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_5(data.arg1);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -30795,40 +30583,38 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_6()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type request;
+        RequestType request;
 
         chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type arg1List[2];
 
         arg1List[0].a = 0;
         arg1List[0].b = true;
         arg1List[0].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
-        arg1List[0].d = chip::ByteSpan(chip::Uint8::from_const_char("first_octet_string"), strlen("first_octet_string"));
-        arg1List[0].e = chip::Span<const char>("first_char_string", strlen("first_char_string"));
+        arg1List[0].d = chip::ByteSpan(chip::Uint8::from_const_char("first_octet_stringgarbage: not in length on purpose"), 18);
+        arg1List[0].e = chip::Span<const char>("first_char_stringgarbage: not in length on purpose", 17);
         arg1List[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
 
         arg1List[1].a = 1;
         arg1List[1].b = true;
         arg1List[1].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
-        arg1List[1].d = chip::ByteSpan(chip::Uint8::from_const_char("second_octet_string"), strlen("second_octet_string"));
-        arg1List[1].e = chip::Span<const char>("second_char_string", strlen("second_char_string"));
+        arg1List[1].d = chip::ByteSpan(chip::Uint8::from_const_char("second_octet_stringgarbage: not in length on purpose"), 19);
+        arg1List[1].e = chip::Span<const char>("second_char_stringgarbage: not in length on purpose", 18);
         arg1List[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
 
         request.arg1 = arg1List;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_6(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_6(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -30841,40 +30627,38 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_7()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type request;
+        RequestType request;
 
         chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type arg1List[2];
 
         arg1List[0].a = 1;
         arg1List[0].b = true;
         arg1List[0].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
-        arg1List[0].d = chip::ByteSpan(chip::Uint8::from_const_char("second_octet_string"), strlen("second_octet_string"));
-        arg1List[0].e = chip::Span<const char>("second_char_string", strlen("second_char_string"));
+        arg1List[0].d = chip::ByteSpan(chip::Uint8::from_const_char("second_octet_stringgarbage: not in length on purpose"), 19);
+        arg1List[0].e = chip::Span<const char>("second_char_stringgarbage: not in length on purpose", 18);
         arg1List[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
 
         arg1List[1].a = 0;
         arg1List[1].b = false;
         arg1List[1].c = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
-        arg1List[1].d = chip::ByteSpan(chip::Uint8::from_const_char("first_octet_string"), strlen("first_octet_string"));
-        arg1List[1].e = chip::Span<const char>("first_char_string", strlen("first_char_string"));
+        arg1List[1].d = chip::ByteSpan(chip::Uint8::from_const_char("first_octet_stringgarbage: not in length on purpose"), 18);
+        arg1List[1].e = chip::Span<const char>("first_char_stringgarbage: not in length on purpose", 17);
         arg1List[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
 
         request.arg1 = arg1List;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_7(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -30885,32 +30669,202 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithOptionalArgSet_8()
+    CHIP_ERROR TestWriteAttributeListWithListOfInt8uAndNoneOfThemIsSetTo0_8()
     {
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
+        chip::app::DataModel::List<const uint8_t> listInt8uArgument;
 
-        chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
-        request.arg1.Emplace().SetNonNull() = 5;
+        uint8_t listInt8uList[4];
+        listInt8uList[0]  = 1;
+        listInt8uList[1]  = 2;
+        listInt8uList[2]  = 3;
+        listInt8uList[3]  = 4;
+        listInt8uArgument = listInt8uList;
 
-        auto success = [](void * context, const responseType & data) {
-            (static_cast<TestClusterComplexTypes *>(context))
-                ->OnSuccessResponse_8(data.wasPresent, data.wasNull, data.value, data.originalValue);
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_8(status);
-        };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
+            listInt8uArgument, this, OnSuccessCallback_8, OnFailureCallback_8);
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
-                             const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
+    void OnSuccessResponse_8() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeListWithListOfInt8u_9()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_9,
+                                                                                                        OnFailureCallback_9);
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    {
+        auto iter = listInt8u.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 0));
+        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[0]", iter.GetValue(), 1));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 1));
+        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[1]", iter.GetValue(), 2));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 2));
+        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[2]", iter.GetValue(), 3));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 3));
+        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[3]", iter.GetValue(), 4));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(listInt8u)>("listInt8u", iter, 4));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeListWithListOfOctetString_10()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        chip::app::DataModel::List<const chip::ByteSpan> listOctetStringArgument;
+
+        chip::ByteSpan listOctetStringList[4];
+        listOctetStringList[0]  = chip::ByteSpan(chip::Uint8::from_const_char("Test0garbage: not in length on purpose"), 5);
+        listOctetStringList[1]  = chip::ByteSpan(chip::Uint8::from_const_char("Test1garbage: not in length on purpose"), 5);
+        listOctetStringList[2]  = chip::ByteSpan(chip::Uint8::from_const_char("Test2garbage: not in length on purpose"), 5);
+        listOctetStringList[3]  = chip::ByteSpan(chip::Uint8::from_const_char("Test3garbage: not in length on purpose"), 5);
+        listOctetStringArgument = listOctetStringList;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo>(
+            listOctetStringArgument, this, OnSuccessCallback_10, OnFailureCallback_10);
+    }
+
+    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeListWithListOfOctetString_11()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo>(
+            this, OnSuccessCallback_11, OnFailureCallback_11);
+    }
+
+    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11(const chip::app::DataModel::DecodableList<chip::ByteSpan> & listOctetString)
+    {
+        auto iter = listOctetString.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 0));
+        VerifyOrReturn(
+            CheckValueAsString("listOctetString[0]", iter.GetValue(), chip::ByteSpan(chip::Uint8::from_const_char("Test0"), 5)));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 1));
+        VerifyOrReturn(
+            CheckValueAsString("listOctetString[1]", iter.GetValue(), chip::ByteSpan(chip::Uint8::from_const_char("Test1"), 5)));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 2));
+        VerifyOrReturn(
+            CheckValueAsString("listOctetString[2]", iter.GetValue(), chip::ByteSpan(chip::Uint8::from_const_char("Test2"), 5)));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 3));
+        VerifyOrReturn(
+            CheckValueAsString("listOctetString[3]", iter.GetValue(), chip::ByteSpan(chip::Uint8::from_const_char("Test3"), 5)));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(listOctetString)>("listOctetString", iter, 4));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeListWithListOfListStructOctetString_12()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type>
+            listStructOctetStringArgument;
+
+        chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type listStructOctetStringList[4];
+
+        listStructOctetStringList[0].fabricIndex = 0ULL;
+        listStructOctetStringList[0].operationalCert =
+            chip::ByteSpan(chip::Uint8::from_const_char("Test0garbage: not in length on purpose"), 5);
+
+        listStructOctetStringList[1].fabricIndex = 1ULL;
+        listStructOctetStringList[1].operationalCert =
+            chip::ByteSpan(chip::Uint8::from_const_char("Test1garbage: not in length on purpose"), 5);
+
+        listStructOctetStringList[2].fabricIndex = 2ULL;
+        listStructOctetStringList[2].operationalCert =
+            chip::ByteSpan(chip::Uint8::from_const_char("Test2garbage: not in length on purpose"), 5);
+
+        listStructOctetStringList[3].fabricIndex = 3ULL;
+        listStructOctetStringList[3].operationalCert =
+            chip::ByteSpan(chip::Uint8::from_const_char("Test3garbage: not in length on purpose"), 5);
+
+        listStructOctetStringArgument = listStructOctetStringList;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+            listStructOctetStringArgument, this, OnSuccessCallback_12, OnFailureCallback_12);
+    }
+
+    void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeListWithListOfListStructOctetString_13()
+    {
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+            this, OnSuccessCallback_13, OnFailureCallback_13);
+    }
+
+    void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+            listStructOctetString)
+    {
+        auto iter = listStructOctetString.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 0));
+        VerifyOrReturn(CheckValue<>("listStructOctetString[0].fabricIndex", iter.GetValue().fabricIndex, 0ULL));
+        VerifyOrReturn(CheckValueAsString("listStructOctetString[0].operationalCert", iter.GetValue().operationalCert,
+                                          chip::ByteSpan(chip::Uint8::from_const_char("Test0"), 5)));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 1));
+        VerifyOrReturn(CheckValue<>("listStructOctetString[1].fabricIndex", iter.GetValue().fabricIndex, 1ULL));
+        VerifyOrReturn(CheckValueAsString("listStructOctetString[1].operationalCert", iter.GetValue().operationalCert,
+                                          chip::ByteSpan(chip::Uint8::from_const_char("Test1"), 5)));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 2));
+        VerifyOrReturn(CheckValue<>("listStructOctetString[2].fabricIndex", iter.GetValue().fabricIndex, 2ULL));
+        VerifyOrReturn(CheckValueAsString("listStructOctetString[2].operationalCert", iter.GetValue().operationalCert,
+                                          chip::ByteSpan(chip::Uint8::from_const_char("Test2"), 5)));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 3));
+        VerifyOrReturn(CheckValue<>("listStructOctetString[3].fabricIndex", iter.GetValue().fabricIndex, 3ULL));
+        VerifyOrReturn(CheckValueAsString("listStructOctetString[3].operationalCert", iter.GetValue().operationalCert,
+                                          chip::ByteSpan(chip::Uint8::from_const_char("Test3"), 5)));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(listStructOctetString)>("listStructOctetString", iter, 4));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendTestCommandWithOptionalArgSet_14()
+    {
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
+
+        RequestType request;
+        request.arg1.Emplace().SetNonNull() = 5;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))
+                ->OnSuccessResponse_14(data.wasPresent, data.wasNull, data.value, data.originalValue);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_14(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_14(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
+                              const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
     {
         VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, true));
 
@@ -30926,62 +30880,58 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithoutItsOptionalArg_9()
+    CHIP_ERROR TestSendTestCommandWithoutItsOptionalArg_15()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
+        RequestType request;
 
-        chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))
-                ->OnSuccessResponse_9(data.wasPresent, data.wasNull, data.value, data.originalValue);
+                ->OnSuccessResponse_15(data.wasPresent, data.wasNull, data.value, data.originalValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_9(status);
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_15(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_15(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
-                             const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
+    void OnSuccessResponse_15(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
+                              const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
     {
         VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, false));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithOptionalArgSetToNull_10()
+    CHIP_ERROR TestSendTestCommandWithOptionalArgSetToNull_16()
     {
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
 
-        using requestType  = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
-        using responseType = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
-
-        chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
+        RequestType request;
         request.arg1.Emplace().SetNull();
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestClusterComplexTypes *>(context))
-                ->OnSuccessResponse_10(data.wasPresent, data.wasNull, data.value, data.originalValue);
+                ->OnSuccessResponse_16(data.wasPresent, data.wasNull, data.value, data.originalValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_10(status);
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_16(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_16(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
+    void OnSuccessResponse_16(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
                               const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
     {
         VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, true));
@@ -31603,7 +31553,7 @@ private:
 
     void OnSuccessResponse_0(chip::CharSpan location)
     {
-        VerifyOrReturn(CheckValueAsString("location", location, ""));
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("", 0)));
         NextTest();
     }
 
@@ -31613,7 +31563,7 @@ private:
         cluster.Associate(mDevice, 0);
 
         chip::CharSpan locationArgument;
-        locationArgument = chip::Span<const char>("us", strlen("us"));
+        locationArgument = chip::Span<const char>("usgarbage: not in length on purpose", 2);
 
         return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
             locationArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -31636,7 +31586,7 @@ private:
 
     void OnSuccessResponse_2(chip::CharSpan location)
     {
-        VerifyOrReturn(CheckValueAsString("location", location, "us"));
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("us", 2)));
         NextTest();
     }
 
@@ -31646,7 +31596,7 @@ private:
         cluster.Associate(mDevice, 0);
 
         chip::CharSpan locationArgument;
-        locationArgument = chip::Span<const char>("", strlen(""));
+        locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
         return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
             locationArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -31710,23 +31660,21 @@ private:
 
     CHIP_ERROR TestSendIdentifyCommandAndExpectSuccessResponse_0()
     {
-        chip::Controller::IdentifyClusterTest cluster;
-        cluster.Associate(mDevice, 0);
+        using RequestType = chip::app::Clusters::Identify::Commands::Identify::Type;
 
-        using requestType  = chip::app::Clusters::Identify::Commands::Identify::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::Identify::Commands::Identify::Type request;
+        RequestType request;
         request.identifyTime = 0U;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestIdentifyCluster *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestIdentifyCluster *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 0, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -32084,7 +32032,7 @@ private:
 
     void OnSuccessResponse_3(chip::CharSpan description)
     {
-        VerifyOrReturn(CheckValueAsString("description", description, "Coffee"));
+        VerifyOrReturn(CheckValueAsString("description", description, chip::CharSpan("Coffee", 6)));
         NextTest();
     }
 
@@ -32105,15 +32053,15 @@ private:
     {
         auto iter = supportedModes.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter, 0));
-        VerifyOrReturn(CheckValueAsString("supportedModes[0].label", iter.GetValue().label, "Black"));
+        VerifyOrReturn(CheckValueAsString("supportedModes[0].label", iter.GetValue().label, chip::CharSpan("Black", 5)));
         VerifyOrReturn(CheckValue<>("supportedModes[0].mode", iter.GetValue().mode, 0));
         VerifyOrReturn(CheckValue<>("supportedModes[0].semanticTag", iter.GetValue().semanticTag, 0UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter, 1));
-        VerifyOrReturn(CheckValueAsString("supportedModes[1].label", iter.GetValue().label, "Cappuccino"));
+        VerifyOrReturn(CheckValueAsString("supportedModes[1].label", iter.GetValue().label, chip::CharSpan("Cappuccino", 10)));
         VerifyOrReturn(CheckValue<>("supportedModes[1].mode", iter.GetValue().mode, 4));
         VerifyOrReturn(CheckValue<>("supportedModes[1].semanticTag", iter.GetValue().semanticTag, 0UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter, 2));
-        VerifyOrReturn(CheckValueAsString("supportedModes[2].label", iter.GetValue().label, "Espresso"));
+        VerifyOrReturn(CheckValueAsString("supportedModes[2].label", iter.GetValue().label, chip::CharSpan("Espresso", 8)));
         VerifyOrReturn(CheckValue<>("supportedModes[2].mode", iter.GetValue().mode, 7));
         VerifyOrReturn(CheckValue<>("supportedModes[2].semanticTag", iter.GetValue().semanticTag, 0UL));
         VerifyOrReturn(CheckNoMoreListItems<decltype(supportedModes)>("supportedModes", iter, 3));
@@ -32122,23 +32070,21 @@ private:
 
     CHIP_ERROR TestChangeToSupportedMode_5()
     {
-        chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
 
-        using requestType  = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type request;
+        RequestType request;
         request.newMode = 4;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -32164,23 +32110,21 @@ private:
 
     CHIP_ERROR TestChangeToUnsupportedMode_7()
     {
-        chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
 
-        using requestType  = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
-
-        chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type request;
+        RequestType request;
         request.newMode = 2;
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_7();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_7(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status) { NextTest(); }
@@ -32470,22 +32414,20 @@ private:
 
     CHIP_ERROR TestSetOnOffAttributeToFalse_0()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_0();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_0(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
@@ -32537,22 +32479,20 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_3()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::On::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::On::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::On::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_3(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -32580,22 +32520,20 @@ private:
 
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_5()
     {
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
+        using RequestType = chip::app::Clusters::OnOff::Commands::Off::Type;
 
-        using requestType  = chip::app::Clusters::OnOff::Commands::Off::Type;
-        using responseType = chip::app::DataModel::NullObjectType;
+        RequestType request;
 
-        chip::app::Clusters::OnOff::Commands::Off::Type request;
-
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_5(status);
         };
-        return cluster.InvokeCommand<requestType, responseType>(request, this, success, failure);
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, 1, request));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -32662,6 +32600,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_FLW_1_1>(),
         make_unique<Test_TC_FLW_2_1>(),
         make_unique<Test_TC_FLW_2_2>(),
+        make_unique<Test_TC_ILL_1_1>(),
         make_unique<Test_TC_LVL_1_1>(),
         make_unique<Test_TC_LVL_2_1>(),
         make_unique<Test_TC_LVL_3_1>(),

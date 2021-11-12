@@ -453,20 +453,6 @@ function isTestOnlyCluster(name)
   return testOnlyClusters.includes(name);
 }
 
-function chip_tests_item_response_type(options)
-{
-  const promise = assertCommandOrAttribute(this).then(item => {
-    if (item.hasSpecificResponse) {
-      return 'Clusters::' + asUpperCamelCase(this.cluster) + '::Commands::' + asUpperCamelCase(item.response.name)
-          + '::DecodableType';
-    }
-
-    return 'DataModel::NullObjectType';
-  });
-
-  return asPromise.call(this, promise, options);
-}
-
 // test_cluster_command_value and test_cluster_value-equals are recursive partials using #each. At some point the |global|
 // context is lost and it fails. Make sure to attach the global context as a property of the | value |
 // that is evaluated.
@@ -596,15 +582,27 @@ function expectedValueHasProp(value, name)
   return name in value;
 }
 
+function octetStringEscapedForCLiteral(value)
+{
+  return value.replace(/\p{Control}/gu, ch => {
+    let code = ch.charCodeAt(0);
+    code     = code.toString();
+    if (code.length == 1) {
+      code = "0" + code;
+    }
+    return "\\x" + code;
+  });
+}
+
 //
 // Module exports
 //
 exports.chip_tests                          = chip_tests;
 exports.chip_tests_items                    = chip_tests_items;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
-exports.chip_tests_item_response_type       = chip_tests_item_response_type;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
 exports.chip_tests_pics                     = chip_tests_pics;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
 exports.expectedValueHasProp                = expectedValueHasProp;
+exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;

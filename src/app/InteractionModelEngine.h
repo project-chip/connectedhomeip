@@ -151,9 +151,7 @@ public:
      *                                      on successful completion of this function. On failure, it will be updated to point to
      *                                      nullptr.
      *  @param[in]      aInteractionType    Type of interaction (read or subscription) that the requested ReadClient should execute.
-     *  @param[in]      aAppIdentifier      A unique token that can be attached to the returned ReadClient object that will be
-     *                                      passed through some of the methods in the registered InteractionModelDelegate.
-     *  @param[in]      apDelegateOverride  If not-null, permits overriding the default delegate registered with the
+     *  @param[in]      aCallback           If not-null, permits overriding the default delegate registered with the
      *                                      InteractionModelEngine that will be used by the ReadClient.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
@@ -178,6 +176,11 @@ public:
     uint16_t GetReadClientArrayIndex(const ReadClient * const apReadClient) const;
 
     uint16_t GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const;
+
+    /**
+     * The Magic number of this InteractionModelEngine, the magic number is set during Init()
+     */
+    uint32_t GetMagicNumber() { return mMagic; }
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
@@ -247,6 +250,10 @@ private:
     reporting::Engine mReportingEngine;
     ClusterInfo mClusterInfoPool[CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS];
     ClusterInfo * mpNextAvailableClusterInfo = nullptr;
+
+    // A magic number for tracking values between stack Shutdown()-s and Init()-s.
+    // An ObjectHandle is valid iff. its magic equals to this one.
+    uint32_t mMagic = 0;
 };
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
