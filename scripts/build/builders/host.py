@@ -41,16 +41,24 @@ class HostApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
-    def BinaryName(self):
+    def OutputNames(self):
         if self == HostApp.ALL_CLUSTERS:
-            return 'chip-all-clusters-app'
+            return ['chip-all-clusters-app', 'chip-all-clusters-app.map']
         elif self == HostApp.CHIP_TOOL:
-            return 'chip-tool'
+            return ['chip-tool', 'chip-tool.map']
         elif self == HostApp.THERMOSTAT:
-            return 'thermostat-app'
+            return ['thermostat-app', 'thermostat-app.map']
         elif self == HostApp.RPC_CONSOLE:
-            return 'rpc-console'
+            return ['chip_rpc_console_wheels']
         elif self == HostApp.MIN_MDNS:
+            return [
+                'mdns-advertiser',
+                'mdns-advertiser.map',
+                'minimal-mdns-client',
+                'minimal-mdns-client.map',
+                'minimal-mdns-server',
+                'minimal-mdns-server.map',
+            ]
             return 'FIXME' # FIXME: multiple names?
         else:
             raise Exception('Unknown app type: %r' % self)
@@ -96,12 +104,11 @@ class HostBuilder(GnBuilder):
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
 
-        self.app_name = app.BinaryName()
-        self.map_name = self.app_name + '.map'
+        self.app = app
         self.board = board
         self.extra_gn_options = []
 
-        if 'rpc-console' not in self.app_name and not enable_ipv4:
+        if (app != HostApp.RPC_CONSOLE) and not enable_ipv4:
             self.extra_gn_options.append('chip_inet_config_enable_ipv4=false')
 
     def GnBuildArgs(self):
@@ -115,7 +122,7 @@ class HostBuilder(GnBuilder):
                 ]
             )
 
-            if 'rpc-console' not in self.app_name:
+            if self.app != HostApp.RPC_CONSOLE:
                 self.extra_gn_options.extend(
                     [
                         'chip_crypto="mbedtls"',
@@ -144,19 +151,10 @@ class HostBuilder(GnBuilder):
 
     def build_outputs(self):
         outputs = {}
-        if 'rpc-console' not in self.app_name:
-            outputs.update(
-                {
-                    self.app_name: os.path.join(self.output_dir, self.app_name),
-                    self.map_name: os.path.join(self.output_dir, self.map_name)
-                }
-            )
-        else:
-            outputs.update(
-                {
-                    self.app_name: os.path.join(
-                        self.output_dir, "chip_rpc_console_wheels")
-                }
-            )
+
+        for name in self.app.OutputNames:
+            outputs.update({
+                name: os.path.join(self.output_dir, name)
+            })
 
         return outputs
