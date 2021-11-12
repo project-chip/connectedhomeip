@@ -12556,6 +12556,212 @@ public class ClusterInfoMapping {
             readTestClusterUnsupportedCommandParams);
     readTestClusterCommandInfo.put(
         "readUnsupportedAttribute", readTestClusterUnsupportedAttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableBooleanCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableBooleanAttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableBooleanAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new DelegatedBooleanAttributeCallback(),
+            readTestClusterNullableBooleanCommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableBooleanAttribute", readTestClusterNullableBooleanAttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableBitmap8CommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableBitmap8AttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableBitmap8Attribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new DelegatedIntegerAttributeCallback(),
+            readTestClusterNullableBitmap8CommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableBitmap8Attribute", readTestClusterNullableBitmap8AttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableBitmap16CommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableBitmap16AttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableBitmap16Attribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new DelegatedIntegerAttributeCallback(),
+            readTestClusterNullableBitmap16CommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableBitmap16Attribute", readTestClusterNullableBitmap16AttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableBitmap32CommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableBitmap32AttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableBitmap32Attribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new DelegatedLongAttributeCallback(),
+            readTestClusterNullableBitmap32CommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableBitmap32Attribute", readTestClusterNullableBitmap32AttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableBitmap64CommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableBitmap64AttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableBitmap64Attribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new DelegatedLongAttributeCallback(),
+            readTestClusterNullableBitmap64CommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableBitmap64Attribute", readTestClusterNullableBitmap64AttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt8uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableInt8uAttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt8uAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new DelegatedIntegerAttributeCallback(),
+            readTestClusterNullableInt8uCommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableInt8uAttribute", readTestClusterNullableInt8uAttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt16uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableInt16uAttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt16uAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new DelegatedIntegerAttributeCallback(),
+            readTestClusterNullableInt16uCommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableInt16uAttribute", readTestClusterNullableInt16uAttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt32uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableInt32uAttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt32uAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new DelegatedLongAttributeCallback(),
+            readTestClusterNullableInt32uCommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableInt32uAttribute", readTestClusterNullableInt32uAttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt64uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableInt64uAttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt64uAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new DelegatedLongAttributeCallback(),
+            readTestClusterNullableInt64uCommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableInt64uAttribute", readTestClusterNullableInt64uAttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt8sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableInt8sAttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt8sAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new DelegatedIntegerAttributeCallback(),
+            readTestClusterNullableInt8sCommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableInt8sAttribute", readTestClusterNullableInt8sAttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt16sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableInt16sAttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt16sAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new DelegatedIntegerAttributeCallback(),
+            readTestClusterNullableInt16sCommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableInt16sAttribute", readTestClusterNullableInt16sAttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt32sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableInt32sAttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt32sAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new DelegatedLongAttributeCallback(),
+            readTestClusterNullableInt32sCommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableInt32sAttribute", readTestClusterNullableInt32sAttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt64sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableInt64sAttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt64sAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new DelegatedLongAttributeCallback(),
+            readTestClusterNullableInt64sCommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableInt64sAttribute", readTestClusterNullableInt64sAttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableEnum8CommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableEnum8AttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableEnum8Attribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new DelegatedIntegerAttributeCallback(),
+            readTestClusterNullableEnum8CommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableEnum8Attribute", readTestClusterNullableEnum8AttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableEnum16CommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableEnum16AttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableEnum16Attribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new DelegatedIntegerAttributeCallback(),
+            readTestClusterNullableEnum16CommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableEnum16Attribute", readTestClusterNullableEnum16AttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableOctetStringCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableOctetStringAttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableOctetStringAttribute(
+                      (ChipClusters.OctetStringAttributeCallback) callback);
+            },
+            () -> new DelegatedOctetStringAttributeCallback(),
+            readTestClusterNullableOctetStringCommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableOctetStringAttribute", readTestClusterNullableOctetStringAttributeCommandInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableCharStringCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readTestClusterNullableCharStringAttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableCharStringAttribute(
+                      (ChipClusters.CharStringAttributeCallback) callback);
+            },
+            () -> new DelegatedCharStringAttributeCallback(),
+            readTestClusterNullableCharStringCommandParams);
+    readTestClusterCommandInfo.put(
+        "readNullableCharStringAttribute", readTestClusterNullableCharStringAttributeCommandInfo);
     Map<String, CommandParameterInfo> readTestClusterClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandInfo readTestClusterClusterRevisionAttributeCommandInfo =
