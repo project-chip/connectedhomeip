@@ -1,0 +1,19 @@
+{{> header}}
+
+#ifndef CHIP_STRUCTS_H
+#define CHIP_STRUCTS_H
+
+#import <Foundation/Foundation.h>
+
+{{#zcl_clusters}}
+{{#zcl_structs}}
+@interface CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}} : NSObject
+{{#zcl_struct_items}}
+@property {{asObjectiveCType type parent.parent.name}} {{asUpperCamelCase label}};
+{{/zcl_struct_items}}
+@end
+
+{{/zcl_structs}}
+{{/zcl_clusters}}
+
+#endif /* CHIP_STRUCTS_H */

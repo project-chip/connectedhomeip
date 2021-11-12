@@ -60,6 +60,26 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc.mm"
         },
         {
+            "path": "CHIPStructsObjc.zapt",
+            "name": "Objc reflections of CHIP spec structs header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPStructsObjc.h"
+        },
+        {
+            "path": "CHIPStructsObjc-src.zapt",
+            "name": "Objc reflections of CHIP spec structs",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPStructsObjc.mm"
+        },
+        {
+            "path": "CHIPCommandPayloadsObjc.zapt",
+            "name": "Objc reflections of CHIP command payloads header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCommandPayloadsObjc.h"
+        },
+        {
+            "path": "CHIPCommandPayloadsObjc-src.zapt",
+            "name": "Objc reflections of CHIP command payloads header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCommandPayloadsObjc.mm"
+        },
+        {
             "path": "CHIPTestClustersObjc.zapt",
             "name": "Test Objc API Header",
             "output": "src/darwin/Framework/CHIP/zap-generated/CHIPTestClustersObjc.h"

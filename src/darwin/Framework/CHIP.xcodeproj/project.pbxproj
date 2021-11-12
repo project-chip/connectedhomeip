@@ -55,6 +55,10 @@
 		2F79A67726CE6672006377B0 /* im-client-callbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2F79A67626CE6672006377B0 /* im-client-callbacks.cpp */; };
 		2FD775552695557E00FF4B12 /* error-mapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FD775542695557E00FF4B12 /* error-mapping.cpp */; };
 		5129BCFD26A9EE3300122DDF /* CHIPError.h in Headers */ = {isa = PBXBuildFile; fileRef = 5129BCFC26A9EE3300122DDF /* CHIPError.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		51B5EB99273F22260039F90A /* CHIPCommandPayloadsObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 51B5EB98273F22260039F90A /* CHIPCommandPayloadsObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		51B5EB9D273F22590039F90A /* CHIPStructsObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 51B5EB9C273F22590039F90A /* CHIPStructsObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		51B5EBA9273F641B0039F90A /* CHIPCommandPayloadsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B5EBA8273F641B0039F90A /* CHIPCommandPayloadsObjc.mm */; };
+		51B5EBAD273F643A0039F90A /* CHIPStructsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B5EBAC273F643A0039F90A /* CHIPStructsObjc.mm */; };
 		991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0822475F45400C13860 /* CHIPDeviceController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 991DC0872475F47D00C13860 /* CHIPDeviceController.mm */; };
 		991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC08A247704DC00C13860 /* CHIPLogging.h */; };
@@ -141,6 +145,10 @@
 		2F79A67626CE6672006377B0 /* im-client-callbacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "im-client-callbacks.cpp"; path = "../../../app/util/im-client-callbacks.cpp"; sourceTree = "<group>"; };
 		2FD775542695557E00FF4B12 /* error-mapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "error-mapping.cpp"; path = "../../../app/util/error-mapping.cpp"; sourceTree = "<group>"; };
 		5129BCFC26A9EE3300122DDF /* CHIPError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CHIPError.h; path = CHIP/CHIPError.h; sourceTree = "<group>"; };
+		51B5EB98273F22260039F90A /* CHIPCommandPayloadsObjc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CHIPCommandPayloadsObjc.h; path = "CHIP/zap-generated/CHIPCommandPayloadsObjc.h"; sourceTree = "<group>"; };
+		51B5EB9C273F22590039F90A /* CHIPStructsObjc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CHIPStructsObjc.h; path = "CHIP/zap-generated/CHIPStructsObjc.h"; sourceTree = "<group>"; };
+		51B5EBA8273F641B0039F90A /* CHIPCommandPayloadsObjc.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPCommandPayloadsObjc.mm; path = "CHIP/zap-generated/CHIPCommandPayloadsObjc.mm"; sourceTree = "<group>"; };
+		51B5EBAC273F643A0039F90A /* CHIPStructsObjc.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPStructsObjc.mm; path = "CHIP/zap-generated/CHIPStructsObjc.mm"; sourceTree = "<group>"; };
 		991DC0822475F45400C13860 /* CHIPDeviceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceController.h; sourceTree = "<group>"; };
 		991DC0872475F47D00C13860 /* CHIPDeviceController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceController.mm; sourceTree = "<group>"; };
 		991DC08A247704DC00C13860 /* CHIPLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPLogging.h; sourceTree = "<group>"; };
@@ -240,6 +248,10 @@
 		B20252832459E34F00F97062 = {
 			isa = PBXGroup;
 			children = (
+				51B5EBAC273F643A0039F90A /* CHIPStructsObjc.mm */,
+				51B5EBA8273F641B0039F90A /* CHIPCommandPayloadsObjc.mm */,
+				51B5EB9C273F22590039F90A /* CHIPStructsObjc.h */,
+				51B5EB98273F22260039F90A /* CHIPCommandPayloadsObjc.h */,
 				5129BCFC26A9EE3300122DDF /* CHIPError.h */,
 				BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */,
 				B202528F2459E34F00F97062 /* CHIP */,
@@ -331,6 +343,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51B5EB9D273F22590039F90A /* CHIPStructsObjc.h in Headers */,
+				51B5EB99273F22260039F90A /* CHIPCommandPayloadsObjc.h in Headers */,
 				2CB7163B252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.h in Headers */,
 				1E16A90326B98AF100683C53 /* CHIPTestClustersObjc.h in Headers */,
 				2C1B027B2641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.h in Headers */,
@@ -478,6 +492,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51B5EBAD273F643A0039F90A /* CHIPStructsObjc.mm in Sources */,
+				51B5EBA9273F641B0039F90A /* CHIPCommandPayloadsObjc.mm in Sources */,
 				2C8C8FC2253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.mm in Sources */,
 				2CB7163C252E8A7C0026E2BB /* CHIPDevicePairingDelegateBridge.mm in Sources */,
 				997DED162695343400975E97 /* CHIPThreadOperationalDataset.mm in Sources */,

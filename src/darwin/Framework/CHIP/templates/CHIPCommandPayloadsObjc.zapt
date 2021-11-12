@@ -1,0 +1,20 @@
+{{> header}}
+
+#ifndef CHIP_COMMAND_PAYLOADS_H
+#define CHIP_COMMAND_PAYLOADS_H
+
+#import <Foundation/Foundation.h>
+
+#include "CHIPStructsObjc.h"
+
+{{#zcl_clusters}}
+{{#zcl_commands}}
+@interface CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Payload : NSObject
+{{#zcl_command_arguments}}
+@property {{asObjectiveCType type parent.parent.name}} {{asUpperCamelCase label}};
+{{/zcl_command_arguments}}
+@end
+
+{{/zcl_commands}}
+{{/zcl_clusters}}
+#endif /* CHIP_COMMAND_PAYLOADS_H */

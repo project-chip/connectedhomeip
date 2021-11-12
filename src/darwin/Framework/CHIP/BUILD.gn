@@ -54,6 +54,10 @@ static_library("framework") {
     "CHIPSetupPayload.mm",
     "zap-generated/CHIPClustersObjc.h",
     "zap-generated/CHIPClustersObjc.mm",
+    "zap-generated/CHIPCommandPayloadsObjc.h",
+    "zap-generated/CHIPCommandPayloadsObjc.mm",
+    "zap-generated/CHIPStructsObjc.h",
+    "zap-generated/CHIPStructsObjc.mm",
   ]
 
   public_deps = [

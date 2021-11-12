@@ -17,6 +17,7 @@
 
 // Import helpers from zap core
 const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
+const string       = require(zapPath + 'util/string.js')
 const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 
@@ -114,6 +115,39 @@ function asTestIndex(index)
   return index.toString().padStart(6, 0);
 }
 
+function asUpperCamelCase(label)
+{
+  let str = string.toCamelCase(label, false);
+  return str.replace(/[\.:]/g, '');
+}
+
+async function asObjectiveCType(type, cluster, options)
+{
+  let pkgId    = await templateUtil.ensureZclPackageId(this);
+  let isStruct = await zclHelper.isStruct(this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
+
+  let typeStr = `Need to define this for ${type}`;
+  if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
+    typeStr = 'NSArray *'
+  } else if (StringHelper.isOctetString(type)) {
+    typeStr = 'NSData *';
+  } else if (StringHelper.isCharString(type)) {
+    typeStr = 'NSString *';
+  } else if (isStruct) {
+    typeStr = `CHIP${asUpperCamelCase(cluster)}Cluster${asUpperCamelCase(type)} *`;
+  } else {
+    typeStr = 'NSNumber *';
+  }
+
+  if (this.isNullable || this.isOptional) {
+    typeStr = `${typeStr} _Nullable`;
+  } else {
+    typeStr = `${typeStr} _Nonnull`;
+  }
+
+  return typeStr;
+}
+
 //
 // Module exports
 //
@@ -122,3 +156,4 @@ exports.asObjectiveCNumberType       = asObjectiveCNumberType;
 exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
 exports.asTestIndex                  = asTestIndex;
 exports.asTestValue                  = asTestValue;
+exports.asObjectiveCType             = asObjectiveCType;
