@@ -282,9 +282,6 @@ private:
     // (mCluster & kClusterIdMask) --> cluster id portion
     static constexpr ClusterId kClusterIdMask = 0x0000FFFF;
 
-    // ((mCluster & kClusterIdMask) < kClusterIdMinStd) --> invalid
-    static constexpr ClusterId kClusterIdMinStd = 0x00000000;
-
     // ((mCluster & kClusterIdMask) < kClusterIdMaxStd) --> invalid
     static constexpr ClusterId kClusterIdMaxStd = 0x00007FFF;
 
@@ -297,9 +294,6 @@ private:
     // (mCluster & kClusterVendorMask) --> cluster vendor portion
     static constexpr ClusterId kClusterVendorMask = 0xFFFF0000;
 
-    // ((mCluster & kClusterVendorMask) < kClusterVendorMin) --> invalid
-    static constexpr ClusterId kClusterVendorMin = 0x00000000;
-
     // ((mCluster & kClusterVendorMask) > kClusterVendorMax) --> invalid
     static constexpr ClusterId kClusterVendorMax = 0xFFFE0000;
 
@@ -309,17 +303,11 @@ private:
     // (mDeviceType & kDeviceTypeIdMask) --> device type id portion
     static constexpr DeviceTypeId kDeviceTypeIdMask = 0x0000FFFF;
 
-    // ((mDeviceType & kDeviceTypeIdMask) < kDeviceTypeIdMin) --> invalid
-    static constexpr DeviceTypeId kDeviceTypeIdMin = 0x00000000;
-
     // ((mDeviceType & kDeviceTypeIdMask) < kDeviceTypeIdMax) --> invalid
     static constexpr DeviceTypeId kDeviceTypeIdMax = 0x0000BFFF;
 
     // (mDeviceType & kDeviceTypeVendorMask) --> device type vendor portion
     static constexpr DeviceTypeId kDeviceTypeVendorMask = 0xFFFF0000;
-
-    // ((mDeviceType & kDeviceTypeVendorMask) < kDeviceTypeVendorMin) --> invalid
-    static constexpr DeviceTypeId kDeviceTypeVendorMin = 0x00000000;
 
     // ((mDeviceType & kDeviceTypeVendorMask) > kDeviceTypeVendorMax) --> invalid
     static constexpr DeviceTypeId kDeviceTypeVendorMax = 0xFFFE0000;
