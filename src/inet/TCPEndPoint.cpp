@@ -195,12 +195,11 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
     if (intfId.IsPresent())
     {
         IPAddress intfLLAddr;
-        InetLayer & lInetLayer = Layer();
 
         if (!addr.IsIPv6LinkLocal() || mState == State::kBound)
             return CHIP_ERROR_NOT_IMPLEMENTED;
 
-        res = lInetLayer.GetLinkLocalAddr(intfId, &intfLLAddr);
+        res = intfId.GetLinkLocalAddr(&intfLLAddr);
         if (res != CHIP_NO_ERROR)
             return res;
 

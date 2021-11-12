@@ -4516,6 +4516,74 @@ namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported
 
+namespace NullableBoolean {
+static constexpr AttributeId Id = 0x00008000;
+} // namespace NullableBoolean
+
+namespace NullableBitmap8 {
+static constexpr AttributeId Id = 0x00008001;
+} // namespace NullableBitmap8
+
+namespace NullableBitmap16 {
+static constexpr AttributeId Id = 0x00008002;
+} // namespace NullableBitmap16
+
+namespace NullableBitmap32 {
+static constexpr AttributeId Id = 0x00008003;
+} // namespace NullableBitmap32
+
+namespace NullableBitmap64 {
+static constexpr AttributeId Id = 0x00008004;
+} // namespace NullableBitmap64
+
+namespace NullableInt8u {
+static constexpr AttributeId Id = 0x00008005;
+} // namespace NullableInt8u
+
+namespace NullableInt16u {
+static constexpr AttributeId Id = 0x00008006;
+} // namespace NullableInt16u
+
+namespace NullableInt32u {
+static constexpr AttributeId Id = 0x00008008;
+} // namespace NullableInt32u
+
+namespace NullableInt64u {
+static constexpr AttributeId Id = 0x0000800C;
+} // namespace NullableInt64u
+
+namespace NullableInt8s {
+static constexpr AttributeId Id = 0x0000800D;
+} // namespace NullableInt8s
+
+namespace NullableInt16s {
+static constexpr AttributeId Id = 0x0000800E;
+} // namespace NullableInt16s
+
+namespace NullableInt32s {
+static constexpr AttributeId Id = 0x00008010;
+} // namespace NullableInt32s
+
+namespace NullableInt64s {
+static constexpr AttributeId Id = 0x00008014;
+} // namespace NullableInt64s
+
+namespace NullableEnum8 {
+static constexpr AttributeId Id = 0x00008015;
+} // namespace NullableEnum8
+
+namespace NullableEnum16 {
+static constexpr AttributeId Id = 0x00008016;
+} // namespace NullableEnum16
+
+namespace NullableOctetString {
+static constexpr AttributeId Id = 0x00008019;
+} // namespace NullableOctetString
+
+namespace NullableCharString {
+static constexpr AttributeId Id = 0x0000801E;
+} // namespace NullableCharString
+
 namespace FeatureMap {
 static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
 } // namespace FeatureMap

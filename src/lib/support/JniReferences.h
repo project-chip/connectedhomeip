@@ -21,6 +21,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <pthread.h>
+#include <string>
 
 namespace chip {
 class JniReferences
@@ -36,11 +37,6 @@ public:
         static JniReferences jniReferences;
         return jniReferences;
     }
-
-    /**
-     * Returns a stack lock to be shared by all controller JNI code.
-     */
-    pthread_mutex_t * GetStackLock();
 
     /**
      * Set the JavaVM.
@@ -80,10 +76,15 @@ public:
 
     void ThrowError(JNIEnv * env, jclass exceptionCls, CHIP_ERROR errToThrow);
 
+    /**
+     * Creates a java.util.Optional wrapping the specified jobject. If the wrapped jobject is null, an empty
+     * Optional will be returned.
+     */
+    CHIP_ERROR CreateOptional(jobject objectToWrap, jobject & outOptional);
+
 private:
     JniReferences() {}
 
-    pthread_mutex_t mStackLock = PTHREAD_MUTEX_INITIALIZER;
     JavaVM * mJvm              = nullptr;
     jobject mClassLoader       = nullptr;
     jmethodID mFindClassMethod = nullptr;

@@ -62,11 +62,8 @@ bool ToolChipDN::SetCertSubjectDN(X509 * cert) const
         case kOID_AttributeType_ChipFabricId:
             attrNID = gNIDChipFabricId;
             break;
-        case kOID_AttributeType_ChipAuthTag1:
-            attrNID = gNIDChipAuthTag1;
-            break;
-        case kOID_AttributeType_ChipAuthTag2:
-            attrNID = gNIDChipAuthTag2;
+        case kOID_AttributeType_ChipCASEAuthenticatedTag:
+            attrNID = gNIDChipCASEAuthenticatedTag;
             break;
         default:
             ExitNow(res = false);

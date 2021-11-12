@@ -38,6 +38,7 @@ public:
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
+        AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndpointId);
         AddArgument("PICS", &mPICSFilePath);
     }
 
@@ -228,5 +229,6 @@ protected:
     };
     chip::Optional<uint64_t> mDelayInMs;
     chip::Optional<char *> mPICSFilePath;
+    chip::Optional<chip::EndpointId> mEndpointId;
     chip::Optional<std::map<std::string, bool>> PICS;
 };

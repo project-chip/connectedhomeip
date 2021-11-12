@@ -46,7 +46,7 @@ OptionDef gCmdOptionDefs[] =
     { "type",                kArgumentRequired, 't' },
     { "subject-chip-id",     kArgumentRequired, 'i' },
     { "subject-fab-id",      kArgumentRequired, 'f' },
-    { "subject-at",          kArgumentRequired, 'a' },
+    { "subject-cat",         kArgumentRequired, 'a' },
     { "subject-cn-u",        kArgumentRequired, 'c' },
     { "path-len-constraint", kArgumentRequired, 'p' },
     { "future-ext-sub",      kArgumentRequired, 'x' },
@@ -83,9 +83,9 @@ const char * const gCmdOptionHelp =
     "\n"
     "       Subject DN Fabric Id attribute (in hex).\n"
     "\n"
-    "   -a, --subject-at <hex-digits>\n"
+    "   -a, --subject-cat <hex-digits>\n"
     "\n"
-    "       Subject DN CHIP Authentication Tag (in hex).\n"
+    "       Subject DN CHIP CASE Authentication Tag (in hex).\n"
     "\n"
     "   -c, --subject-cn-u <string>\n"
     "\n"
@@ -266,20 +266,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             PrintArgError("%s: Invalid value specified for the subject authentication tag attribute: %s\n", progName, arg);
             return false;
         }
-
-        if (!gSubjectDN.HasAttr(kOID_AttributeType_ChipAuthTag1))
-        {
-            attrOID = kOID_AttributeType_ChipAuthTag1;
-        }
-        else if (!gSubjectDN.HasAttr(kOID_AttributeType_ChipAuthTag2))
-        {
-            attrOID = kOID_AttributeType_ChipAuthTag2;
-        }
-        else
-        {
-            PrintArgError("%s: Too many authentication tag attributes are specified: %s\n", progName, arg);
-            return false;
-        }
+        attrOID = kOID_AttributeType_ChipCASEAuthenticatedTag;
 
         err = gSubjectDN.AddAttribute(attrOID, chip32bitAttr);
         if (err != CHIP_NO_ERROR)

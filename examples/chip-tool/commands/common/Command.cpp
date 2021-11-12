@@ -133,7 +133,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::OctetString: {
         if (arg.optional)
-            arg.value = &(reinterpret_cast<chip::Optional<chip::ByteSpan *> *>(arg.value))->Emplace();
+            arg.value = &(reinterpret_cast<chip::Optional<chip::ByteSpan> *>(arg.value))->Emplace();
         auto * value = static_cast<chip::ByteSpan *>(arg.value);
         // We support two ways to pass an octet string argument.  If it happens
         // to be all-ASCII, you can just pass it in.  Otherwise you can pass in
@@ -189,7 +189,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     case ArgumentType::Boolean:
     case ArgumentType::Number_uint8: {
         if (arg.optional)
-            arg.value = &(reinterpret_cast<chip::Optional<uint8_t *> *>(arg.value))->Emplace();
+            arg.value = &(reinterpret_cast<chip::Optional<uint8_t> *>(arg.value))->Emplace();
         uint8_t * value = reinterpret_cast<uint8_t *>(arg.value);
 
         // stringstream treats uint8_t as char, which is not what we want here.
@@ -214,7 +214,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_uint16: {
         if (arg.optional)
-            arg.value = &(reinterpret_cast<chip::Optional<uint16_t *> *>(arg.value))->Emplace();
+            arg.value = &(reinterpret_cast<chip::Optional<uint16_t> *>(arg.value))->Emplace();
         uint16_t * value = reinterpret_cast<uint16_t *>(arg.value);
         std::stringstream ss;
         isHexNotation ? ss << std::hex << argValue : ss << argValue;
@@ -228,7 +228,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_uint32: {
         if (arg.optional)
-            arg.value = &(reinterpret_cast<chip::Optional<uint32_t *> *>(arg.value))->Emplace();
+            arg.value = &(reinterpret_cast<chip::Optional<uint32_t> *>(arg.value))->Emplace();
         uint32_t * value = reinterpret_cast<uint32_t *>(arg.value);
         std::stringstream ss;
         isHexNotation ? ss << std::hex << argValue : ss << argValue;
@@ -242,7 +242,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_uint64: {
         if (arg.optional)
-            arg.value = &(reinterpret_cast<chip::Optional<uint64_t *> *>(arg.value))->Emplace();
+            arg.value = &(reinterpret_cast<chip::Optional<uint64_t> *>(arg.value))->Emplace();
         uint64_t * value = reinterpret_cast<uint64_t *>(arg.value);
         std::stringstream ss;
         isHexNotation ? ss << std::hex << argValue : ss << argValue;
@@ -256,7 +256,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int8: {
         if (arg.optional)
-            arg.value = &(reinterpret_cast<chip::Optional<int8_t *> *>(arg.value))->Emplace();
+            arg.value = &(reinterpret_cast<chip::Optional<int8_t> *>(arg.value))->Emplace();
         int8_t * value = reinterpret_cast<int8_t *>(arg.value);
 
         // stringstream treats int8_t as char, which is not what we want here.
@@ -281,7 +281,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int16: {
         if (arg.optional)
-            arg.value = &(reinterpret_cast<chip::Optional<int16_t *> *>(arg.value))->Emplace();
+            arg.value = &(reinterpret_cast<chip::Optional<int16_t> *>(arg.value))->Emplace();
         int16_t * value = reinterpret_cast<int16_t *>(arg.value);
         std::stringstream ss;
         isHexNotation ? ss << std::hex << argValue : ss << argValue;
@@ -295,7 +295,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int32: {
         if (arg.optional)
-            arg.value = &(reinterpret_cast<chip::Optional<int32_t *> *>(arg.value))->Emplace();
+            arg.value = &(reinterpret_cast<chip::Optional<int32_t> *>(arg.value))->Emplace();
         int32_t * value = reinterpret_cast<int32_t *>(arg.value);
         std::stringstream ss;
         isHexNotation ? ss << std::hex << argValue : ss << argValue;
@@ -309,7 +309,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int64: {
         if (arg.optional)
-            arg.value = &(reinterpret_cast<chip::Optional<int64_t *> *>(arg.value))->Emplace();
+            arg.value = &(reinterpret_cast<chip::Optional<int64_t> *>(arg.value))->Emplace();
         int64_t * value = reinterpret_cast<int64_t *>(arg.value);
         std::stringstream ss;
         isHexNotation ? ss << std::hex << argValue : ss << argValue;
@@ -323,7 +323,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Address: {
         if (arg.optional)
-            arg.value = &(reinterpret_cast<chip::Optional<AddressWithInterface *> *>(arg.value))->Emplace();
+            arg.value = &(reinterpret_cast<chip::Optional<AddressWithInterface> *>(arg.value))->Emplace();
         AddressWithInterface * value = reinterpret_cast<AddressWithInterface *>(arg.value);
         isValidArgument              = ParseAddressWithInterface(argValue, value);
         break;
