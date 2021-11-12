@@ -164,14 +164,14 @@ int AppTask::Init()
     Button_init();
 
     Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED;
-    buttonParams.longPressDuration = 1000U; // ms
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGPRESSED;
+    buttonParams.longPressDuration = 5000U; // ms
     sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
     Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
 
     Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGPRESSED;
-    buttonParams.longPressDuration = 5000U; // ms
+    buttonParams.buttonEventMask   = Button_EV_CLICKED;
+    buttonParams.longPressDuration = 1000U; // ms
     sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
     Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
 
@@ -222,7 +222,10 @@ void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask even
     {
         event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
     }
-
+    else if (events & Button_EV_LONGPRESSED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongPressed;
+    }
     // button callbacks are in ISR context
     if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
     {
@@ -238,10 +241,6 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
     if (events & Button_EV_CLICKED)
     {
         event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
-    }
-    else if (events & Button_EV_LONGPRESSED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongPressed;
     }
     // button callbacks are in ISR context
     if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
@@ -302,7 +301,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 {
     switch (aEvent->Type)
     {
-    case AppEvent::kEventType_ButtonLeft:
+    case AppEvent::kEventType_ButtonRight:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
             // Toggle Pump state
@@ -317,7 +316,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         }
         break;
 
-    case AppEvent::kEventType_ButtonRight:
+    case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
             // Toggle BLE advertisements

@@ -48,13 +48,13 @@ pump and to control the state. The user LEDs on the LaunchPad are set on when
 the pump is started, and are set off when stopped. The LEDs will flash when in
 the transition state between started and stopped.
 
-Short presses (less than 1000ms) of the left user button (`BTN-1`) are used for
+Short presses (less than 1000ms) of the right user button (`BTN-2`) are used for
 toggling the pump state.
 
-Short presses (less than 1000ms) of the right user button (`BTN-2`) are used for
+Short presses (less than 1000ms) of the left user button (`BTN-1`) are used for
 toggling Matter BLE advertisements.
 
-Long presses (greater than 5000ms) of the right user button (`BTN-2`) will
+Long presses (greater than 5000ms) of the left user button (`BTN-1`) will
 initiate a factory reset of the device clearing all stored provisioning
 information to allow for a new network setup.
 
