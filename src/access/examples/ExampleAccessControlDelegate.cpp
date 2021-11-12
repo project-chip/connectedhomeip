@@ -43,7 +43,7 @@ using EntryIterator = chip::Access::AccessControl::EntryIterator;
 using Target        = Entry::Target;
 
 // Pool sizes
-constexpr int kEntryStoragePoolSize          = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORGAGE_POOL_SIZE;
+constexpr int kEntryStoragePoolSize          = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORAGE_POOL_SIZE;
 constexpr int kEntryDelegatePoolSize         = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE;
 constexpr int kEntryIteratorDelegatePoolSize = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_ITERATOR_DELEGATE_POOL_SIZE;
 
