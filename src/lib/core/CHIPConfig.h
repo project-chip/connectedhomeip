@@ -2644,15 +2644,32 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FOREIGN_DELEGATE_SUPPORT
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT
  *
- * Supports "foreign" delegate implementations in the example access control
- * code by implementing a less performant copy through the interface. Not needed
- * unless mixing the example access control code with other entry delegate
- * implementations.
+ * Support fast copy in the example access control implementation.
+ *
+ * At least one of "fast" or "flexible" copy support must be enabled.
  */
-#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FOREIGN_DELEGATE_SUPPORT
-#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FOREIGN_DELEGATE_SUPPORT 0
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
+ *
+ * Support flexible copy in the example access control implementation.
+ *
+ * Only needed if mixing the example access control implementation with other
+ * non-example access control delegate implementations; omitting it saves space.
+ *
+ * At least one of "fast" or "flexible" copy support must be enabled.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT 0
+#endif
+
+#if !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT && !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
+#error "Please enable at least one of CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT or CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT"
 #endif
 
 /**

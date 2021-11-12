@@ -352,7 +352,9 @@ public:
     CHIP_ERROR GetMaxEntries(int & value) const { return mDelegate.GetMaxEntries(value); }
 
     /**
-     * Prepares an entry. An entry must be prepared or read before use.
+     * Prepares an entry.
+     *
+     * An entry must be prepared or read (`ReadEntry`) before first use.
      *
      * @param [in] entry        Entry to prepare.
      */

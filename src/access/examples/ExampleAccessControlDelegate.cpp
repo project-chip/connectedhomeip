@@ -21,7 +21,6 @@
 #include <lib/core/CHIPConfig.h>
 
 #include <algorithm>
-#include <cassert>
 #include <cstdint>
 #include <type_traits>
 
@@ -118,7 +117,6 @@ public:
 
     CHIP_ERROR Add(NodeId node)
     {
-        assert(IsEmpty());
         if (IsValid(node))
         {
             mNode = node;
@@ -174,7 +172,6 @@ public:
 
     CHIP_ERROR Add(const Target & target)
     {
-        assert(IsEmpty());
         if (IsValid(target))
         {
             Encode(target);
@@ -184,6 +181,7 @@ public:
     }
 
 private:
+    // TODO: eventually this functionality should live where the type itself is defined
     static bool IsValidCluster(ClusterId cluster)
     {
         const auto id     = cluster & kClusterIdMask;
@@ -192,8 +190,10 @@ private:
             (kClusterVendorMin <= vendor && vendor <= kClusterVendorMax);
     }
 
+    // TODO: eventually this functionality should live where the type itself is defined
     static constexpr bool IsValidEndpoint(EndpointId endpoint) { return true; }
 
+    // TODO: eventually this functionality should live where the type itself is defined
     static bool IsValidDeviceType(DeviceTypeId deviceType)
     {
         const auto id     = deviceType & kDeviceTypeIdMask;
@@ -202,6 +202,7 @@ private:
             (kDeviceTypeVendorMin <= vendor && vendor <= kDeviceTypeVendorMax);
     }
 
+    // TODO: eventually this functionality should live where the type itself is defined
     static bool IsValid(const Target & target)
     {
         constexpr Target::Flags kNotAll     = Target::kEndpoint | Target::kDeviceType;
@@ -247,7 +248,6 @@ private:
         const auto cluster    = target.cluster;
         const auto endpoint   = target.endpoint;
         const auto deviceType = target.deviceType;
-        assert(IsValid(target));
         if (flags & Target::kCluster)
         {
             mCluster = cluster;
@@ -274,6 +274,8 @@ private:
     static_assert(sizeof(ClusterId) == 4, "Expecting 4 byte cluster ID");
     static_assert(sizeof(EndpointId) == 2, "Expecting 2 byte endpoint ID");
     static_assert(sizeof(DeviceTypeId) == 4, "Expecting 4 byte device type ID");
+
+    // TODO: some (not all) of these values should live where the type itself is defined
 
     // (mCluster == kClusterEmpty) --> mCluster contains no cluster
     static constexpr ClusterId kClusterEmpty = 0xFFFFFFFF;
@@ -541,7 +543,6 @@ public:
 public:
     void Release() override
     {
-        assert(mStorage != nullptr);
         mStorage->Release();
         mStorage = nullptr;
     }
@@ -895,10 +896,9 @@ private:
 
 CHIP_ERROR CopyViaInterface(const Entry & entry, EntryStorage & storage)
 {
-#if CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FOREIGN_DELEGATE_SUPPORT
-    // NOTE: function uses sizeof(EntryStorage) on stack as a temporary
-    //       and is only necessary if using foreign delegates (i.e. not
-    //       EntryDelegate from this file)
+#if CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
+    // NOTE: uses sizeof(EntryStorage) on stack as a temporary and is only necessary if using this
+    //       file with other Entry::Delegate implementations that are not EntryDelegate in this file
     EntryStorage temp;
     temp.Clear();
 
@@ -934,24 +934,28 @@ CHIP_ERROR CopyViaInterface(const Entry & entry, EntryStorage & storage)
         temp.mTargets[i].Add(target);
     }
 
+    temp.mInUse = true;
     storage = temp;
     return CHIP_NO_ERROR;
 #else
     // NOTE: save space by not implementing function
-    assert(false);
+    VerifyOrDie(false);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
 CHIP_ERROR Copy(const Entry & entry, EntryStorage & storage)
 {
+#if CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT
     auto & delegate = entry.GetDelegate();
     if (EntryDelegate::InPool(delegate))
     {
-        assert(static_cast<const EntryDelegate &>(delegate).GetStorage() != nullptr);
+        // NOTE: if an entry's delegate is in the pool, it must be an EntryDelegate,
+        //       which must have a storage that is in use, which can be copied as POD
         storage = *static_cast<const EntryDelegate &>(delegate).GetStorage();
         return CHIP_NO_ERROR;
     }
+#endif
     return CopyViaInterface(entry, storage);
 }
 
