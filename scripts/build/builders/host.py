@@ -152,7 +152,7 @@ class HostBuilder(GnBuilder):
     def build_outputs(self):
         outputs = {}
 
-        for name in self.app.OutputNames:
+        for name in self.app.OutputNames():
             outputs.update({
                 name: os.path.join(self.output_dir, name)
             })
