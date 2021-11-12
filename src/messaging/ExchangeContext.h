@@ -234,8 +234,6 @@ private:
 
     void DoClose(bool clearRetransTable);
 
-    static bool IsValidGroupMsgType(Protocols::Id protocolId, uint8_t msgType);
-
     /**
      * We have handled an application-level message in some way and should
      * re-evaluate out state to see whether we should still be open.

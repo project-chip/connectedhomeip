@@ -119,15 +119,6 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // Don't let method get called on a freed object.
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
-    // Check if we can safely send message to a group
-    if (IsGroupExchangeContext())
-    {
-        if (!IsValidGroupMsgType(protocolId, msgType))
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-    }
-
     // we hold the exchange context here in case the entity that
     // originally generated it tries to close it as a result of
     // an error arising below. at the end, we have to close it.
@@ -508,23 +499,6 @@ void ExchangeContext::MessageHandled()
     }
 
     Close();
-}
-
-bool ExchangeContext::IsValidGroupMsgType(Protocols::Id protocolId, uint8_t msgType)
-{
-    // Spec 8.2.4
-    if (protocolId == Protocols::InteractionModel::Id)
-    {
-        switch (msgType)
-        {
-        case to_underlying(Protocols::InteractionModel::MsgType::WriteRequest):
-        case to_underlying(Protocols::InteractionModel::MsgType::InvokeCommandRequest):
-            return true;
-        default:
-            return false;
-        }
-    }
-    return false;
 }
 
 } // namespace Messaging
