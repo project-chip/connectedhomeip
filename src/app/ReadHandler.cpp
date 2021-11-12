@@ -134,10 +134,9 @@ CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayl
 CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Protocols::InteractionModel::Status status;
-    err = StatusResponse::ProcessStatusResponse(apExchangeContext, std::move(aPayload), status);
-    VerifyOrExit((err == CHIP_NO_ERROR) && (status == Protocols::InteractionModel::Status::Success),
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
+    StatusIB status;
+    err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
+    SuccessOrExit(err);
     switch (mState)
     {
     case HandlerState::AwaitingReportResponse:

@@ -92,26 +92,18 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
                                             System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    StatusIB status(Protocols::InteractionModel::Status::Failure);
     VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse))
     {
         err = ProcessInvokeResponse(std::move(aPayload));
         SuccessOrExit(err);
+        status.mStatus = Protocols::InteractionModel::Status::Success;
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
-        Protocols::InteractionModel::Status status;
-        err           = StatusResponse::ProcessStatusResponse(apExchangeContext, std::move(aPayload), status);
-        mpExchangeCtx = nullptr;
+        err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
         SuccessOrExit(err);
-        if (status == Protocols::InteractionModel::Status::ResourceExhausted)
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-        }
-        else
-        {
-            err = CHIP_ERROR_INCORRECT_STATE;
-        }
     }
     else
     {
@@ -123,8 +115,6 @@ exit:
     {
         if (err != CHIP_NO_ERROR)
         {
-            StatusIB status;
-            status.mStatus = Protocols::InteractionModel::Status::Failure;
             mpCallback->OnError(this, status, err);
         }
     }

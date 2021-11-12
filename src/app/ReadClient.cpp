@@ -250,19 +250,10 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
-        Protocols::InteractionModel::Status status;
+        StatusIB status;
         VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
-        err           = StatusResponse::ProcessStatusResponse(apExchangeContext, std::move(aPayload), status);
-        mpExchangeCtx = nullptr;
+        err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
         SuccessOrExit(err);
-        if (status == Protocols::InteractionModel::Status::ResourceExhausted)
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-        }
-        else
-        {
-            err = CHIP_ERROR_INCORRECT_STATE;
-        }
     }
     else
     {

@@ -402,7 +402,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
     {
         SuccessOrExit(OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
-                                                  ReadHandler::InteractionType::Read, status));
+                                           ReadHandler::InteractionType::Read, status));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
@@ -411,11 +411,12 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeRequest))
     {
         SuccessOrExit(OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
-                                                  ReadHandler::InteractionType::Subscribe, status));
+                                           ReadHandler::InteractionType::Subscribe, status));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
         ReturnErrorOnFailure(OnUnsolicitedReportData(apExchangeContext, aPayloadHeader, std::move(aPayload)));
+        status = Protocols::InteractionModel::Status::Success;
     }
     else
     {
@@ -426,10 +427,6 @@ exit:
     if (status != Protocols::InteractionModel::Status::Success)
     {
         err = StatusResponse::SendStatusResponse(status, apExchangeContext, false /*aExpectResponse*/);
-        if (err != CHIP_NO_ERROR)
-        {
-            apExchangeContext->Abort();
-        }
     }
     return err;
 }

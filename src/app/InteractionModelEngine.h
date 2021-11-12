@@ -200,6 +200,11 @@ private:
 
     void OnDone(CommandHandler & apCommandObj) override;
 
+    /**
+     * Called when Interaction Model receives a Command Request message.  Errors processing
+     * the Command Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
+     * expected to set it to success if it does not want an automatic status response message to be sent.
+     */
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                       System::PacketBufferHandle && aPayload, Protocols::InteractionModel::Status & aStatus);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -208,7 +213,8 @@ private:
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
-     * the Read Request are handled entirely within this function.
+     * the Read Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
+     * expected to set it to success if it does not want an automatic status response message to be sent.
      */
 
     CHIP_ERROR OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -217,7 +223,8 @@ private:
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
-     * the Write Request are handled entirely within this function.
+     * the Write Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
+     * expected to set it to success if it does not want an automatic status response message to be sent.
      */
     CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                               System::PacketBufferHandle && aPayload, Protocols::InteractionModel::Status & aStatus);

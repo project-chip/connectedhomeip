@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/MessageDef/StatusIB.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/TLVPacketBufferBackingStore.h>
@@ -31,8 +32,7 @@ class StatusResponse
 public:
     static CHIP_ERROR SendStatusResponse(Protocols::InteractionModel::Status aStatus,
                                          Messaging::ExchangeContext * apExchangeContext, bool aExpectResponse);
-    static CHIP_ERROR ProcessStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
-                                            Protocols::InteractionModel::Status & aStatus);
+    static CHIP_ERROR ProcessStatusResponse(System::PacketBufferHandle && aPayload, StatusIB & aStatus);
 };
 } // namespace app
 } // namespace chip

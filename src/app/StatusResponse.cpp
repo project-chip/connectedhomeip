@@ -24,7 +24,6 @@ namespace app {
 CHIP_ERROR StatusResponse::SendStatusResponse(Protocols::InteractionModel::Status aStatus,
                                               Messaging::ExchangeContext * apExchangeContext, bool aExpectResponse)
 {
-    using Protocols::InteractionModel::Status;
     VerifyOrReturnError(apExchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -43,10 +42,9 @@ CHIP_ERROR StatusResponse::SendStatusResponse(Protocols::InteractionModel::Statu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR StatusResponse::ProcessStatusResponse(Messaging::ExchangeContext * apExchangeContext,
-                                                 System::PacketBufferHandle && aPayload,
-                                                 Protocols::InteractionModel::Status & aStatus)
+CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && aPayload, StatusIB & aStatus)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     StatusResponseMessage::Parser response;
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
@@ -55,9 +53,22 @@ CHIP_ERROR StatusResponse::ProcessStatusResponse(Messaging::ExchangeContext * ap
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(response.CheckSchemaValidity());
 #endif
-    ReturnErrorOnFailure(response.GetStatus(aStatus));
-    ChipLogProgress(InteractionModel, "Receive status response, status is %" PRIu16, to_underlying(aStatus));
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(response.GetStatus(aStatus.mStatus));
+    ChipLogProgress(InteractionModel, "Received status response, status is %" PRIu16, to_underlying(aStatus.mStatus));
+
+    if (aStatus.mStatus == Protocols::InteractionModel::Status::Success)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else if (aStatus.mStatus == Protocols::InteractionModel::Status::ResourceExhausted)
+    {
+        err = CHIP_ERROR_NO_MEMORY;
+    }
+    else
+    {
+        err = CHIP_ERROR_INCORRECT_STATE;
+    }
+    return err;
 }
 } // namespace app
 } // namespace chip

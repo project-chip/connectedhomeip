@@ -29,6 +29,7 @@
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
+
 typedef uint8_t Percent;
 typedef uint16_t Percent100ths;
 
