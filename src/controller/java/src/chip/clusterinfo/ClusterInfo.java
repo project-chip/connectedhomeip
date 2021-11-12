@@ -8,7 +8,8 @@ public class ClusterInfo {
   private final ClusterConstructor createClusterFunction;
   private final Map<String, InteractionInfo> commands;
 
-  public ClusterInfo(ClusterConstructor createClusterFunction, Map<String, InteractionInfo> commands) {
+  public ClusterInfo(
+      ClusterConstructor createClusterFunction, Map<String, InteractionInfo> commands) {
     this.createClusterFunction = createClusterFunction;
     this.commands = commands;
   }
