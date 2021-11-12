@@ -5996,14 +5996,14 @@ public class ChipClusters {
     private native void resetWatermarks(long chipClusterPtr, DefaultClusterCallback callback);
 
     public static class ThreadMetricsAttribute {
-      public long id;
+      public Long id;
       public String name;
-      public long stackFreeCurrent;
-      public long stackFreeMinimum;
-      public long stackSize;
+      public Long stackFreeCurrent;
+      public Long stackFreeMinimum;
+      public Long stackSize;
 
       public ThreadMetricsAttribute(
-          long id, String name, long stackFreeCurrent, long stackFreeMinimum, long stackSize) {
+          Long id, String name, Long stackFreeCurrent, Long stackFreeMinimum, Long stackSize) {
         this.id = id;
         this.name = name;
         this.stackFreeCurrent = stackFreeCurrent;
