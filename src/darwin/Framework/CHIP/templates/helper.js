@@ -87,7 +87,7 @@ function asObjectiveCNumberType(label, type, asLowerCased)
           case 'uint16_t':
             return 'UnsignedShort';
           case 'uint32_t':
-            return 'UnsignedLong';
+            return 'UnsignedInt';
           case 'uint64_t':
             return 'UnsignedLongLong';
           case 'int8_t':
@@ -95,7 +95,7 @@ function asObjectiveCNumberType(label, type, asLowerCased)
           case 'int16_t':
             return 'Short';
           case 'int32_t':
-            return 'Long';
+            return 'Int';
           case 'int64_t':
             return 'LongLong';
           default:
@@ -121,31 +121,46 @@ function asUpperCamelCase(label)
   return str.replace(/[\.:]/g, '');
 }
 
-async function asObjectiveCType(type, cluster, options)
+async function asObjectiveCClass(type, cluster, options)
 {
   let pkgId    = await templateUtil.ensureZclPackageId(this);
   let isStruct = await zclHelper.isStruct(this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
-  let typeStr = `Need to define this for ${type}`;
   if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
-    typeStr = 'NSArray *'
-  } else if (StringHelper.isOctetString(type)) {
-    typeStr = 'NSData *';
-  } else if (StringHelper.isCharString(type)) {
-    typeStr = 'NSString *';
-  } else if (isStruct) {
-    typeStr = `CHIP${asUpperCamelCase(cluster)}Cluster${asUpperCamelCase(type)} *`;
-  } else {
-    typeStr = 'NSNumber *';
+    return 'NSArray';
   }
 
+  if (StringHelper.isOctetString(type)) {
+    return 'NSData';
+  }
+
+  if (StringHelper.isCharString(type)) {
+    return 'NSString';
+  }
+
+  if (isStruct) {
+    return `CHIP${asUpperCamelCase(cluster)}Cluster${asUpperCamelCase(type)}`;
+  }
+
+  return 'NSNumber';
+}
+
+async function asObjectiveCType(type, cluster, options)
+{
+  let typeStr = await asObjectiveCClass.call(this, type, cluster, options);
   if (this.isNullable || this.isOptional) {
-    typeStr = `${typeStr} _Nullable`;
+    typeStr = `${typeStr} * _Nullable`;
   } else {
-    typeStr = `${typeStr} _Nonnull`;
+    typeStr = `${typeStr} * _Nonnull`;
   }
 
   return typeStr;
+}
+
+async function arrayElementObjectiveCClass(type, cluster, options)
+{
+  options.hash.forceNotList = true;
+  return asObjectiveCClass.call(this, type, cluster, options);
 }
 
 //
@@ -156,4 +171,6 @@ exports.asObjectiveCNumberType       = asObjectiveCNumberType;
 exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
 exports.asTestIndex                  = asTestIndex;
 exports.asTestValue                  = asTestValue;
+exports.asObjectiveCClass            = asObjectiveCClass;
 exports.asObjectiveCType             = asObjectiveCType;
+exports.arrayElementObjectiveCClass  = arrayElementObjectiveCClass;

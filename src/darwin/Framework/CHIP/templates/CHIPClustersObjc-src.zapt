@@ -9,9 +9,49 @@
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
 
+#include <set>
+#include <type_traits>
+
 using chip::Callback::Callback;
 using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
+
+template<typename T> struct ListMemberTypeGetter {};
+template<typename T> struct ListMemberTypeGetter<chip::app::DataModel::List<T>> {
+  // We use List<const ...> in data model data structures, so consumers can
+  // use const data.  Just grab the type with the const stripped off.
+  using Type = std::remove_const_t<T>;
+};
+
+struct ListHolderBase {
+  // Just here so we can delete an instance to trigger the subclass destructor.
+  virtual ~ListHolderBase() {}
+};
+
+template<typename T>
+struct ListHolder : ListHolderBase {
+  ListHolder(size_t N) {
+    mList = new T[N];
+  }
+  ~ListHolder() {
+    delete [] mList;
+  }
+  T * mList;
+};
+
+struct ListFreer {
+  ~ListFreer() {
+    for (auto listHolder : mListHolders) {
+      delete listHolder;
+    }
+  }
+
+  void add(ListHolderBase * listHolder) {
+    mListHolders.insert(listHolder);
+  }
+
+  std::set<ListHolderBase *> mListHolders;
+};
 
 {{#chip_client_clusters}}
 @implementation CHIP{{asUpperCamelCase name}}
@@ -29,7 +69,11 @@ using namespace chip::app::Clusters;
 - (void){{asLowerCamelCase name}}:(ResponseHandler)responseHandler
 {{/if}}
 {
-    {{>encode_command}}
+    ListFreer listFreer;
+    {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
+    {{#chip_cluster_command_arguments}}
+    {{>encode_value target=(concat "request ." (asLowerCamelCase label)) source=(asLowerCamelCase label) cluster=parent.parent.name}}
+    {{/chip_cluster_command_arguments}}
 
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);

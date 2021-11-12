@@ -25,8 +25,8 @@
             "path": "partials/CHIPCallbackBridge.zapt"
         },
         {
-            "name": "encode_command",
-            "path": "partials/encode_command.zapt"
+            "name": "encode_value",
+            "path": "partials/encode_value.zapt"
         },
         {
             "name": "decode_response",
