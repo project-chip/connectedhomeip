@@ -33,6 +33,7 @@
 #include <thread>
 
 #include <arpa/inet.h>
+#include <dirent.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <malloc.h>
@@ -284,6 +285,61 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentH
     currentHeapHighWatermark = mallocInfo.uordblks;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+    DIR * proc_dir = opendir("/proc/self/task");
+
+    if (proc_dir == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Failed to open current process task directory");
+    }
+    else
+    {
+        ThreadMetrics * head = nullptr;
+        struct dirent * entry;
+
+        /* proc available, iterate through tasks... */
+        while ((entry = readdir(proc_dir)) != NULL)
+        {
+            if (entry->d_name[0] == '.')
+                continue;
+
+            ThreadMetrics * thread = new ThreadMetrics();
+
+            strncpy(thread->NameBuf, entry->d_name, kMaxThreadNameLength);
+            thread->NameBuf[kMaxThreadNameLength] = '\0';
+            thread->name                          = CharSpan(thread->NameBuf, strlen(thread->NameBuf));
+            thread->id                            = atoi(entry->d_name);
+
+            // TODO: Get stack info of each thread
+            thread->stackFreeCurrent = 0;
+            thread->stackFreeMinimum = 0;
+            thread->stackSize        = 0;
+
+            thread->Next = head;
+            head         = thread;
+        }
+
+        closedir(proc_dir);
+
+        *threadMetricsOut = head;
+        err               = CHIP_NO_ERROR;
+    }
+
+    return err;
+}
+
+void PlatformManagerImpl::_ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{
+    while (threadMetrics)
+    {
+        ThreadMetrics * del = threadMetrics;
+        threadMetrics       = threadMetrics->Next;
+        delete del;
+    }
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)

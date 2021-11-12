@@ -76,7 +76,7 @@ class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callba
             javaCallbackRef = cppCallback->javaCallbackRef;
             VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#chip_cluster_response_arguments}}{{#if isArray}}{{else if (isOctetString type)}}[B{{else if (isShortString type)}}Ljava/lang/String;{{else}}{{asJniSignature type}}{{/if}}{{/chip_cluster_response_arguments}})V", &javaMethod);
+            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#chip_cluster_response_arguments}}{{#if isArray}}{{else if (isOctetString type)}}[B{{else if (isShortString type)}}Ljava/lang/String;{{else}}{{asJniSignature type false}}{{/if}}{{/chip_cluster_response_arguments}})V", &javaMethod);
             SuccessOrExit(err);
 
             {{#chip_cluster_response_arguments}}
@@ -146,7 +146,7 @@ JNI_METHOD(jlong, {{asUpperCamelCase name}}Cluster, initWithDevice)(JNIEnv * env
 }
 
 {{#chip_cluster_commands}}
-JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{asJniBasicType type}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}})
+JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{asJniBasicType type false}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}})
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -173,7 +173,8 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
     cppCluster = reinterpret_cast<{{asUpperCamelCase ../name}}Cluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_cluster_command_arguments_with_structs_expanded}}, {{#if_chip_enum type}}static_cast<{{chipType}}>({{asLowerCamelCase label}}){{else if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*) {{asLowerCamelCase label}}Arr.data(), {{asLowerCamelCase label}}Arr.size()){{else if (isCharString type)}}chip::CharSpan({{asLowerCamelCase label}}Str.c_str(), strlen({{asLowerCamelCase label}}Str.c_str())){{else}}{{asLowerCamelCase label}}{{/if_chip_enum}}{{/chip_cluster_command_arguments_with_structs_expanded}});
+    err = cppCluster->{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel()
+    {{#chip_cluster_command_arguments_with_structs_expanded}}, {{#if_chip_enum type}}static_cast<{{chipType}}>({{asLowerCamelCase label}}){{else if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*) {{asLowerCamelCase label}}Arr.data(), {{asLowerCamelCase label}}Arr.size()){{else if (isCharString type)}}chip::CharSpan({{asLowerCamelCase label}}Str.c_str(), strlen({{asLowerCamelCase label}}Str.c_str())){{else}}{{asLowerCamelCase label}}{{/if_chip_enum}}{{/chip_cluster_command_arguments_with_structs_expanded}});
     SuccessOrExit(err);
 
 exit: 
@@ -202,7 +203,7 @@ exit:
 {{#chip_server_cluster_attributes}}
 {{#if isWritableAttribute}}
 
-JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{asJniBasicType type}} value)
+JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{asJniBasicType type false}} value)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);

@@ -46,7 +46,8 @@ enum
     kDeviceOption_SecuredDevicePort         = 0x100a,
     kDeviceOption_SecuredCommissionerPort   = 0x100b,
     kDeviceOption_UnsecuredCommissionerPort = 0x100c,
-    kDeviceOption_Command                   = 0x100d
+    kDeviceOption_Command                   = 0x100d,
+    kDeviceOption_PICS                      = 0x100e
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -72,6 +73,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
     { "unsecured-commissioner-port", kArgumentRequired, kDeviceOption_UnsecuredCommissionerPort },
     { "command", kArgumentRequired, kDeviceOption_Command },
+    { "PICS", kArgumentRequired, kDeviceOption_PICS },
     {}
 };
 
@@ -124,6 +126,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --command <command-name>\n"
     "       A name for a command to execute during startup.\n"
+    "\n"
+    "  --PICS <filepath>\n"
+    "       A file containing PICS items.\n"
     "\n";
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -191,6 +196,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_Command:
         LinuxDeviceOptions::GetInstance().command = aValue;
+        break;
+
+    case kDeviceOption_PICS:
+        LinuxDeviceOptions::GetInstance().PICS = aValue;
         break;
 
     default:

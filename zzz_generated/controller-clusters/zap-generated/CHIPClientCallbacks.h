@@ -260,6 +260,13 @@ void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(chip::TLV::TLVRead
                                                               chip::Callback::Cancelable * onFailureCallback);
 typedef void (*PowerSourceActiveBatteryFaultsListAttributeCallback)(void * context,
                                                                     const chip::app::DataModel::DecodableList<uint8_t> & data);
+void SoftwareDiagnosticsClusterThreadMetricsListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                chip::Callback::Cancelable * onSuccessCallback,
+                                                                chip::Callback::Cancelable * onFailureCallback);
+typedef void (*SoftwareDiagnosticsThreadMetricsListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+        data);
 void TvChannelClusterTvChannelListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                       chip::Callback::Cancelable * onFailureCallback);
 typedef void (*TvChannelTvChannelListListAttributeCallback)(

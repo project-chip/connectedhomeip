@@ -500,6 +500,31 @@ void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, @ { @"value" : array });
 };
 
+void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+        list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
+        [array addObject:@ {
+            @"Id" : [NSNumber numberWithUnsignedLongLong:entry.id],
+            @"Name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
+            @"StackFreeCurrent" : [NSNumber numberWithUnsignedLong:entry.stackFreeCurrent],
+            @"StackFreeMinimum" : [NSNumber numberWithUnsignedLong:entry.stackFreeMinimum],
+            @"StackSize" : [NSNumber numberWithUnsignedLong:entry.stackSize],
+        }];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
 void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list)
 {

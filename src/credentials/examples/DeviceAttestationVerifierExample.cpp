@@ -19,6 +19,7 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
+#include <credentials/DeviceAttestationVendorReserved.h>
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <lib/core/CHIPError.h>
@@ -260,15 +261,10 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
     ByteSpan attestationNonceSpan;
     uint32_t timestampDeconstructed;
     ByteSpan firmwareInfoSpan;
-    // TODO: refactor once final vendor-specific data tags is handled.
-    ByteSpan vendorReservedDeconstructed[2];
-    size_t vendorReservedDeconstructedSize = ArraySize(vendorReservedDeconstructed);
-    uint16_t vendorIdDeconstructed;
-    uint16_t profileNumDeconstructed;
+    DeviceAttestationVendorReservedDeconstructor vendorReserved;
+
     VerifyOrReturnError(DeconstructAttestationElements(attestationInfoBuffer, certificationDeclarationSpan, attestationNonceSpan,
-                                                       timestampDeconstructed, firmwareInfoSpan, vendorReservedDeconstructed,
-                                                       vendorReservedDeconstructedSize, vendorIdDeconstructed,
-                                                       profileNumDeconstructed) == CHIP_NO_ERROR,
+                                                       timestampDeconstructed, firmwareInfoSpan, vendorReserved) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kAttestationElementsMalformed);
 
     // Verify that Nonce matches with what we sent
