@@ -15,11 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- * Helpers for manipulating values that are going into and out of the attribute
- * store.
- */
-
 #pragma once
 
 #include <lib/support/TypeTraits.h>
@@ -37,7 +32,9 @@ struct NumericAttributeTraits
     using StorageType = T;
 
     // The value reserved in the value space of StorageType to represent null,
-    // for cases when we have a nullable value.
+    // for cases when we have a nullable value.  This value must match the value
+    // excluded from the valid value range in the spec, so that we don't confuse
+    // valid values with null.
     static constexpr StorageType kNullValue =
         std::is_signed<T>::value ? std::numeric_limits<T>::min() : std::numeric_limits<T>::max();
 

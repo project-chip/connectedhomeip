@@ -28,7 +28,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af.h>
-#include <app/util/attribute-storage-helpers.h>
+#include <app/util/attribute-storage-null-handling.h>
 
 namespace chip {
 namespace app {

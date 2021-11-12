@@ -28,7 +28,7 @@
 #include <app/reporting/Engine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
-#include <app/util/attribute-storage-helpers.h>
+#include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/ember-compatibility-functions.h>
