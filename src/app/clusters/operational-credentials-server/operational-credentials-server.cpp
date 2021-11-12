@@ -552,10 +552,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
         // TODO: retrieve vendor information to populate the fields below.
         uint32_t timestamp = 0;
         ByteSpan firmwareInfo;
-        ByteSpan * vendorReservedArray = nullptr;
-        size_t vendorReservedArraySize = 0;
-        uint16_t vendorId              = 0;
-        uint16_t profileNum            = 0;
+        Credentials::DeviceAttestationVendorReservedConstructor emptyVendorReserved(nullptr, 0);
 
         SuccessOrExit(err = dacProvider->GetCertificationDeclaration(certDeclSpan));
         // TODO: Retrieve firmware Information
@@ -565,8 +562,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 
         MutableByteSpan attestationElementsSpan(attestationElements.Get(), attestationElementsLen);
         SuccessOrExit(err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, timestamp, firmwareInfo,
-                                                                      vendorReservedArray, vendorReservedArraySize, vendorId,
-                                                                      profileNum, attestationElementsSpan));
+                                                                      emptyVendorReserved, attestationElementsSpan));
         attestationElementsLen = attestationElementsSpan.size();
     }
 
