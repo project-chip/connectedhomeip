@@ -139,10 +139,12 @@
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-                [cluster bind:nodeId
-                            groupId:groupId
-                         endpointId:endpointId
-                          clusterId:clusterId
+                CHIPBindingClusterBindPayload * payload = [[CHIPBindingClusterBindPayload alloc] init];
+                payload.NodeId = [NSNumber numberWithUnsignedLongLong:nodeId];
+                payload.GroupId = [NSNumber numberWithUnsignedInt:groupId];
+                payload.EndpointId = [NSNumber numberWithUnsignedInt:endpointId];
+                payload.ClusterId = [NSNumber numberWithUnsignedInt:clusterId];
+                [cluster bind:payload
                     responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
                         NSString * resultString = (error == nil)
                             ? @"Bind command: success!"
@@ -169,10 +171,12 @@
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-                [cluster unbind:nodeId
-                            groupId:groupId
-                         endpointId:endpointId
-                          clusterId:clusterId
+                CHIPBindingClusterUnbindPayload * payload = [[CHIPBindingClusterUnbindPayload alloc] init];
+                payload.NodeId = [NSNumber numberWithUnsignedLongLong:nodeId];
+                payload.GroupId = [NSNumber numberWithUnsignedInt:groupId];
+                payload.EndpointId = [NSNumber numberWithUnsignedInt:endpointId];
+                payload.ClusterId = [NSNumber numberWithUnsignedInt:clusterId];
+                [cluster unbind:payload
                     responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
                         NSString * resultString = (error == nil)
                             ? @"Unbind command: success!"
