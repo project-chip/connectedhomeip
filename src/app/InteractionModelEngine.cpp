@@ -401,7 +401,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
     {
         SuccessOrExit(OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
-                                                  ReadHandler::InteractionType::Read, status));
+                                           ReadHandler::InteractionType::Read, status));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
@@ -410,7 +410,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeRequest))
     {
         SuccessOrExit(OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
-                                                  ReadHandler::InteractionType::Subscribe, status));
+                                           ReadHandler::InteractionType::Subscribe, status));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
