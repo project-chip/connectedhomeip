@@ -136,6 +136,9 @@ private:
 
     WiFiAPMode _GetWiFiAPMode();
     CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
+    CHIP_ERROR _GetWiFiBssId(ByteSpan & value);
+    CHIP_ERROR _GetWiFiSecurityType(uint8_t & securityType);
+    CHIP_ERROR _GetWiFiVersion(uint8_t & wiFiVersion);
     bool _IsWiFiAPActive();
     bool _IsWiFiAPApplicationControlled();
     void _DemandStartWiFiAP();
@@ -220,6 +223,7 @@ private:
     System::Clock::Timestamp mLastAPDemandTime;
     System::Clock::Timeout mWiFiStationReconnectInterval;
     System::Clock::Timeout mWiFiAPIdleTimeout;
+    uint8_t mWiFiMacAddress[kMaxHardwareAddrSize];
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

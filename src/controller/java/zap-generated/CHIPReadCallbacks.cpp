@@ -2024,6 +2024,95 @@ void CHIPPowerSourceActiveBatteryFaultsAttributeCallback::CallbackFn(void * cont
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
+CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback(jobject javaCallback) :
+    chip::Callback::Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback>(CallbackFn, this)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+        list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback> cppCallback(
+        reinterpret_cast<CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback *>(context));
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jclass arrayListClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
+    chip::JniClass arrayListJniClass(arrayListClass);
+    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
+    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
+                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
+    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
+    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jclass attributeClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(
+        env, "chip/devicecontroller/ChipClusters$SoftwareDiagnosticsCluster$ThreadMetricsAttribute", attributeClass);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        ChipLogError(Zcl,
+                     "Could not find class chip/devicecontroller/ChipClusters$SoftwareDiagnosticsCluster$ThreadMetricsAttribute"));
+    chip::JniClass attributeJniClass(attributeClass);
+    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(JLjava/lang/String;JJJ)V");
+    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find ThreadMetricsAttribute constructor"));
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+        auto & entry = iter.GetValue();
+        (void) entry;
+        jlong id = entry.id;
+        chip::UtfString nameStr(env, entry.name);
+        jstring name(nameStr.jniValue());
+        jlong stackFreeCurrent = entry.stackFreeCurrent;
+        jlong stackFreeMinimum = entry.stackFreeMinimum;
+        jlong stackSize        = entry.stackSize;
+
+        jobject attributeObj =
+            env->NewObject(attributeClass, attributeCtor, id, name, stackFreeCurrent, stackFreeMinimum, stackSize);
+        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create ThreadMetricsAttribute object"));
+
+        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+    }
+    VerifyOrReturn(
+        iter.GetStatus() == CHIP_NO_ERROR,
+        ChipLogError(Zcl, "Error decoding ThreadMetricsAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
 CHIPTvChannelTvChannelListAttributeCallback::CHIPTvChannelTvChannelListAttributeCallback(jobject javaCallback) :
     chip::Callback::Callback<TvChannelTvChannelListListAttributeCallback>(CallbackFn, this)
 {

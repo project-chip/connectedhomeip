@@ -5991,6 +5991,59 @@ public class ChipClusters {
 
     private native void resetWatermarks(long chipClusterPtr, DefaultClusterCallback callback);
 
+    public static class ThreadMetricsAttribute {
+      public long id;
+      public String name;
+      public long stackFreeCurrent;
+      public long stackFreeMinimum;
+      public long stackSize;
+
+      public ThreadMetricsAttribute(
+          long id, String name, long stackFreeCurrent, long stackFreeMinimum, long stackSize) {
+        this.id = id;
+        this.name = name;
+        this.stackFreeCurrent = stackFreeCurrent;
+        this.stackFreeMinimum = stackFreeMinimum;
+        this.stackSize = stackSize;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("long id: ");
+        output.append(this.id);
+        output.append("\n");
+
+        output.append("String name: ");
+        output.append(this.name);
+        output.append("\n");
+
+        output.append("long stackFreeCurrent: ");
+        output.append(this.stackFreeCurrent);
+        output.append("\n");
+
+        output.append("long stackFreeMinimum: ");
+        output.append(this.stackFreeMinimum);
+        output.append("\n");
+
+        output.append("long stackSize: ");
+        output.append(this.stackSize);
+        output.append("\n");
+
+        return output.toString();
+      }
+    }
+
+    public interface ThreadMetricsAttributeCallback {
+      void onSuccess(List<ThreadMetricsAttribute> valueList);
+
+      void onError(Exception ex);
+    }
+
+    public void readThreadMetricsAttribute(ThreadMetricsAttributeCallback callback) {
+      readThreadMetricsAttribute(chipClusterPtr, callback);
+    }
+
     public void readCurrentHeapFreeAttribute(LongAttributeCallback callback) {
       readCurrentHeapFreeAttribute(chipClusterPtr, callback);
     }
@@ -6006,6 +6059,9 @@ public class ChipClusters {
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
+
+    private native void readThreadMetricsAttribute(
+        long chipClusterPtr, ThreadMetricsAttributeCallback callback);
 
     private native void readCurrentHeapFreeAttribute(
         long chipClusterPtr, LongAttributeCallback callback);

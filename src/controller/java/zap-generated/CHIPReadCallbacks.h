@@ -515,6 +515,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback
+    : public chip::Callback::Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback>
+{
+public:
+    CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback(jobject javaCallback);
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+            list);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPTvChannelTvChannelListAttributeCallback : public chip::Callback::Callback<TvChannelTvChannelListListAttributeCallback>
 {
 public:

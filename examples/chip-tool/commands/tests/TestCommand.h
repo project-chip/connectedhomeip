@@ -21,6 +21,8 @@
 #include "../common/CHIPCommand.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/DecodableList.h>
+#include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
+#include <app/tests/suites/pics/PICSBooleanReader.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/UnitTestUtils.h>
@@ -36,6 +38,7 @@ public:
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
+        AddArgument("PICS", &mPICSFilePath);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -171,9 +174,9 @@ protected:
         return false;
     }
 
-    bool CheckValueAsString(const char * itemName, chip::ByteSpan current, const char * expected);
+    bool CheckValueAsString(const char * itemName, chip::ByteSpan current, chip::ByteSpan expected);
 
-    bool CheckValueAsString(const char * itemName, chip::CharSpan current, const char * expected);
+    bool CheckValueAsString(const char * itemName, chip::CharSpan current, chip::CharSpan expected);
 
     template <typename T>
     bool CheckValuePresent(const char * itemName, const chip::Optional<T> & value)
@@ -214,12 +217,16 @@ protected:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
+    bool ShouldSkip(const char * expression);
+
     void Wait()
     {
-        if (mDelayInMs)
+        if (mDelayInMs.HasValue())
         {
-            chip::test_utils::SleepMillis(mDelayInMs);
+            chip::test_utils::SleepMillis(mDelayInMs.Value());
         }
     };
-    uint64_t mDelayInMs = 0;
+    chip::Optional<uint64_t> mDelayInMs;
+    chip::Optional<char *> mPICSFilePath;
+    chip::Optional<std::map<std::string, bool>> PICS;
 };

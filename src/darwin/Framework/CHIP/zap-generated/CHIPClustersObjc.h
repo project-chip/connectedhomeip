@@ -1503,6 +1503,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resetWatermarks:(ResponseHandler)responseHandler;
 
+- (void)readAttributeThreadMetricsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentHeapFreeWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeCurrentHeapUsedWithResponseHandler:(ResponseHandler)responseHandler;

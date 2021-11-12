@@ -32,7 +32,7 @@ class {{filename}}: public TestCommand
         {{#chip_tests_items}}
         case {{index}}:
           ChipLogProgress(chipTool, " ***** Test Step {{index}} : {{label}}\n");
-          err = Test{{asUpperCamelCase label}}_{{index}}();
+          err = {{#if PICS}}ShouldSkip("{{PICS}}") ? CHIP_NO_ERROR : {{/if}}Test{{asUpperCamelCase label}}_{{index}}();
           break;
         {{/chip_tests_items}}
       }
@@ -137,27 +137,28 @@ class {{filename}}: public TestCommand
 
     CHIP_ERROR {{>testCommand}}()
     {
-        chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
-        cluster.Associate(mDevice, {{endpoint}});
-
         {{#if isCommand}}
-        using requestType  = chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type;
-        using responseType = chip::app::{{chip_tests_item_response_type}};
+        using RequestType = chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type;
 
-        chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type request;
+        RequestType request;
         {{#chip_tests_item_parameters}}
         {{>commandValue ns=parent.cluster container=(concat "request." (asLowerCamelCase label)) definedValue=definedValue}}
         {{/chip_tests_item_parameters}}
 
-        auto success = [](void * context, const responseType & data) {
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<{{filename}} *>(context))->OnSuccessResponse_{{index}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}data.{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
             (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(status);
         };
-        {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.InvokeCommand<requestType, responseType>(request, this, success, failure){{#if async}}){{/if}};
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, {{endpoint}}, request));
+        {{#unless async}}return CHIP_NO_ERROR;{{/unless}}
         {{else}}
+        chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
+        cluster.Associate(mDevice, {{endpoint}});
+
         {{#chip_tests_item_parameters}}
         {{zapTypeToEncodableClusterObjectType type ns=parent.cluster}} {{asLowerCamelCase name}}Argument;
         {{>commandValue ns=parent.cluster container=(concat (asLowerCamelCase name) "Argument") definedValue=definedValue}}

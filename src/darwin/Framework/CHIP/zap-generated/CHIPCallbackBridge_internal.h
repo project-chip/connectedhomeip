@@ -553,6 +553,20 @@ public:
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
 };
 
+class CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<SoftwareDiagnosticsThreadMetricsListAttributeCallback>
+{
+public:
+    CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<SoftwareDiagnosticsThreadMetricsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+            list);
+};
+
 class CHIPTvChannelTvChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>
 {
 public:

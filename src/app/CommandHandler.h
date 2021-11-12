@@ -71,6 +71,51 @@ public:
         virtual bool CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
     };
 
+    class Handle
+    {
+    public:
+        Handle() {}
+        Handle(const Handle & handle) = delete;
+        Handle(Handle && handle)
+        {
+            mpHandler        = handle.mpHandler;
+            mMagic           = handle.mMagic;
+            handle.mpHandler = nullptr;
+            handle.mMagic    = 0;
+        }
+        Handle(decltype(nullptr)) {}
+        Handle(CommandHandler * handle);
+        ~Handle() { Release(); }
+
+        Handle & operator=(Handle && handle)
+        {
+            Release();
+            mpHandler        = handle.mpHandler;
+            mMagic           = handle.mMagic;
+            handle.mpHandler = nullptr;
+            handle.mMagic    = 0;
+            return *this;
+        }
+
+        Handle & operator=(decltype(nullptr))
+        {
+            Release();
+            return *this;
+        }
+
+        /**
+         * Get the CommandHandler object it holds. Get() may return a nullptr if the CommandHandler object is holds is no longer
+         * valid.
+         */
+        CommandHandler * Get();
+
+        void Release();
+
+    private:
+        CommandHandler * mpHandler = nullptr;
+        uint32_t mMagic            = 0;
+    };
+
     /*
      * Constructor.
      *
@@ -122,6 +167,22 @@ public:
 
 private:
     friend class TestCommandInteraction;
+    friend class CommandHandler::Handle;
+
+    /**
+     * IncrementHoldOff will increase the inner refcount of the CommandHandler.
+     *
+     * Users should use CommandHandler::Handle for management the lifespan of the CommandHandler.
+     * DefRef should be released in reasonable time, and Close() should only be called when the refcount reached 0.
+     */
+    void IncrementHoldOff();
+
+    /**
+     * DecrementHoldOff is used by CommandHandler::Handle for decreasing the refcount of the CommandHandler.
+     * When refcount reached 0, CommandHandler will send the response to the peer and shutdown.
+     */
+    void DecrementHoldOff();
+
     /*
      * Allocates a packet buffer used for encoding an invoke response payload.
      *
@@ -130,11 +191,11 @@ private:
      */
     CHIP_ERROR AllocateBuffer();
 
-    //
-    // Called internally to signal the completion of all work on this object, gracefully close the
-    // exchange (by calling into the base class) and finally, signal to a registerd callback that it's
-    // safe to release this object.
-    //
+    /**
+     * Called internally to signal the completion of all work on this object, gracefully close the
+     * exchange (by calling into the base class) and finally, signal to a registerd callback that it's
+     * safe to release this object.
+     */
     void Close();
 
     CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement);
@@ -146,6 +207,7 @@ private:
     Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
+    size_t mPendingWork                    = 0;
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
 };

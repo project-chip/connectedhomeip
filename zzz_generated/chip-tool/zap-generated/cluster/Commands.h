@@ -27,6 +27,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Nullable.h>
 #include <commands/clusters/ModelCommand.h>
+#include <commands/common/CommandInvoker.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/Span.h>
@@ -60,6 +61,8 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -632,6 +635,38 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Type'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("Id", indent + 1, value.id);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Id'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FaultRecording", indent + 1, value.faultRecording);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FaultRecording'",
+                            IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -2380,6 +2415,17 @@ static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context
     command->SetCommandExitStatus(err);
 }
 
+static void OnSoftwareDiagnosticsThreadMetricsListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+        list)
+{
+    CHIP_ERROR err = LogValue("OnSoftwareDiagnosticsThreadMetricsListAttributeResponse", 0, list);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+}
+
 static void OnTvChannelTvChannelListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list)
@@ -4012,9 +4058,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::AccountLoginCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnAccountLoginGetSetupPINResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnAccountLoginGetSetupPINResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -4038,9 +4083,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::AccountLoginCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -4109,9 +4152,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::AdministratorCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -4139,9 +4180,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::AdministratorCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -4160,9 +4199,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::AdministratorCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -4237,9 +4274,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050D) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -4549,9 +4584,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnApplicationLauncherLaunchAppResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnApplicationLauncherLaunchAppResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -4725,9 +4759,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::AudioOutputCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -4750,9 +4782,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::AudioOutputCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -4893,9 +4923,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BarrierControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -4914,9 +4942,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BarrierControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -5133,9 +5159,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6235,9 +6259,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000F000) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BindingCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6263,9 +6285,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000F000) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BindingCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6477,9 +6497,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000A) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedActionsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6504,9 +6522,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000B) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedActionsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6530,9 +6546,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedActionsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6557,9 +6571,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000009) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedActionsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6583,9 +6595,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedActionsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6610,9 +6620,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedActionsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6636,9 +6644,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedActionsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6663,9 +6669,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedActionsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6689,9 +6693,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedActionsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6715,9 +6717,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedActionsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6742,9 +6742,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedActionsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -6768,9 +6766,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedActionsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7587,9 +7583,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000044) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7616,9 +7610,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000041) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7646,9 +7638,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000040) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7675,9 +7665,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000043) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7705,9 +7693,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000042) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7733,9 +7719,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7764,9 +7748,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004B) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7793,9 +7775,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7822,9 +7802,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7851,9 +7829,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7879,9 +7855,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000000A) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7909,9 +7883,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7938,9 +7910,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7966,9 +7936,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -7995,9 +7963,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000009) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -8027,9 +7993,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004C) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -8057,9 +8021,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -8087,9 +8049,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -8113,9 +8073,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000047) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -10645,9 +10603,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ContentLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnContentLauncherLaunchContentResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnContentLauncherLaunchContentResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -10671,9 +10628,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ContentLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnContentLauncherLaunchURLResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnContentLauncherLaunchURLResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -10996,9 +10952,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000032) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DiagnosticLogsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDiagnosticLogsRetrieveLogsResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDiagnosticLogsRetrieveLogsResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -11052,9 +11007,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockClearAllPinsResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockClearAllPinsResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11073,9 +11027,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockClearAllRfidsResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockClearAllRfidsResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11098,9 +11051,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000013) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockClearHolidayScheduleResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockClearHolidayScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -11123,9 +11075,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockClearPinResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockClearPinResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11148,9 +11099,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockClearRfidResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockClearRfidResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11174,9 +11124,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000D) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockClearWeekdayScheduleResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockClearWeekdayScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -11200,9 +11149,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000010) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockClearYeardayScheduleResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockClearYeardayScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -11225,9 +11173,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000012) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockGetHolidayScheduleResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetHolidayScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -11250,9 +11197,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockGetLogRecordResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetLogRecordResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11275,9 +11221,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockGetPinResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetPinResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11300,9 +11245,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockGetRfidResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetRfidResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11325,9 +11269,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockGetUserTypeResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetUserTypeResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11351,9 +11294,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000C) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockGetWeekdayScheduleResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetWeekdayScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -11377,9 +11319,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000F) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockGetYeardayScheduleResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetYeardayScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -11402,9 +11343,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockLockDoorResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockLockDoorResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11430,9 +11370,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000011) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockSetHolidayScheduleResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockSetHolidayScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -11460,9 +11399,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockSetPinResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockSetPinResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11490,9 +11428,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockSetRfidResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockSetRfidResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11517,9 +11454,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockSetUserTypeResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockSetUserTypeResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11550,9 +11486,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000B) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockSetWeekdayScheduleResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockSetWeekdayScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -11578,9 +11513,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000E) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockSetYeardayScheduleResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockSetYeardayScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -11603,9 +11537,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockUnlockDoorResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockUnlockDoorResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -11629,9 +11562,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::DoorLockCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDoorLockUnlockWithTimeoutResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockUnlockWithTimeoutResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -12285,9 +12217,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000037) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -12927,9 +12857,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::GeneralCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnGeneralCommissioningArmFailSafeResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnGeneralCommissioningArmFailSafeResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -12948,9 +12877,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::GeneralCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnGeneralCommissioningCommissioningCompleteResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnGeneralCommissioningCommissioningCompleteResponseSuccess,
+                                               OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -12977,9 +12905,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::GeneralCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnGeneralCommissioningSetRegulatoryConfigResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnGeneralCommissioningSetRegulatoryConfigResponseSuccess,
+                                               OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -13489,9 +13416,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::GroupsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnGroupsAddGroupResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnGroupsAddGroupResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -13515,9 +13441,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::GroupsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -13541,9 +13465,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::GroupsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnGroupsGetGroupMembershipResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnGroupsGetGroupMembershipResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -13562,9 +13485,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::GroupsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -13587,9 +13508,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::GroupsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnGroupsRemoveGroupResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnGroupsRemoveGroupResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -13612,9 +13532,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::GroupsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnGroupsViewGroupResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnGroupsViewGroupResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -13719,9 +13638,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::IdentifyCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -13740,9 +13657,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::IdentifyCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnIdentifyIdentifyQueryResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnIdentifyIdentifyQueryResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -13768,9 +13684,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000040) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::IdentifyCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -14209,9 +14123,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000509) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::KeypadInputCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnKeypadInputSendKeyResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnKeypadInputSendKeyResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -14303,9 +14216,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::LevelControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -14331,9 +14242,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::LevelControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -14357,9 +14266,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::LevelControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -14384,9 +14291,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::LevelControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -14414,9 +14319,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::LevelControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -14442,9 +14345,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::LevelControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -14468,9 +14369,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::LevelControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -14489,9 +14388,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::LevelControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -15313,9 +15210,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000508) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::LowPowerCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -15383,9 +15278,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaInputCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -15409,9 +15302,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaInputCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -15434,9 +15325,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaInputCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -15455,9 +15344,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaInputCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -15607,9 +15494,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnMediaPlaybackMediaFastForwardResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaFastForwardResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -15628,9 +15514,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnMediaPlaybackMediaNextResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaNextResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -15649,9 +15534,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnMediaPlaybackMediaPauseResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaPauseResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -15670,9 +15554,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnMediaPlaybackMediaPlayResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaPlayResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -15691,9 +15574,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnMediaPlaybackMediaPreviousResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaPreviousResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -15712,9 +15594,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnMediaPlaybackMediaRewindResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaRewindResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -15737,9 +15618,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x0000000A) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnMediaPlaybackMediaSeekResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaSeekResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -15762,9 +15642,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000009) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnMediaPlaybackMediaSkipBackwardResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaSkipBackwardResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -15787,9 +15666,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnMediaPlaybackMediaSkipForwardResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaSkipForwardResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -15808,9 +15686,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnMediaPlaybackMediaStartOverResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaStartOverResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -15829,9 +15706,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnMediaPlaybackMediaStopResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaStopResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -16175,9 +16051,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ModeSelectCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -16510,9 +16384,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::NetworkCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnNetworkCommissioningAddThreadNetworkResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningAddThreadNetworkResponseSuccess,
+                                               OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -16538,9 +16411,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::NetworkCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnNetworkCommissioningAddWiFiNetworkResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningAddWiFiNetworkResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -16565,9 +16437,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x0000000E) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::NetworkCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnNetworkCommissioningDisableNetworkResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningDisableNetworkResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -16592,9 +16463,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x0000000C) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::NetworkCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnNetworkCommissioningEnableNetworkResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningEnableNetworkResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -16619,9 +16489,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x0000000A) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::NetworkCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnNetworkCommissioningRemoveNetworkResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningRemoveNetworkResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -16646,9 +16515,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::NetworkCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnNetworkCommissioningScanNetworksResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningScanNetworksResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -16673,9 +16541,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::NetworkCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnNetworkCommissioningUpdateThreadNetworkResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningUpdateThreadNetworkResponseSuccess,
+                                               OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -16701,9 +16568,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::NetworkCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnNetworkCommissioningUpdateWiFiNetworkResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningUpdateWiFiNetworkResponseSuccess,
+                                               OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -16807,9 +16673,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnOtaSoftwareUpdateProviderApplyUpdateResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnOtaSoftwareUpdateProviderApplyUpdateResponseSuccess,
+                                               OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -16833,9 +16698,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -16865,9 +16728,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnOtaSoftwareUpdateProviderQueryImageResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnOtaSoftwareUpdateProviderQueryImageResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -16941,9 +16803,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000002A) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -17318,9 +17178,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OnOffCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -17346,9 +17204,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000040) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OnOffCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -17367,9 +17223,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OnOffCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -17388,9 +17242,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000041) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OnOffCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -17416,9 +17268,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000042) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OnOffCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -17437,9 +17287,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OnOffCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -18024,9 +17872,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OperationalCredentialsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -18049,9 +17896,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000B) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OperationalCredentialsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -18074,9 +17919,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OperationalCredentialsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnOperationalCredentialsAttestationResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsAttestationResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -18099,9 +17943,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OperationalCredentialsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnOperationalCredentialsCertificateChainResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsCertificateChainResponseSuccess,
+                                               OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -18124,9 +17967,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OperationalCredentialsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnOperationalCredentialsOpCSRResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsOpCSRResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -18149,9 +17991,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000A) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OperationalCredentialsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -18174,9 +18015,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OperationalCredentialsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -18199,9 +18038,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000009) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OperationalCredentialsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -18225,9 +18063,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OperationalCredentialsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -20380,9 +20217,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ScenesCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnScenesAddSceneResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnScenesAddSceneResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -20405,9 +20241,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ScenesCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnScenesGetSceneMembershipResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnScenesGetSceneMembershipResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -20432,9 +20267,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ScenesCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -20457,9 +20290,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ScenesCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnScenesRemoveAllScenesResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnScenesRemoveAllScenesResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -20483,9 +20315,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ScenesCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnScenesRemoveSceneResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnScenesRemoveSceneResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -20509,9 +20340,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ScenesCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnScenesStoreSceneResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnScenesStoreSceneResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -20535,9 +20365,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ScenesCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnScenesViewSceneResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnScenesViewSceneResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -20755,6 +20584,7 @@ private:
 | * ResetWatermarks                                                   |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * ThreadMetrics                                                     | 0x0000 |
 | * CurrentHeapFree                                                   | 0x0001 |
 | * CurrentHeapUsed                                                   | 0x0002 |
 | * CurrentHeapHighWatermark                                          | 0x0003 |
@@ -20773,13 +20603,46 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000034) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::SoftwareDiagnosticsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
     chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type mRequest;
+};
+
+/*
+ * Attribute ThreadMetrics
+ */
+class ReadSoftwareDiagnosticsThreadMetrics : public ModelCommand
+{
+public:
+    ReadSoftwareDiagnosticsThreadMetrics() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "thread-metrics");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadSoftwareDiagnosticsThreadMetrics()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0034) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SoftwareDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeThreadMetrics(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback>(
+            OnSoftwareDiagnosticsThreadMetricsListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -21184,9 +21047,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnTvChannelChangeChannelResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnTvChannelChangeChannelResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -21210,9 +21072,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -21235,9 +21095,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -21409,9 +21267,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000505) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TargetNavigatorCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnTargetNavigatorNavigateTargetResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnTargetNavigatorNavigateTargetResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -21833,9 +21690,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TestClusterCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -21859,9 +21714,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TestClusterCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnTestClusterTestAddArgumentsResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterTestAddArgumentsResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -21885,9 +21739,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TestClusterCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnTestClusterTestEnumsResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterTestEnumsResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -21910,9 +21763,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000A) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TestClusterCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -21935,9 +21787,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000D) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TestClusterCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnTestClusterTestListInt8UReverseResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterTestListInt8UReverseResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -21960,9 +21811,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000009) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TestClusterCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -21981,9 +21831,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TestClusterCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -22006,9 +21854,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TestClusterCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnTestClusterTestNullableOptionalResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterTestNullableOptionalResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest);
     }
 
 private:
@@ -22027,9 +21874,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TestClusterCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnTestClusterTestSpecificResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterTestSpecificResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -22052,9 +21898,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TestClusterCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
     }
 
 private:
@@ -22073,9 +21918,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::TestClusterCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -23840,9 +23683,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ThermostatCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -23861,9 +23702,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ThermostatCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -23890,9 +23729,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ThermostatCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -23922,9 +23759,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ThermostatCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -23948,9 +23783,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ThermostatCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -25285,9 +25118,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000035) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -27588,9 +27419,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000036) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -28120,9 +27949,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::WindowCoveringCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -28146,9 +27973,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::WindowCoveringCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -28171,9 +27996,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::WindowCoveringCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -28197,9 +28020,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::WindowCoveringCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -28222,9 +28043,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::WindowCoveringCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -28243,9 +28062,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::WindowCoveringCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -28264,9 +28081,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::WindowCoveringCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, OnDefaultSuccess, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -30317,6 +30132,7 @@ void registerClusterSoftwareDiagnostics(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<SoftwareDiagnosticsResetWatermarks>(),              //
+        make_unique<ReadSoftwareDiagnosticsThreadMetrics>(),            //
         make_unique<ReadSoftwareDiagnosticsCurrentHeapFree>(),          //
         make_unique<ReadSoftwareDiagnosticsCurrentHeapUsed>(),          //
         make_unique<ReadSoftwareDiagnosticsCurrentHeapHighWatermark>(), //

@@ -29,6 +29,11 @@ void TestCommand::OnDeviceConnectedFn(void * context, chip::DeviceProxy * device
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
     command->mDevice = device;
+
+    if (command->mPICSFilePath.HasValue())
+    {
+        command->PICS.SetValue(PICSBooleanReader::Read(command->mPICSFilePath.Value()));
+    }
     command->NextTest();
 }
 
@@ -109,28 +114,44 @@ bool TestCommand::CheckConstraintMaxLength(const char * itemName, uint64_t curre
     return true;
 }
 
-bool TestCommand::CheckValueAsString(const char * itemName, const chip::ByteSpan current, const char * expected)
+bool TestCommand::CheckValueAsString(const char * itemName, chip::ByteSpan current, chip::ByteSpan expected)
 {
-    const chip::ByteSpan expectedArgument = chip::ByteSpan(chip::Uint8::from_const_char(expected), strlen(expected));
-
-    if (!current.data_equal(expectedArgument))
+    if (!current.data_equal(expected))
     {
-        Exit(std::string(itemName) + " value mismatch, expecting " + std::string(expected));
+        Exit(std::string(itemName) + " value mismatch, expecting " +
+             std::string(chip::Uint8::to_const_char(expected.data()), expected.size()));
         return false;
     }
 
     return true;
 }
 
-bool TestCommand::CheckValueAsString(const char * itemName, const chip::CharSpan current, const char * expected)
+bool TestCommand::CheckValueAsString(const char * itemName, chip::CharSpan current, chip::CharSpan expected)
 {
-    const chip::CharSpan expectedArgument(expected, strlen(expected));
-    if (!current.data_equal(expectedArgument))
+    if (!current.data_equal(expected))
     {
-        Exit(std::string(itemName) + " value mismatch, expected '" + expected + "' but got '" +
+        Exit(std::string(itemName) + " value mismatch, expected '" + std::string(expected.data(), expected.size()) + "' but got '" +
              std::string(current.data(), current.size()) + "'");
         return false;
     }
 
     return true;
+}
+
+bool TestCommand::ShouldSkip(const char * expression)
+{
+    // If there is no PICS configuration file, considers that nothing should be skipped.
+    if (!PICS.HasValue())
+    {
+        return false;
+    }
+
+    std::map<std::string, bool> pics(PICS.Value());
+    bool shouldSkip = !PICSBooleanExpressionParser::Eval(expression, pics);
+    if (shouldSkip)
+    {
+        ChipLogProgress(chipTool, " **** Skipping: %s == false\n", expression);
+        WaitForMs(0);
+    }
+    return shouldSkip;
 }
