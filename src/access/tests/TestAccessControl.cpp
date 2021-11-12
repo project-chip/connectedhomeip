@@ -108,7 +108,7 @@ struct EntryData
     Privilege privilege           = Privilege::kView;
     AuthMode authMode             = AuthMode::kNone;
     NodeId subjects[kMaxSubjects] = { 0 };
-    Target targets[kMaxTargets]   = { 0 };
+    Target targets[kMaxTargets]   = { { 0 } };
 
     void Clear() { memset(this, 0, sizeof(*this)); }
 
@@ -818,6 +818,7 @@ void TestPrepareEntry(nlTestSuite * inSuite, void * inContext)
                 int subjectIndex;
                 switch (authMode)
                 {
+                default:
                 case AuthMode::kPase:
                     subjectIndex = 0;
                     break;
@@ -826,8 +827,6 @@ void TestPrepareEntry(nlTestSuite * inSuite, void * inContext)
                     break;
                 case AuthMode::kGroup:
                     subjectIndex = 2;
-                    break;
-                default:
                     break;
                 }
 
@@ -859,18 +858,18 @@ void TestPrepareEntry(nlTestSuite * inSuite, void * inContext)
                 NL_TEST_ASSERT(inSuite, subjectCount == 3);
                 NL_TEST_ASSERT(inSuite, targetCount == 3);
 
-                for (auto & subject : subjects[subjectIndex])
+                for (size_t i = 0; i < ArraySize(subjects[subjectIndex]); ++i)
                 {
                     NodeId n;
-                    NL_TEST_ASSERT(inSuite, entry.GetSubject(&subject - subjects[subjectIndex], n) == CHIP_NO_ERROR);
-                    NL_TEST_ASSERT(inSuite, n == subject);
+                    NL_TEST_ASSERT(inSuite, entry.GetSubject(i, n) == CHIP_NO_ERROR);
+                    NL_TEST_ASSERT(inSuite, n == subjects[subjectIndex][i]);
                 }
 
-                for (auto & target : targets)
+                for (size_t i = 0; i < ArraySize(targets); ++i)
                 {
                     Target t;
-                    NL_TEST_ASSERT(inSuite, entry.GetTarget(&target - targets, t) == CHIP_NO_ERROR);
-                    NL_TEST_ASSERT(inSuite, t == target);
+                    NL_TEST_ASSERT(inSuite, entry.GetTarget(i, t) == CHIP_NO_ERROR);
+                    NL_TEST_ASSERT(inSuite, t == targets[i]);
                 }
             }
         }
@@ -1049,7 +1048,7 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, data, 6) == CHIP_NO_ERROR);
 
     EntryData updateData;
-    for (int i = 0; i < 6; ++i)
+    for (size_t i = 0; i < 6; ++i)
     {
         updateData.authMode    = authModes[i % 3];
         updateData.fabricIndex = fabricIndexes[i % 3];

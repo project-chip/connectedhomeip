@@ -186,8 +186,8 @@ private:
     {
         const auto id     = cluster & kClusterIdMask;
         const auto vendor = cluster & kClusterVendorMask;
-        return ((kClusterIdMinStd <= id && id <= kClusterIdMaxStd) || (kClusterIdMinMs <= id && id <= kClusterIdMaxMs)) &&
-            (kClusterVendorMin <= vendor && vendor <= kClusterVendorMax);
+        return ((id <= kClusterIdMaxStd) || (kClusterIdMinMs <= id && id <= kClusterIdMaxMs)) &&
+            (vendor <= kClusterVendorMax);
     }
 
     // TODO: eventually this functionality should live where the type itself is defined
@@ -198,8 +198,7 @@ private:
     {
         const auto id     = deviceType & kDeviceTypeIdMask;
         const auto vendor = deviceType & kDeviceTypeVendorMask;
-        return (kDeviceTypeIdMin <= id && id <= kDeviceTypeIdMax) &&
-            (kDeviceTypeVendorMin <= vendor && vendor <= kDeviceTypeVendorMax);
+        return (id <= kDeviceTypeIdMax) && (vendor <= kDeviceTypeVendorMax);
     }
 
     // TODO: eventually this functionality should live where the type itself is defined
@@ -498,8 +497,8 @@ public:
     }
 
 public:
-    static constexpr int kMaxSubjects = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
-    static constexpr int kMaxTargets  = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
+    static constexpr size_t kMaxSubjects = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
+    static constexpr size_t kMaxTargets  = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
 
     bool mInUse;
     FabricIndex mFabricIndex;
@@ -648,7 +647,7 @@ public:
             // storage was in use, this isn't possible, so the final storage is manually cleared.
             auto * dest      = mStorage->mSubjects + index;
             const auto * src = dest + 1;
-            const auto n     = std::min(int(count), EntryStorage::kMaxSubjects - 1) - index;
+            const auto n     = std::min(count, EntryStorage::kMaxSubjects - 1) - index;
             memmove(dest, src, n * sizeof(*dest));
             if (count == EntryStorage::kMaxSubjects)
             {
@@ -721,7 +720,7 @@ public:
             // storage was in use, this isn't possible, so the final storage is manually cleared.
             auto * dest      = mStorage->mTargets + index;
             const auto * src = dest + 1;
-            const auto n     = std::min(int(count), EntryStorage::kMaxTargets - 1) - index;
+            const auto n     = std::min(count, EntryStorage::kMaxTargets - 1) - index;
             memmove(dest, src, n * sizeof(*dest));
             if (count == EntryStorage::kMaxTargets)
             {
@@ -1014,7 +1013,7 @@ public:
                 }
                 if (index != nullptr)
                 {
-                    *index = storage - EntryStorage::acl;
+                    *index = size_t(storage - EntryStorage::acl);
                     if (fabricIndex != nullptr)
                     {
                         EntryStorage::ConvertIndex(*index, *fabricIndex, EntryStorage::ConvertDirection::kAbsoluteToRelative);
