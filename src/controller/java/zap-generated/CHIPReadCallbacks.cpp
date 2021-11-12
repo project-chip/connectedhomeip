@@ -3036,6 +3036,17 @@ CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CHIPSoftwareDiagnosticsTh
     }
 }
 
+CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::~CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
 void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
@@ -3079,7 +3090,8 @@ void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(
         ChipLogError(Zcl,
                      "Could not find class chip/devicecontroller/ChipClusters$SoftwareDiagnosticsCluster$ThreadMetricsAttribute"));
     chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(JLjava/lang/String;JJJ)V");
+    jmethodID attributeCtor = env->GetMethodID(
+        attributeClass, "<init>", "(Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
     VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find ThreadMetricsAttribute constructor"));
 
     auto iter = list.begin();
@@ -3087,12 +3099,77 @@ void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(
     {
         auto & entry = iter.GetValue();
         (void) entry;
-        jlong id = entry.id;
-        chip::UtfString nameStr(env, entry.name);
-        jstring name(nameStr.jniValue());
-        jlong stackFreeCurrent = entry.stackFreeCurrent;
-        jlong stackFreeMinimum = entry.stackFreeMinimum;
-        jlong stackSize        = entry.stackSize;
+        bool idNull     = false;
+        bool idHasValue = true;
+
+        uint64_t idValue = entry.id;
+
+        jobject id = nullptr;
+        if (!idNull && idHasValue)
+        {
+            jclass idEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", idEntryCls);
+            chip::JniClass idJniClass(idEntryCls);
+            jmethodID idEntryTypeCtor = env->GetMethodID(idEntryCls, "<init>", "(J)V");
+            id                        = env->NewObject(idEntryCls, idEntryTypeCtor, idValue);
+        }
+
+        bool nameNull     = false;
+        bool nameHasValue = true;
+
+        chip::CharSpan nameValue = entry.name;
+
+        jstring name = nullptr;
+        chip::UtfString nameStr(env, nameValue);
+        if (!nameNull && nameHasValue)
+        {
+            name = jstring(nameStr.jniValue());
+        }
+
+        bool stackFreeCurrentNull     = false;
+        bool stackFreeCurrentHasValue = true;
+
+        uint32_t stackFreeCurrentValue = entry.stackFreeCurrent;
+
+        jobject stackFreeCurrent = nullptr;
+        if (!stackFreeCurrentNull && stackFreeCurrentHasValue)
+        {
+            jclass stackFreeCurrentEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", stackFreeCurrentEntryCls);
+            chip::JniClass stackFreeCurrentJniClass(stackFreeCurrentEntryCls);
+            jmethodID stackFreeCurrentEntryTypeCtor = env->GetMethodID(stackFreeCurrentEntryCls, "<init>", "(J)V");
+            stackFreeCurrent = env->NewObject(stackFreeCurrentEntryCls, stackFreeCurrentEntryTypeCtor, stackFreeCurrentValue);
+        }
+
+        bool stackFreeMinimumNull     = false;
+        bool stackFreeMinimumHasValue = true;
+
+        uint32_t stackFreeMinimumValue = entry.stackFreeMinimum;
+
+        jobject stackFreeMinimum = nullptr;
+        if (!stackFreeMinimumNull && stackFreeMinimumHasValue)
+        {
+            jclass stackFreeMinimumEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", stackFreeMinimumEntryCls);
+            chip::JniClass stackFreeMinimumJniClass(stackFreeMinimumEntryCls);
+            jmethodID stackFreeMinimumEntryTypeCtor = env->GetMethodID(stackFreeMinimumEntryCls, "<init>", "(J)V");
+            stackFreeMinimum = env->NewObject(stackFreeMinimumEntryCls, stackFreeMinimumEntryTypeCtor, stackFreeMinimumValue);
+        }
+
+        bool stackSizeNull     = false;
+        bool stackSizeHasValue = true;
+
+        uint32_t stackSizeValue = entry.stackSize;
+
+        jobject stackSize = nullptr;
+        if (!stackSizeNull && stackSizeHasValue)
+        {
+            jclass stackSizeEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", stackSizeEntryCls);
+            chip::JniClass stackSizeJniClass(stackSizeEntryCls);
+            jmethodID stackSizeEntryTypeCtor = env->GetMethodID(stackSizeEntryCls, "<init>", "(J)V");
+            stackSize                        = env->NewObject(stackSizeEntryCls, stackSizeEntryTypeCtor, stackSizeValue);
+        }
 
         jobject attributeObj =
             env->NewObject(attributeClass, attributeCtor, id, name, stackFreeCurrent, stackFreeMinimum, stackSize);
