@@ -151,9 +151,14 @@ uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId clusterId
 // otherwise number of client clusters on this endpoint
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server);
 
-// Returns the clusterId of Nth server or client cluster,
+// Returns the cluster of Nth server or client cluster,
 // depending on server toggle.
 EmberAfCluster * emberAfGetNthCluster(chip::EndpointId endpoint, uint8_t n, bool server);
+
+// Returns the clusterId of Nth server or client cluster,
+// depending on server toggle.
+// Returns Optional<ClusterId>::Missing if cluster does not exist.
+chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint, uint8_t n, bool server);
 
 // Returns number of clusters put into the passed cluster list
 // for the given endpoint and client/server polarity
@@ -242,7 +247,7 @@ bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
 // and those indexes may be DIFFERENT than the indexes returned from
 // emberAfGetNthCluster().  In other words:
 //
-//  - Use emberAfGetClustersFromEndpoint()  with emberAfGetNthCluster()
+//  - Use emberAfGetClustersFromEndpoint()  with emberAfGetNthCluster() emberAfGetNthClusterId()
 //  - Use emberAfGetClusterCountForEndpoint() with emberAfGetClusterByIndex()
 //
 // Don't mix them.
@@ -254,6 +259,21 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, Emb
                                         uint8_t deviceVersion);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
+
+// Get the number of attributes of the specific cluster under the endpoint.
+// Returns 0 if the cluster does not exist.
+uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster);
+
+// Get the index of the given attribute of the specific cluster under the endpoint.
+// Returns UINT16_MAX if the attribute does not exist.
+uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                     chip::AttributeId attributeId);
+
+// Get the attribute id at the attributeIndex of the cluster under the endpoint. This function is useful for iterating over the
+// attributes.
+// Returns Optional<chip::AttributeId>::Missing() if the attribute does not exist.
+chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                                     uint16_t attributeIndex);
 
 /**
  * Register an attribute access override.  It will remain registered until

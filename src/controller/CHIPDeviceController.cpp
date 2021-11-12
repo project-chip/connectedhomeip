@@ -580,12 +580,14 @@ Transport::PeerAddress DeviceController::ToPeerAddress(const chip::Dnssd::Resolv
     // For all other addresses, we should rely on the device's routing table to route messages sent.
     // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
     // mDNS advertisements are not usually received on the same interface the peer is reachable on.
-    if (nodeData.mAddress.IsIPv6LinkLocal())
+    // TODO: Right now, just use addr0, but we should really push all the addresses and interfaces to
+    // the device and allow it to make a proper decision about which addresses are preferred and reachable.
+    if (nodeData.mAddress[0].IsIPv6LinkLocal())
     {
         interfaceId = nodeData.mInterfaceId;
     }
 
-    return Transport::PeerAddress::UDP(nodeData.mAddress, nodeData.mPort, interfaceId);
+    return Transport::PeerAddress::UDP(nodeData.mAddress[0], nodeData.mPort, interfaceId);
 }
 
 void DeviceController::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
@@ -905,6 +907,9 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     err = mIDAllocator.Allocate(keyID);
     SuccessOrExit(err);
+
+    // TODO - Remove use of SetActive/IsActive from CommissioneeDeviceProxy
+    device->SetActive(true);
 
     err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), keyID, exchangeCtxt, this);
     // Immediately persist the updted mNextKeyID value

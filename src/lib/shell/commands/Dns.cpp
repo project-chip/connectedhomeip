@@ -45,7 +45,10 @@ public:
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\r\n",
                         ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
         streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.mHostName);
-        streamer_printf(streamer_get(), "   IP address: %s\r\n", nodeData.mAddress.ToString(ipAddressBuf));
+        for (size_t i = 0; i < nodeData.mNumIPs; ++i)
+        {
+            streamer_printf(streamer_get(), "   IP address: %s\r\n", nodeData.mAddress[i].ToString(ipAddressBuf));
+        }
         streamer_printf(streamer_get(), "   Port: %" PRIu16 "\r\n", nodeData.mPort);
 
         auto retryInterval = nodeData.GetMrpRetryIntervalIdle();

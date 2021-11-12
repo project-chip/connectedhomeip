@@ -171,9 +171,9 @@ protected:
         return false;
     }
 
-    bool CheckValueAsString(const char * itemName, chip::ByteSpan current, const char * expected);
+    bool CheckValueAsString(const char * itemName, chip::ByteSpan current, chip::ByteSpan expected);
 
-    bool CheckValueAsString(const char * itemName, chip::CharSpan current, const char * expected);
+    bool CheckValueAsString(const char * itemName, chip::CharSpan current, chip::CharSpan expected);
 
     template <typename T>
     bool CheckValuePresent(const char * itemName, const chip::Optional<T> & value)

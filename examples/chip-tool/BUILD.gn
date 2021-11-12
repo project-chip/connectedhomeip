@@ -30,6 +30,7 @@ executable("chip-tool") {
     "commands/common/CHIPCommand.cpp",
     "commands/common/CHIPCommand.h",
     "commands/common/Command.cpp",
+    "commands/common/CommandInvoker.h",
     "commands/common/Commands.cpp",
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
@@ -52,6 +53,7 @@ executable("chip-tool") {
   defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
 
   deps = [
+    "${chip_root}/src/app/server",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",

@@ -62,9 +62,25 @@ public:
      * Success and Failure callbacks must be passed in through which the decoded response is provided as well as notification of any
      * failure.
      */
-    template <typename RequestDataT, typename ResponseDataT>
+    template <typename RequestDataT>
     CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
-                             CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb);
+                             CommandResponseSuccessCallback<typename RequestDataT::ResponseType> successCb,
+                             CommandResponseFailureCallback failureCb)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
+                                                const typename RequestDataT::ResponseType & responseData) {
+            successCb(context, responseData);
+        };
+
+        auto onFailureCb = [context, failureCb](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+            failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
+        };
+
+        return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
+                                    onSuccessCb, onFailureCb);
+    };
 
     /**
      * Functions for writing attributes.  We have lots of different

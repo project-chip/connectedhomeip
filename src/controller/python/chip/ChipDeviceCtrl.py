@@ -378,37 +378,54 @@ class ChipDeviceController(object):
             raise self._ChipStack.ErrorToException(res)
         return future
 
-    def ReadAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterAttribute.AttributeReadRequest]]):
+    def ReadAttribute(self, nodeid: int, attributes: typing.List[typing.Union[
+        None,  # Empty tuple, all wildcard
+        typing.Tuple[int],  # Endpoint
+        # Wildcard endpoint, Cluster id present
+        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+        # Wildcard endpoint, Cluster + Attribute present
+        typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+        # Wildcard attribute id
+        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
+        # Concrete path
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
+    ]]):
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
         device = self.GetConnectedDeviceSync(nodeid)
-        # TODO: Here, we translates multi attribute read into many individual attribute reads, this should be fixed by implementing Python's attribute read API.
-        res = []
-        for attr in attributes:
-            endpointId = attr[0]
-            attribute = attr[1]
-            clusterInfo = self._Cluster.GetClusterInfoById(
-                attribute.cluster_id)
-            if not clusterInfo:
-                raise UnknownCluster(attribute.cluster_id)
-            attributeInfo = clusterInfo.get("attributes", {}).get(
-                attribute.attribute_id, None)
-            if not attributeInfo:
-                raise UnknownAttribute(
-                    clusterInfo["clusterName"], attribute.attribute_id)
-            self._Cluster.ReadAttribute(
-                device, clusterInfo["clusterName"], attributeInfo["attributeName"], endpointId, 0, False)
-            readRes = im.GetAttributeReadResponse(
-                im.DEFAULT_ATTRIBUTEREAD_APPID)
-            res.append(ClusterAttribute.AttributeReadResult(
-                Path=ClusterAttribute.AttributePath(
-                    EndpointId=endpointId, ClusterId=attribute.cluster_id, AttributeId=attribute.attribute_id),
-                Status=readRes.status,
-                Data=(attribute.FromTagDictOrRawValue(
-                    readRes.value) if readRes.value is not None else None),
-            ))
-        future.set_result(res)
+        attrs = []
+        for v in attributes:
+            endpoint = None
+            cluster = None
+            attribute = None
+            if v == () or v == ('*'):
+                # Wildcard
+                pass
+            elif len(v) == 1:
+                if v[0] is int:
+                    endpoint = v[0]
+                elif issubclass(v[0], ClusterObjects.Cluster):
+                    cluster = v[0]
+                elif issubclass(v[0], ClusterObjects.ClusterAttributeDescriptor):
+                    attribute = v[0]
+                else:
+                    raise ValueError("Unsupported Attribute Path")
+            elif len(v) == 2:
+                # endpoint + (cluster) attribute / endpoint + cluster
+                endpoint = v[0]
+                if issubclass(v[1], ClusterObjects.Cluster):
+                    cluster = v[1]
+                elif issubclass(v[1], ClusterAttribute.ClusterAttributeDescriptor):
+                    attribute = v[1]
+                else:
+                    raise ValueError("Unsupported Attribute Path")
+            attrs.append(ClusterAttribute.AttributePath(
+                EndpointId=endpoint, Cluster=cluster, Attribute=attribute))
+        res = self._ChipStack.Call(
+            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, attrs))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
         return future
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):

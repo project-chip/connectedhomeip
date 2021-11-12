@@ -100,9 +100,13 @@ class AndroidBuilder(Builder):
         # SDK manager must be runnable to 'accept licenses'
         sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'tools', 'bin',
                                    'sdkmanager')
-        if not (os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)):
-            raise Exception("'%s' is not executable by the current user" %
-                            sdk_manager)
+
+        # New SDK manager at cmdline-tools/latest/bin/
+        new_sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest',
+                                       'bin', 'sdkmanager')
+        if not (os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)) and not (os.path.isfile(new_sdk_manager) and os.access(new_sdk_manager, os.X_OK)):
+            raise Exception("'%s' and '%s' is not executable by the current user" %
+                            (sdk_manager, new_sdk_manager))
 
         # In order to accept a license, the licenses folder is updated with the hash of the
         # accepted license
@@ -162,12 +166,24 @@ class AndroidBuilder(Builder):
 
             self._Execute(gn_gen, title='Generating ' + self.identifier)
 
-            self._Execute([
-                'bash', '-c',
-                'yes | %s/tools/bin/sdkmanager --licenses >/dev/null' %
-                os.environ['ANDROID_HOME']
-            ],
-                title='Accepting NDK licenses')
+            new_sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest',
+                                           'bin', 'sdkmanager')
+            if (os.path.isfile(new_sdk_manager) and os.access(new_sdk_manager, os.X_OK)):
+                self._Execute([
+                    'bash', '-c',
+                    'yes | %s --licenses >/dev/null' %
+                    new_sdk_manager
+                ],
+                    title='Accepting NDK licenses @ cmdline-tools')
+            else:
+                sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'tools', 'bin',
+                                           'sdkmanager')
+                self._Execute([
+                    'bash', '-c',
+                    'yes | %s --licenses >/dev/null' %
+                    sdk_manager
+                ],
+                    title='Accepting NDK licenses @ tools')
 
     def _build(self):
         if self.board.IsIde():
