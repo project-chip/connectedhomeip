@@ -23,6 +23,8 @@
 
 namespace chip {
 
+namespace internal {
+
 StaticAllocatorBitmap::StaticAllocatorBitmap(void * storage, std::atomic<tBitChunkType> * usage, size_t capacity,
                                              size_t elementSize) :
     StaticAllocatorBase(capacity),
@@ -46,7 +48,7 @@ void * StaticAllocatorBitmap::Allocate()
             {
                 if (usage.compare_exchange_strong(value, value | (kBit1 << offset)))
                 {
-                    mAllocated++;
+                    IncreaseUsage();
                     return At(word * kBitChunkSize + offset);
                 }
                 else
@@ -70,7 +72,7 @@ void StaticAllocatorBitmap::Deallocate(void * element)
 
     auto value = mUsage[word].fetch_and(~(kBit1 << offset));
     nlASSERT((value & (kBit1 << offset)) != 0); // assert fail when free an unused slot
-    mAllocated--;
+    DecreaseUsage();
 }
 
 size_t StaticAllocatorBitmap::IndexOf(void * element)
@@ -83,7 +85,7 @@ size_t StaticAllocatorBitmap::IndexOf(void * element)
     return index;
 }
 
-bool StaticAllocatorBitmap::ForEachActiveObjectInner(void * context, Lambda lambda)
+bool StaticAllocatorBitmap::ForEachActiveObjectInner(void * context, bool lambda(void * context, void * object))
 {
     for (size_t word = 0; word * kBitChunkSize < Capacity(); ++word)
     {
@@ -101,4 +103,61 @@ bool StaticAllocatorBitmap::ForEachActiveObjectInner(void * context, Lambda lamb
     return true;
 }
 
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+HeapObjectListNode * HeapObjectList::FindNode(void * object) const
+{
+    for (HeapObjectListNode * p = mNext; p != this; p = p->mNext)
+    {
+        if (p->mObject == object)
+        {
+            return p;
+        }
+    }
+    return nullptr;
+}
+
+using Lambda = bool (*)(void *, void *);
+bool HeapObjectList::ForEachNode(void * context, bool lambda(void * context, void * object))
+{
+    bool result            = true;
+    bool anyReleased       = false;
+    HeapObjectListNode * p = mNext;
+    while (p != this)
+    {
+        if (p->mObject != nullptr)
+        {
+            if (!lambda(context, p->mObject))
+            {
+                result = false;
+                break;
+            }
+        }
+        if (p->mObject == nullptr)
+        {
+            anyReleased = true;
+        }
+        p = p->mNext;
+    }
+    if (anyReleased)
+    {
+        // Remove nodes for released objects.
+        p = mNext;
+        while (p != this)
+        {
+            HeapObjectListNode * next = p->mNext;
+            if (p->mObject == nullptr)
+            {
+                p->Remove();
+                delete p;
+            }
+            p = next;
+        }
+    }
+    return result;
+}
+
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+} // namespace internal
 } // namespace chip
