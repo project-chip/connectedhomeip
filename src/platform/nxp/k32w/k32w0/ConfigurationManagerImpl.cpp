@@ -34,9 +34,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-template class GenericConfigurationManagerImpl<K32WConfig>;
-} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 

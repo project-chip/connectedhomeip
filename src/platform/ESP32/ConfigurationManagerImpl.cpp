@@ -36,9 +36,6 @@
 #include "nvs_flash.h"
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-template class GenericConfigurationManagerImpl<ESP32Config>;
-} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 

@@ -31,9 +31,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-template class GenericConfigurationManagerImpl<EFR32Config>;
-} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 

@@ -40,9 +40,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-template class GenericConfigurationManagerImpl<ZephyrConfig>;
-} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 

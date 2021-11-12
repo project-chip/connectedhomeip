@@ -39,9 +39,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-template class GenericConfigurationManagerImpl<AndroidConfig>;
-} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 

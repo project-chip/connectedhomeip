@@ -51,9 +51,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-template class GenericConfigurationManagerImpl<CC13X2_26X2Config>;
-} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 

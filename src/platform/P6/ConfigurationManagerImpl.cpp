@@ -33,9 +33,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-template class GenericConfigurationManagerImpl<P6Config>;
-} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 

@@ -33,9 +33,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-template class GenericConfigurationManagerImpl<AmebaConfig>;
-} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 

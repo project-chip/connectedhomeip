@@ -38,9 +38,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-template class GenericConfigurationManagerImpl<QPGConfig>;
-} // namespace Internal
 
 using namespace ::chip::DeviceLayer::Internal;
 
