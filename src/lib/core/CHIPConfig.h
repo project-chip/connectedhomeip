@@ -1833,6 +1833,18 @@
 #endif // CHIP_DETAIL_LOGGING
 
 /**
+ *  @def CHIP_AUTOMATION_LOGGING
+ *
+ *  @brief
+ *    If asserted (1), enable logging of all messages in the
+ *    chip::Logging::kLogCategory_Automation category.
+ *
+ */
+#ifndef CHIP_AUTOMATION_LOGGING
+#define CHIP_AUTOMATION_LOGGING 1
+#endif // CHIP_AUTOMATION_LOGGING
+
+/**
  * CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
  *
  * The maximum size (in bytes) of a log message
@@ -2569,16 +2581,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
 #define CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS 2
-#endif
-
-/**
- * @def CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
- *
- * @brief Enable or disable attribute read with complex type.
- *
- */
-#ifndef CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
-#define CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ 1
 #endif
 
 /**

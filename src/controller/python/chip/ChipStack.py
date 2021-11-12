@@ -162,10 +162,12 @@ class ChipStack(object):
     def __init__(self, installDefaultLogHandler=True, bluetoothAdapter=0):
         self.networkLock = Lock()
         self.completeEvent = Event()
+        self.commissioningCompleteEvent = Event()
         self._ChipStackLib = None
         self._chipDLLPath = None
         self.devMgr = None
         self.callbackRes = None
+        self.commissioningEventRes = None
         self._activeLogFunct = None
         self.addModulePrefixToLogMessage = True
 

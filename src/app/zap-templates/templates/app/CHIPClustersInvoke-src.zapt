@@ -18,19 +18,17 @@ namespace Controller {
 
 {{#chip_cluster_commands}}
 {{#*inline "requestType"}}chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type{{/inline}}
-{{#*inline "responseType"}}chip::app::{{#if hasSpecificResponse}}Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase response.name}}::DecodableType{{else}}DataModel::NullObjectType{{/if}}{{/inline}}
-template CHIP_ERROR ClusterBase::InvokeCommand<{{>requestType}}, {{>responseType}}>(const {{>requestType}} &, void *, CommandResponseSuccessCallback<{{>responseType}}>, CommandResponseFailureCallback);
+template CHIP_ERROR ClusterBase::InvokeCommand<{{>requestType}}>(const {{>requestType}} &, void *, CommandResponseSuccessCallback<typename {{>requestType}}::ResponseType>, CommandResponseFailureCallback);
 {{/chip_cluster_commands}}
 {{/chip_client_clusters}}
 
-template <typename RequestDataT, typename ResponseDataT>
+template <typename RequestDataT>
 CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
-                         CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb)
+                         CommandResponseSuccessCallback<typename RequestDataT::ResponseType> successCb, CommandResponseFailureCallback failureCb)
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
 
-    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus, const ResponseDataT & responseData) {
+    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus, const typename RequestDataT::ResponseType & responseData) {
         successCb(context, responseData);
     };
 
@@ -38,8 +36,8 @@ CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * c
         failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
     };
 
-    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                               requestData, onSuccessCb, onFailureCb);
+    return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
+                                requestData, onSuccessCb, onFailureCb);
 };
 
 } // namespace Controller

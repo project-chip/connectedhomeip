@@ -187,189 +187,215 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
-                                 bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+                                 AttributeReportIB::Builder & aAttributeReport)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
+    AttributeDataIB::Builder attributeDataIBBuilder;
+    AttributePathIB::Builder attributePathIBBuilder;
+    AttributeStatusIB::Builder attributeStatusIBBuilder;
+    TLV::TLVWriter * writer = nullptr;
+    TLV::TLVWriter backup;
+    aAttributeReport.Checkpoint(backup);
+
+    attributeDataIBBuilder = aAttributeReport.CreateAttributeData();
+    attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
+    attributePathIBBuilder.Endpoint(aPath.mEndpointId)
+        .Cluster(aPath.mClusterId)
+        .Attribute(aPath.mAttributeId)
+        .EndOfAttributePathIB();
+    ReturnErrorOnFailure(attributePathIBBuilder.GetError());
 
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
     if (attrOverride != nullptr)
     {
         // TODO: We should probably clone the writer and convert failures here
         // into status responses, unless our caller already does that.
-        AttributeValueEncoder valueEncoder(apWriter, aAccessingFabricIndex);
+        writer = attributeDataIBBuilder.GetWriter();
+        VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
+        AttributeValueEncoder valueEncoder(writer, aAccessingFabricIndex);
         ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
 
         if (valueEncoder.TriedEncode())
         {
-            if (apDataExists != nullptr)
-            {
-                *apDataExists = true;
-            }
-            if (apWriter != nullptr)
-            {
-                // TODO: Add DataVersion support
-                ReturnErrorOnFailure(
-                    apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), kTemporaryDataVersion));
-            }
+            // TODO: Add DataVersion support
+            attributeDataIBBuilder.DataVersion(kTemporaryDataVersion).EndOfAttributeDataIB();
+            ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
             return CHIP_NO_ERROR;
         }
     }
 
     EmberAfAttributeType attributeType;
-    EmberAfStatus status;
-    status = emberAfReadAttribute(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, attributeData,
-                                  sizeof(attributeData), &attributeType);
+    EmberAfStatus emberStatus = EMBER_ZCL_STATUS_SUCCESS;
+    emberStatus = emberAfReadAttribute(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, attributeData,
+                                       sizeof(attributeData), &attributeType);
 
-    if (apDataExists != nullptr)
+    if (emberStatus == EMBER_ZCL_STATUS_SUCCESS)
     {
-        *apDataExists = (EMBER_ZCL_STATUS_SUCCESS == status);
-    }
+        writer = attributeDataIBBuilder.GetWriter();
+        VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
+        // TODO: ZCL_STRUCT_ATTRIBUTE_TYPE is not included in this switch case currently, should add support for structures.
+        switch (BaseType(attributeType))
+        {
+        case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data
+            ReturnErrorOnFailure(writer->PutNull(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData))));
+            break;
+        case ZCL_BOOLEAN_ATTRIBUTE_TYPE: // Boolean
+            ReturnErrorOnFailure(
+                writer->PutBoolean(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), !!attributeData[0]));
+            break;
+        case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
+            ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), attributeData[0]));
+            break;
+        case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
+        {
+            uint16_t uint16_data;
+            memcpy(&uint16_data, attributeData, sizeof(uint16_data));
+            ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), uint16_data));
+            break;
+        }
+        case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
+        {
+            uint32_t uint32_data;
+            memcpy(&uint32_data, attributeData, sizeof(uint32_data));
+            ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), uint32_data));
+            break;
+        }
+        case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
+        {
+            uint64_t uint64_data;
+            memcpy(&uint64_data, attributeData, sizeof(uint64_data));
+            ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), uint64_data));
+            break;
+        }
+        case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
+        {
+            int8_t int8_data;
+            memcpy(&int8_data, attributeData, sizeof(int8_data));
+            ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), int8_data));
+            break;
+        }
+        case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
+        {
+            int16_t int16_data;
+            memcpy(&int16_data, attributeData, sizeof(int16_data));
+            ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), int16_data));
+            break;
+        }
+        case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
+        {
+            int32_t int32_data;
+            memcpy(&int32_data, attributeData, sizeof(int32_data));
+            ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), int32_data));
+            break;
+        }
+        case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
+        {
+            int64_t int64_data;
+            memcpy(&int64_data, attributeData, sizeof(int64_data));
+            ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), int64_data));
+            break;
+        }
+        case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
+        {
+            char * actualData  = reinterpret_cast<char *>(attributeData + 1);
+            uint8_t dataLength = attributeData[0];
+            if (dataLength == 0xFF /* invalid data, put empty value instead */)
+            {
+                dataLength = 0;
+            }
+            ReturnErrorOnFailure(
+                writer->PutString(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), actualData, dataLength));
+            break;
+        }
+        case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE: {
+            char * actualData = reinterpret_cast<char *>(attributeData + 2); // The pascal string contains 2 bytes length
+            uint16_t dataLength;
+            memcpy(&dataLength, attributeData, sizeof(dataLength));
+            if (dataLength == 0xFFFF /* invalid data, put empty value instead */)
+            {
+                dataLength = 0;
+            }
+            ReturnErrorOnFailure(
+                writer->PutString(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), actualData, dataLength));
+            break;
+        }
+        case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
+        {
+            uint8_t * actualData = attributeData + 1;
+            uint8_t dataLength   = attributeData[0];
+            if (dataLength == 0xFF /* invalid data, put empty value instead */)
+            {
+                dataLength = 0;
+            }
+            ReturnErrorOnFailure(
+                writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), chip::ByteSpan(actualData, dataLength)));
+            break;
+        }
+        case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE: {
+            uint8_t * actualData = attributeData + 2; // The pascal string contains 2 bytes length
+            uint16_t dataLength;
+            memcpy(&dataLength, attributeData, sizeof(dataLength));
+            if (dataLength == 0xFFFF /* invalid data, put empty value instead */)
+            {
+                dataLength = 0;
+            }
+            ReturnErrorOnFailure(
+                writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), chip::ByteSpan(actualData, dataLength)));
+            break;
+        }
+        case ZCL_ARRAY_ATTRIBUTE_TYPE: {
+            // We only get here for attributes of list type that have no override
+            // registered.  There should not be any nonempty lists like that.
+            uint16_t size = emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData);
+            if (size != 2)
+            {
+                // The value returned by emberAfAttributeValueSize for a list
+                // includes the space needed to store the list length (2 bytes) plus
+                // the space needed to store the actual list items.  We expect it to
+                // return 2 here, indicating a zero-length list.  If it doesn't,
+                // something has gone wrong.
+                return CHIP_ERROR_INCORRECT_STATE;
+            }
 
-    VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status), ToInteractionModelStatus(status));
-    }
-
-    // TODO: ZCL_STRUCT_ATTRIBUTE_TYPE is not included in this switch case currently, should add support for structures.
-    switch (BaseType(attributeType))
-    {
-    case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data
-        ReturnErrorOnFailure(apWriter->PutNull(TLV::ContextTag(AttributeDataElement::kCsTag_Data)));
-        break;
-    case ZCL_BOOLEAN_ATTRIBUTE_TYPE: // Boolean
-        ReturnErrorOnFailure(apWriter->PutBoolean(TLV::ContextTag(AttributeDataElement::kCsTag_Data), !!attributeData[0]));
-        break;
-    case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), attributeData[0]));
-        break;
-    case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
-    {
-        uint16_t uint16_data;
-        memcpy(&uint16_data, attributeData, sizeof(uint16_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), uint16_data));
-        break;
-    }
-    case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
-    {
-        uint32_t uint32_data;
-        memcpy(&uint32_data, attributeData, sizeof(uint32_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), uint32_data));
-        break;
-    }
-    case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
-    {
-        uint64_t uint64_data;
-        memcpy(&uint64_data, attributeData, sizeof(uint64_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), uint64_data));
-        break;
-    }
-    case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
-    {
-        int8_t int8_data;
-        memcpy(&int8_data, attributeData, sizeof(int8_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int8_data));
-        break;
-    }
-    case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
-    {
-        int16_t int16_data;
-        memcpy(&int16_data, attributeData, sizeof(int16_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int16_data));
-        break;
-    }
-    case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
-    {
-        int32_t int32_data;
-        memcpy(&int32_data, attributeData, sizeof(int32_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int32_data));
-        break;
-    }
-    case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
-    {
-        int64_t int64_data;
-        memcpy(&int64_data, attributeData, sizeof(int64_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int64_data));
-        break;
-    }
-    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
-    {
-        char * actualData  = reinterpret_cast<char *>(attributeData + 1);
-        uint8_t dataLength = attributeData[0];
-        if (dataLength == 0xFF /* invalid data, put empty value instead */)
-        {
-            dataLength = 0;
+            // Just encode an empty array.
+            TLV::TLVType containerType;
+            ReturnErrorOnFailure(writer->StartContainer(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),
+                                                        TLV::kTLVType_Array, containerType));
+            ReturnErrorOnFailure(writer->EndContainer(containerType));
+            break;
         }
-        ReturnErrorOnFailure(apWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), actualData, dataLength));
-        break;
-    }
-    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE: {
-        char * actualData = reinterpret_cast<char *>(attributeData + 2); // The pascal string contains 2 bytes length
-        uint16_t dataLength;
-        memcpy(&dataLength, attributeData, sizeof(dataLength));
-        if (dataLength == 0xFFFF /* invalid data, put empty value instead */)
-        {
-            dataLength = 0;
+        default:
+            ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
+            emberStatus = EMBER_ZCL_STATUS_WRITE_ONLY;
         }
-        ReturnErrorOnFailure(apWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), actualData, dataLength));
-        break;
-    }
-    case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
-    {
-        uint8_t * actualData = attributeData + 1;
-        uint8_t dataLength   = attributeData[0];
-        if (dataLength == 0xFF /* invalid data, put empty value instead */)
-        {
-            dataLength = 0;
-        }
-        ReturnErrorOnFailure(
-            apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::ByteSpan(actualData, dataLength)));
-        break;
-    }
-    case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE: {
-        uint8_t * actualData = attributeData + 2; // The pascal string contains 2 bytes length
-        uint16_t dataLength;
-        memcpy(&dataLength, attributeData, sizeof(dataLength));
-        if (dataLength == 0xFFFF /* invalid data, put empty value instead */)
-        {
-            dataLength = 0;
-        }
-        ReturnErrorOnFailure(
-            apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::ByteSpan(actualData, dataLength)));
-        break;
-    }
-    case ZCL_ARRAY_ATTRIBUTE_TYPE: {
-        // We only get here for attributes of list type that have no override
-        // registered.  There should not be any nonempty lists like that.
-        uint16_t size = emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData);
-        if (size != 2)
-        {
-            // The value returned by emberAfAttributeValueSize for a list
-            // includes the space needed to store the list length (2 bytes) plus
-            // the space needed to store the actual list items.  We expect it to
-            // return 2 here, indicating a zero-length list.  If it doesn't,
-            // something has gone wrong.
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-
-        // Just encode an empty array.
-        TLV::TLVType containerType;
-        ReturnErrorOnFailure(
-            apWriter->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data), TLV::kTLVType_Array, containerType));
-        ReturnErrorOnFailure(apWriter->EndContainer(containerType));
-        break;
-    }
-    default:
-        ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
-        return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                             Protocols::InteractionModel::Status::UnsupportedRead);
     }
 
-    // TODO: Add DataVersion support
-    ReturnErrorOnFailure(apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), kTemporaryDataVersion));
+    Protocols::InteractionModel::Status imStatus = ToInteractionModelStatus(emberStatus);
+    if (imStatus == Protocols::InteractionModel::Status::Success)
+    {
+        // TODO: Add DataVersion support
+        attributeDataIBBuilder.DataVersion(kTemporaryDataVersion).EndOfAttributeDataIB();
+        ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
+    }
+    else
+    {
+        aAttributeReport.Rollback(backup);
+        attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
+        attributePathIBBuilder   = attributeStatusIBBuilder.CreatePath();
+        attributePathIBBuilder.Endpoint(aPath.mEndpointId)
+            .Cluster(aPath.mClusterId)
+            .Attribute(aPath.mAttributeId)
+            .EndOfAttributePathIB();
+        ReturnErrorOnFailure(attributePathIBBuilder.GetError());
+        StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
+        statusIBBuilder.EncodeStatusIB(StatusIB(imStatus));
+        ReturnErrorOnFailure(statusIBBuilder.GetError());
+        attributeStatusIBBuilder.EndOfAttributeStatusIB();
+        ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -444,7 +470,7 @@ static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(Cluste
     // Passing nullptr as buf to emberAfReadAttribute means we only need attribute type here, and ember will not do data read &
     // copy in this case.
     const EmberAfAttributeMetadata * attributeMetadata = emberAfLocateAttributeMetadata(
-        aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId, CLUSTER_MASK_SERVER, 0);
+        aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0);
 
     if (attributeMetadata == nullptr)
     {
@@ -466,22 +492,36 @@ static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(Cluste
     }
 
     return ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
-                                                                  aClusterInfo.mFieldId, CLUSTER_MASK_SERVER, 0, attributeData,
+                                                                  aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0, attributeData,
                                                                   attributeMetadata->attributeType));
 }
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     AttributePathParams attributePathParams;
-    attributePathParams.mNodeId     = aClusterInfo.mNodeId;
-    attributePathParams.mEndpointId = aClusterInfo.mEndpointId;
-    attributePathParams.mClusterId  = aClusterInfo.mClusterId;
-    attributePathParams.mFieldId    = aClusterInfo.mFieldId;
-    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
+    attributePathParams.mEndpointId  = aClusterInfo.mEndpointId;
+    attributePathParams.mClusterId   = aClusterInfo.mClusterId;
+    attributePathParams.mAttributeId = aClusterInfo.mAttributeId;
+
+    // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
+    // as the input argument.
+    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
+    if (attrOverride != nullptr)
+    {
+        ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
+        AttributeValueDecoder valueDecoder(aReader);
+        ReturnErrorOnFailure(attrOverride->Write(path, valueDecoder));
+
+        if (valueDecoder.TriedDecode())
+        {
+            return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+        }
+    }
 
     auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
     return apWriteHandler->AddStatus(attributePathParams, imCode);
 }
+
 } // namespace app
 } // namespace chip
 
@@ -499,9 +539,9 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
 void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     ClusterInfo info;
-    info.mClusterId  = clusterId;
-    info.mFieldId    = attributeId;
-    info.mEndpointId = endpoint;
+    info.mClusterId   = clusterId;
+    info.mAttributeId = attributeId;
+    info.mEndpointId  = endpoint;
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
 

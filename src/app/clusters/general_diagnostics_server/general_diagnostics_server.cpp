@@ -30,6 +30,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
 using chip::DeviceLayer::ConnectivityMgr;
+using chip::DeviceLayer::PlatformManager;
 using chip::DeviceLayer::PlatformMgr;
 
 namespace {
@@ -44,16 +45,16 @@ public:
 
 private:
     template <typename T>
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (DeviceLayer::PlatformManager::*getter)(T &), AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &), AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 };
 
 template <typename T>
-CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DeviceLayer::PlatformManager::*getter)(T &),
+CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &),
                                                         AttributeValueEncoder & aEncoder)
 {
     T data;
-    CHIP_ERROR err = (DeviceLayer::PlatformMgr().*getter)(data);
+    CHIP_ERROR err = (PlatformMgr().*getter)(data);
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
         data = 0;
@@ -108,16 +109,16 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath
         return ReadNetworkInterfaces(aEncoder);
     }
     case RebootCount::Id: {
-        return ReadIfSupported(&DeviceLayer::PlatformManager::GetRebootCount, aEncoder);
+        return ReadIfSupported(&PlatformManager::GetRebootCount, aEncoder);
     }
     case UpTime::Id: {
-        return ReadIfSupported(&DeviceLayer::PlatformManager::GetUpTime, aEncoder);
+        return ReadIfSupported(&PlatformManager::GetUpTime, aEncoder);
     }
     case TotalOperationalHours::Id: {
-        return ReadIfSupported(&DeviceLayer::PlatformManager::GetTotalOperationalHours, aEncoder);
+        return ReadIfSupported(&PlatformManager::GetTotalOperationalHours, aEncoder);
     }
     case BootReasons::Id: {
-        return ReadIfSupported(&DeviceLayer::PlatformManager::GetBootReasons, aEncoder);
+        return ReadIfSupported(&PlatformManager::GetBootReasons, aEncoder);
     }
     default: {
         break;
@@ -139,8 +140,6 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
             if (emberAfEndpointIndexIsEnabled(index))
             {
                 EndpointId endpointId = emberAfEndpointFromIndex(index);
-                if (endpointId == 0)
-                    continue;
 
                 if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
                 {

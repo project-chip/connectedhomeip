@@ -130,7 +130,7 @@
 namespace chip {
 namespace Inet {
 
-chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPoint::sPool;
+BitMapObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPoint::sPool;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -428,7 +428,7 @@ void UDPEndPoint::CloseImpl()
 void UDPEndPoint::Free()
 {
     Close();
-    DeferredFree(kReleaseDeferralErrorTactic_Die);
+    Release();
 }
 
 void UDPEndPoint::HandleDataReceived(System::PacketBufferHandle && msg)
@@ -536,10 +536,10 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
 void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port)
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 {
-    UDPEndPoint * ep                 = static_cast<UDPEndPoint *>(arg);
-    System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
-    IPPacketInfo * pktInfo           = nullptr;
-    System::PacketBufferHandle buf   = System::PacketBufferHandle::Adopt(p);
+    UDPEndPoint * ep               = static_cast<UDPEndPoint *>(arg);
+    System::Layer * lSystemLayer   = ep->Layer().SystemLayer();
+    IPPacketInfo * pktInfo         = nullptr;
+    System::PacketBufferHandle buf = System::PacketBufferHandle::Adopt(p);
     if (buf->HasChainedBuffer())
     {
         // Try the simple expedient of flattening in-place.
@@ -585,12 +585,19 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
         pktInfo->DestPort  = pcb->local_port;
     }
 
-    const CHIP_ERROR error =
-        lSystemLayer->PostEvent(*ep, kInetEvent_UDPDataReceived, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf));
-    if (error == CHIP_NO_ERROR)
+    ep->Retain();
+    CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf)] {
+        ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
+        ep->Release();
+    });
+    if (err == CHIP_NO_ERROR)
     {
-        // If PostEvent() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
+        // If ScheduleLambda() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
         static_cast<void>(std::move(buf).UnsafeRelease());
+    }
+    else
+    {
+        ep->Release();
     }
 }
 
@@ -1979,7 +1986,7 @@ CHIP_ERROR UDPEndPoint::Listen(OnMessageReceivedFunct onMessageReceived, OnRecei
 
     OnMessageReceived = onMessageReceived;
     OnReceiveError    = onReceiveError;
-    AppState          = appState;
+    mAppState         = appState;
 
     ReturnErrorOnFailure(ListenImpl());
 
@@ -2017,12 +2024,6 @@ void UDPEndPoint::Close()
         CloseImpl();
         mState = State::kClosed;
     }
-}
-
-void UDPEndPoint::Init(InetLayer * inetLayer)
-{
-    InitEndPointBasis(*inetLayer);
-    InitImpl();
 }
 
 CHIP_ERROR UDPEndPoint::JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)

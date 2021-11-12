@@ -74,8 +74,7 @@ public:
         mDelegate(delegate),
         mDiscoveryType(discoveryType), mPacketRange(packet)
     {
-        mInterfaceId           = interfaceId;
-        mNodeData.mInterfaceId = interfaceId;
+        mInterfaceId = interfaceId;
     }
 
     // ParserDelegate implementation
@@ -177,8 +176,9 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     // This code assumes that all entries in the mDNS packet relate to the
     // same entity. This may not be correct if multiple servers are reported
     // (if multi-admin decides to use unique ports for every ecosystem).
-    mNodeData.mAddress = addr;
-    mHasIP             = true;
+    mNodeData.mAddress[mDiscoveredNodeData.numIPs++] = addr;
+    mNodeData.mInterfaceId                           = mInterfaceId;
+    mHasIP                                           = true;
 }
 
 void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr)

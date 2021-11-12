@@ -1,0 +1,142 @@
+/*
+ *
+ *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ *  @file
+ *    This file contains definitions for DeviceProxy base class. The objects of this
+ *    class will be used by applications to interact with peer CHIP devices.
+ *    The class provides mechanism to construct, send and receive messages to and
+ *    from the corresponding CHIP devices.
+ */
+
+#pragma once
+
+#include <app/CommandSender.h>
+#include <app/DeviceControllerInteractionModelDelegate.h>
+#include <app/InteractionModelEngine.h>
+#include <app/util/CHIPDeviceCallbacksMgr.h>
+#include <lib/core/CHIPCallback.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/DLLUtil.h>
+
+namespace chip {
+
+class DLL_EXPORT DeviceProxy
+{
+public:
+    virtual ~DeviceProxy() {}
+    DeviceProxy() {}
+
+    /**
+     *   Called when a connection is closing.
+     *   The object releases all resources associated with the connection.
+     */
+    virtual void OnConnectionExpired(SessionHandle session) = 0;
+
+    /**
+     *  Mark any open session with the device as expired.
+     */
+    virtual CHIP_ERROR Disconnect() = 0;
+
+    virtual NodeId GetDeviceId() const = 0;
+
+    virtual bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const { return false; }
+
+    virtual CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
+                                                Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter);
+
+    virtual CHIP_ERROR SendSubscribeAttributeRequest(app::AttributePathParams aPath, uint16_t mMinIntervalFloorSeconds,
+                                                     uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback);
+    virtual CHIP_ERROR ShutdownSubscriptions() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    virtual CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback);
+
+    virtual CHIP_ERROR SendCommands(app::CommandSender * commandObj);
+
+    virtual void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute,
+                                  Callback::Cancelable * onReportCallback, app::TLVDataFilter tlvDataFilter);
+
+    // Interaction model uses the object and callback interface instead of sequence number to mark different transactions.
+    virtual void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
+                                      Callback::Cancelable * onFailureCallback, app::TLVDataFilter tlvDataFilter = nullptr);
+
+    virtual void CancelIMResponseHandler(void * commandObj);
+
+    virtual Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() = 0;
+
+    virtual Messaging::ExchangeManager * GetExchangeManager() const = 0;
+
+    virtual chip::Optional<SessionHandle> GetSecureSession() const = 0;
+
+    virtual bool IsActive() const { return true; }
+
+    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval) const
+    {
+        idleInterval   = mMrpIdleInterval;
+        activeInterval = mMrpActiveInterval;
+    }
+
+protected:
+    virtual bool IsSecureConnected() const = 0;
+
+    virtual uint8_t GetNextSequenceNumber() = 0;
+
+    app::CHIPDeviceCallbacksMgr & mCallbacksMgr = app::CHIPDeviceCallbacksMgr::GetInstance();
+
+    uint32_t mMrpIdleInterval   = CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL;
+    uint32_t mMrpActiveInterval = CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL;
+};
+
+/**
+ * This class defines an interface for an object that the user of Device
+ * can register as a delegate. The delegate object will be called by the
+ * Device when a new message or status update is received from the corresponding
+ * CHIP device.
+ */
+class DLL_EXPORT DeviceStatusDelegate
+{
+public:
+    virtual ~DeviceStatusDelegate() {}
+
+    /**
+     * @brief
+     *   Called when a message is received from the device.
+     *
+     * @param[in] msg Received message buffer.
+     */
+    virtual void OnMessage(System::PacketBufferHandle && msg) = 0;
+
+    /**
+     * @brief
+     *   Called when response to OpenPairingWindow is received from the device.
+     *
+     * @param[in] status CHIP_NO_ERROR on success, or corresponding error.
+     */
+    virtual void OnPairingWindowOpenStatus(CHIP_ERROR status){};
+
+    /**
+     * @brief
+     *   Called when device status is updated.
+     *
+     */
+    virtual void OnStatusChange(void){};
+};
+
+} // namespace chip

@@ -30,7 +30,6 @@
 #include "InetInterface.h"
 
 #include "InetLayer.h"
-#include "InetLayerEvents.h"
 
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -274,6 +273,35 @@ bool InterfaceAddressIterator::SupportsMulticast()
 bool InterfaceAddressIterator::HasBroadcastAddress()
 {
     return HasCurrent() && mIntfIter.HasBroadcastAddress();
+}
+
+CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr)
+{
+    VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+#if !LWIP_IPV6
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif //! LWIP_IPV6
+
+    for (struct netif * intf = netif_list; intf != nullptr; intf = intf->next)
+    {
+        if ((mPlatformInterface != nullptr) && (mPlatformInterface != intf))
+            continue;
+        for (int j = 0; j < LWIP_IPV6_NUM_ADDRESSES; ++j)
+        {
+            if (ip6_addr_isvalid(netif_ip6_addr_state(intf, j)) && ip6_addr_islinklocal(netif_ip6_addr(intf, j)))
+            {
+                (*llAddr) = IPAddress(*netif_ip6_addr(intf, j));
+                return CHIP_NO_ERROR;
+            }
+        }
+        if (mPlatformInterface != nullptr)
+        {
+            return INET_ERROR_ADDRESS_NOT_FOUND;
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -705,6 +733,38 @@ bool InterfaceAddressIterator::HasBroadcastAddress()
     return HasCurrent() && (mCurAddr->ifa_flags & IFF_BROADCAST) != 0;
 }
 
+CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr)
+{
+    VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    struct ifaddrs * ifaddr;
+    const int rv = getifaddrs(&ifaddr);
+    if (rv == -1)
+    {
+        return INET_ERROR_ADDRESS_NOT_FOUND;
+    }
+
+    for (struct ifaddrs * ifaddr_iter = ifaddr; ifaddr_iter != nullptr; ifaddr_iter = ifaddr_iter->ifa_next)
+    {
+        if (ifaddr_iter->ifa_addr != nullptr)
+        {
+            if ((ifaddr_iter->ifa_addr->sa_family == AF_INET6) &&
+                ((mPlatformInterface == 0) || (mPlatformInterface == if_nametoindex(ifaddr_iter->ifa_name))))
+            {
+                struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
+                if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
+                {
+                    (*llAddr) = IPAddress((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
+                    break;
+                }
+            }
+        }
+    }
+    freeifaddrs(ifaddr);
+
+    return CHIP_NO_ERROR;
+}
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
@@ -866,7 +926,64 @@ bool InterfaceAddressIterator::HasBroadcastAddress()
     return HasCurrent() && mIntfIter.HasBroadcastAddress();
 }
 
+CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr)
+{
+    VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    net_if * const iface = mPlatformInterface ? net_if_get_by_index(mPlatformInterface) : net_if_get_default();
+    VerifyOrReturnError(iface != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
+
+    in6_addr * const ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
+    VerifyOrReturnError(ip6_addr != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
+
+    *llAddr = IPAddress(*ip6_addr);
+
+    return CHIP_NO_ERROR;
+}
+
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+
+// static
+InterfaceId InterfaceId::FromIPAddress(const IPAddress & addr)
+{
+    InterfaceAddressIterator addrIter;
+
+    for (; addrIter.HasCurrent(); addrIter.Next())
+    {
+        IPAddress curAddr = addrIter.GetAddress();
+        if (addr == curAddr)
+        {
+            return addrIter.GetInterfaceId();
+        }
+    }
+
+    return InterfaceId::Null();
+}
+
+// static
+bool InterfaceId::MatchLocalIPv6Subnet(const IPAddress & addr)
+{
+    if (addr.IsIPv6LinkLocal())
+        return true;
+
+    InterfaceAddressIterator ifAddrIter;
+    for (; ifAddrIter.HasCurrent(); ifAddrIter.Next())
+    {
+        IPPrefix addrPrefix;
+        addrPrefix.IPAddr = ifAddrIter.GetAddress();
+#if INET_CONFIG_ENABLE_IPV4
+        if (addrPrefix.IPAddr.IsIPv4())
+            continue;
+#endif // INET_CONFIG_ENABLE_IPV4
+        if (addrPrefix.IPAddr.IsIPv6LinkLocal())
+            continue;
+        addrPrefix.Length = ifAddrIter.GetPrefixLength();
+        if (addrPrefix.MatchAddress(addr))
+            return true;
+    }
+
+    return false;
+}
 
 void InterfaceAddressIterator::GetAddressWithPrefix(IPPrefix & addrWithPrefix)
 {

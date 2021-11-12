@@ -58,18 +58,18 @@ namespace Messaging {
 #endif // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
 
 /**
- *  @def CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+ *  @def CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
  *
  *  @brief
- *    Initial retransmission interval, or time to wait before retransmission after first
+ *    Initial base retransmission interval, or time to wait before retransmission after first
  *    failure in milliseconds.
  *
  * This is the default value, that might be adjusted by end device depending on its
  * needs (e.g. sleeping period) using Service Discovery TXT record CRI key.
  */
-#ifndef CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
-#define CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL (5000)
-#endif // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+#ifndef CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
+#define CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL (5000)
+#endif // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
 
 /**
  *  @def CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
@@ -118,12 +118,12 @@ namespace Messaging {
  */
 struct ReliableMessageProtocolConfig
 {
-    uint32_t mInitialRetransTimeoutTick; /**< Configurable timeout in msec for retransmission of the first sent message. */
-    uint32_t mActiveRetransTimeoutTick;  /**< Configurable timeout in msec for retransmission of all subsequent messages. */
+    uint32_t mIdleRetransTimeoutTick;   /**< Configurable timeout in msec for retransmission of the first sent message. */
+    uint32_t mActiveRetransTimeoutTick; /**< Configurable timeout in msec for retransmission of all subsequent messages. */
 };
 
 const ReliableMessageProtocolConfig gDefaultReliableMessageProtocolConfig = {
-    CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
+    CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
     CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
 };
 

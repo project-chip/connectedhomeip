@@ -254,6 +254,18 @@ tests:
                 value: [9, 8, 7, 6, 5, 4, 3, 2, 1]
 
     - label:
+          "Send Test Command With empty List of INT8U and get an empty list back"
+      command: "testListInt8UReverseRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: []
+      response:
+          values:
+              - name: "arg1"
+                value: []
+
+    - label:
           "Send Test Command With List of Struct Argument and arg1.b of first
           item is true"
       command: "testListStructArgumentRequest"
@@ -426,6 +438,55 @@ tests:
           values:
               - name: "value"
                 value: false
+
+    - label:
+          "Write attribute LIST With List of INT8U and none of them is set to 0"
+      command: "writeAttribute"
+      attribute: "list_int8u"
+      arguments:
+          value: [1, 2, 3, 4]
+
+    - label: "Read attribute LIST With List of INT8U"
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          value: [1, 2, 3, 4]
+
+    - label: "Write attribute LIST With List of OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "list_octet_string"
+      arguments:
+          value: ["Test0", "Test1", "Test2", "Test3"]
+
+    - label: "Read attribute LIST With List of OCTET_STRING"
+      command: "readAttribute"
+      attribute: "list_octet_string"
+      response:
+          value: ["Test0", "Test1", "Test2", "Test3"]
+
+    - label: "Write attribute LIST With List of LIST_STRUCT_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "list_struct_octet_string"
+      arguments:
+          value:
+              [
+                  { fabricIndex: 0, operationalCert: "Test0" },
+                  { fabricIndex: 1, operationalCert: "Test1" },
+                  { fabricIndex: 2, operationalCert: "Test2" },
+                  { fabricIndex: 3, operationalCert: "Test3" },
+              ]
+
+    - label: "Read attribute LIST With List of LIST_STRUCT_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "list_struct_octet_string"
+      response:
+          value:
+              [
+                  { fabricIndex: 0, operationalCert: "Test0" },
+                  { fabricIndex: 1, operationalCert: "Test1" },
+                  { fabricIndex: 2, operationalCert: "Test2" },
+                  { fabricIndex: 3, operationalCert: "Test3" },
+              ]
 
     # Tests for Nullables and Optionals
 

@@ -29,12 +29,12 @@ from chip import ChipUtility
 
 from chip.tlv import uint
 
-from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand, ClusterAttributeDescriptor
+from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand, ClusterAttributeDescriptor, Cluster
 from .Types import Nullable, NullValue
 
 
 @dataclass
-class PowerConfiguration:
+class PowerConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x0001
 
     class Attributes:
@@ -807,7 +807,7 @@ class PowerConfiguration:
 
 
 @dataclass
-class DeviceTemperatureConfiguration:
+class DeviceTemperatureConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x0002
 
     class Attributes:
@@ -956,7 +956,7 @@ class DeviceTemperatureConfiguration:
 
 
 @dataclass
-class Identify:
+class Identify(Cluster):
     id: typing.ClassVar[int] = 0x0003
 
     class Enums:
@@ -1098,7 +1098,7 @@ class Identify:
 
 
 @dataclass
-class Groups:
+class Groups(Cluster):
     id: typing.ClassVar[int] = 0x0004
 
     class Commands:
@@ -1327,7 +1327,7 @@ class Groups:
 
 
 @dataclass
-class Scenes:
+class Scenes(Cluster):
     id: typing.ClassVar[int] = 0x0005
 
     class Structs:
@@ -1890,7 +1890,7 @@ class Scenes:
 
 
 @dataclass
-class OnOff:
+class OnOff(Cluster):
     id: typing.ClassVar[int] = 0x0006
 
     class Enums:
@@ -2202,7 +2202,7 @@ class OnOff:
 
 
 @dataclass
-class OnOffSwitchConfiguration:
+class OnOffSwitchConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x0007
 
     class Attributes:
@@ -2260,7 +2260,7 @@ class OnOffSwitchConfiguration:
 
 
 @dataclass
-class LevelControl:
+class LevelControl(Cluster):
     id: typing.ClassVar[int] = 0x0008
 
     class Enums:
@@ -2653,7 +2653,7 @@ class LevelControl:
 
 
 @dataclass
-class Alarms:
+class Alarms(Cluster):
     id: typing.ClassVar[int] = 0x0009
 
     class Commands:
@@ -2798,7 +2798,7 @@ class Alarms:
 
 
 @dataclass
-class Time:
+class Time(Cluster):
     id: typing.ClassVar[int] = 0x000A
 
     class Attributes:
@@ -2960,7 +2960,7 @@ class Time:
 
 
 @dataclass
-class BinaryInputBasic:
+class BinaryInputBasic(Cluster):
     id: typing.ClassVar[int] = 0x000F
 
     class Attributes:
@@ -3109,7 +3109,7 @@ class BinaryInputBasic:
 
 
 @dataclass
-class PowerProfile:
+class PowerProfile(Cluster):
     id: typing.ClassVar[int] = 0x001A
 
     class Structs:
@@ -3689,7 +3689,7 @@ class PowerProfile:
 
 
 @dataclass
-class ApplianceControl:
+class ApplianceControl(Cluster):
     id: typing.ClassVar[int] = 0x001B
 
     class Enums:
@@ -3933,7 +3933,7 @@ class ApplianceControl:
 
 
 @dataclass
-class Descriptor:
+class Descriptor(Cluster):
     id: typing.ClassVar[int] = 0x001D
 
     class Structs:
@@ -4033,7 +4033,7 @@ class Descriptor:
 
 
 @dataclass
-class PollControl:
+class PollControl(Cluster):
     id: typing.ClassVar[int] = 0x0020
 
     class Commands:
@@ -4232,7 +4232,7 @@ class PollControl:
 
 
 @dataclass
-class BridgedActions:
+class BridgedActions(Cluster):
     id: typing.ClassVar[int] = 0x0025
 
     class Enums:
@@ -4621,7 +4621,7 @@ class BridgedActions:
 
 
 @dataclass
-class Basic:
+class Basic(Cluster):
     id: typing.ClassVar[int] = 0x0028
 
     class Commands:
@@ -4936,7 +4936,7 @@ class Basic:
 
 
 @dataclass
-class OtaSoftwareUpdateProvider:
+class OtaSoftwareUpdateProvider(Cluster):
     id: typing.ClassVar[int] = 0x0029
 
     class Enums:
@@ -5117,7 +5117,7 @@ class OtaSoftwareUpdateProvider:
 
 
 @dataclass
-class OtaSoftwareUpdateRequestor:
+class OtaSoftwareUpdateRequestor(Cluster):
     id: typing.ClassVar[int] = 0x002A
 
     class Enums:
@@ -5207,7 +5207,7 @@ class OtaSoftwareUpdateRequestor:
 
 
 @dataclass
-class PowerSource:
+class PowerSource(Cluster):
     id: typing.ClassVar[int] = 0x002F
 
     class Attributes:
@@ -5642,7 +5642,7 @@ class PowerSource:
 
 
 @dataclass
-class GeneralCommissioning:
+class GeneralCommissioning(Cluster):
     id: typing.ClassVar[int] = 0x0030
 
     class Enums:
@@ -5867,7 +5867,7 @@ class GeneralCommissioning:
 
 
 @dataclass
-class NetworkCommissioning:
+class NetworkCommissioning(Cluster):
     id: typing.ClassVar[int] = 0x0031
 
     class Enums:
@@ -6300,7 +6300,7 @@ class NetworkCommissioning:
 
 
 @dataclass
-class DiagnosticLogs:
+class DiagnosticLogs(Cluster):
     id: typing.ClassVar[int] = 0x0032
 
     class Enums:
@@ -6397,7 +6397,7 @@ class DiagnosticLogs:
 
 
 @dataclass
-class GeneralDiagnostics:
+class GeneralDiagnostics(Cluster):
     id: typing.ClassVar[int] = 0x0033
 
     class Enums:
@@ -6606,10 +6606,28 @@ class GeneralDiagnostics:
 
 
 @dataclass
-class SoftwareDiagnostics:
+class SoftwareDiagnostics(Cluster):
     id: typing.ClassVar[int] = 0x0034
 
     class Structs:
+        @dataclass
+        class SoftwareFault(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="id", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="name", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(
+                            Label="faultRecording", Tag=2, Type=bytes),
+                    ])
+
+            id: 'uint' = None
+            name: 'str' = None
+            faultRecording: 'bytes' = None
+
         @dataclass
         class ThreadMetrics(ClusterObject):
             @ChipUtility.classproperty
@@ -6728,7 +6746,7 @@ class SoftwareDiagnostics:
 
 
 @dataclass
-class ThreadNetworkDiagnostics:
+class ThreadNetworkDiagnostics(Cluster):
     id: typing.ClassVar[int] = 0x0035
 
     class Enums:
@@ -6746,6 +6764,10 @@ class ThreadNetworkDiagnostics:
             kReed = 0x04
             kRouter = 0x05
             kLeader = 0x06
+
+        class ThreadConnectionStatus(IntEnum):
+            kConnected = 0x00
+            kNotConnected = 0x01
 
     class Structs:
         @dataclass
@@ -7759,10 +7781,16 @@ class ThreadNetworkDiagnostics:
 
 
 @dataclass
-class WiFiNetworkDiagnostics:
+class WiFiNetworkDiagnostics(Cluster):
     id: typing.ClassVar[int] = 0x0036
 
     class Enums:
+        class AssociationFailureCause(IntEnum):
+            kUnknown = 0x00
+            kAssociationFailed = 0x01
+            kAuthenticationFailed = 0x02
+            kSsidNotFound = 0x03
+
         class SecurityType(IntEnum):
             kUnspecified = 0x00
             kNone = 0x01
@@ -7770,6 +7798,10 @@ class WiFiNetworkDiagnostics:
             kWpa = 0x03
             kWpa2 = 0x04
             kWpa3 = 0x05
+
+        class WiFiConnectionStatus(IntEnum):
+            kConnected = 0x00
+            kNotConnected = 0x01
 
         class WiFiVersionType(IntEnum):
             k80211a = 0x00
@@ -7990,7 +8022,7 @@ class WiFiNetworkDiagnostics:
 
 
 @dataclass
-class EthernetNetworkDiagnostics:
+class EthernetNetworkDiagnostics(Cluster):
     id: typing.ClassVar[int] = 0x0037
 
     class Enums:
@@ -8165,7 +8197,7 @@ class EthernetNetworkDiagnostics:
 
 
 @dataclass
-class BridgedDeviceBasic:
+class BridgedDeviceBasic(Cluster):
     id: typing.ClassVar[int] = 0x0039
 
     class Commands:
@@ -8428,7 +8460,7 @@ class BridgedDeviceBasic:
 
 
 @dataclass
-class Switch:
+class Switch(Cluster):
     id: typing.ClassVar[int] = 0x003B
 
     class Attributes:
@@ -8499,7 +8531,7 @@ class Switch:
 
 
 @dataclass
-class AdministratorCommissioning:
+class AdministratorCommissioning(Cluster):
     id: typing.ClassVar[int] = 0x003C
 
     class Enums:
@@ -8597,7 +8629,7 @@ class AdministratorCommissioning:
 
 
 @dataclass
-class OperationalCredentials:
+class OperationalCredentials(Cluster):
     id: typing.ClassVar[int] = 0x003E
 
     class Enums:
@@ -8986,7 +9018,7 @@ class OperationalCredentials:
 
 
 @dataclass
-class FixedLabel:
+class FixedLabel(Cluster):
     id: typing.ClassVar[int] = 0x0040
 
     class Structs:
@@ -9047,7 +9079,7 @@ class FixedLabel:
 
 
 @dataclass
-class BooleanState:
+class BooleanState(Cluster):
     id: typing.ClassVar[int] = 0x0045
 
     class Attributes:
@@ -9092,7 +9124,7 @@ class BooleanState:
 
 
 @dataclass
-class ModeSelect:
+class ModeSelect(Cluster):
     id: typing.ClassVar[int] = 0x0050
 
     class Structs:
@@ -9240,7 +9272,7 @@ class ModeSelect:
 
 
 @dataclass
-class ShadeConfiguration:
+class ShadeConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x0100
 
     class Attributes:
@@ -9337,7 +9369,7 @@ class ShadeConfiguration:
 
 
 @dataclass
-class DoorLock:
+class DoorLock(Cluster):
     id: typing.ClassVar[int] = 0x0101
 
     class Enums:
@@ -11030,7 +11062,7 @@ class DoorLock:
 
 
 @dataclass
-class WindowCovering:
+class WindowCovering(Cluster):
     id: typing.ClassVar[int] = 0x0102
 
     class Commands:
@@ -11520,7 +11552,7 @@ class WindowCovering:
 
 
 @dataclass
-class BarrierControl:
+class BarrierControl(Cluster):
     id: typing.ClassVar[int] = 0x0103
 
     class Commands:
@@ -11711,7 +11743,7 @@ class BarrierControl:
 
 
 @dataclass
-class PumpConfigurationAndControl:
+class PumpConfigurationAndControl(Cluster):
     id: typing.ClassVar[int] = 0x0200
 
     class Enums:
@@ -12070,7 +12102,7 @@ class PumpConfigurationAndControl:
 
 
 @dataclass
-class Thermostat:
+class Thermostat(Cluster):
     id: typing.ClassVar[int] = 0x0201
 
     class Enums:
@@ -12811,7 +12843,7 @@ class Thermostat:
 
 
 @dataclass
-class FanControl:
+class FanControl(Cluster):
     id: typing.ClassVar[int] = 0x0202
 
     class Attributes:
@@ -12869,7 +12901,7 @@ class FanControl:
 
 
 @dataclass
-class DehumidificationControl:
+class DehumidificationControl(Cluster):
     id: typing.ClassVar[int] = 0x0203
 
     class Attributes:
@@ -13005,7 +13037,7 @@ class DehumidificationControl:
 
 
 @dataclass
-class ThermostatUserInterfaceConfiguration:
+class ThermostatUserInterfaceConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x0204
 
     class Attributes:
@@ -13076,7 +13108,7 @@ class ThermostatUserInterfaceConfiguration:
 
 
 @dataclass
-class ColorControl:
+class ColorControl(Cluster):
     id: typing.ClassVar[int] = 0x0300
 
     class Enums:
@@ -14344,7 +14376,7 @@ class ColorControl:
 
 
 @dataclass
-class BallastConfiguration:
+class BallastConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x0301
 
     class Attributes:
@@ -14584,7 +14616,7 @@ class BallastConfiguration:
 
 
 @dataclass
-class IlluminanceMeasurement:
+class IlluminanceMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0400
 
     class Enums:
@@ -14686,7 +14718,7 @@ class IlluminanceMeasurement:
 
 
 @dataclass
-class TemperatureMeasurement:
+class TemperatureMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0402
 
     class Attributes:
@@ -14770,7 +14802,7 @@ class TemperatureMeasurement:
 
 
 @dataclass
-class PressureMeasurement:
+class PressureMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0403
 
     class Attributes:
@@ -14919,7 +14951,7 @@ class PressureMeasurement:
 
 
 @dataclass
-class FlowMeasurement:
+class FlowMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0404
 
     class Attributes:
@@ -15003,7 +15035,7 @@ class FlowMeasurement:
 
 
 @dataclass
-class RelativeHumidityMeasurement:
+class RelativeHumidityMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0405
 
     class Attributes:
@@ -15087,7 +15119,7 @@ class RelativeHumidityMeasurement:
 
 
 @dataclass
-class OccupancySensing:
+class OccupancySensing(Cluster):
     id: typing.ClassVar[int] = 0x0406
 
     class Attributes:
@@ -15275,7 +15307,7 @@ class OccupancySensing:
 
 
 @dataclass
-class CarbonMonoxideConcentrationMeasurement:
+class CarbonMonoxideConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x040C
 
     class Attributes:
@@ -15359,7 +15391,7 @@ class CarbonMonoxideConcentrationMeasurement:
 
 
 @dataclass
-class CarbonDioxideConcentrationMeasurement:
+class CarbonDioxideConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x040D
 
     class Attributes:
@@ -15443,7 +15475,7 @@ class CarbonDioxideConcentrationMeasurement:
 
 
 @dataclass
-class EthyleneConcentrationMeasurement:
+class EthyleneConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x040E
 
     class Attributes:
@@ -15527,7 +15559,7 @@ class EthyleneConcentrationMeasurement:
 
 
 @dataclass
-class EthyleneOxideConcentrationMeasurement:
+class EthyleneOxideConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x040F
 
     class Attributes:
@@ -15611,7 +15643,7 @@ class EthyleneOxideConcentrationMeasurement:
 
 
 @dataclass
-class HydrogenConcentrationMeasurement:
+class HydrogenConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0410
 
     class Attributes:
@@ -15695,7 +15727,7 @@ class HydrogenConcentrationMeasurement:
 
 
 @dataclass
-class HydrogenSulphideConcentrationMeasurement:
+class HydrogenSulphideConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0411
 
     class Attributes:
@@ -15779,7 +15811,7 @@ class HydrogenSulphideConcentrationMeasurement:
 
 
 @dataclass
-class NitricOxideConcentrationMeasurement:
+class NitricOxideConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0412
 
     class Attributes:
@@ -15863,7 +15895,7 @@ class NitricOxideConcentrationMeasurement:
 
 
 @dataclass
-class NitrogenDioxideConcentrationMeasurement:
+class NitrogenDioxideConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0413
 
     class Attributes:
@@ -15947,7 +15979,7 @@ class NitrogenDioxideConcentrationMeasurement:
 
 
 @dataclass
-class OxygenConcentrationMeasurement:
+class OxygenConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0414
 
     class Attributes:
@@ -16031,7 +16063,7 @@ class OxygenConcentrationMeasurement:
 
 
 @dataclass
-class OzoneConcentrationMeasurement:
+class OzoneConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0415
 
     class Attributes:
@@ -16115,7 +16147,7 @@ class OzoneConcentrationMeasurement:
 
 
 @dataclass
-class SulfurDioxideConcentrationMeasurement:
+class SulfurDioxideConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0416
 
     class Attributes:
@@ -16199,7 +16231,7 @@ class SulfurDioxideConcentrationMeasurement:
 
 
 @dataclass
-class DissolvedOxygenConcentrationMeasurement:
+class DissolvedOxygenConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0417
 
     class Attributes:
@@ -16283,7 +16315,7 @@ class DissolvedOxygenConcentrationMeasurement:
 
 
 @dataclass
-class BromateConcentrationMeasurement:
+class BromateConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0418
 
     class Attributes:
@@ -16367,7 +16399,7 @@ class BromateConcentrationMeasurement:
 
 
 @dataclass
-class ChloraminesConcentrationMeasurement:
+class ChloraminesConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0419
 
     class Attributes:
@@ -16451,7 +16483,7 @@ class ChloraminesConcentrationMeasurement:
 
 
 @dataclass
-class ChlorineConcentrationMeasurement:
+class ChlorineConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x041A
 
     class Attributes:
@@ -16535,7 +16567,7 @@ class ChlorineConcentrationMeasurement:
 
 
 @dataclass
-class FecalColiformAndEColiConcentrationMeasurement:
+class FecalColiformAndEColiConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x041B
 
     class Attributes:
@@ -16619,7 +16651,7 @@ class FecalColiformAndEColiConcentrationMeasurement:
 
 
 @dataclass
-class FluorideConcentrationMeasurement:
+class FluorideConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x041C
 
     class Attributes:
@@ -16703,7 +16735,7 @@ class FluorideConcentrationMeasurement:
 
 
 @dataclass
-class HaloaceticAcidsConcentrationMeasurement:
+class HaloaceticAcidsConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x041D
 
     class Attributes:
@@ -16787,7 +16819,7 @@ class HaloaceticAcidsConcentrationMeasurement:
 
 
 @dataclass
-class TotalTrihalomethanesConcentrationMeasurement:
+class TotalTrihalomethanesConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x041E
 
     class Attributes:
@@ -16871,7 +16903,7 @@ class TotalTrihalomethanesConcentrationMeasurement:
 
 
 @dataclass
-class TotalColiformBacteriaConcentrationMeasurement:
+class TotalColiformBacteriaConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x041F
 
     class Attributes:
@@ -16955,7 +16987,7 @@ class TotalColiformBacteriaConcentrationMeasurement:
 
 
 @dataclass
-class TurbidityConcentrationMeasurement:
+class TurbidityConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0420
 
     class Attributes:
@@ -17039,7 +17071,7 @@ class TurbidityConcentrationMeasurement:
 
 
 @dataclass
-class CopperConcentrationMeasurement:
+class CopperConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0421
 
     class Attributes:
@@ -17123,7 +17155,7 @@ class CopperConcentrationMeasurement:
 
 
 @dataclass
-class LeadConcentrationMeasurement:
+class LeadConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0422
 
     class Attributes:
@@ -17207,7 +17239,7 @@ class LeadConcentrationMeasurement:
 
 
 @dataclass
-class ManganeseConcentrationMeasurement:
+class ManganeseConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0423
 
     class Attributes:
@@ -17291,7 +17323,7 @@ class ManganeseConcentrationMeasurement:
 
 
 @dataclass
-class SulfateConcentrationMeasurement:
+class SulfateConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0424
 
     class Attributes:
@@ -17375,7 +17407,7 @@ class SulfateConcentrationMeasurement:
 
 
 @dataclass
-class BromodichloromethaneConcentrationMeasurement:
+class BromodichloromethaneConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0425
 
     class Attributes:
@@ -17459,7 +17491,7 @@ class BromodichloromethaneConcentrationMeasurement:
 
 
 @dataclass
-class BromoformConcentrationMeasurement:
+class BromoformConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0426
 
     class Attributes:
@@ -17543,7 +17575,7 @@ class BromoformConcentrationMeasurement:
 
 
 @dataclass
-class ChlorodibromomethaneConcentrationMeasurement:
+class ChlorodibromomethaneConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0427
 
     class Attributes:
@@ -17627,7 +17659,7 @@ class ChlorodibromomethaneConcentrationMeasurement:
 
 
 @dataclass
-class ChloroformConcentrationMeasurement:
+class ChloroformConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0428
 
     class Attributes:
@@ -17711,7 +17743,7 @@ class ChloroformConcentrationMeasurement:
 
 
 @dataclass
-class SodiumConcentrationMeasurement:
+class SodiumConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0429
 
     class Attributes:
@@ -17795,7 +17827,7 @@ class SodiumConcentrationMeasurement:
 
 
 @dataclass
-class IasZone:
+class IasZone(Cluster):
     id: typing.ClassVar[int] = 0x0500
 
     class Enums:
@@ -18062,7 +18094,7 @@ class IasZone:
 
 
 @dataclass
-class IasAce:
+class IasAce(Cluster):
     id: typing.ClassVar[int] = 0x0501
 
     class Enums:
@@ -18573,7 +18605,7 @@ class IasAce:
 
 
 @dataclass
-class IasWd:
+class IasWd(Cluster):
     id: typing.ClassVar[int] = 0x0502
 
     class Commands:
@@ -18660,7 +18692,7 @@ class IasWd:
 
 
 @dataclass
-class WakeOnLan:
+class WakeOnLan(Cluster):
     id: typing.ClassVar[int] = 0x0503
 
     class Attributes:
@@ -18705,7 +18737,7 @@ class WakeOnLan:
 
 
 @dataclass
-class TvChannel:
+class TvChannel(Cluster):
     id: typing.ClassVar[int] = 0x0504
 
     class Enums:
@@ -18901,7 +18933,7 @@ class TvChannel:
 
 
 @dataclass
-class TargetNavigator:
+class TargetNavigator(Cluster):
     id: typing.ClassVar[int] = 0x0505
 
     class Enums:
@@ -19020,7 +19052,7 @@ class TargetNavigator:
 
 
 @dataclass
-class MediaPlayback:
+class MediaPlayback(Cluster):
     id: typing.ClassVar[int] = 0x0506
 
     class Enums:
@@ -19508,7 +19540,7 @@ class MediaPlayback:
 
 
 @dataclass
-class MediaInput:
+class MediaInput(Cluster):
     id: typing.ClassVar[int] = 0x0507
 
     class Enums:
@@ -19663,7 +19695,7 @@ class MediaInput:
 
 
 @dataclass
-class LowPower:
+class LowPower(Cluster):
     id: typing.ClassVar[int] = 0x0508
 
     class Commands:
@@ -19708,7 +19740,7 @@ class LowPower:
 
 
 @dataclass
-class KeypadInput:
+class KeypadInput(Cluster):
     id: typing.ClassVar[int] = 0x0509
 
     class Enums:
@@ -19867,7 +19899,7 @@ class KeypadInput:
 
 
 @dataclass
-class ContentLauncher:
+class ContentLauncher(Cluster):
     id: typing.ClassVar[int] = 0x050A
 
     class Enums:
@@ -20126,7 +20158,7 @@ class ContentLauncher:
 
 
 @dataclass
-class AudioOutput:
+class AudioOutput(Cluster):
     id: typing.ClassVar[int] = 0x050B
 
     class Enums:
@@ -20248,7 +20280,7 @@ class AudioOutput:
 
 
 @dataclass
-class ApplicationLauncher:
+class ApplicationLauncher(Cluster):
     id: typing.ClassVar[int] = 0x050C
 
     class Enums:
@@ -20383,7 +20415,7 @@ class ApplicationLauncher:
 
 
 @dataclass
-class ApplicationBasic:
+class ApplicationBasic(Cluster):
     id: typing.ClassVar[int] = 0x050D
 
     class Enums:
@@ -20530,7 +20562,7 @@ class ApplicationBasic:
 
 
 @dataclass
-class AccountLogin:
+class AccountLogin(Cluster):
     id: typing.ClassVar[int] = 0x050E
 
     class Commands:
@@ -20614,7 +20646,7 @@ class AccountLogin:
 
 
 @dataclass
-class TestCluster:
+class TestCluster(Cluster):
     id: typing.ClassVar[int] = 0x050F
 
     class Enums:
@@ -21715,7 +21747,7 @@ class TestCluster:
 
 
 @dataclass
-class Messaging:
+class Messaging(Cluster):
     id: typing.ClassVar[int] = 0x0703
 
     class Enums:
@@ -22002,7 +22034,7 @@ class Messaging:
 
 
 @dataclass
-class ApplianceIdentification:
+class ApplianceIdentification(Cluster):
     id: typing.ClassVar[int] = 0x0B00
 
     class Attributes:
@@ -22190,7 +22222,7 @@ class ApplianceIdentification:
 
 
 @dataclass
-class MeterIdentification:
+class MeterIdentification(Cluster):
     id: typing.ClassVar[int] = 0x0B01
 
     class Attributes:
@@ -22378,7 +22410,7 @@ class MeterIdentification:
 
 
 @dataclass
-class ApplianceEventsAndAlert:
+class ApplianceEventsAndAlert(Cluster):
     id: typing.ClassVar[int] = 0x0B02
 
     class Enums:
@@ -22488,7 +22520,7 @@ class ApplianceEventsAndAlert:
 
 
 @dataclass
-class ApplianceStatistics:
+class ApplianceStatistics(Cluster):
     id: typing.ClassVar[int] = 0x0B03
 
     class Commands:
@@ -22663,7 +22695,7 @@ class ApplianceStatistics:
 
 
 @dataclass
-class ElectricalMeasurement:
+class ElectricalMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0B04
 
     class Commands:
@@ -24450,7 +24482,7 @@ class ElectricalMeasurement:
 
 
 @dataclass
-class Binding:
+class Binding(Cluster):
     id: typing.ClassVar[int] = 0xF000
 
     class Commands:
@@ -24533,7 +24565,7 @@ class Binding:
 
 
 @dataclass
-class GroupKeyManagement:
+class GroupKeyManagement(Cluster):
     id: typing.ClassVar[int] = 0xF004
 
     class Enums:
@@ -24639,7 +24671,7 @@ class GroupKeyManagement:
 
 
 @dataclass
-class SampleMfgSpecificCluster:
+class SampleMfgSpecificCluster(Cluster):
     id: typing.ClassVar[int] = 0xFC00
 
     class Commands:
@@ -24714,7 +24746,7 @@ class SampleMfgSpecificCluster:
 
 
 @dataclass
-class SampleMfgSpecificCluster2:
+class SampleMfgSpecificCluster2(Cluster):
     id: typing.ClassVar[int] = 0xFC00
 
     class Commands:

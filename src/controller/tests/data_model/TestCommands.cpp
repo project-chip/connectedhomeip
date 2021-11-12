@@ -39,6 +39,7 @@
 using TestContext = chip::Test::AppContext;
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
@@ -54,9 +55,11 @@ enum ResponseDirective
     kSendError,
     kSendSuccessStatusCodeWithClusterStatus,
     kSendErrorWithClusterStatus,
+    kAsync,
 };
 
 ResponseDirective responseDirective;
+CommandHandler::Handle asyncHandle;
 
 } // namespace
 
@@ -118,6 +121,10 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         {
             apCommandObj->AddClusterSpecificFailure(aCommandPath, kTestFailureClusterStatus);
         }
+        else if (responseDirective == kAsync)
+        {
+            asyncHandle = apCommandObj;
+        }
     }
 }
 
@@ -127,8 +134,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
-                                 bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+                                 AttributeReportIB::Builder & aAttributeReport)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -149,6 +156,7 @@ public:
     TestCommandInteraction() {}
     static void TestDataResponse(nlTestSuite * apSuite, void * apContext);
     static void TestSuccessNoDataResponse(nlTestSuite * apSuite, void * apContext);
+    static void TestAsyncResponse(nlTestSuite * apSuite, void * apContext);
     static void TestFailure(nlTestSuite * apSuite, void * apContext);
     static void TestSuccessNoDataResponseWithClusterStatus(nlTestSuite * apSuite, void * apContext);
     static void TestFailureWithClusterStatus(nlTestSuite * apSuite, void * apContext);
@@ -159,7 +167,15 @@ private:
 void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    TestCluster::Commands::TestSimpleArgumentRequest::Type request;
+    // We want to send a TestSimpleArgumentRequest::Type, but get a
+    // TestStructArrayArgumentResponse in return, so need to shadow the actual
+    // ResponseType that TestSimpleArgumentRequest has.
+    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    {
+        using ResponseType = TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType;
+    };
+
+    FakeRequest request;
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;
@@ -196,8 +212,8 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     responseDirective = kSendDataResponse;
 
-    chip::Controller::InvokeCommandRequest<TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
+    chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+                                           onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -232,6 +248,57 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
 
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled && statusCheck);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestCommandInteraction::TestAsyncResponse(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    TestCluster::Commands::TestSimpleArgumentRequest::Type request;
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    bool onSuccessWasCalled = false;
+    bool onFailureWasCalled = false;
+    bool statusCheck        = false;
+    request.arg1            = true;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessWasCalled, &statusCheck](const app::ConcreteCommandPath & commandPath,
+                                                           const app::StatusIB & aStatus, const auto & dataResponse) {
+        statusCheck        = (aStatus.mStatus == Protocols::InteractionModel::Status::Success);
+        onSuccessWasCalled = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureWasCalled](const app::StatusIB & aStatus, CHIP_ERROR aError) { onFailureWasCalled = true; };
+
+    responseDirective = kAsync;
+
+    chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+                                           onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, !onSuccessWasCalled && !onFailureWasCalled && !statusCheck);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
+
+    CommandHandler * commandHandle = asyncHandle.Get();
+    NL_TEST_ASSERT(apSuite, commandHandle != nullptr);
+
+    if (commandHandle == nullptr)
+    {
+        return;
+    }
+
+    commandHandle->AddStatus(ConcreteCommandPath(kTestEndpointId, request.GetClusterId(), request.GetCommandId()),
+                             Protocols::InteractionModel::Status::Success);
+    asyncHandle.Release();
 
     ctx.DrainAndServiceIO();
 
@@ -348,6 +415,7 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("TestDataResponse", TestCommandInteraction::TestDataResponse),
     NL_TEST_DEF("TestSuccessNoDataResponse", TestCommandInteraction::TestSuccessNoDataResponse),
+    NL_TEST_DEF("TestAsyncResponse", TestCommandInteraction::TestAsyncResponse),
     NL_TEST_DEF("TestFailure", TestCommandInteraction::TestFailure),
     NL_TEST_DEF("TestSuccessNoDataResponseWithClusterStatus", TestCommandInteraction::TestSuccessNoDataResponseWithClusterStatus),
     NL_TEST_DEF("TestFailureWithClusterStatus", TestCommandInteraction::TestFailureWithClusterStatus),

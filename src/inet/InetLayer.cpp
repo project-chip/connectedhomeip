@@ -79,18 +79,6 @@
 namespace chip {
 namespace Inet {
 
-void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
-{
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    TCPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumTCPEps],
-                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumTCPEps]);
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    UDPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumUDPEps],
-                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumUDPEps]);
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-}
-
 /**
  *  This is the InetLayer default constructor.
  *
@@ -99,112 +87,7 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
  *  method must be called successfully prior to using the object.
  *
  */
-InetLayer::InetLayer()
-{
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (!sInetEventHandlerDelegate.IsInitialized())
-        sInetEventHandlerDelegate.Init(HandleInetLayerEvent);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-}
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-chip::System::LayerLwIP::EventHandlerDelegate InetLayer::sInetEventHandlerDelegate;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if INET_CONFIG_MAX_DROPPABLE_EVENTS && CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_NO_LOCKING
-
-CHIP_ERROR InetLayer::InitQueueLimiter(void)
-{
-    mDroppableEvents = 0;
-    return CHIP_NO_ERROR;
-}
-
-bool InetLayer::CanEnqueueDroppableEvent(void)
-{
-    if (__sync_add_and_fetch(&mDroppableEvents, 1) <= INET_CONFIG_MAX_DROPPABLE_EVENTS)
-    {
-        return true;
-    }
-    else
-    {
-        __sync_add_and_fetch(&mDroppableEvents, -1);
-        return false;
-    }
-}
-
-void InetLayer::DroppableEventDequeued(void)
-{
-    __sync_add_and_fetch(&mDroppableEvents, -1);
-}
-
-#elif CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-
-CHIP_ERROR InetLayer::InitQueueLimiter(void)
-{
-    const unsigned portBASE_TYPE maximum = INET_CONFIG_MAX_DROPPABLE_EVENTS;
-    const unsigned portBASE_TYPE initial = INET_CONFIG_MAX_DROPPABLE_EVENTS;
-
-#if (configSUPPORT_STATIC_ALLOCATION == 1)
-    mDroppableEvents                     = xSemaphoreCreateCountingStatic(maximum, initial, &mDroppableEventsObj);
-#else
-    mDroppableEvents = xSemaphoreCreateCounting(maximum, initial);
-#endif
-
-    if (mDroppableEvents != NULL)
-        return CHIP_NO_ERROR;
-    else
-        return CHIP_ERROR_NO_MEMORY;
-}
-
-bool InetLayer::CanEnqueueDroppableEvent(void)
-{
-    if (xSemaphoreTake(mDroppableEvents, 0) != pdTRUE)
-    {
-        return false;
-    }
-    return true;
-}
-
-void InetLayer::DroppableEventDequeued(void)
-{
-    xSemaphoreGive(mDroppableEvents);
-}
-
-#else // !CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-
-CHIP_ERROR InetLayer::InitQueueLimiter(void)
-{
-    if (sem_init(&mDroppableEvents, 0, INET_CONFIG_MAX_DROPPABLE_EVENTS) != 0)
-    {
-        return CHIP_ERROR_POSIX(errno);
-    }
-    return CHIP_NO_ERROR;
-}
-
-bool InetLayer::CanEnqueueDroppableEvent(void)
-{
-    // Striclty speaking, we should check for EAGAIN.  But, other
-    // errno values probably should signal that that we should drop
-    // the packet: EINVAL means that the semaphore is not valid (we
-    // failed initialization), and EINTR should probably also lead to
-    // dropping a packet.
-
-    if (sem_trywait(&mDroppableEvents) != 0)
-    {
-        return false;
-    }
-    return true;
-}
-
-void InetLayer::DroppableEventDequeued(void)
-{
-    sem_post(&mDroppableEvents);
-}
-
-#endif // !CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-#endif // INET_CONFIG_MAX_DROPPABLE_EVENTS && CHIP_SYSTEM_CONFIG_USE_LWIP
+InetLayer::InetLayer() {}
 
 /**
  *  This is the InetLayer explicit initializer. This must be called
@@ -246,12 +129,6 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     mSystemLayer = &aSystemLayer;
     mContext     = aContext;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    ReturnErrorOnFailure(InitQueueLimiter());
-
-    static_cast<System::LayerLwIP *>(mSystemLayer)->AddEventHandlerDelegate(sInetEventHandlerDelegate);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
     mLayerState.SetInitialized();
 
     return CHIP_NO_ERROR;
@@ -274,7 +151,7 @@ CHIP_ERROR InetLayer::Shutdown()
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Abort all TCP endpoints owned by this instance.
     TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        if ((lEndPoint != nullptr) && &lEndPoint->Layer() == this)
         {
             lEndPoint->Abort();
         }
@@ -285,7 +162,7 @@ CHIP_ERROR InetLayer::Shutdown()
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     // Close all UDP endpoints owned by this instance.
     UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
-        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
+        if ((lEndPoint != nullptr) && &lEndPoint->Layer() == this)
         {
             lEndPoint->Close();
         }
@@ -342,91 +219,6 @@ bool InetLayer::IsIdleTimerRunning()
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
 
-/**
- *  Get the link local IPv6 address for a specified link or interface.
- *
- *  @param[in]    interface The interface for which the link local IPv6
- *                          address is being sought.
- *
- *  @param[out]   llAddr  The link local IPv6 address for the link.
- *
- *  @retval    #CHIP_ERROR_NOT_IMPLEMENTED      If IPv6 is not supported.
- *  @retval    #CHIP_ERROR_INVALID_ARGUMENT     If the link local address
- *                                              is nullptr.
- *  @retval    #INET_ERROR_ADDRESS_NOT_FOUND    If the link does not have
- *                                              any address configured.
- *  @retval    #CHIP_NO_ERROR                   On success.
- *
- */
-CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId interface, IPAddress * llAddr)
-{
-    VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if !LWIP_IPV6
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif //! LWIP_IPV6
-
-    struct netif * link = interface.GetPlatformInterface();
-    for (struct netif * intf = netif_list; intf != NULL; intf = intf->next)
-    {
-        if ((link != NULL) && (link != intf))
-            continue;
-        for (int j = 0; j < LWIP_IPV6_NUM_ADDRESSES; ++j)
-        {
-            if (ip6_addr_isvalid(netif_ip6_addr_state(intf, j)) && ip6_addr_islinklocal(netif_ip6_addr(intf, j)))
-            {
-                (*llAddr) = IPAddress(*netif_ip6_addr(intf, j));
-                return CHIP_NO_ERROR;
-            }
-        }
-        if (link != NULL)
-        {
-            return INET_ERROR_ADDRESS_NOT_FOUND;
-        }
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-    struct ifaddrs * ifaddr;
-    const int rv = getifaddrs(&ifaddr);
-    if (rv == -1)
-    {
-        return INET_ERROR_ADDRESS_NOT_FOUND;
-    }
-
-    for (struct ifaddrs * ifaddr_iter = ifaddr; ifaddr_iter != nullptr; ifaddr_iter = ifaddr_iter->ifa_next)
-    {
-        if (ifaddr_iter->ifa_addr != nullptr)
-        {
-            if ((ifaddr_iter->ifa_addr->sa_family == AF_INET6) &&
-                (!interface.IsPresent() || (if_nametoindex(ifaddr_iter->ifa_name) == interface.GetPlatformInterface())))
-            {
-                struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
-                if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
-                {
-                    (*llAddr) = IPAddress((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
-                    break;
-                }
-            }
-        }
-    }
-    freeifaddrs(ifaddr);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-    net_if * const iface = interface.IsPresent() ? net_if_get_by_index(interface.GetPlatformInterface()) : net_if_get_default();
-    VerifyOrReturnError(iface != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
-
-    in6_addr * const ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
-    VerifyOrReturnError(ip6_addr != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
-
-    *llAddr = IPAddress(*ip6_addr);
-#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-
-    return CHIP_NO_ERROR;
-}
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 /**
  *  Creates a new TCPEndPoint object.
@@ -453,14 +245,13 @@ CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = TCPEndPoint::sPool.TryCreate();
+    *retEndPoint = TCPEndPoint::sPool.CreateObject(*this);
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "TCP");
         return CHIP_ERROR_ENDPOINT_POOL_FULL;
     }
 
-    (*retEndPoint)->Init(this);
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumTCPEps);
 
     return CHIP_NO_ERROR;
@@ -493,87 +284,18 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = UDPEndPoint::sPool.TryCreate();
+    *retEndPoint = UDPEndPoint::sPool.CreateObject(*this);
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "UDP");
         return CHIP_ERROR_ENDPOINT_POOL_FULL;
     }
 
-    (*retEndPoint)->Init(this);
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumUDPEps);
 
     return CHIP_NO_ERROR;
 }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-/**
- *  Get the interface identifier for the specified IP address. If the
- *  interface identifier cannot be derived it is set to the default
- *  InterfaceId.
- *
- *  @note
- *    This function fetches the first interface (from the configured list
- *    of interfaces) that matches the specified IP address.
- *
- *  @param[in]    addr      A reference to the IPAddress object.
- *
- *  @param[out]   intfId    A reference to the InterfaceId object.
- *
- *  @return  #CHIP_NO_ERROR unconditionally.
- *
- */
-CHIP_ERROR InetLayer::GetInterfaceFromAddr(const IPAddress & addr, InterfaceId & intfId)
-{
-    InterfaceAddressIterator addrIter;
-
-    for (; addrIter.HasCurrent(); addrIter.Next())
-    {
-        IPAddress curAddr = addrIter.GetAddress();
-        if (addr == curAddr)
-        {
-            intfId = addrIter.GetInterfaceId();
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    intfId = InterfaceId::Null();
-
-    return CHIP_NO_ERROR;
-}
-
-/**
- *  Check if there is a prefix match between the specified IPv6 address and any of
- *  the locally configured IPv6 addresses.
- *
- *  @param[in]    addr    The IPv6 address to check for the prefix-match.
- *
- *  @return true if a successful match is found, otherwise false.
- *
- */
-bool InetLayer::MatchLocalIPv6Subnet(const IPAddress & addr)
-{
-    if (addr.IsIPv6LinkLocal())
-        return true;
-
-    InterfaceAddressIterator ifAddrIter;
-    for (; ifAddrIter.HasCurrent(); ifAddrIter.Next())
-    {
-        IPPrefix addrPrefix;
-        addrPrefix.IPAddr = ifAddrIter.GetAddress();
-#if INET_CONFIG_ENABLE_IPV4
-        if (addrPrefix.IPAddr.IsIPv4())
-            continue;
-#endif // INET_CONFIG_ENABLE_IPV4
-        if (addrPrefix.IPAddr.IsIPv6LinkLocal())
-            continue;
-        addrPrefix.Length = ifAddrIter.GetPrefixLength();
-        if (addrPrefix.MatchAddress(addr))
-            return true;
-    }
-
-    return false;
-}
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
 void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState)
@@ -582,7 +304,7 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
     bool lTimerRequired    = lInetLayer.IsIdleTimerRunning();
 
     TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
-        if (!lEndPoint->IsCreatedByInetLayer(lInetLayer))
+        if (&lEndPoint->Layer() != &lInetLayer)
             return true;
         if (!lEndPoint->IsConnected())
             return true;
@@ -608,64 +330,6 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
     }
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-CHIP_ERROR InetLayer::HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType, uintptr_t aArgument)
-{
-    assertChipStackLockedByCurrentThread();
-
-    VerifyOrReturnError(INET_IsInetEvent(aEventType), CHIP_ERROR_UNEXPECTED_EVENT);
-
-    // Dispatch the event according to its type.
-    switch (aEventType)
-    {
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    case kInetEvent_TCPConnectComplete:
-        static_cast<TCPEndPoint &>(aTarget).HandleConnectComplete(static_cast<CHIP_ERROR>(aArgument));
-        break;
-
-    case kInetEvent_TCPConnectionReceived:
-        static_cast<TCPEndPoint &>(aTarget).HandleIncomingConnection(reinterpret_cast<TCPEndPoint *>(aArgument));
-        break;
-
-    case kInetEvent_TCPDataReceived:
-        static_cast<TCPEndPoint &>(aTarget).HandleDataReceived(
-            System::PacketBufferHandle::Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
-        break;
-
-    case kInetEvent_TCPDataSent:
-        static_cast<TCPEndPoint &>(aTarget).HandleDataSent(static_cast<uint16_t>(aArgument));
-        break;
-
-    case kInetEvent_TCPError:
-        static_cast<TCPEndPoint &>(aTarget).HandleError(static_cast<CHIP_ERROR>(aArgument));
-        break;
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    case kInetEvent_UDPDataReceived:
-        static_cast<UDPEndPoint &>(aTarget).HandleDataReceived(
-            System::PacketBufferHandle::Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
-        break;
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-    default:
-        return CHIP_ERROR_UNEXPECTED_EVENT;
-    }
-
-    // If the event was droppable, record the fact that it has been dequeued.
-    if (IsDroppableEvent(aEventType))
-    {
-        EndPointBasis & lBasis = static_cast<EndPointBasis &>(aTarget);
-        InetLayer & lInetLayer = lBasis.Layer();
-
-        lInetLayer.DroppableEventDequeued();
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**
  *  Reset the members of the IPPacketInfo object.

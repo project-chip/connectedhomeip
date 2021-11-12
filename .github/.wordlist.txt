@@ -385,6 +385,7 @@ FreeRTOS
 FreeRTOSConfig
 fsl
 fsync
+fullclean
 gcloud
 GDB
 GeneralCommissioning
@@ -434,6 +435,7 @@ hciconfig
 hdlc
 HKDF
 hoc
+homebrew
 hostapd
 hostname
 href
@@ -486,6 +488,8 @@ itemName
 iterable
 jinja
 jlink
+jre
+JDK
 JLink
 JLinkExe
 JLinkRTTClient
@@ -667,6 +671,7 @@ Onboarding
 onboardingcodes
 oneshot
 onnetwork
+openjdk
 OnOff
 OnOffClusterTest
 OnPlatformEvent
@@ -815,6 +820,7 @@ RUNAS
 RunMain
 runtime
 rw
+RXD
 sbin
 scalability
 scalable
@@ -952,6 +958,7 @@ ttyACMx
 ttymxc
 ttyUSB
 TvChannel
+TXD
 txt
 uart
 UART
@@ -966,6 +973,7 @@ unblur
 UNBLUR
 uncommissioned
 unfocus
+userguide
 Unicast
 UniFlash
 unpair

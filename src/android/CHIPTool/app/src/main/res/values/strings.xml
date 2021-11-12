@@ -147,4 +147,7 @@
     <string name="dcl_custom_flow_url_key">custom</string>
     <string name="custom_flow_return_url"></string>
     <string name="retrieve_endpoint_list">Retrieve Endpoint List</string>
+    <string name="invoke">Invoke</string>
+    <string name="select_a_command">Select a command</string>
+    <string name="select_a_cluster">Select a cluster</string>
 </resources>

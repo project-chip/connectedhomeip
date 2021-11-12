@@ -214,6 +214,13 @@ class ClusterCommand(ClusterObject):
         raise NotImplementedError()
 
 
+class Cluster:
+    ''' This class does nothing, but a convenient class that generated clusters can inherit from.
+    This gives the ability that the users can use issubclass(X, Cluster) to determine if the class represnents a Cluster.
+    '''
+    pass
+
+
 class ClusterAttributeDescriptor:
     '''
     The ClusterAttributeDescriptor is used for holding an attribute's metadata like its cluster id, attribute id and its type.

@@ -61,6 +61,7 @@ p6_executable("clusters_app") {
 
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/init_p6Platform.cpp",
     "src/AppTask.cpp",
@@ -82,6 +83,7 @@ p6_executable("clusters_app") {
     "include",
     "${examples_plat_dir}",
     "${p6_project_dir}/include",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]
 
   defines = []

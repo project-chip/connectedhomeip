@@ -19,6 +19,7 @@
 const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
 const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const queryCommand = require(zapPath + 'db/query-command.js')
 const zclQuery     = require(zapPath + 'db/query-zcl.js')
 const cHelper      = require(zapPath + 'generator/helper-c.js')
 const string       = require(zapPath + 'util/string.js')
@@ -106,7 +107,7 @@ var endpointClusterWithInit = [
   'Pump Configuration and Control',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
-var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
+var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Thermostat User Interface Configuration' ];
 var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
 
 /**
@@ -494,6 +495,14 @@ function zapTypeToPythonClusterObjectType(type, options)
   return _zapTypeToPythonClusterObjectType.call(this, type, options)
 }
 
+async function getResponseCommandName(responseRef, options)
+{
+  let pkgId = await templateUtil.ensureZclPackageId(this);
+
+  const { db, sessionId } = this.global;
+  return queryCommand.selectCommandById(db, responseRef, pkgId).then(response => asUpperCamelCase(response.name));
+}
+
 //
 // Module exports
 //
@@ -509,3 +518,4 @@ exports.asMEI                               = asMEI;
 exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
 exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectType;
 exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;
+exports.getResponseCommandName              = getResponseCommandName;

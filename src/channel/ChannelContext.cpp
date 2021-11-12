@@ -271,6 +271,8 @@ void ChannelContext::EnterCasePairingState()
         EnterFailedState(CHIP_ERROR_NO_MEMORY);
         return;
     }
+    session.Value().GetUnauthenticatedSession()->SetMRPIntervals(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL,
+                                                                 CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
 
     ExchangeContext * ctxt = mExchangeManager->NewContext(session.Value(), prepare.mCasePairingSession);
     VerifyOrReturn(ctxt != nullptr);

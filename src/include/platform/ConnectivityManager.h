@@ -216,7 +216,22 @@ public:
 // Sleepy end device methods
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     CHIP_ERROR GetSEDPollingConfig(SEDPollingConfig & pollingConfig);
+
+    /**
+     * Sets Sleepy End Device polling configuration and posts kSEDPollingIntervalChange event to inform other software
+     * modules about the change.
+     *
+     * @param[in]  pollingConfig  polling intervals configuration to be set
+     */
     CHIP_ERROR SetSEDPollingConfig(const SEDPollingConfig & pollingConfig);
+
+    /**
+     * Requests setting Sleepy End Device fast polling interval on or off.
+     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the fast polling
+     * consumers counter. Fast polling mode is set if the consumers counter is bigger than 0.
+     *
+     * @param[in]  onOff  true if fast polling should be enabled and false otherwise.
+     */
     CHIP_ERROR RequestSEDFastPollingMode(bool onOff);
 #endif
 
@@ -233,6 +248,7 @@ public:
     CHIP_ERROR ResetEthNetworkDiagnosticsCounts();
 
     // WiFi network diagnostics methods
+    CHIP_ERROR GetWiFiBssId(ByteSpan & value);
     CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
     CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber);
@@ -503,6 +519,11 @@ inline CHIP_ERROR ConnectivityManager::GetEthOverrunCount(uint64_t & overrunCoun
 inline CHIP_ERROR ConnectivityManager::ResetEthNetworkDiagnosticsCounts()
 {
     return static_cast<ImplClass *>(this)->_ResetEthNetworkDiagnosticsCounts();
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiBssId(ByteSpan & value)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiBssId(value);
 }
 
 inline CHIP_ERROR ConnectivityManager::GetWiFiSecurityType(uint8_t & securityType)
