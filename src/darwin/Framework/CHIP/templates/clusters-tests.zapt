@@ -105,12 +105,6 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 
-    XCTestExpectation * addressExpectation = [self expectationWithDescription:@"Address Updated"];
-    pairing.expectation = addressExpectation;
-    [controller updateDevice:kDeviceId fabricId:0];
-
-    [self waitForExpectationsWithTimeout:kAddressResolveTimeoutInSeconds handler:nil];
-
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
     [controller getConnectedDevice:kDeviceId
                              queue:dispatch_get_main_queue()
