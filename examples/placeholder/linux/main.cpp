@@ -39,6 +39,12 @@ std::unique_ptr<TestCommand> RunTestCommand()
     }
 
     chip::DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(test.get()));
+
+    const char * PICSFilePath = LinuxDeviceOptions::GetInstance().PICS;
+    if (PICSFilePath != nullptr)
+    {
+        test->PICS.SetValue(PICSBooleanReader::Read(PICSFilePath));
+    }
     return test;
 }
 
