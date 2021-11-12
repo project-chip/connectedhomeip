@@ -10260,7 +10260,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 0UL);
 
         [expectation fulfill];
     }];
@@ -10302,7 +10302,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 0UL);
 
         [expectation fulfill];
     }];
@@ -14687,7 +14687,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 0UL);
 
         [expectation fulfill];
     }];
@@ -14708,7 +14708,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 0UL);
 
         [expectation fulfill];
     }];
@@ -15606,7 +15606,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 0UL);
 
         [expectation fulfill];
     }];
@@ -15648,7 +15648,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 4294967295UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 4294967295UL);
 
         [expectation fulfill];
     }];
@@ -15690,7 +15690,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 0UL);
 
         [expectation fulfill];
     }];
@@ -16026,7 +16026,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 0UL);
 
         [expectation fulfill];
     }];
@@ -16068,7 +16068,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 4294967295UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 4294967295UL);
 
         [expectation fulfill];
     }];
@@ -16110,7 +16110,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 0UL);
 
         [expectation fulfill];
     }];
@@ -16530,7 +16530,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] longValue], 0L);
+        XCTAssertEqual([values[@"value"] intValue], 0L);
 
         [expectation fulfill];
     }];
@@ -16572,7 +16572,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] longValue], 2147483647L);
+        XCTAssertEqual([values[@"value"] intValue], 2147483647L);
 
         [expectation fulfill];
     }];
@@ -16614,7 +16614,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] longValue], -2147483648L);
+        XCTAssertEqual([values[@"value"] intValue], -2147483648L);
 
         [expectation fulfill];
     }];
@@ -16656,7 +16656,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] longValue], 0L);
+        XCTAssertEqual([values[@"value"] intValue], 0L);
 
         [expectation fulfill];
     }];
@@ -17580,7 +17580,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 0UL);
 
         [expectation fulfill];
     }];
@@ -17622,7 +17622,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 4294967295UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 4294967295UL);
 
         [expectation fulfill];
     }];
@@ -17664,7 +17664,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        XCTAssertEqual([values[@"value"] unsignedIntValue], 0UL);
 
         [expectation fulfill];
     }];
@@ -17887,7 +17887,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertGreaterThanOrEqual([values[@"value"] unsignedLongValue], 5);
+        XCTAssertGreaterThanOrEqual([values[@"value"] unsignedIntValue], 5);
 
         [expectation fulfill];
     }];
@@ -17908,7 +17908,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertLessThanOrEqual([values[@"value"] unsignedLongValue], 5);
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedIntValue], 5);
 
         [expectation fulfill];
     }];
@@ -17929,7 +17929,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertNotEqual([values[@"value"] unsignedLongValue], 6);
+        XCTAssertNotEqual([values[@"value"] unsignedIntValue], 6);
 
         [expectation fulfill];
     }];

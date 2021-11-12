@@ -1,0 +1,61 @@
+{{#if isOptional}}
+  if ({{source}} != nil) {
+    auto & definedValue = {{target}}.Emplace();
+    {{>encode_value target="definedValue" source=source cluster=cluster isOptional=false}}
+  }
+{{else if isNullable}}
+  if ({{source}} == nil) {
+    {{target}}.SetNull();
+  } else {
+    auto & nonNullValue = {{target}}.SetNonNull();
+    {{>encode_value target="nonNullValue" source=source cluster=cluster isNullable=false}}
+  }
+{{else if isArray}}
+  {{! TODO: This is not great, with its fallible allocation and
+      whatnot.  Maybe we should just switch to encoding our ObjC types
+      directly to TLV...  We need the listFreer thing because we want
+      our allocation to live long enough, and if it's scoped to where
+      we are right now it may not (e.g. for a nullable list we're
+      inside an "else" block here).  }}
+  {
+    using ListType = decltype({{target}});
+    using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+    if ({{source}}.count != 0) {
+      auto * listHolder = new ListHolder<ListMemberType>({{source}}.count);
+      if (listHolder == nullptr || listHolder->mList == nullptr) {
+        // Now what?
+        return;
+      }
+      listFreer.add(listHolder);
+      for (size_t i = 0; i < {{source}}.count; ++i) {
+        if (![{{source}}[i] isKindOfClass:[{{asObjectiveCClass type cluster forceNotList=true}} class]]) {
+          // Wrong kind of value, now what?
+          return;
+        }
+        auto element = ({{asObjectiveCClass type cluster forceNotList=true}} *){{source}}[i];
+        {{>encode_value target="listHolder->mList[i]" source="element" cluster=cluster isArray=false}}
+      }
+      {{target}} = ListType(listHolder->mList, {{source}}.count);
+    } else {
+      {{target}} = ListType();
+    }
+  }
+{{else if isStruct}}
+  {{#zcl_struct_items_by_struct_name type}}
+    {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "." (asUpperCamelCase label)) cluster=../cluster}}
+  {{/zcl_struct_items_by_struct_name}}
+{{else if (isOctetString type)}}
+  {{target}} = [self asByteSpan:{{source}}];
+{{else if (isCharString type)}}
+  {{target}} = [self asCharSpan:{{source}}];
+{{else}}
+  {{#if_chip_enum type}}
+    {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
+  {{else}}
+    {{#if_is_bitmap type}}
+      {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
+    {{else}}
+      {{target}} = {{source}}.{{asObjectiveCNumberType source type true}}Value;
+    {{/if_is_bitmap}}
+  {{/if_chip_enum}}
+{{/if}}

@@ -59,12 +59,12 @@ void CHIPInt16sAttributeCallbackBridge::OnSuccessFn(void * context, int16_t valu
 
 void CHIPInt32uAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
-    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithUnsignedLong:value] });
+    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithUnsignedInt:value] });
 };
 
 void CHIPInt32sAttributeCallbackBridge::OnSuccessFn(void * context, int32_t value)
 {
-    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithLong:value] });
+    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithInt:value] });
 };
 
 void CHIPInt64uAttributeCallbackBridge::OnSuccessFn(void * context, uint64_t value)
@@ -211,7 +211,7 @@ void CHIPDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * con
         auto & entry = iter.GetValue();
         (void) entry; // All our types below might be unsupported
         [array addObject:@ {
-            @"type" : [NSNumber numberWithUnsignedLong:entry.type],
+            @"type" : [NSNumber numberWithUnsignedInt:entry.type],
             @"revision" : [NSNumber numberWithUnsignedShort:entry.revision],
         }];
     }
@@ -231,7 +231,7 @@ void CHIPDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(
     while (iter.Next()) {
         auto & entry = iter.GetValue();
         (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedLong:entry]];
+        [array addObject:[NSNumber numberWithUnsignedInt:entry]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
@@ -249,7 +249,7 @@ void CHIPDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(
     while (iter.Next()) {
         auto & entry = iter.GetValue();
         (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedLong:entry]];
+        [array addObject:[NSNumber numberWithUnsignedInt:entry]];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
@@ -308,7 +308,7 @@ void CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBrid
         auto & entry = iter.GetValue();
         (void) entry; // All our types below might be unsupported
         [array addObject:@ {
-            @"FailSafeExpiryLengthMs" : [NSNumber numberWithUnsignedLong:entry.failSafeExpiryLengthMs],
+            @"FailSafeExpiryLengthMs" : [NSNumber numberWithUnsignedInt:entry.failSafeExpiryLengthMs],
         }];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -427,7 +427,7 @@ void CHIPModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void *
         [array addObject:@ {
             @"Label" : [[NSString alloc] initWithBytes:entry.label.data() length:entry.label.size() encoding:NSUTF8StringEncoding],
             @"Mode" : [NSNumber numberWithUnsignedChar:entry.mode],
-            @"SemanticTag" : [NSNumber numberWithUnsignedLong:entry.semanticTag],
+            @"SemanticTag" : [NSNumber numberWithUnsignedInt:entry.semanticTag],
         }];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -512,9 +512,9 @@ void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessF
         [array addObject:@ {
             @"Id" : [NSNumber numberWithUnsignedLongLong:entry.id],
             @"Name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
-            @"StackFreeCurrent" : [NSNumber numberWithUnsignedLong:entry.stackFreeCurrent],
-            @"StackFreeMinimum" : [NSNumber numberWithUnsignedLong:entry.stackFreeMinimum],
-            @"StackSize" : [NSNumber numberWithUnsignedLong:entry.stackSize],
+            @"StackFreeCurrent" : [NSNumber numberWithUnsignedInt:entry.stackFreeCurrent],
+            @"StackFreeMinimum" : [NSNumber numberWithUnsignedInt:entry.stackFreeMinimum],
+            @"StackSize" : [NSNumber numberWithUnsignedInt:entry.stackSize],
         }];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -662,10 +662,10 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::O
         (void) entry; // All our types below might be unsupported
         [array addObject:@ {
             @"ExtAddress" : [NSNumber numberWithUnsignedLongLong:entry.extAddress],
-            @"Age" : [NSNumber numberWithUnsignedLong:entry.age],
+            @"Age" : [NSNumber numberWithUnsignedInt:entry.age],
             @"Rloc16" : [NSNumber numberWithUnsignedShort:entry.rloc16],
-            @"LinkFrameCounter" : [NSNumber numberWithUnsignedLong:entry.linkFrameCounter],
-            @"MleFrameCounter" : [NSNumber numberWithUnsignedLong:entry.mleFrameCounter],
+            @"LinkFrameCounter" : [NSNumber numberWithUnsignedInt:entry.linkFrameCounter],
+            @"MleFrameCounter" : [NSNumber numberWithUnsignedInt:entry.mleFrameCounter],
             @"LQI" : [NSNumber numberWithUnsignedChar:entry.lqi],
             @"AverageRssi" : [NSNumber numberWithChar:entry.averageRssi],
             @"LastRssi" : [NSNumber numberWithChar:entry.lastRssi],
@@ -834,8 +834,8 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
     id response = @ {
         @"status" : [NSNumber numberWithUnsignedChar:data.status],
         @"content" : [NSData dataWithBytes:data.content.data() length:data.content.size()],
-        @"timeStamp" : [NSNumber numberWithUnsignedLong:data.timeStamp],
-        @"timeSinceBoot" : [NSNumber numberWithUnsignedLong:data.timeSinceBoot],
+        @"timeStamp" : [NSNumber numberWithUnsignedInt:data.timeStamp],
+        @"timeSinceBoot" : [NSNumber numberWithUnsignedInt:data.timeSinceBoot],
     };
     DispatchSuccess(context, response);
 };
@@ -909,8 +909,8 @@ void CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
     id response = @ {
         @"scheduleId" : [NSNumber numberWithUnsignedChar:data.scheduleId],
         @"status" : [NSNumber numberWithUnsignedChar:data.status],
-        @"localStartTime" : [NSNumber numberWithUnsignedLong:data.localStartTime],
-        @"localEndTime" : [NSNumber numberWithUnsignedLong:data.localEndTime],
+        @"localStartTime" : [NSNumber numberWithUnsignedInt:data.localStartTime],
+        @"localEndTime" : [NSNumber numberWithUnsignedInt:data.localEndTime],
         @"operatingModeDuringHoliday" : [NSNumber numberWithUnsignedChar:data.operatingModeDuringHoliday],
     };
     DispatchSuccess(context, response);
@@ -921,7 +921,7 @@ void CHIPDoorLockClusterGetLogRecordResponseCallbackBridge::OnSuccessFn(
 {
     id response = @ {
         @"logEntryId" : [NSNumber numberWithUnsignedShort:data.logEntryId],
-        @"timestamp" : [NSNumber numberWithUnsignedLong:data.timestamp],
+        @"timestamp" : [NSNumber numberWithUnsignedInt:data.timestamp],
         @"eventType" : [NSNumber numberWithUnsignedChar:data.eventType],
         @"source" : [NSNumber numberWithUnsignedChar:data.source],
         @"eventIdOrAlarmCode" : [NSNumber numberWithUnsignedChar:data.eventIdOrAlarmCode],
@@ -988,8 +988,8 @@ void CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge::OnSuccessFn(
         @"scheduleId" : [NSNumber numberWithUnsignedChar:data.scheduleId],
         @"userId" : [NSNumber numberWithUnsignedShort:data.userId],
         @"status" : [NSNumber numberWithUnsignedChar:data.status],
-        @"localStartTime" : [NSNumber numberWithUnsignedLong:data.localStartTime],
-        @"localEndTime" : [NSNumber numberWithUnsignedLong:data.localEndTime],
+        @"localStartTime" : [NSNumber numberWithUnsignedInt:data.localStartTime],
+        @"localEndTime" : [NSNumber numberWithUnsignedInt:data.localEndTime],
     };
     DispatchSuccess(context, response);
 };
@@ -1375,7 +1375,7 @@ void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSu
 {
     id response = @ {
         @"action" : [NSNumber numberWithUnsignedChar:data.action],
-        @"delayedActionTime" : [NSNumber numberWithUnsignedLong:data.delayedActionTime],
+        @"delayedActionTime" : [NSNumber numberWithUnsignedInt:data.delayedActionTime],
     };
     DispatchSuccess(context, response);
 };
@@ -1387,14 +1387,14 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuc
         @"status" : [NSNumber numberWithUnsignedChar:data.status],
         @"delayedActionTime" : data.delayedActionTime.HasValue() == false
             ? [NSNull null]
-            : [NSNumber numberWithUnsignedLong:data.delayedActionTime.Value()],
+            : [NSNumber numberWithUnsignedInt:data.delayedActionTime.Value()],
         @"imageURI" : data.imageURI.HasValue() == false ? [NSNull null]
                                                         : [[NSString alloc] initWithBytes:data.imageURI.Value().data()
                                                                                    length:data.imageURI.Value().size()
                                                                                  encoding:NSUTF8StringEncoding],
         @"softwareVersion" : data.softwareVersion.HasValue() == false
             ? [NSNull null]
-            : [NSNumber numberWithUnsignedLong:data.softwareVersion.Value()],
+            : [NSNumber numberWithUnsignedInt:data.softwareVersion.Value()],
         @"softwareVersionString" : data.softwareVersionString.HasValue() == false
             ? [NSNull null]
             : [[NSString alloc] initWithBytes:data.softwareVersionString.Value().data()
