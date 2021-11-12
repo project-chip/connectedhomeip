@@ -23,7 +23,7 @@
  * must include this file
  */
 
-#include <ota-image-processor.h>
+#include "ota-image-processor.h"
 
 #pragma once
 
@@ -41,19 +41,20 @@ public:
     void virtual OnPreparedForDownload();
 
     // Action parameter type for the OnBlockProcessed()
-    enum blockActionType
+    enum BlockActionType
     {
         kGetNext,
         kEnd
     };
 
     // Platform calls this method upon the completion of ProcessBlock() processing
-    void virtual OnBlockProcessed(blockActionType action);
+    void virtual OnBlockProcessed(BlockActionType action);
 
     // A setter for the delegate class pointer
-    void SetImageProcessorDelegate(OTAImageProcessorDriver * delegate)
+    void SetImageProcessorDelegate(OTAImageProcessorDriver * delegate);
 
-        // API declarations end
+    // API declarations end
 
-        private : OTAImageProcessorDriver * imageProcessorDelegate;
+private :
+    OTAImageProcessorDriver * mImageProcessorDelegate;
 };
