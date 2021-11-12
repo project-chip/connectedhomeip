@@ -78,13 +78,16 @@ void InteractionModelEngine::Shutdown()
 
     mCommandHandlerList = nullptr;
 
-    // Increase magic number to invalid all Handle-s.
+    // Increase magic number to invalidate all Handle-s.
     mMagic++;
 
     mCommandHandlerObjs.ForEachActiveObject([this](CommandHandler * obj) -> bool {
         // Modifying the pool during iteration is generally frowned upon.
         // This is almost safe since mCommandHandlerObjs is a BitMapObjectPool which won't malfunction when modifying the inner
         // record while during traversal. But this behavior is not guranteed, so we should fix this by implementing DeallocateAll.
+        //
+        // Deallocate an CommandHandler will call its destructor (and abort the exchange context it holds) without calling
+        // Shutdown().
         //
         // TODO(@kghost, #10332) Implement DeallocateAll and replace this.
 

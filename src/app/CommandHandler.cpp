@@ -74,8 +74,8 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
 
     // Use the RAII feature, if this is the only Handle when this function returns, DecrementHoldOff will trigger sending response.
     Handle workHandle(this);
-    ReturnErrorOnFailure(ProcessInvokeRequest(std::move(payload)));
     mpExchangeCtx->WillSendMessage();
+    ReturnErrorOnFailure(ProcessInvokeRequest(std::move(payload)));
 
     return CHIP_NO_ERROR;
 }
@@ -149,7 +149,7 @@ void CommandHandler::DecrementHoldOff()
     CHIP_ERROR err = SendCommandResponse();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Failed to send command response: %s", err.AsString());
+        ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
         // We marked the exchange as "WillSendMessage", need to shutdown the exchange manually to avoid leaking exchanges.
         if (mpExchangeCtx != nullptr)
         {

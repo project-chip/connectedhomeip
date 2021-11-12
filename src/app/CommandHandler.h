@@ -103,6 +103,10 @@ public:
             return *this;
         }
 
+        /**
+         * Get the CommandHandler object it holds. Get() may return a nullptr if the CommandHandler object is holds is no longer
+         * valid.
+         */
         CommandHandler * Get();
 
         void Release();
