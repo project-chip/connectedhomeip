@@ -20,6 +20,7 @@
 package chip.devicecontroller;
 
 import androidx.annotation.Nullable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -1038,17 +1039,9 @@ public class ChipClusters {
         output.append(this.type);
         output.append("\n");
 
-        output.append("byte[] endpoints: [");
-        for (int i = 0; i < endpoints.length; i++) {
-          if (i != endpoints.length - 1) {
-            output.append(endpoints[i]);
-            output.append(", ");
-          } else {
-            output.append(endpoints[i]);
-            output.append("]");
-            output.append("\n");
-          }
-        }
+        output.append("byte[] ");
+        output.append(Arrays.toString(endpoints));
+        output.append("\n");
 
         return output.toString();
       }
@@ -3314,17 +3307,9 @@ public class ChipClusters {
         output.append(this.offPremiseServicesReachableIPv6);
         output.append("\n");
 
-        output.append("byte[] hardwareAddress: [");
-        for (int i = 0; i < hardwareAddress.length; i++) {
-          if (i != hardwareAddress.length - 1) {
-            output.append(hardwareAddress[i]);
-            output.append(", ");
-          } else {
-            output.append(hardwareAddress[i]);
-            output.append("]");
-            output.append("\n");
-          }
-        }
+        output.append("byte[] ");
+        output.append(Arrays.toString(hardwareAddress));
+        output.append("\n");
 
         output.append("int type: ");
         output.append(this.type);
@@ -3461,17 +3446,9 @@ public class ChipClusters {
         output.append(this.groupKeyIndex);
         output.append("\n");
 
-        output.append("byte[] groupKeyRoot: [");
-        for (int i = 0; i < groupKeyRoot.length; i++) {
-          if (i != groupKeyRoot.length - 1) {
-            output.append(groupKeyRoot[i]);
-            output.append(", ");
-          } else {
-            output.append(groupKeyRoot[i]);
-            output.append("]");
-            output.append("\n");
-          }
-        }
+        output.append("byte[] ");
+        output.append(Arrays.toString(groupKeyRoot));
+        output.append("\n");
 
         output.append("long groupKeyEpochStartTime: ");
         output.append(this.groupKeyEpochStartTime);
@@ -5261,17 +5238,9 @@ public class ChipClusters {
         output.append(this.fabricIndex);
         output.append("\n");
 
-        output.append("byte[] rootPublicKey: [");
-        for (int i = 0; i < rootPublicKey.length; i++) {
-          if (i != rootPublicKey.length - 1) {
-            output.append(rootPublicKey[i]);
-            output.append(", ");
-          } else {
-            output.append(rootPublicKey[i]);
-            output.append("]");
-            output.append("\n");
-          }
-        }
+        output.append("byte[] ");
+        output.append(Arrays.toString(rootPublicKey));
+        output.append("\n");
 
         output.append("int vendorId: ");
         output.append(this.vendorId);
@@ -6586,17 +6555,9 @@ public class ChipClusters {
         output.append(this.fabricIndex);
         output.append("\n");
 
-        output.append("byte[] operationalCert: [");
-        for (int i = 0; i < operationalCert.length; i++) {
-          if (i != operationalCert.length - 1) {
-            output.append(operationalCert[i]);
-            output.append(", ");
-          } else {
-            output.append(operationalCert[i]);
-            output.append("]");
-            output.append("\n");
-          }
-        }
+        output.append("byte[] ");
+        output.append(Arrays.toString(operationalCert));
+        output.append("\n");
 
         return output.toString();
       }

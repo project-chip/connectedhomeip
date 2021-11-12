@@ -15,7 +15,7 @@ import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import chip.clusterinfo.ClusterCommandCallback
 import chip.clusterinfo.ClusterInfo
-import chip.clusterinfo.CommandInfo
+import chip.clusterinfo.InteractionInfo
 import chip.clusterinfo.CommandResponseInfo
 import chip.clusterinfo.DelegatedClusterCallback
 import chip.devicecontroller.ChipClusters
@@ -53,7 +53,7 @@ class ClusterDetailFragment : Fragment() {
   private lateinit var selectedClusterInfo: ClusterInfo
   private lateinit var selectedCluster: ChipClusters.BaseChipCluster
   private lateinit var selectedCommandCallback: DelegatedClusterCallback
-  private lateinit var selectedCommandInfo: CommandInfo
+  private lateinit var selectedInteractionInfo: InteractionInfo
   private var devicePtr = 0L
   private var endpointId = 0
 
@@ -80,12 +80,12 @@ class ClusterDetailFragment : Fragment() {
         val commandArguments = HashMap<String, Any>()
         parameterList.forEach {
           val type =
-            selectedCommandInfo.commandParameters[it.clusterParameterNameTv.text.toString()]!!.type
+            selectedInteractionInfo.commandParameters[it.clusterParameterNameTv.text.toString()]!!.type
           val data = castStringToType(it.clusterParameterData.text.toString(), type)!!
 
           commandArguments[it.clusterParameterNameTv.text.toString()] = data
         }
-        selectedCommandInfo.getCommandFunction()
+        selectedInteractionInfo.getCommandFunction()
           .invokeCommand(selectedCluster, selectedCommandCallback, commandArguments)
       }
     }
@@ -94,7 +94,6 @@ class ClusterDetailFragment : Fragment() {
   private fun castStringToType(data: String, type: Class<*>): Any? {
     return when (type) {
       Int::class.java -> data.toInt()
-      String::class.java -> data
       Boolean::class.java -> data.toBoolean()
       else -> data
     }
@@ -141,8 +140,8 @@ class ClusterDetailFragment : Fragment() {
       callbackList.removeAllViews()
       selectedCluster = selectedClusterInfo.createClusterFunction.create(devicePtr, endpointId)
       val selectedCommand: String = commandAutoComplete.adapter.getItem(position).toString()
-      selectedCommandInfo = selectedClusterInfo.commands[selectedCommand]!!
-      selectedCommandCallback = selectedCommandInfo.commandCallbackSupplier.get()
+      selectedInteractionInfo = selectedClusterInfo.commands[selectedCommand]!!
+      selectedCommandCallback = selectedInteractionInfo.commandCallbackSupplier.get()
       populateCommandParameter(inflater, parameterList)
       selectedCommandCallback.setCallbackDelegate(object : ClusterCommandCallback {
         override fun onSuccess(responseValues: Map<CommandResponseInfo, Any>) {
@@ -167,7 +166,7 @@ class ClusterDetailFragment : Fragment() {
   }
 
   private fun populateCommandParameter(inflater: LayoutInflater, parameterList: LinearLayout) {
-    selectedCommandInfo.commandParameters.forEach { (paramName, paramInfo) ->
+    selectedInteractionInfo.commandParameters.forEach { (paramName, paramInfo) ->
       val param = inflater.inflate(R.layout.cluster_parameter_item, null, false) as ConstraintLayout
       param.clusterParameterNameTv.text = "${paramName}"
       param.clusterParameterTypeTv.text = "${paramInfo.type}"
@@ -182,37 +181,55 @@ class ClusterDetailFragment : Fragment() {
   ) {
     responseValues.forEach { (variableNameType, response) ->
       if (response is List<*>) {
-        if (response.size == 0) {
-          val emptyCallback =
-            inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
-          emptyCallback.clusterCallbackNameTv.text = "Result is empty"
-          callbackList.addView(emptyCallback)
-        } else {
-          response.forEachIndexed { index, it ->
-            val objectCallback =
-              inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
-            objectCallback.clusterCallbackNameTv.text = variableNameType.name + "[$index]"
-            val objectDeserializationString = it.toString()
-            val callbackClassName = it!!.javaClass.toString().split('$').last()
-            objectCallback.clusterCallbackDataTv.text = callbackClassName
-            objectCallback.clusterCallbackDataTv.setOnClickListener {
-              AlertDialog.Builder(requireContext())
-                .setTitle(callbackClassName)
-                .setMessage(objectDeserializationString)
-                .create()
-                .show()
-            }
-            objectCallback.clusterCallbackTypeTv.text = "List<$callbackClassName>"
-            callbackList.addView(objectCallback)
-          }
-        }
+        createListReadAttributeView(response, inflater, callbackList, variableNameType)
       } else {
-        val callback =
+        createPrimitiveReadAttributeView(response, inflater, callbackList, variableNameType)
+      }
+    }
+  }
+
+  private fun createPrimitiveReadAttributeView(
+    response: Any,
+    inflater: LayoutInflater,
+    callbackList: LinearLayout,
+    variableNameType: CommandResponseInfo
+  ) {
+    val callback =
+      inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
+    callback.clusterCallbackNameTv.text = variableNameType.name
+    callback.clusterCallbackDataTv.text = response.toString()
+    callback.clusterCallbackTypeTv.text = variableNameType.type
+    callbackList.addView(callback)
+  }
+
+  private fun createListReadAttributeView(
+    response: List<*>,
+    inflater: LayoutInflater,
+    callbackList: LinearLayout,
+    variableNameType: CommandResponseInfo
+  ) {
+    if (response.isEmpty()) {
+      val emptyCallback =
+        inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
+      emptyCallback.clusterCallbackNameTv.text = "Result is empty"
+      callbackList.addView(emptyCallback)
+    } else {
+      response.forEachIndexed { index, it ->
+        val readAttributeCallbackItem =
           inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
-        callback.clusterCallbackNameTv.text = variableNameType.name
-        callback.clusterCallbackDataTv.text = response.toString()
-        callback.clusterCallbackTypeTv.text = variableNameType.type
-        callbackList.addView(callback)
+        readAttributeCallbackItem.clusterCallbackNameTv.text = variableNameType.name + "[$index]"
+        val objectString = it.toString()
+        val callbackClassName = it!!.javaClass.toString().split('$').last()
+        readAttributeCallbackItem.clusterCallbackDataTv.text = callbackClassName
+        readAttributeCallbackItem.clusterCallbackDataTv.setOnClickListener {
+          AlertDialog.Builder(requireContext())
+            .setTitle(callbackClassName)
+            .setMessage(objectString)
+            .create()
+            .show()
+        }
+        readAttributeCallbackItem.clusterCallbackTypeTv.text = "List<$callbackClassName>"
+        callbackList.addView(readAttributeCallbackItem)
       }
     }
   }
