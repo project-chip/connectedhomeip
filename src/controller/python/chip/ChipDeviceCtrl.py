@@ -133,6 +133,8 @@ class ChipDeviceController(object):
             self.state = DCState.IDLE
             self._ChipStack.callbackRes = err
             self._ChipStack.completeEvent.set()
+            self._ChipStack.commissioningCompleteEvent.set()
+            self._ChipStack.commissioningEventRes = err
 
         im.InitIMDelegate()
         ClusterCommand.Init(self)
@@ -197,11 +199,20 @@ class ChipDeviceController(object):
         )
 
     def ConnectIP(self, ipaddr, setupPinCode, nodeid):
+        # IP connection will run through full commissioning, so we need to wait
+        # for the commissioning complete event, not just any callback.
         self.state = DCState.RENDEZVOUS_ONGOING
-        return self._ChipStack.CallAsync(
+        self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectIP(
                 self.devCtrl, ipaddr, setupPinCode, nodeid)
         )
+        # Wait up to 5 additional seconds for the commissioning complete event
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            self._ChipStack.commissioningCompleteEvent.wait(5.0)
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            # Error 50 is a timeout
+            return False
+        return self._ChipStack.commissioningEventRes == 0
 
     def ResolveNode(self, nodeid):
         return self._ChipStack.CallAsync(

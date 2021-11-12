@@ -1271,7 +1271,7 @@
               "outgoing": 1
             },
             {
-              "name": "ApplyUpdateRequestResponse",
+              "name": "ApplyUpdateResponse",
               "code": 4,
               "mfgCode": null,
               "source": "server",
@@ -1801,6 +1801,21 @@
           "enabled": 1,
           "commands": [],
           "attributes": [
+            {
+              "name": "ThreadMetrics",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "CurrentHeapFree",
               "code": 1,
@@ -7821,7 +7836,7 @@
               "outgoing": 1
             },
             {
-              "name": "ApplyUpdateRequestResponse",
+              "name": "ApplyUpdateResponse",
               "code": 4,
               "mfgCode": null,
               "source": "server",

@@ -19,7 +19,9 @@
 
 package chip.devicecontroller;
 
+import androidx.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
 public class ChipClusters {
 
@@ -362,11 +364,11 @@ public class ChipClusters {
         long chipClusterPtr, DefaultClusterCallback callback, int index);
 
     public static class AudioOutputListAttribute {
-      public int index;
-      public int outputType;
+      public Integer index;
+      public Integer outputType;
       public String name;
 
-      public AudioOutputListAttribute(int index, int outputType, String name) {
+      public AudioOutputListAttribute(Integer index, Integer outputType, String name) {
         this.index = index;
         this.outputType = outputType;
         this.name = name;
@@ -948,20 +950,20 @@ public class ChipClusters {
         long chipClusterPtr, DefaultClusterCallback callback, int actionID, long invokeID);
 
     public static class ActionListAttribute {
-      public int actionID;
+      public Integer actionID;
       public String name;
-      public int type;
-      public int endpointListID;
-      public int supportedCommands;
-      public int status;
+      public Integer type;
+      public Integer endpointListID;
+      public Integer supportedCommands;
+      public Integer status;
 
       public ActionListAttribute(
-          int actionID,
+          Integer actionID,
           String name,
-          int type,
-          int endpointListID,
-          int supportedCommands,
-          int status) {
+          Integer type,
+          Integer endpointListID,
+          Integer supportedCommands,
+          Integer status) {
         this.actionID = actionID;
         this.name = name;
         this.type = type;
@@ -1008,12 +1010,13 @@ public class ChipClusters {
     }
 
     public static class EndpointListAttribute {
-      public int endpointListID;
+      public Integer endpointListID;
       public String name;
-      public int type;
+      public Integer type;
       public byte[] endpoints;
 
-      public EndpointListAttribute(int endpointListID, String name, int type, byte[] endpoints) {
+      public EndpointListAttribute(
+          Integer endpointListID, String name, Integer type, byte[] endpoints) {
         this.endpointListID = endpointListID;
         this.name = name;
         this.type = type;
@@ -2268,10 +2271,10 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public static class DeviceListAttribute {
-      public long type;
-      public int revision;
+      public Long type;
+      public Integer revision;
 
-      public DeviceListAttribute(long type, int revision) {
+      public DeviceListAttribute(Long type, Integer revision) {
         this.type = type;
         this.revision = revision;
       }
@@ -3204,9 +3207,9 @@ public class ChipClusters {
     }
 
     public static class BasicCommissioningInfoListAttribute {
-      public long failSafeExpiryLengthMs;
+      public Long failSafeExpiryLengthMs;
 
-      public BasicCommissioningInfoListAttribute(long failSafeExpiryLengthMs) {
+      public BasicCommissioningInfoListAttribute(Long failSafeExpiryLengthMs) {
         this.failSafeExpiryLengthMs = failSafeExpiryLengthMs;
       }
 
@@ -3271,19 +3274,19 @@ public class ChipClusters {
 
     public static class NetworkInterfacesAttribute {
       public String name;
-      public boolean fabricConnected;
-      public boolean offPremiseServicesReachableIPv4;
-      public boolean offPremiseServicesReachableIPv6;
+      public Boolean fabricConnected;
+      public Boolean offPremiseServicesReachableIPv4;
+      public Boolean offPremiseServicesReachableIPv6;
       public byte[] hardwareAddress;
-      public int type;
+      public Integer type;
 
       public NetworkInterfacesAttribute(
           String name,
-          boolean fabricConnected,
-          boolean offPremiseServicesReachableIPv4,
-          boolean offPremiseServicesReachableIPv6,
+          Boolean fabricConnected,
+          Boolean offPremiseServicesReachableIPv4,
+          Boolean offPremiseServicesReachableIPv6,
           byte[] hardwareAddress,
-          int type) {
+          Integer type) {
         this.name = name;
         this.fabricConnected = fabricConnected;
         this.offPremiseServicesReachableIPv4 = offPremiseServicesReachableIPv4;
@@ -3392,11 +3395,11 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public static class GroupsAttribute {
-      public int vendorId;
-      public int vendorGroupId;
-      public int groupKeySetIndex;
+      public Integer vendorId;
+      public Integer vendorGroupId;
+      public Integer groupKeySetIndex;
 
-      public GroupsAttribute(int vendorId, int vendorGroupId, int groupKeySetIndex) {
+      public GroupsAttribute(Integer vendorId, Integer vendorGroupId, Integer groupKeySetIndex) {
         this.vendorId = vendorId;
         this.vendorGroupId = vendorGroupId;
         this.groupKeySetIndex = groupKeySetIndex;
@@ -3428,18 +3431,18 @@ public class ChipClusters {
     }
 
     public static class GroupKeysAttribute {
-      public int vendorId;
-      public int groupKeyIndex;
+      public Integer vendorId;
+      public Integer groupKeyIndex;
       public byte[] groupKeyRoot;
-      public long groupKeyEpochStartTime;
-      public int groupKeySecurityPolicy;
+      public Long groupKeyEpochStartTime;
+      public Integer groupKeySecurityPolicy;
 
       public GroupKeysAttribute(
-          int vendorId,
-          int groupKeyIndex,
+          Integer vendorId,
+          Integer groupKeyIndex,
           byte[] groupKeyRoot,
-          long groupKeyEpochStartTime,
-          int groupKeySecurityPolicy) {
+          Long groupKeyEpochStartTime,
+          Integer groupKeySecurityPolicy) {
         this.vendorId = vendorId;
         this.groupKeyIndex = groupKeyIndex;
         this.groupKeyRoot = groupKeyRoot;
@@ -4123,12 +4126,13 @@ public class ChipClusters {
     private native void showInputStatus(long chipClusterPtr, DefaultClusterCallback callback);
 
     public static class MediaInputListAttribute {
-      public int index;
-      public int inputType;
+      public Integer index;
+      public Integer inputType;
       public String name;
       public String description;
 
-      public MediaInputListAttribute(int index, int inputType, String name, String description) {
+      public MediaInputListAttribute(
+          Integer index, Integer inputType, String name, String description) {
         this.index = index;
         this.inputType = inputType;
         this.name = name;
@@ -4423,10 +4427,10 @@ public class ChipClusters {
 
     public static class SupportedModesAttribute {
       public String label;
-      public int mode;
-      public long semanticTag;
+      public Integer mode;
+      public Long semanticTag;
 
-      public SupportedModesAttribute(String label, int mode, long semanticTag) {
+      public SupportedModesAttribute(String label, Integer mode, Long semanticTag) {
         this.label = label;
         this.mode = mode;
         this.semanticTag = semanticTag;
@@ -5228,19 +5232,19 @@ public class ChipClusters {
     }
 
     public static class FabricsListAttribute {
-      public int fabricIndex;
+      public Integer fabricIndex;
       public byte[] rootPublicKey;
-      public int vendorId;
-      public long fabricId;
-      public long nodeId;
+      public Integer vendorId;
+      public Long fabricId;
+      public Long nodeId;
       public String label;
 
       public FabricsListAttribute(
-          int fabricIndex,
+          Integer fabricIndex,
           byte[] rootPublicKey,
-          int vendorId,
-          long fabricId,
-          long nodeId,
+          Integer vendorId,
+          Long fabricId,
+          Long nodeId,
           String label) {
         this.fabricIndex = fabricIndex;
         this.rootPublicKey = rootPublicKey;
@@ -5991,6 +5995,59 @@ public class ChipClusters {
 
     private native void resetWatermarks(long chipClusterPtr, DefaultClusterCallback callback);
 
+    public static class ThreadMetricsAttribute {
+      public long id;
+      public String name;
+      public long stackFreeCurrent;
+      public long stackFreeMinimum;
+      public long stackSize;
+
+      public ThreadMetricsAttribute(
+          long id, String name, long stackFreeCurrent, long stackFreeMinimum, long stackSize) {
+        this.id = id;
+        this.name = name;
+        this.stackFreeCurrent = stackFreeCurrent;
+        this.stackFreeMinimum = stackFreeMinimum;
+        this.stackSize = stackSize;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("long id: ");
+        output.append(this.id);
+        output.append("\n");
+
+        output.append("String name: ");
+        output.append(this.name);
+        output.append("\n");
+
+        output.append("long stackFreeCurrent: ");
+        output.append(this.stackFreeCurrent);
+        output.append("\n");
+
+        output.append("long stackFreeMinimum: ");
+        output.append(this.stackFreeMinimum);
+        output.append("\n");
+
+        output.append("long stackSize: ");
+        output.append(this.stackSize);
+        output.append("\n");
+
+        return output.toString();
+      }
+    }
+
+    public interface ThreadMetricsAttributeCallback {
+      void onSuccess(List<ThreadMetricsAttribute> valueList);
+
+      void onError(Exception ex);
+    }
+
+    public void readThreadMetricsAttribute(ThreadMetricsAttributeCallback callback) {
+      readThreadMetricsAttribute(chipClusterPtr, callback);
+    }
+
     public void readCurrentHeapFreeAttribute(LongAttributeCallback callback) {
       readCurrentHeapFreeAttribute(chipClusterPtr, callback);
     }
@@ -6006,6 +6063,9 @@ public class ChipClusters {
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
+
+    private native void readThreadMetricsAttribute(
+        long chipClusterPtr, ThreadMetricsAttributeCallback callback);
 
     private native void readCurrentHeapFreeAttribute(
         long chipClusterPtr, LongAttributeCallback callback);
@@ -6127,15 +6187,15 @@ public class ChipClusters {
     }
 
     public static class TvChannelListAttribute {
-      public int majorNumber;
-      public int minorNumber;
+      public Integer majorNumber;
+      public Integer minorNumber;
       public String name;
       public String callSign;
       public String affiliateCallSign;
 
       public TvChannelListAttribute(
-          int majorNumber,
-          int minorNumber,
+          Integer majorNumber,
+          Integer minorNumber,
           String name,
           String callSign,
           String affiliateCallSign) {
@@ -6234,10 +6294,10 @@ public class ChipClusters {
     }
 
     public static class TargetNavigatorListAttribute {
-      public int identifier;
+      public Integer identifier;
       public String name;
 
-      public TargetNavigatorListAttribute(int identifier, String name) {
+      public TargetNavigatorListAttribute(Integer identifier, String name) {
         this.identifier = identifier;
         this.name = name;
       }
@@ -6511,10 +6571,10 @@ public class ChipClusters {
     }
 
     public static class ListStructOctetStringAttribute {
-      public long fabricIndex;
+      public Long fabricIndex;
       public byte[] operationalCert;
 
-      public ListStructOctetStringAttribute(long fabricIndex, byte[] operationalCert) {
+      public ListStructOctetStringAttribute(Long fabricIndex, byte[] operationalCert) {
         this.fabricIndex = fabricIndex;
         this.operationalCert = operationalCert;
       }
@@ -6549,8 +6609,27 @@ public class ChipClusters {
     }
 
     public static class ListNullablesAndOptionalsStructAttribute {
+      @Nullable public Integer nullableInt;
+      public Optional<Integer> optionalInt;
+      @Nullable public Optional<Integer> nullableOptionalInt;
+      @Nullable public String nullableString;
+      public Optional<String> optionalString;
+      @Nullable public Optional<String> nullableOptionalString;
 
-      public ListNullablesAndOptionalsStructAttribute() {}
+      public ListNullablesAndOptionalsStructAttribute(
+          @Nullable Integer nullableInt,
+          Optional<Integer> optionalInt,
+          @Nullable Optional<Integer> nullableOptionalInt,
+          @Nullable String nullableString,
+          Optional<String> optionalString,
+          @Nullable Optional<String> nullableOptionalString) {
+        this.nullableInt = nullableInt;
+        this.optionalInt = optionalInt;
+        this.nullableOptionalInt = nullableOptionalInt;
+        this.nullableString = nullableString;
+        this.optionalString = optionalString;
+        this.nullableOptionalString = nullableOptionalString;
+      }
 
       @Override
       public String toString() {
@@ -7269,36 +7348,36 @@ public class ChipClusters {
     private native void resetCounts(long chipClusterPtr, DefaultClusterCallback callback);
 
     public static class NeighborTableListAttribute {
-      public long extAddress;
-      public long age;
-      public int rloc16;
-      public long linkFrameCounter;
-      public long mleFrameCounter;
-      public int lqi;
-      public int averageRssi;
-      public int lastRssi;
-      public int frameErrorRate;
-      public int messageErrorRate;
-      public boolean rxOnWhenIdle;
-      public boolean fullThreadDevice;
-      public boolean fullNetworkData;
-      public boolean isChild;
+      public Long extAddress;
+      public Long age;
+      public Integer rloc16;
+      public Long linkFrameCounter;
+      public Long mleFrameCounter;
+      public Integer lqi;
+      public Integer averageRssi;
+      public Integer lastRssi;
+      public Integer frameErrorRate;
+      public Integer messageErrorRate;
+      public Boolean rxOnWhenIdle;
+      public Boolean fullThreadDevice;
+      public Boolean fullNetworkData;
+      public Boolean isChild;
 
       public NeighborTableListAttribute(
-          long extAddress,
-          long age,
-          int rloc16,
-          long linkFrameCounter,
-          long mleFrameCounter,
-          int lqi,
-          int averageRssi,
-          int lastRssi,
-          int frameErrorRate,
-          int messageErrorRate,
-          boolean rxOnWhenIdle,
-          boolean fullThreadDevice,
-          boolean fullNetworkData,
-          boolean isChild) {
+          Long extAddress,
+          Long age,
+          Integer rloc16,
+          Long linkFrameCounter,
+          Long mleFrameCounter,
+          Integer lqi,
+          Integer averageRssi,
+          Integer lastRssi,
+          Integer frameErrorRate,
+          Integer messageErrorRate,
+          Boolean rxOnWhenIdle,
+          Boolean fullThreadDevice,
+          Boolean fullNetworkData,
+          Boolean isChild) {
         this.extAddress = extAddress;
         this.age = age;
         this.rloc16 = rloc16;
@@ -7385,28 +7464,28 @@ public class ChipClusters {
     }
 
     public static class RouteTableListAttribute {
-      public long extAddress;
-      public int rloc16;
-      public int routerId;
-      public int nextHop;
-      public int pathCost;
-      public int LQIIn;
-      public int LQIOut;
-      public int age;
-      public boolean allocated;
-      public boolean linkEstablished;
+      public Long extAddress;
+      public Integer rloc16;
+      public Integer routerId;
+      public Integer nextHop;
+      public Integer pathCost;
+      public Integer LQIIn;
+      public Integer LQIOut;
+      public Integer age;
+      public Boolean allocated;
+      public Boolean linkEstablished;
 
       public RouteTableListAttribute(
-          long extAddress,
-          int rloc16,
-          int routerId,
-          int nextHop,
-          int pathCost,
-          int LQIIn,
-          int LQIOut,
-          int age,
-          boolean allocated,
-          boolean linkEstablished) {
+          Long extAddress,
+          Integer rloc16,
+          Integer routerId,
+          Integer nextHop,
+          Integer pathCost,
+          Integer LQIIn,
+          Integer LQIOut,
+          Integer age,
+          Boolean allocated,
+          Boolean linkEstablished) {
         this.extAddress = extAddress;
         this.rloc16 = rloc16;
         this.routerId = routerId;
@@ -7473,10 +7552,10 @@ public class ChipClusters {
     }
 
     public static class SecurityPolicyAttribute {
-      public int rotationTime;
-      public int flags;
+      public Integer rotationTime;
+      public Integer flags;
 
-      public SecurityPolicyAttribute(int rotationTime, int flags) {
+      public SecurityPolicyAttribute(Integer rotationTime, Integer flags) {
         this.rotationTime = rotationTime;
         this.flags = flags;
       }
@@ -7503,32 +7582,32 @@ public class ChipClusters {
     }
 
     public static class OperationalDatasetComponentsAttribute {
-      public boolean activeTimestampPresent;
-      public boolean pendingTimestampPresent;
-      public boolean masterKeyPresent;
-      public boolean networkNamePresent;
-      public boolean extendedPanIdPresent;
-      public boolean meshLocalPrefixPresent;
-      public boolean delayPresent;
-      public boolean panIdPresent;
-      public boolean channelPresent;
-      public boolean pskcPresent;
-      public boolean securityPolicyPresent;
-      public boolean channelMaskPresent;
+      public Boolean activeTimestampPresent;
+      public Boolean pendingTimestampPresent;
+      public Boolean masterKeyPresent;
+      public Boolean networkNamePresent;
+      public Boolean extendedPanIdPresent;
+      public Boolean meshLocalPrefixPresent;
+      public Boolean delayPresent;
+      public Boolean panIdPresent;
+      public Boolean channelPresent;
+      public Boolean pskcPresent;
+      public Boolean securityPolicyPresent;
+      public Boolean channelMaskPresent;
 
       public OperationalDatasetComponentsAttribute(
-          boolean activeTimestampPresent,
-          boolean pendingTimestampPresent,
-          boolean masterKeyPresent,
-          boolean networkNamePresent,
-          boolean extendedPanIdPresent,
-          boolean meshLocalPrefixPresent,
-          boolean delayPresent,
-          boolean panIdPresent,
-          boolean channelPresent,
-          boolean pskcPresent,
-          boolean securityPolicyPresent,
-          boolean channelMaskPresent) {
+          Boolean activeTimestampPresent,
+          Boolean pendingTimestampPresent,
+          Boolean masterKeyPresent,
+          Boolean networkNamePresent,
+          Boolean extendedPanIdPresent,
+          Boolean meshLocalPrefixPresent,
+          Boolean delayPresent,
+          Boolean panIdPresent,
+          Boolean channelPresent,
+          Boolean pskcPresent,
+          Boolean securityPolicyPresent,
+          Boolean channelMaskPresent) {
         this.activeTimestampPresent = activeTimestampPresent;
         this.pendingTimestampPresent = pendingTimestampPresent;
         this.masterKeyPresent = masterKeyPresent;

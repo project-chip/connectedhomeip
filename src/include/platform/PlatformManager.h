@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <system/PlatformEventSupport.h>
@@ -65,6 +66,16 @@ class GenericThreadStackManagerImpl_OpenThread;
 template <class>
 class GenericThreadStackManagerImpl_OpenThread_LwIP;
 } // namespace Internal
+
+// Maximum length of vendor defined name or prefix of the software thread that is
+// static for the duration of the thread.
+static constexpr size_t kMaxThreadNameLength = 32;
+
+struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type
+{
+    char NameBuf[kMaxThreadNameLength + 1];
+    ThreadMetrics * Next; /* Pointer to the next structure.  */
+};
 
 class PlatformManager;
 
@@ -176,6 +187,14 @@ public:
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree);
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed);
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
+
+    /*
+     * Get the linked list of thread metrics of the current plaform. After usage, each caller of GetThreadMetrics
+     * needs to release the thread metrics list it gets via ReleaseThreadMetrics.
+     *
+     */
+    CHIP_ERROR GetThreadMetrics(ThreadMetrics ** threadMetricsOut);
+    void ReleaseThreadMetrics(ThreadMetrics * threadMetrics);
 
     /**
      * General Diagnostics methods.
@@ -444,6 +463,16 @@ inline CHIP_ERROR PlatformManager::GetCurrentHeapUsed(uint64_t & currentHeapUsed
 inline CHIP_ERROR PlatformManager::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
     return static_cast<ImplClass *>(this)->_GetCurrentHeapHighWatermark(currentHeapHighWatermark);
+}
+
+inline CHIP_ERROR PlatformManager::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+    return static_cast<ImplClass *>(this)->_GetThreadMetrics(threadMetricsOut);
+}
+
+inline void PlatformManager::ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{
+    return static_cast<ImplClass *>(this)->_ReleaseThreadMetrics(threadMetrics);
 }
 
 inline CHIP_ERROR PlatformManager::GetRebootCount(uint16_t & rebootCount)

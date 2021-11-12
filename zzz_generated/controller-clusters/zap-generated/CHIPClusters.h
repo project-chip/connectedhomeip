@@ -1272,6 +1272,7 @@ public:
     CHIP_ERROR ResetWatermarks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
     // Cluster Attributes
+    CHIP_ERROR ReadAttributeThreadMetrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeCurrentHeapFree(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeCurrentHeapUsed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeCurrentHeapHighWatermark(Callback::Cancelable * onSuccessCallback,

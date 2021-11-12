@@ -2567,6 +2567,34 @@ public class ClusterInfoMapping {
     }
   }
 
+  public class DelegatedThreadMetricsAttributeCallback
+      implements ChipClusters.SoftwareDiagnosticsCluster.ThreadMetricsAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(
+        List<ChipClusters.SoftwareDiagnosticsCluster.ThreadMetricsAttribute> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo(
+              "valueList", "List<ChipClusters.SoftwareDiagnosticsCluster.ThreadMetricsAttribute>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public class DelegatedChangeChannelResponseCallback
       implements ChipClusters.TvChannelCluster.ChangeChannelResponseCallback,
           DelegatedClusterCallback {
@@ -11913,6 +11941,20 @@ public class ClusterInfoMapping {
     clusterMap.get("scenes").combineCommands(readScenesCommandInfo);
     Map<String, CommandInfo> readSoftwareDiagnosticsCommandInfo = new LinkedHashMap<>();
     // read attribute
+    Map<String, CommandParameterInfo> readSoftwareDiagnosticsThreadMetricsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandInfo readSoftwareDiagnosticsThreadMetricsAttributeCommandInfo =
+        new CommandInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SoftwareDiagnosticsCluster) cluster)
+                  .readThreadMetricsAttribute(
+                      (ChipClusters.SoftwareDiagnosticsCluster.ThreadMetricsAttributeCallback)
+                          callback);
+            },
+            () -> new DelegatedThreadMetricsAttributeCallback(),
+            readSoftwareDiagnosticsThreadMetricsCommandParams);
+    readSoftwareDiagnosticsCommandInfo.put(
+        "readThreadMetricsAttribute", readSoftwareDiagnosticsThreadMetricsAttributeCommandInfo);
     Map<String, CommandParameterInfo> readSoftwareDiagnosticsCurrentHeapFreeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandInfo readSoftwareDiagnosticsCurrentHeapFreeAttributeCommandInfo =

@@ -25,6 +25,8 @@ class CHIPBooleanAttributeCallback : public chip::Callback::Callback<BooleanAttr
 public:
     CHIPBooleanAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
+    ~CHIPBooleanAttributeCallback();
+
     static void maybeDestroy(CHIPBooleanAttributeCallback * callback)
     {
         if (!callback->keepAlive)
@@ -45,6 +47,8 @@ class CHIPCharStringAttributeCallback : public chip::Callback::Callback<CharStri
 {
 public:
     CHIPCharStringAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPCharStringAttributeCallback();
 
     static void maybeDestroy(CHIPCharStringAttributeCallback * callback)
     {
@@ -67,6 +71,8 @@ class CHIPInt8sAttributeCallback : public chip::Callback::Callback<Int8sAttribut
 public:
     CHIPInt8sAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
+    ~CHIPInt8sAttributeCallback();
+
     static void maybeDestroy(CHIPInt8sAttributeCallback * callback)
     {
         if (!callback->keepAlive)
@@ -87,6 +93,8 @@ class CHIPInt8uAttributeCallback : public chip::Callback::Callback<Int8uAttribut
 {
 public:
     CHIPInt8uAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPInt8uAttributeCallback();
 
     static void maybeDestroy(CHIPInt8uAttributeCallback * callback)
     {
@@ -109,6 +117,8 @@ class CHIPInt16sAttributeCallback : public chip::Callback::Callback<Int16sAttrib
 public:
     CHIPInt16sAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
+    ~CHIPInt16sAttributeCallback();
+
     static void maybeDestroy(CHIPInt16sAttributeCallback * callback)
     {
         if (!callback->keepAlive)
@@ -129,6 +139,8 @@ class CHIPInt16uAttributeCallback : public chip::Callback::Callback<Int16uAttrib
 {
 public:
     CHIPInt16uAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPInt16uAttributeCallback();
 
     static void maybeDestroy(CHIPInt16uAttributeCallback * callback)
     {
@@ -151,6 +163,8 @@ class CHIPInt32sAttributeCallback : public chip::Callback::Callback<Int32sAttrib
 public:
     CHIPInt32sAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
+    ~CHIPInt32sAttributeCallback();
+
     static void maybeDestroy(CHIPInt32sAttributeCallback * callback)
     {
         if (!callback->keepAlive)
@@ -171,6 +185,8 @@ class CHIPInt32uAttributeCallback : public chip::Callback::Callback<Int32uAttrib
 {
 public:
     CHIPInt32uAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPInt32uAttributeCallback();
 
     static void maybeDestroy(CHIPInt32uAttributeCallback * callback)
     {
@@ -193,6 +209,8 @@ class CHIPInt64sAttributeCallback : public chip::Callback::Callback<Int64sAttrib
 public:
     CHIPInt64sAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
+    ~CHIPInt64sAttributeCallback();
+
     static void maybeDestroy(CHIPInt64sAttributeCallback * callback)
     {
         if (!callback->keepAlive)
@@ -214,6 +232,8 @@ class CHIPInt64uAttributeCallback : public chip::Callback::Callback<Int64uAttrib
 public:
     CHIPInt64uAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
+    ~CHIPInt64uAttributeCallback();
+
     static void maybeDestroy(CHIPInt64uAttributeCallback * callback)
     {
         if (!callback->keepAlive)
@@ -234,6 +254,8 @@ class CHIPOctetStringAttributeCallback : public chip::Callback::Callback<OctetSt
 {
 public:
     CHIPOctetStringAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPOctetStringAttributeCallback();
 
     static void maybeDestroy(CHIPOctetStringAttributeCallback * callback)
     {
@@ -257,6 +279,8 @@ class CHIPApplicationLauncherApplicationLauncherListAttributeCallback
 public:
     CHIPApplicationLauncherApplicationLauncherListAttributeCallback(jobject javaCallback);
 
+    ~CHIPApplicationLauncherApplicationLauncherListAttributeCallback();
+
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & list);
 
 private:
@@ -268,6 +292,8 @@ class CHIPAudioOutputAudioOutputListAttributeCallback
 {
 public:
     CHIPAudioOutputAudioOutputListAttributeCallback(jobject javaCallback);
+
+    ~CHIPAudioOutputAudioOutputListAttributeCallback();
 
     static void CallbackFn(
         void * context,
@@ -282,6 +308,8 @@ class CHIPBridgedActionsActionListAttributeCallback : public chip::Callback::Cal
 {
 public:
     CHIPBridgedActionsActionListAttributeCallback(jobject javaCallback);
+
+    ~CHIPBridgedActionsActionListAttributeCallback();
 
     static void CallbackFn(
         void * context,
@@ -298,6 +326,8 @@ class CHIPBridgedActionsEndpointListAttributeCallback
 public:
     CHIPBridgedActionsEndpointListAttributeCallback(jobject javaCallback);
 
+    ~CHIPBridgedActionsEndpointListAttributeCallback();
+
     static void CallbackFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
@@ -313,6 +343,8 @@ class CHIPContentLauncherAcceptsHeaderListAttributeCallback
 public:
     CHIPContentLauncherAcceptsHeaderListAttributeCallback(jobject javaCallback);
 
+    ~CHIPContentLauncherAcceptsHeaderListAttributeCallback();
+
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
 
 private:
@@ -324,6 +356,8 @@ class CHIPContentLauncherSupportedStreamingTypesAttributeCallback
 {
 public:
     CHIPContentLauncherSupportedStreamingTypesAttributeCallback(jobject javaCallback);
+
+    ~CHIPContentLauncherSupportedStreamingTypesAttributeCallback();
 
     static void
     CallbackFn(void * context,
@@ -338,6 +372,8 @@ class CHIPDescriptorDeviceListAttributeCallback : public chip::Callback::Callbac
 public:
     CHIPDescriptorDeviceListAttributeCallback(jobject javaCallback);
 
+    ~CHIPDescriptorDeviceListAttributeCallback();
+
     static void CallbackFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list);
@@ -351,6 +387,8 @@ class CHIPDescriptorServerListAttributeCallback : public chip::Callback::Callbac
 public:
     CHIPDescriptorServerListAttributeCallback(jobject javaCallback);
 
+    ~CHIPDescriptorServerListAttributeCallback();
+
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list);
 
 private:
@@ -361,6 +399,8 @@ class CHIPDescriptorClientListAttributeCallback : public chip::Callback::Callbac
 {
 public:
     CHIPDescriptorClientListAttributeCallback(jobject javaCallback);
+
+    ~CHIPDescriptorClientListAttributeCallback();
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list);
 
@@ -373,6 +413,8 @@ class CHIPDescriptorPartsListAttributeCallback : public chip::Callback::Callback
 public:
     CHIPDescriptorPartsListAttributeCallback(jobject javaCallback);
 
+    ~CHIPDescriptorPartsListAttributeCallback();
+
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & list);
 
 private:
@@ -383,6 +425,8 @@ class CHIPFixedLabelLabelListAttributeCallback : public chip::Callback::Callback
 {
 public:
     CHIPFixedLabelLabelListAttributeCallback(jobject javaCallback);
+
+    ~CHIPFixedLabelLabelListAttributeCallback();
 
     static void CallbackFn(
         void * context,
@@ -397,6 +441,8 @@ class CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback
 {
 public:
     CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback(jobject javaCallback);
+
+    ~CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback();
 
     static void
     CallbackFn(void * context,
@@ -413,6 +459,8 @@ class CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback
 public:
     CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback(jobject javaCallback);
 
+    ~CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback();
+
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & list);
@@ -425,6 +473,8 @@ class CHIPGroupKeyManagementGroupsAttributeCallback : public chip::Callback::Cal
 {
 public:
     CHIPGroupKeyManagementGroupsAttributeCallback(jobject javaCallback);
+
+    ~CHIPGroupKeyManagementGroupsAttributeCallback();
 
     static void CallbackFn(
         void * context,
@@ -441,6 +491,8 @@ class CHIPGroupKeyManagementGroupKeysAttributeCallback
 public:
     CHIPGroupKeyManagementGroupKeysAttributeCallback(jobject javaCallback);
 
+    ~CHIPGroupKeyManagementGroupKeysAttributeCallback();
+
     static void CallbackFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
@@ -455,6 +507,8 @@ class CHIPMediaInputMediaInputListAttributeCallback : public chip::Callback::Cal
 public:
     CHIPMediaInputMediaInputListAttributeCallback(jobject javaCallback);
 
+    ~CHIPMediaInputMediaInputListAttributeCallback();
+
     static void CallbackFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list);
@@ -467,6 +521,8 @@ class CHIPModeSelectSupportedModesAttributeCallback : public chip::Callback::Cal
 {
 public:
     CHIPModeSelectSupportedModesAttributeCallback(jobject javaCallback);
+
+    ~CHIPModeSelectSupportedModesAttributeCallback();
 
     static void CallbackFn(
         void * context,
@@ -483,6 +539,8 @@ class CHIPOperationalCredentialsFabricsListAttributeCallback
 public:
     CHIPOperationalCredentialsFabricsListAttributeCallback(jobject javaCallback);
 
+    ~CHIPOperationalCredentialsFabricsListAttributeCallback();
+
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list);
@@ -497,6 +555,8 @@ class CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback
 public:
     CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback(jobject javaCallback);
 
+    ~CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback();
+
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
 
 private:
@@ -509,7 +569,24 @@ class CHIPPowerSourceActiveBatteryFaultsAttributeCallback
 public:
     CHIPPowerSourceActiveBatteryFaultsAttributeCallback(jobject javaCallback);
 
+    ~CHIPPowerSourceActiveBatteryFaultsAttributeCallback();
+
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback
+    : public chip::Callback::Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback>
+{
+public:
+    CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback(jobject javaCallback);
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+            list);
 
 private:
     jobject javaCallbackRef;
@@ -519,6 +596,8 @@ class CHIPTvChannelTvChannelListAttributeCallback : public chip::Callback::Callb
 {
 public:
     CHIPTvChannelTvChannelListAttributeCallback(jobject javaCallback);
+
+    ~CHIPTvChannelTvChannelListAttributeCallback();
 
     static void CallbackFn(
         void * context,
@@ -534,6 +613,8 @@ class CHIPTargetNavigatorTargetNavigatorListAttributeCallback
 public:
     CHIPTargetNavigatorTargetNavigatorListAttributeCallback(jobject javaCallback);
 
+    ~CHIPTargetNavigatorTargetNavigatorListAttributeCallback();
+
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & list);
@@ -547,6 +628,8 @@ class CHIPTestClusterListInt8uAttributeCallback : public chip::Callback::Callbac
 public:
     CHIPTestClusterListInt8uAttributeCallback(jobject javaCallback);
 
+    ~CHIPTestClusterListInt8uAttributeCallback();
+
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
 
 private:
@@ -559,6 +642,8 @@ class CHIPTestClusterListOctetStringAttributeCallback
 public:
     CHIPTestClusterListOctetStringAttributeCallback(jobject javaCallback);
 
+    ~CHIPTestClusterListOctetStringAttributeCallback();
+
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
 
 private:
@@ -570,6 +655,8 @@ class CHIPTestClusterListStructOctetStringAttributeCallback
 {
 public:
     CHIPTestClusterListStructOctetStringAttributeCallback(jobject javaCallback);
+
+    ~CHIPTestClusterListStructOctetStringAttributeCallback();
 
     static void CallbackFn(
         void * context,
@@ -586,6 +673,8 @@ class CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback
 public:
     CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback(jobject javaCallback);
 
+    ~CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback();
+
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list);
@@ -599,6 +688,8 @@ class CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback
 {
 public:
     CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback(jobject javaCallback);
+
+    ~CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback();
 
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
@@ -614,6 +705,8 @@ class CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback
 public:
     CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback(jobject javaCallback);
 
+    ~CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback();
+
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & list);
@@ -627,6 +720,8 @@ class CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback
 {
 public:
     CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback(jobject javaCallback);
+
+    ~CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback();
 
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
@@ -642,6 +737,8 @@ class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback
 public:
     CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback(jobject javaCallback);
 
+    ~CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback();
+
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::DecodableList<
@@ -656,6 +753,8 @@ class CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback
 {
 public:
     CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback(jobject javaCallback);
+
+    ~CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback();
 
     static void
     CallbackFn(void * context,

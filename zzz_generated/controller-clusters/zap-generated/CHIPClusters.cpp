@@ -10455,6 +10455,17 @@ exit:
 }
 
 // SoftwareDiagnostics Cluster Attributes
+CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeThreadMetrics(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000000;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             SoftwareDiagnosticsClusterThreadMetricsListAttributeFilter);
+}
+
 CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeCurrentHeapFree(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback)
 {

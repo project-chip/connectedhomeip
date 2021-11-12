@@ -50,7 +50,10 @@ public:
     ~JniByteArray() { mEnv->ReleaseByteArrayElements(mArray, mData, 0); }
 
     const jbyte * data() const { return mData; }
-    chip::ByteSpan byteSpan() const { return chip::ByteSpan(reinterpret_cast<const uint8_t *>(data()), size()); }
+    chip::ByteSpan byteSpan() const
+    {
+        return chip::ByteSpan(reinterpret_cast<const uint8_t *>(data()), static_cast<size_t>(size()));
+    }
     jsize size() const { return mDataLength; }
 
 private:
