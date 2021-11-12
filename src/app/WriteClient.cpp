@@ -252,15 +252,18 @@ CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::T
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
 
-    if (!session.IsGroupSession())
-    {
-        MoveToState(State::AwaitingResponse);
-    }
+    MoveToState(State::AwaitingResponse);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ClearExistingExchangeContext();
+    }
+
+    if (session.IsGroupSession())
+    {
+        // Always shutdown on Group communication
+        Shutdown();
     }
 
     return err;
@@ -358,7 +361,7 @@ CHIP_ERROR WriteClientHandle::SendWriteRequest(SessionHandle session, System::Cl
 
     // Transferring ownership of the underlying WriteClient to the IM layer. IM will manage its lifetime.
     // For groupcast writes, there is no transfer of ownership since the interaction is done upon transmission of the action
-    if (err == CHIP_NO_ERROR && !session.IsGroupSession())
+    if (err == CHIP_NO_ERROR)
     {
         // Release the WriteClient without closing it.
         mpWriteClient = nullptr;
