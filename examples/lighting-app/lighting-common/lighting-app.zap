@@ -4192,7 +4192,7 @@
               "code": 64,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 0
             },
             {
@@ -4200,7 +4200,7 @@
               "code": 65,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 0
             },
             {
@@ -4208,7 +4208,7 @@
               "code": 66,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 0
             }
           ],
@@ -5828,6 +5828,30 @@
             {
               "name": "Toggle",
               "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "OffWithEffect",
+              "code": 64,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "OnWithRecallGlobalScene",
+              "code": 65,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "OnWithTimedOff",
+              "code": 66,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
