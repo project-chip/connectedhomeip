@@ -137,6 +137,7 @@ function getTests()
   const Thermostat = [
     'Test_TC_TSTAT_1_1',
     'Test_TC_TSTAT_2_1',
+    'Test_TC_TSTAT_2_2',
   ];
 
   const ThermostatUserConfiguration = [
@@ -153,6 +154,8 @@ function getTests()
     'Test_TC_WNCV_1_1',
     'Test_TC_WNCV_2_1',
     'Test_TC_WNCV_2_2',
+    'Test_TC_WNCV_2_3',
+    'Test_TC_WNCV_2_4',
     'Test_TC_WNCV_2_5',
     'Test_TC_WNCV_3_1',
     'Test_TC_WNCV_3_2',
@@ -172,6 +175,7 @@ function getTests()
 
   const SoftwareDiagnostics = [
     'Test_TC_DIAGSW_1_1',
+    'Test_TC_DIAGSW_2_1',
     'Test_TC_DIAGSW_3_2',
   ];
 
