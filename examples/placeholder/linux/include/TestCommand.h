@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 
@@ -44,6 +46,27 @@ public:
         ChipLogProgress(chipTool, "%s", message);
         NextTest();
         return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR WaitForCommissioning()
+    {
+        isRunning = false;
+        return chip::DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this));
+    }
+
+    static void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+    {
+        switch (event->Type)
+        {
+        case chip::DeviceLayer::DeviceEventType::kCommissioningComplete:
+            ChipLogProgress(chipTool, "Commissioning complete");
+            chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, arg);
+
+            TestCommand * command = reinterpret_cast<TestCommand *>(arg);
+            command->isRunning    = true;
+            command->NextTest();
+            break;
+        }
     }
 
     void CheckCommandPath(const chip::app::ConcreteCommandPath & commandPath)
@@ -75,6 +98,8 @@ public:
         mCommandPath   = chip::app::ConcreteCommandPath(0, 0, 0);
         mAttributePath = chip::app::ConcreteAttributePath(0, 0, 0);
     }
+
+    std::atomic_bool isRunning{ true };
 
 protected:
     chip::app::ConcreteCommandPath mCommandPath;
