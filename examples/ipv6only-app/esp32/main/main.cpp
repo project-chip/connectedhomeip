@@ -109,7 +109,8 @@ void UdpReceiver(void * pvParameters)
             if (select_err < 0)
                 continue;
 
-            n = recvfrom(sockfd, buf, kUdpBufferSize, 0, reinterpret_cast<struct sockaddr *>(&clientaddr), &clientlen);
+            n = recvfrom(sockfd, buf, kUdpBufferSize, 0, reinterpret_cast<struct sockaddr *>(&clientaddr),
+                         reinterpret_cast<socklen_t*>(&clientlen));
             if (n < 0)
                 continue;
             // Echo back

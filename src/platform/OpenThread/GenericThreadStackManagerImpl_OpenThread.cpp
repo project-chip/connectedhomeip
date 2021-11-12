@@ -827,7 +827,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 
     case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id: {
         otDeviceRole role = otThreadGetDeviceRole(mOTInst);
-        err               = encoder.Encode(role);
+        err               = encoder.Encode(static_cast<uint8_t>(role));
     }
     break;
 
