@@ -149,10 +149,13 @@ function setDefaultPICS(test)
     return;
   }
 
-  if (!PICS.has(test[kPICSName])) {
-    const errorStr = 'PICS database does not contains any defined value for: ' + test[kPICSName];
-    throwError(test, errorStr);
-  }
+  const items = test[kPICSName].split(/[&|() !]+/g).filter(item => item.length);
+  items.forEach(key => {
+    if (!PICS.has(key)) {
+      const errorStr = 'PICS database does not contains any defined value for: ' + key;
+      throwError(test, errorStr);
+    }
+  })
 }
 
 function setDefaultArguments(test)
@@ -308,9 +311,6 @@ function parse(filename)
 
   // Filter disabled tests
   yaml.tests = yaml.tests.filter(test => !test.disabled);
-
-  // Filter tests based on PICS
-  yaml.tests = yaml.tests.filter(test => test[kPICSName] == '' || PICS.get(test[kPICSName]).value == true);
 
   yaml.tests.forEach((test, index) => {
     setDefault(test, kIndexName, index);
