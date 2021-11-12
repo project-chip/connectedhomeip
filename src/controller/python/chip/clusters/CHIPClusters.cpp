@@ -1078,6 +1078,58 @@ static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context
 chip::Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback> gPowerSourceActiveBatteryFaultsListAttributeCallback{
     OnPowerSourceActiveBatteryFaultsListAttributeResponse, nullptr
 };
+static void OnSoftwareDiagnosticsThreadMetricsListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+        list)
+{
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  [");
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+        ChipLogProgress(Zcl, "    {");
+        ChipLogProgress(Zcl, "      Id: %" PRIu64 ",", entry.id);
+        ChipLogProgress(Zcl, "      Name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
+        ChipLogProgress(Zcl, "      StackFreeCurrent: %" PRIu32 ",", entry.stackFreeCurrent);
+        ChipLogProgress(Zcl, "      StackFreeMinimum: %" PRIu32 ",", entry.stackFreeMinimum);
+        ChipLogProgress(Zcl, "      StackSize: %" PRIu32 ",", entry.stackSize);
+        ChipLogProgress(Zcl, "    },");
+#endif // CHIP_PROGRESS_LOGGING
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  ]");
+
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback>
+    gSoftwareDiagnosticsThreadMetricsListAttributeCallback{ OnSoftwareDiagnosticsThreadMetricsListAttributeResponse, nullptr };
 static void OnTvChannelTvChannelListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list)
@@ -6921,6 +6973,19 @@ chip::ChipError::StorageType chip_ime_AppendCommand_SoftwareDiagnostics_ResetWat
     chip::Controller::SoftwareDiagnosticsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ResetWatermarks(nullptr, nullptr).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_SoftwareDiagnostics_ThreadMetrics(chip::DeviceProxy * device,
+                                                                                      chip::EndpointId ZCLendpointId,
+                                                                                      chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::SoftwareDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .ReadAttributeThreadMetrics(gSoftwareDiagnosticsThreadMetricsListAttributeCallback.Cancel(),
+                                    gDefaultFailureCallback.Cancel())
+        .AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapFree(chip::DeviceProxy * device,

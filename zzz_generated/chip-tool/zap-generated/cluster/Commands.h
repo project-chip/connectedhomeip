@@ -2415,6 +2415,17 @@ static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context
     command->SetCommandExitStatus(err);
 }
 
+static void OnSoftwareDiagnosticsThreadMetricsListAttributeResponse(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+        list)
+{
+    CHIP_ERROR err = LogValue("OnSoftwareDiagnosticsThreadMetricsListAttributeResponse", 0, list);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+}
+
 static void OnTvChannelTvChannelListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list)
@@ -20573,6 +20584,7 @@ private:
 | * ResetWatermarks                                                   |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * ThreadMetrics                                                     | 0x0000 |
 | * CurrentHeapFree                                                   | 0x0001 |
 | * CurrentHeapUsed                                                   | 0x0002 |
 | * CurrentHeapHighWatermark                                          | 0x0003 |
@@ -20596,6 +20608,41 @@ public:
 
 private:
     chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type mRequest;
+};
+
+/*
+ * Attribute ThreadMetrics
+ */
+class ReadSoftwareDiagnosticsThreadMetrics : public ModelCommand
+{
+public:
+    ReadSoftwareDiagnosticsThreadMetrics() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "thread-metrics");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadSoftwareDiagnosticsThreadMetrics()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0034) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SoftwareDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeThreadMetrics(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback>(
+            OnSoftwareDiagnosticsThreadMetricsListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -30085,6 +30132,7 @@ void registerClusterSoftwareDiagnostics(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<SoftwareDiagnosticsResetWatermarks>(),              //
+        make_unique<ReadSoftwareDiagnosticsThreadMetrics>(),            //
         make_unique<ReadSoftwareDiagnosticsCurrentHeapFree>(),          //
         make_unique<ReadSoftwareDiagnosticsCurrentHeapUsed>(),          //
         make_unique<ReadSoftwareDiagnosticsCurrentHeapHighWatermark>(), //
