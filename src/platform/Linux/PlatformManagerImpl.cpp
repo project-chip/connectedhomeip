@@ -402,6 +402,38 @@ CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
     return err;
 }
 
+CHIP_ERROR PlatformManagerImpl::_GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
+{
+    // On Linux Simulation, set following hardware faults statically.
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
+{
+    // On Linux Simulation, set following radio faults statically.
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
+{
+    // On Linux Simulation, set following radio faults statically.
+    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
+    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
+
+    return CHIP_NO_ERROR;
+}
+
 void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
 {
     PlatformManagerDelegate * delegate = PlatformMgr().GetDelegate();
