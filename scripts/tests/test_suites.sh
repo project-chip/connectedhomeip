@@ -131,10 +131,15 @@ if [[ $use_netns != 0 ]]; then
     echo "Using network namespaces"
 
     if [[ `id -u` -ne 0 ]]; then
-        echo 'Running as non-root user, restarting in unshare environment'
-        echo 'Executing: ' $0 -r $INPUT_ARGS
+        echo 'Executing in a new namespace: ' $0 -r $INPUT_ARGS
         unshare --map-root-user -n -m $0 -r $INPUT_ARGS
         exit 0
+    else
+        if [[ $root_remount -eq 0 ]]; then
+          # Running as root may be fine in docker/vm however this is not advised
+          # on workstations as changes are global and harder to undo
+          echo 'Running as root: this changes global network namespaces, not ideal'
+        fi
     fi
 
     netns_setup
