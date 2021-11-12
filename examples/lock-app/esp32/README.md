@@ -57,6 +57,10 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
         $ source ./scripts/activate.sh
 
+-   Target Set
+
+    $ idf.py set-target esp32(or esp32c3)
+
 -   Configuration Options
 
     This application uses `ESP32-DevKitC` as a default device type. To use other
