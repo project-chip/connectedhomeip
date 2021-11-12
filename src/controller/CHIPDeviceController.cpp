@@ -149,16 +149,20 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     ReturnErrorOnFailure(ProcessControllerNOCChain(params));
 
-    CASESessionManagerInitParams sessionParams = {
-        .sessionInitParams.sessionManager = params.systemState->SessionMgr(),
-        .sessionInitParams.exchangeMgr    = params.systemState->ExchangeMgr(),
-        .sessionInitParams.idAllocator    = &mIDAllocator,
-        .sessionInitParams.fabricInfo     = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex),
-        .sessionInitParams.imDelegate     = params.systemState->IMDelegate(),
-        .dnsCache                         = &mDNSCache,
+    DeviceProxyInitParams deviceInitParams = {
+        .sessionManager = params.systemState->SessionMgr(),
+        .exchangeMgr    = params.systemState->ExchangeMgr(),
+        .idAllocator    = &mIDAllocator,
+        .fabricInfo     = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex),
+        .imDelegate     = params.systemState->IMDelegate(),
     };
 
-    mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionParams);
+    CASESessionManagerInitParams sessionManagerParams = {
+        .sessionInitParams = deviceInitParams,
+        .dnsCache          = &mDNSCache,
+    };
+
+    mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerParams);
     VerifyOrReturnError(mCASESessionManager != nullptr, CHIP_ERROR_NO_MEMORY);
 
     mSystemState = params.systemState->Retain();
