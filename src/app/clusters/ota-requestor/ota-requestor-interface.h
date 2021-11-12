@@ -21,6 +21,9 @@
  * this interface.
  */
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandHandler.h>
+
 #pragma once
 
 // Interface class to connect the OTA Software Update Requestor cluster command processing
@@ -30,11 +33,9 @@ class OTARequestorInterface
 public:
     // Handler for the AnnounceOTAProvider command
     virtual bool HandleAnnounceOTAProvider(
-        ip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData ch) = 0;
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) = 0;
 
     // Handler for the QueryImageResponse command
-    virtual bool HandleQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, CharSpan imageURI,
-                                          uint32_t softwareVersion, CharSpan softwareVersionString, ByteSpan updateToken,
-                                          bool userConsentNeeded, ByteSpan metadataForRequester) = 0;
+    virtual bool HandleQueryImageResponse(QueryImageResponse::DecodableType) = 0;
 };

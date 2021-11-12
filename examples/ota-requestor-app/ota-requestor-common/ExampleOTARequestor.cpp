@@ -16,6 +16,10 @@
  *    limitations under the License.
  */
 
+#if 0 // LISS
+
+
+
 #include <ExampleOTARequestor.h>
 
 #include <app/util/util.h>
@@ -116,3 +120,5 @@ void ExampleOTARequestor::StartDelayTimerHandler(chip::System::Layer * systemLay
     VerifyOrReturn(appState != nullptr);
     static_cast<ExampleOTARequestor *>(appState)->ConnectToProvider();
 }
+
+#endif // LISS
