@@ -27,7 +27,7 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-const char * TAG                            = "OTAUpdate";
+const char * TAG                           = "OTAUpdate";
 bool otaUpdateInProgress                   = false;
 const esp_partition_t * otaUpdatePartition = nullptr;
 esp_ota_handle_t otaUpdateHandle;
