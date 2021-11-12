@@ -5,16 +5,16 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * CommandInfo has a functional interface to invoke arbitrary commands based on cluster, callback
+ * InteractionInfo has a functional interface to invoke arbitrary commands based on cluster, callback
  * and a map of arguments, a Supplier that provides {@link DelegatedClusterCallback}, and maps the
  * parameter and commandParametersInfo.
  */
-public class CommandInfo {
+public class InteractionInfo {
   public ClusterCommandFunction commandFunction;
   private Supplier<DelegatedClusterCallback> commandCallbackSupplier;
   private Map<String, CommandParameterInfo> commandParameters;
 
-  public CommandInfo(
+  public InteractionInfo(
       ClusterCommandFunction commandFunction,
       Supplier<DelegatedClusterCallback> commandCallbackSupplier,
       Map<String, CommandParameterInfo> commandParameters) {
