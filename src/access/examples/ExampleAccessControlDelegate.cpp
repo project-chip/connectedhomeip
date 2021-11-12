@@ -935,7 +935,7 @@ CHIP_ERROR CopyViaInterface(const Entry & entry, EntryStorage & storage)
     }
 
     temp.mInUse = true;
-    storage = temp;
+    storage     = temp;
     return CHIP_NO_ERROR;
 #else
     // NOTE: save space by not implementing function

@@ -26,18 +26,17 @@ using namespace chip::Access;
 AccessControl defaultAccessControl;
 AccessControl * globalAccessControl = &defaultAccessControl;
 
-static_assert(
-    ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kManage)) == 0) &&
-    ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kOperate)) == 0) &&
-    ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kView)) == 0) &&
-    ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kProxyView)) == 0) &&
-    ((unsigned(Privilege::kManage) & unsigned(Privilege::kOperate)) == 0) &&
-    ((unsigned(Privilege::kManage) & unsigned(Privilege::kView)) == 0) &&
-    ((unsigned(Privilege::kManage) & unsigned(Privilege::kProxyView)) == 0) &&
-    ((unsigned(Privilege::kOperate) & unsigned(Privilege::kView)) == 0) &&
-    ((unsigned(Privilege::kOperate) & unsigned(Privilege::kProxyView)) == 0) &&
-    ((unsigned(Privilege::kView) & unsigned(Privilege::kProxyView)) == 0),
-    "Privilege bits must be unique");
+static_assert(((unsigned(Privilege::kAdminister) & unsigned(Privilege::kManage)) == 0) &&
+                  ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kOperate)) == 0) &&
+                  ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kView)) == 0) &&
+                  ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kProxyView)) == 0) &&
+                  ((unsigned(Privilege::kManage) & unsigned(Privilege::kOperate)) == 0) &&
+                  ((unsigned(Privilege::kManage) & unsigned(Privilege::kView)) == 0) &&
+                  ((unsigned(Privilege::kManage) & unsigned(Privilege::kProxyView)) == 0) &&
+                  ((unsigned(Privilege::kOperate) & unsigned(Privilege::kView)) == 0) &&
+                  ((unsigned(Privilege::kOperate) & unsigned(Privilege::kProxyView)) == 0) &&
+                  ((unsigned(Privilege::kView) & unsigned(Privilege::kProxyView)) == 0),
+              "Privilege bits must be unique");
 
 bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Privilege entryPrivilege)
 {
