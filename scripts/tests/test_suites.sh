@@ -30,7 +30,8 @@ declare -i delay=0
 declare -i node_id=0x12344321
 declare -i background_pid=0
 declare -i use_netns=0
-declare -i pre_clean_netns=0
+declare -i root_remount=0
+declare -i clean_netns=0
 declare test_case_wrapper=()
 
 usage() {
@@ -44,6 +45,7 @@ usage() {
     echo "  -w COMMAND: prefix all instantiations with a command (e.g. valgrind) (default: '')"
     echo "  -n Use linux netns to isolate app and tool executables"
     echo "  -c execute a netns cleanup and exit"
+    echo "  -r Execute a remount (INTERNAL USE for netns)"
     echo ""
     exit 0
 }
@@ -52,17 +54,6 @@ declare app_run_prefix=""
 declare tool_run_prefix=""
 
 netns_setup() {
-    if [[ `id -u` -ne 0 ]]; then
-        echo 'Running as non-root user, restarting in unshare environment'
-        echo 'Executing: ' $0 $INPUT_ARGS
-        unshare --map-root-user -n -m $0 $INPUT_ARGS
-        exit 0
-    fi
-
-    echo 'Creating a separate mount'
-    mount --make-private /
-    mount -t tmpfs tmpfs /run
-
     # 2 virtual hosts: for app and for the tool
     ip netns add app
     ip netns add tool
@@ -110,7 +101,7 @@ netns_cleanup() {
     ip link del eth-app-switch || true
 }
 
-while getopts a:d:i:hs:w:nc flag; do
+while getopts a:d:i:hs:w:ncr flag; do
     case "$flag" in
     a) application=$OPTARG ;;
     d) delay=$OPTARG ;;
@@ -119,18 +110,33 @@ while getopts a:d:i:hs:w:nc flag; do
     s) single_case=$OPTARG ;;
     w) test_case_wrapper=("$OPTARG") ;;
     n) use_netns=1 ;;
-    c) pre_clean_netns=1 ;;
+    c) clean_netns=1 ;;
+    r) root_remount=1 ;;
     esac
 done
 
-if [[ $pre_clean_netns != 0 ]]; then
+if [[ $clean_netns != 0 ]]; then
     echo "Cleaning network namespaces"
     netns_cleanup
     exit 0
 fi
 
+if [[ $root_remount != 0 ]]; then
+    echo 'Creating a separate mount'
+    mount --make-private /
+    mount -t tmpfs tmpfs /run
+fi
+
 if [[ $use_netns != 0 ]]; then
     echo "Using network namespaces"
+
+    if [[ `id -u` -ne 0 ]]; then
+        echo 'Running as non-root user, restarting in unshare environment'
+        echo 'Executing: ' $0 -r $INPUT_ARGS
+        unshare --map-root-user -n -m $0 -r $INPUT_ARGS
+        exit 0
+    fi
+
     netns_setup
 
     app_run_prefix="ip netns exec app"
