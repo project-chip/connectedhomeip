@@ -5368,6 +5368,14 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)readAttributeThreadMetricsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReadAttributeThreadMetrics(success, failure);
+        });
+}
+
 - (void)readAttributeCurrentHeapFreeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {

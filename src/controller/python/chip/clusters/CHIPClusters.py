@@ -3121,6 +3121,11 @@ class ChipClusters:
             },
         },
         "attributes": {
+            0x00000000: {
+                "attributeName": "ThreadMetrics",
+                "attributeId": 0x00000000,
+                "type": "",
+            },
             0x00000001: {
                 "attributeName": "CurrentHeapFree",
                 "attributeId": 0x00000001,
@@ -6482,6 +6487,9 @@ class ChipClusters:
     def ClusterScenes_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Scenes_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterSoftwareDiagnostics_ReadAttributeThreadMetrics(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_ThreadMetrics(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterSoftwareDiagnostics_ReadAttributeCurrentHeapFree(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapFree(device, ZCLendpoint, ZCLgroupid)
 
@@ -9178,6 +9186,10 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_SoftwareDiagnostics_ResetWatermarks.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_SoftwareDiagnostics_ResetWatermarks.restype = ctypes.c_uint32
+        # Cluster SoftwareDiagnostics ReadAttribute ThreadMetrics
+        self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_ThreadMetrics.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_ThreadMetrics.restype = ctypes.c_uint32
         # Cluster SoftwareDiagnostics ReadAttribute CurrentHeapFree
         self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapFree.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
