@@ -186,8 +186,7 @@ private:
     {
         const auto id     = cluster & kClusterIdMask;
         const auto vendor = cluster & kClusterVendorMask;
-        return ((id <= kClusterIdMaxStd) || (kClusterIdMinMs <= id && id <= kClusterIdMaxMs)) &&
-            (vendor <= kClusterVendorMax);
+        return ((id <= kClusterIdMaxStd) || (kClusterIdMinMs <= id && id <= kClusterIdMaxMs)) && (vendor <= kClusterVendorMax);
     }
 
     // TODO: eventually this functionality should live where the type itself is defined
