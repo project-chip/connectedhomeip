@@ -859,3 +859,448 @@ tests:
                 value: 20003
               - name: "arg2"
                 value: 101
+    # Tests for Struct
+
+    - label: "Send Test Command With Struct Argument and arg1.b is true"
+      command: "testStructArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: true,
+                        c: 2,
+                        d: "octet_string",
+                        e: "char_string",
+                        f: 1,
+                    }
+      response:
+          values:
+              - name: "value"
+                value: true
+
+    - label: "Send Test Command With Struct Argument and arg1.b is false"
+      command: "testStructArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: false,
+                        c: 2,
+                        d: "octet_string",
+                        e: "char_string",
+                        f: 1,
+                    }
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    - label:
+          "Send Test Command With Nested Struct Argument and arg1.c.b is true"
+      disabled: true
+      command: "testNestedStructArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: true,
+                        c:
+                            {
+                                a: 0,
+                                b: true,
+                                c: 2,
+                                d: "octet_string",
+                                e: "char_string",
+                                f: 1,
+                            },
+                    }
+      response:
+          values:
+              - name: "value"
+                value: true
+
+    - label: "Send Test Command With Nested Struct Argument arg1.c.b is false"
+      disabled: true
+      command: "testNestedStructArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: true,
+                        c:
+                            {
+                                a: 0,
+                                b: false,
+                                c: 2,
+                                d: "octet_string",
+                                e: "char_string",
+                                f: 1,
+                            },
+                    }
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    - label:
+          "Send Test Command With Nested Struct List Argument and all fields b
+          of arg1.d are true"
+      disabled: true
+      command: "testNestedStructListArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: true,
+                        c:
+                            {
+                                a: 0,
+                                b: true,
+                                c: 2,
+                                d: "octet_string",
+                                e: "char_string",
+                                f: 1,
+                            },
+                        d:
+                            [
+                                {
+                                    a: 1,
+                                    b: true,
+                                    c: 3,
+                                    d: "nested_octet_string",
+                                    e: "nested_char_string",
+                                    f: 1,
+                                },
+                                {
+                                    a: 2,
+                                    b: true,
+                                    c: 3,
+                                    d: "nested_octet_string",
+                                    e: "nested_char_string",
+                                    f: 1,
+                                },
+                            ],
+                        e: [1, 2, 3],
+                        f:
+                            [
+                                "octet_string_1",
+                                "octect_string_2",
+                                "octet_string_3",
+                            ],
+                        g: [0, 255],
+                    }
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    - label:
+          "Send Test Command With Nested Struct List Argument and some fields b
+          of arg1.d are false"
+      disabled: true
+      command: "testNestedStructListArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: true,
+                        c:
+                            {
+                                a: 0,
+                                b: true,
+                                c: 2,
+                                d: "octet_string",
+                                e: "char_string",
+                                f: 1,
+                            },
+                        d:
+                            [
+                                {
+                                    a: 1,
+                                    b: true,
+                                    c: 3,
+                                    d: "nested_octet_string",
+                                    e: "nested_char_string",
+                                    f: 1,
+                                },
+                                {
+                                    a: 2,
+                                    b: false,
+                                    c: 3,
+                                    d: "nested_octet_string",
+                                    e: "nested_char_string",
+                                    f: 1,
+                                },
+                            ],
+                        e: [1, 2, 3],
+                        f:
+                            [
+                                "octet_string_1",
+                                "octect_string_2",
+                                "octet_string_3",
+                            ],
+                        g: [0, 255],
+                    }
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    # Tests for List
+
+    - label: "Send Test Command With List of INT8U and none of them is set to 0"
+      command: "testListInt8UArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      response:
+          values:
+              - name: "value"
+                value: true
+
+    - label: "Send Test Command With List of INT8U and one of them is set to 0"
+      command: "testListInt8UArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    - label: "Send Test Command With List of INT8U and get it reversed"
+      command: "testListInt8UReverseRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      response:
+          values:
+              - name: "arg1"
+                value: [9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+    - label:
+          "Send Test Command With empty List of INT8U and get an empty list back"
+      command: "testListInt8UReverseRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: []
+      response:
+          values:
+              - name: "arg1"
+                value: []
+
+    - label:
+          "Send Test Command With List of Struct Argument and arg1.b of first
+          item is true"
+      command: "testListStructArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    [
+                        {
+                            a: 0,
+                            b: true,
+                            c: 2,
+                            d: "first_octet_string",
+                            e: "first_char_string",
+                            f: 1,
+                        },
+                        {
+                            a: 1,
+                            b: true,
+                            c: 3,
+                            d: "second_octet_string",
+                            e: "second_char_string",
+                            f: 1,
+                        },
+                    ]
+      response:
+          values:
+              - name: "value"
+                value: true
+
+    - label:
+          "Send Test Command With List of Struct Argument and arg1.b of first
+          item is false"
+      command: "testListStructArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    [
+                        {
+                            a: 1,
+                            b: true,
+                            c: 3,
+                            d: "second_octet_string",
+                            e: "second_char_string",
+                            f: 1,
+                        },
+                        {
+                            a: 0,
+                            b: false,
+                            c: 2,
+                            d: "first_octet_string",
+                            e: "first_char_string",
+                            f: 1,
+                        },
+                    ]
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    - label:
+          "Send Test Command With List of Nested Struct List Argument and all
+          fields b of elements of arg1.d are true"
+      disabled: true
+      command: "testListNestedStructListArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    [
+                        {
+                            a: 0,
+                            b: true,
+                            c:
+                                {
+                                    a: 0,
+                                    b: true,
+                                    c: 2,
+                                    d: "octet_string",
+                                    e: "char_string",
+                                    f: 1,
+                                },
+                            d:
+                                [
+                                    {
+                                        a: 1,
+                                        b: true,
+                                        c: 3,
+                                        d: "nested_octet_string",
+                                        e: "nested_char_string",
+                                        f: 1,
+                                    },
+                                    {
+                                        a: 2,
+                                        b: true,
+                                        c: 3,
+                                        d: "nested_octet_string",
+                                        e: "nested_char_string",
+                                        f: 1,
+                                    },
+                                ],
+                            e: [1, 2, 3],
+                            f:
+                                [
+                                    "octet_string_1",
+                                    "octect_string_2",
+                                    "octet_string_3",
+                                ],
+                            g: [0, 255],
+                        },
+                    ]
+      response:
+          values:
+              - name: "value"
+                value: true
+
+    - label:
+          "Send Test Command With Nested Struct List Argument and some fields b
+          of elements of arg1.d are false"
+      disabled: true
+      command: "testListNestedStructListArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    [
+                        {
+                            a: 0,
+                            b: true,
+                            c:
+                                {
+                                    a: 0,
+                                    b: true,
+                                    c: 2,
+                                    d: "octet_string",
+                                    e: "char_string",
+                                    f: 1,
+                                },
+                            d:
+                                [
+                                    {
+                                        a: 1,
+                                        b: true,
+                                        c: 3,
+                                        d: "nested_octet_string",
+                                        e: "nested_char_string",
+                                        f: 1,
+                                    },
+                                    {
+                                        a: 2,
+                                        b: false,
+                                        c: 3,
+                                        d: "nested_octet_string",
+                                        e: "nested_char_string",
+                                        f: 1,
+                                    },
+                                ],
+                            e: [1, 2, 3],
+                            f:
+                                [
+                                    "octet_string_1",
+                                    "octect_string_2",
+                                    "octet_string_3",
+                                ],
+                            g: [0, 255],
+                        },
+                    ]
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    # Tests for Nullables and Optionals
+
+    - label: "Send Test Command with optional arg set."
+      command: "testNullableOptionalRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 5
+      response:
+          values:
+              - name: "wasPresent"
+                value: true
+              - name: "wasNull"
+                value: false
+              - name: "value"
+                value: 5
+              - name: "originalValue"
+                value: 5
+
+    - label: "Send Test Command without its optional arg."
+      command: "testNullableOptionalRequest"
+      response:
+          values:
+              - name: "wasPresent"
+                value: false

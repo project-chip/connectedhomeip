@@ -18818,6 +18818,408 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTestCluster_000126_TestStructArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With Struct Argument and arg1.b is true"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPTestClusterClusterTestStructArgumentRequestPayload * payload =
+        [[CHIPTestClusterClusterTestStructArgumentRequestPayload alloc] init];
+    payload.Arg1 = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).A = [NSNumber numberWithUnsignedChar:0];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).B = [NSNumber numberWithBool:true];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).C = [NSNumber numberWithUnsignedChar:2];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).D = [[NSData alloc] initWithBytes:"octet_string" length:12];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).E = @"char_string";
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).F = [NSNumber numberWithUnsignedChar:1];
+
+    [cluster testStructArgumentRequest:payload
+                       responseHandler:^(NSError * err, NSDictionary * values) {
+                           NSLog(@"Send Test Command With Struct Argument and arg1.b is true Error: %@", err);
+
+                           XCTAssertEqual(err.code, 0);
+
+                           {
+                               id actualValue = values[@"Value"];
+                               XCTAssertEqual([actualValue boolValue], true);
+                           }
+
+                           [expectation fulfill];
+                       }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000127_TestStructArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With Struct Argument and arg1.b is false"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPTestClusterClusterTestStructArgumentRequestPayload * payload =
+        [[CHIPTestClusterClusterTestStructArgumentRequestPayload alloc] init];
+    payload.Arg1 = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).A = [NSNumber numberWithUnsignedChar:0];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).B = [NSNumber numberWithBool:false];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).C = [NSNumber numberWithUnsignedChar:2];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).D = [[NSData alloc] initWithBytes:"octet_string" length:12];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).E = @"char_string";
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).F = [NSNumber numberWithUnsignedChar:1];
+
+    [cluster testStructArgumentRequest:payload
+                       responseHandler:^(NSError * err, NSDictionary * values) {
+                           NSLog(@"Send Test Command With Struct Argument and arg1.b is false Error: %@", err);
+
+                           XCTAssertEqual(err.code, 0);
+
+                           {
+                               id actualValue = values[@"Value"];
+                               XCTAssertEqual([actualValue boolValue], false);
+                           }
+
+                           [expectation fulfill];
+                       }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000128_TestListInt8UArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With List of INT8U and none of them is set to 0"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPTestClusterClusterTestListInt8UArgumentRequestPayload * payload =
+        [[CHIPTestClusterClusterTestListInt8UArgumentRequestPayload alloc] init];
+    {
+        NSMutableArray * temp = [[NSMutableArray alloc] init];
+        temp[0] = [NSNumber numberWithUnsignedChar:1];
+        temp[1] = [NSNumber numberWithUnsignedChar:2];
+        temp[2] = [NSNumber numberWithUnsignedChar:3];
+        temp[3] = [NSNumber numberWithUnsignedChar:4];
+        temp[4] = [NSNumber numberWithUnsignedChar:5];
+        temp[5] = [NSNumber numberWithUnsignedChar:6];
+        temp[6] = [NSNumber numberWithUnsignedChar:7];
+        temp[7] = [NSNumber numberWithUnsignedChar:8];
+        temp[8] = [NSNumber numberWithUnsignedChar:9];
+        payload.Arg1 = temp;
+    }
+    [cluster testListInt8UArgumentRequest:payload
+                          responseHandler:^(NSError * err, NSDictionary * values) {
+                              NSLog(@"Send Test Command With List of INT8U and none of them is set to 0 Error: %@", err);
+
+                              XCTAssertEqual(err.code, 0);
+
+                              {
+                                  id actualValue = values[@"Value"];
+                                  XCTAssertEqual([actualValue boolValue], true);
+                              }
+
+                              [expectation fulfill];
+                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000129_TestListInt8UArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With List of INT8U and one of them is set to 0"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPTestClusterClusterTestListInt8UArgumentRequestPayload * payload =
+        [[CHIPTestClusterClusterTestListInt8UArgumentRequestPayload alloc] init];
+    {
+        NSMutableArray * temp = [[NSMutableArray alloc] init];
+        temp[0] = [NSNumber numberWithUnsignedChar:1];
+        temp[1] = [NSNumber numberWithUnsignedChar:2];
+        temp[2] = [NSNumber numberWithUnsignedChar:3];
+        temp[3] = [NSNumber numberWithUnsignedChar:4];
+        temp[4] = [NSNumber numberWithUnsignedChar:5];
+        temp[5] = [NSNumber numberWithUnsignedChar:6];
+        temp[6] = [NSNumber numberWithUnsignedChar:7];
+        temp[7] = [NSNumber numberWithUnsignedChar:8];
+        temp[8] = [NSNumber numberWithUnsignedChar:9];
+        temp[9] = [NSNumber numberWithUnsignedChar:0];
+        payload.Arg1 = temp;
+    }
+    [cluster testListInt8UArgumentRequest:payload
+                          responseHandler:^(NSError * err, NSDictionary * values) {
+                              NSLog(@"Send Test Command With List of INT8U and one of them is set to 0 Error: %@", err);
+
+                              XCTAssertEqual(err.code, 0);
+
+                              {
+                                  id actualValue = values[@"Value"];
+                                  XCTAssertEqual([actualValue boolValue], false);
+                              }
+
+                              [expectation fulfill];
+                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000130_TestListInt8UReverseRequest
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command With List of INT8U and get it reversed"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPTestClusterClusterTestListInt8UReverseRequestPayload * payload =
+        [[CHIPTestClusterClusterTestListInt8UReverseRequestPayload alloc] init];
+    {
+        NSMutableArray * temp = [[NSMutableArray alloc] init];
+        temp[0] = [NSNumber numberWithUnsignedChar:1];
+        temp[1] = [NSNumber numberWithUnsignedChar:2];
+        temp[2] = [NSNumber numberWithUnsignedChar:3];
+        temp[3] = [NSNumber numberWithUnsignedChar:4];
+        temp[4] = [NSNumber numberWithUnsignedChar:5];
+        temp[5] = [NSNumber numberWithUnsignedChar:6];
+        temp[6] = [NSNumber numberWithUnsignedChar:7];
+        temp[7] = [NSNumber numberWithUnsignedChar:8];
+        temp[8] = [NSNumber numberWithUnsignedChar:9];
+        payload.Arg1 = temp;
+    }
+    [cluster testListInt8UReverseRequest:payload
+                         responseHandler:^(NSError * err, NSDictionary * values) {
+                             NSLog(@"Send Test Command With List of INT8U and get it reversed Error: %@", err);
+
+                             XCTAssertEqual(err.code, 0);
+
+                             {
+                                 id actualValue = values[@"Arg1"];
+                                 XCTAssertEqual([actualValue count], 9);
+                                 XCTAssertEqual([actualValue[0] unsignedCharValue], 9);
+                                 XCTAssertEqual([actualValue[1] unsignedCharValue], 8);
+                                 XCTAssertEqual([actualValue[2] unsignedCharValue], 7);
+                                 XCTAssertEqual([actualValue[3] unsignedCharValue], 6);
+                                 XCTAssertEqual([actualValue[4] unsignedCharValue], 5);
+                                 XCTAssertEqual([actualValue[5] unsignedCharValue], 4);
+                                 XCTAssertEqual([actualValue[6] unsignedCharValue], 3);
+                                 XCTAssertEqual([actualValue[7] unsignedCharValue], 2);
+                                 XCTAssertEqual([actualValue[8] unsignedCharValue], 1);
+                             }
+
+                             [expectation fulfill];
+                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000131_TestListInt8UReverseRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With empty List of INT8U and get an empty list back"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPTestClusterClusterTestListInt8UReverseRequestPayload * payload =
+        [[CHIPTestClusterClusterTestListInt8UReverseRequestPayload alloc] init];
+    {
+        NSMutableArray * temp = [[NSMutableArray alloc] init];
+        payload.Arg1 = temp;
+    }
+    [cluster testListInt8UReverseRequest:payload
+                         responseHandler:^(NSError * err, NSDictionary * values) {
+                             NSLog(@"Send Test Command With empty List of INT8U and get an empty list back Error: %@", err);
+
+                             XCTAssertEqual(err.code, 0);
+
+                             {
+                                 id actualValue = values[@"Arg1"];
+                                 XCTAssertEqual([actualValue count], 0);
+                             }
+
+                             [expectation fulfill];
+                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000132_TestListStructArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With List of Struct Argument and arg1.b of first item is true"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPTestClusterClusterTestListStructArgumentRequestPayload * payload =
+        [[CHIPTestClusterClusterTestListStructArgumentRequestPayload alloc] init];
+    {
+        NSMutableArray * temp = [[NSMutableArray alloc] init];
+        temp[0] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).A = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).B = [NSNumber numberWithBool:true];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).C = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).D = [[NSData alloc] initWithBytes:"first_octet_string" length:18];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).E = @"first_char_string";
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).F = [NSNumber numberWithUnsignedChar:1];
+
+        temp[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).A = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).B = [NSNumber numberWithBool:true];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).C = [NSNumber numberWithUnsignedChar:3];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).D = [[NSData alloc] initWithBytes:"second_octet_string" length:19];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).E = @"second_char_string";
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).F = [NSNumber numberWithUnsignedChar:1];
+
+        payload.Arg1 = temp;
+    }
+    [cluster
+        testListStructArgumentRequest:payload
+                      responseHandler:^(NSError * err, NSDictionary * values) {
+                          NSLog(@"Send Test Command With List of Struct Argument and arg1.b of first item is true Error: %@", err);
+
+                          XCTAssertEqual(err.code, 0);
+
+                          {
+                              id actualValue = values[@"Value"];
+                              XCTAssertEqual([actualValue boolValue], true);
+                          }
+
+                          [expectation fulfill];
+                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000133_TestListStructArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With List of Struct Argument and arg1.b of first item is false"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPTestClusterClusterTestListStructArgumentRequestPayload * payload =
+        [[CHIPTestClusterClusterTestListStructArgumentRequestPayload alloc] init];
+    {
+        NSMutableArray * temp = [[NSMutableArray alloc] init];
+        temp[0] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).A = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).B = [NSNumber numberWithBool:true];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).C = [NSNumber numberWithUnsignedChar:3];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).D = [[NSData alloc] initWithBytes:"second_octet_string" length:19];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).E = @"second_char_string";
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).F = [NSNumber numberWithUnsignedChar:1];
+
+        temp[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).A = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).B = [NSNumber numberWithBool:false];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).C = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).D = [[NSData alloc] initWithBytes:"first_octet_string" length:18];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).E = @"first_char_string";
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).F = [NSNumber numberWithUnsignedChar:1];
+
+        payload.Arg1 = temp;
+    }
+    [cluster
+        testListStructArgumentRequest:payload
+                      responseHandler:^(NSError * err, NSDictionary * values) {
+                          NSLog(@"Send Test Command With List of Struct Argument and arg1.b of first item is false Error: %@", err);
+
+                          XCTAssertEqual(err.code, 0);
+
+                          {
+                              id actualValue = values[@"Value"];
+                              XCTAssertEqual([actualValue boolValue], false);
+                          }
+
+                          [expectation fulfill];
+                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000134_TestNullableOptionalRequest
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command with optional arg set."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPTestClusterClusterTestNullableOptionalRequestPayload * payload =
+        [[CHIPTestClusterClusterTestNullableOptionalRequestPayload alloc] init];
+    payload.Arg1 = [NSNumber numberWithUnsignedChar:5];
+    [cluster testNullableOptionalRequest:payload
+                         responseHandler:^(NSError * err, NSDictionary * values) {
+                             NSLog(@"Send Test Command with optional arg set. Error: %@", err);
+
+                             XCTAssertEqual(err.code, 0);
+
+                             {
+                                 id actualValue = values[@"WasPresent"];
+                                 XCTAssertEqual([actualValue boolValue], true);
+                             }
+                             {
+                                 id actualValue = values[@"WasNull"];
+                                 XCTAssertEqual([actualValue boolValue], false);
+                             }
+                             {
+                                 id actualValue = values[@"Value"];
+                                 XCTAssertEqual([actualValue unsignedCharValue], 5);
+                             }
+                             {
+                                 id actualValue = values[@"OriginalValue"];
+                                 XCTAssertFalse([actualValue isKindOfClass:[NSNull class]]);
+                                 XCTAssertEqual([actualValue unsignedCharValue], 5);
+                             }
+
+                             [expectation fulfill];
+                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000135_TestNullableOptionalRequest
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command without its optional arg."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPTestClusterClusterTestNullableOptionalRequestPayload * payload =
+        [[CHIPTestClusterClusterTestNullableOptionalRequestPayload alloc] init];
+    [cluster testNullableOptionalRequest:payload
+                         responseHandler:^(NSError * err, NSDictionary * values) {
+                             NSLog(@"Send Test Command without its optional arg. Error: %@", err);
+
+                             XCTAssertEqual(err.code, 0);
+
+                             {
+                                 id actualValue = values[@"WasPresent"];
+                                 XCTAssertEqual([actualValue boolValue], false);
+                             }
+
+                             [expectation fulfill];
+                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTestConstraints_000000_WriteAttribute
 {
