@@ -31,6 +31,10 @@
         {
             "name": "decode_response",
             "path": "partials/decode_response.zapt"
+        },
+        {
+            "name": "test_value",
+            "path": "partials/test_value.zapt"
         }
     ],
     "templates": [

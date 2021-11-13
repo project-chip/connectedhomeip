@@ -18,6 +18,13 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     CHIPTest{{asUpperCamelCase cluster}} * cluster = [[CHIPTest{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:queue];
     XCTAssertNotNil(cluster);
 
+    {{#if isCommand}}
+    CHIP{{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase command}}Payload * payload = [[CHIP{{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase command}}Payload alloc] init];
+    {{#chip_tests_item_parameters}}
+      {{>test_value target=(concat "payload." (asUpperCamelCase label)) definedValue=definedValue cluster=parent.cluster}}
+    {{/chip_tests_item_parameters}}
+    [cluster {{asLowerCamelCase command}}:payload responseHandler:^(NSError * err, NSDictionary * values) {
+    {{else if isSubscribeAttribute}}
     {{#chip_tests_item_parameters}}
     {{#if (isString type)}}
     {{#if (isOctetString type)}}
@@ -29,9 +36,6 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{definedValue}}{{asTypeLiteralSuffix type}};
     {{/if}}
     {{/chip_tests_item_parameters}}
-    {{#if isCommand}}
-    [cluster {{asLowerCamelCase command}}:{{#chip_tests_item_parameters}}{{#not_first}}{{asLowerCamelCase name}}:{{/not_first}}{{asLowerCamelCase name}}Argument {{#last}}responseHandler:{{/last}}{{/chip_tests_item_parameters}}^(NSError * err, NSDictionary * values) {
-    {{else if isSubscribeAttribute}}
     [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:minIntervalArgument
                                                                  maxInterval:maxIntervalArgument
                                                              responseHandler:^(NSError * err, NSDictionary * values) {
@@ -40,6 +44,17 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     {{else if isReadAttribute}}
     [cluster readAttribute{{asUpperCamelCase attribute}}WithResponseHandler:^(NSError * err, NSDictionary * values) {
     {{else if isWriteAttribute}}
+    {{#chip_tests_item_parameters}}
+    {{#if (isString type)}}
+    {{#if (isOctetString type)}}
+    NSData * {{asLowerCamelCase name}}Argument = [[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral definedValue}}" length:{{definedValue.length}}];
+    {{else}}
+    NSString * {{asLowerCamelCase name}}Argument= @"{{definedValue}}";
+    {{/if}}
+    {{else}}
+    {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{definedValue}}{{asTypeLiteralSuffix type}};
+    {{/if}}
+    {{/chip_tests_item_parameters}}
     [cluster writeAttribute{{asUpperCamelCase attribute}}WithValue:{{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}} responseHandler:^(NSError * err, NSDictionary * values) {
     {{/if}}
         NSLog(@"{{label}} Error: %@", err);
