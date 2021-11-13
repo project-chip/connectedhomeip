@@ -29,12 +29,16 @@
             "path": "partials/encode_value.zapt"
         },
         {
-            "name": "decode_response",
-            "path": "partials/decode_response.zapt"
+            "name": "decode_value",
+            "path": "partials/decode_value.zapt"
         },
         {
             "name": "test_value",
             "path": "partials/test_value.zapt"
+        },
+        {
+            "name": "check_test_value",
+            "path": "partials/check_test_value.zapt"
         }
     ],
     "templates": [

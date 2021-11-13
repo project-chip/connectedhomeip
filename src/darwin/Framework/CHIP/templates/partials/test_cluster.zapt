@@ -74,23 +74,10 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
 
         {{#chip_tests_item_response_parameters}}
         {{#if hasExpectedValue}}
-        {{#if isList}}
-        XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
-        {{else if isArray}}
-        XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
-        {{else}}
-        {{#if (isString type)}}
-        {{#if (isOctetString type)}}
-        NSData * {{asLowerCamelCase name}}Argument = [[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral expectedValue}}" length:{{expectedValue.length}}];
-        XCTAssertTrue([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToData:{{asLowerCamelCase name}}Argument]);
-        {{else}}
-        NSString * {{asLowerCamelCase name}}Argument= @"{{expectedValue}}";
-        XCTAssertTrue([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToString:{{asLowerCamelCase name}}Argument]);
-        {{/if}}
-        {{else}}
-        XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{asTypeLiteralSuffix type}});
-        {{/if}}
-        {{/if}}
+        {
+          id actualValue = values[@"{{#if parent.isAttribute}}value{{else}}{{asUpperCamelCase name}}{{/if}}"];
+          {{>check_test_value actual="actualValue" expected=expectedValue cluster=../cluster}}
+        }
         {{/if}}
         {{#if hasExpectedConstraints}}
         {{#if expectedConstraints.minLength}}

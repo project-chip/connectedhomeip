@@ -1,0 +1,44 @@
+{{#if isOptional}}
+  {{! This just means we expect a non-nil value.  Go ahead and check the value,
+      stripping the optionality off. }}
+  {{>check_test_value actual=actual expected=expected cluster=cluster isOptional=false}}
+{{else if isNullable}}
+  {{#if (isLiteralNull expected)}}
+    {{! TODO: This should be checking for nil once we fix our responses }}
+    XCTAssertTrue([{{actual}} isKindOfClass:[NSNull class]]);
+  {{else}}
+    XCTAssertFalse([{{actual}} isKindOfClass:[NSNull class]]);
+    {{>check_test_value actual=actual expected=expected cluster=cluster isNullable=false}}
+  {{/if}}
+{{else if isArray}}
+    XCTAssertEqual([{{actual}} count], {{expected.length}});
+    {{#each expected}}
+      {{>check_test_value actual=(concat ../actual "[" @index "]") expected=this cluster=../cluster isArray=false type=../type}}
+    {{/each}}
+{{else}}
+  {{#if_is_struct type}}
+    {{! Iterate over the actual types in the struct, so we pick up the right
+        type/optionality/nullability information for them for our recursive
+        call. }}
+    {{#zcl_struct_items_by_struct_name type}}
+      {{#if (expectedValueHasProp ../expected (asLowerCamelCase label))}}
+        {{! TODO: This is a hack because right now some of our return values (attribute reads) are using NSDictionary for structs while others (commands) are using generated object types.  Just support both for now. }}
+        if ([{{../actual}} isKindOfClass:[NSDictionary class]]) {
+          {{>check_test_value actual=(concat ../actual '[@"' (asUpperCamelCase label) '"]') expected=(lookup ../expected (asLowerCamelCase label)) cluster=../cluster}}
+        } else {
+          {{>check_test_value actual=(concat "[" ../actual (asUpperCamelCase label) "]") expected=(lookup ../expected (asLowerCamelCase label)) cluster=../cluster}}
+        }
+      {{/if}}
+    {{/zcl_struct_items_by_struct_name}}
+    {{! Maybe we should add a check for properties in the expected object (other
+        than "global") that are not present in the struct ? }}
+  {{else}}
+    {{#if (isOctetString type)}}
+      XCTAssertTrue([{{actual}} isEqualToData:[[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral expected}}" length:{{expected.length}}]]);
+    {{else if (isCharString type)}}
+      XCTAssertTrue([{{actual}} isEqualToString:@"{{expected}}"]);
+    {{else}}
+      XCTAssertEqual([{{actual}} {{asObjectiveCNumberType "" type true}}Value], {{expected}}{{asTypeLiteralSuffix type}});
+    {{/if}}
+  {{/if_is_struct}}
+{{/if}}
