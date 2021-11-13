@@ -69,6 +69,10 @@ android_library("java") {
   sources = [
     "src/chip/clusterinfo/ClusterCommandCallback.java",
     "src/chip/clusterinfo/ClusterInfo.java",
+<<<<<<< HEAD
+=======
+    "src/chip/clusterinfo/InteractionInfo.java",
+>>>>>>> df6a8040a4ba09bfde26c36c14f01433f78541a0
     "src/chip/clusterinfo/CommandParameterInfo.java",
     "src/chip/clusterinfo/CommandResponseInfo.java",
     "src/chip/clusterinfo/DelegatedClusterCallback.java",
