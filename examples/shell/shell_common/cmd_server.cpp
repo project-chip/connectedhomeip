@@ -94,6 +94,30 @@ static CHIP_ERROR CmdAppServerUdcPort(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+static bool CmdAppServerSession(void *context, SessionHandle &session)
+{
+    streamer_printf(streamer_get(),
+        "session id=0x%04x peerSessionId=0x%04x peerNodeId=0x%016" PRIx64 "\r\n",
+        session.GetLocalSessionId().Value(),
+        session.GetPeerSessionId().Value(),
+        session.GetPeerNodeId());
+    return true;
+}
+
+static CHIP_ERROR CmdAppServerSessions(int argc, char ** argv)
+{
+    Server::GetInstance().GetSecureSessionManager().ForEachSessionHandle(nullptr, CmdAppServerSession);
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR CmdAppServerExchanges(int argc, char ** argv)
+{
+    //Messaging::ExchangeManager * exchangeMgr = &Server::GetInstance().GetExchangeManager();
+
+    return CHIP_NO_ERROR;
+}
+
 static CHIP_ERROR CmdAppServer(int argc, char ** argv)
 {
     switch (argc)
@@ -122,6 +146,8 @@ void cmd_app_server_init()
         { &CmdAppServerStop, "stop", "Stop the ZCL application server." },
         { &CmdAppServerPort, "port", "Get/Set operational port of server." },
         { &CmdAppServerUdcPort, "udcport", "Get/Set commissioning port of server." },
+        { &CmdAppServerSessions, "sessions", "Manage active sessions on the server." },
+        { &CmdAppServerExchanges, "exchanges", "Manage active exchanges on the server." },
     };
 
     // Register `config` subcommands with the local shell dispatcher.
