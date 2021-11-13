@@ -182,7 +182,7 @@ static CHIP_ERROR ConfigHandler(int argc, char ** argv)
     case 0:
         return PrintAllConfigs();
     case 1:
-        if ((strcmp(argv[0], "help") == 0) || 
+        if ((strcmp(argv[0], "help") == 0) ||
             (strcmp(argv[0], "-h") == 0))
         {
             return ConfigHelpHandler(argc, argv);
