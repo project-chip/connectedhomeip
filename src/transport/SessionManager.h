@@ -247,6 +247,9 @@ public:
     // and tv-casting-app that uses the TV's node ID to find the associated secure session
     SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
 
+    using SessionHandleCallback = bool (*)(void * context, SessionHandle & sessionHandle);
+    CHIP_ERROR ForEachSessionHandle(void * context, SessionHandleCallback callback);
+
 private:
     /**
      *    The State of a secure transport object.
