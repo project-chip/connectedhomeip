@@ -51,6 +51,7 @@ int main()
     cmd_otcli_init();
     cmd_ping_init();
     cmd_send_init();
+    cmd_app_server_init();
 
     Engine::Root().RunMainLoop();
     return 0;
