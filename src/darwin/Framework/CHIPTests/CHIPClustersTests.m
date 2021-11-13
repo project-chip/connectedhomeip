@@ -157,11 +157,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster test:^(NSError * err, NSDictionary * values) {
-        NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
+    [cluster test:[[CHIPTestClusterClusterTestPayload alloc] init]
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 
@@ -169,11 +170,12 @@ CHIPDevice * GetConnectedDevice()
 
     // Reuse the CHIPCluster Object for multiple times.
 
-    [cluster test:^(NSError * err, NSDictionary * values) {
-        NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
+    [cluster test:[[CHIPTestClusterClusterTestPayload alloc] init]
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -3860,13 +3862,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -3900,16 +3904,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t hueArgument = 150;
-    uint8_t directionArgument = 0;
-    uint16_t transitionTimeArgument = 100U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToHue:hueArgument
-              direction:directionArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToHuePayload alloc] init];
+    payload.Hue = [NSNumber numberWithUnsignedChar:150];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:100];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move to hue shortest distance command Error: %@", err);
 
@@ -3929,16 +3930,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t hueArgument = 200;
-    uint8_t directionArgument = 1;
-    uint16_t transitionTimeArgument = 100U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToHue:hueArgument
-              direction:directionArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToHuePayload alloc] init];
+    payload.Hue = [NSNumber numberWithUnsignedChar:200];
+    payload.Direction = [NSNumber numberWithUnsignedChar:1];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:100];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move to hue longest distance command Error: %@", err);
 
@@ -3958,16 +3956,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t hueArgument = 250;
-    uint8_t directionArgument = 2;
-    uint16_t transitionTimeArgument = 100U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToHue:hueArgument
-              direction:directionArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToHuePayload alloc] init];
+    payload.Hue = [NSNumber numberWithUnsignedChar:250];
+    payload.Direction = [NSNumber numberWithUnsignedChar:2];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:100];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move to hue up command Error: %@", err);
 
@@ -3987,16 +3982,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t hueArgument = 225;
-    uint8_t directionArgument = 3;
-    uint16_t transitionTimeArgument = 100U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToHue:hueArgument
-              direction:directionArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToHuePayload alloc] init];
+    payload.Hue = [NSNumber numberWithUnsignedChar:225];
+    payload.Direction = [NSNumber numberWithUnsignedChar:3];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:100];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move to hue down command Error: %@", err);
 
@@ -4016,13 +4008,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4057,13 +4051,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4097,14 +4093,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 1;
-    uint8_t rateArgument = 50;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveHue:moveModeArgument
-                   rate:rateArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.Rate = [NSNumber numberWithUnsignedChar:50];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move hue up command Error: %@", err);
 
@@ -4124,14 +4118,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint8_t rateArgument = 50;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveHue:moveModeArgument
-                   rate:rateArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedChar:50];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move hue stop command Error: %@", err);
 
@@ -4151,14 +4143,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 3;
-    uint8_t rateArgument = 50;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveHue:moveModeArgument
-                   rate:rateArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:3];
+    payload.Rate = [NSNumber numberWithUnsignedChar:50];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move hue down command Error: %@", err);
 
@@ -4178,14 +4168,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint8_t rateArgument = 50;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveHue:moveModeArgument
-                   rate:rateArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedChar:50];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move hue stop command Error: %@", err);
 
@@ -4205,13 +4193,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4246,13 +4236,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4286,16 +4278,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 1;
-    uint8_t stepSizeArgument = 5;
-    uint8_t transitionTimeArgument = 25;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepHue:stepModeArgument
-               stepSize:stepSizeArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepHuePayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:5];
+    payload.TransitionTime = [NSNumber numberWithUnsignedChar:25];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Step hue up command Error: %@", err);
 
@@ -4315,16 +4304,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 3;
-    uint8_t stepSizeArgument = 5;
-    uint8_t transitionTimeArgument = 25;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepHue:stepModeArgument
-               stepSize:stepSizeArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepHuePayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:3];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:5];
+    payload.TransitionTime = [NSNumber numberWithUnsignedChar:25];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Step hue down command Error: %@", err);
 
@@ -4344,13 +4330,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4385,13 +4373,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4425,14 +4415,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t saturationArgument = 90;
-    uint16_t transitionTimeArgument = 10U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToSaturation:saturationArgument
-               transitionTime:transitionTimeArgument
-                  optionsMask:optionsMaskArgument
-              optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToSaturationPayload alloc] init];
+    payload.Saturation = [NSNumber numberWithUnsignedChar:90];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:10];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToSaturation:payload
               responseHandler:^(NSError * err, NSDictionary * values) {
                   NSLog(@"Move to saturation command Error: %@", err);
 
@@ -4452,13 +4440,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4493,13 +4483,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4533,14 +4525,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 1;
-    uint8_t rateArgument = 5;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveSaturation:moveModeArgument
-                       rate:rateArgument
-                optionsMask:optionsMaskArgument
-            optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveSaturationPayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.Rate = [NSNumber numberWithUnsignedChar:5];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveSaturation:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 NSLog(@"Move saturation up command Error: %@", err);
 
@@ -4560,14 +4550,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 3;
-    uint8_t rateArgument = 5;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveSaturation:moveModeArgument
-                       rate:rateArgument
-                optionsMask:optionsMaskArgument
-            optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveSaturationPayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:3];
+    payload.Rate = [NSNumber numberWithUnsignedChar:5];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveSaturation:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 NSLog(@"Move saturation down command Error: %@", err);
 
@@ -4587,13 +4575,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4628,13 +4618,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4668,16 +4660,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 1;
-    uint8_t stepSizeArgument = 15;
-    uint8_t transitionTimeArgument = 10;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepSaturation:stepModeArgument
-                   stepSize:stepSizeArgument
-             transitionTime:transitionTimeArgument
-                optionsMask:optionsMaskArgument
-            optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepSaturationPayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:15];
+    payload.TransitionTime = [NSNumber numberWithUnsignedChar:10];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepSaturation:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 NSLog(@"Step saturation up command Error: %@", err);
 
@@ -4697,16 +4686,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 3;
-    uint8_t stepSizeArgument = 20;
-    uint8_t transitionTimeArgument = 10;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepSaturation:stepModeArgument
-                   stepSize:stepSizeArgument
-             transitionTime:transitionTimeArgument
-                optionsMask:optionsMaskArgument
-            optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepSaturationPayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:3];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:20];
+    payload.TransitionTime = [NSNumber numberWithUnsignedChar:10];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepSaturation:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 NSLog(@"Step saturation down command Error: %@", err);
 
@@ -4726,13 +4712,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4767,13 +4755,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4807,16 +4797,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t hueArgument = 40;
-    uint8_t saturationArgument = 160;
-    uint16_t transitionTimeArgument = 10U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToHueAndSaturation:hueArgument
-                         saturation:saturationArgument
-                     transitionTime:transitionTimeArgument
-                        optionsMask:optionsMaskArgument
-                    optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToHueAndSaturationPayload alloc] init];
+    payload.Hue = [NSNumber numberWithUnsignedChar:40];
+    payload.Saturation = [NSNumber numberWithUnsignedChar:160];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:10];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToHueAndSaturation:payload
                     responseHandler:^(NSError * err, NSDictionary * values) {
                         NSLog(@"Move To current hue and saturation command Error: %@", err);
 
@@ -4836,13 +4823,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4877,13 +4866,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4917,16 +4908,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t colorXArgument = 200U;
-    uint16_t colorYArgument = 300U;
-    uint16_t transitionTimeArgument = 20U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToColor:colorXArgument
-                  colorY:colorYArgument
-          transitionTime:transitionTimeArgument
-             optionsMask:optionsMaskArgument
-         optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToColorPayload alloc] init];
+    payload.ColorX = [NSNumber numberWithUnsignedShort:200];
+    payload.ColorY = [NSNumber numberWithUnsignedShort:300];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToColor:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"Move to Color command Error: %@", err);
 
@@ -4946,13 +4934,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4987,13 +4977,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5027,14 +5019,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    int16_t rateXArgument = 15;
-    int16_t rateYArgument = 20;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveColor:rateXArgument
-                  rateY:rateYArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveColorPayload alloc] init];
+    payload.RateX = [NSNumber numberWithShort:15];
+    payload.RateY = [NSNumber numberWithShort:20];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColor:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move Color command Error: %@", err);
 
@@ -5054,10 +5044,10 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stopMoveStep:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStopMoveStepPayload alloc] init];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stopMoveStep:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Stop Move Step command Error: %@", err);
 
@@ -5077,13 +5067,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5118,13 +5110,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5158,16 +5152,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    int16_t stepXArgument = 15;
-    int16_t stepYArgument = 20;
-    uint16_t transitionTimeArgument = 50U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepColor:stepXArgument
-                  stepY:stepYArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepColorPayload alloc] init];
+    payload.StepX = [NSNumber numberWithShort:15];
+    payload.StepY = [NSNumber numberWithShort:20];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:50];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepColor:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Step Color command Error: %@", err);
 
@@ -5187,13 +5178,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5228,13 +5221,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5268,14 +5263,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t colorTemperatureArgument = 100U;
-    uint16_t transitionTimeArgument = 10U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToColorTemperature:colorTemperatureArgument
-                     transitionTime:transitionTimeArgument
-                        optionsMask:optionsMaskArgument
-                    optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToColorTemperaturePayload alloc] init];
+    payload.ColorTemperature = [NSNumber numberWithUnsignedShort:100];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:10];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToColorTemperature:payload
                     responseHandler:^(NSError * err, NSDictionary * values) {
                         NSLog(@"Move To Color Temperature command Error: %@", err);
 
@@ -5295,13 +5288,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5336,13 +5331,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5376,18 +5373,14 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 1;
-    uint16_t rateArgument = 10U;
-    uint16_t colorTemperatureMinimumArgument = 1U;
-    uint16_t colorTemperatureMaximumArgument = 255U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveColorTemperature:moveModeArgument
-                             rate:rateArgument
-          colorTemperatureMinimum:colorTemperatureMinimumArgument
-          colorTemperatureMaximum:colorTemperatureMaximumArgument
-                      optionsMask:optionsMaskArgument
-                  optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveColorTemperaturePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.Rate = [NSNumber numberWithUnsignedShort:10];
+    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1];
+    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Move up color temperature command Error: %@", err);
 
@@ -5407,18 +5400,14 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint16_t rateArgument = 10U;
-    uint16_t colorTemperatureMinimumArgument = 1U;
-    uint16_t colorTemperatureMaximumArgument = 255U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveColorTemperature:moveModeArgument
-                             rate:rateArgument
-          colorTemperatureMinimum:colorTemperatureMinimumArgument
-          colorTemperatureMaximum:colorTemperatureMaximumArgument
-                      optionsMask:optionsMaskArgument
-                  optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveColorTemperaturePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedShort:10];
+    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1];
+    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Stop Color Temperature command Error: %@", err);
 
@@ -5438,18 +5427,14 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 3;
-    uint16_t rateArgument = 20U;
-    uint16_t colorTemperatureMinimumArgument = 1U;
-    uint16_t colorTemperatureMaximumArgument = 255U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveColorTemperature:moveModeArgument
-                             rate:rateArgument
-          colorTemperatureMinimum:colorTemperatureMinimumArgument
-          colorTemperatureMaximum:colorTemperatureMaximumArgument
-                      optionsMask:optionsMaskArgument
-                  optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveColorTemperaturePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:3];
+    payload.Rate = [NSNumber numberWithUnsignedShort:20];
+    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1];
+    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Move down color temperature command Error: %@", err);
 
@@ -5469,13 +5454,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5510,13 +5497,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5550,20 +5539,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 1;
-    uint16_t stepSizeArgument = 5U;
-    uint16_t transitionTimeArgument = 50U;
-    uint16_t colorTemperatureMinimumArgument = 5U;
-    uint16_t colorTemperatureMaximumArgument = 100U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepColorTemperature:stepModeArgument
-                         stepSize:stepSizeArgument
-                   transitionTime:transitionTimeArgument
-          colorTemperatureMinimum:colorTemperatureMinimumArgument
-          colorTemperatureMaximum:colorTemperatureMaximumArgument
-                      optionsMask:optionsMaskArgument
-                  optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepColorTemperaturePayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.StepSize = [NSNumber numberWithUnsignedShort:5];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:50];
+    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:5];
+    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:100];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Step up color temperature command Error: %@", err);
 
@@ -5583,20 +5567,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 3;
-    uint16_t stepSizeArgument = 5U;
-    uint16_t transitionTimeArgument = 50U;
-    uint16_t colorTemperatureMinimumArgument = 5U;
-    uint16_t colorTemperatureMaximumArgument = 100U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepColorTemperature:stepModeArgument
-                         stepSize:stepSizeArgument
-                   transitionTime:transitionTimeArgument
-          colorTemperatureMinimum:colorTemperatureMinimumArgument
-          colorTemperatureMaximum:colorTemperatureMaximumArgument
-                      optionsMask:optionsMaskArgument
-                  optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepColorTemperaturePayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:3];
+    payload.StepSize = [NSNumber numberWithUnsignedShort:5];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:50];
+    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:5];
+    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:100];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Step down color temperature command Error: %@", err);
 
@@ -5616,13 +5595,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5657,13 +5638,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5697,16 +5680,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t enhancedHueArgument = 1025U;
-    uint8_t directionArgument = 0;
-    uint16_t transitionTimeArgument = 1U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveToHue:enhancedHueArgument
-                     direction:directionArgument
-                transitionTime:transitionTimeArgument
-                   optionsMask:optionsMaskArgument
-               optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveToHuePayload alloc] init];
+    payload.EnhancedHue = [NSNumber numberWithUnsignedShort:1025];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:1];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveToHue:payload
                responseHandler:^(NSError * err, NSDictionary * values) {
                    NSLog(@"Enhanced Move To Hue command Error: %@", err);
 
@@ -5748,13 +5728,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5789,13 +5771,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5829,14 +5813,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 3;
-    uint16_t rateArgument = 5U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveHue:moveModeArgument
-                        rate:rateArgument
-                 optionsMask:optionsMaskArgument
-             optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:3];
+    payload.Rate = [NSNumber numberWithUnsignedShort:5];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Move Hue Down command  Error: %@", err);
 
@@ -5856,14 +5838,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint16_t rateArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveHue:moveModeArgument
-                        rate:rateArgument
-                 optionsMask:optionsMaskArgument
-             optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
 
@@ -5883,14 +5863,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 1;
-    uint16_t rateArgument = 50U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveHue:moveModeArgument
-                        rate:rateArgument
-                 optionsMask:optionsMaskArgument
-             optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.Rate = [NSNumber numberWithUnsignedShort:50];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Move Hue Up command Error: %@", err);
 
@@ -5910,14 +5888,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint16_t rateArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveHue:moveModeArgument
-                        rate:rateArgument
-                 optionsMask:optionsMaskArgument
-             optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
 
@@ -5937,13 +5913,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5978,13 +5956,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6018,16 +5998,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 0;
-    uint16_t stepSizeArgument = 50U;
-    uint16_t transitionTimeArgument = 1U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedStepHue:stepModeArgument
-                    stepSize:stepSizeArgument
-              transitionTime:transitionTimeArgument
-                 optionsMask:optionsMaskArgument
-             optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedStepHuePayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:0];
+    payload.StepSize = [NSNumber numberWithUnsignedShort:50];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:1];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedStepHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Step Hue Up command Error: %@", err);
 
@@ -6047,16 +6024,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 1;
-    uint16_t stepSizeArgument = 75U;
-    uint16_t transitionTimeArgument = 1U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedStepHue:stepModeArgument
-                    stepSize:stepSizeArgument
-              transitionTime:transitionTimeArgument
-                 optionsMask:optionsMaskArgument
-             optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedStepHuePayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.StepSize = [NSNumber numberWithUnsignedShort:75];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:1];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedStepHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Step Hue Down command Error: %@", err);
 
@@ -6076,13 +6050,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6117,13 +6093,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6157,16 +6135,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t enhancedHueArgument = 1200U;
-    uint8_t saturationArgument = 90;
-    uint16_t transitionTimeArgument = 10U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveToHueAndSaturation:enhancedHueArgument
-                                 saturation:saturationArgument
-                             transitionTime:transitionTimeArgument
-                                optionsMask:optionsMaskArgument
-                            optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveToHueAndSaturationPayload alloc] init];
+    payload.EnhancedHue = [NSNumber numberWithUnsignedShort:1200];
+    payload.Saturation = [NSNumber numberWithUnsignedChar:90];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:10];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveToHueAndSaturation:payload
                             responseHandler:^(NSError * err, NSDictionary * values) {
                                 NSLog(@"Enhanced move to hue and saturation command Error: %@", err);
 
@@ -6186,13 +6161,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6227,13 +6204,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6267,20 +6246,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 14;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 1;
-    uint16_t timeArgument = 100U;
-    uint16_t startHueArgument = 500U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:14];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:1];
+    payload.Time = [NSNumber numberWithUnsignedShort:100];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:500];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set all Attributs Error: %@", err);
 
@@ -6384,20 +6358,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 1;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:1];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
@@ -6439,20 +6408,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 6;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 3500U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:6];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:3500];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set direction and time while running Error: %@", err);
 
@@ -6514,20 +6478,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 2;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 1;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:1];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set direction while running Error: %@", err);
 
@@ -6568,13 +6527,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6609,13 +6570,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Precondition : Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Precondition : Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6649,20 +6612,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -6703,20 +6661,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 2;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -6757,20 +6710,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 4;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 30U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:4];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:30];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -6811,20 +6759,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 8;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 160U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:8];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:160];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -6865,20 +6808,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 1;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:1];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -6919,20 +6857,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -6973,20 +6906,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 2;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 1;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:1];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7027,20 +6955,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 1;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:1];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7081,20 +7004,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7135,16 +7053,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t enhancedHueArgument = 40960U;
-    uint8_t directionArgument = 0;
-    uint16_t transitionTimeArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveToHue:enhancedHueArgument
-                     direction:directionArgument
-                transitionTime:transitionTimeArgument
-                   optionsMask:optionsMaskArgument
-               optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveToHuePayload alloc] init];
+    payload.EnhancedHue = [NSNumber numberWithUnsignedShort:40960];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveToHue:payload
                responseHandler:^(NSError * err, NSDictionary * values) {
                    NSLog(@"Enhanced Move To Hue command 10 Error: %@", err);
 
@@ -7193,20 +7108,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 2;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7247,20 +7157,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 2;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:2];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7301,20 +7206,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7355,20 +7255,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 2;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 1;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:1];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7409,20 +7304,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 2;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:2];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7463,20 +7353,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7517,13 +7402,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn Off light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn Off light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -7537,13 +7424,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Precondition: Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Precondition: Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -7578,20 +7467,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 15;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 30U;
-    uint16_t startHueArgument = 160U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:15];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:30];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:160];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7695,20 +7579,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 1;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:1];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set all Attributes Error: %@", err);
 
@@ -7749,20 +7628,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 2;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 1;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:1];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
@@ -7803,20 +7677,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
@@ -7857,13 +7726,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -7877,13 +7748,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Precondition: Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Precondition: Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -7918,20 +7791,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 15;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 30U;
-    uint16_t startHueArgument = 160U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:15];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:30];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:160];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -8035,20 +7903,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 1;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:1];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set all Attributes Error: %@", err);
 
@@ -8089,20 +7952,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 4;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 60U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:4];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:60];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
@@ -8143,20 +8001,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
@@ -8197,13 +8050,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -9019,14 +8874,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t levelArgument = 64;
-    uint16_t transitionTimeArgument = 0U;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster moveToLevel:levelArgument
-          transitionTime:transitionTimeArgument
-              optionMask:optionMaskArgument
-          optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMoveToLevelPayload alloc] init];
+    payload.Level = [NSNumber numberWithUnsignedChar:64];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster moveToLevel:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"sends a Move to level command Error: %@", err);
 
@@ -9075,14 +8928,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t levelArgument = 128;
-    uint16_t transitionTimeArgument = 1U;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster moveToLevel:levelArgument
-          transitionTime:transitionTimeArgument
-              optionMask:optionMaskArgument
-          optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMoveToLevelPayload alloc] init];
+    payload.Level = [NSNumber numberWithUnsignedChar:128];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:1];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster moveToLevel:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"sends a Move to level command Error: %@", err);
 
@@ -9152,14 +9003,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t levelArgument = 254;
-    uint16_t transitionTimeArgument = 65535U;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster moveToLevel:levelArgument
-          transitionTime:transitionTimeArgument
-              optionMask:optionMaskArgument
-          optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMoveToLevelPayload alloc] init];
+    payload.Level = [NSNumber numberWithUnsignedChar:254];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:65535];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster moveToLevel:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"sends a Move to level command Error: %@", err);
 
@@ -9208,14 +9057,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t levelArgument = 0;
-    uint16_t transitionTimeArgument = 0U;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster moveToLevel:levelArgument
-          transitionTime:transitionTimeArgument
-              optionMask:optionMaskArgument
-          optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMoveToLevelPayload alloc] init];
+    payload.Level = [NSNumber numberWithUnsignedChar:0];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster moveToLevel:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"Reset level to 0 Error: %@", err);
 
@@ -9286,14 +9133,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint8_t rateArgument = 200;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster move:moveModeArgument
-                   rate:rateArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMovePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedChar:200];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster move:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"sends a Move up command Error: %@", err);
 
@@ -9363,14 +9208,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 1;
-    uint8_t rateArgument = 250;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster move:moveModeArgument
-                   rate:rateArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMovePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.Rate = [NSNumber numberWithUnsignedChar:250];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster move:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"sends a Move down command Error: %@", err);
 
@@ -9461,14 +9304,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 1;
-    uint8_t rateArgument = 255;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster move:moveModeArgument
-                   rate:rateArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMovePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.Rate = [NSNumber numberWithUnsignedChar:255];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster move:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"sends a Move up command at default move rate Error: %@", err);
 
@@ -9518,13 +9359,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Sending on command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Sending on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -9537,16 +9380,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 0;
-    uint8_t stepSizeArgument = 128;
-    uint16_t transitionTimeArgument = 20U;
-    uint8_t optionMaskArgument = 0;
-    uint8_t optionOverrideArgument = 0;
-    [cluster step:stepModeArgument
-               stepSize:stepSizeArgument
-         transitionTime:transitionTimeArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterStepPayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:0];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:128];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster step:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
 
@@ -9595,16 +9435,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 1;
-    uint8_t stepSizeArgument = 64;
-    uint16_t transitionTimeArgument = 20U;
-    uint8_t optionMaskArgument = 0;
-    uint8_t optionOverrideArgument = 0;
-    [cluster step:stepModeArgument
-               stepSize:stepSizeArgument
-         transitionTime:transitionTimeArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterStepPayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:64];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster step:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Sends step down command to DUT Error: %@", err);
 
@@ -9653,16 +9490,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 0;
-    uint8_t stepSizeArgument = 64;
-    uint16_t transitionTimeArgument = 20U;
-    uint8_t optionMaskArgument = 0;
-    uint8_t optionOverrideArgument = 0;
-    [cluster step:stepModeArgument
-               stepSize:stepSizeArgument
-         transitionTime:transitionTimeArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterStepPayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:0];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:64];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster step:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Sends a Step up command Error: %@", err);
 
@@ -9711,13 +9545,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Sending off command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Sending off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -9731,13 +9567,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Sending on command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Sending on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -9750,16 +9588,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 0;
-    uint8_t stepSizeArgument = 128;
-    uint16_t transitionTimeArgument = 20U;
-    uint8_t optionMaskArgument = 0;
-    uint8_t optionOverrideArgument = 0;
-    [cluster step:stepModeArgument
-               stepSize:stepSizeArgument
-         transitionTime:transitionTimeArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterStepPayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:0];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:128];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster step:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
 
@@ -9787,14 +9622,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint8_t rateArgument = 1;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster move:moveModeArgument
-                   rate:rateArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMovePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster move:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Sends a move up command to DUT Error: %@", err);
 
@@ -9822,10 +9655,10 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t optionMaskArgument = 0;
-    uint8_t optionOverrideArgument = 0;
-    [cluster stop:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterStopPayload alloc] init];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stop:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Sends stop command to DUT Error: %@", err);
 
@@ -9845,13 +9678,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Sending off command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Sending off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -9890,13 +9725,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLowPower * cluster = [[CHIPTestLowPower alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster sleep:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Put the device into low power mode Error: %@", err);
+    __auto_type * payload = [[CHIPLowPowerClusterSleepPayload alloc] init];
+    [cluster sleep:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Put the device into low power mode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10572,13 +10409,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10612,13 +10451,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10652,13 +10493,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10692,13 +10535,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster toggle:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Toggle Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterTogglePayload alloc] init];
+    [cluster toggle:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Toggle Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10733,13 +10578,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster toggle:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Toggle Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterTogglePayload alloc] init];
+    [cluster toggle:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Toggle Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10774,13 +10621,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10814,13 +10663,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10855,13 +10706,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10924,13 +10777,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10993,13 +10848,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11104,13 +10961,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11186,13 +11045,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11310,13 +11171,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11371,13 +11234,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11474,13 +11339,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11556,13 +11423,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11743,13 +11612,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15001,13 +14872,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster downOrClose:^(NSError * err, NSDictionary * values) {
-        NSLog(@"1a: TH adjusts the the DUT to a non-open position Error: %@", err);
+    __auto_type * payload = [[CHIPWindowCoveringClusterDownOrClosePayload alloc] init];
+    [cluster downOrClose:payload
+         responseHandler:^(NSError * err, NSDictionary * values) {
+             NSLog(@"1a: TH adjusts the the DUT to a non-open position Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+             XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+             [expectation fulfill];
+         }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15020,13 +14893,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster upOrOpen:^(NSError * err, NSDictionary * values) {
-        NSLog(@"2a: TH sends UpOrOpen command to DUT Error: %@", err);
+    __auto_type * payload = [[CHIPWindowCoveringClusterUpOrOpenPayload alloc] init];
+    [cluster upOrOpen:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"2a: TH sends UpOrOpen command to DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15061,13 +14936,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster upOrOpen:^(NSError * err, NSDictionary * values) {
-        NSLog(@"1a: TH adjusts the the DUT to a non-closed position Error: %@", err);
+    __auto_type * payload = [[CHIPWindowCoveringClusterUpOrOpenPayload alloc] init];
+    [cluster upOrOpen:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"1a: TH adjusts the the DUT to a non-closed position Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15080,13 +14957,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster downOrClose:^(NSError * err, NSDictionary * values) {
-        NSLog(@"2a: TH sends DownOrClose command to DUT Error: %@", err);
+    __auto_type * payload = [[CHIPWindowCoveringClusterDownOrClosePayload alloc] init];
+    [cluster downOrClose:payload
+         responseHandler:^(NSError * err, NSDictionary * values) {
+             NSLog(@"2a: TH sends DownOrClose command to DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+             XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+             [expectation fulfill];
+         }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15121,13 +15000,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster upOrOpen:^(NSError * err, NSDictionary * values) {
-        NSLog(@"1a: TH adjusts the the DUT to a non-open position Error: %@", err);
+    __auto_type * payload = [[CHIPWindowCoveringClusterUpOrOpenPayload alloc] init];
+    [cluster upOrOpen:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"1a: TH adjusts the the DUT to a non-open position Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15140,13 +15021,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster stopMotion:^(NSError * err, NSDictionary * values) {
-        NSLog(@"2a: TH sends StopMotion command to DUT Error: %@", err);
+    __auto_type * payload = [[CHIPWindowCoveringClusterStopMotionPayload alloc] init];
+    [cluster stopMotion:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"2a: TH sends StopMotion command to DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15181,13 +15064,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster test:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Test Command Error: %@", err);
+    __auto_type * payload = [[CHIPTestClusterClusterTestPayload alloc] init];
+    [cluster test:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Test Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15200,12 +15085,14 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster testNotHandled:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Test Not Handled Command Error: %@", err);
+    __auto_type * payload = [[CHIPTestClusterClusterTestNotHandledPayload alloc] init];
+    [cluster testNotHandled:payload
+            responseHandler:^(NSError * err, NSDictionary * values) {
+                NSLog(@"Send Test Not Handled Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 1);
-        [expectation fulfill];
-    }];
+                XCTAssertEqual(err.code, 1);
+                [expectation fulfill];
+            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15218,15 +15105,17 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster testSpecific:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Test Specific Command Error: %@", err);
+    __auto_type * payload = [[CHIPTestClusterClusterTestSpecificPayload alloc] init];
+    [cluster testSpecific:payload
+          responseHandler:^(NSError * err, NSDictionary * values) {
+              NSLog(@"Send Test Specific Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+              XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"returnValue"] unsignedCharValue], 7);
+              XCTAssertEqual([values[@"returnValue"] unsignedCharValue], 7);
 
-        [expectation fulfill];
-    }];
+              [expectation fulfill];
+          }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15239,10 +15128,10 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t arg1Argument = 3;
-    uint8_t arg2Argument = 17;
-    [cluster testAddArguments:arg1Argument
-                         arg2:arg2Argument
+    __auto_type * payload = [[CHIPTestClusterClusterTestAddArgumentsPayload alloc] init];
+    payload.Arg1 = [NSNumber numberWithUnsignedChar:3];
+    payload.Arg2 = [NSNumber numberWithUnsignedChar:17];
+    [cluster testAddArguments:payload
               responseHandler:^(NSError * err, NSDictionary * values) {
                   NSLog(@"Send Test Add Arguments Command Error: %@", err);
 
@@ -15264,10 +15153,10 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t arg1Argument = 250;
-    uint8_t arg2Argument = 6;
-    [cluster testAddArguments:arg1Argument
-                         arg2:arg2Argument
+    __auto_type * payload = [[CHIPTestClusterClusterTestAddArgumentsPayload alloc] init];
+    payload.Arg1 = [NSNumber numberWithUnsignedChar:250];
+    payload.Arg2 = [NSNumber numberWithUnsignedChar:6];
+    [cluster testAddArguments:payload
               responseHandler:^(NSError * err, NSDictionary * values) {
                   NSLog(@"Send failing Test Add Arguments Command Error: %@", err);
 
@@ -17732,12 +17621,14 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:200 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster test:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Test Command to unsupported endpoint Error: %@", err);
+    __auto_type * payload = [[CHIPTestClusterClusterTestPayload alloc] init];
+    [cluster test:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Test Command to unsupported endpoint Error: %@", err);
 
-        XCTAssertEqual(err.code, 1);
-        [expectation fulfill];
-    }];
+            XCTAssertEqual(err.code, 1);
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -17834,10 +17725,10 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t arg1Argument = 20003U;
-    uint8_t arg2Argument = 101;
-    [cluster testEnumsRequest:arg1Argument
-                         arg2:arg2Argument
+    __auto_type * payload = [[CHIPTestClusterClusterTestEnumsRequestPayload alloc] init];
+    payload.Arg1 = [NSNumber numberWithUnsignedShort:20003];
+    payload.Arg2 = [NSNumber numberWithUnsignedChar:101];
+    [cluster testEnumsRequest:payload
               responseHandler:^(NSError * err, NSDictionary * values) {
                   NSLog(@"Send a command with a vendor_id and enum Error: %@", err);
 
@@ -18127,8 +18018,9 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t identifyTimeArgument = 0U;
-    [cluster identify:identifyTimeArgument
+    __auto_type * payload = [[CHIPIdentifyClusterIdentifyPayload alloc] init];
+    payload.IdentifyTime = [NSNumber numberWithUnsignedShort:0];
+    [cluster identify:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Send Identify command and expect success response Error: %@", err);
 
@@ -18325,8 +18217,9 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t newModeArgument = 4;
-    [cluster changeToMode:newModeArgument
+    __auto_type * payload = [[CHIPModeSelectClusterChangeToModePayload alloc] init];
+    payload.NewMode = [NSNumber numberWithUnsignedChar:4];
+    [cluster changeToMode:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Change to Supported Mode Error: %@", err);
 
@@ -18367,8 +18260,9 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t newModeArgument = 2;
-    [cluster changeToMode:newModeArgument
+    __auto_type * payload = [[CHIPModeSelectClusterChangeToModePayload alloc] init];
+    payload.NewMode = [NSNumber numberWithUnsignedChar:2];
+    [cluster changeToMode:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Change to Unsupported Mode Error: %@", err);
 
@@ -18464,13 +18358,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Set OnOff Attribute to false Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Set OnOff Attribute to false Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -18525,13 +18421,15 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn On the light to see attribute change Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn On the light to see attribute change Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -18565,13 +18463,15 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn Off the light to see attribute change Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn Off the light to see attribute change Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
