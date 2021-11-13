@@ -604,4 +604,17 @@ SessionHandle SessionManager::FindSecureSessionForNode(NodeId peerNodeId)
     return SessionHandle(found->GetPeerNodeId(), found->GetLocalSessionId(), found->GetPeerSessionId(), found->GetFabricIndex());
 }
 
+/**
+ * Provides a means to get diagnositic information such as number of sessions.
+ */
+CHIP_ERROR SessionManager::ForEachSessionHandle(void * context, SessionHandleCallback lambda)
+{
+    mSecureSessions.ForEachSession([&](auto session) {
+        SessionHandle handle(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(), session->GetFabricIndex());
+        lambda(context, handle);
+        return true;
+    });
+    return CHIP_NO_ERROR;
+}
+
 } // namespace chip

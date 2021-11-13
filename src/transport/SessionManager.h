@@ -257,6 +257,9 @@ public:
     // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
     SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
 
+    using SessionHandleCallback = bool (*)(void * context, SessionHandle &sessionHandle);
+    CHIP_ERROR ForEachSessionHandle(void * context, SessionHandleCallback callback);
+
 private:
     /**
      *    The State of a secure transport object.
