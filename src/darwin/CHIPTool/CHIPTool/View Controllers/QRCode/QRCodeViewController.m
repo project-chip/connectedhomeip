@@ -541,7 +541,8 @@
                 self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice
                                                                        endpoint:0
                                                                           queue:dispatch_get_main_queue()];
-                CHIPNetworkCommissioningClusterAddWiFiNetworkPayload * payload = [[CHIPNetworkCommissioningClusterAddWiFiNetworkPayload alloc] init];
+                CHIPNetworkCommissioningClusterAddWiFiNetworkPayload * payload =
+                    [[CHIPNetworkCommissioningClusterAddWiFiNetworkPayload alloc] init];
                 payload.Ssid = [ssid dataUsingEncoding:NSUTF8StringEncoding];
                 payload.Credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
                 payload.Breadcrumb = [NSNumber numberWithUnsignedInt:0];
@@ -569,7 +570,8 @@
                 self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice
                                                                        endpoint:0
                                                                           queue:dispatch_get_main_queue()];
-                CHIPNetworkCommissioningClusterAddThreadNetworkPayload * payload = [[CHIPNetworkCommissioningClusterAddThreadNetworkPayload alloc] init];
+                CHIPNetworkCommissioningClusterAddThreadNetworkPayload * payload =
+                    [[CHIPNetworkCommissioningClusterAddThreadNetworkPayload alloc] init];
                 payload.OperationalDataset = threadDataSet;
                 payload.Breadcrumb = [NSNumber numberWithUnsignedInt:0];
                 payload.TimeoutMs = [NSNumber numberWithUnsignedInt:3000];
@@ -596,7 +598,8 @@
         return;
     }
 
-    CHIPNetworkCommissioningClusterEnableNetworkPayload * payload = [[CHIPNetworkCommissioningClusterEnableNetworkPayload alloc] init];
+    CHIPNetworkCommissioningClusterEnableNetworkPayload * payload =
+        [[CHIPNetworkCommissioningClusterEnableNetworkPayload alloc] init];
     if (isWiFi) {
         NSString * ssid = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
         payload.NetworkID = [ssid dataUsingEncoding:NSUTF8StringEncoding];

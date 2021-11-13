@@ -118,10 +118,11 @@
 
                 [cluster mfgSpecificPing:[[CHIPBasicClusterMfgSpecificPingPayload alloc] init]
                          responseHandler:^(NSError * error, NSDictionary * values) {
-                    NSString * resultString = (error == nil) ? @"MfgSpecificPing command: success!"
-                                                             : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
-                    [self updateResult:resultString];
-                }];
+                             NSString * resultString = (error == nil)
+                                 ? @"MfgSpecificPing command: success!"
+                                 : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
+                             [self updateResult:resultString];
+                         }];
             } else {
                 [self updateResult:@"Failed to establish a connection with the device"];
             }
