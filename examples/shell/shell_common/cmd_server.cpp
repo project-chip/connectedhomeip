@@ -31,11 +31,15 @@
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::Credentials;
+using namespace chip::ArgParser;
 
 bool lowPowerClusterSleep() { return true; }
 
 
 static chip::Shell::Engine sShellServerSubcommands;
+static uint16_t sServerPortOperational = CHIP_PORT;
+static uint16_t sServerPortCommissioning = CHIP_UDC_PORT;
+
 
 CHIP_ERROR CmdAppServerHelp(int argc, char ** argv)
 {
@@ -45,17 +49,8 @@ CHIP_ERROR CmdAppServerHelp(int argc, char ** argv)
 
 static CHIP_ERROR CmdAppServerStart(int argc, char ** argv)
 {
-    uint16_t securePort   = CHIP_PORT;
-    uint16_t unsecurePort = CHIP_UDC_PORT;
-/*
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    // use a different service port to make testing possible with other sample devices running on same host
-    securePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
-    unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-*/
     // Init ZCL Data Model and CHIP App Server
-    chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
+    chip::Server::GetInstance().Init(nullptr, sServerPortOperational, sServerPortCommissioning);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -69,6 +64,35 @@ static CHIP_ERROR CmdAppServerStop(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+static CHIP_ERROR CmdAppServerPort(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        streamer_printf(streamer_get(), "%d\r\n", sServerPortOperational);
+    }
+    else
+    {
+        bool success = ParseInt(argv[0], sServerPortOperational);
+        if (!success) return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR CmdAppServerUdcPort(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        streamer_printf(streamer_get(), "%d\r\n", sServerPortCommissioning);
+    }
+    else
+    {
+        bool success = ParseInt(argv[0], sServerPortCommissioning);
+        if (!success) return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CHIP_NO_ERROR;
+}
 
 static CHIP_ERROR CmdAppServer(int argc, char ** argv)
 {
@@ -96,6 +120,8 @@ void cmd_app_server_init()
         { &CmdAppServerHelp, "help", "Usage: server <subcommand>" },
         { &CmdAppServerStart, "start", "Start the ZCL application server." },
         { &CmdAppServerStop, "stop", "Stop the ZCL application server." },
+        { &CmdAppServerPort, "port", "Get/Set operational port of server." },
+        { &CmdAppServerUdcPort, "udcport", "Get/Set commissioning port of server." },
     };
 
     // Register `config` subcommands with the local shell dispatcher.
