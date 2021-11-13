@@ -183,23 +183,23 @@ class ClusterDetailFragment : Fragment() {
       if (response is List<*>) {
         createListReadAttributeView(response, inflater, callbackList, variableNameType)
       } else {
-        createPrimitiveReadAttributeView(response, inflater, callbackList, variableNameType)
+        createBasicReadAttributeView(response, inflater, callbackList, variableNameType)
       }
     }
   }
 
-  private fun createPrimitiveReadAttributeView(
+  private fun createBasicReadAttributeView(
     response: Any,
     inflater: LayoutInflater,
     callbackList: LinearLayout,
     variableNameType: CommandResponseInfo
   ) {
-    val callback =
+    val callbackItem =
       inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
-    callback.clusterCallbackNameTv.text = variableNameType.name
-    callback.clusterCallbackDataTv.text = response.toString()
-    callback.clusterCallbackTypeTv.text = variableNameType.type
-    callbackList.addView(callback)
+    callbackItem.clusterCallbackNameTv.text = variableNameType.name
+    callbackItem.clusterCallbackDataTv.text = response.toString()
+    callbackItem.clusterCallbackTypeTv.text = variableNameType.type
+    callbackList.addView(callbackItem)
   }
 
   private fun createListReadAttributeView(
