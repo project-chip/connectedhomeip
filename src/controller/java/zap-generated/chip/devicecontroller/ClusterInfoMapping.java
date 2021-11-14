@@ -3413,6 +3413,7 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.WindowCoveringCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("windowCovering", windowCoveringClusterInfo);
+    return clusterMap;
   }
 
   public void combineCommand(

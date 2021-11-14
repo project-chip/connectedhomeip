@@ -263,6 +263,7 @@ public class ClusterInfoMapping {
         (ptr, endpointId) -> new ChipClusters.{{asUpperCamelCase name}}Cluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInfo);
     {{/chip_client_clusters}}
+    return clusterMap;
  }
 
  public void combineCommand(Map<String, ClusterInfo> destination, Map<String, Map<String, InteractionInfo>> source) {
