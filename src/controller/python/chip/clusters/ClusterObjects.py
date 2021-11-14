@@ -35,7 +35,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
         return None
 
     for t in typing.get_args(typeToCheck):
-        if (matchingType == None):
+        if (matchingType is None):
             if (t != type(None) and t != Nullable):
                 return t
         else:
@@ -69,13 +69,13 @@ class ClusterObjectFieldDescriptor:
 
     def PutFieldToTLV(self, tag, val, writer: tlv.TLVWriter, debugPath: str = '?'):
         if (val == NullValue):
-            if (GetUnionUnderlyingType(self.Type, Nullable) == None):
+            if (GetUnionUnderlyingType(self.Type, Nullable) is None):
                 raise ValueError(
                     f"Field {debugPath}.{self.Label} was not nullable, but got a null")
 
             writer.put(tag, None)
-        elif (val == None):
-            if (GetUnionUnderlyingType(self.Type, type(None)) == None):
+        elif (val is None):
+            if (GetUnionUnderlyingType(self.Type, type(None)) is None):
                 raise ValueError(
                     f"Field {debugPath}.{self.Label} was not optional, but encountered None")
         else:
@@ -85,7 +85,7 @@ class ClusterObjectFieldDescriptor:
             # since at this point, we're guarenteed to not get None or Null as values.
             #
             elementType = GetUnionUnderlyingType(self.Type)
-            if (elementType == None):
+            if (elementType is None):
                 elementType = self.Type
 
             if not isinstance(val, List):
@@ -144,13 +144,13 @@ class ClusterObjectDescriptor:
                 ret[tag] = value
                 continue
 
-            if (value == None):
+            if (value is None):
                 ret[descriptor.Label] = NullValue
                 continue
 
             if (typing.get_origin(descriptor.Type) == typing.Union):
                 realType = GetUnionUnderlyingType(descriptor.Type)
-                if (realType == None):
+                if (realType is None):
                     raise ValueError(
                         f"Field {debugPath}.{self.Label} has no valid underlying data model type")
 
