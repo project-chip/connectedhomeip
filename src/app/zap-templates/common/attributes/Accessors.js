@@ -15,9 +15,11 @@
  *    limitations under the License.
  */
 
+const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
 const ListHelper   = require('../../common/ListHelper.js');
 const StringHelper = require('../../common/StringHelper.js');
 const StructHelper = require('../../common/StructHelper.js');
+const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 
 // Issue #8202
 // The specification allow non-standard signed and unsigned integer with a width of 24, 40, 48 or 56, but those types does not have
@@ -29,24 +31,52 @@ function isUnsupportedType(type)
   return unsupportedTypes.includes(type.toUpperCase());
 }
 
-function canHaveSimpleAccessors(type)
+function canHaveSimpleAccessors(attr)
 {
-  if (ListHelper.isList(type)) {
+  if (attr.isArray || attr.isList) {
     return false;
   }
 
-  if (StructHelper.isStruct(type)) {
+  if (ListHelper.isList(attr.type)) {
     return false;
   }
 
-  if (isUnsupportedType(type)) {
+  if (StructHelper.isStruct(attr.type)) {
+    return false;
+  }
+
+  if (isUnsupportedType(attr.type)) {
     return false;
   }
 
   return true;
 }
 
+async function accessorGetterType(attr)
+{
+  let type;
+  let mayNeedPointer = false;
+  if (StringHelper.isCharString(attr.type)) {
+    type = "chip::MutableCharSpan";
+  } else if (StringHelper.isOctetString(attr.type)) {
+    type = "chip::MutableByteSpan";
+  } else {
+    mayNeedPointer = true;
+    const options  = { 'hash' : {} };
+    type           = await zclHelper.asUnderlyingZclType.call(this, attr.type, options);
+  }
+
+  if (attr.isNullable) {
+    type = `DataModel::Nullable<${type}> &`;
+  } else if (mayNeedPointer) {
+    type = `${type} *`;
+  }
+
+  return type;
+}
+
 //
 // Module exports
 //
 exports.canHaveSimpleAccessors = canHaveSimpleAccessors;
+exports.accessorGetterType     = accessorGetterType;
