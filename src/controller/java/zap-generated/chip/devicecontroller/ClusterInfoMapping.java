@@ -3117,11 +3117,302 @@ public class ClusterInfoMapping {
   }
 
   public Map<String, ClusterInfo> getClusterMap() {
-    Map<String, ClusterInfo> clusterMap = new HashMap<>();
-    getCommandMap(clusterMap);
+    Map<String, ClusterInfo> clusterMap = initializeClusterMap();
+    Map<String, Map<String, InteractionInfo>> commandMap = getCommandMap();
+    combineCommand(clusterMap, commandMap);
     Map<String, Map<String, InteractionInfo>> readAttributeMap = getReadAttributeMap();
     combineCommand(clusterMap, readAttributeMap);
     return clusterMap;
+  }
+
+  public Map<String, ClusterInfo> initializeClusterMap() {
+    Map<String, ClusterInfo> clusterMap = new HashMap<>();
+    ClusterInfo accountLoginClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.AccountLoginCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("accountLogin", accountLoginClusterInfo);
+    ClusterInfo administratorCommissioningClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) ->
+                new ChipClusters.AdministratorCommissioningCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("administratorCommissioning", administratorCommissioningClusterInfo);
+    ClusterInfo applicationBasicClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ApplicationBasicCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("applicationBasic", applicationBasicClusterInfo);
+    ClusterInfo applicationLauncherClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ApplicationLauncherCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("applicationLauncher", applicationLauncherClusterInfo);
+    ClusterInfo audioOutputClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.AudioOutputCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("audioOutput", audioOutputClusterInfo);
+    ClusterInfo barrierControlClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BarrierControlCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("barrierControl", barrierControlClusterInfo);
+    ClusterInfo basicClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BasicCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("basic", basicClusterInfo);
+    ClusterInfo binaryInputBasicClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BinaryInputBasicCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("binaryInputBasic", binaryInputBasicClusterInfo);
+    ClusterInfo bindingClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BindingCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("binding", bindingClusterInfo);
+    ClusterInfo booleanStateClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BooleanStateCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("booleanState", booleanStateClusterInfo);
+    ClusterInfo bridgedActionsClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BridgedActionsCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("bridgedActions", bridgedActionsClusterInfo);
+    ClusterInfo bridgedDeviceBasicClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BridgedDeviceBasicCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("bridgedDeviceBasic", bridgedDeviceBasicClusterInfo);
+    ClusterInfo colorControlClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ColorControlCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("colorControl", colorControlClusterInfo);
+    ClusterInfo contentLauncherClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ContentLauncherCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("contentLauncher", contentLauncherClusterInfo);
+    ClusterInfo descriptorClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.DescriptorCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("descriptor", descriptorClusterInfo);
+    ClusterInfo diagnosticLogsClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.DiagnosticLogsCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("diagnosticLogs", diagnosticLogsClusterInfo);
+    ClusterInfo doorLockClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.DoorLockCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("doorLock", doorLockClusterInfo);
+    ClusterInfo electricalMeasurementClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ElectricalMeasurementCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("electricalMeasurement", electricalMeasurementClusterInfo);
+    ClusterInfo ethernetNetworkDiagnosticsClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) ->
+                new ChipClusters.EthernetNetworkDiagnosticsCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("ethernetNetworkDiagnostics", ethernetNetworkDiagnosticsClusterInfo);
+    ClusterInfo fixedLabelClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.FixedLabelCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("fixedLabel", fixedLabelClusterInfo);
+    ClusterInfo flowMeasurementClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.FlowMeasurementCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("flowMeasurement", flowMeasurementClusterInfo);
+    ClusterInfo generalCommissioningClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.GeneralCommissioningCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("generalCommissioning", generalCommissioningClusterInfo);
+    ClusterInfo generalDiagnosticsClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.GeneralDiagnosticsCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("generalDiagnostics", generalDiagnosticsClusterInfo);
+    ClusterInfo groupKeyManagementClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.GroupKeyManagementCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("groupKeyManagement", groupKeyManagementClusterInfo);
+    ClusterInfo groupsClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.GroupsCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("groups", groupsClusterInfo);
+    ClusterInfo identifyClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.IdentifyCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("identify", identifyClusterInfo);
+    ClusterInfo illuminanceMeasurementClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.IlluminanceMeasurementCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("illuminanceMeasurement", illuminanceMeasurementClusterInfo);
+    ClusterInfo keypadInputClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.KeypadInputCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("keypadInput", keypadInputClusterInfo);
+    ClusterInfo levelControlClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.LevelControlCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("levelControl", levelControlClusterInfo);
+    ClusterInfo lowPowerClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.LowPowerCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("lowPower", lowPowerClusterInfo);
+    ClusterInfo mediaInputClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.MediaInputCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("mediaInput", mediaInputClusterInfo);
+    ClusterInfo mediaPlaybackClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.MediaPlaybackCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("mediaPlayback", mediaPlaybackClusterInfo);
+    ClusterInfo modeSelectClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ModeSelectCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("modeSelect", modeSelectClusterInfo);
+    ClusterInfo networkCommissioningClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.NetworkCommissioningCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("networkCommissioning", networkCommissioningClusterInfo);
+    ClusterInfo otaSoftwareUpdateProviderClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.OtaSoftwareUpdateProviderCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("otaSoftwareUpdateProvider", otaSoftwareUpdateProviderClusterInfo);
+    ClusterInfo otaSoftwareUpdateRequestorClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) ->
+                new ChipClusters.OtaSoftwareUpdateRequestorCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("otaSoftwareUpdateRequestor", otaSoftwareUpdateRequestorClusterInfo);
+    ClusterInfo occupancySensingClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.OccupancySensingCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("occupancySensing", occupancySensingClusterInfo);
+    ClusterInfo onOffClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.OnOffCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("onOff", onOffClusterInfo);
+    ClusterInfo onOffSwitchConfigurationClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.OnOffSwitchConfigurationCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("onOffSwitchConfiguration", onOffSwitchConfigurationClusterInfo);
+    ClusterInfo operationalCredentialsClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.OperationalCredentialsCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("operationalCredentials", operationalCredentialsClusterInfo);
+    ClusterInfo powerSourceClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.PowerSourceCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("powerSource", powerSourceClusterInfo);
+    ClusterInfo pressureMeasurementClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.PressureMeasurementCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("pressureMeasurement", pressureMeasurementClusterInfo);
+    ClusterInfo pumpConfigurationAndControlClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) ->
+                new ChipClusters.PumpConfigurationAndControlCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("pumpConfigurationAndControl", pumpConfigurationAndControlClusterInfo);
+    ClusterInfo relativeHumidityMeasurementClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) ->
+                new ChipClusters.RelativeHumidityMeasurementCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("relativeHumidityMeasurement", relativeHumidityMeasurementClusterInfo);
+    ClusterInfo scenesClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ScenesCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("scenes", scenesClusterInfo);
+    ClusterInfo softwareDiagnosticsClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.SoftwareDiagnosticsCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("softwareDiagnostics", softwareDiagnosticsClusterInfo);
+    ClusterInfo switchClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.SwitchCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("switch", switchClusterInfo);
+    ClusterInfo tvChannelClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.TvChannelCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("tvChannel", tvChannelClusterInfo);
+    ClusterInfo targetNavigatorClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.TargetNavigatorCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("targetNavigator", targetNavigatorClusterInfo);
+    ClusterInfo temperatureMeasurementClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.TemperatureMeasurementCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("temperatureMeasurement", temperatureMeasurementClusterInfo);
+    ClusterInfo testClusterClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.TestClusterCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("testCluster", testClusterClusterInfo);
+    ClusterInfo thermostatClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ThermostatCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("thermostat", thermostatClusterInfo);
+    ClusterInfo thermostatUserInterfaceConfigurationClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) ->
+                new ChipClusters.ThermostatUserInterfaceConfigurationCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put(
+        "thermostatUserInterfaceConfiguration", thermostatUserInterfaceConfigurationClusterInfo);
+    ClusterInfo threadNetworkDiagnosticsClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ThreadNetworkDiagnosticsCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("threadNetworkDiagnostics", threadNetworkDiagnosticsClusterInfo);
+    ClusterInfo wakeOnLanClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.WakeOnLanCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("wakeOnLan", wakeOnLanClusterInfo);
+    ClusterInfo wiFiNetworkDiagnosticsClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.WiFiNetworkDiagnosticsCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("wiFiNetworkDiagnostics", wiFiNetworkDiagnosticsClusterInfo);
+    ClusterInfo windowCoveringClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.WindowCoveringCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("windowCovering", windowCoveringClusterInfo);
   }
 
   public void combineCommand(
@@ -3203,7 +3494,8 @@ public class ClusterInfoMapping {
     destination.get("windowCovering").combineCommands(source.get("windowCovering"));
   }
 
-  public Map<String, ClusterInfo> getCommandMap(Map<String, ClusterInfo> clusterMap) {
+  public Map<String, Map<String, InteractionInfo>> getCommandMap() {
+    Map<String, Map<String, InteractionInfo>> commandMap = new HashMap<>();
     Map<String, InteractionInfo> accountLoginClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> accountLogingetSetupPINCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -3249,12 +3541,7 @@ public class ClusterInfoMapping {
             () -> new DelegatedDefaultClusterCallback(),
             accountLoginloginCommandParams);
     accountLoginClusterInteractionInfoMap.put("login", accountLoginloginInteractionInfo);
-    // Populate cluster
-    ClusterInfo accountLoginClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.AccountLoginCluster(ptr, endpointId),
-            accountLoginClusterInteractionInfoMap);
-    clusterMap.put("accountLogin", accountLoginClusterInfo);
+    commandMap.put("accountLogin", accountLoginClusterInteractionInfoMap);
     Map<String, InteractionInfo> administratorCommissioningClusterInteractionInfoMap =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo>
@@ -3356,13 +3643,8 @@ public class ClusterInfoMapping {
             administratorCommissioningrevokeCommissioningCommandParams);
     administratorCommissioningClusterInteractionInfoMap.put(
         "revokeCommissioning", administratorCommissioningrevokeCommissioningInteractionInfo);
-    // Populate cluster
-    ClusterInfo administratorCommissioningClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) ->
-                new ChipClusters.AdministratorCommissioningCluster(ptr, endpointId),
-            administratorCommissioningClusterInteractionInfoMap);
-    clusterMap.put("administratorCommissioning", administratorCommissioningClusterInfo);
+    commandMap.put(
+        "administratorCommissioning", administratorCommissioningClusterInteractionInfoMap);
     Map<String, InteractionInfo> applicationBasicClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> applicationBasicchangeStatusCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -3383,12 +3665,7 @@ public class ClusterInfoMapping {
             applicationBasicchangeStatusCommandParams);
     applicationBasicClusterInteractionInfoMap.put(
         "changeStatus", applicationBasicchangeStatusInteractionInfo);
-    // Populate cluster
-    ClusterInfo applicationBasicClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.ApplicationBasicCluster(ptr, endpointId),
-            applicationBasicClusterInteractionInfoMap);
-    clusterMap.put("applicationBasic", applicationBasicClusterInfo);
+    commandMap.put("applicationBasic", applicationBasicClusterInteractionInfoMap);
     Map<String, InteractionInfo> applicationLauncherClusterInteractionInfoMap =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> applicationLauncherlaunchAppCommandParams =
@@ -3423,12 +3700,7 @@ public class ClusterInfoMapping {
             applicationLauncherlaunchAppCommandParams);
     applicationLauncherClusterInteractionInfoMap.put(
         "launchApp", applicationLauncherlaunchAppInteractionInfo);
-    // Populate cluster
-    ClusterInfo applicationLauncherClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.ApplicationLauncherCluster(ptr, endpointId),
-            applicationLauncherClusterInteractionInfoMap);
-    clusterMap.put("applicationLauncher", applicationLauncherClusterInfo);
+    commandMap.put("applicationLauncher", applicationLauncherClusterInteractionInfoMap);
     Map<String, InteractionInfo> audioOutputClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> audioOutputrenameOutputCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -3475,12 +3747,7 @@ public class ClusterInfoMapping {
             audioOutputselectOutputCommandParams);
     audioOutputClusterInteractionInfoMap.put(
         "selectOutput", audioOutputselectOutputInteractionInfo);
-    // Populate cluster
-    ClusterInfo audioOutputClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.AudioOutputCluster(ptr, endpointId),
-            audioOutputClusterInteractionInfoMap);
-    clusterMap.put("audioOutput", audioOutputClusterInfo);
+    commandMap.put("audioOutput", audioOutputClusterInteractionInfoMap);
     Map<String, InteractionInfo> barrierControlClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> barrierControlbarrierControlGoToPercentCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -3515,12 +3782,7 @@ public class ClusterInfoMapping {
             barrierControlbarrierControlStopCommandParams);
     barrierControlClusterInteractionInfoMap.put(
         "barrierControlStop", barrierControlbarrierControlStopInteractionInfo);
-    // Populate cluster
-    ClusterInfo barrierControlClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.BarrierControlCluster(ptr, endpointId),
-            barrierControlClusterInteractionInfoMap);
-    clusterMap.put("barrierControl", barrierControlClusterInfo);
+    commandMap.put("barrierControl", barrierControlClusterInteractionInfoMap);
     Map<String, InteractionInfo> basicClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> basicmfgSpecificPingCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -3534,19 +3796,9 @@ public class ClusterInfoMapping {
             () -> new DelegatedDefaultClusterCallback(),
             basicmfgSpecificPingCommandParams);
     basicClusterInteractionInfoMap.put("mfgSpecificPing", basicmfgSpecificPingInteractionInfo);
-    // Populate cluster
-    ClusterInfo basicClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.BasicCluster(ptr, endpointId),
-            basicClusterInteractionInfoMap);
-    clusterMap.put("basic", basicClusterInfo);
+    commandMap.put("basic", basicClusterInteractionInfoMap);
     Map<String, InteractionInfo> binaryInputBasicClusterInteractionInfoMap = new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo binaryInputBasicClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.BinaryInputBasicCluster(ptr, endpointId),
-            binaryInputBasicClusterInteractionInfoMap);
-    clusterMap.put("binaryInputBasic", binaryInputBasicClusterInfo);
+    commandMap.put("binaryInputBasic", binaryInputBasicClusterInteractionInfoMap);
     Map<String, InteractionInfo> bindingClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> bindingbindCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -3614,19 +3866,9 @@ public class ClusterInfoMapping {
             () -> new DelegatedDefaultClusterCallback(),
             bindingunbindCommandParams);
     bindingClusterInteractionInfoMap.put("unbind", bindingunbindInteractionInfo);
-    // Populate cluster
-    ClusterInfo bindingClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.BindingCluster(ptr, endpointId),
-            bindingClusterInteractionInfoMap);
-    clusterMap.put("binding", bindingClusterInfo);
+    commandMap.put("binding", bindingClusterInteractionInfoMap);
     Map<String, InteractionInfo> booleanStateClusterInteractionInfoMap = new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo booleanStateClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.BooleanStateCluster(ptr, endpointId),
-            booleanStateClusterInteractionInfoMap);
-    clusterMap.put("booleanState", booleanStateClusterInfo);
+    commandMap.put("booleanState", booleanStateClusterInteractionInfoMap);
     Map<String, InteractionInfo> bridgedActionsClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> bridgedActionsdisableActionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -3972,20 +4214,10 @@ public class ClusterInfoMapping {
             bridgedActionsstopActionCommandParams);
     bridgedActionsClusterInteractionInfoMap.put(
         "stopAction", bridgedActionsstopActionInteractionInfo);
-    // Populate cluster
-    ClusterInfo bridgedActionsClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.BridgedActionsCluster(ptr, endpointId),
-            bridgedActionsClusterInteractionInfoMap);
-    clusterMap.put("bridgedActions", bridgedActionsClusterInfo);
+    commandMap.put("bridgedActions", bridgedActionsClusterInteractionInfoMap);
     Map<String, InteractionInfo> bridgedDeviceBasicClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo bridgedDeviceBasicClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.BridgedDeviceBasicCluster(ptr, endpointId),
-            bridgedDeviceBasicClusterInteractionInfoMap);
-    clusterMap.put("bridgedDeviceBasic", bridgedDeviceBasicClusterInfo);
+    commandMap.put("bridgedDeviceBasic", bridgedDeviceBasicClusterInteractionInfoMap);
     Map<String, InteractionInfo> colorControlClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> colorControlcolorLoopSetCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -4801,12 +5033,7 @@ public class ClusterInfoMapping {
             colorControlstopMoveStepCommandParams);
     colorControlClusterInteractionInfoMap.put(
         "stopMoveStep", colorControlstopMoveStepInteractionInfo);
-    // Populate cluster
-    ClusterInfo colorControlClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.ColorControlCluster(ptr, endpointId),
-            colorControlClusterInteractionInfoMap);
-    clusterMap.put("colorControl", colorControlClusterInfo);
+    commandMap.put("colorControl", colorControlClusterInteractionInfoMap);
     Map<String, InteractionInfo> contentLauncherClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> contentLauncherlaunchContentCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -4860,19 +5087,9 @@ public class ClusterInfoMapping {
             contentLauncherlaunchURLCommandParams);
     contentLauncherClusterInteractionInfoMap.put(
         "launchURL", contentLauncherlaunchURLInteractionInfo);
-    // Populate cluster
-    ClusterInfo contentLauncherClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.ContentLauncherCluster(ptr, endpointId),
-            contentLauncherClusterInteractionInfoMap);
-    clusterMap.put("contentLauncher", contentLauncherClusterInfo);
+    commandMap.put("contentLauncher", contentLauncherClusterInteractionInfoMap);
     Map<String, InteractionInfo> descriptorClusterInteractionInfoMap = new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo descriptorClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.DescriptorCluster(ptr, endpointId),
-            descriptorClusterInteractionInfoMap);
-    clusterMap.put("descriptor", descriptorClusterInfo);
+    commandMap.put("descriptor", descriptorClusterInteractionInfoMap);
     Map<String, InteractionInfo> diagnosticLogsClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> diagnosticLogsretrieveLogsRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -4909,12 +5126,7 @@ public class ClusterInfoMapping {
             diagnosticLogsretrieveLogsRequestCommandParams);
     diagnosticLogsClusterInteractionInfoMap.put(
         "retrieveLogsRequest", diagnosticLogsretrieveLogsRequestInteractionInfo);
-    // Populate cluster
-    ClusterInfo diagnosticLogsClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.DiagnosticLogsCluster(ptr, endpointId),
-            diagnosticLogsClusterInteractionInfoMap);
-    clusterMap.put("diagnosticLogs", diagnosticLogsClusterInfo);
+    commandMap.put("diagnosticLogs", diagnosticLogsClusterInteractionInfoMap);
     Map<String, InteractionInfo> doorLockClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> doorLockclearAllPinsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -5480,20 +5692,10 @@ public class ClusterInfoMapping {
             doorLockunlockWithTimeoutCommandParams);
     doorLockClusterInteractionInfoMap.put(
         "unlockWithTimeout", doorLockunlockWithTimeoutInteractionInfo);
-    // Populate cluster
-    ClusterInfo doorLockClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.DoorLockCluster(ptr, endpointId),
-            doorLockClusterInteractionInfoMap);
-    clusterMap.put("doorLock", doorLockClusterInfo);
+    commandMap.put("doorLock", doorLockClusterInteractionInfoMap);
     Map<String, InteractionInfo> electricalMeasurementClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo electricalMeasurementClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.ElectricalMeasurementCluster(ptr, endpointId),
-            electricalMeasurementClusterInteractionInfoMap);
-    clusterMap.put("electricalMeasurement", electricalMeasurementClusterInfo);
+    commandMap.put("electricalMeasurement", electricalMeasurementClusterInteractionInfoMap);
     Map<String, InteractionInfo> ethernetNetworkDiagnosticsClusterInteractionInfoMap =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> ethernetNetworkDiagnosticsresetCountsCommandParams =
@@ -5509,27 +5711,12 @@ public class ClusterInfoMapping {
             ethernetNetworkDiagnosticsresetCountsCommandParams);
     ethernetNetworkDiagnosticsClusterInteractionInfoMap.put(
         "resetCounts", ethernetNetworkDiagnosticsresetCountsInteractionInfo);
-    // Populate cluster
-    ClusterInfo ethernetNetworkDiagnosticsClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) ->
-                new ChipClusters.EthernetNetworkDiagnosticsCluster(ptr, endpointId),
-            ethernetNetworkDiagnosticsClusterInteractionInfoMap);
-    clusterMap.put("ethernetNetworkDiagnostics", ethernetNetworkDiagnosticsClusterInfo);
+    commandMap.put(
+        "ethernetNetworkDiagnostics", ethernetNetworkDiagnosticsClusterInteractionInfoMap);
     Map<String, InteractionInfo> fixedLabelClusterInteractionInfoMap = new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo fixedLabelClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.FixedLabelCluster(ptr, endpointId),
-            fixedLabelClusterInteractionInfoMap);
-    clusterMap.put("fixedLabel", fixedLabelClusterInfo);
+    commandMap.put("fixedLabel", fixedLabelClusterInteractionInfoMap);
     Map<String, InteractionInfo> flowMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo flowMeasurementClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.FlowMeasurementCluster(ptr, endpointId),
-            flowMeasurementClusterInteractionInfoMap);
-    clusterMap.put("flowMeasurement", flowMeasurementClusterInfo);
+    commandMap.put("flowMeasurement", flowMeasurementClusterInteractionInfoMap);
     Map<String, InteractionInfo> generalCommissioningClusterInteractionInfoMap =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> generalCommissioningarmFailSafeCommandParams =
@@ -5621,28 +5808,13 @@ public class ClusterInfoMapping {
             generalCommissioningsetRegulatoryConfigCommandParams);
     generalCommissioningClusterInteractionInfoMap.put(
         "setRegulatoryConfig", generalCommissioningsetRegulatoryConfigInteractionInfo);
-    // Populate cluster
-    ClusterInfo generalCommissioningClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.GeneralCommissioningCluster(ptr, endpointId),
-            generalCommissioningClusterInteractionInfoMap);
-    clusterMap.put("generalCommissioning", generalCommissioningClusterInfo);
+    commandMap.put("generalCommissioning", generalCommissioningClusterInteractionInfoMap);
     Map<String, InteractionInfo> generalDiagnosticsClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo generalDiagnosticsClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.GeneralDiagnosticsCluster(ptr, endpointId),
-            generalDiagnosticsClusterInteractionInfoMap);
-    clusterMap.put("generalDiagnostics", generalDiagnosticsClusterInfo);
+    commandMap.put("generalDiagnostics", generalDiagnosticsClusterInteractionInfoMap);
     Map<String, InteractionInfo> groupKeyManagementClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo groupKeyManagementClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.GroupKeyManagementCluster(ptr, endpointId),
-            groupKeyManagementClusterInteractionInfoMap);
-    clusterMap.put("groupKeyManagement", groupKeyManagementClusterInfo);
+    commandMap.put("groupKeyManagement", groupKeyManagementClusterInteractionInfoMap);
     Map<String, InteractionInfo> groupsClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> groupsaddGroupCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -5767,12 +5939,7 @@ public class ClusterInfoMapping {
             () -> new DelegatedViewGroupResponseCallback(),
             groupsviewGroupCommandParams);
     groupsClusterInteractionInfoMap.put("viewGroup", groupsviewGroupInteractionInfo);
-    // Populate cluster
-    ClusterInfo groupsClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.GroupsCluster(ptr, endpointId),
-            groupsClusterInteractionInfoMap);
-    clusterMap.put("groups", groupsClusterInfo);
+    commandMap.put("groups", groupsClusterInteractionInfoMap);
     Map<String, InteractionInfo> identifyClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> identifyidentifyCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -5831,20 +5998,10 @@ public class ClusterInfoMapping {
             () -> new DelegatedDefaultClusterCallback(),
             identifytriggerEffectCommandParams);
     identifyClusterInteractionInfoMap.put("triggerEffect", identifytriggerEffectInteractionInfo);
-    // Populate cluster
-    ClusterInfo identifyClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.IdentifyCluster(ptr, endpointId),
-            identifyClusterInteractionInfoMap);
-    clusterMap.put("identify", identifyClusterInfo);
+    commandMap.put("identify", identifyClusterInteractionInfoMap);
     Map<String, InteractionInfo> illuminanceMeasurementClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo illuminanceMeasurementClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.IlluminanceMeasurementCluster(ptr, endpointId),
-            illuminanceMeasurementClusterInteractionInfoMap);
-    clusterMap.put("illuminanceMeasurement", illuminanceMeasurementClusterInfo);
+    commandMap.put("illuminanceMeasurement", illuminanceMeasurementClusterInteractionInfoMap);
     Map<String, InteractionInfo> keypadInputClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> keypadInputsendKeyCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -5864,12 +6021,7 @@ public class ClusterInfoMapping {
             () -> new DelegatedSendKeyResponseCallback(),
             keypadInputsendKeyCommandParams);
     keypadInputClusterInteractionInfoMap.put("sendKey", keypadInputsendKeyInteractionInfo);
-    // Populate cluster
-    ClusterInfo keypadInputClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.KeypadInputCluster(ptr, endpointId),
-            keypadInputClusterInteractionInfoMap);
-    clusterMap.put("keypadInput", keypadInputClusterInfo);
+    commandMap.put("keypadInput", keypadInputClusterInteractionInfoMap);
     Map<String, InteractionInfo> levelControlClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> levelControlmoveCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -6104,12 +6256,7 @@ public class ClusterInfoMapping {
             levelControlstopWithOnOffCommandParams);
     levelControlClusterInteractionInfoMap.put(
         "stopWithOnOff", levelControlstopWithOnOffInteractionInfo);
-    // Populate cluster
-    ClusterInfo levelControlClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.LevelControlCluster(ptr, endpointId),
-            levelControlClusterInteractionInfoMap);
-    clusterMap.put("levelControl", levelControlClusterInfo);
+    commandMap.put("levelControl", levelControlClusterInteractionInfoMap);
     Map<String, InteractionInfo> lowPowerClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> lowPowersleepCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -6122,12 +6269,7 @@ public class ClusterInfoMapping {
             () -> new DelegatedDefaultClusterCallback(),
             lowPowersleepCommandParams);
     lowPowerClusterInteractionInfoMap.put("sleep", lowPowersleepInteractionInfo);
-    // Populate cluster
-    ClusterInfo lowPowerClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.LowPowerCluster(ptr, endpointId),
-            lowPowerClusterInteractionInfoMap);
-    clusterMap.put("lowPower", lowPowerClusterInfo);
+    commandMap.put("lowPower", lowPowerClusterInteractionInfoMap);
     Map<String, InteractionInfo> mediaInputClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> mediaInputhideInputStatusCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -6195,12 +6337,7 @@ public class ClusterInfoMapping {
             mediaInputshowInputStatusCommandParams);
     mediaInputClusterInteractionInfoMap.put(
         "showInputStatus", mediaInputshowInputStatusInteractionInfo);
-    // Populate cluster
-    ClusterInfo mediaInputClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.MediaInputCluster(ptr, endpointId),
-            mediaInputClusterInteractionInfoMap);
-    clusterMap.put("mediaInput", mediaInputClusterInfo);
+    commandMap.put("mediaInput", mediaInputClusterInteractionInfoMap);
     Map<String, InteractionInfo> mediaPlaybackClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> mediaPlaybackmediaFastForwardCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -6376,12 +6513,7 @@ public class ClusterInfoMapping {
             () -> new DelegatedMediaStopResponseCallback(),
             mediaPlaybackmediaStopCommandParams);
     mediaPlaybackClusterInteractionInfoMap.put("mediaStop", mediaPlaybackmediaStopInteractionInfo);
-    // Populate cluster
-    ClusterInfo mediaPlaybackClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.MediaPlaybackCluster(ptr, endpointId),
-            mediaPlaybackClusterInteractionInfoMap);
-    clusterMap.put("mediaPlayback", mediaPlaybackClusterInfo);
+    commandMap.put("mediaPlayback", mediaPlaybackClusterInteractionInfoMap);
     Map<String, InteractionInfo> modeSelectClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> modeSelectchangeToModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -6401,12 +6533,7 @@ public class ClusterInfoMapping {
             () -> new DelegatedDefaultClusterCallback(),
             modeSelectchangeToModeCommandParams);
     modeSelectClusterInteractionInfoMap.put("changeToMode", modeSelectchangeToModeInteractionInfo);
-    // Populate cluster
-    ClusterInfo modeSelectClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.ModeSelectCluster(ptr, endpointId),
-            modeSelectClusterInteractionInfoMap);
-    clusterMap.put("modeSelect", modeSelectClusterInfo);
+    commandMap.put("modeSelect", modeSelectClusterInteractionInfoMap);
     Map<String, InteractionInfo> networkCommissioningClusterInteractionInfoMap =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> networkCommissioningaddThreadNetworkCommandParams =
@@ -6689,12 +6816,7 @@ public class ClusterInfoMapping {
             networkCommissioningupdateWiFiNetworkCommandParams);
     networkCommissioningClusterInteractionInfoMap.put(
         "updateWiFiNetwork", networkCommissioningupdateWiFiNetworkInteractionInfo);
-    // Populate cluster
-    ClusterInfo networkCommissioningClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.NetworkCommissioningCluster(ptr, endpointId),
-            networkCommissioningClusterInteractionInfoMap);
-    clusterMap.put("networkCommissioning", networkCommissioningClusterInfo);
+    commandMap.put("networkCommissioning", networkCommissioningClusterInteractionInfoMap);
     Map<String, InteractionInfo> otaSoftwareUpdateProviderClusterInteractionInfoMap =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> otaSoftwareUpdateProviderapplyUpdateRequestCommandParams =
@@ -6822,12 +6944,7 @@ public class ClusterInfoMapping {
             otaSoftwareUpdateProviderqueryImageCommandParams);
     otaSoftwareUpdateProviderClusterInteractionInfoMap.put(
         "queryImage", otaSoftwareUpdateProviderqueryImageInteractionInfo);
-    // Populate cluster
-    ClusterInfo otaSoftwareUpdateProviderClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.OtaSoftwareUpdateProviderCluster(ptr, endpointId),
-            otaSoftwareUpdateProviderClusterInteractionInfoMap);
-    clusterMap.put("otaSoftwareUpdateProvider", otaSoftwareUpdateProviderClusterInfo);
+    commandMap.put("otaSoftwareUpdateProvider", otaSoftwareUpdateProviderClusterInteractionInfoMap);
     Map<String, InteractionInfo> otaSoftwareUpdateRequestorClusterInteractionInfoMap =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> otaSoftwareUpdateRequestorannounceOtaProviderCommandParams =
@@ -6874,20 +6991,10 @@ public class ClusterInfoMapping {
             otaSoftwareUpdateRequestorannounceOtaProviderCommandParams);
     otaSoftwareUpdateRequestorClusterInteractionInfoMap.put(
         "announceOtaProvider", otaSoftwareUpdateRequestorannounceOtaProviderInteractionInfo);
-    // Populate cluster
-    ClusterInfo otaSoftwareUpdateRequestorClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) ->
-                new ChipClusters.OtaSoftwareUpdateRequestorCluster(ptr, endpointId),
-            otaSoftwareUpdateRequestorClusterInteractionInfoMap);
-    clusterMap.put("otaSoftwareUpdateRequestor", otaSoftwareUpdateRequestorClusterInfo);
+    commandMap.put(
+        "otaSoftwareUpdateRequestor", otaSoftwareUpdateRequestorClusterInteractionInfoMap);
     Map<String, InteractionInfo> occupancySensingClusterInteractionInfoMap = new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo occupancySensingClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.OccupancySensingCluster(ptr, endpointId),
-            occupancySensingClusterInteractionInfoMap);
-    clusterMap.put("occupancySensing", occupancySensingClusterInfo);
+    commandMap.put("occupancySensing", occupancySensingClusterInteractionInfoMap);
     Map<String, InteractionInfo> onOffClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> onOffoffCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -6989,20 +7096,10 @@ public class ClusterInfoMapping {
             () -> new DelegatedDefaultClusterCallback(),
             onOfftoggleCommandParams);
     onOffClusterInteractionInfoMap.put("toggle", onOfftoggleInteractionInfo);
-    // Populate cluster
-    ClusterInfo onOffClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.OnOffCluster(ptr, endpointId),
-            onOffClusterInteractionInfoMap);
-    clusterMap.put("onOff", onOffClusterInfo);
+    commandMap.put("onOff", onOffClusterInteractionInfoMap);
     Map<String, InteractionInfo> onOffSwitchConfigurationClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo onOffSwitchConfigurationClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.OnOffSwitchConfigurationCluster(ptr, endpointId),
-            onOffSwitchConfigurationClusterInteractionInfoMap);
-    clusterMap.put("onOffSwitchConfiguration", onOffSwitchConfigurationClusterInfo);
+    commandMap.put("onOffSwitchConfiguration", onOffSwitchConfigurationClusterInteractionInfoMap);
     Map<String, InteractionInfo> operationalCredentialsClusterInteractionInfoMap =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> operationalCredentialsaddNOCCommandParams =
@@ -7228,45 +7325,20 @@ public class ClusterInfoMapping {
             operationalCredentialsupdateNOCCommandParams);
     operationalCredentialsClusterInteractionInfoMap.put(
         "updateNOC", operationalCredentialsupdateNOCInteractionInfo);
-    // Populate cluster
-    ClusterInfo operationalCredentialsClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.OperationalCredentialsCluster(ptr, endpointId),
-            operationalCredentialsClusterInteractionInfoMap);
-    clusterMap.put("operationalCredentials", operationalCredentialsClusterInfo);
+    commandMap.put("operationalCredentials", operationalCredentialsClusterInteractionInfoMap);
     Map<String, InteractionInfo> powerSourceClusterInteractionInfoMap = new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo powerSourceClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.PowerSourceCluster(ptr, endpointId),
-            powerSourceClusterInteractionInfoMap);
-    clusterMap.put("powerSource", powerSourceClusterInfo);
+    commandMap.put("powerSource", powerSourceClusterInteractionInfoMap);
     Map<String, InteractionInfo> pressureMeasurementClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo pressureMeasurementClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.PressureMeasurementCluster(ptr, endpointId),
-            pressureMeasurementClusterInteractionInfoMap);
-    clusterMap.put("pressureMeasurement", pressureMeasurementClusterInfo);
+    commandMap.put("pressureMeasurement", pressureMeasurementClusterInteractionInfoMap);
     Map<String, InteractionInfo> pumpConfigurationAndControlClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo pumpConfigurationAndControlClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) ->
-                new ChipClusters.PumpConfigurationAndControlCluster(ptr, endpointId),
-            pumpConfigurationAndControlClusterInteractionInfoMap);
-    clusterMap.put("pumpConfigurationAndControl", pumpConfigurationAndControlClusterInfo);
+    commandMap.put(
+        "pumpConfigurationAndControl", pumpConfigurationAndControlClusterInteractionInfoMap);
     Map<String, InteractionInfo> relativeHumidityMeasurementClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo relativeHumidityMeasurementClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) ->
-                new ChipClusters.RelativeHumidityMeasurementCluster(ptr, endpointId),
-            relativeHumidityMeasurementClusterInteractionInfoMap);
-    clusterMap.put("relativeHumidityMeasurement", relativeHumidityMeasurementClusterInfo);
+    commandMap.put(
+        "relativeHumidityMeasurement", relativeHumidityMeasurementClusterInteractionInfoMap);
     Map<String, InteractionInfo> scenesClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> scenesaddSceneCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -7454,12 +7526,7 @@ public class ClusterInfoMapping {
             () -> new DelegatedViewSceneResponseCallback(),
             scenesviewSceneCommandParams);
     scenesClusterInteractionInfoMap.put("viewScene", scenesviewSceneInteractionInfo);
-    // Populate cluster
-    ClusterInfo scenesClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.ScenesCluster(ptr, endpointId),
-            scenesClusterInteractionInfoMap);
-    clusterMap.put("scenes", scenesClusterInfo);
+    commandMap.put("scenes", scenesClusterInteractionInfoMap);
     Map<String, InteractionInfo> softwareDiagnosticsClusterInteractionInfoMap =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> softwareDiagnosticsresetWatermarksCommandParams =
@@ -7475,19 +7542,9 @@ public class ClusterInfoMapping {
             softwareDiagnosticsresetWatermarksCommandParams);
     softwareDiagnosticsClusterInteractionInfoMap.put(
         "resetWatermarks", softwareDiagnosticsresetWatermarksInteractionInfo);
-    // Populate cluster
-    ClusterInfo softwareDiagnosticsClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.SoftwareDiagnosticsCluster(ptr, endpointId),
-            softwareDiagnosticsClusterInteractionInfoMap);
-    clusterMap.put("softwareDiagnostics", softwareDiagnosticsClusterInfo);
+    commandMap.put("softwareDiagnostics", softwareDiagnosticsClusterInteractionInfoMap);
     Map<String, InteractionInfo> switchClusterInteractionInfoMap = new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo switchClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.SwitchCluster(ptr, endpointId),
-            switchClusterInteractionInfoMap);
-    clusterMap.put("switch", switchClusterInfo);
+    commandMap.put("switch", switchClusterInteractionInfoMap);
     Map<String, InteractionInfo> tvChannelClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> tvChannelchangeChannelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -7551,12 +7608,7 @@ public class ClusterInfoMapping {
             () -> new DelegatedDefaultClusterCallback(),
             tvChannelskipChannelCommandParams);
     tvChannelClusterInteractionInfoMap.put("skipChannel", tvChannelskipChannelInteractionInfo);
-    // Populate cluster
-    ClusterInfo tvChannelClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.TvChannelCluster(ptr, endpointId),
-            tvChannelClusterInteractionInfoMap);
-    clusterMap.put("tvChannel", tvChannelClusterInfo);
+    commandMap.put("tvChannel", tvChannelClusterInteractionInfoMap);
     Map<String, InteractionInfo> targetNavigatorClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> targetNavigatornavigateTargetCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -7584,20 +7636,10 @@ public class ClusterInfoMapping {
             targetNavigatornavigateTargetCommandParams);
     targetNavigatorClusterInteractionInfoMap.put(
         "navigateTarget", targetNavigatornavigateTargetInteractionInfo);
-    // Populate cluster
-    ClusterInfo targetNavigatorClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.TargetNavigatorCluster(ptr, endpointId),
-            targetNavigatorClusterInteractionInfoMap);
-    clusterMap.put("targetNavigator", targetNavigatorClusterInfo);
+    commandMap.put("targetNavigator", targetNavigatorClusterInteractionInfoMap);
     Map<String, InteractionInfo> temperatureMeasurementClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo temperatureMeasurementClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.TemperatureMeasurementCluster(ptr, endpointId),
-            temperatureMeasurementClusterInteractionInfoMap);
-    clusterMap.put("temperatureMeasurement", temperatureMeasurementClusterInfo);
+    commandMap.put("temperatureMeasurement", temperatureMeasurementClusterInteractionInfoMap);
     Map<String, InteractionInfo> testClusterClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> testClustertestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -7864,12 +7906,7 @@ public class ClusterInfoMapping {
             testClustertestUnknownCommandCommandParams);
     testClusterClusterInteractionInfoMap.put(
         "testUnknownCommand", testClustertestUnknownCommandInteractionInfo);
-    // Populate cluster
-    ClusterInfo testClusterClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.TestClusterCluster(ptr, endpointId),
-            testClusterClusterInteractionInfoMap);
-    clusterMap.put("testCluster", testClusterClusterInfo);
+    commandMap.put("testCluster", testClusterClusterInteractionInfoMap);
     Map<String, InteractionInfo> thermostatClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> thermostatclearWeeklyScheduleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -7990,22 +8027,12 @@ public class ClusterInfoMapping {
             thermostatsetpointRaiseLowerCommandParams);
     thermostatClusterInteractionInfoMap.put(
         "setpointRaiseLower", thermostatsetpointRaiseLowerInteractionInfo);
-    // Populate cluster
-    ClusterInfo thermostatClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.ThermostatCluster(ptr, endpointId),
-            thermostatClusterInteractionInfoMap);
-    clusterMap.put("thermostat", thermostatClusterInfo);
+    commandMap.put("thermostat", thermostatClusterInteractionInfoMap);
     Map<String, InteractionInfo> thermostatUserInterfaceConfigurationClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo thermostatUserInterfaceConfigurationClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) ->
-                new ChipClusters.ThermostatUserInterfaceConfigurationCluster(ptr, endpointId),
-            thermostatUserInterfaceConfigurationClusterInteractionInfoMap);
-    clusterMap.put(
-        "thermostatUserInterfaceConfiguration", thermostatUserInterfaceConfigurationClusterInfo);
+    commandMap.put(
+        "thermostatUserInterfaceConfiguration",
+        thermostatUserInterfaceConfigurationClusterInteractionInfoMap);
     Map<String, InteractionInfo> threadNetworkDiagnosticsClusterInteractionInfoMap =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> threadNetworkDiagnosticsresetCountsCommandParams =
@@ -8021,19 +8048,9 @@ public class ClusterInfoMapping {
             threadNetworkDiagnosticsresetCountsCommandParams);
     threadNetworkDiagnosticsClusterInteractionInfoMap.put(
         "resetCounts", threadNetworkDiagnosticsresetCountsInteractionInfo);
-    // Populate cluster
-    ClusterInfo threadNetworkDiagnosticsClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.ThreadNetworkDiagnosticsCluster(ptr, endpointId),
-            threadNetworkDiagnosticsClusterInteractionInfoMap);
-    clusterMap.put("threadNetworkDiagnostics", threadNetworkDiagnosticsClusterInfo);
+    commandMap.put("threadNetworkDiagnostics", threadNetworkDiagnosticsClusterInteractionInfoMap);
     Map<String, InteractionInfo> wakeOnLanClusterInteractionInfoMap = new LinkedHashMap<>();
-    // Populate cluster
-    ClusterInfo wakeOnLanClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.WakeOnLanCluster(ptr, endpointId),
-            wakeOnLanClusterInteractionInfoMap);
-    clusterMap.put("wakeOnLan", wakeOnLanClusterInfo);
+    commandMap.put("wakeOnLan", wakeOnLanClusterInteractionInfoMap);
     Map<String, InteractionInfo> wiFiNetworkDiagnosticsClusterInteractionInfoMap =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> wiFiNetworkDiagnosticsresetCountsCommandParams =
@@ -8049,12 +8066,7 @@ public class ClusterInfoMapping {
             wiFiNetworkDiagnosticsresetCountsCommandParams);
     wiFiNetworkDiagnosticsClusterInteractionInfoMap.put(
         "resetCounts", wiFiNetworkDiagnosticsresetCountsInteractionInfo);
-    // Populate cluster
-    ClusterInfo wiFiNetworkDiagnosticsClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.WiFiNetworkDiagnosticsCluster(ptr, endpointId),
-            wiFiNetworkDiagnosticsClusterInteractionInfoMap);
-    clusterMap.put("wiFiNetworkDiagnostics", wiFiNetworkDiagnosticsClusterInfo);
+    commandMap.put("wiFiNetworkDiagnostics", wiFiNetworkDiagnosticsClusterInteractionInfoMap);
     Map<String, InteractionInfo> windowCoveringClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> windowCoveringdownOrCloseCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -8192,13 +8204,8 @@ public class ClusterInfoMapping {
             () -> new DelegatedDefaultClusterCallback(),
             windowCoveringupOrOpenCommandParams);
     windowCoveringClusterInteractionInfoMap.put("upOrOpen", windowCoveringupOrOpenInteractionInfo);
-    // Populate cluster
-    ClusterInfo windowCoveringClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.WindowCoveringCluster(ptr, endpointId),
-            windowCoveringClusterInteractionInfoMap);
-    clusterMap.put("windowCovering", windowCoveringClusterInfo);
-    return clusterMap;
+    commandMap.put("windowCovering", windowCoveringClusterInteractionInfoMap);
+    return commandMap;
   }
 
   public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {

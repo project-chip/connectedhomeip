@@ -248,11 +248,21 @@ public class ClusterInfoMapping {
   {{/chip_client_clusters}}
 
  public Map<String, ClusterInfo> getClusterMap() {
-    Map<String, ClusterInfo> clusterMap = new HashMap<>();
-    getCommandMap(clusterMap);
+    Map<String, ClusterInfo> clusterMap = initializeClusterMap();
+    Map<String, Map<String, InteractionInfo>> commandMap = getCommandMap();
+    combineCommand(clusterMap, commandMap);
     Map<String, Map<String, InteractionInfo>> readAttributeMap = getReadAttributeMap();
     combineCommand(clusterMap, readAttributeMap);
     return clusterMap;
+ }
+
+ public Map<String, ClusterInfo> initializeClusterMap() {
+    Map<String, ClusterInfo> clusterMap = new HashMap<>();
+    {{#chip_client_clusters}}
+      ClusterInfo {{asLowerCamelCase name}}ClusterInfo = new ClusterInfo(
+        (ptr, endpointId) -> new ChipClusters.{{asUpperCamelCase name}}Cluster(ptr, endpointId), new HashMap<>());
+      clusterMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInfo);
+    {{/chip_client_clusters}}
  }
 
  public void combineCommand(Map<String, ClusterInfo> destination, Map<String, Map<String, InteractionInfo>> source) {
@@ -261,7 +271,8 @@ public class ClusterInfoMapping {
     {{/chip_client_clusters}}
  }
 
- public Map<String, ClusterInfo> getCommandMap(Map<String, ClusterInfo> clusterMap) {
+ public Map<String, Map<String, InteractionInfo>> getCommandMap() {
+     Map<String, Map<String, InteractionInfo>> commandMap = new HashMap<>();
      {{#chip_client_clusters}}
      Map<String, InteractionInfo> {{asLowerCamelCase name}}ClusterInteractionInfoMap = new LinkedHashMap<>();
      {{#chip_cluster_commands}}
@@ -307,12 +318,9 @@ public class ClusterInfoMapping {
      {{/if}}
        {{asLowerCamelCase ../name}}ClusterInteractionInfoMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}InteractionInfo);
      {{/chip_cluster_commands}}
-     // Populate cluster
-     ClusterInfo {{asLowerCamelCase name}}ClusterInfo = new ClusterInfo(
-       (ptr, endpointId) -> new ChipClusters.{{asUpperCamelCase name}}Cluster(ptr, endpointId), {{asLowerCamelCase name}}ClusterInteractionInfoMap);
-     clusterMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInfo);
+     commandMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInteractionInfoMap);
      {{/chip_client_clusters}}
-     return clusterMap;
+     return commandMap;
   }
 
  public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
