@@ -21730,7 +21730,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=bool)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, bool])
 
         class NullableBitmap8(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21743,7 +21743,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
         class NullableBitmap16(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21756,7 +21756,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
         class NullableBitmap32(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21769,7 +21769,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
         class NullableBitmap64(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21782,7 +21782,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
         class NullableInt8u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21795,7 +21795,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
         class NullableInt16u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21808,7 +21808,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
         class NullableInt32u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21821,7 +21821,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
         class NullableInt64u(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21834,7 +21834,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
         class NullableInt8s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21847,7 +21847,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=int)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
         class NullableInt16s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21860,7 +21860,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=int)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
         class NullableInt32s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21873,7 +21873,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=int)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
         class NullableInt64s(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21886,7 +21886,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=int)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
         class NullableEnum8(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21899,7 +21899,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
         class NullableEnum16(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21912,7 +21912,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
         class NullableOctetString(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21925,7 +21925,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=bytes)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, bytes])
 
         class NullableCharString(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -21938,7 +21938,7 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=str)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, str])
 
         class FeatureMap(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
