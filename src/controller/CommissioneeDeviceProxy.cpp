@@ -92,7 +92,7 @@ void CommissioneeDeviceProxy::OnNewConnection(SessionHandle session)
     mSecureSession.SetValue(session);
 }
 
-void CommissioneeDeviceProxy::OnConnectionExpired(SessionHandle session)
+void CommissioneeDeviceProxy::OnSessionReleased(SessionHandle session)
 {
     VerifyOrReturn(mSecureSession.HasValue() && mSecureSession.Value() == session,
                    ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));

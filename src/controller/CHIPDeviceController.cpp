@@ -131,10 +131,6 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     VerifyOrReturnError(params.systemState->TransportMgr() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // TODO Exchange Mgr needs to be able to track multiple delegates. Delegate API should be able to query for the right delegate
-    // to handle events.
-    params.systemState->ExchangeMgr()->SetDelegate(this);
-
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     Dnssd::Resolver::Instance().Init(params.systemState->InetLayer());
     Dnssd::Resolver::Instance().SetResolverDelegate(this);
@@ -299,18 +295,6 @@ CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-}
-
-void DeviceController::OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) {}
-
-void DeviceController::OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr)
-{
-    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
-
-    OperationalDeviceProxy * device = FindOperationalDevice(session);
-    VerifyOrReturn(device != nullptr, ChipLogDetail(Controller, "OnConnectionExpired was called for unknown device, ignoring it."));
-
-    device->OnConnectionExpired(session);
 }
 
 OperationalDeviceProxy * DeviceController::FindOperationalDevice(SessionHandle session)
@@ -625,6 +609,9 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
     ReturnErrorOnFailure(DeviceController::Init(params));
 
+    params.systemState->SessionMgr()->RegisterCreationDelegate(*this);
+    params.systemState->SessionMgr()->RegisterReleaseDelegate(*this);
+
     uint16_t nextKeyID = 0;
     uint16_t size      = sizeof(nextKeyID);
     CHIP_ERROR error   = mStorageDelegate->SyncGetKeyValue(kNextAvailableKeyID, &nextKeyID, size);
@@ -686,24 +673,25 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr)
+void DeviceCommissioner::OnNewSession(SessionHandle session)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNewConnection was called in incorrect state"));
 
-    CommissioneeDeviceProxy * device = FindCommissioneeDevice(mgr->GetSessionManager()->GetSecureSession(session)->GetPeerNodeId());
+    CommissioneeDeviceProxy * device =
+        FindCommissioneeDevice(mSystemState->SessionMgr()->GetSecureSession(session)->GetPeerNodeId());
     VerifyOrReturn(device != nullptr, ChipLogDetail(Controller, "OnNewConnection was called for unknown device, ignoring it."));
 
     device->OnNewConnection(session);
 }
 
-void DeviceCommissioner::OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr)
+void DeviceCommissioner::OnSessionReleased(SessionHandle session)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
 
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(session);
     VerifyOrReturn(device != nullptr, ChipLogDetail(Controller, "OnConnectionExpired was called for unknown device, ignoring it."));
 
-    device->OnConnectionExpired(session);
+    device->OnSessionReleased(session);
 }
 
 CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(SessionHandle session)
