@@ -186,8 +186,7 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public Messaging::ExchangeDelegate,
-                                    public Messaging::ExchangeMgrDelegate,
+class DLL_EXPORT DeviceController : public Messaging::ExchangeMgrDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
                                     public AbstractDnssdDiscoveryController,
 #endif
@@ -402,11 +401,6 @@ protected:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 private:
-    //////////// ExchangeDelegate Implementation ///////////////
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && msgBuf) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-
     OperationalDeviceProxy * FindOperationalDevice(SessionHandle session);
     OperationalDeviceProxy * FindOperationalDevice(NodeId id);
     void ReleaseOperationalDevice(OperationalDeviceProxy * device);

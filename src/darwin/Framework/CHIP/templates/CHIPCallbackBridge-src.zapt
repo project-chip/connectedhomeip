@@ -2,6 +2,8 @@
 
 {{#if (chip_has_client_clusters)}}
 #import "CHIPCallbackBridge_internal.h"
+#import "CHIPStructsObjc.h"
+#import "CHIPCommandPayloadsObjc.h"
 
 {{#>CHIPCallbackBridge partial-type=""            }}DefaultSuccessCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge partial-type="Octet_String"}}OctetStringAttributeCallback{{/CHIPCallbackBridge}}

@@ -42,8 +42,6 @@
 
 namespace chip {
 
-class DeviceStatusDelegate;
-
 struct DeviceProxyInitParams
 {
     SessionManager * sessionManager          = nullptr;
@@ -59,7 +57,7 @@ class OperationalDeviceProxy;
 typedef void (*OnDeviceConnected)(void * context, DeviceProxy * device);
 typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
 
-class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, Messaging::ExchangeDelegate, public SessionEstablishmentDelegate
+class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, public SessionEstablishmentDelegate
 {
 public:
     virtual ~OperationalDeviceProxy();
@@ -128,16 +126,6 @@ public:
        onFailureCallback, app::TLVDataFilter tlvDataFilter = nullptr) override; void CancelIMResponseHandler(void * commandObj)
        override;
     */
-    /**
-     * @brief
-     *   This function is called when a message is received from the corresponding
-     *   device. The message ownership is transferred to the function, and it is expected
-     *   to release the message buffer before returning.
-     */
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && msgBuf) override;
-
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 
     /**
      *   Update data of the device.
@@ -146,13 +134,6 @@ public:
      *   will load the device settings first, before making the changes.
      */
     CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, uint32_t mrpIdleInterval, uint32_t mrpActiveInterval);
-
-    /**
-     *   Set the delegate object which will be called when a message is received.
-     *   The user of this Device object must reset the delegate (by calling
-     *   SetDelegate(nullptr)) before releasing their delegate object.
-     */
-    void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
 
     PeerId GetPeerId() const { return mPeerId; }
 
@@ -196,7 +177,6 @@ private:
 
     State mState = State::Uninitialized;
 
-    DeviceStatusDelegate * mStatusDelegate = nullptr;
     Optional<SessionHandle> mSecureSession = Optional<SessionHandle>::Missing();
 
     uint8_t mSequenceNumber = 0;

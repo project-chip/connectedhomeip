@@ -498,7 +498,6 @@ WiFiWidget pairingWindowLED;
 class AppCallbacks : public AppDelegate
 {
 public:
-    void OnReceiveError() override { statusLED1.BlinkOnError(); }
     void OnRendezvousStarted() override { bluetoothLED.Set(true); }
     void OnRendezvousStopped() override
     {

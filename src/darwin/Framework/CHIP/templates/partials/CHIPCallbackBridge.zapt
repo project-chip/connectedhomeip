@@ -31,7 +31,14 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
 )
 {
     {{#if (isStrEqual partial-type "Command")}}
-    {{>decode_response}}
+    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    {{#chip_cluster_response_arguments}}
+    {
+      id value;
+      {{>decode_value target="value" source=(concat "data." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE); return;"}}
+      response[@"{{asUpperCamelCase label}}"] = value;
+    }
+    {{/chip_cluster_response_arguments}}
     DispatchSuccess(context, response);
     {{else if (isStrEqual partial-type "List")}}
     id array = [[NSMutableArray alloc] init];
@@ -49,16 +56,16 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
           {{! TODO: Add support for nullable types, probably by having a templated ToObjectiveCType function }}
           {{else if isArray}}
           {{! TODO: Add support for list members of structs in list attributes }}
-          @"{{name}}": [[NSMutableArray alloc] init],
+          @"{{asUpperCamelCase name}}": [[NSMutableArray alloc] init],
           {{else if (isOctetString type)}}
-          @"{{name}}" : [NSData dataWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size()],
+          @"{{asUpperCamelCase name}}" : [NSData dataWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size()],
           {{else if (isCharString type)}}
-          @"{{name}}" : [[NSString alloc] initWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size() encoding:NSUTF8StringEncoding],
+          @"{{asUpperCamelCase name}}" : [[NSString alloc] initWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size() encoding:NSUTF8StringEncoding],
           {{else if isStruct}}
           {{! TODO: Add support for struct members of structs in list attributes }}
-          @"{{name}}": @{}
+          @"{{asUpperCamelCase name}}": @{}
           {{else}}
-          @"{{name}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entry.{{asLowerCamelCase name}}],
+          @"{{asUpperCamelCase name}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entry.{{asLowerCamelCase name}}],
           {{/if}}
           {{/chip_attribute_list_entryTypes}}
         }];
