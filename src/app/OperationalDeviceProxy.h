@@ -57,7 +57,7 @@ class OperationalDeviceProxy;
 typedef void (*OnDeviceConnected)(void * context, DeviceProxy * device);
 typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
 
-class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, public SessionEstablishmentDelegate
+class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, SessionReleaseDelegate, public SessionEstablishmentDelegate
 {
 public:
     virtual ~OperationalDeviceProxy();
@@ -97,7 +97,7 @@ public:
      *   Called when a connection is closing.
      *   The object releases all resources associated with the connection.
      */
-    void OnConnectionExpired(SessionHandle session) override;
+    void OnSessionReleased(SessionHandle session) override;
 
     /**
      *  Mark any open session with the device as expired.

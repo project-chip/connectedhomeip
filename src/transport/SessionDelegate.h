@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,45 +14,38 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines the classes corresponding to CHIP Exchange Manager Delegate.
- *
- */
-
 #pragma once
 
-#include <system/SystemPacketBuffer.h>
-#include <transport/SessionManager.h>
+#include <transport/SessionHandle.h>
 
 namespace chip {
-namespace Messaging {
 
-class ExchangeManager;
-
-class DLL_EXPORT ExchangeMgrDelegate
+class DLL_EXPORT SessionCreationDelegate
 {
 public:
-    virtual ~ExchangeMgrDelegate() {}
+    virtual ~SessionCreationDelegate() {}
 
     /**
      * @brief
-     *   Called when a new pairing is being established
+     *   Called when a new session is being established
      *
      * @param session   The handle to the secure session
-     * @param mgr       A pointer to the ExchangeManager
      */
-    virtual void OnNewConnection(SessionHandle session, ExchangeManager * mgr) {}
-
-    /**
-     * @brief
-     *   Called when a connection is closing
-     *
-     * @param session   The handle to the secure session
-     * @param mgr       A pointer to the ExchangeManager
-     */
-    virtual void OnConnectionExpired(SessionHandle session, ExchangeManager * mgr) {}
+    virtual void OnNewSession(SessionHandle session) = 0;
 };
 
-} // namespace Messaging
+class DLL_EXPORT SessionReleaseDelegate
+{
+public:
+    virtual ~SessionReleaseDelegate() {}
+
+    /**
+     * @brief
+     *   Called when a session is releasing
+     *
+     * @param session   The handle to the secure session
+     */
+    virtual void OnSessionReleased(SessionHandle session) = 0;
+};
+
 } // namespace chip

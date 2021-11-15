@@ -266,7 +266,7 @@ void OperationalDeviceProxy::Clear()
     mInitParams = DeviceProxyInitParams();
 }
 
-void OperationalDeviceProxy::OnConnectionExpired(SessionHandle session)
+void OperationalDeviceProxy::OnSessionReleased(SessionHandle session)
 {
     VerifyOrReturn(mSecureSession.HasValue() && mSecureSession.Value() == session,
                    ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));
