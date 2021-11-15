@@ -35,6 +35,14 @@ android {
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs/jniLibs']
+
+            java.srcDirs = [
+                    '../../../setup_payload/java/src',
+                    '../../../controller/java/zap-generated',
+                    '../../../controller/java/src',
+                    '../../../platform/android/java',
+                    '../../../../examples/tv-app/android/java',
+            ]
         }
     }
 

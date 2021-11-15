@@ -224,7 +224,7 @@ class AndroidBuilder(Builder):
             #
             #   If we unify the JNI libraries, libc++_shared.so may not be needed anymore, which could
             # be another path of resolving this inconsistency.
-            for libName in ['libSetupPayloadParser.so', 'libCHIPController.so', 'libc++_shared.so', 'libCHIPAppServer.so']:
+            for libName in ['libSetupPayloadParser.so', 'libCHIPController.so', 'libc++_shared.so', 'libTvApp.so']:
                 self._Execute(['cp', os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(
                 ), libName), os.path.join(jnilibs_dir, libName)])
 
@@ -233,6 +233,7 @@ class AndroidBuilder(Builder):
                 'SetupPayloadParser.jar': 'src/setup_payload/java/SetupPayloadParser.jar',
                 'AndroidPlatform.jar': 'src/platform/android/AndroidPlatform.jar',
                 'CHIPAppServer.jar': 'src/app/server/java/CHIPAppServer.jar',
+                'TvApp.jar': 'examples/tv-app/android/TvApp.jar',
             }
 
             for jarName in jars.keys():
@@ -266,6 +267,9 @@ class AndroidBuilder(Builder):
                 'SetupPayloadParser.jar':
                     os.path.join(self.output_dir, 'lib',
                                  'src/setup_payload/java/SetupPayloadParser.jar'),
+                'CHIPAppServer.jar':
+                    os.path.join(self.output_dir, 'lib',
+                                 'src/app/server/java/CHIPAppServer.jar'),
 
                 'jni/%s/libSetupPayloadParser.so' % self.board.AbiName():
                     os.path.join(self.output_dir, 'lib', 'jni',
