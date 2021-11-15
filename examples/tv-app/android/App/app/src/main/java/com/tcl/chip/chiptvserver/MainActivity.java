@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.tcl.tvapp.TvApp;
+
 import chip.appserver.ChipAppServer;
 import chip.platform.AndroidBleManager;
 import chip.platform.AndroidChipPlatform;
@@ -30,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     mQrCodeImg = findViewById(R.id.qrCodeImg);
     mQrCodeTxt = findViewById(R.id.qrCodeTxt);
     mManualPairingCodeTxt = findViewById(R.id.manualPairingCodeTxt);
-    ChipAppServer chipAppServer = new ChipAppServer();
+    TvApp tvApp = new TvApp();
     AndroidChipPlatform chipPlatform =
         new AndroidChipPlatform(
             new AndroidBleManager(),
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
       e.printStackTrace();
     }
 
+    ChipAppServer chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
   }
 }
