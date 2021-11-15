@@ -602,21 +602,40 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     return CHIP_NO_ERROR;
 }
 
+void ReadHandler::OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState)
+{
+    VerifyOrReturn(apAppState != nullptr);
+    ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
+    ChipLogProgress(DataManagement, "Unblock report hold after min %d seconds", readHandler->mMinIntervalFloorSeconds);
+    readHandler->mHoldReport = false;
+    if (readHandler->mDirty)
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    }
+    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+        System::Clock::Seconds16(readHandler->mMaxIntervalCeilingSeconds - readHandler->mMinIntervalFloorSeconds),
+        OnRefreshSubscribeTimerSyncCallback, readHandler);
+}
+
 void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState)
 {
-    ReadHandler * aReadHandler = static_cast<ReadHandler *>(apAppState);
-    aReadHandler->mHoldReport  = false;
+    VerifyOrReturn(apAppState != nullptr);
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
 
 CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 {
-    ChipLogProgress(DataManagement, "ReadHandler::Refresh Subscribe Sync Timer with %d seconds", mMinIntervalFloorSeconds);
+    ChipLogProgress(DataManagement, "ReadHandler::Refresh Subscribe Sync Timer with %d seconds", mMaxIntervalCeilingSeconds);
+    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
+        OnUnblockHoldReportCallback, this);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnRefreshSubscribeTimerSyncCallback, this);
     mHoldReport = true;
-    return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        System::Clock::Seconds16(mMinIntervalFloorSeconds), OnRefreshSubscribeTimerSyncCallback, this);
+    ReturnErrorOnFailure(
+        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+            System::Clock::Seconds16(mMinIntervalFloorSeconds), OnUnblockHoldReportCallback, this));
+
+    return CHIP_NO_ERROR;
 }
 } // namespace app
 } // namespace chip

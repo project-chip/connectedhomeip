@@ -559,10 +559,15 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
 
 CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     CancelLivenessCheckTimer();
-    ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %d seconds", mMaxIntervalCeilingSeconds);
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        System::Clock::Seconds16(mMaxIntervalCeilingSeconds), OnLivenessTimeoutCallback, this);
+    VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    System::Clock::Timeout timeout = System::Clock::Seconds16(mMaxIntervalCeilingSeconds) + mpExchangeCtx->GetAckTimeout();
+    // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
+    ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %lu milliseconds", static_cast<long unsigned>(timeout.count()));
+    err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+        timeout, OnLivenessTimeoutCallback, this);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -685,6 +690,11 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHandle, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
+    if (mpExchangeCtx->IsBLETransport())
+    {
+        ChipLogError(DataManagement, "IM Subscribe cannot work with BLE");
+        SuccessOrExit(err = CHIP_ERROR_INCORRECT_STATE);
+    }
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));

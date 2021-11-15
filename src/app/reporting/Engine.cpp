@@ -447,7 +447,15 @@ CHIP_ERROR Engine::SetDirty(ClusterInfo & aClusterInfo)
         // chunk for read interactions.
         if (handler.IsGeneratingReports() || handler.IsAwaitingReportResponse())
         {
-            handler.SetDirty();
+            for (auto clusterInfo = handler.GetAttributeClusterInfolist(); clusterInfo != nullptr;
+                 clusterInfo      = clusterInfo->mpNext)
+            {
+                if (aClusterInfo.IsAttributePathSupersetOf(*clusterInfo) || clusterInfo->IsAttributePathSupersetOf(aClusterInfo))
+                {
+                    handler.SetDirty();
+                    break;
+                }
+            }
         }
     }
     if (!InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(mpGlobalDirtySet, aClusterInfo) &&
@@ -468,20 +476,22 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     {
         return;
     }
+
+    bool intersected = false;
     for (auto clusterInfo = aReadHandler.GetAttributeClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
     {
-        bool intersected = false;
         for (auto path = mpGlobalDirtySet; path != nullptr; path = path->mpNext)
         {
             if (path->IsAttributePathSupersetOf(*clusterInfo) || clusterInfo->IsAttributePathSupersetOf(*path))
             {
                 intersected = true;
+                break;
             }
         }
-        if (!intersected)
-        {
-            aReadHandler.ClearDirty();
-        }
+    }
+    if (!intersected)
+    {
+        aReadHandler.ClearDirty();
     }
 }
 
@@ -504,8 +514,8 @@ void Engine::OnReportConfirm()
 }
 
 }; // namespace reporting
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip
 
 void __attribute__((weak)) MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
 void __attribute__((weak)) MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
