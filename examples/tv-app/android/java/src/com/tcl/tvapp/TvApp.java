@@ -18,10 +18,9 @@
 package com.tcl.tvapp;
 
 public class TvApp {
-    public TvApp() {
-    }
+  public TvApp() {}
 
-    static {
-        System.loadLibrary("TvApp");
-    }
+  static {
+    System.loadLibrary("TvApp");
+  }
 }
