@@ -70,7 +70,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-efr32:0.5.25
+            image: connectedhomeip/chip-build-efr32:0.5.27
         steps:
             - name: Checkout
               uses: actions/checkout@v2
