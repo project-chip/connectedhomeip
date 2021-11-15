@@ -594,6 +594,18 @@ tests:
       response:
           value: ""
 
+    - label: "Write attribute OCTET_STRING with embedded null"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "Tes\x00ti\x00ng"
+
+    - label: "Read attribute OCTET_STRING with embedded null"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "Tes\x00ti\x00ng"
+
     - label: "Write attribute OCTET_STRING"
       command: "writeAttribute"
       attribute: "octet_string"
@@ -719,36 +731,6 @@ tests:
       attribute: "long_char_string"
       arguments:
           value: ""
-
-    # Tests for List attribute
-
-    - label: "Read attribute LIST"
-      command: "readAttribute"
-      attribute: "list_int8u"
-      response:
-          value: [1, 2, 3, 4]
-
-    # Tests for List Octet String attribute
-
-    - label: "Read attribute LIST_OCTET_STRING"
-      command: "readAttribute"
-      attribute: "list_octet_string"
-      response:
-          value: ["Test0", "Test1", "Test2", "Test3"]
-
-    # Tests for List Struct Octet String attribute
-
-    - label: "Read attribute LIST_STRUCT_OCTET_STRING"
-      command: "readAttribute"
-      attribute: "list_struct_octet_string"
-      response:
-          value:
-              [
-                  { fabricIndex: 0, operationalCert: "Test0" },
-                  { fabricIndex: 1, operationalCert: "Test1" },
-                  { fabricIndex: 2, operationalCert: "Test2" },
-                  { fabricIndex: 3, operationalCert: "Test3" },
-              ]
 
     # Tests for Epoch Microseconds
 

@@ -71,6 +71,7 @@ public:
     System::Clock::Timeout _GetWiFiAPIdleTimeout(void);
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
     CHIP_ERROR _GetAndLogWifiStatsCounters(void);
+    CHIP_ERROR _GetWiFiBssId(ByteSpan & value);
     CHIP_ERROR _GetWiFiSecurityType(uint8_t & securityType);
     CHIP_ERROR _GetWiFiVersion(uint8_t & wiFiVersion);
     CHIP_ERROR _GetWiFiChannelNumber(uint16_t & channelNumber);
@@ -232,6 +233,12 @@ template <class ImplClass>
 inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPStateToStr(ConnectivityManager::WiFiAPState state)
 {
     return NULL;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiBssId(ByteSpan & value)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>

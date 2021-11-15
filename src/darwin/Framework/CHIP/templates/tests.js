@@ -69,6 +69,10 @@ function getTests()
     'Test_TC_FLW_2_2',
   ];
 
+  const IlluminanceMeasurement = [
+    'Test_TC_ILL_1_1',
+  ];
+
   const OccupancySensing = [
     'Test_TC_OCC_1_1',
     'Test_TC_OCC_2_1',
@@ -182,6 +186,7 @@ function getTests()
     DeviceManagement, //
     ElectricalMeasurement, //
     FlowMeasurement, //
+    IlluminanceMeasurement, //
     LevelControl, //
     MediaControl, //
     OccupancySensing, //

@@ -156,7 +156,6 @@ template("chip_data_model") {
       sources += [
         "${invoker.zap_pregenerated_dir}/CHIPClusters.cpp",
         "${invoker.zap_pregenerated_dir}/CHIPClusters.h",
-        "${invoker.zap_pregenerated_dir}/CHIPClustersInvoke.cpp",
         "${invoker.zap_pregenerated_dir}/attribute-size.cpp",
         "${invoker.zap_pregenerated_dir}/callback-stub.cpp",
       ]

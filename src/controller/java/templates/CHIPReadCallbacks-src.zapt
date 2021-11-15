@@ -26,6 +26,16 @@ CHIP{{chipCallback.name}}AttributeCallback::CHIP{{chipCallback.name}}AttributeCa
     }
 }
 
+CHIP{{chipCallback.name}}AttributeCallback::~CHIP{{chipCallback.name}}AttributeCallback() {
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
 void CHIP{{chipCallback.name}}AttributeCallback::CallbackFn(void * context, {{chipCallback.type}} value)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -43,7 +53,7 @@ void CHIP{{chipCallback.name}}AttributeCallback::CallbackFn(void * context, {{ch
     jmethodID javaMethod;
     {{#unless (isStrEqual chipCallback.name "OctetString")}}
     {{#unless (isStrEqual chipCallback.name "CharString")}}
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{convertCTypeToJniSignature chipCallback.type}})V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{convertCTypeToJniSignature chipCallback.type false}})V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<{{convertBasicCTypeToJniType chipCallback.type}}>(value));
     {{/unless}}
@@ -89,6 +99,16 @@ CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::
     }
 }
 
+CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::~CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback() {
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
 void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -124,7 +144,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters${{asUpperCamelCase parent.name}}Cluster${{asUpperCamelCase name}}Attribute"));
     chip::JniClass attributeJniClass(attributeClass);
     jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>"
-        , "({{#chip_attribute_list_entryTypes}}{{#if isOptional}}{{! TODO: Add support for optional types here }}{{else if isNullable}}{{! TODO: Add support for nullable types here }}{{else if isArray}}{{! TODO: Add support for lists here }}{{else if isStruct}}{{! TODO: Add support for structs here }}{{else if (isString type)}}{{#if (isOctetString type)}}[B{{else}}Ljava/lang/String;{{/if}}{{else}}{{asJniSignature type}}{{/if}}{{/chip_attribute_list_entryTypes}})V");
+        , "({{#chip_attribute_list_entryTypes}}{{#if isArray}}{{! TODO: Add support for lists here }}{{else if isStruct}}{{! TODO: Add support for structs here }}{{else if isOptional}}Ljava/util/Optional;{{else if (isString type)}}{{#if (isOctetString type)}}[B{{else}}Ljava/lang/String;{{/if}}{{else}}{{asJniSignature type true}}{{/if}}{{/chip_attribute_list_entryTypes}})V");
     VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find {{asUpperCamelCase name}}Attribute constructor"));
     {{/if}}
 
@@ -135,35 +155,93 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         {{#if isStruct}}
         (void)entry; {{! In case all our struct members are not supported yet }}
         {{#chip_attribute_list_entryTypes}}
+        {{#unless isArray}}
+        {{#unless isStruct}}
+        bool {{asLowerCamelCase name}}Null = false;
+        bool {{asLowerCamelCase name}}HasValue = true;
+        {{#if isNullable}}
+        {{#unless isOptional}}
+        {{chipType}} {{asLowerCamelCase name}}Value;
+        {{asLowerCamelCase name}}Null = entry.{{asLowerCamelCase name}}.IsNull();
+        if (!{{asLowerCamelCase name}}Null) {
+            {{asLowerCamelCase name}}Value = entry.{{asLowerCamelCase name}}.Value();
+        }
+        {{/unless}}
+        {{/if}}
+
         {{#if isOptional}}
-        {{! TODO: Add support for optional types here }}
-        {{else if isNullable}}
-        {{! TODO: Add support for nullable types here }}
-        {{else if isArray}}
+        {{chipType}} {{asLowerCamelCase name}}Value;
+        {{#if isNullable}}
+        {{asLowerCamelCase name}}HasValue = entry.{{asLowerCamelCase name}}.HasValue();
+        if ({{asLowerCamelCase name}}HasValue) {
+            auto {{asLowerCamelCase name}}ValueFromOptional = entry.{{asLowerCamelCase name}}.Value();
+            {{asLowerCamelCase name}}Null = {{asLowerCamelCase name}}ValueFromOptional.IsNull();
+            if (!{{asLowerCamelCase name}}Null) {
+                {{asLowerCamelCase name}}Value = {{asLowerCamelCase name}}ValueFromOptional.Value();
+            }
+        }
+        {{else}}
+        {{asLowerCamelCase name}}HasValue = entry.{{asLowerCamelCase name}}.HasValue();
+        if ({{asLowerCamelCase name}}HasValue) {
+            {{asLowerCamelCase name}}Value = entry.{{asLowerCamelCase name}}.Value();
+        }
+        {{/if}}
+        {{/if}}
+
+        {{#unless isOptional}}
+        {{#unless isNullable}}
+        {{chipType}} {{asLowerCamelCase name}}Value = entry.{{asLowerCamelCase name}};
+        {{/unless}}
+        {{/unless}}
+
+        {{/unless}}
+        {{/unless}}
+
+        {{#if isArray}}
         {{! TODO: Add support for lists here }}
         {{else if isStruct}}
         {{! TODO: Add support for structs here }}
         {{else if (isOctetString type)}}
-        jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entry.{{asLowerCamelCase name}}.size());
-        env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entry.{{asLowerCamelCase name}}.size(), reinterpret_cast<const jbyte *>(entry.{{asLowerCamelCase name}}.data()));
+        jbyteArray {{asLowerCamelCase name}} = nullptr;
+        if (!{{asLowerCamelCase name}}Null && {{asLowerCamelCase name}}HasValue) {
+            {{asLowerCamelCase name}} = env->NewByteArray({{asLowerCamelCase name}}Value.size());
+            env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, {{asLowerCamelCase name}}Value.size(), reinterpret_cast<const jbyte *>({{asLowerCamelCase name}}Value.data()));
+        }
         {{else if (isCharString type)}}
-        chip::UtfString {{asLowerCamelCase name}}Str(env, entry.{{asLowerCamelCase name}});
-        jstring {{asLowerCamelCase name}}({{asLowerCamelCase name}}Str.jniValue());
+        jstring {{asLowerCamelCase name}} = nullptr;
+        chip::UtfString {{asLowerCamelCase name}}Str(env, {{asLowerCamelCase name}}Value);
+        if (!{{asLowerCamelCase name}}Null && {{asLowerCamelCase name}}HasValue) {
+            {{asLowerCamelCase name}} = jstring({{asLowerCamelCase name}}Str.jniValue());
+        }
         {{else}}
-        {{asJniBasicType type}} {{asLowerCamelCase name}} = entry.{{asLowerCamelCase name}};
+        jobject {{asLowerCamelCase name}} = nullptr;
+        if (!{{asLowerCamelCase name}}Null && {{asLowerCamelCase name}}HasValue) {
+            jclass {{asLowerCamelCase name}}EntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/{{asJavaBasicTypeForZclType type true}}", {{asLowerCamelCase name}}EntryCls);
+            chip::JniClass {{asLowerCamelCase name}}JniClass({{asLowerCamelCase name}}EntryCls);
+            jmethodID {{asLowerCamelCase name}}EntryTypeCtor = env->GetMethodID({{asLowerCamelCase name}}EntryCls, "<init>", "({{asJniSignature type false}})V");
+            {{asLowerCamelCase name}} = env->NewObject({{asLowerCamelCase name}}EntryCls, {{asLowerCamelCase name}}EntryTypeCtor, {{asLowerCamelCase name}}Value);
+        }
+        {{/if}}
+
+        {{#if isOptional}}
+        {{#unless isArray}}
+        {{#unless isStruct}}
+        jobject {{asLowerCamelCase name}}Optional = nullptr;
+        chip::JniReferences::GetInstance().CreateOptional({{asLowerCamelCase name}}, {{asLowerCamelCase name}}Optional);
+        {{/unless}}
+        {{/unless}}
         {{/if}}
         {{/chip_attribute_list_entryTypes}}
 
         jobject attributeObj = env->NewObject(attributeClass, attributeCtor
             {{#chip_attribute_list_entryTypes}}
-            {{#if isOptional}}
-            {{! TODO: Add support for optional types here }}
-            {{else if isNullable}}
-            {{! TODO: Add support for nullable types here }}
-            {{else if isArray}}
+            {{#if isArray}}
             {{! TODO: Add support for lists here }}
             {{else if isStruct}}
             {{! TODO: Add support for structs here }}
+            {{else isOptional}}
+            , {{asLowerCamelCase name}}Optional
             {{else}}
             , {{asLowerCamelCase name}}
             {{/if}}
@@ -173,19 +251,53 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
 
         env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         {{else}}
-        {{#if (isOctetString type)}}
-        jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entry.size());
-        env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entry.size(), reinterpret_cast<const jbyte *>(entry.data()));
-        {{else if (isCharString type)}}
-        chip::UtfString {{asLowerCamelCase name}}Str(env, entry);
-        jstring {{asLowerCamelCase name}}({{asLowerCamelCase name}}Str.jniValue());
+        bool entryNull = false;
+        {{#unless isArray}}
+        {{#unless isStruct}}
+        {{#if isNullable}}
+        {{chipType}} entryValue;
+        entryNull = entry.IsNull();
+        if (!entryNull) {
+            entryValue = entry.Value();
+        }
         {{else}}
-        jclass entryTypeCls;
-        chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/{{asJavaBasicTypeForZclType type true}}", entryTypeCls);
-        jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "({{asJniSignature type}})V");
-        jobject {{asLowerCamelCase name}} = env->NewObject(entryTypeCls, entryTypeCtor, entry);
+        {{chipType}} entryValue = entry;
         {{/if}}
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, {{asLowerCamelCase name}});
+        {{/unless}}
+        {{/unless}}
+
+        {{#if isStruct}}
+        {{! TODO: Add support for structs here }}
+        {{else if (isOctetString type)}}
+        jbyteArray entryObject = nullptr;
+        if (!entryNull) {
+            entryObject = env->NewByteArray(entryValue.size());
+            env->SetByteArrayRegion(entryObject, 0, entryValue.size(), reinterpret_cast<const jbyte *>(entryValue.data()));
+        }
+        {{else if (isCharString type)}}
+        jstring entryObject = nullptr;
+        chip::UtfString entryStr(env, entryValue);
+        if (!entryNull) {
+            entryObject = jstring(entryStr.jniValue());
+        }
+        {{else}}
+        jobject entryObject = nullptr;
+        if (!entryNull) {
+            jclass entryTypeCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/{{asJavaBasicTypeForZclType type true}}", entryTypeCls);
+            chip::JniClass jniClass(entryTypeCls);
+            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "({{asJniSignature type false}})V");
+            entryObject = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
+        }
+        {{/if}}
+
+        {{#if isOptional}}
+        jobject entryOptional = nullptr;
+        chip::JniReferences::GetInstance().CreateOptional(entryObject, entryOptional);
+        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryOptional);
+        {{else}}
+        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        {{/if}}
         {{/if}}
     }
     VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR, ChipLogError(Zcl, "Error decoding {{asUpperCamelCase name}}Attribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));

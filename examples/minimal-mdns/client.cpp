@@ -186,7 +186,10 @@ public:
         char addr[32];
         info->SrcAddress.ToString(addr, sizeof(addr));
 
-        printf("QUERY from: %-15s on port %d, via interface %d\n", addr, info->SrcPort, info->Interface);
+        char ifName[64];
+        VerifyOrDie(info->Interface.GetInterfaceName(ifName, sizeof(ifName)) == CHIP_NO_ERROR);
+
+        printf("QUERY from: %-15s on port %d, via interface %s\n", addr, info->SrcPort, ifName);
         Report("QUERY: ", data);
     }
 
@@ -195,7 +198,10 @@ public:
         char addr[32];
         info->SrcAddress.ToString(addr, sizeof(addr));
 
-        printf("RESPONSE from: %-15s on port %d, via interface %d\n", addr, info->SrcPort, info->Interface);
+        char ifName[64];
+        VerifyOrDie(info->Interface.GetInterfaceName(ifName, sizeof(ifName)) == CHIP_NO_ERROR);
+
+        printf("RESPONSE from: %-15s on port %d, via interface %s\n", addr, info->SrcPort, ifName);
         Report("RESPONSE: ", data);
     }
 
@@ -328,7 +334,7 @@ int main(int argc, char ** args)
     BroadcastPacket(&mdnsServer);
 
     err = DeviceLayer::SystemLayer().StartTimer(
-        gOptions.runtimeMs,
+        chip::System::Clock::Milliseconds32(gOptions.runtimeMs),
         [](System::Layer *, void *) {
             DeviceLayer::PlatformMgr().StopEventLoopTask();
             DeviceLayer::PlatformMgr().Shutdown();

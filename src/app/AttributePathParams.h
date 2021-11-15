@@ -58,12 +58,12 @@ struct AttributePathParams
      */
     bool IsValidAttributePath() const { return HasWildcardListIndex() || !HasWildcardAttributeId(); }
 
-    inline bool HasWildcardEndpointId() const { return mEndpointId == ClusterInfo::kInvalidEndpointId; }
+    inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
     inline bool HasWildcardClusterId() const { return mClusterId == ClusterInfo::kInvalidClusterId; }
     inline bool HasWildcardAttributeId() const { return mAttributeId == ClusterInfo::kInvalidAttributeId; }
     inline bool HasWildcardListIndex() const { return mListIndex == ClusterInfo::kInvalidListIndex; }
 
-    EndpointId mEndpointId   = ClusterInfo::kInvalidEndpointId;
+    EndpointId mEndpointId   = kInvalidEndpointId;
     ClusterId mClusterId     = ClusterInfo::kInvalidClusterId;
     AttributeId mAttributeId = ClusterInfo::kInvalidAttributeId;
     ListIndex mListIndex     = ClusterInfo::kInvalidListIndex;
