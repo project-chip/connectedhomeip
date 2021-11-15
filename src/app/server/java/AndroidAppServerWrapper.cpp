@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "AppMain.h"
+#include "AndroidAppServerWrapper.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>

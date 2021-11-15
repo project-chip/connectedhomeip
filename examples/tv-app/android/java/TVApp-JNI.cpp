@@ -15,11 +15,21 @@
  *   limitations under the License.
  *
  */
-package chip.appserver;
 
-/** Controller to interact with the CHIP device. */
-public class ChipAppServer {
-  private static final String TAG = ChipAppServer.class.getSimpleName();
+/**
+ *    @file
+ *      Implementation of JNI bridge for Tv App on Android.
+ *
+ */
+#include <jni.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPJNIError.h>
+#include <app/server/java/AndroidAppServerWrapper.h>
 
-  public native boolean startApp();
+jint JNI_OnLoad(JavaVM * jvm, void * reserved) {
+    return AndroidAppServerJNI_OnLoad(jvm, reserved);
+}
+
+void JNI_OnUnload(JavaVM * jvm, void * reserved) {
+    return AndroidAppServerJNI_OnUnload(jvm, reserved);
 }
