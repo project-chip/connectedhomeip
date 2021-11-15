@@ -43,12 +43,6 @@ public:
     DeviceProxy() {}
 
     /**
-     *   Called when a connection is closing.
-     *   The object releases all resources associated with the connection.
-     */
-    virtual void OnConnectionExpired(SessionHandle session) = 0;
-
-    /**
      *  Mark any open session with the device as expired.
      */
     virtual CHIP_ERROR Disconnect() = 0;

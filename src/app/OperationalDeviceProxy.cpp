@@ -229,6 +229,7 @@ void OperationalDeviceProxy::OnSessionEstablished()
     VerifyOrReturn(mState != State::Uninitialized,
                    ChipLogError(Controller, "OnSessionEstablished was called while the device was not initialized"));
 
+    // TODO Update the MRP params based on the MRP params extracted from CASE, when this is available.
     CHIP_ERROR err = mInitParams.sessionManager->NewPairing(
         Optional<Transport::PeerAddress>::Value(mDeviceAddress), mPeerId.GetNodeId(), &mCASESession,
         CryptoContext::SessionRole::kInitiator, mInitParams.fabricInfo->GetFabricIndex());
@@ -267,7 +268,7 @@ void OperationalDeviceProxy::Clear()
     mInitParams = DeviceProxyInitParams();
 }
 
-void OperationalDeviceProxy::OnConnectionExpired(SessionHandle session)
+void OperationalDeviceProxy::OnSessionReleased(SessionHandle session)
 {
     VerifyOrReturn(mSecureSession.HasValue() && mSecureSession.Value() == session,
                    ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));

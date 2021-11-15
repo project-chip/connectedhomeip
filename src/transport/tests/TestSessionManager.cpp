@@ -59,7 +59,7 @@ constexpr NodeId kDestinationNodeId = 111222333;
 
 const char LARGE_PAYLOAD[kMaxAppMessageLen + 1] = "test message";
 
-class TestSessMgrCallback : public SessionManagerDelegate
+class TestSessMgrCallback : public SessionCreationDelegate, public SessionReleaseDelegate, public SessionMessageDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SessionHandle session,
@@ -84,7 +84,7 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    void OnNewConnection(SessionHandle session) override
+    void OnNewSession(SessionHandle session) override
     {
         // Preset the MessageCounter
         if (NewConnectionHandlerCallCount == 0)
@@ -93,7 +93,8 @@ public:
             mLocalToRemoteSession.SetValue(session);
         NewConnectionHandlerCallCount++;
     }
-    void OnConnectionExpired(SessionHandle session) override { mOldConnectionDropped = true; }
+
+    void OnSessionReleased(SessionHandle session) override { mOldConnectionDropped = true; }
 
     bool mOldConnectionDropped = false;
 
@@ -105,8 +106,6 @@ public:
 
     bool LargeMessageSent = false;
 };
-
-TestSessMgrCallback callback;
 
 void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
@@ -131,6 +130,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     uint16_t payload_len = sizeof(PAYLOAD);
 
+    TestSessMgrCallback callback;
     callback.LargeMessageSent = false;
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
@@ -152,7 +152,8 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     callback.mSuite = inSuite;
 
-    sessionManager.SetDelegate(&callback);
+    sessionManager.RegisterCreationDelegate(callback);
+    sessionManager.SetMessageDelegate(&callback);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
@@ -218,6 +219,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     uint16_t payload_len = sizeof(PAYLOAD);
 
+    TestSessMgrCallback callback;
     callback.LargeMessageSent = false;
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
@@ -239,7 +241,8 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     callback.mSuite = inSuite;
 
-    sessionManager.SetDelegate(&callback);
+    sessionManager.RegisterCreationDelegate(callback);
+    sessionManager.SetMessageDelegate(&callback);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
@@ -291,6 +294,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     uint16_t payload_len = sizeof(PAYLOAD);
 
+    TestSessMgrCallback callback;
     callback.LargeMessageSent = false;
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
@@ -312,7 +316,8 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     callback.mSuite = inSuite;
 
-    sessionManager.SetDelegate(&callback);
+    sessionManager.RegisterCreationDelegate(callback);
+    sessionManager.SetMessageDelegate(&callback);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
@@ -414,9 +419,12 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    TestSessMgrCallback callback;
     callback.mSuite = inSuite;
 
-    sessionManager.SetDelegate(&callback);
+    sessionManager.RegisterCreationDelegate(callback);
+    sessionManager.RegisterReleaseDelegate(callback);
+    sessionManager.SetMessageDelegate(&callback);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 

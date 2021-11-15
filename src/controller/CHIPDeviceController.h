@@ -48,7 +48,6 @@
 #include <lib/support/SerializableIntegerSet.h>
 #include <lib/support/Span.h>
 #include <messaging/ExchangeMgr.h>
-#include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
@@ -187,11 +186,11 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public Messaging::ExchangeMgrDelegate,
+class DLL_EXPORT DeviceController :
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-                                    public AbstractDnssdDiscoveryController,
+    public AbstractDnssdDiscoveryController,
 #endif
-                                    public app::InteractionModelDelegate
+    public app::InteractionModelDelegate
 {
 public:
     DeviceController();
@@ -376,9 +375,8 @@ protected:
 
     uint16_t mVendorId;
 
-    //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override {}
-    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    //////////// SessionReleaseDelegate Implementation ///////////////
+    void OnSessionReleased(SessionHandle session) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     //////////// ResolverDelegate Implementation ///////////////
@@ -412,12 +410,13 @@ private:
  *   will be stored.
  */
 class DLL_EXPORT DeviceCommissioner : public DeviceController,
+                                      public SessionCreationDelegate,
+                                      public SessionReleaseDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
                                       public Protocols::UserDirectedCommissioning::UserConfirmationProvider,
 #endif
                                       public SessionEstablishmentDelegate
-
 {
 public:
     DeviceCommissioner();
@@ -624,9 +623,10 @@ private:
 
     void OnSessionEstablishmentTimeout();
 
-    //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
-    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    //////////// SessionCreationDelegate Implementation ///////////////
+    void OnNewSession(SessionHandle session) override;
+    //////////// SessionReleaseDelegate Implementation ///////////////
+    void OnSessionReleased(SessionHandle session) override;
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
