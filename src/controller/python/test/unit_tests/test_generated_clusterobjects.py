@@ -1,24 +1,31 @@
 import unittest
 import chip.clusters as Clusters
 from rich.pretty import pprint
+from rich.console import Console
 from chip.clusters.Types import Nullable, NullValue
+import logging
+from rich.logging import RichHandler
 
 '''
 This file contains tests for validating the generated cluster objects by running encoding and decoding
 through them symmetrically to exercise both pathways.
 '''
 
+enable_debug = False
+
 
 class TestGeneratedClusterObjects(unittest.TestCase):
     def CheckData(self, expected):
-        print("\nExpected Data:")
-        pprint(expected, expand_all=True)
-
         tlv = expected.ToTLV()
         actual = expected.FromTLV(tlv)
 
-        print("Actual Data:")
-        pprint(actual, expand_all=True)
+        if (enable_debug):
+            print("Expected Data:")
+            pprint(expected, expand_all=True)
+
+            print("Actual Data:")
+            pprint(actual, expand_all=True)
+
         self.assertEqual(actual, expected)
 
     def test_simple_struct(self):
