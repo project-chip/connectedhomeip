@@ -17,9 +17,24 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 
+/**********************************************************
+ * Defines and Macros
+ *********************************************************/
+
+#define UPDATE_TIME_MS 100
+#define TRANSITION_TIME_1S 10
+
+#define MAX_TIME_VALUE 0xFFFF
+#define MIN_TIME_VALUE 1
+
+/**
+ * @brief
+ *
+ */
 class OnOffServer
 {
 public:
@@ -50,6 +65,11 @@ public:
     bool onCommand();
     bool toggleCommand();
     void initOnOffServer(chip::EndpointId endpoint);
+    bool offWithEffectCommand(uint8_t effectId, uint8_t effectVariant);
+    bool OnWithRecallGlobalSceneCommand();
+    bool OnWithTimedOffCommand(chip::BitFlags<chip::app::Clusters::OnOff::OnOffControl> onOffControl, uint16_t onTime,
+                               uint16_t offWaitTime);
+    void updateOnOffTimeCommand(chip::EndpointId endpoint);
     EmberAfStatus setOnOffValue(chip::EndpointId endpoint, uint8_t command, bool initiatedByLevelChange);
 
 private:
@@ -60,12 +80,15 @@ private:
 #ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
     bool areStartUpOnOffServerAttributesTokenized(chip::EndpointId endpoint);
 #endif // ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+    EmberEventControl * getEventControl(chip::EndpointId endpoint);
+    EmberEventControl * configureEventControl(chip::EndpointId endpoint);
 
     /**********************************************************
      * Attributes Decleration
      *********************************************************/
 
     static OnOffServer instance;
+    EmberEventControl eventControls[EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT];
 };
 
 /**********************************************************
@@ -96,3 +119,5 @@ void emberAfOnOffClusterLevelControlEffectCallback(chip::EndpointId endpoint, bo
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
 void emberAfPluginOnOffClusterServerPostInitCallback(chip::EndpointId endpoint);
+
+void onOffWaitTimeOffEventHandler(chip::EndpointId endpoint);

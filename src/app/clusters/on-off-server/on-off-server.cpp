@@ -41,7 +41,7 @@
 #include "on-off-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
+#include <app/util/af-event.h>
 #include <app/util/af.h>
 
 #include <app/CommandHandler.h>
@@ -120,8 +120,23 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
     // should update the on/off attribute before kicking off level change, if we are
     // turning off the light, we should do the opposite, that is kick off level change
     // before updating the on/off attribute.
-    if (newValue)
+    if (newValue) // Set On
     {
+        uint16_t onTime = 0;
+        Attributes::OnTime::Get(endpoint, &onTime);
+
+        if (onTime == 0)
+        {
+            emberAfOnOffClusterPrintln("On Command - OffWaitTime :  0");
+            Attributes::OffWaitTime::Set(endpoint, 0);
+
+            // Stop timer on the endpoint
+            emberEventControlSetInactive(getEventControl(endpoint));
+            emberAfOnOffClusterPrintln("On Command - Stop Timer");
+        }
+
+        Attributes::GlobalSceneControl::Set(endpoint, true);
+
         // write the new on/off value
         status = Attributes::OnOff::Set(endpoint, newValue);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -139,8 +154,11 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
         }
 #endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
     }
-    else
+    else // Set Off
     {
+        emberAfOnOffClusterPrintln("Off Command - OnTime :  0");
+        Attributes::OnTime::Set(endpoint, 0); // Reset onTime
+
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         // If initiatedByLevelChange is false, then we assume that the level change
         // ZCL stuff has not happened and we do it here
@@ -281,6 +299,168 @@ bool OnOffServer::toggleCommand()
     return true;
 }
 
+bool OnOffServer::offWithEffectCommand(uint8_t effectId, uint8_t effectVariant)
+{
+    chip::EndpointId endpoint = emberAfCurrentEndpoint();
+    EmberAfStatus status      = EMBER_ZCL_STATUS_SUCCESS;
+
+    bool globalSceneControl = false;
+    OnOff::Attributes::GlobalSceneControl::Get(endpoint, &globalSceneControl);
+
+    if (globalSceneControl)
+    {
+        OnOff::Attributes::GlobalSceneControl::Set(endpoint, false);
+
+        status = setOnOffValue(endpoint, Commands::Off::Id, false);
+        Attributes::OnTime::Set(endpoint, 0);
+    }
+    else
+    {
+        status = setOnOffValue(endpoint, Commands::Off::Id, false);
+    }
+
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+bool OnOffServer::OnWithRecallGlobalSceneCommand()
+{
+    chip::EndpointId endpoint = emberAfCurrentEndpoint();
+    EmberAfStatus status      = EMBER_ZCL_STATUS_SUCCESS;
+
+    bool globalSceneControl = false;
+    OnOff::Attributes::GlobalSceneControl::Get(endpoint, &globalSceneControl);
+
+    if (globalSceneControl)
+    {
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
+    OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);
+    setOnOffValue(endpoint, Commands::On::Id, false);
+
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+bool OnOffServer::OnWithTimedOffCommand(BitFlags<OnOffControl> onOffControl, uint16_t onTime, uint16_t offWaitTime)
+{
+    EmberAfStatus status      = EMBER_ZCL_STATUS_SUCCESS;
+    chip::EndpointId endpoint = emberAfCurrentEndpoint();
+
+    bool isOn = false;
+    OnOff::Attributes::OnOff::Get(endpoint, &isOn);
+
+    // OnOff is off and the commands is only accepted if on
+    if (onOffControl.Has(OnOffControl::kAcceptOnlyWhenOn) && !isOn)
+    {
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
+
+    uint16_t currentOffWaitTime = MAX_TIME_VALUE;
+    OnOff::Attributes::OffWaitTime::Get(endpoint, &currentOffWaitTime);
+
+    uint16_t currentOnTime = 0;
+    OnOff::Attributes::OnTime::Get(endpoint, &currentOnTime);
+
+    if (currentOffWaitTime > 0 && !isOn)
+    {
+        uint16_t newOffWaitTime = currentOffWaitTime < offWaitTime ? currentOffWaitTime : offWaitTime;
+        OnOff::Attributes::OffWaitTime::Set(endpoint, newOffWaitTime);
+
+        currentOffWaitTime = newOffWaitTime;
+    }
+    else
+    {
+        uint16_t newOnTime = currentOnTime > onTime ? currentOnTime : onTime;
+        OnOff::Attributes::OnTime::Set(endpoint, newOnTime);
+
+        OnOff::Attributes::OffWaitTime::Set(endpoint, offWaitTime);
+        setOnOffValue(endpoint, Commands::On::Id, false);
+
+        currentOnTime      = newOnTime;
+        currentOffWaitTime = offWaitTime;
+    }
+
+    emberAfOnOffClusterPrintln("On Time:  %d | off wait Time: %d", currentOnTime, currentOffWaitTime);
+
+    if (currentOnTime < MAX_TIME_VALUE && currentOffWaitTime < MAX_TIME_VALUE)
+    {
+        emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
+    }
+
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+/**
+ * @brief Updates OnOff values after timer is finished
+ *
+ * @param endpoint
+ */
+void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
+{
+    emberAfOnOffClusterPrintln("Timer callback - Entering callbackc");
+
+    bool isOn = false;
+    OnOff::Attributes::OnOff::Get(endpoint, &isOn);
+
+    if (isOn) // OnOff On case
+    {
+        // Restart Timer
+        emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
+
+        // Update onTime values
+        uint16_t onTime = MIN_TIME_VALUE;
+        OnOff::Attributes::OnTime::Get(endpoint, &onTime);
+        emberAfOnOffClusterPrintln("Timer callback - On Time:  %d", onTime);
+
+        if (onTime > 0)
+        {
+            onTime--;
+            OnOff::Attributes::OnTime::Set(endpoint, onTime);
+        }
+
+        if (onTime == 0)
+        {
+            emberAfOnOffClusterPrintln("Timer callback - Turning off OnOff");
+
+            OnOff::Attributes::OffWaitTime::Set(endpoint, 0);
+            setOnOffValue(endpoint, Commands::Off::Id, false);
+        }
+    }
+    else // OnOff Off Case
+    {
+        uint16_t offWaitTime = 0;
+        OnOff::Attributes::OffWaitTime::Get(endpoint, &offWaitTime);
+
+        // Validate before decreasing counter
+        if (offWaitTime > 0)
+        {
+            offWaitTime--;
+            OnOff::Attributes::OffWaitTime::Set(endpoint, offWaitTime);
+        }
+
+        emberAfOnOffClusterPrintln("Timer Callback - wait Off Time:  %d", offWaitTime);
+
+        // Validate if necessary to restart timer
+        if (offWaitTime > 0)
+        {
+            // Restart Timer
+            emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
+        }
+        else
+        {
+            emberAfOnOffClusterPrintln("Timer  Callback - wait Off Time cycle finished");
+
+            // Stop timer on the endpoint
+            emberEventControlSetInactive(getEventControl(endpoint));
+        }
+    }
+}
+
 #ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
 bool OnOffServer::areStartUpOnOffServerAttributesTokenized(EndpointId endpoint)
 {
@@ -302,7 +482,34 @@ bool OnOffServer::areStartUpOnOffServerAttributesTokenized(EndpointId endpoint)
 
     return true;
 }
-#endif
+#endif // ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+
+/**
+ * @brief event control object for an endpoint
+ *
+ * @param[in] endpoint
+ * @return EmberEventControl*
+ */
+EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint)
+{
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, OnOff::Id);
+    return &eventControls[index];
+}
+
+/**
+ * @brief Configures EnventControl callback when using XY colors
+ *
+ * @param endpoint
+ */
+EmberEventControl * OnOffServer::configureEventControl(EndpointId endpoint)
+{
+    EmberEventControl * controller = getEventControl(endpoint);
+
+    controller->endpoint = endpoint;
+    controller->callback = &onOffWaitTimeOffEventHandler;
+
+    return controller;
+}
 
 /**********************************************************
  * Callbacks Implementation
@@ -326,9 +533,40 @@ bool emberAfOnOffClusterToggleCallback(app::CommandHandler * commandObj, const a
     return OnOffServer::Instance().toggleCommand();
 }
 
+bool emberAfOnOffClusterOffWithEffectCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                              const Commands::OffWithEffect::DecodableType & commandData)
+{
+    auto & effectId      = commandData.effectId;
+    auto & effectVariant = commandData.effectVariant;
+
+    return OnOffServer::Instance().offWithEffectCommand(effectId, effectVariant);
+}
+
+bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(app::CommandHandler * commandObj,
+                                                        const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::OnWithRecallGlobalScene::DecodableType & commandData)
+{
+    return OnOffServer::Instance().OnWithRecallGlobalSceneCommand();
+}
+
+bool emberAfOnOffClusterOnWithTimedOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                               const Commands::OnWithTimedOff::DecodableType & commandData)
+{
+    auto & onOffControl = commandData.onOffControl;
+    auto & onTime       = commandData.onTime;
+    auto & offWaitTime  = commandData.offWaitTime;
+
+    return OnOffServer::Instance().OnWithTimedOffCommand(onOffControl, onTime, offWaitTime);
+}
+
 void emberAfOnOffClusterServerInitCallback(chip::EndpointId endpoint)
 {
     OnOffServer::Instance().initOnOffServer(endpoint);
+}
+
+void onOffWaitTimeOffEventHandler(chip::EndpointId endpoint)
+{
+    OnOffServer::Instance().updateOnOffTimeCommand(endpoint);
 }
 
 void emberAfPluginOnOffClusterServerPostInitCallback(EndpointId endpoint) {}
