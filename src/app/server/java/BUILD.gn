@@ -21,7 +21,7 @@ import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/lib.gni")
 
 static_library("jni") {
-  output_name = "libCHIPAppServer"
+  output_name = "libCHIPAppServerJni"
 
   sources = [
     "AndroidAppServerWrapper.cpp",
