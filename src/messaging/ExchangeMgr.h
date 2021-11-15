@@ -248,8 +248,8 @@ private:
 #if CHIP_CONFIG_TEST
 public: // Allow ExpireExchangesForSession to be called directly from tests.
 #endif  // CHIP_CONFIG_TEST
-        // TODO: this should be test only, after OnSessionReleased is move to SessionHandle within the exchange context
-    // Expire all exchanges associated with the given session
+       // TODO: this should be test only, after OnSessionReleased is move to SessionHandle within the exchange context
+        // Expire all exchanges associated with the given session
     void ExpireExchangesForSession(SessionHandle session);
 };
 
