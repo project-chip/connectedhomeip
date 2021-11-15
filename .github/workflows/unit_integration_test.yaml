@@ -37,7 +37,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.25
+            image: connectedhomeip/chip-build:0.5.28
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
                 - "/tmp/happy_test_logs:/tmp/happy_test_logs"
