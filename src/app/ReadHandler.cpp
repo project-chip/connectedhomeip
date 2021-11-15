@@ -564,6 +564,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
     ReturnLogErrorOnFailure(subscribeRequestParser.GetMinIntervalSeconds(&mMinIntervalFloorSeconds));
     ReturnLogErrorOnFailure(subscribeRequestParser.GetMaxIntervalSeconds(&mMaxIntervalCeilingSeconds));
+    VerifyOrReturnLogError(mMinIntervalFloorSeconds < mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnLogErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
 
     MoveToState(HandlerState::GeneratingReports);
