@@ -157,12 +157,12 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
         .imDelegate     = params.systemState->IMDelegate(),
     };
 
-    CASESessionManagerInitParams sessionManagerParams = {
+    CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
         .dnsCache          = &mDNSCache,
     };
 
-    mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerParams);
+    mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
     VerifyOrReturnError(mCASESessionManager != nullptr, CHIP_ERROR_NO_MEMORY);
 
     mSystemState = params.systemState->Retain();
@@ -495,7 +495,8 @@ void DeviceController::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & no
 void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
 {
     ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
-    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNodeIdResolved was called in incorrect state"));
+    VerifyOrReturn(mState == State::Initialized,
+                   ChipLogError(Controller, "OnNodeIdResolutionFailed was called in incorrect state"));
     mCASESessionManager->OnNodeIdResolutionFailed(peer, error);
 
     if (mDeviceAddressUpdateDelegate != nullptr)
@@ -801,9 +802,14 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     device->SetActive(true);
 
     err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), keyID, exchangeCtxt, this);
+    SuccessOrExit(err);
+
     // Immediately persist the updted mNextKeyID value
     // TODO maybe remove FreeRendezvousSession() since mNextKeyID is always persisted immediately
     PersistNextKeyId();
+
+    mDeviceCommissioningInProgress = true;
+    mNodeIdBeingCommissioned       = remoteDeviceId;
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -834,6 +840,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     FreeRendezvousSession();
 
     ReleaseCommissioneeDevice(device);
+    mDeviceCommissioningInProgress = false;
     return CHIP_NO_ERROR;
 }
 
@@ -883,6 +890,7 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
         ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
         mDeviceBeingCommissioned = nullptr;
     }
+    mDeviceCommissioningInProgress = false;
 }
 
 void DeviceCommissioner::OnSessionEstablished()
@@ -1528,8 +1536,13 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
         mDeviceBeingCommissioned = nullptr;
     }
 
-    mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId.GetNodeId(), ToPeerAddress(nodeData), &mOnDeviceConnectedCallback,
-                                                &mOnDeviceConnectionFailureCallback);
+    mDNSCache.Insert(nodeData);
+
+    if (mDeviceCommissioningInProgress && mNodeIdBeingCommissioned == nodeData.mPeerId.GetNodeId())
+    {
+        mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId.GetNodeId(), &mOnDeviceConnectedCallback,
+                                                    &mOnDeviceConnectionFailureCallback);
+    }
 
     DeviceController::OnNodeIdResolved(nodeData);
 }
@@ -1572,6 +1585,7 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, DeviceProxy * devic
 
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connected callback with null pairing delegate. Ignoring"));
+    commissioner->mDeviceCommissioningInProgress = false;
     commissioner->mPairingDelegate->OnCommissioningComplete(device->GetDeviceId(), CHIP_NO_ERROR);
 }
 
@@ -1583,6 +1597,7 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, NodeId devi
                    ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
+    commissioner->mDeviceCommissioningInProgress = false;
     commissioner->mPairingDelegate->OnCommissioningComplete(deviceId, error);
 }
 
@@ -1780,7 +1795,8 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         {
             mPairingDelegate->OnCommissioningComplete(mDeviceOperational->GetDeviceId(), CHIP_NO_ERROR);
         }
-        mDeviceOperational = nullptr;
+        mDeviceOperational             = nullptr;
+        mDeviceCommissioningInProgress = false;
         break;
     case CommissioningStage::kSecurePairing:
     case CommissioningStage::kError:

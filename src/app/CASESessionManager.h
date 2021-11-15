@@ -29,20 +29,28 @@
 
 namespace chip {
 
-struct CASESessionManagerInitParams
+struct CASESessionManagerConfig
 {
     DeviceProxyInitParams sessionInitParams;
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> * dnsCache = nullptr;
 };
 
+/**
+ * This class provides the following
+ * 1. Manage a pool of operational device proxy objects for peer nodes that have active message exchange with the local node.
+ * 2. The pool contains atmost one device proxy object for a given peer node.
+ * 3. API to lookup an existing proxy object, or allocate a new one by triggering session establishment with the peer node.
+ * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
+ * successful)
+ */
 class CASESessionManager : public Messaging::ExchangeMgrDelegate, public Dnssd::ResolverDelegate
 {
 public:
-    CASESessionManager(CASESessionManagerInitParams & params)
+    CASESessionManager(CASESessionManagerConfig & params)
     {
         VerifyOrReturn(params.sessionInitParams.Validate() == CHIP_NO_ERROR);
 
-        mInitParams  = params;
+        mConfig      = params;
         mInitialized = true;
     }
 
@@ -50,16 +58,28 @@ public:
 
     void Shutdown() { mInitialized = false; }
 
-    CHIP_ERROR FindOrEstablishSession(NodeId deviceId, Transport::PeerAddress addr,
-                                      Callback::Callback<OnDeviceConnected> * onConnection,
+    /**
+     * Find an existing session for the given node ID, or trigger a new session request.
+     */
+    CHIP_ERROR FindOrEstablishSession(NodeId nodeId, Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalDeviceProxy * FindExistingSession(NodeId deviceId) { return FindSession(deviceId); }
+    OperationalDeviceProxy * FindExistingSession(NodeId nodeId);
 
-    void ReleaseSession(NodeId deviceId);
+    void ReleaseSession(NodeId nodeId);
 
-    CHIP_ERROR ResolveDeviceAddress(NodeId deviceId);
-    CHIP_ERROR GetDeviceAddressAndPort(NodeId deviceId, Inet::IPAddress & addr, uint16_t & port);
+    FabricInfo * GetFabricInfo()
+    {
+        if (!mInitialized)
+        {
+            return nullptr;
+        }
+
+        return mConfig.sessionInitParams.fabricInfo;
+    }
+
+    CHIP_ERROR ResolveDeviceAddress(NodeId nodeId);
+    CHIP_ERROR GetDeviceAddressAndPort(NodeId nodeId, Inet::IPAddress & addr, uint16_t & port);
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
     void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
@@ -72,14 +92,11 @@ public:
 
 private:
     OperationalDeviceProxy * FindSession(SessionHandle session);
-    OperationalDeviceProxy * FindSession(NodeId id);
     void ReleaseSession(OperationalDeviceProxy * device);
-
-    Transport::PeerAddress ToPeerAddress(const Dnssd::ResolvedNodeData & nodeData) const;
 
     BitMapObjectPool<OperationalDeviceProxy, CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES> mActiveSessions;
 
-    CASESessionManagerInitParams mInitParams;
+    CASESessionManagerConfig mConfig;
 
     bool mInitialized = false;
 };

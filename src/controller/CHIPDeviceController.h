@@ -234,8 +234,7 @@ public:
                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->FindOrEstablishSession(deviceId, Transport::PeerAddress::UDP(Inet::IPAddress::Any),
-                                                           onConnection, onFailure);
+        return mCASESessionManager->FindOrEstablishSession(deviceId, onConnection, onFailure);
     }
 
     /**
@@ -607,6 +606,9 @@ private:
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
        persist the device list */
     bool mPairedDevicesUpdated;
+
+    bool mDeviceCommissioningInProgress = false;
+    NodeId mNodeIdBeingCommissioned;
 
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
 
