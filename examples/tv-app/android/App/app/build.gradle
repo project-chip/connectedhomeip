@@ -31,24 +31,19 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs/jniLibs']
 
-            java.srcDirs = [
-                    '../../../setup_payload/java/src',
-                    '../../../controller/java/zap-generated',
-                    '../../../controller/java/src',
-                    '../../../platform/android/java',
-                    '../../../../examples/tv-app/android/java',
-            ]
+            // uncomment this code to debug
+//            java.srcDirs = [
+//                    'src/main/java',
+//                    '../../third_party/connectedhomeip/src/setup_payload/java/src',
+//                    '../../third_party/connectedhomeip/src/platform/android/java',
+//                    '../../java/src',
+//            ]
         }
     }
-
-
-
-
 }
 
 dependencies {
