@@ -1405,11 +1405,14 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
     return ExtractKIDFromX509Cert(false, certificate, akid);
 }
 
-CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
+namespace {
+
+CHIP_ERROR ExtractDNAttributeFromX509Cert(bool isVID, const ByteSpan & certificate, uint16_t & id)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
     mbedtls_x509_crt mbed_cert;
+    mbedtls_asn1_named_data * asn1IdEntry;
 
     mbedtls_x509_crt_init(&mbed_cert);
 
@@ -1417,26 +1420,46 @@ CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     // vendor id is the second element of subject and should be of size 4
+    // product id is the third element of subject and should be of size 4
     // returning CHIP_ERROR_KEY_NOT_FOUND to sinalize VID is not present in the certificate.
-    VerifyOrExit(mbed_cert.subject.next->val.p != nullptr && mbed_cert.subject.next->val.len == 4,
+    asn1IdEntry = isVID ? mbed_cert.subject.next : mbed_cert.subject.next->next;
+    VerifyOrExit(asn1IdEntry != nullptr && asn1IdEntry->val.p != nullptr && asn1IdEntry->val.len == 4,
                  error = CHIP_ERROR_KEY_NOT_FOUND);
 
     // vendor id is of size 4, we should ensure the string is null terminated before passing in to strtoul to avoid undefined
     // behavior
-    mbed_cert.subject.next->val.p[4] = 0;
-    vid = static_cast<VendorId>(strtoul(reinterpret_cast<const char *>(mbed_cert.subject.next->val.p), NULL, 16));
+    asn1IdEntry->val.p[4] = 0;
+    id                    = static_cast<uint16_t>(strtoul(reinterpret_cast<const char *>(asn1IdEntry->val.p), NULL, 16));
 
 exit:
     _log_mbedTLS_error(result);
     mbedtls_x509_crt_free(&mbed_cert);
 
 #else
+    (void) isVID;
     (void) certificate;
-    (void) vid;
+    (void) id;
     CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 
     return error;
+}
+
+} // namespace
+
+CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
+{
+    vid = VendorId::NotSpecified;
+    uint16_t id;
+    ReturnErrorOnFailure(ExtractDNAttributeFromX509Cert(true, certificate, id));
+    vid = static_cast<VendorId>(id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractPIDFromX509Cert(const ByteSpan & certificate, uint16_t & pid)
+{
+    pid = 0xFFFFu; // not specified
+    return ExtractDNAttributeFromX509Cert(false, certificate, pid);
 }
 
 } // namespace Crypto

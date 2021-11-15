@@ -60,6 +60,9 @@ enum class AttestationVerificationResult : uint16_t
     kCertificationDeclarationNoKeyId            = 600,
     kCertificationDeclarationNoCertificateFound = 601,
     kCertificationDeclarationInvalidSignature   = 602,
+    kCertificationDeclarationInvalidFormat      = 603,
+    kCertificationDeclarationInvalidVendorId    = 604,
+    kCertificationDeclarationInvalidProductId   = 605,
 
     kNoMemory = 700,
 
@@ -117,7 +120,25 @@ public:
     virtual AttestationVerificationResult ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
                                                                                     ByteSpan & certDeclBuffer) = 0;
 
-    // TODO: Validate Certification Declaration Payload
+    /**
+     * @brief Verify a CMS Signed Data Payload against the Basic Information Cluster and DAC/PAI's Vendor and Product IDs
+     *
+     * @param[in] certDeclBuffer   A ByteSpan with the Certification Declaration content.
+     * @param[in] firmwareInfo     A ByteSpan with the Firmware Information content.
+     * @param[in] clusterVendorId
+     * @param[in] clusterProductId
+     * @param[in] dacVendorId
+     * @param[in] dacProductId
+     * @param[in] paiProductId
+     *
+     * @returns AttestationVerificationResult::kSuccess on success or another specific
+     *          value from AttestationVerificationResult enum on failure.
+     */
+    virtual AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
+                                                                                const ByteSpan & firmwareInfo,
+                                                                                uint16_t clusterVendorId, uint16_t clusterProductId,
+                                                                                uint16_t dacVendorId, uint16_t dacProductId,
+                                                                                uint16_t paiProductId) = 0;
 
     // TODO: Validate Firmware Information
 

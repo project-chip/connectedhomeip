@@ -1773,18 +1773,19 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
     return ExtractKIDFromX509Cert(false, certificate, akid);
 }
 
-CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
+namespace {
+
+CHIP_ERROR ExtractDNAttributeFromX509Cert(bool isVID, const ByteSpan & certificate, uint16_t & id)
 {
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     X509 * x509certificate             = nullptr;
     const unsigned char * pCertificate = certificate.data();
     constexpr char vidNeedle[]         = "1.3.6.1.4.1.37244.2.1"; // Matter VID OID - taken from Spec
-    constexpr size_t vidNeedleSize     = sizeof(vidNeedle);
-    char buff[vidNeedleSize]           = { 0 };
+    constexpr char pidNeedle[]         = "1.3.6.1.4.1.37244.2.2"; // Matter PID OID - taken from Spec
+    constexpr size_t needleSize        = sizeof(vidNeedle);
+    char buff[needleSize]              = { 0 };
     X509_NAME * subject                = nullptr;
     int x509EntryCountIdx              = 0;
-
-    vid = VendorId::NotSpecified;
 
     x509certificate = d2i_X509(NULL, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -1800,14 +1801,14 @@ CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
         VerifyOrExit(object != nullptr, err = CHIP_ERROR_INTERNAL);
         VerifyOrExit(OBJ_obj2txt(buff, sizeof(buff), object, 0) != 0, err = CHIP_ERROR_INTERNAL);
 
-        if (strncmp(vidNeedle, buff, vidNeedleSize) == 0)
+        if (strncmp(isVID ? vidNeedle : pidNeedle, buff, needleSize) == 0)
         {
             ASN1_STRING * data_entry = X509_NAME_ENTRY_get_data(name_entry);
             VerifyOrExit(data_entry != nullptr, err = CHIP_ERROR_INTERNAL);
             unsigned char * str = ASN1_STRING_data(data_entry);
             VerifyOrExit(str != nullptr, err = CHIP_ERROR_INTERNAL);
 
-            vid = static_cast<VendorId>(strtoul(reinterpret_cast<const char *>(str), NULL, 16));
+            id = static_cast<uint16_t>(strtoul(reinterpret_cast<const char *>(str), NULL, 16));
             break;
         }
     }
@@ -1819,6 +1820,23 @@ exit:
     X509_free(x509certificate);
 
     return err;
+}
+
+} // namespace
+
+CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
+{
+    vid = VendorId::NotSpecified;
+    uint16_t id;
+    ReturnErrorOnFailure(ExtractDNAttributeFromX509Cert(true, certificate, id));
+    vid = static_cast<VendorId>(id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractPIDFromX509Cert(const ByteSpan & certificate, uint16_t & pid)
+{
+    pid = 0xFFFFu; // not specified
+    return ExtractDNAttributeFromX509Cert(false, certificate, pid);
 }
 
 } // namespace Crypto

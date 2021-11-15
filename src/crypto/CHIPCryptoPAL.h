@@ -1222,5 +1222,10 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
  **/
 CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid);
 
+/**
+ * @brief Extracts the Product ID from an X509 Certificate.
+ **/
+CHIP_ERROR ExtractPIDFromX509Cert(const ByteSpan & certificate, uint16_t & pid);
+
 } // namespace Crypto
 } // namespace chip

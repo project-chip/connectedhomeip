@@ -52,6 +52,21 @@ public:
         (void) certDeclBuffer;
         return AttestationVerificationResult::kNotImplemented;
     }
+
+    AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
+                                                                        const ByteSpan & firmwareInfo, uint16_t clusterVendorId,
+                                                                        uint16_t clusterProductId, uint16_t dacVendorId,
+                                                                        uint16_t dacProductId, uint16_t paiProductId) override
+    {
+        (void) certDeclBuffer;
+        (void) firmwareInfo;
+        (void) clusterVendorId;
+        (void) clusterProductId;
+        (void) dacVendorId;
+        (void) dacProductId;
+        (void) paiProductId;
+        return AttestationVerificationResult::kNotImplemented;
+    }
 };
 
 // Default to avoid nullptr on getter and cleanly handle new products/clients before

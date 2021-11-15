@@ -240,6 +240,9 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     // -> certification_type = 0
     // -> dac_origin_vendor_id is not present
     // -> dac_origin_product_id is not present
+    static constexpr CertificationElements sTestCMS_CertElements = { 1,    0xFFF1, { 0x8000 }, 1, 0x1234, "ZIG20141ZB330001-24",
+                                                                     0,    0,      0x2694,     0, 0,      0,
+                                                                     false };
     static constexpr uint8_t sTestCMS_CDContent[] = { 0x15, 0x24, 0x00, 0x01, 0x25, 0x01, 0xf1, 0xff, 0x36, 0x02, 0x05,
                                                       0x00, 0x80, 0x18, 0x25, 0x03, 0x34, 0x12, 0x2c, 0x04, 0x13, 0x5a,
                                                       0x49, 0x47, 0x32, 0x30, 0x31, 0x34, 0x31, 0x5a, 0x42, 0x33, 0x33,
@@ -278,6 +281,11 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
 
     NL_TEST_ASSERT(inSuite, cd_payload.data_equal(ByteSpan(sTestCMS_CDContent)));
+
+    attestation_result = default_verifier->ValidateCertificateDeclarationPayload(
+        cd_payload, ByteSpan(), sTestCMS_CertElements.VendorId, sTestCMS_CertElements.ProductIds[0], sTestCMS_CertElements.VendorId,
+        sTestCMS_CertElements.ProductIds[0], sTestCMS_CertElements.ProductIds[0]);
+    NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
 }
 
 /**

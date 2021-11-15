@@ -165,7 +165,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
 
         err = reader.Next();
     }
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT || err == CHIP_NO_ERROR, err);
 
     ReturnErrorOnFailure(reader.ExitContainer(outerContainer1));
 
