@@ -30,6 +30,27 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
+{
+public:
+    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
+    ~OtaSoftwareUpdateProviderCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  chip::ByteSpan updateToken, uint32_t newVersion);
+    CHIP_ERROR NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   chip::ByteSpan updateToken, uint32_t softwareVersion);
+    CHIP_ERROR QueryImage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                          chip::VendorId vendorId, uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
+                          uint16_t hardwareVersion, chip::CharSpan location, bool requestorCanConsent,
+                          chip::ByteSpan metadataForProvider);
+
+    // Cluster Attributes
+
+private:
+};
+
 class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:
