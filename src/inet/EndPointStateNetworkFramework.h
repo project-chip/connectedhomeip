@@ -17,7 +17,7 @@
  */
 
 /**
- *  Network Framework implementation of EndPointBase.
+ *  Shared state for Network Framework implementations of TCPEndPoint and UDPEndPoint.
  */
 
 #pragma once
@@ -31,16 +31,14 @@
 namespace chip {
 namespace Inet {
 
-class DLL_EXPORT EndPointImplNetworkFramework : public EndPointBase
+class DLL_EXPORT EndPointStateNetworkFramework
 {
 protected:
-    EndPointImplNetworkFramework(InetLayer & inetLayer, void * appState = nullptr) : EndPointBase(inetLayer, appState) {}
+    EndPointStateNetworkFramework() {}
 
     nw_parameters_t mParameters;
     IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
 };
-
-using EndPointBasis = EndPointImplNetworkFramework;
 
 } // namespace Inet
 } // namespace chip

@@ -46,13 +46,13 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
     ReturnErrorOnFailure(GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(instance));
 
-    UDPEndPoint::SetJoinMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
+    UDPEndPointImplSockets::SetJoinMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
         const otIp6Address otAddress = ToOpenThreadIP6Address(address);
         const auto otError           = otIp6SubscribeMulticastAddress(openthread_get_default_instance(), &otAddress);
         return MapOpenThreadError(otError);
     });
 
-    UDPEndPoint::SetLeaveMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
+    UDPEndPointImplSockets::SetLeaveMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
         const otIp6Address otAddress = ToOpenThreadIP6Address(address);
         const auto otError           = otIp6UnsubscribeMulticastAddress(openthread_get_default_instance(), &otAddress);
         return MapOpenThreadError(otError);
