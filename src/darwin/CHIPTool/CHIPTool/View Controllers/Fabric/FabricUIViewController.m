@@ -348,8 +348,11 @@
                 CHIPOperationalCredentials * cluster =
                     [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"updateFabricLabel command sent."] isError:NO];
+                __auto_type * payload = [[CHIPOperationalCredentialsClusterUpdateFabricLabelPayload alloc] init];
+                payload.Label = label;
+
                 [cluster
-                    updateFabricLabel:label
+                    updateFabricLabel:payload
                       responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
                           dispatch_async(dispatch_get_main_queue(), ^{
                               if (error) {

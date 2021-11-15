@@ -1,0 +1,11 @@
+{{> header}}
+
+#import "CHIPStructsObjc.h"
+
+{{#zcl_clusters}}
+{{#zcl_structs}}
+@implementation CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}
+@end
+
+{{/zcl_structs}}
+{{/zcl_clusters}}

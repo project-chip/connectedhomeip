@@ -157,11 +157,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster test:^(NSError * err, NSDictionary * values) {
-        NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
+    [cluster test:[[CHIPTestClusterClusterTestPayload alloc] init]
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 
@@ -169,11 +170,12 @@ CHIPDevice * GetConnectedDevice()
 
     // Reuse the CHIPCluster Object for multiple times.
 
-    [cluster test:^(NSError * err, NSDictionary * values) {
-        NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
+    [cluster test:[[CHIPTestClusterClusterTestPayload alloc] init]
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -192,7 +194,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 1U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 1U);
+        }
 
         [expectation fulfill];
     }];
@@ -235,7 +240,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 1U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 1U);
+        }
 
         [expectation fulfill];
     }];
@@ -257,7 +265,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -322,7 +333,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -387,7 +401,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -408,7 +425,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -474,7 +494,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -496,7 +519,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -517,7 +543,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -538,7 +567,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -559,7 +591,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -580,7 +615,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -601,7 +639,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -622,7 +663,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -643,7 +687,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -665,7 +712,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 1U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 1U);
+        }
 
         [expectation fulfill];
     }];
@@ -708,7 +758,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 1U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 1U);
+        }
 
         [expectation fulfill];
     }];
@@ -730,7 +783,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -793,7 +849,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -838,7 +897,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -901,7 +963,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -922,7 +987,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -986,7 +1054,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -1007,7 +1078,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 24939U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 24939U);
+        }
 
         [expectation fulfill];
     }];
@@ -1069,7 +1143,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 24939U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 24939U);
+        }
 
         [expectation fulfill];
     }];
@@ -1090,7 +1167,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 24701U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 24701U);
+        }
 
         [expectation fulfill];
     }];
@@ -1153,7 +1233,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 24701U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 24701U);
+        }
 
         [expectation fulfill];
     }];
@@ -1217,7 +1300,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -1278,7 +1364,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -1299,7 +1388,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -1361,7 +1453,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -1401,7 +1496,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -1462,7 +1560,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -1483,7 +1584,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -1545,7 +1649,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -1566,7 +1673,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 25U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 25U);
+        }
 
         [expectation fulfill];
     }];
@@ -1627,7 +1737,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 25U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 25U);
+        }
 
         [expectation fulfill];
     }];
@@ -1648,7 +1761,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 8960U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 8960U);
+        }
 
         [expectation fulfill];
     }];
@@ -1713,7 +1829,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 8960U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 8960U);
+        }
 
         [expectation fulfill];
     }];
@@ -1734,7 +1853,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -1799,7 +1921,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -1820,7 +1945,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -1884,7 +2012,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -1905,7 +2036,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -1972,7 +2106,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -1993,7 +2130,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 65279U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 65279U);
+        }
 
         [expectation fulfill];
     }];
@@ -2060,7 +2200,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 65279U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 65279U);
+        }
 
         [expectation fulfill];
     }];
@@ -2125,7 +2268,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -2193,7 +2339,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -2214,7 +2363,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -2277,7 +2429,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -2341,7 +2496,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -2424,7 +2582,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -2486,7 +2647,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -2548,7 +2712,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -2629,7 +2796,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -2691,7 +2861,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -2772,7 +2945,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -2834,7 +3010,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -2915,7 +3094,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -2977,7 +3159,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3058,7 +3243,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3120,7 +3308,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3201,7 +3392,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3263,7 +3457,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3345,7 +3542,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3408,7 +3608,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3471,7 +3674,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3534,7 +3740,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3616,7 +3825,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3679,7 +3891,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3761,7 +3976,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3824,7 +4042,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -3860,13 +4081,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -3884,7 +4107,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -3900,16 +4126,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t hueArgument = 150;
-    uint8_t directionArgument = 0;
-    uint16_t transitionTimeArgument = 100U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToHue:hueArgument
-              direction:directionArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToHuePayload alloc] init];
+    payload.Hue = [NSNumber numberWithUnsignedChar:150];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:100];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move to hue shortest distance command Error: %@", err);
 
@@ -3929,16 +4152,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t hueArgument = 200;
-    uint8_t directionArgument = 1;
-    uint16_t transitionTimeArgument = 100U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToHue:hueArgument
-              direction:directionArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToHuePayload alloc] init];
+    payload.Hue = [NSNumber numberWithUnsignedChar:200];
+    payload.Direction = [NSNumber numberWithUnsignedChar:1];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:100];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move to hue longest distance command Error: %@", err);
 
@@ -3958,16 +4178,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t hueArgument = 250;
-    uint8_t directionArgument = 2;
-    uint16_t transitionTimeArgument = 100U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToHue:hueArgument
-              direction:directionArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToHuePayload alloc] init];
+    payload.Hue = [NSNumber numberWithUnsignedChar:250];
+    payload.Direction = [NSNumber numberWithUnsignedChar:2];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:100];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move to hue up command Error: %@", err);
 
@@ -3987,16 +4204,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t hueArgument = 225;
-    uint8_t directionArgument = 3;
-    uint16_t transitionTimeArgument = 100U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToHue:hueArgument
-              direction:directionArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToHuePayload alloc] init];
+    payload.Hue = [NSNumber numberWithUnsignedChar:225];
+    payload.Direction = [NSNumber numberWithUnsignedChar:3];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:100];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move to hue down command Error: %@", err);
 
@@ -4016,13 +4230,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4040,7 +4256,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -4057,13 +4276,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4081,7 +4302,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -4097,14 +4321,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 1;
-    uint8_t rateArgument = 50;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveHue:moveModeArgument
-                   rate:rateArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.Rate = [NSNumber numberWithUnsignedChar:50];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move hue up command Error: %@", err);
 
@@ -4124,14 +4346,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint8_t rateArgument = 50;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveHue:moveModeArgument
-                   rate:rateArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedChar:50];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move hue stop command Error: %@", err);
 
@@ -4151,14 +4371,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 3;
-    uint8_t rateArgument = 50;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveHue:moveModeArgument
-                   rate:rateArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:3];
+    payload.Rate = [NSNumber numberWithUnsignedChar:50];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move hue down command Error: %@", err);
 
@@ -4178,14 +4396,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint8_t rateArgument = 50;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveHue:moveModeArgument
-                   rate:rateArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedChar:50];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move hue stop command Error: %@", err);
 
@@ -4205,13 +4421,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4229,7 +4447,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -4246,13 +4467,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4270,7 +4493,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -4286,16 +4512,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 1;
-    uint8_t stepSizeArgument = 5;
-    uint8_t transitionTimeArgument = 25;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepHue:stepModeArgument
-               stepSize:stepSizeArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepHuePayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:5];
+    payload.TransitionTime = [NSNumber numberWithUnsignedChar:25];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Step hue up command Error: %@", err);
 
@@ -4315,16 +4538,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 3;
-    uint8_t stepSizeArgument = 5;
-    uint8_t transitionTimeArgument = 25;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepHue:stepModeArgument
-               stepSize:stepSizeArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepHuePayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:3];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:5];
+    payload.TransitionTime = [NSNumber numberWithUnsignedChar:25];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Step hue down command Error: %@", err);
 
@@ -4344,13 +4564,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4368,7 +4590,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -4385,13 +4610,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4409,7 +4636,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -4425,14 +4655,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t saturationArgument = 90;
-    uint16_t transitionTimeArgument = 10U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToSaturation:saturationArgument
-               transitionTime:transitionTimeArgument
-                  optionsMask:optionsMaskArgument
-              optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToSaturationPayload alloc] init];
+    payload.Saturation = [NSNumber numberWithUnsignedChar:90];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:10];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToSaturation:payload
               responseHandler:^(NSError * err, NSDictionary * values) {
                   NSLog(@"Move to saturation command Error: %@", err);
 
@@ -4452,13 +4680,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4476,7 +4706,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -4493,13 +4726,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4517,7 +4752,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -4533,14 +4771,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 1;
-    uint8_t rateArgument = 5;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveSaturation:moveModeArgument
-                       rate:rateArgument
-                optionsMask:optionsMaskArgument
-            optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveSaturationPayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.Rate = [NSNumber numberWithUnsignedChar:5];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveSaturation:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 NSLog(@"Move saturation up command Error: %@", err);
 
@@ -4560,14 +4796,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 3;
-    uint8_t rateArgument = 5;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveSaturation:moveModeArgument
-                       rate:rateArgument
-                optionsMask:optionsMaskArgument
-            optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveSaturationPayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:3];
+    payload.Rate = [NSNumber numberWithUnsignedChar:5];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveSaturation:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 NSLog(@"Move saturation down command Error: %@", err);
 
@@ -4587,13 +4821,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4611,7 +4847,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -4628,13 +4867,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4652,7 +4893,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -4668,16 +4912,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 1;
-    uint8_t stepSizeArgument = 15;
-    uint8_t transitionTimeArgument = 10;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepSaturation:stepModeArgument
-                   stepSize:stepSizeArgument
-             transitionTime:transitionTimeArgument
-                optionsMask:optionsMaskArgument
-            optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepSaturationPayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:15];
+    payload.TransitionTime = [NSNumber numberWithUnsignedChar:10];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepSaturation:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 NSLog(@"Step saturation up command Error: %@", err);
 
@@ -4697,16 +4938,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 3;
-    uint8_t stepSizeArgument = 20;
-    uint8_t transitionTimeArgument = 10;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepSaturation:stepModeArgument
-                   stepSize:stepSizeArgument
-             transitionTime:transitionTimeArgument
-                optionsMask:optionsMaskArgument
-            optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepSaturationPayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:3];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:20];
+    payload.TransitionTime = [NSNumber numberWithUnsignedChar:10];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepSaturation:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 NSLog(@"Step saturation down command Error: %@", err);
 
@@ -4726,13 +4964,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4750,7 +4990,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -4767,13 +5010,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4791,7 +5036,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -4807,16 +5055,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t hueArgument = 40;
-    uint8_t saturationArgument = 160;
-    uint16_t transitionTimeArgument = 10U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToHueAndSaturation:hueArgument
-                         saturation:saturationArgument
-                     transitionTime:transitionTimeArgument
-                        optionsMask:optionsMaskArgument
-                    optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToHueAndSaturationPayload alloc] init];
+    payload.Hue = [NSNumber numberWithUnsignedChar:40];
+    payload.Saturation = [NSNumber numberWithUnsignedChar:160];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:10];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToHueAndSaturation:payload
                     responseHandler:^(NSError * err, NSDictionary * values) {
                         NSLog(@"Move To current hue and saturation command Error: %@", err);
 
@@ -4836,13 +5081,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4860,7 +5107,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -4877,13 +5127,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4901,7 +5153,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -4917,16 +5172,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t colorXArgument = 200U;
-    uint16_t colorYArgument = 300U;
-    uint16_t transitionTimeArgument = 20U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToColor:colorXArgument
-                  colorY:colorYArgument
-          transitionTime:transitionTimeArgument
-             optionsMask:optionsMaskArgument
-         optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToColorPayload alloc] init];
+    payload.ColorX = [NSNumber numberWithUnsignedShort:200];
+    payload.ColorY = [NSNumber numberWithUnsignedShort:300];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToColor:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"Move to Color command Error: %@", err);
 
@@ -4946,13 +5198,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -4970,7 +5224,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -4987,13 +5244,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5011,7 +5270,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -5027,14 +5289,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    int16_t rateXArgument = 15;
-    int16_t rateYArgument = 20;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveColor:rateXArgument
-                  rateY:rateYArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveColorPayload alloc] init];
+    payload.RateX = [NSNumber numberWithShort:15];
+    payload.RateY = [NSNumber numberWithShort:20];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColor:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move Color command Error: %@", err);
 
@@ -5054,10 +5314,10 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stopMoveStep:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStopMoveStepPayload alloc] init];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stopMoveStep:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Stop Move Step command Error: %@", err);
 
@@ -5077,13 +5337,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5101,7 +5363,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -5118,13 +5383,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5142,7 +5409,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -5158,16 +5428,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    int16_t stepXArgument = 15;
-    int16_t stepYArgument = 20;
-    uint16_t transitionTimeArgument = 50U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepColor:stepXArgument
-                  stepY:stepYArgument
-         transitionTime:transitionTimeArgument
-            optionsMask:optionsMaskArgument
-        optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepColorPayload alloc] init];
+    payload.StepX = [NSNumber numberWithShort:15];
+    payload.StepY = [NSNumber numberWithShort:20];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:50];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepColor:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Step Color command Error: %@", err);
 
@@ -5187,13 +5454,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5211,7 +5480,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -5228,13 +5500,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5252,7 +5526,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -5268,14 +5545,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t colorTemperatureArgument = 100U;
-    uint16_t transitionTimeArgument = 10U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveToColorTemperature:colorTemperatureArgument
-                     transitionTime:transitionTimeArgument
-                        optionsMask:optionsMaskArgument
-                    optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveToColorTemperaturePayload alloc] init];
+    payload.ColorTemperature = [NSNumber numberWithUnsignedShort:100];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:10];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveToColorTemperature:payload
                     responseHandler:^(NSError * err, NSDictionary * values) {
                         NSLog(@"Move To Color Temperature command Error: %@", err);
 
@@ -5295,13 +5570,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5319,7 +5596,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -5336,13 +5616,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5360,7 +5642,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -5376,18 +5661,14 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 1;
-    uint16_t rateArgument = 10U;
-    uint16_t colorTemperatureMinimumArgument = 1U;
-    uint16_t colorTemperatureMaximumArgument = 255U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveColorTemperature:moveModeArgument
-                             rate:rateArgument
-          colorTemperatureMinimum:colorTemperatureMinimumArgument
-          colorTemperatureMaximum:colorTemperatureMaximumArgument
-                      optionsMask:optionsMaskArgument
-                  optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveColorTemperaturePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.Rate = [NSNumber numberWithUnsignedShort:10];
+    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1];
+    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Move up color temperature command Error: %@", err);
 
@@ -5407,18 +5688,14 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint16_t rateArgument = 10U;
-    uint16_t colorTemperatureMinimumArgument = 1U;
-    uint16_t colorTemperatureMaximumArgument = 255U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveColorTemperature:moveModeArgument
-                             rate:rateArgument
-          colorTemperatureMinimum:colorTemperatureMinimumArgument
-          colorTemperatureMaximum:colorTemperatureMaximumArgument
-                      optionsMask:optionsMaskArgument
-                  optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveColorTemperaturePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedShort:10];
+    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1];
+    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Stop Color Temperature command Error: %@", err);
 
@@ -5438,18 +5715,14 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 3;
-    uint16_t rateArgument = 20U;
-    uint16_t colorTemperatureMinimumArgument = 1U;
-    uint16_t colorTemperatureMaximumArgument = 255U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster moveColorTemperature:moveModeArgument
-                             rate:rateArgument
-          colorTemperatureMinimum:colorTemperatureMinimumArgument
-          colorTemperatureMaximum:colorTemperatureMaximumArgument
-                      optionsMask:optionsMaskArgument
-                  optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterMoveColorTemperaturePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:3];
+    payload.Rate = [NSNumber numberWithUnsignedShort:20];
+    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1];
+    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Move down color temperature command Error: %@", err);
 
@@ -5469,13 +5742,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5493,7 +5768,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -5510,13 +5788,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5534,7 +5814,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -5550,20 +5833,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 1;
-    uint16_t stepSizeArgument = 5U;
-    uint16_t transitionTimeArgument = 50U;
-    uint16_t colorTemperatureMinimumArgument = 5U;
-    uint16_t colorTemperatureMaximumArgument = 100U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepColorTemperature:stepModeArgument
-                         stepSize:stepSizeArgument
-                   transitionTime:transitionTimeArgument
-          colorTemperatureMinimum:colorTemperatureMinimumArgument
-          colorTemperatureMaximum:colorTemperatureMaximumArgument
-                      optionsMask:optionsMaskArgument
-                  optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepColorTemperaturePayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.StepSize = [NSNumber numberWithUnsignedShort:5];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:50];
+    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:5];
+    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:100];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Step up color temperature command Error: %@", err);
 
@@ -5583,20 +5861,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 3;
-    uint16_t stepSizeArgument = 5U;
-    uint16_t transitionTimeArgument = 50U;
-    uint16_t colorTemperatureMinimumArgument = 5U;
-    uint16_t colorTemperatureMaximumArgument = 100U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster stepColorTemperature:stepModeArgument
-                         stepSize:stepSizeArgument
-                   transitionTime:transitionTimeArgument
-          colorTemperatureMinimum:colorTemperatureMinimumArgument
-          colorTemperatureMaximum:colorTemperatureMaximumArgument
-                      optionsMask:optionsMaskArgument
-                  optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterStepColorTemperaturePayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:3];
+    payload.StepSize = [NSNumber numberWithUnsignedShort:5];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:50];
+    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:5];
+    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:100];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stepColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Step down color temperature command Error: %@", err);
 
@@ -5616,13 +5889,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5640,7 +5915,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -5657,13 +5935,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5681,7 +5961,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -5697,16 +5980,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t enhancedHueArgument = 1025U;
-    uint8_t directionArgument = 0;
-    uint16_t transitionTimeArgument = 1U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveToHue:enhancedHueArgument
-                     direction:directionArgument
-                transitionTime:transitionTimeArgument
-                   optionsMask:optionsMaskArgument
-               optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveToHuePayload alloc] init];
+    payload.EnhancedHue = [NSNumber numberWithUnsignedShort:1025];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:1];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveToHue:payload
                responseHandler:^(NSError * err, NSDictionary * values) {
                    NSLog(@"Enhanced Move To Hue command Error: %@", err);
 
@@ -5732,7 +6012,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 1U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 1U);
+        }
 
         [expectation fulfill];
     }];
@@ -5748,13 +6031,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5772,7 +6057,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -5789,13 +6077,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5813,7 +6103,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -5829,14 +6122,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 3;
-    uint16_t rateArgument = 5U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveHue:moveModeArgument
-                        rate:rateArgument
-                 optionsMask:optionsMaskArgument
-             optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:3];
+    payload.Rate = [NSNumber numberWithUnsignedShort:5];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Move Hue Down command  Error: %@", err);
 
@@ -5856,14 +6147,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint16_t rateArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveHue:moveModeArgument
-                        rate:rateArgument
-                 optionsMask:optionsMaskArgument
-             optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
 
@@ -5883,14 +6172,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 1;
-    uint16_t rateArgument = 50U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveHue:moveModeArgument
-                        rate:rateArgument
-                 optionsMask:optionsMaskArgument
-             optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.Rate = [NSNumber numberWithUnsignedShort:50];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Move Hue Up command Error: %@", err);
 
@@ -5910,14 +6197,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint16_t rateArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveHue:moveModeArgument
-                        rate:rateArgument
-                 optionsMask:optionsMaskArgument
-             optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveHuePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
 
@@ -5937,13 +6222,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -5961,7 +6248,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -5978,13 +6268,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6002,7 +6294,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -6018,16 +6313,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 0;
-    uint16_t stepSizeArgument = 50U;
-    uint16_t transitionTimeArgument = 1U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedStepHue:stepModeArgument
-                    stepSize:stepSizeArgument
-              transitionTime:transitionTimeArgument
-                 optionsMask:optionsMaskArgument
-             optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedStepHuePayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:0];
+    payload.StepSize = [NSNumber numberWithUnsignedShort:50];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:1];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedStepHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Step Hue Up command Error: %@", err);
 
@@ -6047,16 +6339,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 1;
-    uint16_t stepSizeArgument = 75U;
-    uint16_t transitionTimeArgument = 1U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedStepHue:stepModeArgument
-                    stepSize:stepSizeArgument
-              transitionTime:transitionTimeArgument
-                 optionsMask:optionsMaskArgument
-             optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedStepHuePayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.StepSize = [NSNumber numberWithUnsignedShort:75];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:1];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedStepHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Step Hue Down command Error: %@", err);
 
@@ -6076,13 +6365,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6100,7 +6391,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -6117,13 +6411,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6141,7 +6437,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -6157,16 +6456,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t enhancedHueArgument = 1200U;
-    uint8_t saturationArgument = 90;
-    uint16_t transitionTimeArgument = 10U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveToHueAndSaturation:enhancedHueArgument
-                                 saturation:saturationArgument
-                             transitionTime:transitionTimeArgument
-                                optionsMask:optionsMaskArgument
-                            optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveToHueAndSaturationPayload alloc] init];
+    payload.EnhancedHue = [NSNumber numberWithUnsignedShort:1200];
+    payload.Saturation = [NSNumber numberWithUnsignedChar:90];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:10];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveToHueAndSaturation:payload
                             responseHandler:^(NSError * err, NSDictionary * values) {
                                 NSLog(@"Enhanced move to hue and saturation command Error: %@", err);
 
@@ -6186,13 +6482,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6210,7 +6508,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -6227,13 +6528,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6251,7 +6554,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -6267,20 +6573,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 14;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 1;
-    uint16_t timeArgument = 100U;
-    uint16_t startHueArgument = 500U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:14];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:1];
+    payload.Time = [NSNumber numberWithUnsignedShort:100];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:500];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set all Attributs Error: %@", err);
 
@@ -6305,7 +6606,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -6326,7 +6630,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 100U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 100U);
+        }
 
         [expectation fulfill];
     }];
@@ -6347,7 +6654,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 500U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 500U);
+        }
 
         [expectation fulfill];
     }];
@@ -6368,7 +6678,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -6384,20 +6697,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 1;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:1];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
@@ -6422,7 +6730,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -6439,20 +6750,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 6;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 3500U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:6];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:3500];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set direction and time while running Error: %@", err);
 
@@ -6477,7 +6783,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -6498,7 +6807,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 3500U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 3500U);
+        }
 
         [expectation fulfill];
     }];
@@ -6514,20 +6826,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 2;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 1;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:1];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set direction while running Error: %@", err);
 
@@ -6552,7 +6859,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -6568,13 +6878,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light that we turned on Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6592,7 +6904,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -6609,13 +6924,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Precondition : Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Precondition : Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -6633,7 +6950,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -6649,20 +6969,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -6687,7 +7002,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -6703,20 +7021,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 2;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -6741,7 +7054,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -6757,20 +7073,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 4;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 30U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:4];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:30];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -6795,7 +7106,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 30U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 30U);
+        }
 
         [expectation fulfill];
     }];
@@ -6811,20 +7125,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 8;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 160U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:8];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:160];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -6849,7 +7158,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 160U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 160U);
+        }
 
         [expectation fulfill];
     }];
@@ -6865,20 +7177,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 1;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:1];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -6903,7 +7210,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -6919,20 +7229,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -6957,7 +7262,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -6973,20 +7281,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 2;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 1;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:1];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7011,7 +7314,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -7027,20 +7333,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 1;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:1];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7065,7 +7366,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -7081,20 +7385,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7119,7 +7418,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -7135,16 +7437,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t enhancedHueArgument = 40960U;
-    uint8_t directionArgument = 0;
-    uint16_t transitionTimeArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster enhancedMoveToHue:enhancedHueArgument
-                     direction:directionArgument
-                transitionTime:transitionTimeArgument
-                   optionsMask:optionsMaskArgument
-               optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveToHuePayload alloc] init];
+    payload.EnhancedHue = [NSNumber numberWithUnsignedShort:40960];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveToHue:payload
                responseHandler:^(NSError * err, NSDictionary * values) {
                    NSLog(@"Enhanced Move To Hue command 10 Error: %@", err);
 
@@ -7177,7 +7476,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 40960U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 40960U);
+        }
 
         [expectation fulfill];
     }];
@@ -7193,20 +7495,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 2;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7231,7 +7528,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -7247,20 +7547,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 2;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:2];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7285,7 +7580,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -7301,20 +7599,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7339,7 +7632,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -7355,20 +7651,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 2;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 1;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:1];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7393,7 +7684,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -7409,20 +7703,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 2;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:2];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7447,7 +7736,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -7463,20 +7755,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7501,7 +7788,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -7517,13 +7807,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn Off light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn Off light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -7537,13 +7829,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Precondition: Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Precondition: Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -7562,7 +7856,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -7578,20 +7875,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 15;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 30U;
-    uint16_t startHueArgument = 160U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:15];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:30];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:160];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7616,7 +7908,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -7637,7 +7932,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -7658,7 +7956,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 30U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 30U);
+        }
 
         [expectation fulfill];
     }];
@@ -7679,7 +7980,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 160U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 160U);
+        }
 
         [expectation fulfill];
     }];
@@ -7695,20 +7999,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 1;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:1];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set all Attributes Error: %@", err);
 
@@ -7733,7 +8032,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -7749,20 +8051,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 2;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 1;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:1];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
@@ -7787,7 +8084,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -7803,20 +8103,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
@@ -7841,7 +8136,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -7857,13 +8155,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -7877,13 +8177,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Precondition: Turn on light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Precondition: Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -7902,7 +8204,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -7918,20 +8223,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 15;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 30U;
-    uint16_t startHueArgument = 160U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:15];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:30];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:160];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
@@ -7956,7 +8256,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -7977,7 +8280,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -7998,7 +8304,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 30U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 30U);
+        }
 
         [expectation fulfill];
     }];
@@ -8019,7 +8328,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 160U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 160U);
+        }
 
         [expectation fulfill];
     }];
@@ -8035,20 +8347,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 1;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:1];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set all Attributes Error: %@", err);
 
@@ -8073,7 +8380,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -8089,20 +8399,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 4;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 60U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:4];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:60];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
@@ -8127,7 +8432,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 60U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 60U);
+        }
 
         [expectation fulfill];
     }];
@@ -8143,20 +8451,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t updateFlagsArgument = 1;
-    uint8_t actionArgument = 0;
-    uint8_t directionArgument = 0;
-    uint16_t timeArgument = 0U;
-    uint16_t startHueArgument = 0U;
-    uint8_t optionsMaskArgument = 0;
-    uint8_t optionsOverrideArgument = 0;
-    [cluster colorLoopSet:updateFlagsArgument
-                   action:actionArgument
-                direction:directionArgument
-                     time:timeArgument
-                 startHue:startHueArgument
-              optionsMask:optionsMaskArgument
-          optionsOverride:optionsOverrideArgument
+    __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
+    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.Action = [NSNumber numberWithUnsignedChar:0];
+    payload.Direction = [NSNumber numberWithUnsignedChar:0];
+    payload.Time = [NSNumber numberWithUnsignedShort:0];
+    payload.StartHue = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
@@ -8181,7 +8484,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -8197,13 +8503,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn off light for color control tests Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn off light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -8625,7 +8933,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 3U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 3U);
+        }
 
         [expectation fulfill];
     }];
@@ -8668,7 +8979,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 3U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 3U);
+        }
 
         [expectation fulfill];
     }];
@@ -8911,7 +9225,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 2U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 2U);
+        }
 
         [expectation fulfill];
     }];
@@ -8958,7 +9275,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 2U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 2U);
+        }
 
         [expectation fulfill];
     }];
@@ -9003,7 +9323,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -9019,14 +9342,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t levelArgument = 64;
-    uint16_t transitionTimeArgument = 0U;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster moveToLevel:levelArgument
-          transitionTime:transitionTimeArgument
-              optionMask:optionMaskArgument
-          optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMoveToLevelPayload alloc] init];
+    payload.Level = [NSNumber numberWithUnsignedChar:64];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster moveToLevel:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"sends a Move to level command Error: %@", err);
 
@@ -9059,7 +9380,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 64);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 64);
+        }
 
         [expectation fulfill];
     }];
@@ -9075,14 +9399,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t levelArgument = 128;
-    uint16_t transitionTimeArgument = 1U;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster moveToLevel:levelArgument
-          transitionTime:transitionTimeArgument
-              optionMask:optionMaskArgument
-          optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMoveToLevelPayload alloc] init];
+    payload.Level = [NSNumber numberWithUnsignedChar:128];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:1];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster moveToLevel:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"sends a Move to level command Error: %@", err);
 
@@ -9115,7 +9437,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 128);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 128);
+        }
 
         [expectation fulfill];
     }];
@@ -9136,7 +9461,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -9152,14 +9480,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t levelArgument = 254;
-    uint16_t transitionTimeArgument = 65535U;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster moveToLevel:levelArgument
-          transitionTime:transitionTimeArgument
-              optionMask:optionMaskArgument
-          optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMoveToLevelPayload alloc] init];
+    payload.Level = [NSNumber numberWithUnsignedChar:254];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:65535];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster moveToLevel:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"sends a Move to level command Error: %@", err);
 
@@ -9192,7 +9518,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 254);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 254);
+        }
 
         [expectation fulfill];
     }];
@@ -9208,14 +9537,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t levelArgument = 0;
-    uint16_t transitionTimeArgument = 0U;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster moveToLevel:levelArgument
-          transitionTime:transitionTimeArgument
-              optionMask:optionMaskArgument
-          optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMoveToLevelPayload alloc] init];
+    payload.Level = [NSNumber numberWithUnsignedChar:0];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:0];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster moveToLevel:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"Reset level to 0 Error: %@", err);
 
@@ -9249,7 +9576,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -9270,7 +9600,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 255);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 255);
+        }
 
         [expectation fulfill];
     }];
@@ -9286,14 +9619,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint8_t rateArgument = 200;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster move:moveModeArgument
-                   rate:rateArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMovePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedChar:200];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster move:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"sends a Move up command Error: %@", err);
 
@@ -9326,7 +9657,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 255);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 255);
+        }
 
         [expectation fulfill];
     }];
@@ -9347,7 +9681,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -9363,14 +9700,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 1;
-    uint8_t rateArgument = 250;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster move:moveModeArgument
-                   rate:rateArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMovePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.Rate = [NSNumber numberWithUnsignedChar:250];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster move:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"sends a Move down command Error: %@", err);
 
@@ -9403,7 +9738,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -9445,7 +9783,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 20);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 20);
+        }
 
         [expectation fulfill];
     }];
@@ -9461,14 +9802,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 1;
-    uint8_t rateArgument = 255;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster move:moveModeArgument
-                   rate:rateArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMovePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.Rate = [NSNumber numberWithUnsignedChar:255];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster move:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"sends a Move up command at default move rate Error: %@", err);
 
@@ -9518,13 +9857,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Sending on command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Sending on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -9537,16 +9878,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 0;
-    uint8_t stepSizeArgument = 128;
-    uint16_t transitionTimeArgument = 20U;
-    uint8_t optionMaskArgument = 0;
-    uint8_t optionOverrideArgument = 0;
-    [cluster step:stepModeArgument
-               stepSize:stepSizeArgument
-         transitionTime:transitionTimeArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterStepPayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:0];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:128];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster step:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
 
@@ -9579,7 +9917,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 128);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 128);
+        }
 
         [expectation fulfill];
     }];
@@ -9595,16 +9936,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 1;
-    uint8_t stepSizeArgument = 64;
-    uint16_t transitionTimeArgument = 20U;
-    uint8_t optionMaskArgument = 0;
-    uint8_t optionOverrideArgument = 0;
-    [cluster step:stepModeArgument
-               stepSize:stepSizeArgument
-         transitionTime:transitionTimeArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterStepPayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:64];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster step:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Sends step down command to DUT Error: %@", err);
 
@@ -9637,7 +9975,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 64);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 64);
+        }
 
         [expectation fulfill];
     }];
@@ -9653,16 +9994,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 0;
-    uint8_t stepSizeArgument = 64;
-    uint16_t transitionTimeArgument = 20U;
-    uint8_t optionMaskArgument = 0;
-    uint8_t optionOverrideArgument = 0;
-    [cluster step:stepModeArgument
-               stepSize:stepSizeArgument
-         transitionTime:transitionTimeArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterStepPayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:0];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:64];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster step:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Sends a Step up command Error: %@", err);
 
@@ -9695,7 +10033,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 128);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 128);
+        }
 
         [expectation fulfill];
     }];
@@ -9711,13 +10052,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Sending off command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Sending off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -9731,13 +10074,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Sending on command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Sending on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -9750,16 +10095,13 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t stepModeArgument = 0;
-    uint8_t stepSizeArgument = 128;
-    uint16_t transitionTimeArgument = 20U;
-    uint8_t optionMaskArgument = 0;
-    uint8_t optionOverrideArgument = 0;
-    [cluster step:stepModeArgument
-               stepSize:stepSizeArgument
-         transitionTime:transitionTimeArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterStepPayload alloc] init];
+    payload.StepMode = [NSNumber numberWithUnsignedChar:0];
+    payload.StepSize = [NSNumber numberWithUnsignedChar:128];
+    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster step:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
 
@@ -9787,14 +10129,12 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t moveModeArgument = 0;
-    uint8_t rateArgument = 1;
-    uint8_t optionMaskArgument = 1;
-    uint8_t optionOverrideArgument = 1;
-    [cluster move:moveModeArgument
-                   rate:rateArgument
-             optionMask:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterMovePayload alloc] init];
+    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.Rate = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster move:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Sends a move up command to DUT Error: %@", err);
 
@@ -9822,10 +10162,10 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t optionMaskArgument = 0;
-    uint8_t optionOverrideArgument = 0;
-    [cluster stop:optionMaskArgument
-         optionOverride:optionOverrideArgument
+    __auto_type * payload = [[CHIPLevelControlClusterStopPayload alloc] init];
+    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster stop:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Sends stop command to DUT Error: %@", err);
 
@@ -9845,13 +10185,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Sending off command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Sending off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -9890,13 +10232,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLowPower * cluster = [[CHIPTestLowPower alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster sleep:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Put the device into low power mode Error: %@", err);
+    __auto_type * payload = [[CHIPLowPowerClusterSleepPayload alloc] init];
+    [cluster sleep:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Put the device into low power mode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -9915,7 +10259,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 2U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 2U);
+        }
 
         [expectation fulfill];
     }];
@@ -10001,7 +10348,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -10067,7 +10417,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -10135,7 +10488,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -10196,7 +10552,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 4U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 4U);
+        }
 
         [expectation fulfill];
     }];
@@ -10239,7 +10598,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 4U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 4U);
+        }
 
         [expectation fulfill];
     }];
@@ -10260,7 +10622,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
 
         [expectation fulfill];
     }];
@@ -10302,7 +10667,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
 
         [expectation fulfill];
     }];
@@ -10324,7 +10692,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -10345,7 +10716,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -10366,7 +10740,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -10387,7 +10764,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -10408,7 +10788,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -10429,7 +10812,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -10513,7 +10899,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -10534,7 +10923,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -10555,7 +10947,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -10572,13 +10967,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10596,7 +10993,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -10612,13 +11012,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10636,7 +11038,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -10652,13 +11057,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10676,7 +11083,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -10692,13 +11102,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster toggle:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Toggle Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterTogglePayload alloc] init];
+    [cluster toggle:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Toggle Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10717,7 +11129,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -10733,13 +11148,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster toggle:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Toggle Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterTogglePayload alloc] init];
+    [cluster toggle:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Toggle Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10758,7 +11175,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -10774,13 +11194,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10798,7 +11220,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -10814,13 +11239,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10838,7 +11265,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -10855,13 +11285,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10887,7 +11319,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -10908,7 +11343,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -10924,13 +11362,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -10956,7 +11396,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -10977,7 +11420,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -10993,13 +11439,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11025,7 +11473,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -11046,7 +11497,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -11067,7 +11521,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11088,7 +11545,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11104,13 +11564,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11128,7 +11590,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -11149,7 +11614,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11170,7 +11638,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11186,13 +11657,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11210,7 +11683,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -11231,7 +11707,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11252,7 +11731,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -11273,7 +11755,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11294,7 +11779,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11310,13 +11798,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11334,7 +11824,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11355,7 +11848,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11371,13 +11867,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11395,7 +11893,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -11416,7 +11917,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11437,7 +11941,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -11458,7 +11965,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11474,13 +11984,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send On Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11498,7 +12010,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -11519,7 +12034,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11540,7 +12058,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11556,13 +12077,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11580,7 +12103,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -11601,7 +12127,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11622,7 +12151,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -11643,7 +12175,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11664,7 +12199,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11685,7 +12223,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -11706,7 +12247,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11727,7 +12271,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -11743,13 +12290,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Off Command Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -11768,7 +12317,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 2U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 2U);
+        }
 
         [expectation fulfill];
     }];
@@ -11830,7 +12382,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 2U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 2U);
+        }
 
         [expectation fulfill];
     }];
@@ -11892,7 +12447,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -11954,7 +12512,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -12016,7 +12577,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -12330,7 +12894,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -12467,7 +13034,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 3U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 3U);
+        }
 
         [expectation fulfill];
     }];
@@ -12514,7 +13084,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 3U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 3U);
+        }
 
         [expectation fulfill];
     }];
@@ -12645,7 +13218,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 700);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 700);
+        }
 
         [expectation fulfill];
     }];
@@ -12713,7 +13289,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 700);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 700);
+        }
 
         [expectation fulfill];
     }];
@@ -12735,7 +13314,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 3000);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 3000);
+        }
 
         [expectation fulfill];
     }];
@@ -12803,7 +13385,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 3000);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 3000);
+        }
 
         [expectation fulfill];
     }];
@@ -12825,7 +13410,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 1600);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 1600);
+        }
 
         [expectation fulfill];
     }];
@@ -12893,7 +13481,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 1600);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 1600);
+        }
 
         [expectation fulfill];
     }];
@@ -12915,7 +13506,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 3200);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 3200);
+        }
 
         [expectation fulfill];
     }];
@@ -12983,7 +13577,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 3200);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 3200);
+        }
 
         [expectation fulfill];
     }];
@@ -13005,7 +13602,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 2600);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 2600);
+        }
 
         [expectation fulfill];
     }];
@@ -13074,7 +13674,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 2600);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 2600);
+        }
 
         [expectation fulfill];
     }];
@@ -13096,7 +13699,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 2000);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 2000);
+        }
 
         [expectation fulfill];
     }];
@@ -13165,7 +13771,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 2000);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 2000);
+        }
 
         [expectation fulfill];
     }];
@@ -13187,7 +13796,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 700);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 700);
+        }
 
         [expectation fulfill];
     }];
@@ -13256,7 +13868,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 700);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 700);
+        }
 
         [expectation fulfill];
     }];
@@ -13278,7 +13893,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 3000);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 3000);
+        }
 
         [expectation fulfill];
     }];
@@ -13347,7 +13965,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 3000);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 3000);
+        }
 
         [expectation fulfill];
     }];
@@ -13369,7 +13990,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 1600);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 1600);
+        }
 
         [expectation fulfill];
     }];
@@ -13438,7 +14062,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 1600);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 1600);
+        }
 
         [expectation fulfill];
     }];
@@ -13460,7 +14087,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 3200);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 3200);
+        }
 
         [expectation fulfill];
     }];
@@ -13529,7 +14159,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 3200);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 3200);
+        }
 
         [expectation fulfill];
     }];
@@ -13551,7 +14184,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 4);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 4);
+        }
 
         [expectation fulfill];
     }];
@@ -13620,7 +14256,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 4);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 4);
+        }
 
         [expectation fulfill];
     }];
@@ -13641,7 +14280,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -13708,7 +14350,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -13729,7 +14374,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] charValue], 25);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue charValue], 25);
+        }
 
         [expectation fulfill];
     }];
@@ -13797,7 +14445,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] charValue], 25);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue charValue], 25);
+        }
 
         [expectation fulfill];
     }];
@@ -13863,7 +14514,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -13996,7 +14650,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14060,7 +14717,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14102,7 +14762,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14166,7 +14829,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14209,7 +14875,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14278,7 +14947,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14554,7 +15226,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 1U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 1U);
+        }
 
         [expectation fulfill];
     }];
@@ -14601,7 +15276,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 1U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 1U);
+        }
 
         [expectation fulfill];
     }];
@@ -14623,7 +15301,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 5U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 5U);
+        }
 
         [expectation fulfill];
     }];
@@ -14666,7 +15347,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 5U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 5U);
+        }
 
         [expectation fulfill];
     }];
@@ -14687,7 +15371,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
 
         [expectation fulfill];
     }];
@@ -14708,7 +15395,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
 
         [expectation fulfill];
     }];
@@ -14730,7 +15420,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14751,7 +15444,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14772,7 +15468,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 3);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 3);
+        }
 
         [expectation fulfill];
     }];
@@ -14793,7 +15492,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 3);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 3);
+        }
 
         [expectation fulfill];
     }];
@@ -14815,7 +15517,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14836,7 +15541,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14857,7 +15565,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14878,7 +15589,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14899,7 +15613,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -14941,7 +15658,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 7);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 7);
+        }
 
         [expectation fulfill];
     }];
@@ -14963,7 +15683,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -15001,13 +15724,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster downOrClose:^(NSError * err, NSDictionary * values) {
-        NSLog(@"1a: TH adjusts the the DUT to a non-open position Error: %@", err);
+    __auto_type * payload = [[CHIPWindowCoveringClusterDownOrClosePayload alloc] init];
+    [cluster downOrClose:payload
+         responseHandler:^(NSError * err, NSDictionary * values) {
+             NSLog(@"1a: TH adjusts the the DUT to a non-open position Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+             XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+             [expectation fulfill];
+         }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15020,13 +15745,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster upOrOpen:^(NSError * err, NSDictionary * values) {
-        NSLog(@"2a: TH sends UpOrOpen command to DUT Error: %@", err);
+    __auto_type * payload = [[CHIPWindowCoveringClusterUpOrOpenPayload alloc] init];
+    [cluster upOrOpen:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"2a: TH sends UpOrOpen command to DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15044,7 +15771,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -15061,13 +15791,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster upOrOpen:^(NSError * err, NSDictionary * values) {
-        NSLog(@"1a: TH adjusts the the DUT to a non-closed position Error: %@", err);
+    __auto_type * payload = [[CHIPWindowCoveringClusterUpOrOpenPayload alloc] init];
+    [cluster upOrOpen:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"1a: TH adjusts the the DUT to a non-closed position Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15080,13 +15812,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster downOrClose:^(NSError * err, NSDictionary * values) {
-        NSLog(@"2a: TH sends DownOrClose command to DUT Error: %@", err);
+    __auto_type * payload = [[CHIPWindowCoveringClusterDownOrClosePayload alloc] init];
+    [cluster downOrClose:payload
+         responseHandler:^(NSError * err, NSDictionary * values) {
+             NSLog(@"2a: TH sends DownOrClose command to DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+             XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+             [expectation fulfill];
+         }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15104,7 +15838,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -15121,13 +15858,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster upOrOpen:^(NSError * err, NSDictionary * values) {
-        NSLog(@"1a: TH adjusts the the DUT to a non-open position Error: %@", err);
+    __auto_type * payload = [[CHIPWindowCoveringClusterUpOrOpenPayload alloc] init];
+    [cluster upOrOpen:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"1a: TH adjusts the the DUT to a non-open position Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15140,13 +15879,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster stopMotion:^(NSError * err, NSDictionary * values) {
-        NSLog(@"2a: TH sends StopMotion command to DUT Error: %@", err);
+    __auto_type * payload = [[CHIPWindowCoveringClusterStopMotionPayload alloc] init];
+    [cluster stopMotion:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"2a: TH sends StopMotion command to DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15164,7 +15905,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -15181,13 +15925,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster test:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Test Command Error: %@", err);
+    __auto_type * payload = [[CHIPTestClusterClusterTestPayload alloc] init];
+    [cluster test:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Test Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15200,12 +15946,14 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster testNotHandled:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Test Not Handled Command Error: %@", err);
+    __auto_type * payload = [[CHIPTestClusterClusterTestNotHandledPayload alloc] init];
+    [cluster testNotHandled:payload
+            responseHandler:^(NSError * err, NSDictionary * values) {
+                NSLog(@"Send Test Not Handled Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 1);
-        [expectation fulfill];
-    }];
+                XCTAssertEqual(err.code, 1);
+                [expectation fulfill];
+            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15218,15 +15966,20 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster testSpecific:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Test Specific Command Error: %@", err);
+    __auto_type * payload = [[CHIPTestClusterClusterTestSpecificPayload alloc] init];
+    [cluster testSpecific:payload
+          responseHandler:^(NSError * err, NSDictionary * values) {
+              NSLog(@"Send Test Specific Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+              XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"returnValue"] unsignedCharValue], 7);
+              {
+                  id actualValue = values[@"ReturnValue"];
+                  XCTAssertEqual([actualValue unsignedCharValue], 7);
+              }
 
-        [expectation fulfill];
-    }];
+              [expectation fulfill];
+          }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -15239,16 +15992,19 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t arg1Argument = 3;
-    uint8_t arg2Argument = 17;
-    [cluster testAddArguments:arg1Argument
-                         arg2:arg2Argument
+    __auto_type * payload = [[CHIPTestClusterClusterTestAddArgumentsPayload alloc] init];
+    payload.Arg1 = [NSNumber numberWithUnsignedChar:3];
+    payload.Arg2 = [NSNumber numberWithUnsignedChar:17];
+    [cluster testAddArguments:payload
               responseHandler:^(NSError * err, NSDictionary * values) {
                   NSLog(@"Send Test Add Arguments Command Error: %@", err);
 
                   XCTAssertEqual(err.code, 0);
 
-                  XCTAssertEqual([values[@"returnValue"] unsignedCharValue], 20);
+                  {
+                      id actualValue = values[@"ReturnValue"];
+                      XCTAssertEqual([actualValue unsignedCharValue], 20);
+                  }
 
                   [expectation fulfill];
               }];
@@ -15264,10 +16020,10 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t arg1Argument = 250;
-    uint8_t arg2Argument = 6;
-    [cluster testAddArguments:arg1Argument
-                         arg2:arg2Argument
+    __auto_type * payload = [[CHIPTestClusterClusterTestAddArgumentsPayload alloc] init];
+    payload.Arg1 = [NSNumber numberWithUnsignedChar:250];
+    payload.Arg2 = [NSNumber numberWithUnsignedChar:6];
+    [cluster testAddArguments:payload
               responseHandler:^(NSError * err, NSDictionary * values) {
                   NSLog(@"Send failing Test Add Arguments Command Error: %@", err);
 
@@ -15291,7 +16047,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -15333,7 +16092,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 1);
+        }
 
         [expectation fulfill];
     }];
@@ -15375,7 +16137,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -15396,7 +16161,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -15438,7 +16206,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 255);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 255);
+        }
 
         [expectation fulfill];
     }];
@@ -15480,7 +16251,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -15501,7 +16275,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -15543,7 +16320,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 65535U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 65535U);
+        }
 
         [expectation fulfill];
     }];
@@ -15585,7 +16365,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -15606,7 +16389,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
 
         [expectation fulfill];
     }];
@@ -15648,7 +16434,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 4294967295UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 4294967295UL);
+        }
 
         [expectation fulfill];
     }];
@@ -15690,7 +16479,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
 
         [expectation fulfill];
     }];
@@ -15711,7 +16503,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongLongValue], 0ULL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
+        }
 
         [expectation fulfill];
     }];
@@ -15753,7 +16548,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongLongValue], 18446744073709551615ULL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedLongLongValue], 18446744073709551615ULL);
+        }
 
         [expectation fulfill];
     }];
@@ -15795,7 +16593,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongLongValue], 0ULL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
+        }
 
         [expectation fulfill];
     }];
@@ -15816,7 +16617,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -15858,7 +16662,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 255);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 255);
+        }
 
         [expectation fulfill];
     }];
@@ -15900,7 +16707,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -15921,7 +16731,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -15963,7 +16776,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 65535U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 65535U);
+        }
 
         [expectation fulfill];
     }];
@@ -16005,7 +16821,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -16026,7 +16845,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
 
         [expectation fulfill];
     }];
@@ -16068,7 +16890,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 4294967295UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 4294967295UL);
+        }
 
         [expectation fulfill];
     }];
@@ -16110,7 +16935,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
 
         [expectation fulfill];
     }];
@@ -16131,7 +16959,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongLongValue], 0ULL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
+        }
 
         [expectation fulfill];
     }];
@@ -16173,7 +17004,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongLongValue], 18446744073709551615ULL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedLongLongValue], 18446744073709551615ULL);
+        }
 
         [expectation fulfill];
     }];
@@ -16215,7 +17049,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongLongValue], 0ULL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
+        }
 
         [expectation fulfill];
     }];
@@ -16236,7 +17073,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] charValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue charValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -16278,7 +17118,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] charValue], 127);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue charValue], 127);
+        }
 
         [expectation fulfill];
     }];
@@ -16320,7 +17163,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] charValue], -128);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue charValue], -128);
+        }
 
         [expectation fulfill];
     }];
@@ -16362,7 +17208,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] charValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue charValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -16383,7 +17232,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -16425,7 +17277,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 32767);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 32767);
+        }
 
         [expectation fulfill];
     }];
@@ -16467,7 +17322,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], -32768);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], -32768);
+        }
 
         [expectation fulfill];
     }];
@@ -16509,7 +17367,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] shortValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue shortValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -16530,7 +17391,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] longValue], 0L);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue intValue], 0L);
+        }
 
         [expectation fulfill];
     }];
@@ -16572,7 +17436,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] longValue], 2147483647L);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue intValue], 2147483647L);
+        }
 
         [expectation fulfill];
     }];
@@ -16614,7 +17481,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] longValue], -2147483648L);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue intValue], -2147483648L);
+        }
 
         [expectation fulfill];
     }];
@@ -16656,7 +17526,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] longValue], 0L);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue intValue], 0L);
+        }
 
         [expectation fulfill];
     }];
@@ -16677,7 +17550,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] longLongValue], 0LL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue longLongValue], 0LL);
+        }
 
         [expectation fulfill];
     }];
@@ -16719,7 +17595,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] longLongValue], 9223372036854775807LL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue longLongValue], 9223372036854775807LL);
+        }
 
         [expectation fulfill];
     }];
@@ -16761,7 +17640,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] longLongValue], -9223372036854775807LL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue longLongValue], -9223372036854775807LL);
+        }
 
         [expectation fulfill];
     }];
@@ -16803,7 +17685,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] longLongValue], 0LL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue longLongValue], 0LL);
+        }
 
         [expectation fulfill];
     }];
@@ -16824,7 +17709,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -16866,7 +17754,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 255);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 255);
+        }
 
         [expectation fulfill];
     }];
@@ -16908,7 +17799,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -16929,7 +17823,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -16971,7 +17868,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 65535U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 65535U);
+        }
 
         [expectation fulfill];
     }];
@@ -17013,7 +17913,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -17034,8 +17937,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        NSData * octetStringArgument = [[NSData alloc] initWithBytes:"" length:0];
-        XCTAssertTrue([values[@"value"] isEqualToData:octetStringArgument]);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"" length:0]]);
+        }
 
         [expectation fulfill];
     }];
@@ -17077,8 +17982,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        NSData * octetStringArgument = [[NSData alloc] initWithBytes:"Tes\x00ti\x00ng" length:9];
-        XCTAssertTrue([values[@"value"] isEqualToData:octetStringArgument]);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"Tes\x00ti\x00ng" length:9]]);
+        }
 
         [expectation fulfill];
     }];
@@ -17120,8 +18027,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        NSData * octetStringArgument = [[NSData alloc] initWithBytes:"TestValue" length:9];
-        XCTAssertTrue([values[@"value"] isEqualToData:octetStringArgument]);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"TestValue" length:9]]);
+        }
 
         [expectation fulfill];
     }];
@@ -17162,8 +18071,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        NSData * octetStringArgument = [[NSData alloc] initWithBytes:"TestValue" length:9];
-        XCTAssertTrue([values[@"value"] isEqualToData:octetStringArgument]);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"TestValue" length:9]]);
+        }
 
         [expectation fulfill];
     }];
@@ -17205,8 +18116,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        NSData * longOctetStringArgument = [[NSData alloc] initWithBytes:"" length:0];
-        XCTAssertTrue([values[@"value"] isEqualToData:longOctetStringArgument]);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"" length:0]]);
+        }
 
         [expectation fulfill];
     }];
@@ -17252,12 +18165,16 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        NSData * longOctetStringArgument = [[NSData alloc]
-            initWithBytes:"11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                          "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                          "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                   length:300];
-        XCTAssertTrue([values[@"value"] isEqualToData:longOctetStringArgument]);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertTrue([actualValue
+                isEqualToData:[[NSData alloc]
+                                  initWithBytes:"1111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                                                "1111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                                                "1111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                                                "111111111111111111111111111111111111111111111111111111"
+                                         length:300]]);
+        }
 
         [expectation fulfill];
     }];
@@ -17299,8 +18216,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        NSString * charStringArgument = @"";
-        XCTAssertTrue([values[@"value"] isEqualToString:charStringArgument]);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertTrue([actualValue isEqualToString:@""]);
+        }
 
         [expectation fulfill];
     }];
@@ -17383,8 +18302,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        NSString * longCharStringArgument = @"";
-        XCTAssertTrue([values[@"value"] isEqualToString:longCharStringArgument]);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertTrue([actualValue isEqualToString:@""]);
+        }
 
         [expectation fulfill];
     }];
@@ -17429,11 +18350,14 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        NSString * longCharStringArgument
-            = @"☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-              @"☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-              @"☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉";
-        XCTAssertTrue([values[@"value"] isEqualToString:longCharStringArgument]);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertTrue([actualValue
+                isEqualToString:
+                    @"☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+                    @"☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+                    @"☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"]);
+        }
 
         [expectation fulfill];
     }];
@@ -17475,7 +18399,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongLongValue], 0ULL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
+        }
 
         [expectation fulfill];
     }];
@@ -17517,7 +18444,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongLongValue], 18446744073709551615ULL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedLongLongValue], 18446744073709551615ULL);
+        }
 
         [expectation fulfill];
     }];
@@ -17559,7 +18489,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongLongValue], 0ULL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
+        }
 
         [expectation fulfill];
     }];
@@ -17580,7 +18513,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
 
         [expectation fulfill];
     }];
@@ -17622,7 +18558,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 4294967295UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 4294967295UL);
+        }
 
         [expectation fulfill];
     }];
@@ -17664,7 +18603,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedLongValue], 0UL);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
 
         [expectation fulfill];
     }];
@@ -17690,7 +18632,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -17732,12 +18677,14 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:200 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster test:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Send Test Command to unsupported endpoint Error: %@", err);
+    __auto_type * payload = [[CHIPTestClusterClusterTestPayload alloc] init];
+    [cluster test:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Send Test Command to unsupported endpoint Error: %@", err);
 
-        XCTAssertEqual(err.code, 1);
-        [expectation fulfill];
-    }];
+            XCTAssertEqual(err.code, 1);
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -17755,7 +18702,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 0U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 0U);
+        }
 
         [expectation fulfill];
     }];
@@ -17797,7 +18747,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 17U);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedShortValue], 17U);
+        }
 
         [expectation fulfill];
     }];
@@ -17834,20 +18787,418 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t arg1Argument = 20003U;
-    uint8_t arg2Argument = 101;
-    [cluster testEnumsRequest:arg1Argument
-                         arg2:arg2Argument
+    __auto_type * payload = [[CHIPTestClusterClusterTestEnumsRequestPayload alloc] init];
+    payload.Arg1 = [NSNumber numberWithUnsignedShort:20003];
+    payload.Arg2 = [NSNumber numberWithUnsignedChar:101];
+    [cluster testEnumsRequest:payload
               responseHandler:^(NSError * err, NSDictionary * values) {
                   NSLog(@"Send a command with a vendor_id and enum Error: %@", err);
 
                   XCTAssertEqual(err.code, 0);
 
-                  XCTAssertEqual([values[@"arg1"] unsignedShortValue], 20003U);
-                  XCTAssertEqual([values[@"arg2"] unsignedCharValue], 101);
+                  {
+                      id actualValue = values[@"Arg1"];
+                      XCTAssertEqual([actualValue unsignedShortValue], 20003U);
+                  }
+                  {
+                      id actualValue = values[@"Arg2"];
+                      XCTAssertEqual([actualValue unsignedCharValue], 101);
+                  }
 
                   [expectation fulfill];
               }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000126_TestStructArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With Struct Argument and arg1.b is true"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * payload = [[CHIPTestClusterClusterTestStructArgumentRequestPayload alloc] init];
+    payload.Arg1 = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).A = [NSNumber numberWithUnsignedChar:0];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).B = [NSNumber numberWithBool:true];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).C = [NSNumber numberWithUnsignedChar:2];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).D = [[NSData alloc] initWithBytes:"octet_string" length:12];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).E = @"char_string";
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).F = [NSNumber numberWithUnsignedChar:1];
+
+    [cluster testStructArgumentRequest:payload
+                       responseHandler:^(NSError * err, NSDictionary * values) {
+                           NSLog(@"Send Test Command With Struct Argument and arg1.b is true Error: %@", err);
+
+                           XCTAssertEqual(err.code, 0);
+
+                           {
+                               id actualValue = values[@"Value"];
+                               XCTAssertEqual([actualValue boolValue], true);
+                           }
+
+                           [expectation fulfill];
+                       }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000127_TestStructArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With Struct Argument and arg1.b is false"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * payload = [[CHIPTestClusterClusterTestStructArgumentRequestPayload alloc] init];
+    payload.Arg1 = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).A = [NSNumber numberWithUnsignedChar:0];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).B = [NSNumber numberWithBool:false];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).C = [NSNumber numberWithUnsignedChar:2];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).D = [[NSData alloc] initWithBytes:"octet_string" length:12];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).E = @"char_string";
+    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).F = [NSNumber numberWithUnsignedChar:1];
+
+    [cluster testStructArgumentRequest:payload
+                       responseHandler:^(NSError * err, NSDictionary * values) {
+                           NSLog(@"Send Test Command With Struct Argument and arg1.b is false Error: %@", err);
+
+                           XCTAssertEqual(err.code, 0);
+
+                           {
+                               id actualValue = values[@"Value"];
+                               XCTAssertEqual([actualValue boolValue], false);
+                           }
+
+                           [expectation fulfill];
+                       }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000128_TestListInt8UArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With List of INT8U and none of them is set to 0"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * payload = [[CHIPTestClusterClusterTestListInt8UArgumentRequestPayload alloc] init];
+    {
+        NSMutableArray * temp = [[NSMutableArray alloc] init];
+        temp[0] = [NSNumber numberWithUnsignedChar:1];
+        temp[1] = [NSNumber numberWithUnsignedChar:2];
+        temp[2] = [NSNumber numberWithUnsignedChar:3];
+        temp[3] = [NSNumber numberWithUnsignedChar:4];
+        temp[4] = [NSNumber numberWithUnsignedChar:5];
+        temp[5] = [NSNumber numberWithUnsignedChar:6];
+        temp[6] = [NSNumber numberWithUnsignedChar:7];
+        temp[7] = [NSNumber numberWithUnsignedChar:8];
+        temp[8] = [NSNumber numberWithUnsignedChar:9];
+        payload.Arg1 = temp;
+    }
+    [cluster testListInt8UArgumentRequest:payload
+                          responseHandler:^(NSError * err, NSDictionary * values) {
+                              NSLog(@"Send Test Command With List of INT8U and none of them is set to 0 Error: %@", err);
+
+                              XCTAssertEqual(err.code, 0);
+
+                              {
+                                  id actualValue = values[@"Value"];
+                                  XCTAssertEqual([actualValue boolValue], true);
+                              }
+
+                              [expectation fulfill];
+                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000129_TestListInt8UArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With List of INT8U and one of them is set to 0"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * payload = [[CHIPTestClusterClusterTestListInt8UArgumentRequestPayload alloc] init];
+    {
+        NSMutableArray * temp = [[NSMutableArray alloc] init];
+        temp[0] = [NSNumber numberWithUnsignedChar:1];
+        temp[1] = [NSNumber numberWithUnsignedChar:2];
+        temp[2] = [NSNumber numberWithUnsignedChar:3];
+        temp[3] = [NSNumber numberWithUnsignedChar:4];
+        temp[4] = [NSNumber numberWithUnsignedChar:5];
+        temp[5] = [NSNumber numberWithUnsignedChar:6];
+        temp[6] = [NSNumber numberWithUnsignedChar:7];
+        temp[7] = [NSNumber numberWithUnsignedChar:8];
+        temp[8] = [NSNumber numberWithUnsignedChar:9];
+        temp[9] = [NSNumber numberWithUnsignedChar:0];
+        payload.Arg1 = temp;
+    }
+    [cluster testListInt8UArgumentRequest:payload
+                          responseHandler:^(NSError * err, NSDictionary * values) {
+                              NSLog(@"Send Test Command With List of INT8U and one of them is set to 0 Error: %@", err);
+
+                              XCTAssertEqual(err.code, 0);
+
+                              {
+                                  id actualValue = values[@"Value"];
+                                  XCTAssertEqual([actualValue boolValue], false);
+                              }
+
+                              [expectation fulfill];
+                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000130_TestListInt8UReverseRequest
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command With List of INT8U and get it reversed"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * payload = [[CHIPTestClusterClusterTestListInt8UReverseRequestPayload alloc] init];
+    {
+        NSMutableArray * temp = [[NSMutableArray alloc] init];
+        temp[0] = [NSNumber numberWithUnsignedChar:1];
+        temp[1] = [NSNumber numberWithUnsignedChar:2];
+        temp[2] = [NSNumber numberWithUnsignedChar:3];
+        temp[3] = [NSNumber numberWithUnsignedChar:4];
+        temp[4] = [NSNumber numberWithUnsignedChar:5];
+        temp[5] = [NSNumber numberWithUnsignedChar:6];
+        temp[6] = [NSNumber numberWithUnsignedChar:7];
+        temp[7] = [NSNumber numberWithUnsignedChar:8];
+        temp[8] = [NSNumber numberWithUnsignedChar:9];
+        payload.Arg1 = temp;
+    }
+    [cluster testListInt8UReverseRequest:payload
+                         responseHandler:^(NSError * err, NSDictionary * values) {
+                             NSLog(@"Send Test Command With List of INT8U and get it reversed Error: %@", err);
+
+                             XCTAssertEqual(err.code, 0);
+
+                             {
+                                 id actualValue = values[@"Arg1"];
+                                 XCTAssertEqual([actualValue count], 9);
+                                 XCTAssertEqual([actualValue[0] unsignedCharValue], 9);
+                                 XCTAssertEqual([actualValue[1] unsignedCharValue], 8);
+                                 XCTAssertEqual([actualValue[2] unsignedCharValue], 7);
+                                 XCTAssertEqual([actualValue[3] unsignedCharValue], 6);
+                                 XCTAssertEqual([actualValue[4] unsignedCharValue], 5);
+                                 XCTAssertEqual([actualValue[5] unsignedCharValue], 4);
+                                 XCTAssertEqual([actualValue[6] unsignedCharValue], 3);
+                                 XCTAssertEqual([actualValue[7] unsignedCharValue], 2);
+                                 XCTAssertEqual([actualValue[8] unsignedCharValue], 1);
+                             }
+
+                             [expectation fulfill];
+                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000131_TestListInt8UReverseRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With empty List of INT8U and get an empty list back"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * payload = [[CHIPTestClusterClusterTestListInt8UReverseRequestPayload alloc] init];
+    {
+        NSMutableArray * temp = [[NSMutableArray alloc] init];
+        payload.Arg1 = temp;
+    }
+    [cluster testListInt8UReverseRequest:payload
+                         responseHandler:^(NSError * err, NSDictionary * values) {
+                             NSLog(@"Send Test Command With empty List of INT8U and get an empty list back Error: %@", err);
+
+                             XCTAssertEqual(err.code, 0);
+
+                             {
+                                 id actualValue = values[@"Arg1"];
+                                 XCTAssertEqual([actualValue count], 0);
+                             }
+
+                             [expectation fulfill];
+                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000132_TestListStructArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With List of Struct Argument and arg1.b of first item is true"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * payload = [[CHIPTestClusterClusterTestListStructArgumentRequestPayload alloc] init];
+    {
+        NSMutableArray * temp = [[NSMutableArray alloc] init];
+        temp[0] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).A = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).B = [NSNumber numberWithBool:true];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).C = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).D = [[NSData alloc] initWithBytes:"first_octet_string" length:18];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).E = @"first_char_string";
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).F = [NSNumber numberWithUnsignedChar:1];
+
+        temp[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).A = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).B = [NSNumber numberWithBool:true];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).C = [NSNumber numberWithUnsignedChar:3];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).D = [[NSData alloc] initWithBytes:"second_octet_string" length:19];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).E = @"second_char_string";
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).F = [NSNumber numberWithUnsignedChar:1];
+
+        payload.Arg1 = temp;
+    }
+    [cluster
+        testListStructArgumentRequest:payload
+                      responseHandler:^(NSError * err, NSDictionary * values) {
+                          NSLog(@"Send Test Command With List of Struct Argument and arg1.b of first item is true Error: %@", err);
+
+                          XCTAssertEqual(err.code, 0);
+
+                          {
+                              id actualValue = values[@"Value"];
+                              XCTAssertEqual([actualValue boolValue], true);
+                          }
+
+                          [expectation fulfill];
+                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000133_TestListStructArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send Test Command With List of Struct Argument and arg1.b of first item is false"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * payload = [[CHIPTestClusterClusterTestListStructArgumentRequestPayload alloc] init];
+    {
+        NSMutableArray * temp = [[NSMutableArray alloc] init];
+        temp[0] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).A = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).B = [NSNumber numberWithBool:true];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).C = [NSNumber numberWithUnsignedChar:3];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).D = [[NSData alloc] initWithBytes:"second_octet_string" length:19];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).E = @"second_char_string";
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).F = [NSNumber numberWithUnsignedChar:1];
+
+        temp[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).A = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).B = [NSNumber numberWithBool:false];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).C = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).D = [[NSData alloc] initWithBytes:"first_octet_string" length:18];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).E = @"first_char_string";
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).F = [NSNumber numberWithUnsignedChar:1];
+
+        payload.Arg1 = temp;
+    }
+    [cluster
+        testListStructArgumentRequest:payload
+                      responseHandler:^(NSError * err, NSDictionary * values) {
+                          NSLog(@"Send Test Command With List of Struct Argument and arg1.b of first item is false Error: %@", err);
+
+                          XCTAssertEqual(err.code, 0);
+
+                          {
+                              id actualValue = values[@"Value"];
+                              XCTAssertEqual([actualValue boolValue], false);
+                          }
+
+                          [expectation fulfill];
+                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000134_TestNullableOptionalRequest
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command with optional arg set."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * payload = [[CHIPTestClusterClusterTestNullableOptionalRequestPayload alloc] init];
+    payload.Arg1 = [NSNumber numberWithUnsignedChar:5];
+    [cluster testNullableOptionalRequest:payload
+                         responseHandler:^(NSError * err, NSDictionary * values) {
+                             NSLog(@"Send Test Command with optional arg set. Error: %@", err);
+
+                             XCTAssertEqual(err.code, 0);
+
+                             {
+                                 id actualValue = values[@"WasPresent"];
+                                 XCTAssertEqual([actualValue boolValue], true);
+                             }
+                             {
+                                 id actualValue = values[@"WasNull"];
+                                 XCTAssertEqual([actualValue boolValue], false);
+                             }
+                             {
+                                 id actualValue = values[@"Value"];
+                                 XCTAssertEqual([actualValue unsignedCharValue], 5);
+                             }
+                             {
+                                 id actualValue = values[@"OriginalValue"];
+                                 XCTAssertFalse([actualValue isKindOfClass:[NSNull class]]);
+                                 XCTAssertEqual([actualValue unsignedCharValue], 5);
+                             }
+
+                             [expectation fulfill];
+                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000135_TestNullableOptionalRequest
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command without its optional arg."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * payload = [[CHIPTestClusterClusterTestNullableOptionalRequestPayload alloc] init];
+    [cluster testNullableOptionalRequest:payload
+                         responseHandler:^(NSError * err, NSDictionary * values) {
+                             NSLog(@"Send Test Command without its optional arg. Error: %@", err);
+
+                             XCTAssertEqual(err.code, 0);
+
+                             {
+                                 id actualValue = values[@"WasPresent"];
+                                 XCTAssertEqual([actualValue boolValue], false);
+                             }
+
+                             [expectation fulfill];
+                         }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -17887,7 +19238,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertGreaterThanOrEqual([values[@"value"] unsignedLongValue], 5);
+        XCTAssertGreaterThanOrEqual([values[@"value"] unsignedIntValue], 5);
 
         [expectation fulfill];
     }];
@@ -17908,7 +19259,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertLessThanOrEqual([values[@"value"] unsignedLongValue], 5);
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedIntValue], 5);
 
         [expectation fulfill];
     }];
@@ -17929,7 +19280,7 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertNotEqual([values[@"value"] unsignedLongValue], 6);
+        XCTAssertNotEqual([values[@"value"] unsignedIntValue], 6);
 
         [expectation fulfill];
     }];
@@ -17960,7 +19311,20 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] count], 1);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue count], 1);
+            if ([actualValue[0] isKindOfClass:[NSDictionary class]]) {
+                XCTAssertEqual([actualValue[0][@"Type"] unsignedIntValue], 0UL);
+            } else {
+                XCTAssertEqual([[actualValue[0] Type] unsignedIntValue], 0UL);
+            }
+            if ([actualValue[0] isKindOfClass:[NSDictionary class]]) {
+                XCTAssertEqual([actualValue[0][@"Revision"] unsignedShortValue], 1U);
+            } else {
+                XCTAssertEqual([[actualValue[0] Revision] unsignedShortValue], 1U);
+            }
+        }
 
         [expectation fulfill];
     }];
@@ -17981,7 +19345,28 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] count], 18);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue count], 18);
+            XCTAssertEqual([actualValue[0] unsignedIntValue], 3UL);
+            XCTAssertEqual([actualValue[1] unsignedIntValue], 29UL);
+            XCTAssertEqual([actualValue[2] unsignedIntValue], 40UL);
+            XCTAssertEqual([actualValue[3] unsignedIntValue], 41UL);
+            XCTAssertEqual([actualValue[4] unsignedIntValue], 42UL);
+            XCTAssertEqual([actualValue[5] unsignedIntValue], 48UL);
+            XCTAssertEqual([actualValue[6] unsignedIntValue], 49UL);
+            XCTAssertEqual([actualValue[7] unsignedIntValue], 50UL);
+            XCTAssertEqual([actualValue[8] unsignedIntValue], 51UL);
+            XCTAssertEqual([actualValue[9] unsignedIntValue], 52UL);
+            XCTAssertEqual([actualValue[10] unsignedIntValue], 53UL);
+            XCTAssertEqual([actualValue[11] unsignedIntValue], 54UL);
+            XCTAssertEqual([actualValue[12] unsignedIntValue], 55UL);
+            XCTAssertEqual([actualValue[13] unsignedIntValue], 60UL);
+            XCTAssertEqual([actualValue[14] unsignedIntValue], 62UL);
+            XCTAssertEqual([actualValue[15] unsignedIntValue], 1029UL);
+            XCTAssertEqual([actualValue[16] unsignedIntValue], 61440UL);
+            XCTAssertEqual([actualValue[17] unsignedIntValue], 61444UL);
+        }
 
         [expectation fulfill];
     }];
@@ -18002,7 +19387,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] count], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue count], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -18023,7 +19411,12 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] count], 2);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue count], 2);
+            XCTAssertEqual([actualValue[0] unsignedShortValue], 1U);
+            XCTAssertEqual([actualValue[1] unsignedShortValue], 2U);
+        }
 
         [expectation fulfill];
     }];
@@ -18045,8 +19438,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        NSString * locationArgument = @"";
-        XCTAssertTrue([values[@"value"] isEqualToString:locationArgument]);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertTrue([actualValue isEqualToString:@""]);
+        }
 
         [expectation fulfill];
     }];
@@ -18088,8 +19483,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        NSString * locationArgument = @"us";
-        XCTAssertTrue([values[@"value"] isEqualToString:locationArgument]);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertTrue([actualValue isEqualToString:@"us"]);
+        }
 
         [expectation fulfill];
     }];
@@ -18127,8 +19524,9 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t identifyTimeArgument = 0U;
-    [cluster identify:identifyTimeArgument
+    __auto_type * payload = [[CHIPIdentifyClusterIdentifyPayload alloc] init];
+    payload.IdentifyTime = [NSNumber numberWithUnsignedShort:0];
+    [cluster identify:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Send Identify command and expect success response Error: %@", err);
 
@@ -18224,7 +19622,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -18245,7 +19646,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -18266,7 +19670,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -18287,8 +19694,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        NSString * descriptionArgument = @"Coffee";
-        XCTAssertTrue([values[@"value"] isEqualToString:descriptionArgument]);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertTrue([actualValue isEqualToString:@"Coffee"]);
+        }
 
         [expectation fulfill];
     }];
@@ -18309,7 +19718,55 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] count], 3);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue count], 3);
+            if ([actualValue[0] isKindOfClass:[NSDictionary class]]) {
+                XCTAssertTrue([actualValue[0][@"Label"] isEqualToString:@"Black"]);
+            } else {
+                XCTAssertTrue([[actualValue[0] Label] isEqualToString:@"Black"]);
+            }
+            if ([actualValue[0] isKindOfClass:[NSDictionary class]]) {
+                XCTAssertEqual([actualValue[0][@"Mode"] unsignedCharValue], 0);
+            } else {
+                XCTAssertEqual([[actualValue[0] Mode] unsignedCharValue], 0);
+            }
+            if ([actualValue[0] isKindOfClass:[NSDictionary class]]) {
+                XCTAssertEqual([actualValue[0][@"SemanticTag"] unsignedIntValue], 0UL);
+            } else {
+                XCTAssertEqual([[actualValue[0] SemanticTag] unsignedIntValue], 0UL);
+            }
+            if ([actualValue[1] isKindOfClass:[NSDictionary class]]) {
+                XCTAssertTrue([actualValue[1][@"Label"] isEqualToString:@"Cappuccino"]);
+            } else {
+                XCTAssertTrue([[actualValue[1] Label] isEqualToString:@"Cappuccino"]);
+            }
+            if ([actualValue[1] isKindOfClass:[NSDictionary class]]) {
+                XCTAssertEqual([actualValue[1][@"Mode"] unsignedCharValue], 4);
+            } else {
+                XCTAssertEqual([[actualValue[1] Mode] unsignedCharValue], 4);
+            }
+            if ([actualValue[1] isKindOfClass:[NSDictionary class]]) {
+                XCTAssertEqual([actualValue[1][@"SemanticTag"] unsignedIntValue], 0UL);
+            } else {
+                XCTAssertEqual([[actualValue[1] SemanticTag] unsignedIntValue], 0UL);
+            }
+            if ([actualValue[2] isKindOfClass:[NSDictionary class]]) {
+                XCTAssertTrue([actualValue[2][@"Label"] isEqualToString:@"Espresso"]);
+            } else {
+                XCTAssertTrue([[actualValue[2] Label] isEqualToString:@"Espresso"]);
+            }
+            if ([actualValue[2] isKindOfClass:[NSDictionary class]]) {
+                XCTAssertEqual([actualValue[2][@"Mode"] unsignedCharValue], 7);
+            } else {
+                XCTAssertEqual([[actualValue[2] Mode] unsignedCharValue], 7);
+            }
+            if ([actualValue[2] isKindOfClass:[NSDictionary class]]) {
+                XCTAssertEqual([actualValue[2][@"SemanticTag"] unsignedIntValue], 0UL);
+            } else {
+                XCTAssertEqual([[actualValue[2] SemanticTag] unsignedIntValue], 0UL);
+            }
+        }
 
         [expectation fulfill];
     }];
@@ -18325,8 +19782,9 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t newModeArgument = 4;
-    [cluster changeToMode:newModeArgument
+    __auto_type * payload = [[CHIPModeSelectClusterChangeToModePayload alloc] init];
+    payload.NewMode = [NSNumber numberWithUnsignedChar:4];
+    [cluster changeToMode:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Change to Supported Mode Error: %@", err);
 
@@ -18351,7 +19809,10 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 4);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 4);
+        }
 
         [expectation fulfill];
     }];
@@ -18367,8 +19828,9 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t newModeArgument = 2;
-    [cluster changeToMode:newModeArgument
+    __auto_type * payload = [[CHIPModeSelectClusterChangeToModePayload alloc] init];
+    payload.NewMode = [NSNumber numberWithUnsignedChar:2];
+    [cluster changeToMode:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Change to Unsupported Mode Error: %@", err);
 
@@ -18464,13 +19926,15 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Set OnOff Attribute to false Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Set OnOff Attribute to false Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -18488,7 +19952,10 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], false);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], false);
+        }
 
         testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = true;
     }];
@@ -18525,13 +19992,15 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster on:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn On the light to see attribute change Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOnPayload alloc] init];
+    [cluster on:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn On the light to see attribute change Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -18549,7 +20018,10 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], true);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], true);
+        }
 
         [expectation fulfill];
     }];
@@ -18565,13 +20037,15 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster off:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Turn Off the light to see attribute change Error: %@", err);
+    __auto_type * payload = [[CHIPOnOffClusterOffPayload alloc] init];
+    [cluster off:payload
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Turn Off the light to see attribute change Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+            XCTAssertEqual(err.code, 0);
 
-        [expectation fulfill];
-    }];
+            [expectation fulfill];
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -18589,7 +20063,10 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 
         XCTAssertEqual(err.code, 0);
 
-        XCTAssertEqual([values[@"value"] boolValue], false);
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue boolValue], false);
+        }
 
         [expectation fulfill];
     }];
