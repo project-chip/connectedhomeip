@@ -33,21 +33,6 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR WriteRequestMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    mReader.Init(aReader);
-
-    VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = mReader.EnterContainer(mOuterContainerType);
-
-exit:
-
-    return err;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR WriteRequestMessage::Parser::CheckSchemaValidity() const
 {
@@ -188,11 +173,6 @@ exit:
 CHIP_ERROR WriteRequestMessage::Parser::GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const
 {
     return GetSimpleValue(kCsTag_MoreChunkedMessages, chip::TLV::kTLVType_Boolean, apMoreChunkedMessages);
-}
-
-CHIP_ERROR WriteRequestMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
 }
 
 WriteRequestMessage::Builder & WriteRequestMessage::Builder::SuppressResponse(const bool aSuppressResponse)
