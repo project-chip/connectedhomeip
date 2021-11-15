@@ -379,20 +379,26 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreBootReasons(uint32_t
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetLifetimeCounter(uint16_t & lifetimeCounter)
 {
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     lifetimeCounter = static_cast<uint16_t>(mLifetimePersistedCounter.GetValue());
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
 }
 
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_IncrementLifetimeCounter()
 {
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     return mLifetimePersistedCounter.Advance();
-}
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
+}
 
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetFailSafeArmed(bool & val)
@@ -490,16 +496,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSecondaryPairingInstru
     return CHIP_NO_ERROR;
 }
 
-#if !defined(NDEBUG)
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::RunUnitTests()
 {
+#if !defined(NDEBUG)
     ChipLogProgress(DeviceLayer, "Running configuration unit test");
     Impl()->RunConfigUnitTest();
-
+#endif
     return CHIP_NO_ERROR;
 }
-#endif
 
 template <class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
