@@ -87,6 +87,14 @@ netns_setup() {
     ip netns exec app ip -6 addr flush eth-app
     ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev eth-tool
     ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev eth-app
+
+    # TODO(andy314): IPv6 does Duplicate Address Detection even though
+    # we know these addresses are isolated. For a while IPv6 addresses
+    # will be in 'transitional' state and cannot be used.
+    #
+    # This sleep waits for the addresses to become 'global'. Ideally
+    # we should loop/wait here instead.
+    sleep 2
 }
 
 netns_cleanup() {
