@@ -30,7 +30,7 @@ from __future__ import print_function
 
 import struct
 from collections import Mapping, Sequence, OrderedDict
-
+from enum import Enum
 
 TLV_TYPE_SIGNED_INTEGER = 0x00
 TLV_TYPE_UNSIGNED_INTEGER = 0x04
@@ -116,7 +116,11 @@ class uint(int):
     '''
     NewType will not return a class until Python 3.10, as Python 3.10 is not widely used, we still need to construct a class so it can work as a type.
     '''
-    pass
+
+    def __init__(self, val: int):
+        if (val < 0):
+            raise TypeError(
+                'expecting positive value, got negative value of %d instead' % val)
 
 
 class TLVWriter(object):
@@ -182,6 +186,8 @@ class TLVWriter(object):
         """
         if val is None:
             self.putNull(tag)
+        elif isinstance(val, Enum):
+            self.putUnsignedInt(tag, val)
         elif isinstance(val, bool):
             self.putBool(tag, val)
         elif isinstance(val, uint):

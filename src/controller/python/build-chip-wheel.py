@@ -118,6 +118,7 @@ try:
         'construct',
         'ipython',
         'dacite',
+        'rich',
     ]
 
     if platform.system() == 'Darwin':
