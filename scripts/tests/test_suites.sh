@@ -251,7 +251,7 @@ for j in "${iter_array[@]}"; do
         echo "          * Pairing to device"
         ${tool_run_prefix} "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00 | tee "$pairing_log_file"
         echo "          * Starting test run: $i"
-        ${tool_run_prefix} "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$node_id" "$delay" | tee "$chip_tool_log_file"
+        ${tool_run_prefix} "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$node_id" --delayInMs "$delay" | tee "$chip_tool_log_file"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0
