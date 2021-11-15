@@ -32,6 +32,12 @@ union SubjectId
 {
     PasscodeId passcode;
     NodeId node;
+    uint32_t cat_raw;
+    struct
+    {
+        uint16_t version;
+        uint16_t id;
+    } cat;
     GroupId group;
 };
 

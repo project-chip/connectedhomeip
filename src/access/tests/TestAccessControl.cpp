@@ -45,10 +45,13 @@ constexpr int kEmptyFlags = 0;
 
 // For test purposes, store all subjects as node, use tags to discriminate
 // passcode/group, and don't allow 0.
-constexpr NodeId kTestSubjectMask     = 0xFFFFFFFFFFFF0000;
-constexpr NodeId kTestSubjectPasscode = 0xDDDDDDDDDDDD0000;
-constexpr NodeId kTestSubjectGroup    = 0xEEEEEEEEEEEE0000;
-constexpr NodeId kTestSubjectEmpty    = 0x0000000000000000;
+constexpr NodeId kTestSubjectMask           = 0xFFFFFFFFFFFF0000;
+constexpr NodeId kTestSubjectPasscode       = 0xDDDDDDDDDDDD0000;
+constexpr NodeId kTestSubjectGroup          = 0xEEEEEEEEEEEE0000;
+constexpr NodeId kTestSubjectEmpty          = 0x0000000000000000;
+constexpr NodeId kTestSubjectCATMask        = 0xFFFFFFFF00000000;
+constexpr NodeId kTestSubjectCATVersionMask = 0xFFFFFFFFFFFF0000;
+constexpr NodeId kTestSubjectCAT            = 0xFFFFFFFD00000000;
 
 constexpr SubjectId Passcode(PasscodeId passcode)
 {
@@ -61,14 +64,9 @@ constexpr SubjectId Node(NodeId node)
     return { .node = node };
 }
 
-constexpr SubjectId CAT1(NodeId node)
+constexpr SubjectId CAT(uint16_t catId, uint16_t catVersion)
 {
-    return { .node = node };
-}
-
-constexpr SubjectId CAT2(NodeId node)
-{
-    return { .node = node };
+    return { .node = kTestSubjectCAT | (catId << 16) | catVersion };
 }
 
 constexpr SubjectId Group(GroupId group)
@@ -168,8 +166,9 @@ TestEntryDelegate entries[] = {
         .fabricIndex = 1,
         .authMode    = AuthMode::kCase,
         .privilege   = Privilege::kView,
-        .subjects    = { CAT1(86), CAT2(99) },
+        .subjects    = { CAT(0xABCD, 2) },
         .targets     = { Target(kEndpoint0), Target(kAccessControlCluster) },
+        .tag         = "1-cat-view",
     },
     {
         .fabricIndex = 1,
@@ -278,9 +277,16 @@ public:
                     return true;
                 }
             }
+            else if ((p->node & kTestSubjectCATMask) == kTestSubjectCAT)
+            {
+                if (((p->node & ~kTestSubjectCATMask) >> 16) == subject.cat.id &&
+                    (p->node & ~kTestSubjectMask) <= subject.cat.version)
+                {
+                    return true;
+                }
+            }
             else
             {
-                // TODO: handle CASE Authenticated Tags (CAT1/CAT2)
                 if (p->node == subject.node)
                 {
                     return true;
@@ -465,6 +471,27 @@ void TestCheck(nlTestSuite * inSuite, void * inContext)
             Privilege::kView,
             CHIP_NO_ERROR,
             "1-pase-view-onoff-2",
+        },
+        {
+            { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { CAT(0xABCD, 2) } },
+            { .endpoint = kEndpoint0, .cluster = kAccessControlCluster },
+            Privilege::kView,
+            CHIP_NO_ERROR,
+            "1-cat-view",
+        },
+        {
+            { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { CAT(0xABCD, 2) } },
+            { .endpoint = kEndpoint0, .cluster = kAccessControlCluster },
+            Privilege::kAdminister,
+            CHIP_ERROR_ACCESS_DENIED,
+            "(end)",
+        },
+        {
+            { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { CAT(0xABCD, 1) } },
+            { .endpoint = kEndpoint0, .cluster = kAccessControlCluster },
+            Privilege::kView,
+            CHIP_ERROR_ACCESS_DENIED,
+            "(end)",
         },
         // clang-format on
     };
