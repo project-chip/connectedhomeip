@@ -62,14 +62,14 @@ bool GenerateBdxUri(const Span<char> & fileDesignator, Span<char> outUri, size_t
     static constexpr char bdxPrefix[] = "bdx://";
     chip::NodeId nodeId               = chip::kTestDeviceNodeId; // TODO: read this dynamically
     size_t nodeIdHexStrLen            = sizeof(nodeId) * 2;
-    size_t expectedLength             = strlen(bdxPrefix) + nodeIdHexStrLen + fileDesignator.size();
+    size_t expectedLength             = strlen(bdxPrefix) + nodeIdHexStrLen + 1 + fileDesignator.size();
 
     if (expectedLength >= availableSize)
     {
         return false;
     }
 
-    size_t written = static_cast<size_t>(snprintf(outUri.data(), availableSize, "%s" ChipLogFormatX64 "%s", bdxPrefix,
+    size_t written = static_cast<size_t>(snprintf(outUri.data(), availableSize, "%s" ChipLogFormatX64 "/%s", bdxPrefix,
                                                   ChipLogValueX64(nodeId), fileDesignator.data()));
 
     return expectedLength == written;
