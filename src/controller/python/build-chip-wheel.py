@@ -119,6 +119,8 @@ try:
         'ipython',
         'dacite',
         'rich',
+        'stringcase',
+        'pyyaml',
     ]
 
     if platform.system() == 'Darwin':
