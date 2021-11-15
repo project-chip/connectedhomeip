@@ -17,7 +17,7 @@
  */
 
 /**
- *  Sockets implementation of EndPointBase.
+ *  Shared state for Network Framework implementations of TCPEndPoint and UDPEndPoint.
  */
 
 #pragma once
@@ -25,25 +25,20 @@
 #include <inet/EndPointBasis.h>
 
 #include <inet/IPAddress.h>
-#include <system/SocketEvents.h>
+
+#include <Network/Network.h>
 
 namespace chip {
 namespace Inet {
 
-class DLL_EXPORT EndPointImplSockets : public EndPointBase
+class DLL_EXPORT EndPointStateNetworkFramework
 {
 protected:
-    EndPointImplSockets(InetLayer & inetLayer, void * appState = nullptr) :
-        EndPointBase(inetLayer, appState), mSocket(kInvalidSocketFd)
-    {}
+    EndPointStateNetworkFramework() {}
 
-    static constexpr int kInvalidSocketFd = -1;
-    int mSocket;                     /**< Encapsulated socket descriptor. */
-    IPAddressType mAddrType;         /**< Protocol family, i.e. IPv4 or IPv6. */
-    System::SocketWatchToken mWatch; /**< Socket event watcher */
+    nw_parameters_t mParameters;
+    IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
 };
-
-using EndPointBasis = EndPointImplSockets;
 
 } // namespace Inet
 } // namespace chip

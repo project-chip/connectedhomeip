@@ -347,9 +347,6 @@ private:
 
     uint8_t mSequenceNumber = 0;
 
-    uint32_t mLocalMessageCounter = 0;
-    uint32_t mPeerMessageCounter  = 0;
-
     /**
      * @brief
      *   This function loads the secure session object from the serialized operational

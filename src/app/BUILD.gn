@@ -35,7 +35,10 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
+    "AttributePathExpandIterator.cpp",
+    "AttributePathExpandIterator.h",
     "AttributePathParams.cpp",
+    "AttributePathParams.h",
     "Command.cpp",
     "Command.h",
     "CommandHandler.cpp",
@@ -119,13 +122,6 @@ static_library("app") {
     "reporting/Engine.cpp",
     "reporting/Engine.h",
   ]
-
-  if (chip_ip_commissioning) {
-    defines = [
-      "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=1",
-      "CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY=1",
-    ]
-  }
 
   public_deps = [
     ":app_buildconfig",

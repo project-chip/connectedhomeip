@@ -248,10 +248,7 @@ CHIP_ERROR PairingCommand::SetupNetwork()
     {
     case PairingNetworkType::None:
     case PairingNetworkType::Ethernet:
-        // Nothing to do other than to resolve the device's operational address.
-        err = UpdateNetworkAddress();
-        VerifyOrExit(err == CHIP_NO_ERROR,
-                     ChipLogError(chipTool, "Setup failure! Error calling UpdateNetworkAddress: %s", ErrorStr(err)));
+        // Nothing to do here - device address has been resolved as part of the commissioning process.
         break;
     case PairingNetworkType::WiFi:
     case PairingNetworkType::Thread:

@@ -39,7 +39,6 @@ class DLL_EXPORT EndPointBase
 {
 public:
     EndPointBase(InetLayer & aInetLayer, void * aAppState = nullptr) : mAppState(aAppState), mInetLayer(aInetLayer) {}
-    virtual ~EndPointBase() = default;
 
     /**
      *  Returns a reference to the Inet layer object that owns this basis object.
@@ -54,9 +53,3 @@ private:
 
 } // namespace Inet
 } // namespace chip
-
-#ifdef CHIP_INET_END_POINT_IMPL_CONFIG_FILE
-#include CHIP_INET_END_POINT_IMPL_CONFIG_FILE
-#else // CHIP_INET_END_POINT_IMPL_CONFIG_FILE
-#include <inet/EndPointBasisImplSockets.h>
-#endif // CHIP_INET_END_POINT_IMPL_CONFIG_FILE

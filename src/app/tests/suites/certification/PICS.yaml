@@ -17,20 +17,15 @@ name: PICS Items
 PICS:
     - label: "Does the device support discovery over Bluetooth Low Power (BLE)"
       id: BLE
-      value: false
 
     - label: "Does the device support discovery over WiFi?"
       id: WIFI
-      value: true
 
     - label: "Does the device support manufacturing date"
       id: MANF_DATE
-      value: true
 
     - label: "Does the device support part number"
       id: PART_NUM
-      value: true
 
     - label: "Does the device support Intermediate CA Certificate"
       id: DM_ICACERT
-      value: true

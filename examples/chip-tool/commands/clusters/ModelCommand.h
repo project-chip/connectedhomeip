@@ -24,10 +24,6 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/core/CHIPEncoding.h>
 
-// Limits on endpoint values.
-#define CHIP_ZCL_ENDPOINT_MIN 0x00
-#define CHIP_ZCL_ENDPOINT_MAX 0xF0
-
 class ModelCommand : public CHIPCommand
 {
 public:

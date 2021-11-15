@@ -37,7 +37,7 @@ limitations under the License.
     <attribute side="server" code="10" define="SOFTWARE_VERSION_STRING"   type="char_string" minLength="1" length="64"                                             >SoftwareVersionString</attribute>
     <attribute side="server" code="11" define="MANUFACTURING_DATE"        type="char_string" minLength="8" length="16"                              optional="true">ManufacturingDate</attribute>
     <attribute side="server" code="12" define="PART_NUMBER"               type="char_string"               length="32"                              optional="true">PartNumber</attribute>
-    <attribute side="server" code="13" define="PRODUCT_URL"               type="char_string"               length="256"                             optional="true">ProductURL</attribute>
+    <attribute side="server" code="13" define="PRODUCT_URL"               type="long_char_string"          length="256"                             optional="true">ProductURL</attribute>
     <attribute side="server" code="14" define="PRODUCT_LABEL"             type="char_string"               length="64"                              optional="true">ProductLabel</attribute>
     <attribute side="server" code="15" define="SERIAL_NUMBER"             type="char_string"               length="32"                              optional="true">SerialNumber</attribute>
     <attribute side="server" code="16" define="LOCAL_CONFIG_DISABLED"     type="boolean"                                default="0" writable="true" optional="true">LocalConfigDisabled</attribute>

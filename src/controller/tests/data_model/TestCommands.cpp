@@ -22,6 +22,7 @@
  *
  */
 
+#include "app/data-model/NullObject.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
@@ -223,8 +224,13 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
 void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, void * apContext)
 {
+    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    {
+        using ResponseType = DataModel::NullObjectType;
+    };
+
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    TestCluster::Commands::TestSimpleArgumentRequest::Type request;
+    FakeRequest request;
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;
@@ -257,8 +263,13 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
 
 void TestCommandInteraction::TestAsyncResponse(nlTestSuite * apSuite, void * apContext)
 {
+    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    {
+        using ResponseType = DataModel::NullObjectType;
+    };
+
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    TestCluster::Commands::TestSimpleArgumentRequest::Type request;
+    FakeRequest request;
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;
@@ -342,8 +353,13 @@ void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext
 
 void TestCommandInteraction::TestSuccessNoDataResponseWithClusterStatus(nlTestSuite * apSuite, void * apContext)
 {
+    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    {
+        using ResponseType = DataModel::NullObjectType;
+    };
+
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    TestCluster::Commands::TestSimpleArgumentRequest::Type request;
+    FakeRequest request;
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;

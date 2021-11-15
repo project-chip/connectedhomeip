@@ -115,7 +115,10 @@ public:
         char addr[INET6_ADDRSTRLEN];
         info->SrcAddress.ToString(addr, sizeof(addr));
 
-        printf("QUERY from: %-15s on port %d, via interface %d\n", addr, info->SrcPort, info->Interface);
+        char ifName[64];
+        VerifyOrDie(info->Interface.GetInterfaceName(ifName, sizeof(ifName)) == CHIP_NO_ERROR);
+
+        printf("QUERY from: %-15s on port %d, via interface %s\n", addr, info->SrcPort, ifName);
         Report("QUERY: ", data);
 
         mCurrentSource = info;
@@ -131,7 +134,10 @@ public:
         char addr[INET6_ADDRSTRLEN];
         info->SrcAddress.ToString(addr, sizeof(addr));
 
-        printf("RESPONSE from: %-15s on port %d, via interface %d\n", addr, info->SrcPort, info->Interface);
+        char ifName[64];
+        VerifyOrDie(info->Interface.GetInterfaceName(ifName, sizeof(ifName)) == CHIP_NO_ERROR);
+
+        printf("RESPONSE from: %-15s on port %d, via interface %s\n", addr, info->SrcPort, ifName);
     }
 
     // ParserDelegate

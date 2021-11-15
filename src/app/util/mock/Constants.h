@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
- *    Copyright (c) 2015-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,30 +17,29 @@
  */
 
 /**
- *  Network Framework implementation of EndPointBase.
+ *    @file
+ *     This file contains the constants for the mocked attribute-storage.cpp
  */
 
 #pragma once
 
-#include <inet/EndPointBasis.h>
-
-#include <inet/IPAddress.h>
-
-#include <Network/Network.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
-namespace Inet {
+namespace Test {
+constexpr EndpointId kMockEndpoint1 = 0xFFFE;
+constexpr EndpointId kMockEndpoint2 = 0xFFFD;
+constexpr EndpointId kMockEndpoint3 = 0xFFFC;
 
-class DLL_EXPORT EndPointImplNetworkFramework : public EndPointBase
+constexpr AttributeId MockAttributeId(const uint16_t & id)
 {
-protected:
-    EndPointImplNetworkFramework(InetLayer & inetLayer, void * appState = nullptr) : EndPointBase(inetLayer, appState) {}
+    return (0xFFF1'0000 | id);
+}
 
-    nw_parameters_t mParameters;
-    IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
-};
+constexpr AttributeId MockClusterId(const uint16_t & id)
+{
+    return (0xFFF1'0000 | id);
+}
 
-using EndPointBasis = EndPointImplNetworkFramework;
-
-} // namespace Inet
+} // namespace Test
 } // namespace chip

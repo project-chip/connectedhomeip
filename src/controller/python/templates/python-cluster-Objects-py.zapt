@@ -12,12 +12,12 @@ from chip import ChipUtility
 
 from chip.tlv import uint
 
-from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand, ClusterAttributeDescriptor
+from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand, ClusterAttributeDescriptor, Cluster
 
 
 {{#zcl_clusters}}
 @dataclass
-class {{asUpperCamelCase name}}:
+class {{asUpperCamelCase name}}(Cluster):
     id: typing.ClassVar[int] = {{asHex code 4}}
 
 {{#zcl_enums}}

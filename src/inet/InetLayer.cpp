@@ -150,7 +150,7 @@ CHIP_ERROR InetLayer::Shutdown()
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Abort all TCP endpoints owned by this instance.
-    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
+    TCPEndPointImpl::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
         if ((lEndPoint != nullptr) && &lEndPoint->Layer() == this)
         {
             lEndPoint->Abort();
@@ -161,7 +161,7 @@ CHIP_ERROR InetLayer::Shutdown()
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     // Close all UDP endpoints owned by this instance.
-    UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
+    UDPEndPointImpl::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
         if ((lEndPoint != nullptr) && &lEndPoint->Layer() == this)
         {
             lEndPoint->Close();
@@ -206,7 +206,7 @@ bool InetLayer::IsIdleTimerRunning()
     bool timerRunning = false;
 
     // See if there are any TCP connections with the idle timer check in use.
-    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
+    TCPEndPointImpl::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
         if ((lEndPoint != nullptr) && (lEndPoint->mIdleTimeout != 0))
         {
             timerRunning = true;
@@ -218,91 +218,6 @@ bool InetLayer::IsIdleTimerRunning()
     return timerRunning;
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-
-/**
- *  Get the link local IPv6 address for a specified link or interface.
- *
- *  @param[in]    interface The interface for which the link local IPv6
- *                          address is being sought.
- *
- *  @param[out]   llAddr  The link local IPv6 address for the link.
- *
- *  @retval    #CHIP_ERROR_NOT_IMPLEMENTED      If IPv6 is not supported.
- *  @retval    #CHIP_ERROR_INVALID_ARGUMENT     If the link local address
- *                                              is nullptr.
- *  @retval    #INET_ERROR_ADDRESS_NOT_FOUND    If the link does not have
- *                                              any address configured.
- *  @retval    #CHIP_NO_ERROR                   On success.
- *
- */
-CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId interface, IPAddress * llAddr)
-{
-    VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if !LWIP_IPV6
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif //! LWIP_IPV6
-
-    struct netif * link = interface.GetPlatformInterface();
-    for (struct netif * intf = netif_list; intf != NULL; intf = intf->next)
-    {
-        if ((link != NULL) && (link != intf))
-            continue;
-        for (int j = 0; j < LWIP_IPV6_NUM_ADDRESSES; ++j)
-        {
-            if (ip6_addr_isvalid(netif_ip6_addr_state(intf, j)) && ip6_addr_islinklocal(netif_ip6_addr(intf, j)))
-            {
-                (*llAddr) = IPAddress(*netif_ip6_addr(intf, j));
-                return CHIP_NO_ERROR;
-            }
-        }
-        if (link != NULL)
-        {
-            return INET_ERROR_ADDRESS_NOT_FOUND;
-        }
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-    struct ifaddrs * ifaddr;
-    const int rv = getifaddrs(&ifaddr);
-    if (rv == -1)
-    {
-        return INET_ERROR_ADDRESS_NOT_FOUND;
-    }
-
-    for (struct ifaddrs * ifaddr_iter = ifaddr; ifaddr_iter != nullptr; ifaddr_iter = ifaddr_iter->ifa_next)
-    {
-        if (ifaddr_iter->ifa_addr != nullptr)
-        {
-            if ((ifaddr_iter->ifa_addr->sa_family == AF_INET6) &&
-                (!interface.IsPresent() || (if_nametoindex(ifaddr_iter->ifa_name) == interface.GetPlatformInterface())))
-            {
-                struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
-                if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
-                {
-                    (*llAddr) = IPAddress((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
-                    break;
-                }
-            }
-        }
-    }
-    freeifaddrs(ifaddr);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-    net_if * const iface = interface.IsPresent() ? net_if_get_by_index(interface.GetPlatformInterface()) : net_if_get_default();
-    VerifyOrReturnError(iface != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
-
-    in6_addr * const ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
-    VerifyOrReturnError(ip6_addr != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
-
-    *llAddr = IPAddress(*ip6_addr);
-#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-
-    return CHIP_NO_ERROR;
-}
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 /**
@@ -330,7 +245,7 @@ CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = TCPEndPoint::sPool.CreateObject(*this);
+    *retEndPoint = TCPEndPointImpl::sPool.CreateObject(*this);
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "TCP");
@@ -369,7 +284,7 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = UDPEndPoint::sPool.CreateObject(*this);
+    *retEndPoint = UDPEndPointImpl::sPool.CreateObject(*this);
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "UDP");
@@ -382,81 +297,13 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-/**
- *  Get the interface identifier for the specified IP address. If the
- *  interface identifier cannot be derived it is set to the default
- *  InterfaceId.
- *
- *  @note
- *    This function fetches the first interface (from the configured list
- *    of interfaces) that matches the specified IP address.
- *
- *  @param[in]    addr      A reference to the IPAddress object.
- *
- *  @param[out]   intfId    A reference to the InterfaceId object.
- *
- *  @return  #CHIP_NO_ERROR unconditionally.
- *
- */
-CHIP_ERROR InetLayer::GetInterfaceFromAddr(const IPAddress & addr, InterfaceId & intfId)
-{
-    InterfaceAddressIterator addrIter;
-
-    for (; addrIter.HasCurrent(); addrIter.Next())
-    {
-        IPAddress curAddr = addrIter.GetAddress();
-        if (addr == curAddr)
-        {
-            intfId = addrIter.GetInterfaceId();
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    intfId = InterfaceId::Null();
-
-    return CHIP_NO_ERROR;
-}
-
-/**
- *  Check if there is a prefix match between the specified IPv6 address and any of
- *  the locally configured IPv6 addresses.
- *
- *  @param[in]    addr    The IPv6 address to check for the prefix-match.
- *
- *  @return true if a successful match is found, otherwise false.
- *
- */
-bool InetLayer::MatchLocalIPv6Subnet(const IPAddress & addr)
-{
-    if (addr.IsIPv6LinkLocal())
-        return true;
-
-    InterfaceAddressIterator ifAddrIter;
-    for (; ifAddrIter.HasCurrent(); ifAddrIter.Next())
-    {
-        IPPrefix addrPrefix;
-        addrPrefix.IPAddr = ifAddrIter.GetAddress();
-#if INET_CONFIG_ENABLE_IPV4
-        if (addrPrefix.IPAddr.IsIPv4())
-            continue;
-#endif // INET_CONFIG_ENABLE_IPV4
-        if (addrPrefix.IPAddr.IsIPv6LinkLocal())
-            continue;
-        addrPrefix.Length = ifAddrIter.GetPrefixLength();
-        if (addrPrefix.MatchAddress(addr))
-            return true;
-    }
-
-    return false;
-}
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
 void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState)
 {
     InetLayer & lInetLayer = *reinterpret_cast<InetLayer *>(aAppState);
     bool lTimerRequired    = lInetLayer.IsIdleTimerRunning();
 
-    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
+    TCPEndPointImpl::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
         if (&lEndPoint->Layer() != &lInetLayer)
             return true;
         if (!lEndPoint->IsConnected())

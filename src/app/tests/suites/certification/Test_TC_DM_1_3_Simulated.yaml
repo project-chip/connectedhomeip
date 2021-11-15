@@ -19,6 +19,10 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Wait for the device to be commissioned"
+      cluster: "DelayCommands"
+      command: "WaitForCommissioning"
+
     - label: "Log OnOff Test Startup"
       cluster: "LogCommands"
       command: "Log"

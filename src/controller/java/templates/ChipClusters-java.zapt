@@ -3,7 +3,10 @@
 
 package chip.devicecontroller;
 
+import androidx.annotation.Nullable;
 import java.util.List;
+import java.util.Arrays;
+import java.util.Optional;
 
 public class ChipClusters {
 
@@ -110,48 +113,51 @@ public class ChipClusters {
   {{#if isStruct}}
     public static class {{asUpperCamelCase name}}Attribute {
     {{#chip_attribute_list_entryTypes}}
-      {{#if isOptional}}
-      {{! TODO: Add support for optional types here }}
-      {{else if isNullable}}
-      {{! TODO: Add support for nullable types here }}
-      {{else if isArray}}
+      {{#if isNullable}}
+      {{! 'unless' blocks are temporary until optional array / struct implemented }}
+      {{#unless isArray}}
+      {{#unless isStruct}}
+      @Nullable
+      {{/unless}}
+      {{/unless}}
+      {{/if}}
+      {{#if isArray}}
       {{! TODO: Add support for lists here }}
       {{else if isStruct}}
       {{! TODO: Add support for structs here }}
       {{else if (isOctetString type)}}
-      public byte[] {{asLowerCamelCase name}};
+      public {{#if isOptional}}Optional<{{/if}}byte[]{{#if isOptional}}>{{/if}} {{asLowerCamelCase name}};
       {{else if (isCharString type)}}
-      public String {{asLowerCamelCase name}};
+      public {{#if isOptional}}Optional<{{/if}}String{{#if isOptional}}>{{/if}} {{asLowerCamelCase name}};
       {{else}}
-      public {{asJavaBasicType label type}} {{asLowerCamelCase name}};
+      public {{#if isOptional}}Optional<{{/if}}{{asJavaBoxedType label type}}{{#if isOptional}}>{{/if}} {{asLowerCamelCase name}};
       {{/if}}
     {{/chip_attribute_list_entryTypes}}
 
       public {{asUpperCamelCase name}}Attribute(
         {{#chip_attribute_list_entryTypes}}
-        {{#if isOptional}}
-        {{! TODO: Add support for optional types here }}
-        {{else if isNullable}}
-        {{! TODO: Add support for nullable types here }}
-        {{else if isArray}}
+        {{#if isNullable}}
+        {{#unless isArray}}
+        {{#unless isStruct}}
+        @Nullable
+        {{/unless}}
+        {{/unless}}
+        {{/if}}
+        {{#if isArray}}
         {{! TODO: Add support for lists here }}
         {{else if isStruct}}
         {{! TODO: Add support for structs here }}
         {{else if (isOctetString type)}}
-        byte[] {{asLowerCamelCase name}}{{#not_last}},{{/not_last}}
+        {{#if isOptional}}Optional<{{/if}}byte[]{{#if isOptional}}>{{/if}} {{asLowerCamelCase name}} {{#notLastSupportedEntryTypes ..}},{{/notLastSupportedEntryTypes}}
         {{else if (isCharString type)}}
-        String {{asLowerCamelCase name}}{{#not_last}},{{/not_last}}
+        {{#if isOptional}}Optional<{{/if}}String{{#if isOptional}}>{{/if}} {{asLowerCamelCase name}} {{#notLastSupportedEntryTypes ..}},{{/notLastSupportedEntryTypes}}
         {{else}}
-        {{asJavaBasicType label type}} {{asLowerCamelCase name}}{{#not_last}},{{/not_last}}
+        {{#if isOptional}}Optional<{{/if}}{{asJavaBoxedType label type}}{{#if isOptional}}>{{/if}} {{asLowerCamelCase name}} {{#notLastSupportedEntryTypes ..}},{{/notLastSupportedEntryTypes}}
         {{/if}}
         {{/chip_attribute_list_entryTypes}}
       ) {
         {{#chip_attribute_list_entryTypes}}
-        {{#if isOptional}}
-        {{! TODO: Add support for optional types here }}
-        {{else if isNullable}}
-        {{! TODO: Add support for nullable types here }}
-        {{else if isArray}}
+        {{#if isArray}}
         {{! TODO: Add support for lists here }}
         {{else if isStruct}}
         {{! TODO: Add support for structs here }}
@@ -174,18 +180,9 @@ public class ChipClusters {
             {{else if isStruct}}
             {{! TODO: Add support for structs here }}
             {{else if (isOctetString type)}}
-            output.append("byte[] {{asLowerCamelCase name}}: [");
-            for (int i = 0; i < {{asLowerCamelCase name}}.length; i++) {
-              if (i != {{asLowerCamelCase name}}.length - 1) {
-                output.append({{asLowerCamelCase name}}[i]);
-                output.append(", ");
-              }
-              else {
-                output.append({{asLowerCamelCase name}}[i]);
-                output.append("]");
-                output.append("\n");
-              }
-            }
+            output.append("byte[] ");
+            output.append(Arrays.toString({{asLowerCamelCase name}}));
+            output.append("\n");
             {{else if (isCharString type)}}
             output.append("String {{asLowerCamelCase name}}: ");
             output.append(this.{{asLowerCamelCase name}});
@@ -207,12 +204,33 @@ public class ChipClusters {
       {{#if isStruct}}
       {{asUpperCamelCase name}}Attribute
       {{else}}
+        {{#if isNullable}}
+        {{#unless isArray}}
+        {{#unless isStruct}}
+        @Nullable
+        {{/unless}}
+        {{/unless}}
+        {{/if}}
+        {{#if isOptional}}
+        {{#unless isArray}}
+        {{#unless isStruct}}
+        Optional<
+        {{/unless}}
+        {{/unless}}
+        {{/if}}
         {{#if (isOctetString type)}}
         byte[]
         {{else if (isCharString type)}}
         // Add String field here after ByteSpan is properly emitted in C++ layer
         {{else}}
         {{asJavaBasicTypeForZclType type true}}
+        {{/if}}
+        {{#if isOptional}}
+        {{#unless isArray}}
+        {{#unless isStruct}}
+        >
+        {{/unless}}
+        {{/unless}}
         {{/if}}
       {{/if}}
       > valueList);
