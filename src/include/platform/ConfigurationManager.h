@@ -83,10 +83,8 @@ public:
     virtual CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev)                                  = 0;
     virtual CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode)                                     = 0;
     virtual CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator)                         = 0;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
     // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
-    virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) = 0;
-#endif
+    virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter)                  = 0;
     virtual CHIP_ERROR GetRegulatoryLocation(uint32_t & location)                      = 0;
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
     virtual CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb)                            = 0;
@@ -109,9 +107,7 @@ public:
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 
-#if !defined(NDEBUG)
     virtual CHIP_ERROR RunUnitTests() = 0;
-#endif
 
     virtual bool IsFullyProvisioned()   = 0;
     virtual void InitiateFactoryReset() = 0;
