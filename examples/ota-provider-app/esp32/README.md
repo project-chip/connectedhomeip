@@ -29,7 +29,7 @@ This OTA image is built for ESP32, it will not work on other devices. This is
 the OTA upgrade image and will be sent to OTA requestor.
 
 ```
-esptool.py -p <ProviderSerialPort> write_flash 0x206400 hello-world-flash-in-ota-provider-partition.bin
+esptool.py -p <OTAProviderSerialPort> write_flash 0x206400 hello-world-flash-in-ota-provider-partition.bin
 ```
 
 NOTE: This is a modified binary which contains the size of OTA image at first 4
