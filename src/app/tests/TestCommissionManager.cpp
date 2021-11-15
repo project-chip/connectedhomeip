@@ -34,7 +34,6 @@ using chip::Server;
 
 // Mock function for linking
 void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeMgr) {}
-void HandleDataModelMessage(chip::Messaging::ExchangeContext * exchange, chip::System::PacketBufferHandle && buffer) {}
 
 namespace {
 

@@ -113,25 +113,6 @@ void CommissioneeDeviceProxy::OnConnectionExpired(SessionHandle session)
     mSecureSession.ClearValue();
 }
 
-CHIP_ERROR CommissioneeDeviceProxy::OnMessageReceived(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
-                                                      System::PacketBufferHandle && msgBuf)
-{
-    if (mState == ConnectionState::SecureConnected)
-    {
-        if (mStatusDelegate != nullptr)
-        {
-            mStatusDelegate->OnMessage(std::move(msgBuf));
-        }
-        else
-        {
-            HandleDataModelMessage(exchange, std::move(msgBuf));
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-
-void CommissioneeDeviceProxy::OnResponseTimeout(Messaging::ExchangeContext * ec) {}
-
 CHIP_ERROR CommissioneeDeviceProxy::CloseSession()
 {
     ReturnErrorCodeIf(mState != ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
@@ -178,18 +159,10 @@ void CommissioneeDeviceProxy::Reset()
 
     mState          = ConnectionState::NotConnected;
     mSessionManager = nullptr;
-    mStatusDelegate = nullptr;
     mInetLayer      = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     mBleLayer = nullptr;
 #endif
-    if (mExchangeMgr)
-    {
-        // Ensure that any exchange contexts we have open get closed now,
-        // because we don't want them to call back in to us after this
-        // point.
-        mExchangeMgr->CloseAllContextsForDelegate(this);
-    }
     mExchangeMgr = nullptr;
 
     ReleaseDAC();
@@ -307,14 +280,6 @@ CHIP_ERROR CommissioneeDeviceProxy::SetPAI(const chip::ByteSpan & pai)
 
 CommissioneeDeviceProxy::~CommissioneeDeviceProxy()
 {
-    if (mExchangeMgr)
-    {
-        // Ensure that any exchange contexts we have open get closed now,
-        // because we don't want them to call back in to us after this
-        // point.
-        mExchangeMgr->CloseAllContextsForDelegate(this);
-    }
-
     ReleaseDAC();
     ReleasePAI();
 }
