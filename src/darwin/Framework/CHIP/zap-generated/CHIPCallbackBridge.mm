@@ -1591,8 +1591,9 @@ void CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge::OnSuccess
         @"wasPresent" : [NSNumber numberWithBool:data.wasPresent],
         @"wasNull" : data.wasNull.HasValue() == false ? [NSNull null] : [NSNumber numberWithBool:data.wasNull.Value()],
         @"value" : data.value.HasValue() == false ? [NSNull null] : [NSNumber numberWithUnsignedChar:data.value.Value()],
-        @"originalValue" : data.originalValue.HasValue() == false ? [NSNull null]
-            : data.originalValue.Value().IsNull()                 ? [NSNull null]
+        @"originalValue" : data.originalValue.HasValue() == false
+            ? [NSNull null]
+            : data.originalValue.Value().IsNull() ? [NSNull null]
                                                   : [NSNumber numberWithUnsignedChar:data.originalValue.Value().Value()],
     };
     DispatchSuccess(context, response);
