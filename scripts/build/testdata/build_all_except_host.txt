@@ -11,9 +11,9 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-androidstudio-arm-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-androidstudio-arm-chip-tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true ' --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
+gn gen --check --fail-on-unused-args {out}/android-androidstudio-arm-chip-tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" ' --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
 
-# Accepting NDK licenses
+# Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating JARs for Java build rules test
@@ -23,9 +23,9 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-androidstudio-arm64-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-androidstudio-arm64-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true ' --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
+gn gen --check --fail-on-unused-args {out}/android-androidstudio-arm64-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" ' --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
 
-# Accepting NDK licenses
+# Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating JARs for Java build rules test
@@ -35,9 +35,9 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-androidstudio-x64-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-androidstudio-x64-chip-tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true ' --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
+gn gen --check --fail-on-unused-args {out}/android-androidstudio-x64-chip-tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" ' --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
 
-# Accepting NDK licenses
+# Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating JARs for Java build rules test
@@ -47,9 +47,9 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-androidstudio-x86-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-androidstudio-x86-chip-tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true ' --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
+gn gen --check --fail-on-unused-args {out}/android-androidstudio-x86-chip-tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" ' --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
 
-# Accepting NDK licenses
+# Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating JARs for Java build rules test
@@ -59,9 +59,9 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-arm-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-arm-chip-tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true '
+gn gen --check --fail-on-unused-args {out}/android-arm-chip-tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" '
 
-# Accepting NDK licenses
+# Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating JARs for Java build rules test
@@ -71,9 +71,9 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-arm64-chip-test
-gn gen --check --fail-on-unused-args {out}/android-arm64-chip-test '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true '
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip-test '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" '
 
-# Accepting NDK licenses
+# Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating JARs for Java build rules test
@@ -83,9 +83,9 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-arm64-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true '
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" '
 
-# Accepting NDK licenses
+# Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating JARs for Java build rules test
@@ -95,9 +95,9 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-arm64-chip-tvserver
-gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tvserver '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true chip_config_network_layer_ble=false '
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tvserver '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false '
 
-# Accepting NDK licenses
+# Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating JARs for Java build rules test
@@ -107,9 +107,9 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-x64-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-x64-chip-tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true '
+gn gen --check --fail-on-unused-args {out}/android-x64-chip-tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" '
 
-# Accepting NDK licenses
+# Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating JARs for Java build rules test
@@ -119,9 +119,9 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-x86-chip-tool
-gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning=true '
+gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" '
 
-# Accepting NDK licenses
+# Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating efr32-brd4161a-light
@@ -168,7 +168,7 @@ cp examples/all-clusters-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-cl
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'echo CONFIG_DISABLE_IPV4=y >>{out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults'
+bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
@@ -236,7 +236,7 @@ cp examples/all-clusters-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5stac
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'echo CONFIG_DISABLE_IPV4=y >>{out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults'
+bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
@@ -260,7 +260,7 @@ cp examples/all-clusters-app/esp32/sdkconfig_m5stack_rpc.defaults {out}/esp32-m5
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'echo CONFIG_DISABLE_IPV4=y >>{out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults'
+bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults'
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults

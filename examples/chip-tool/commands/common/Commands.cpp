@@ -255,7 +255,16 @@ void Commands::ShowCommand(std::string executable, std::string clusterName, Comm
     for (size_t i = 0; i < argumentsCount; i++)
     {
         arguments += " ";
+        bool isOptional = command->GetArgumentIsOptional(i);
+        if (isOptional)
+        {
+            arguments += "[--";
+        }
         arguments += command->GetArgumentName(i);
+        if (isOptional)
+        {
+            arguments += "]";
+        }
     }
     fprintf(stderr, "  %s %s %s\n", executable.c_str(), clusterName.c_str(), arguments.c_str());
 }

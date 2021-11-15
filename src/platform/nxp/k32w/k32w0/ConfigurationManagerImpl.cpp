@@ -39,9 +39,11 @@ using namespace ::chip::DeviceLayer::Internal;
 
 // TODO: Define a Singleton instance of CHIP Group Key Store here
 
-/** Singleton instance of the ConfigurationManager implementation object.
- */
-ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
+ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
+{
+    static ConfigurationManagerImpl sInstance;
+    return sInstance;
+}
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {

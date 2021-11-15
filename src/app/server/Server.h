@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/OperationalDeviceProxy.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <inet/InetConfig.h>
@@ -49,7 +50,7 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #endif
                                               >;
 
-class Server : public Messaging::ExchangeDelegate
+class Server
 {
 public:
     CHIP_ERROR Init(AppDelegate * delegate = nullptr, uint16_t secureServicePort = CHIP_PORT,
@@ -70,6 +71,13 @@ public:
     SessionManager & GetSecureSessionManager() { return mSessions; }
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
+
+    chip::OperationalDeviceProxy * GetOperationalDeviceProxy() { return mOperationalDeviceProxy; }
+
+    void SetOperationalDeviceProxy(chip::OperationalDeviceProxy * operationalDeviceProxy)
+    {
+        mOperationalDeviceProxy = operationalDeviceProxy;
+    }
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * getBleLayerObject() { return mBleLayer; }
@@ -122,13 +130,6 @@ private:
         CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
     };
 
-    // Messaging::ExchangeDelegate
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && buffer) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-
-    AppDelegate * mAppDelegate = nullptr;
-
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
@@ -147,6 +148,8 @@ private:
 
     ServerStorageDelegate mServerStorage;
     CommissioningWindowManager mCommissioningWindowManager;
+
+    chip::OperationalDeviceProxy * mOperationalDeviceProxy = nullptr;
 
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;

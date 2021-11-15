@@ -278,7 +278,7 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
-    entry->nextRetransTimeTick = static_cast<uint16_t>(entry->ec->GetInitialRetransmitTimeoutTick() +
+    entry->nextRetransTimeTick = static_cast<uint16_t>(entry->ec->GetIdleRetransmitTimeoutTick() +
                                                        GetTickCounterFromTimeDelta(System::SystemClock().GetMonotonicTimestamp()));
 
     // Check if the timer needs to be started and start it.

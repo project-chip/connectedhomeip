@@ -29,6 +29,7 @@
  *         - #CHIP_ERROR_LOGGING
  *         - #CHIP_PROGRESS_LOGGING
  *         - #CHIP_DETAIL_LOGGING
+ *         - #CHIP_AUTOMATION_LOGGING
  *
  */
 
@@ -62,6 +63,7 @@
  *        - #CHIP_ERROR_LOGGING
  *        - #CHIP_PROGRESS_LOGGING
  *        - #CHIP_DETAIL_LOGGING
+ *         - #CHIP_AUTOMATION_LOGGING
  *
  */
 
@@ -174,11 +176,32 @@ void SetLogFilter(uint8_t category);
 #define ChipLogByteSpan(MOD, DATA) ((void) 0)
 #endif
 
-#if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING
+#ifndef CHIP_AUTOMATION_LOGGING
+#define CHIP_AUTOMATION_LOGGING 1
+#endif
+
+#if CHIP_AUTOMATION_LOGGING
+/**
+ * @def ChipLogAutomation(MSG, ...)
+ *
+ * @brief
+ *   Log a chip message for the specified module in the 'Automation'
+ *   category.
+ *
+ */
+#ifndef ChipLogAutomation
+#define ChipLogAutomation(MSG, ...)                                                                                                \
+    chip::Logging::Log(chip::Logging::kLogModule_Automation, chip::Logging::kLogCategory_Automation, MSG, ##__VA_ARGS__)
+#endif
+#else
+#define ChipLogAutomation(MOD, MSG, ...) ((void) 0)
+#endif
+
+#if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING || CHIP_AUTOMATION_LOGGING
 #define _CHIP_USE_LOGGING 1
 #else
 #define _CHIP_USE_LOGGING 0
-#endif /* CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING */
+#endif /* CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING || CHIP_AUTOMATION_LOGGING */
 
 #if _CHIP_USE_LOGGING
 

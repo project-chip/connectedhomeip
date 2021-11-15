@@ -59,12 +59,26 @@ public:
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 
+    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval)
+    {
+        idleInterval   = mMRPIdleInterval;
+        activeInterval = mMRPActiveInterval;
+    }
+
+    void SetMRPIntervals(uint32_t idleInterval, uint32_t activeInterval)
+    {
+        mMRPIdleInterval   = idleInterval;
+        mMRPActiveInterval = activeInterval;
+    }
+
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:
     System::Clock::Timestamp mLastActivityTime = System::Clock::kZero;
 
     const PeerAddress mPeerAddress;
+    uint32_t mMRPIdleInterval   = 0;
+    uint32_t mMRPActiveInterval = 0;
     PeerMessageCounter mPeerMessageCounter;
 };
 

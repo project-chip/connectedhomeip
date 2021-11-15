@@ -33,6 +33,7 @@
 #include <thread>
 
 #include <arpa/inet.h>
+#include <dirent.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <malloc.h>
@@ -60,27 +61,27 @@ void SignalHandler(int signum)
     switch (signum)
     {
     case SIGINT:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET);
+        ConfigurationMgr().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGHUP:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET);
+        ConfigurationMgr().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGTERM:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT);
+        ConfigurationMgr().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGUSR1:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET);
+        ConfigurationMgr().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGUSR2:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET);
+        ConfigurationMgr().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGTSTP:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED);
+        ConfigurationMgr().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     default:
@@ -209,6 +210,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
@@ -230,9 +232,9 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     {
         uint32_t totalOperationalHours = 0;
 
-        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgrImpl().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
@@ -285,11 +287,66 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentH
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR PlatformManagerImpl::_GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+    DIR * proc_dir = opendir("/proc/self/task");
+
+    if (proc_dir == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Failed to open current process task directory");
+    }
+    else
+    {
+        ThreadMetrics * head = nullptr;
+        struct dirent * entry;
+
+        /* proc available, iterate through tasks... */
+        while ((entry = readdir(proc_dir)) != NULL)
+        {
+            if (entry->d_name[0] == '.')
+                continue;
+
+            ThreadMetrics * thread = new ThreadMetrics();
+
+            strncpy(thread->NameBuf, entry->d_name, kMaxThreadNameLength);
+            thread->NameBuf[kMaxThreadNameLength] = '\0';
+            thread->name                          = CharSpan(thread->NameBuf, strlen(thread->NameBuf));
+            thread->id                            = atoi(entry->d_name);
+
+            // TODO: Get stack info of each thread
+            thread->stackFreeCurrent = 0;
+            thread->stackFreeMinimum = 0;
+            thread->stackSize        = 0;
+
+            thread->Next = head;
+            head         = thread;
+        }
+
+        closedir(proc_dir);
+
+        *threadMetricsOut = head;
+        err               = CHIP_NO_ERROR;
+    }
+
+    return err;
+}
+
+void PlatformManagerImpl::_ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{
+    while (threadMetrics)
+    {
+        ThreadMetrics * del = threadMetrics;
+        threadMetrics       = threadMetrics->Next;
+        delete del;
+    }
+}
+
 CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
 {
     uint32_t count = 0;
 
-    CHIP_ERROR err = ConfigurationMgrImpl().GetRebootCount(count);
+    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -320,7 +377,7 @@ CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperat
     if (_GetUpTime(upTime) == CHIP_NO_ERROR)
     {
         uint32_t totalHours = 0;
-        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
+        if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
         {
             VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
             totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
@@ -334,7 +391,7 @@ CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
 {
     uint32_t reason = 0;
 
-    CHIP_ERROR err = ConfigurationMgrImpl().GetBootReasons(reason);
+    CHIP_ERROR err = ConfigurationMgr().GetBootReasons(reason);
 
     if (err == CHIP_NO_ERROR)
     {

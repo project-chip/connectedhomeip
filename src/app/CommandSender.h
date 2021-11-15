@@ -64,12 +64,12 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apCommandSender: The command sender object that initiated the command transaction.
-         * @param[in] aPath: The command path field in invoke command response.
-         * @param[in] aStatusIB: It will always have a success status. If apData is null, it can be any success status, including
-         *                       possibly a cluster-specific one.   If apData is not null it aStatusIB will always be a generic
-         * SUCCESS status with no-cluster specific information.
-         * @param[in] aData: The command data, will be nullptr if the server returns a StatusIB.
+         * @param[in] apCommandSender The command sender object that initiated the command transaction.
+         * @param[in] aPath           The command path field in invoke command response.
+         * @param[in] aStatusIB       It will always have a success status. If apData is null, it can be any success status,
+         *                            including possibly a cluster-specific one. If apData is not null it aStatusIB will always
+         *                            be a generic SUCCESS status with no-cluster specific information.
+         * @param[in] apData          The command data, will be nullptr if the server returns a StatusIB.
          */
         virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
                                 TLV::TLVReader * apData)
@@ -89,9 +89,9 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy and free the object.
          *
-         * @param[in] apCommandSender: The command sender object that initiated the command transaction.
-         * @param[in] aStatusIB: The status code including IM status code and optional cluster status code
-         * @param[in] aError: A system error code that conveys the overall error code.
+         * @param[in] apCommandSender The command sender object that initiated the command transaction.
+         * @param[in] aStatusIB       The status code including IM status code and optional cluster status code
+         * @param[in] aError          A system error code that conveys the overall error code.
          */
         virtual void OnError(const CommandSender * apCommandSender, const StatusIB & aStatusIB, CHIP_ERROR aError) {}
 

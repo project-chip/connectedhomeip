@@ -40,7 +40,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.25
+            image: connectedhomeip/chip-build:0.5.28
             options:
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -86,11 +86,11 @@ jobs:
             - name: Run Tests
               timeout-minutes: 20
               run: |
-                  scripts/tests/test_suites.sh
+                  scripts/tests/test_suites.sh -n
             - name: Run TV Tests
               timeout-minutes: 10
               run: |
-                  scripts/tests/test_suites.sh  -a tv
+                  scripts/tests/test_suites.sh -n -a tv
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
@@ -171,6 +171,13 @@ jobs:
               timeout-minutes: 35
               run: |
                   scripts/tests/test_suites.sh
+            - name: Uploading application logs
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }} && ${{ !env.ACT }}
+              with:
+                  name: test-suite-app-logs-${{ matrix.type }}-${{ matrix.eventloop }}
+                  path: /tmp/test_suites_app_logs/
+                  retention-days: 5
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}

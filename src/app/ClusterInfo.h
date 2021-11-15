@@ -35,8 +35,9 @@ namespace app {
 struct ClusterInfo
 {
 private:
-    // Endpoint Id is a uint16 number, and should between 0 and 0xFFFE
-    static constexpr EndpointId kInvalidEndpointId = 0xFFFF;
+    // Allow AttributePathParams access these constants.
+    friend struct AttributePathParams;
+
     // The ClusterId, AttributeId and EventId are MEIs,
     // 0xFFFF is not a valid manufacturer code, thus 0xFFFF'FFFF is not a valid MEI
     static constexpr ClusterId kInvalidClusterId     = 0xFFFF'FFFF;
@@ -50,7 +51,7 @@ public:
     {
         VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
         VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
-        VerifyOrReturnError(HasWildcardAttributeId() || mFieldId == other.mFieldId, false);
+        VerifyOrReturnError(HasWildcardAttributeId() || mAttributeId == other.mAttributeId, false);
         VerifyOrReturnError(HasWildcardListIndex() || mListIndex == other.mListIndex, false);
 
         return true;
@@ -68,7 +69,7 @@ public:
     inline bool HasWildcardNodeId() const { return mNodeId == kUndefinedNodeId; }
     inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
     inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
-    inline bool HasWildcardAttributeId() const { return mFieldId == kInvalidAttributeId; }
+    inline bool HasWildcardAttributeId() const { return mAttributeId == kInvalidAttributeId; }
     inline bool HasWildcardListIndex() const { return mListIndex == kInvalidListIndex; }
     inline bool HasWildcardEventId() const { return mEventId == kInvalidEventId; }
 
@@ -79,13 +80,13 @@ public:
      * Changing order to something more natural (e.g. endpoint id before cluster id) will result
      * in extra memory alignment padding.
      */
-    NodeId mNodeId         = kUndefinedNodeId;    // uint64
-    ClusterInfo * mpNext   = nullptr;             // pointer width (32/64 bits)
-    ClusterId mClusterId   = kInvalidClusterId;   // uint32
-    AttributeId mFieldId   = kInvalidAttributeId; // uint32
-    EventId mEventId       = kInvalidEventId;     // uint32
-    ListIndex mListIndex   = kInvalidListIndex;   // uint16
-    EndpointId mEndpointId = kInvalidEndpointId;  // uint16
+    NodeId mNodeId           = kUndefinedNodeId;    // uint64
+    ClusterInfo * mpNext     = nullptr;             // pointer width (32/64 bits)
+    ClusterId mClusterId     = kInvalidClusterId;   // uint32
+    AttributeId mAttributeId = kInvalidAttributeId; // uint32
+    EventId mEventId         = kInvalidEventId;     // uint32
+    ListIndex mListIndex     = kInvalidListIndex;   // uint16
+    EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
 };
 } // namespace app
 } // namespace chip

@@ -46,6 +46,7 @@ public:
 
 private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &), AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & aEncoder);
 };
 
 SoftwareDiagosticsAttrAccess gAttrAccess;
@@ -69,6 +70,9 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPat
     case CurrentHeapHighWatermark::Id: {
         return ReadIfSupported(&PlatformManager::GetCurrentHeapHighWatermark, aEncoder);
     }
+    case ThreadMetrics::Id: {
+        return ReadThreadMetrics(aEncoder);
+    }
     default: {
         break;
     }
@@ -91,6 +95,32 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMan
     }
 
     return aEncoder.Encode(data);
+}
+
+CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DeviceLayer::ThreadMetrics * threadMetrics;
+
+    if (DeviceLayer::PlatformMgr().GetThreadMetrics(&threadMetrics) == CHIP_NO_ERROR)
+    {
+        err = aEncoder.EncodeList([&threadMetrics](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+            for (DeviceLayer::ThreadMetrics * thread = threadMetrics; thread != nullptr; thread = thread->Next)
+            {
+                ReturnErrorOnFailure(encoder.Encode(*thread));
+            }
+
+            return CHIP_NO_ERROR;
+        });
+
+        DeviceLayer::PlatformMgr().ReleaseThreadMetrics(threadMetrics);
+    }
+    else
+    {
+        err = aEncoder.Encode(DataModel::List<EndpointId>());
+    }
+
+    return err;
 }
 } // anonymous namespace
 

@@ -66,25 +66,24 @@ static void TestConfigurationMgr_SerialNumber(nlTestSuite * inSuite, void * inCo
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     char buf[64];
-    size_t serialNumberLen    = 0;
     const char * serialNumber = "89051AAZZ236";
 
     err = ConfigurationMgr().StoreSerialNumber(serialNumber, strlen(serialNumber));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetSerialNumber(buf, 64, serialNumberLen);
+    err = ConfigurationMgr().GetSerialNumber(buf, 64);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, serialNumberLen == strlen(serialNumber));
+    NL_TEST_ASSERT(inSuite, strlen(buf) == 12);
     NL_TEST_ASSERT(inSuite, strcmp(buf, serialNumber) == 0);
 
     err = ConfigurationMgr().StoreSerialNumber(serialNumber, 5);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetSerialNumber(buf, 64, serialNumberLen);
+    err = ConfigurationMgr().GetSerialNumber(buf, 64);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, serialNumberLen == 5);
+    NL_TEST_ASSERT(inSuite, strlen(buf) == 5);
     NL_TEST_ASSERT(inSuite, strcmp(buf, "89051") == 0);
 }
 

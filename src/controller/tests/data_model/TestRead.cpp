@@ -58,11 +58,13 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter,
-                                 bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+                                 AttributeReportIB::Builder & aAttributeReport)
 {
+
     if (responseDirective == kSendDataResponse)
     {
+        AttributeDataIB::Builder attributeData = aAttributeReport.CreateAttributeData();
         TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
         TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
 
@@ -75,13 +77,27 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
             i++;
         }
 
-        ReturnErrorOnFailure(DataModel::Encode(*apWriter, chip::TLV::ContextTag(AttributeDataElement::kCsTag_Data), value));
-        return apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), static_cast<uint64_t>(0));
+        AttributePathIB::Builder attributePath = attributeData.CreatePath();
+        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        ReturnErrorOnFailure(attributePath.GetError());
+
+        ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()),
+                                               chip::TLV::ContextTag(chip::to_underlying(AttributeDataIB::Tag::kData)), value));
+        attributeData.DataVersion(0).EndOfAttributeDataIB();
+        return CHIP_NO_ERROR;
     }
     else
     {
-        return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                             chip::Protocols::InteractionModel::Status::Busy);
+        AttributeStatusIB::Builder attributeStatus = aAttributeReport.CreateAttributeStatus();
+        AttributePathIB::Builder attributePath     = attributeStatus.CreatePath();
+        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        ReturnErrorOnFailure(attributePath.GetError());
+
+        StatusIB::Builder errorStatus = attributeStatus.CreateErrorStatus();
+        errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
+        attributeStatus.EndOfAttributeStatusIB();
+        ReturnErrorOnFailure(attributeStatus.GetError());
+        return CHIP_NO_ERROR;
     }
 
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

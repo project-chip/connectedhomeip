@@ -36,7 +36,7 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callbac
     VerifyOrReturnError(mpExchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    AttributeDataList::Builder attributeDataListBuilder;
+    AttributeDataIBs::Builder AttributeDataIBsBuilder;
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -44,8 +44,8 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callbac
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
 
-    attributeDataListBuilder = mWriteRequestBuilder.CreateAttributeDataListBuilder();
-    ReturnErrorOnFailure(attributeDataListBuilder.GetError());
+    AttributeDataIBsBuilder = mWriteRequestBuilder.CreateAttributeDataIBsBuilder();
+    ReturnErrorOnFailure(AttributeDataIBsBuilder.GetError());
 
     ClearExistingExchangeContext();
     mpExchangeMgr         = apExchangeMgr;
@@ -137,10 +137,9 @@ CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    AttributeDataElement::Builder attributeDataElement =
-        mWriteRequestBuilder.GetAttributeDataListBuilder().CreateAttributeDataElementBuilder();
-    SuccessOrExit(attributeDataElement.GetError());
-    err = ConstructAttributePath(attributePathParams, attributeDataElement);
+    AttributeDataIB::Builder AttributeDataIB = mWriteRequestBuilder.GetAttributeReportIBsBuilder().CreateAttributeDataIBBuilder();
+    SuccessOrExit(AttributeDataIB.GetError());
+    err = ConstructAttributePath(attributePathParams, AttributeDataIB);
 
 exit:
     return err;
@@ -150,53 +149,39 @@ CHIP_ERROR WriteClient::FinishAttribute()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    AttributeDataElement::Builder attributeDataElement =
-        mWriteRequestBuilder.GetAttributeDataListBuilder().GetAttributeDataElementBuilder();
+    AttributeDataIB::Builder AttributeDataIB = mWriteRequestBuilder.GetAttributeReportIBsBuilder().GetAttributeDataIBBuilder();
 
     // TODO: Add attribute version support
-    attributeDataElement.DataVersion(0);
-    attributeDataElement.EndOfAttributeDataElement();
-    SuccessOrExit(err = attributeDataElement.GetError());
+    AttributeDataIB.DataVersion(0);
+    AttributeDataIB.EndOfAttributeDataIB();
+    SuccessOrExit(err = AttributeDataIB.GetError());
     MoveToState(State::AddAttribute);
 
 exit:
     return err;
 }
 
-TLV::TLVWriter * WriteClient::GetAttributeDataElementTLVWriter()
+TLV::TLVWriter * WriteClient::GetAttributeDataIBTLVWriter()
 {
-    return mWriteRequestBuilder.GetAttributeDataListBuilder().GetAttributeDataElementBuilder().GetWriter();
+    return mWriteRequestBuilder.GetAttributeReportIBsBuilder().GetAttributeDataIBBuilder().GetWriter();
 }
 
 CHIP_ERROR WriteClient::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                               AttributeDataElement::Builder aAttributeDataElement)
+                                               AttributeDataIB::Builder aAttributeDataIB)
 {
-    AttributePathIB::Builder attributePath = aAttributeDataElement.CreateAttributePath();
-    if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
-    {
-        attributePath.Attribute(aAttributePathParams.mFieldId);
-    }
-
-    if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kListIndexValid))
-    {
-        attributePath.ListIndex(aAttributePathParams.mListIndex);
-    }
-
-    attributePath.Node(aAttributePathParams.mNodeId)
-        .Cluster(aAttributePathParams.mClusterId)
-        .Endpoint(aAttributePathParams.mEndpointId)
-        .EndOfAttributePathIB();
-
-    return attributePath.GetError();
+    // We do not support wildcard write now, reject them on client side.
+    VerifyOrReturnError(!aAttributePathParams.HasWildcard() && aAttributePathParams.IsValidAttributePath(),
+                        CHIP_ERROR_INVALID_PATH_LIST);
+    return aAttributePathParams.BuildAttributePath(aAttributeDataIB.CreatePath());
 }
 
 CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributeDataList::Builder attributeDataListBuilder;
+    AttributeDataIBs::Builder AttributeDataIBsBuilder;
     VerifyOrExit(mState == State::AddAttribute, err = CHIP_ERROR_INCORRECT_STATE);
-    attributeDataListBuilder = mWriteRequestBuilder.GetAttributeDataListBuilder().EndOfAttributeDataList();
-    err                      = attributeDataListBuilder.GetError();
+    AttributeDataIBsBuilder = mWriteRequestBuilder.GetAttributeReportIBsBuilder().EndOfAttributeDataIBs();
+    err                     = AttributeDataIBsBuilder.GetError();
     SuccessOrExit(err);
 
     mWriteRequestBuilder.EndOfWriteRequestMessage();
@@ -259,17 +244,26 @@ CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::T
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
     mpExchangeCtx->SetResponseTimeout(timeout);
 
+    // kExpectResponse is ignored by ExchangeContext in case of groupcast
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
+
     MoveToState(State::AwaitingResponse);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ClearExistingExchangeContext();
+    }
+
+    if (session.IsGroupSession())
+    {
+        // Always shutdown on Group communication
+        Shutdown();
     }
 
     return err;
@@ -328,31 +322,21 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
     mAttributeStatusIndex++;
     err = aAttributeStatusIB.GetPath(&attributePath);
     SuccessOrExit(err);
-    err = attributePath.GetNode(&(attributePathParams.mNodeId));
-    SuccessOrExit(err);
     err = attributePath.GetCluster(&(attributePathParams.mClusterId));
     SuccessOrExit(err);
     err = attributePath.GetEndpoint(&(attributePathParams.mEndpointId));
     SuccessOrExit(err);
-
-    err = attributePath.GetAttribute(&(attributePathParams.mFieldId));
-    if (CHIP_NO_ERROR == err)
-    {
-        attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
-    }
-    else if (CHIP_END_OF_TLV == err)
+    err = attributePath.GetAttribute(&(attributePathParams.mAttributeId));
+    SuccessOrExit(err);
+    err = attributePath.GetListIndex(&(attributePathParams.mListIndex));
+    if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
-    SuccessOrExit(err);
-
-    err = attributePath.GetListIndex(&(attributePathParams.mListIndex));
-    if (CHIP_NO_ERROR == err)
-    {
-        VerifyOrExit(attributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid),
-                     err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-        attributePathParams.mFlags.Set(AttributePathParams::Flags::kListIndexValid);
-    }
+    // TODO: (#11423) Attribute paths has a pattern of invalid paths, should add a function for checking invalid paths here.
+    // NOTE: We don't support wildcard write for now, reject all wildcard paths.
+    VerifyOrExit(!attributePathParams.HasWildcard() && attributePathParams.IsValidAttributePath(),
+                 err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
     err = aAttributeStatusIB.GetErrorStatus(&(StatusIBParser));
     if (CHIP_NO_ERROR == err)
@@ -362,7 +346,7 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
         if (mpCallback != nullptr)
         {
             ConcreteAttributePath path(attributePathParams.mEndpointId, attributePathParams.mClusterId,
-                                       attributePathParams.mFieldId);
+                                       attributePathParams.mAttributeId);
             mpCallback->OnResponse(this, path, statusIB);
         }
     }
@@ -375,10 +359,11 @@ CHIP_ERROR WriteClientHandle::SendWriteRequest(SessionHandle session, System::Cl
 {
     CHIP_ERROR err = mpWriteClient->SendWriteRequest(session, timeout);
 
+    // Transferring ownership of the underlying WriteClient to the IM layer. IM will manage its lifetime.
+    // For groupcast writes, there is no transfer of ownership since the interaction is done upon transmission of the action
     if (err == CHIP_NO_ERROR)
     {
-        // On success, the InteractionModelEngine will be responible to take care of the lifecycle of the WriteClient, so we release
-        // the WriteClient without closing it.
+        // Release the WriteClient without closing it.
         mpWriteClient = nullptr;
     }
     else

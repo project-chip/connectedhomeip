@@ -64,6 +64,8 @@ private:
     CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
     CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
     CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
+    CHIP_ERROR _GetThreadMetrics(ThreadMetrics ** threadMetricsOut);
+    void _ReleaseThreadMetrics(ThreadMetrics * threadMetrics);
 
     CHIP_ERROR _GetRebootCount(uint16_t & rebootCount);
     CHIP_ERROR _GetUpTime(uint64_t & upTime);

@@ -73,7 +73,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     ReadRequestMessage::Builder readRequestBuilder;
-    AttributePaths::Builder attributePathListBuilder;
+    AttributePathIBs::Builder attributePathListBuilder;
     AttributePathIB::Builder attributePathBuilder;
 
     err = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), nullptr);
@@ -104,7 +104,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
                                .Attribute(kTestFieldId2)
                                .EndOfAttributePathIB();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathListBuilder.EndOfAttributePaths();
+    attributePathListBuilder.EndOfAttributePathIBs();
 
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     readRequestBuilder.EndOfReadRequestMessage();

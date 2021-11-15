@@ -34,6 +34,7 @@
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Constants.h>
 #include <lib/dnssd/ServiceNaming.h>
+#include <system/TimeSource.h>
 
 namespace chip {
 namespace Dnssd {
@@ -75,6 +76,8 @@ struct DnssdService
     const char ** mSubTypes;
     size_t mSubTypeSize;
     Optional<chip::Inet::IPAddress> mAddress;
+    // Time to live in seconds. Per rfc6762 section 10, because we have a hostname, our default TTL is 120 seconds
+    uint32_t mTtlSeconds = 120;
 };
 
 /**

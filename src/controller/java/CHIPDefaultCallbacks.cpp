@@ -27,7 +27,7 @@ chip::CHIPDefaultSuccessCallback::~CHIPDefaultSuccessCallback()
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
     {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
         return;
     }
     env->DeleteGlobalRef(javaCallbackRef);

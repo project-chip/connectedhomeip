@@ -63,11 +63,7 @@ public:
     CHIPDeviceCallbacksMgr(const CHIPDeviceCallbacksMgr &&) = delete;
     CHIPDeviceCallbacksMgr & operator=(const CHIPDeviceCallbacksMgr &) = delete;
 
-    static CHIPDeviceCallbacksMgr & GetInstance()
-    {
-        static CHIPDeviceCallbacksMgr instance;
-        return instance;
-    }
+    static CHIPDeviceCallbacksMgr & GetInstance();
 
     CHIP_ERROR AddResponseCallback(NodeId nodeId, uint8_t sequenceNumber, Callback::Cancelable * onSuccessCallback,
                                    Callback::Cancelable * onFailureCallback, TLVDataFilter callbackFilter = nullptr);

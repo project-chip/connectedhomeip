@@ -1,0 +1,34 @@
+{{#if isOptional}}
+  {{! Just go ahead and assign to the value, stripping the optionality bit off.  }}
+  {{>test_value target=target definedValue=definedValue cluster=cluster isOptional=false}}
+{{else if isNullable}}
+  {{#if (isLiteralNull definedValue)}}
+    {{target}} = nil;
+  {{else}}
+    {{>test_value target=target definedValue=definedValue cluster=cluster isNullable=false}}
+  {{/if}}
+{{else if isArray}}
+  {
+    NSMutableArray * temp = [[NSMutableArray alloc] init];
+    {{#each definedValue}}
+      {{>test_value target=(concat "temp[" @index "]") definedValue=this cluster=../cluster type=../type isArray=false}}
+    {{/each}}
+    {{target}} = temp;
+  }
+{{else}}
+  {{#if_is_struct type}}
+    {{target}} = [[CHIP{{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase type}} alloc] init];
+    {{#zcl_struct_items_by_struct_name type}}
+      {{! target may be some place where we lost type information (e.g. an id),
+          so add explicit cast when trying to assign to our properties. }}
+      {{>test_value target=(concat "((CHIP" (asUpperCamelCase ../cluster) "Cluster" (asUpperCamelCase ../type) " *)" ../target ")." (asUpperCamelCase label)) definedValue=(lookup ../definedValue name) cluster=../cluster}}
+    {{/zcl_struct_items_by_struct_name}}
+
+  {{else if (isCharString type)}}
+    {{target}} = @"{{definedValue}}";
+  {{else if (isOctetString type)}}
+    {{target}} = [[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral definedValue}}" length:{{definedValue.length}}];
+  {{else}}
+    {{target}} = [NSNumber numberWith{{asObjectiveCNumberType definedValue type false}}:{{definedValue}}];
+  {{/if_is_struct}}
+{{/if}}

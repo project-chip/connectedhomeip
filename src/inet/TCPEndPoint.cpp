@@ -87,9 +87,10 @@
 namespace chip {
 namespace Inet {
 
-chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPoint::sPool;
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+
+BitMapObjectPool<TCPEndPointImplLwIP, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPointImplLwIP::sPool;
+
 namespace {
 
 /*
@@ -108,7 +109,7 @@ err_t start_tcp_timers(void)
 
 } // anonymous namespace
 
-CHIP_ERROR TCPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
+CHIP_ERROR TCPEndPointImplLwIP::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
 {
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -170,7 +171,7 @@ CHIP_ERROR TCPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
     return res;
 }
 
-CHIP_ERROR TCPEndPoint::ListenImpl(uint16_t backlog)
+CHIP_ERROR TCPEndPointImplLwIP::ListenImpl(uint16_t backlog)
 {
     // Start listening for incoming connections.
     mTCP              = tcp_listen(mTCP);
@@ -183,7 +184,7 @@ CHIP_ERROR TCPEndPoint::ListenImpl(uint16_t backlog)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId)
+CHIP_ERROR TCPEndPointImplLwIP::ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId)
 {
     CHIP_ERROR res         = CHIP_NO_ERROR;
     IPAddressType addrType = addr.Type();
@@ -195,12 +196,11 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
     if (intfId.IsPresent())
     {
         IPAddress intfLLAddr;
-        InetLayer & lInetLayer = Layer();
 
         if (!addr.IsIPv6LinkLocal() || mState == State::kBound)
             return CHIP_ERROR_NOT_IMPLEMENTED;
 
-        res = lInetLayer.GetLinkLocalAddr(intfId, &intfLLAddr);
+        res = intfId.GetLinkLocalAddr(&intfLLAddr);
         if (res != CHIP_NO_ERROR)
             return res;
 
@@ -261,7 +261,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
     return res;
 }
 
-CHIP_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const
+CHIP_ERROR TCPEndPointImplLwIP::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -291,7 +291,7 @@ CHIP_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) con
     return res;
 }
 
-CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const
+CHIP_ERROR TCPEndPointImplLwIP::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -321,7 +321,7 @@ CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) co
     return res;
 }
 
-CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
+CHIP_ERROR TCPEndPointImplLwIP::GetInterfaceId(InterfaceId * retInterface)
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -332,7 +332,7 @@ CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPEndPoint::SendQueuedImpl(bool queueWasEmpty)
+CHIP_ERROR TCPEndPointImplLwIP::SendQueuedImpl(bool queueWasEmpty)
 {
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
     if (!mUserTimeoutTimerRunning)
@@ -345,7 +345,7 @@ CHIP_ERROR TCPEndPoint::SendQueuedImpl(bool queueWasEmpty)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPEndPoint::EnableNoDelay()
+CHIP_ERROR TCPEndPointImplLwIP::EnableNoDelay()
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -365,7 +365,7 @@ CHIP_ERROR TCPEndPoint::EnableNoDelay()
     return res;
 }
 
-CHIP_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount)
+CHIP_ERROR TCPEndPointImplLwIP::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount)
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR res = CHIP_ERROR_NOT_IMPLEMENTED;
@@ -403,7 +403,7 @@ CHIP_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount
     return res;
 }
 
-CHIP_ERROR TCPEndPoint::DisableKeepAlive()
+CHIP_ERROR TCPEndPointImplLwIP::DisableKeepAlive()
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR res = CHIP_ERROR_NOT_IMPLEMENTED;
@@ -432,17 +432,12 @@ CHIP_ERROR TCPEndPoint::DisableKeepAlive()
     return res;
 }
 
-CHIP_ERROR TCPEndPoint::SetUserTimeoutImpl(uint32_t userTimeoutMillis)
+CHIP_ERROR TCPEndPointImplLwIP::SetUserTimeoutImpl(uint32_t userTimeoutMillis)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void TCPEndPoint::InitImpl()
-{
-    mUnackedLength = 0;
-}
-
-CHIP_ERROR TCPEndPoint::DriveSendingImpl()
+CHIP_ERROR TCPEndPointImplLwIP::DriveSendingImpl()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -463,7 +458,7 @@ CHIP_ERROR TCPEndPoint::DriveSendingImpl()
         {
             // Find first packet buffer with remaining data to send by skipping
             // all sent but un-acked data.
-            TCPEndPoint::BufferOffset startOfUnsent = FindStartOfUnsent();
+            TCPEndPointImplLwIP::BufferOffset startOfUnsent = FindStartOfUnsent();
 
             // While there's data to be sent and a window to send it in...
             do
@@ -547,9 +542,9 @@ CHIP_ERROR TCPEndPoint::DriveSendingImpl()
     return err;
 }
 
-void TCPEndPoint::HandleConnectCompleteImpl() {}
+void TCPEndPointImplLwIP::HandleConnectCompleteImpl() {}
 
-void TCPEndPoint::DoCloseImpl(CHIP_ERROR err, State oldState)
+void TCPEndPointImplLwIP::DoCloseImpl(CHIP_ERROR err, State oldState)
 {
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -622,7 +617,7 @@ void TCPEndPoint::DoCloseImpl(CHIP_ERROR err, State oldState)
     }
 }
 
-CHIP_ERROR TCPEndPoint::AckReceive(uint16_t len)
+CHIP_ERROR TCPEndPointImplLwIP::AckReceive(uint16_t len)
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR res = CHIP_NO_ERROR;
@@ -642,23 +637,18 @@ CHIP_ERROR TCPEndPoint::AckReceive(uint16_t len)
 }
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState)
+void TCPEndPointImplLwIP::TCPUserTimeoutHandler()
 {
-    TCPEndPoint * tcpEndPoint = reinterpret_cast<TCPEndPoint *>(aAppState);
-
-    VerifyOrDie((aSystemLayer != nullptr) && (tcpEndPoint != nullptr));
-
     // Set the timer running flag to false
-    tcpEndPoint->mUserTimeoutTimerRunning = false;
+    mUserTimeoutTimerRunning = false;
 
     // Close Connection as we have timed out and there is still
     // data not sent out successfully.
-
-    tcpEndPoint->DoClose(INET_ERROR_TCP_USER_TIMEOUT, false);
+    DoClose(INET_ERROR_TCP_USER_TIMEOUT, false);
 }
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-uint16_t TCPEndPoint::RemainingToSend()
+uint16_t TCPEndPointImplLwIP::RemainingToSend()
 {
     if (mSendQueue.IsNull())
     {
@@ -674,7 +664,7 @@ uint16_t TCPEndPoint::RemainingToSend()
     }
 }
 
-TCPEndPoint::BufferOffset TCPEndPoint::FindStartOfUnsent()
+TCPEndPointImplLwIP::BufferOffset TCPEndPointImplLwIP::FindStartOfUnsent()
 {
     // Find first packet buffer with remaining data to send by skipping
     // all sent but un-acked data. This is necessary because of the Consume()
@@ -686,7 +676,7 @@ TCPEndPoint::BufferOffset TCPEndPoint::FindStartOfUnsent()
     // unsent data while retaining the buffers that have un-acked data is to
     // traverse all sent-but-unacked data in the chain to reach the beginning
     // of ready-to-send data.
-    TCPEndPoint::BufferOffset startOfUnsent(mSendQueue.Retain());
+    TCPEndPointImplLwIP::BufferOffset startOfUnsent(mSendQueue.Retain());
     uint16_t leftToSkip = mUnackedLength;
 
     VerifyOrDie(leftToSkip < mSendQueue->TotalLength());
@@ -714,7 +704,7 @@ TCPEndPoint::BufferOffset TCPEndPoint::FindStartOfUnsent()
     return startOfUnsent;
 }
 
-CHIP_ERROR TCPEndPoint::GetPCB(IPAddressType addrType)
+CHIP_ERROR TCPEndPointImplLwIP::GetPCB(IPAddressType addrType)
 {
     // IMMPORTANT: This method MUST be called with the LwIP stack LOCKED!
 
@@ -801,7 +791,7 @@ CHIP_ERROR TCPEndPoint::GetPCB(IPAddressType addrType)
     return CHIP_NO_ERROR;
 }
 
-void TCPEndPoint::HandleDataSent(uint16_t lenSent)
+void TCPEndPointImplLwIP::HandleDataSent(uint16_t lenSent)
 {
     if (IsConnected())
     {
@@ -868,7 +858,7 @@ void TCPEndPoint::HandleDataSent(uint16_t lenSent)
     }
 }
 
-void TCPEndPoint::HandleDataReceived(System::PacketBufferHandle && buf)
+void TCPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && buf)
 {
     // Only receive new data while in the Connected or SendShutdown states.
     if (mState == State::kConnected || mState == State::kSendShutdown)
@@ -915,7 +905,7 @@ void TCPEndPoint::HandleDataReceived(System::PacketBufferHandle && buf)
     }
 }
 
-void TCPEndPoint::HandleIncomingConnection(TCPEndPoint * conEP)
+void TCPEndPointImplLwIP::HandleIncomingConnection(TCPEndPoint * conEP)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     IPAddress peerAddr;
@@ -947,7 +937,7 @@ void TCPEndPoint::HandleIncomingConnection(TCPEndPoint * conEP)
         conEP->Free();
 }
 
-void TCPEndPoint::HandleError(CHIP_ERROR err)
+void TCPEndPointImplLwIP::HandleError(CHIP_ERROR err)
 {
     if (mState == State::kListening)
     {
@@ -958,15 +948,14 @@ void TCPEndPoint::HandleError(CHIP_ERROR err)
         DoClose(err, false);
 }
 
-err_t TCPEndPoint::LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, err_t lwipErr)
+err_t TCPEndPointImplLwIP::LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, err_t lwipErr)
 {
     err_t res = ERR_OK;
 
     if (arg != NULL)
     {
-        CHIP_ERROR conErr;
-        TCPEndPoint * ep                 = static_cast<TCPEndPoint *>(arg);
-        System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
+        TCPEndPointImplLwIP * ep     = static_cast<TCPEndPointImplLwIP *>(arg);
+        System::Layer * lSystemLayer = ep->Layer().SystemLayer();
 
         if (lwipErr == ERR_OK)
         {
@@ -976,10 +965,16 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, 
         }
 
         // Post callback to HandleConnectComplete.
-        conErr = chip::System::MapErrorLwIP(lwipErr);
-        if (lSystemLayer->PostEvent(*ep, kInetEvent_TCPConnectComplete, static_cast<uintptr_t>(conErr.AsInteger())) !=
-            CHIP_NO_ERROR)
+        ep->Retain();
+        CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, conErr = System::MapErrorLwIP(lwipErr)] {
+            ep->HandleConnectComplete(conErr);
+            ep->Release();
+        });
+        if (err != CHIP_NO_ERROR)
+        {
+            ep->Release();
             res = ERR_ABRT;
+        }
     }
     else
         res = ERR_ABRT;
@@ -990,15 +985,15 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, 
     return res;
 }
 
-err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpcb, err_t lwipErr)
+err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpcb, err_t lwipErr)
 {
     CHIP_ERROR err = chip::System::MapErrorLwIP(lwipErr);
 
     if (arg != NULL)
     {
-        TCPEndPoint * listenEP           = static_cast<TCPEndPoint *>(arg);
-        TCPEndPoint * conEP              = NULL;
-        System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(listenEP->Layer().SystemLayer());
+        TCPEndPointImplLwIP * listenEP = static_cast<TCPEndPointImplLwIP *>(arg);
+        TCPEndPointImplLwIP * conEP    = NULL;
+        System::Layer * lSystemLayer   = listenEP->Layer().SystemLayer();
 
         // Tell LwIP we've accepted the connection so it can decrement the listen PCB's pending_accepts counter.
         tcp_accepted(listenEP->mTCP);
@@ -1014,7 +1009,9 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
         {
             InetLayer & lInetLayer = listenEP->Layer();
 
-            err = lInetLayer.NewTCPEndPoint(&conEP);
+            TCPEndPoint * connectEndPoint = nullptr;
+            err                           = lInetLayer.NewTCPEndPoint(&connectEndPoint);
+            conEP                         = static_cast<TCPEndPointImplLwIP *>(connectEndPoint);
         }
 
         // Ensure that TCP timers have been started
@@ -1043,8 +1040,17 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
             tcp_err(tpcb, LwIPHandleError);
 
             // Post a callback to the HandleConnectionReceived() function, passing it the new end point.
-            if (lSystemLayer->PostEvent(*listenEP, kInetEvent_TCPConnectionReceived, (uintptr_t) conEP) != CHIP_NO_ERROR)
+            listenEP->Retain();
+            conEP->Retain();
+            err = lSystemLayer->ScheduleLambda([listenEP, conEP] {
+                listenEP->HandleIncomingConnection(conEP);
+                conEP->Release();
+                listenEP->Release();
+            });
+            if (err != CHIP_NO_ERROR)
             {
+                conEP->Release(); // for the Ref in ScheduleLambda
+                listenEP->Release();
                 err = CHIP_ERROR_CONNECTION_ABORTED;
                 conEP->Release(); // for the Retain() above
                 conEP->Release(); // for the Retain() in NewTCPEndPoint()
@@ -1053,7 +1059,17 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
 
         // Otherwise, there was an error accepting the connection, so post a callback to the HandleError function.
         else
-            lSystemLayer->PostEvent(*listenEP, kInetEvent_TCPError, static_cast<uintptr_t>(err.AsInteger()));
+        {
+            listenEP->Retain();
+            err = lSystemLayer->ScheduleLambda([listenEP, err] {
+                listenEP->HandleError(err);
+                listenEP->Release();
+            });
+            if (err != CHIP_NO_ERROR)
+            {
+                listenEP->Release();
+            }
+        }
     }
     else
         err = CHIP_ERROR_CONNECTION_ABORTED;
@@ -1069,18 +1085,26 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
     }
 }
 
-err_t TCPEndPoint::LwIPHandleDataReceived(void * arg, struct tcp_pcb * tpcb, struct pbuf * p, err_t err)
+err_t TCPEndPointImplLwIP::LwIPHandleDataReceived(void * arg, struct tcp_pcb * tpcb, struct pbuf * p, err_t _err)
 {
     err_t res = ERR_OK;
 
     if (arg != NULL)
     {
-        TCPEndPoint * ep                 = static_cast<TCPEndPoint *>(arg);
-        System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
+        TCPEndPointImplLwIP * ep     = static_cast<TCPEndPointImplLwIP *>(arg);
+        System::Layer * lSystemLayer = ep->Layer().SystemLayer();
 
         // Post callback to HandleDataReceived.
-        if (lSystemLayer->PostEvent(*ep, kInetEvent_TCPDataReceived, (uintptr_t) p) != CHIP_NO_ERROR)
+        ep->Retain();
+        CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, p] {
+            ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
+            ep->Release();
+        });
+        if (err != CHIP_NO_ERROR)
+        {
+            ep->Release();
             res = ERR_ABRT;
+        }
     }
     else
         res = ERR_ABRT;
@@ -1097,18 +1121,26 @@ err_t TCPEndPoint::LwIPHandleDataReceived(void * arg, struct tcp_pcb * tpcb, str
     return res;
 }
 
-err_t TCPEndPoint::LwIPHandleDataSent(void * arg, struct tcp_pcb * tpcb, u16_t len)
+err_t TCPEndPointImplLwIP::LwIPHandleDataSent(void * arg, struct tcp_pcb * tpcb, u16_t len)
 {
     err_t res = ERR_OK;
 
     if (arg != NULL)
     {
-        TCPEndPoint * ep                 = static_cast<TCPEndPoint *>(arg);
-        System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
+        TCPEndPointImplLwIP * ep     = static_cast<TCPEndPointImplLwIP *>(arg);
+        System::Layer * lSystemLayer = ep->Layer().SystemLayer();
 
         // Post callback to HandleDataReceived.
-        if (lSystemLayer->PostEvent(*ep, kInetEvent_TCPDataSent, (uintptr_t) len) != CHIP_NO_ERROR)
+        ep->Retain();
+        CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, len] {
+            ep->HandleDataSent(len);
+            ep->Release();
+        });
+        if (err != CHIP_NO_ERROR)
+        {
+            ep->Release();
             res = ERR_ABRT;
+        }
     }
     else
         res = ERR_ABRT;
@@ -1119,11 +1151,11 @@ err_t TCPEndPoint::LwIPHandleDataSent(void * arg, struct tcp_pcb * tpcb, u16_t l
     return res;
 }
 
-void TCPEndPoint::LwIPHandleError(void * arg, err_t lwipErr)
+void TCPEndPointImplLwIP::LwIPHandleError(void * arg, err_t lwipErr)
 {
     if (arg != NULL)
     {
-        TCPEndPoint * ep                 = static_cast<TCPEndPoint *>(arg);
+        TCPEndPointImplLwIP * ep         = static_cast<TCPEndPointImplLwIP *>(arg);
         System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
 
         // At this point LwIP has already freed the PCB.  Since the thread that owns the TCPEndPoint may
@@ -1135,8 +1167,13 @@ void TCPEndPoint::LwIPHandleError(void * arg, err_t lwipErr)
         ep->mLwIPEndPointType = LwIPEndPointType::Unknown;
 
         // Post callback to HandleError.
-        CHIP_ERROR err = chip::System::MapErrorLwIP(lwipErr);
-        lSystemLayer->PostEvent(*ep, kInetEvent_TCPError, static_cast<uintptr_t>(err.AsInteger()));
+        ep->Retain();
+        CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, conErr = System::MapErrorLwIP(lwipErr)] {
+            ep->HandleError(conErr);
+            ep->Release();
+        });
+        if (err != CHIP_NO_ERROR)
+            ep->Release();
     }
 }
 
@@ -1144,7 +1181,9 @@ void TCPEndPoint::LwIPHandleError(void * arg, err_t lwipErr)
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-CHIP_ERROR TCPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
+BitMapObjectPool<TCPEndPointImplSockets, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPointImplSockets::sPool;
+
+CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
 {
     CHIP_ERROR res = GetSocket(addrType);
 
@@ -1236,7 +1275,7 @@ CHIP_ERROR TCPEndPoint::BindImpl(IPAddressType addrType, const IPAddress & addr,
     return res;
 }
 
-CHIP_ERROR TCPEndPoint::ListenImpl(uint16_t backlog)
+CHIP_ERROR TCPEndPointImplSockets::ListenImpl(uint16_t backlog)
 {
     if (listen(mSocket, backlog) != 0)
     {
@@ -1258,7 +1297,7 @@ CHIP_ERROR TCPEndPoint::ListenImpl(uint16_t backlog)
     return res;
 }
 
-CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId)
+CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId)
 {
     IPAddressType addrType = addr.Type();
 
@@ -1362,8 +1401,7 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
     ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())
                              ->SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
 
-    // Once Connecting or Connected, bump the reference count.  The corresponding Release()
-    // [or on LwIP, DeferredRelease()] will happen in DoClose().
+    // Once Connecting or Connected, bump the reference count.  The corresponding Release() will happen in DoClose().
     Retain();
 
     if (conRes == 0)
@@ -1386,17 +1424,18 @@ CHIP_ERROR TCPEndPoint::ConnectImpl(const IPAddress & addr, uint16_t port, Inter
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const
+CHIP_ERROR TCPEndPointImplSockets::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const
 {
     return GetSocketInfo(getpeername, retAddr, retPort);
 }
 
-CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const
+CHIP_ERROR TCPEndPointImplSockets::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const
 {
     return GetSocketInfo(getsockname, retAddr, retPort);
 }
 
-CHIP_ERROR TCPEndPoint::GetSocketInfo(int getname(int, sockaddr *, socklen_t *), IPAddress * retAddr, uint16_t * retPort) const
+CHIP_ERROR TCPEndPointImplSockets::GetSocketInfo(int getname(int, sockaddr *, socklen_t *), IPAddress * retAddr,
+                                                 uint16_t * retPort) const
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -1428,7 +1467,7 @@ CHIP_ERROR TCPEndPoint::GetSocketInfo(int getname(int, sockaddr *, socklen_t *),
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
-CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
+CHIP_ERROR TCPEndPointImplSockets::GetInterfaceId(InterfaceId * retInterface)
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -1468,7 +1507,7 @@ CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
     return INET_ERROR_WRONG_ADDRESS_TYPE;
 }
 
-CHIP_ERROR TCPEndPoint::SendQueuedImpl(bool queueWasEmpty)
+CHIP_ERROR TCPEndPointImplSockets::SendQueuedImpl(bool queueWasEmpty)
 {
     if (queueWasEmpty)
     {
@@ -1478,7 +1517,7 @@ CHIP_ERROR TCPEndPoint::SendQueuedImpl(bool queueWasEmpty)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPEndPoint::EnableNoDelay()
+CHIP_ERROR TCPEndPointImplSockets::EnableNoDelay()
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -1494,7 +1533,7 @@ CHIP_ERROR TCPEndPoint::EnableNoDelay()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount)
+CHIP_ERROR TCPEndPointImplSockets::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount)
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -1529,7 +1568,7 @@ CHIP_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPEndPoint::DisableKeepAlive()
+CHIP_ERROR TCPEndPointImplSockets::DisableKeepAlive()
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -1543,7 +1582,7 @@ CHIP_ERROR TCPEndPoint::DisableKeepAlive()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPEndPoint::AckReceive(uint16_t len)
+CHIP_ERROR TCPEndPointImplSockets::AckReceive(uint16_t len)
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -1551,7 +1590,7 @@ CHIP_ERROR TCPEndPoint::AckReceive(uint16_t len)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPEndPoint::SetUserTimeoutImpl(uint32_t userTimeoutMillis)
+CHIP_ERROR TCPEndPointImplSockets::SetUserTimeoutImpl(uint32_t userTimeoutMillis)
 {
 #if defined(TCP_USER_TIMEOUT)
     // Set the user timeout
@@ -1566,15 +1605,7 @@ CHIP_ERROR TCPEndPoint::SetUserTimeoutImpl(uint32_t userTimeoutMillis)
 #endif // defined(TCP_USER_TIMEOUT)
 }
 
-void TCPEndPoint::InitImpl()
-{
-#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    mBytesWrittenSinceLastProbe = 0;
-    mLastTCPKernelSendQueueLen  = 0;
-#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-}
-
-CHIP_ERROR TCPEndPoint::DriveSendingImpl()
+CHIP_ERROR TCPEndPointImplSockets::DriveSendingImpl()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1695,7 +1726,7 @@ CHIP_ERROR TCPEndPoint::DriveSendingImpl()
     return err;
 }
 
-void TCPEndPoint::HandleConnectCompleteImpl()
+void TCPEndPointImplSockets::HandleConnectCompleteImpl()
 {
     // Wait for ability to read or write on this endpoint.
     CHIP_ERROR err = static_cast<System::LayerSockets *>(Layer().SystemLayer())->RequestCallbackOnPendingRead(mWatch);
@@ -1710,7 +1741,7 @@ void TCPEndPoint::HandleConnectCompleteImpl()
     }
 }
 
-void TCPEndPoint::DoCloseImpl(CHIP_ERROR err, State oldState)
+void TCPEndPointImplSockets::DoCloseImpl(CHIP_ERROR err, State oldState)
 {
     struct linger lingerStruct;
 
@@ -1755,30 +1786,26 @@ void TCPEndPoint::DoCloseImpl(CHIP_ERROR err, State oldState)
 }
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState)
+void TCPEndPointImplSockets::TCPUserTimeoutHandler()
 {
-    TCPEndPoint * tcpEndPoint = reinterpret_cast<TCPEndPoint *>(aAppState);
-
-    VerifyOrDie((aSystemLayer != nullptr) && (tcpEndPoint != nullptr));
-
     // Set the timer running flag to false
-    tcpEndPoint->mUserTimeoutTimerRunning = false;
+    mUserTimeoutTimerRunning = false;
 
     CHIP_ERROR err     = CHIP_NO_ERROR;
     bool isProgressing = false;
-    err                = tcpEndPoint->CheckConnectionProgress(isProgressing);
+    err                = CheckConnectionProgress(isProgressing);
     SuccessOrExit(err);
 
-    if (tcpEndPoint->mLastTCPKernelSendQueueLen == 0)
+    if (mLastTCPKernelSendQueueLen == 0)
     {
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
         // If the kernel TCP send queue as well as the TCPEndPoint
         // send queue have been flushed then notify application
         // that all data has been acknowledged.
 
-        if (tcpEndPoint->mSendQueue.IsNull())
+        if (mSendQueue.IsNull())
         {
-            tcpEndPoint->SetTCPSendIdleAndNotifyChange(true);
+            SetTCPSendIdleAndNotifyChange(true);
         }
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
     }
@@ -1791,7 +1818,7 @@ void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void
             // to shift it forward while also resetting the max
             // poll count.
 
-            tcpEndPoint->StartTCPUserTimeoutTimer();
+            StartTCPUserTimeoutTimer();
         }
         else
         {
@@ -1799,13 +1826,13 @@ void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void
             // Data flow is not progressing.
             // Decrement the remaining max TCP send queue polls.
 
-            tcpEndPoint->mTCPSendQueueRemainingPollCount--;
+            mTCPSendQueueRemainingPollCount--;
 
-            VerifyOrExit(tcpEndPoint->mTCPSendQueueRemainingPollCount != 0, err = INET_ERROR_TCP_USER_TIMEOUT);
+            VerifyOrExit(mTCPSendQueueRemainingPollCount != 0, err = INET_ERROR_TCP_USER_TIMEOUT);
 
             // Restart timer to poll again
 
-            tcpEndPoint->ScheduleNextTCPUserTimeoutPoll(tcpEndPoint->mTCPSendQueuePollPeriodMillis);
+            ScheduleNextTCPUserTimeoutPoll(mTCPSendQueuePollPeriodMillis);
 #else
             // Close the connection as the TCP UserTimeout has expired
 
@@ -1820,12 +1847,12 @@ exit:
     {
         // Close the connection as the TCP UserTimeout has expired
 
-        tcpEndPoint->DoClose(err, false);
+        DoClose(err, false);
     }
 }
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-CHIP_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId)
+CHIP_ERROR TCPEndPointImplSockets::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId)
 {
     // If we are trying to make a TCP connection over a 'specified target interface',
     // then we bind the TCPEndPoint to an IP address on that target interface
@@ -1879,7 +1906,7 @@ CHIP_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
+CHIP_ERROR TCPEndPointImplSockets::GetSocket(IPAddressType addrType)
 {
     if (mSocket == kInvalidSocketFd)
     {
@@ -1938,12 +1965,12 @@ CHIP_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
 }
 
 // static
-void TCPEndPoint::HandlePendingIO(System::SocketEvents events, intptr_t data)
+void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events, intptr_t data)
 {
-    reinterpret_cast<TCPEndPoint *>(data)->HandlePendingIO(events);
+    reinterpret_cast<TCPEndPointImplSockets *>(data)->HandlePendingIO(events);
 }
 
-void TCPEndPoint::HandlePendingIO(System::SocketEvents events)
+void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
 {
     // Prevent the end point from being freed while in the middle of a callback.
     Retain();
@@ -2005,7 +2032,7 @@ void TCPEndPoint::HandlePendingIO(System::SocketEvents events)
     Release();
 }
 
-void TCPEndPoint::ReceiveData()
+void TCPEndPointImplSockets::ReceiveData()
 {
     System::PacketBufferHandle rcvBuf;
     bool isNewBuf = true;
@@ -2149,10 +2176,10 @@ void TCPEndPoint::ReceiveData()
     DriveReceiving();
 }
 
-void TCPEndPoint::HandleIncomingConnection()
+void TCPEndPointImplSockets::HandleIncomingConnection()
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    TCPEndPoint * conEP = nullptr;
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    TCPEndPointImplSockets * conEP = nullptr;
     IPAddress peerAddr;
     uint16_t peerPort;
 
@@ -2206,7 +2233,9 @@ void TCPEndPoint::HandleIncomingConnection()
     {
         InetLayer & lInetLayer = Layer();
 
-        err = lInetLayer.NewTCPEndPoint(&conEP);
+        TCPEndPoint * connectEndPoint = nullptr;
+        err                           = lInetLayer.NewTCPEndPoint(&connectEndPoint);
+        conEP                         = static_cast<TCPEndPointImplSockets *>(connectEndPoint);
     }
 
     // If all went well...
@@ -2265,7 +2294,7 @@ void TCPEndPoint::HandleIncomingConnection()
  *  This function probes the TCP output queue and checks if data is successfully
  *  being transferred to the other end.
  */
-CHIP_ERROR TCPEndPoint::CheckConnectionProgress(bool & isProgressing)
+CHIP_ERROR TCPEndPointImplSockets::CheckConnectionProgress(bool & isProgressing)
 {
     int currPendingBytesRaw = 0;
     uint32_t currPendingBytes; // Will be initialized once we know it's safe.
@@ -2339,8 +2368,7 @@ CHIP_ERROR TCPEndPoint::Listen(uint16_t backlog)
 
     if (res == CHIP_NO_ERROR)
     {
-        // Once Listening, bump the reference count.  The corresponding call to Release()
-        // [or on LwIP, DeferredRelease()] will happen in DoClose().
+        // Once Listening, bump the reference count.  The corresponding call to Release() will happen in DoClose().
         Retain();
         mState = State::kListening;
     }
@@ -2477,9 +2505,7 @@ void TCPEndPoint::Free()
         Abort();
     }
 
-    // Release the Retain() that happened when the end point was allocated
-    // [on LwIP, the object may still be alive if DoClose() used the
-    // EndPointBasis::DeferredFree() method.]
+    // Release the Retain() that happened when the end point was allocated.
     Release();
 }
 
@@ -2539,11 +2565,9 @@ void TCPEndPoint::StopConnectTimer()
 void TCPEndPoint::TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState)
 {
     TCPEndPoint * tcpEndPoint = reinterpret_cast<TCPEndPoint *>(aAppState);
-
     VerifyOrDie((aSystemLayer != nullptr) && (tcpEndPoint != nullptr));
 
-    // Close Connection as we have timed out and Connect has not returned to
-    // stop this timer.
+    // Close Connection as we have timed out and Connect has not returned to stop this timer.
     tcpEndPoint->DoClose(INET_ERROR_TCP_CONNECT_TIMEOUT, false);
 }
 
@@ -2551,35 +2575,6 @@ bool TCPEndPoint::IsConnected(State state)
 {
     return state == State::kConnected || state == State::kSendShutdown || state == State::kReceiveShutdown ||
         state == State::kClosing;
-}
-
-void TCPEndPoint::Init(InetLayer * inetLayer)
-{
-    InitEndPointBasis(*inetLayer);
-
-    mReceiveEnabled = true;
-
-    // Initialize to zero for using system defaults.
-    mConnectTimeoutMsecs = 0;
-
-#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    mUserTimeoutMillis = INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC;
-
-    mUserTimeoutTimerRunning = false;
-
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    mIsTCPSendIdle = true;
-
-    mTCPSendQueuePollPeriodMillis = INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC;
-
-    mTCPSendQueueRemainingPollCount = MaxTCPSendQueuePolls();
-
-    OnTCPSendIdleChanged = NULL;
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
-#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-
-    InitImpl();
 }
 
 CHIP_ERROR TCPEndPoint::DriveSending()
@@ -2713,16 +2708,9 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
         }
 
         // Decrement the ref count that was added when the connection started (in Connect()) or listening started (in Listen()).
-        //
-        // When using LwIP, post a callback to Release() rather than calling it directly. Since up-calls
-        // from LwIP are delivered as events (via the LwIP* methods), we must ensure that all events have been
-        // cleared from the queue before the end point gets freed, otherwise we'll end up accessing freed memory.
-        // We achieve this by first preventing further up-calls from LwIP (via the call to tcp_abort() above)
-        // and then queuing the Release() call to happen after all existing events have been processed.
-        //
         if (oldState != State::kReady && oldState != State::kBound)
         {
-            DeferredFree(kReleaseDeferralErrorTactic_Ignore);
+            Release();
         }
     }
 
@@ -2783,6 +2771,14 @@ void TCPEndPoint::RestartTCPUserTimeoutTimer()
 {
     StopTCPUserTimeoutTimer();
     StartTCPUserTimeoutTimer();
+}
+
+// static
+void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState)
+{
+    TCPEndPoint * tcpEndPoint = reinterpret_cast<TCPEndPoint *>(aAppState);
+    VerifyOrDie((aSystemLayer != nullptr) && (tcpEndPoint != nullptr));
+    tcpEndPoint->TCPUserTimeoutHandler();
 }
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT

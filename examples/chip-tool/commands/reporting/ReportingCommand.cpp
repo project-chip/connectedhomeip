@@ -35,7 +35,7 @@ exit:
     return err;
 }
 
-void ReportingCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+void ReportingCommand::OnDeviceConnectedFn(void * context, chip::DeviceProxy * device)
 {
     ReportingCommand * command = reinterpret_cast<ReportingCommand *>(context);
     VerifyOrReturn(command != nullptr,

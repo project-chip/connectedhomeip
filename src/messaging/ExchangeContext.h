@@ -76,6 +76,8 @@ public:
 
     bool IsEncryptionRequired() const { return mDispatch->IsEncryptionRequired(); }
 
+    bool IsGroupExchangeContext() const { return (mSession.HasValue() && mSession.Value().IsGroupSession()); }
+
     /**
      *  Send a CHIP message on this exchange.
      *
@@ -244,15 +246,11 @@ private:
      * - set IDLE polling mode if all conditions are met:
      *   - device doesn't expect getting response nor sending message
      *   - there is no other active exchange than the current one
-     *   - active state is not forced (commissioning window is not opened)
      * - set ACTIVE polling mode if any of the conditions is met:
      *   - device expects getting response or sending message
      *   - there is another active exchange
-     *   - active state is forced (commissioning window is currently open)
-     *
-     * @param[in]  transportType  transport used by the exchange
      */
-    void UpdateSEDPollingMode(Transport::Type transportType);
+    void UpdateSEDPollingMode();
 };
 
 } // namespace Messaging

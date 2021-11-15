@@ -152,7 +152,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
         if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
         {
-            AttributePaths::Builder attributePathListBuilder = request.CreateAttributePathListBuilder();
+            AttributePathIBs::Builder attributePathListBuilder = request.CreateAttributePathListBuilder();
             SuccessOrExit(err = attributePathListBuilder.GetError());
             err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
                                             aReadPrepareParams.mAttributePathParamsListSize);
@@ -253,33 +253,17 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePaths::Builder & aAttributePathListBuilder,
+CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                                  AttributePathParams * apAttributePathParamsList,
                                                  size_t aAttributePathParamsListSize)
 {
     for (size_t index = 0; index < aAttributePathParamsListSize; index++)
     {
-        AttributePathIB::Builder attributePathBuilder = aAttributePathListBuilder.CreateAttributePath();
-        attributePathBuilder.Node(apAttributePathParamsList[index].mNodeId)
-            .Endpoint(apAttributePathParamsList[index].mEndpointId)
-            .Cluster(apAttributePathParamsList[index].mClusterId);
-        if (apAttributePathParamsList[index].mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
-        {
-            attributePathBuilder.Attribute(apAttributePathParamsList[index].mFieldId);
-        }
-
-        if (apAttributePathParamsList[index].mFlags.Has(AttributePathParams::Flags::kListIndexValid))
-        {
-            VerifyOrReturnError(apAttributePathParamsList[index].mFlags.Has(AttributePathParams::Flags::kFieldIdValid),
-                                CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-            attributePathBuilder.ListIndex(apAttributePathParamsList[index].mListIndex);
-        }
-
-        attributePathBuilder.EndOfAttributePathIB();
-        ReturnErrorOnFailure(attributePathBuilder.GetError());
+        VerifyOrReturnError(apAttributePathParamsList[index].IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+        ReturnErrorOnFailure(apAttributePathParamsList[index].BuildAttributePath(aAttributePathIBsBuilder.CreateAttributePath()));
     }
-    aAttributePathListBuilder.EndOfAttributePaths();
-    return aAttributePathListBuilder.GetError();
+    aAttributePathIBsBuilder.EndOfAttributePathIBs();
+    return aAttributePathIBsBuilder.GetError();
 }
 
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -345,13 +329,13 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportDataMessage::Parser report;
 
-    bool isEventReportsPresent      = false;
-    bool isAttributeDataListPresent = false;
-    bool suppressResponse           = false;
-    bool moreChunkedMessages        = false;
-    uint64_t subscriptionId         = 0;
+    bool isEventReportsPresent       = false;
+    bool isAttributeReportIBsPresent = false;
+    bool suppressResponse            = false;
+    bool moreChunkedMessages         = false;
+    uint64_t subscriptionId          = 0;
     EventReports::Parser EventReports;
-    AttributeDataList::Parser attributeDataList;
+    AttributeReportIBs::Parser attributeReportIBs;
     System::PacketBufferTLVReader reader;
 
     reader.Init(std::move(aPayload));
@@ -416,22 +400,21 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     {
         chip::TLV::TLVReader EventReportsReader;
         EventReports.GetReader(&EventReportsReader);
-        ChipLogProgress(DataManagement, "on event data is called!!!!!!!!!!!!!");
         mpCallback->OnEventData(this, EventReportsReader);
     }
 
-    err                        = report.GetAttributeDataList(&attributeDataList);
-    isAttributeDataListPresent = (err == CHIP_NO_ERROR);
+    err                         = report.GetAttributeReportIBs(&attributeReportIBs);
+    isAttributeReportIBsPresent = (err == CHIP_NO_ERROR);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
-    if (isAttributeDataListPresent && nullptr != mpCallback && !moreChunkedMessages)
+    if (isAttributeReportIBsPresent && nullptr != mpCallback && !moreChunkedMessages)
     {
-        chip::TLV::TLVReader attributeDataListReader;
-        attributeDataList.GetReader(&attributeDataListReader);
-        err = ProcessAttributeDataList(attributeDataListReader);
+        TLV::TLVReader attributeReportIBsReader;
+        attributeReportIBs.GetReader(&attributeReportIBsReader);
+        err = ProcessAttributeReportIBs(attributeReportIBsReader);
         SuccessOrExit(err);
     }
 
@@ -458,78 +441,79 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
     ShutdownInternal(CHIP_ERROR_TIMEOUT);
 }
 
-CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader)
+CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ClusterInfo & aClusterInfo)
+{
+    CHIP_ERROR err = aAttributePath.GetNode(&(aClusterInfo.mNodeId));
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+
+    // The ReportData must contain a concrete attribute path
+    err = aAttributePath.GetEndpoint(&(aClusterInfo.mEndpointId));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+
+    err = aAttributePath.GetCluster(&(aClusterInfo.mClusterId));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+
+    err = aAttributePath.GetAttribute(&(aClusterInfo.mAttributeId));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+
+    err = aAttributePath.GetListIndex(&(aClusterInfo.mListIndex));
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+    VerifyOrReturnError(aClusterInfo.IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeReportIBsReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    while (CHIP_NO_ERROR == (err = aAttributeDataListReader.Next()))
+    while (CHIP_NO_ERROR == (err = aAttributeReportIBsReader.Next()))
     {
-        chip::TLV::TLVReader dataReader;
-        AttributeDataElement::Parser element;
-        AttributePathIB::Parser attributePathParser;
+        TLV::TLVReader dataReader;
+        AttributeReportIB::Parser report;
+        AttributeDataIB::Parser data;
+        AttributeStatusIB::Parser status;
+        AttributePathIB::Parser path;
         ClusterInfo clusterInfo;
-        uint16_t statusU16 = 0;
-        auto status        = Protocols::InteractionModel::Status::Success;
+        StatusIB statusIB;
 
-        TLV::TLVReader reader = aAttributeDataListReader;
-        err                   = element.Init(reader);
-        SuccessOrExit(err);
+        TLV::TLVReader reader = aAttributeReportIBsReader;
+        ReturnErrorOnFailure(report.Init(reader));
 
-        err = element.GetAttributePath(&attributePathParser);
-        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
-        // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
-        // cluster info will be invalid / wildcard, it is safe ignore CHIP_END_OF_TLV directly.
-
-        err = attributePathParser.GetNode(&(clusterInfo.mNodeId));
-        if (err == CHIP_END_OF_TLV)
+        err = report.GetAttributeStatus(&status);
+        if (CHIP_NO_ERROR == err)
         {
-            err = CHIP_NO_ERROR;
+            StatusIB::Parser errorStatus;
+            ReturnErrorOnFailure(status.GetPath(&path));
+            ReturnErrorOnFailure(ProcessAttributePath(path, clusterInfo));
+            ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
+            ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
+            mpCallback->OnAttributeData(
+                this, ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId), nullptr,
+                statusIB);
         }
-        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
-        // The ReportData must contain a concrete attribute path
-
-        err = attributePathParser.GetEndpoint(&(clusterInfo.mEndpointId));
-        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
-        err = attributePathParser.GetCluster(&(clusterInfo.mClusterId));
-        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
-        err = attributePathParser.GetAttribute(&(clusterInfo.mFieldId));
-        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
-        err = attributePathParser.GetListIndex(&(clusterInfo.mListIndex));
-        if (CHIP_END_OF_TLV == err)
+        else if (CHIP_END_OF_TLV == err)
         {
-            err = CHIP_NO_ERROR;
+            ReturnErrorOnFailure(report.GetAttributeData(&data));
+            ReturnErrorOnFailure(data.GetPath(&path));
+            ReturnErrorOnFailure(ProcessAttributePath(path, clusterInfo));
+            ReturnErrorOnFailure(data.GetData(&dataReader));
+            mpCallback->OnAttributeData(
+                this, ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId), &dataReader,
+                statusIB);
         }
-        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
-        VerifyOrExit(clusterInfo.IsValidAttributePath(), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
-        err = element.GetData(&dataReader);
-        if (err == CHIP_END_OF_TLV)
-        {
-            // The spec requires that one of data or status code must exist, thus failure to read data and status code means we
-            // received malformed data from server.
-            SuccessOrExit(err = element.GetStatus(&statusU16));
-            status = static_cast<Protocols::InteractionModel::Status>(statusU16);
-        }
-        else if (err != CHIP_NO_ERROR)
-        {
-            ExitNow();
-        }
-        mpCallback->OnAttributeData(
-            this, ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mFieldId),
-            status == Protocols::InteractionModel::Status::Success ? &dataReader : nullptr, StatusIB(status));
     }
 
     if (CHIP_END_OF_TLV == err)
     {
         err = CHIP_NO_ERROR;
     }
-
-exit:
     return err;
 }
 
@@ -633,13 +617,15 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
     {
-        AttributePaths::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
+        AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
         SuccessOrExit(err = attributePathListBuilder.GetError());
         err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
                                         aReadPrepareParams.mAttributePathParamsListSize);
         SuccessOrExit(err);
     }
 
+    VerifyOrExit(aReadPrepareParams.mMinIntervalFloorSeconds < aReadPrepareParams.mMaxIntervalCeilingSeconds,
+                 err = CHIP_ERROR_INVALID_ARGUMENT);
     request.MinIntervalSeconds(aReadPrepareParams.mMinIntervalFloorSeconds)
         .MaxIntervalSeconds(aReadPrepareParams.mMaxIntervalCeilingSeconds)
         .KeepSubscriptions(aReadPrepareParams.mKeepSubscriptions)
@@ -664,10 +650,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        AbortExistingExchangeContext();
-    }
-    if (err != CHIP_NO_ERROR)
-    {
+        ChipLogError(DataManagement, "Failed to send subscribe request: %" CHIP_ERROR_FORMAT, err.Format());
         Shutdown();
     }
     return err;

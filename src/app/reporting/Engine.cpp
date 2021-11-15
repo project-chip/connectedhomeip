@@ -63,30 +63,23 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 }
 
 CHIP_ERROR
-Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeDataList::Builder & aAttributeDataList,
+Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
                             ClusterInfo & aClusterInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId);
-    AttributeDataElement::Builder attributeDataElementBuilder = aAttributeDataList.CreateAttributeDataElementBuilder();
-    AttributePathIB::Builder attributePathBuilder             = attributeDataElementBuilder.CreateAttributePath();
-    attributePathBuilder.Endpoint(aClusterInfo.mEndpointId)
-        .Cluster(aClusterInfo.mClusterId)
-        .Attribute(aClusterInfo.mFieldId)
-        .EndOfAttributePathIB();
-    err = attributePathBuilder.GetError();
-    SuccessOrExit(err);
+    ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
 
-    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aClusterInfo.mClusterId,
-                  aClusterInfo.mFieldId);
+    AttributeReportIB::Builder attributeReport = aAttributeReportIBs.CreateAttributeReport();
+
+    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aClusterInfo.mClusterId,
+                  aClusterInfo.mAttributeId);
 
     MatterPreAttributeReadCallback(path);
-    err = ReadSingleClusterData(aAccessingFabricIndex, path, attributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
+    err = ReadSingleClusterData(aAccessingFabricIndex, path, attributeReport);
     MatterPostAttributeReadCallback(path);
     SuccessOrExit(err);
-    attributeDataElementBuilder.MoreClusterData(false);
-    attributeDataElementBuilder.EndOfAttributeDataElement();
-    err = attributeDataElementBuilder.GetError();
+    attributeReport.EndOfAttributeReportIB();
+    err = attributeReport.GetError();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -98,14 +91,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Builder & aReportDataBuilder,
-                                                          ReadHandler * apReadHandler)
+CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & aReportDataBuilder,
+                                                           ReadHandler * apReadHandler)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     bool attributeClean = true;
     TLV::TLVWriter backup;
     aReportDataBuilder.Checkpoint(backup);
-    AttributeDataList::Builder attributeDataList = aReportDataBuilder.CreateAttributeDataListBuilder();
+    AttributeReportIBs::Builder AttributeReportIBs = aReportDataBuilder.CreateAttributeReportIBs();
     SuccessOrExit(err = aReportDataBuilder.GetError());
     // TODO: Need to handle multiple chunk of message
     for (auto clusterInfo = apReadHandler->GetAttributeClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
@@ -113,7 +106,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Bui
         if (apReadHandler->IsInitialReport())
         {
             // Retrieve data for this cluster instance and clear its dirty flag.
-            err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeDataList, *clusterInfo);
+            err = RetrieveClusterData(apReadHandler->GetFabricIndex(), AttributeReportIBs, *clusterInfo);
             VerifyOrExit(err == CHIP_NO_ERROR,
                          ChipLogError(DataManagement, "<RE:Run> Error retrieving data from cluster, aborting"));
             attributeClean = false;
@@ -124,11 +117,15 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Bui
             {
                 if (clusterInfo->IsAttributePathSupersetOf(*path))
                 {
-                    err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeDataList, *path);
+                    // SetDirty injects path into GlobalDirtySet path that don't have the particular nodeId,
+                    // need to inject nodeId from subscribed path here.
+                    ClusterInfo dirtyPath = *path;
+                    dirtyPath.mNodeId     = clusterInfo->mNodeId;
+                    err                   = RetrieveClusterData(apReadHandler->GetFabricIndex(), AttributeReportIBs, dirtyPath);
                 }
                 else if (path->IsAttributePathSupersetOf(*clusterInfo))
                 {
-                    err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeDataList, *clusterInfo);
+                    err = RetrieveClusterData(apReadHandler->GetFabricIndex(), AttributeReportIBs, *clusterInfo);
                 }
                 else
                 {
@@ -142,8 +139,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportDataMessage::Bui
             }
         }
     }
-    attributeDataList.EndOfAttributeDataList();
-    err = attributeDataList.GetError();
+    AttributeReportIBs.EndOfAttributeReportIBs();
+    err = AttributeReportIBs.GetError();
 
 exit:
     if (attributeClean || err != CHIP_NO_ERROR)
@@ -170,7 +167,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     VerifyOrExit(clusterInfoList != nullptr, );
     VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    EventReports = aReportDataBuilder.CreateEventReportsBuilder();
+    EventReports = aReportDataBuilder.CreateEventReports();
     SuccessOrExit(err = EventReports.GetError());
 
     memcpy(initialEvents, eventNumberList, sizeof(initialEvents));
@@ -278,7 +275,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         reportDataBuilder.SubscriptionId(subscriptionId);
     }
 
-    err = BuildSingleReportDataAttributeDataList(reportDataBuilder, apReadHandler);
+    err = BuildSingleReportDataAttributeReportIBs(reportDataBuilder, apReadHandler);
     SuccessOrExit(err);
 
     err = BuildSingleReportDataEventReports(reportDataBuilder, apReadHandler);

@@ -18,19 +18,8 @@
 
 #include <ExampleOTARequestor.h>
 
-#include <app-common/zap-generated/enums.h>
-#include <app/util/af-enums.h>
 #include <app/util/util.h>
-#include <controller/CHIPDevice.h>
-#include <lib/core/NodeId.h>
-#include <lib/support/BufferReader.h>
-#include <lib/support/Span.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <system/SystemClock.h>
-#include <transport/FabricTable.h>
-
-using chip::FabricInfo;
 
 ExampleOTARequestor ExampleOTARequestor::sInstance;
 
@@ -53,9 +42,8 @@ ExampleOTARequestor::ExampleOTARequestor()
     mProviderFabricIndex = chip::kUndefinedFabricIndex;
 }
 
-void ExampleOTARequestor::Init(chip::Controller::ControllerDeviceInitParams connectParams, uint32_t startDelayMs)
+void ExampleOTARequestor::Init(uint32_t startDelayMs)
 {
-    mConnectParams   = connectParams;
     mOtaStartDelayMs = startDelayMs;
 }
 
@@ -127,15 +115,4 @@ void ExampleOTARequestor::StartDelayTimerHandler(chip::System::Layer * systemLay
 {
     VerifyOrReturn(appState != nullptr);
     static_cast<ExampleOTARequestor *>(appState)->ConnectToProvider();
-}
-
-chip::FabricInfo * ExampleOTARequestor::GetProviderFabricInfo()
-{
-    if (mConnectParams.fabricsTable == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "FabricTable is null!");
-        return nullptr;
-    }
-
-    return mConnectParams.fabricsTable->FindFabricWithIndex(mProviderFabricIndex);
 }

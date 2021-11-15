@@ -25,8 +25,18 @@ tests:
       response:
           value:
               [
-                  { index: 1, inputType: 4, name: 12, description: 19 },
-                  { index: 2, inputType: 4, name: 12, description: 19 },
+                  {
+                      index: 1,
+                      inputType: 4,
+                      name: "exampleName",
+                      description: "exampleDescription",
+                  },
+                  {
+                      index: 2,
+                      inputType: 4,
+                      name: "exampleName",
+                      description: "exampleDescription",
+                  },
               ]
 
     - label: "Select Input Command"

@@ -58,7 +58,7 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/MessageDef/AttributeDataElement.h>
+#include <app/MessageDef/AttributeDataIB.h>
 #include <app/data-model/Encode.h>
 
 #include <limits>
@@ -867,8 +867,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
-        // List and structure not yet functionnal
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        err = encoder.Encode(DataModel::List<EndpointId>());
+
         // TO DO When list is functionnal.
         // Determined limit of otNeighborInfo list
         // pReadLength = sizeof(otNeighborInfo) * 20;
@@ -895,8 +895,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
-        // List not yet functionnal
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        err = encoder.Encode(DataModel::List<EndpointId>());
     }
     break;
 
@@ -1222,7 +1221,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id: {
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        err = encoder.Encode(DataModel::List<EndpointId>());
+
         // Stuct type nopt yet supported
         // if (otDatasetIsCommissioned(mOTInst))
         // {
@@ -1258,6 +1258,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id: {
+        err = encoder.Encode(DataModel::List<EndpointId>());
+
         // Structure not yet supported
         // if (otDatasetIsCommissioned(mOTInst))
         // {
@@ -1276,10 +1278,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
-        // List not yet supported
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
-        break;
+        err = encoder.Encode(DataModel::List<EndpointId>());
     }
+    break;
 
     default: {
         err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -1468,7 +1469,7 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDFastPollingMode(bool onOff)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint32_t interval;
+    ConnectivityManager::SEDPollingMode mode;
 
     if (onOff)
     {
@@ -1480,14 +1481,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDFastP
             mFastPollingConsumers--;
     }
 
-    if (mFastPollingConsumers > 0)
-    {
-        err = SetSEDPollingMode(ConnectivityManager::SEDPollingMode::Active);
-    }
-    else
-    {
-        err = SetSEDPollingMode(ConnectivityManager::SEDPollingMode::Idle);
-    }
+    mode = mFastPollingConsumers > 0 ? ConnectivityManager::SEDPollingMode::Active : ConnectivityManager::SEDPollingMode::Idle;
+
+    if (mPollingMode != mode)
+        err = SetSEDPollingMode(mode);
 
     return err;
 }
