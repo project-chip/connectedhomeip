@@ -19,7 +19,6 @@ import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tools.gni")
 
-# Todo: copy from examples/tv-app/linux but later will be moved to jni and upto java word
 shared_library("jni") {
 
   output_name = "libTvApp"
