@@ -21,15 +21,17 @@
  *      Implementation of JNI bridge for Tv App on Android.
  *
  */
+#include <app/server/java/AndroidAppServerWrapper.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
-#include <app/server/java/AndroidAppServerWrapper.h>
 
-jint JNI_OnLoad(JavaVM * jvm, void * reserved) {
+jint JNI_OnLoad(JavaVM * jvm, void * reserved)
+{
     return AndroidAppServerJNI_OnLoad(jvm, reserved);
 }
 
-void JNI_OnUnload(JavaVM * jvm, void * reserved) {
+void JNI_OnUnload(JavaVM * jvm, void * reserved)
+{
     return AndroidAppServerJNI_OnUnload(jvm, reserved);
 }
