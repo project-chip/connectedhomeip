@@ -11,6 +11,9 @@ RUN set -x \
     && cd ambd_sdk_with_chip_non_NDA \
     && git reset --hard ae7ff59 \
     && git submodule update --depth 1 --init --progress \
+    && cd project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/toolchain \
+    && cat asdk/asdk-9.3.0-linux-newlib-build-3483-x86_64.tar.bz2.part* > asdk/asdk-9.3.0-linux-newlib-build-3483-x86_64.tar.bz2 \
+    && mkdir -p linux && tar -jxvf asdk/asdk-9.3.0-linux-newlib-build-3483-x86_64.tar.bz2 -C linux/ \
     && : # last line
 
 ENV AMEBA_PATH=${AMEBA_DIR}/ambd_sdk_with_chip_non_NDA
