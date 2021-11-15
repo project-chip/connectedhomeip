@@ -6,6 +6,7 @@
 #import "CHIPCommandPayloadsObjc.h"
 
 {{#>CHIPCallbackBridge partial-type=""            }}DefaultSuccessCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="CommandStatus"}}CommandSuccessCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge partial-type="Octet_String"}}OctetStringAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge partial-type="Char_String" }}CharStringAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge partial-type="Boolean"     }}BooleanAttributeCallback{{/CHIPCallbackBridge}}

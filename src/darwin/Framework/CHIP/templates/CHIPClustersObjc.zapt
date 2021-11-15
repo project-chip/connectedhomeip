@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 - (void)read{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler;
 {{#if isWritableAttribute}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler;
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value responseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{#if isReportableAttribute}}
 - (void) subscribe{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval responseHandler:(ResponseHandler)responseHandler;

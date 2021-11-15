@@ -10,6 +10,8 @@ public:
     static void OnSuccessFn(void * context
       {{#if (isStrEqual partial-type "Command")}}
       , const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data
+      {{else if (isStrEqual partial-type "CommandStatus")}}
+      , const chip::app::DataModel::NullObjectType &
       {{else if (isStrEqual partial-type "List")}}
       , {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list
       {{else if partial-type}}
@@ -22,6 +24,8 @@ public:
 void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
   {{#if (isStrEqual partial-type "Command")}}
   , const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data
+  {{else if (isStrEqual partial-type "CommandStatus")}}
+  , const chip::app::DataModel::NullObjectType &
   {{else if (isStrEqual partial-type "List")}}
   , {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list
   {{else if partial-type}}
@@ -88,6 +92,8 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
     DispatchSuccess(context, @{ @"value": [NSData dataWithBytes: value.data() length: value.size()] });
     {{else if (isCharString partial-type)}}
     DispatchSuccess(context, @{ @"value": [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding] });
+    {{else if (isStrEqual partial-type "CommandStatus")}}
+    DispatchSuccess(context, nil);
     {{else if partial-type}}
     DispatchSuccess(context, @{ @"value": [NSNumber numberWith{{asObjectiveCNumberType name partial-type false}}:value] });
     {{else}}
