@@ -208,13 +208,15 @@ CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan 
 
     Crypto::P256ECDSASignature signature;
     Crypto::P256KeypairHSM keypair;
-    keypair.SetKeyId(DEV_ATTESTATION_KEY);
-    keypair.provisioned_key = true;
-    keypair.Initialize();
 
     VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSpanUsable(digest_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    keypair.SetKeyId(DEV_ATTESTATION_KEY);
+    keypair.provisioned_key = true;
+    keypair.Initialize();
+
     ReturnErrorOnFailure(keypair.ECDSA_sign_hash(digest_to_sign.data(), digest_to_sign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, out_signature_buffer);

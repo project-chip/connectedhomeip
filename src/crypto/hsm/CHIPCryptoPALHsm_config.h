@@ -60,8 +60,6 @@
 #define ENABLE_HSM_EC_KEY
 #define ENABLE_HSM_CASE_EPHEMERAL_KEY
 #define ENABLE_HSM_CASE_OPS_KEY
-/* Provision HSM with device attestation key before enabling ENABLE_HSM_DEVICE_ATTESTATION */
-//#define ENABLE_HSM_DEVICE_ATTESTATION
 #endif
 
 #if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_PBKDF2_SHA256))
