@@ -24,8 +24,8 @@ shared_library("jni") {
   sources = [ "SetupPayloadParser-JNI.cpp" ]
 
   deps = [
-    "//src/lib",
-    "//src/setup_payload",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
   ]
 
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"

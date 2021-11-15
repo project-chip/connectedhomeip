@@ -97,3 +97,14 @@ android_library("java") {
 java_prebuilt("android") {
   jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
 }
+
+group("default") {
+  deps = [
+    ":android",
+    ":jni",
+    ":java",
+    "${chip_root}/src/platform/android:java",
+    "${chip_root}/src/setup_payload/java",
+    "${chip_root}/src/app/server/java",
+  ]
+}
