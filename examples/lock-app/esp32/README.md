@@ -59,7 +59,7 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   Target Set
 
-    $ idf.py set-target esp32(or esp32c3)
+    \$ idf.py set-target esp32(or esp32c3)
 
 -   Configuration Options
 
