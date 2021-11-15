@@ -9142,8 +9142,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     DataModel::List<const HardwareFaultType> current;
@@ -9178,8 +9178,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000001;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     DataModel::List<const RadioFaultType> current;
@@ -9214,8 +9214,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000002;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     DataModel::List<const NetworkFaultType> current;
@@ -9249,8 +9249,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000003;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     BootReasonType bootReason;
@@ -9445,8 +9445,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 
     Structs::SoftwareFault::Type softwareFault;
@@ -10425,8 +10425,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
 
     ThreadConnectionStatus connectionStatus;
@@ -10727,8 +10727,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     uint16_t reasonCode;
@@ -10761,8 +10761,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000001;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     AssociationFailureCause associationFailure;
@@ -10796,8 +10796,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000002;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     WiFiConnectionStatus connectionStatus;
@@ -12295,8 +12295,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
 
     bool stateValue;
@@ -16430,8 +16430,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16458,8 +16458,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000001;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16486,8 +16486,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000002;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16514,8 +16514,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000003;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16542,8 +16542,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000004;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16570,8 +16570,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000005;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16598,8 +16598,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000006;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16626,8 +16626,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000007;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16654,8 +16654,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000008;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16682,8 +16682,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000009;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16710,8 +16710,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000A;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16738,8 +16738,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000B;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16766,8 +16766,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x0000000C;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16794,8 +16794,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000D;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16822,8 +16822,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000E;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16850,8 +16850,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000F;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16878,8 +16878,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000010;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -28766,8 +28766,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000001;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1;
