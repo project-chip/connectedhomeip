@@ -83,7 +83,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
 
         ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()),
                                                chip::TLV::ContextTag(chip::to_underlying(AttributeDataIB::Tag::kData)), value));
-        attributeData.DataVersion(0);
+        attributeData.DataVersion(0).EndOfAttributeDataIB();
         return CHIP_NO_ERROR;
     }
     else

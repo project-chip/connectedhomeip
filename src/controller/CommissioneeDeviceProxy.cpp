@@ -90,19 +90,6 @@ void CommissioneeDeviceProxy::OnNewConnection(SessionHandle session)
 {
     mState = ConnectionState::SecureConnected;
     mSecureSession.SetValue(session);
-
-    // Reset the message counters here because this is the first time we get a handle to the secure session.
-    // Since CHIPDevices can be serialized/deserialized in the middle of what is conceptually a single PASE session
-    // we need to restore the session counters along with the session information.
-    Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
-    VerifyOrReturn(secureSession != nullptr);
-    MessageCounter & localCounter = secureSession->GetSessionMessageCounter().GetLocalMessageCounter();
-    if (localCounter.SetCounter(mLocalMessageCounter) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Unable to restore local counter to %" PRIu32, mLocalMessageCounter);
-    }
-    Transport::PeerMessageCounter & peerCounter = secureSession->GetSessionMessageCounter().GetPeerMessageCounter();
-    peerCounter.SetCounter(mPeerMessageCounter);
 }
 
 void CommissioneeDeviceProxy::OnConnectionExpired(SessionHandle session)

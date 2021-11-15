@@ -17,7 +17,7 @@
  */
 
 /**
- *  LwIP implementation of EndPointBase.
+ *  Shared state for LwIP implementations of TCPEndPoint and UDPEndPoint.
  */
 
 #pragma once
@@ -32,12 +32,10 @@ struct tcp_pcb;
 namespace chip {
 namespace Inet {
 
-class DLL_EXPORT EndPointImplLwIP : public EndPointBase
+class DLL_EXPORT EndPointStateLwIP
 {
 protected:
-    EndPointImplLwIP(InetLayer & inetLayer, void * appState = nullptr) :
-        EndPointBase(inetLayer, appState), mLwIPEndPointType(LwIPEndPointType::Unknown)
-    {}
+    EndPointStateLwIP() : mLwIPEndPointType(LwIPEndPointType::Unknown) {}
 
     /** Encapsulated LwIP protocol control block */
     union
@@ -58,8 +56,6 @@ protected:
         TCP     = 2
     } mLwIPEndPointType;
 };
-
-using EndPointBasis = EndPointImplLwIP;
 
 } // namespace Inet
 } // namespace chip
