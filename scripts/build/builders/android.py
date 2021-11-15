@@ -142,7 +142,7 @@ class AndroidBuilder(Builder):
         libs_dir = os.path.join(
             self.root, 'src/android/', self.app.AppName(), 'app/libs')
         self._Execute(['mkdir', '-p', jnilibs_dir],
-                        title='Prepare Native libs ' + self.identifier)
+                      title='Prepare Native libs ' + self.identifier)
 
         # TODO: Runtime dependencies should be computed by the build system rather than hardcoded
         # GN supports getting these dependencies like:
@@ -173,7 +173,7 @@ class AndroidBuilder(Builder):
         libs_dir = os.path.join(
             self.root, 'examples', self.app.ExampleName(), 'android/App/app/libs')
         self._Execute(['mkdir', '-p', jnilibs_dir],
-                        title='Prepare Native libs ' + self.identifier)
+                      title='Prepare Native libs ' + self.identifier)
 
         for libName in ['libSetupPayloadParser.so', 'libc++_shared.so', 'libTvApp.so']:
             self._Execute(['cp', os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(
@@ -194,22 +194,22 @@ class AndroidBuilder(Builder):
         # App compilation
         self._Execute([
             '%s/src/android/%s/gradlew' % (self.root,
-                                            self.app.AppName()), '-p',
+                                           self.app.AppName()), '-p',
             '%s/src/android/%s' % (self.root,
-                                    self.app.AppName()),
+                                   self.app.AppName()),
             '-PmatterBuildSrcDir=%s' % self.output_dir,
             '-PmatterSdkSourceBuild=false',
             '-PbuildDir=%s' % self.output_dir, 'assembleDebug'
         ],
             title='Building APP ' + self.identifier)
-        
+
     def gradlewBuildExampleAndroid(self):
         # Example compilation
         self._Execute([
             '%s/examples/%s/android/App/gradlew' % (self.root,
-                                         self.app.ExampleName()), '-p',
+                                                    self.app.ExampleName()), '-p',
             '%s/examples/%s/android/App/' % (self.root,
-                                 self.app.ExampleName()),
+                                             self.app.ExampleName()),
             '-PmatterBuildSrcDir=%s' % self.output_dir,
             '-PmatterSdkSourceBuild=false',
             '-PbuildDir=%s' % self.output_dir, 'assembleDebug'
@@ -254,7 +254,8 @@ class AndroidBuilder(Builder):
 
             exampleName = self.app.ExampleName()
             if exampleName is not None:
-                gn_gen += ['--root=%s/examples/%s/android/' % (self.root, exampleName)]
+                gn_gen += ['--root=%s/examples/%s/android/' %
+                           (self.root, exampleName)]
 
             if self.board.IsIde():
                 gn_gen += ['--ide=json',
@@ -298,7 +299,7 @@ class AndroidBuilder(Builder):
         else:
             self._Execute(['ninja', '-C', self.output_dir],
                           title='Building JNI ' + self.identifier)
-                        
+
             exampleName = self.app.ExampleName()
             if exampleName is None:
                 self.copyToSrcAndroid()
