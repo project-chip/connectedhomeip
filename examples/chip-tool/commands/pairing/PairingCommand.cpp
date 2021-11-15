@@ -425,11 +425,13 @@ CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
 {
     ChipLogProgress(chipTool, "OnAddressUpdateComplete: %" PRIx64 ": %s", nodeId, ErrorStr(err));
-    if (err != CHIP_NO_ERROR && nodeId == mNodeId)
+    if (err != CHIP_NO_ERROR)
     {
-        // Set exit status only if the address update failed.
-        // Otherwise wait for OnCommissioningComplete() callback.
-        SetCommandExitStatus(err);
+        // For some devices, it may take more time to appear on the network and become discoverable
+        // over DNS-SD, so don't give up on failure and restart the address update. Note that this
+        // will not be repeated endlessly as each chip-tool command has a timeout (in the case of
+        // the `pairing` command it equals 120s).
+        UpdateNetworkAddress();
     }
 }
 
