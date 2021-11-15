@@ -157,6 +157,7 @@ private:
         AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
     };
 
+    static void OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState);
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
     CHIP_ERROR RefreshSubscribeSyncTimer();
     CHIP_ERROR SendSubscribeResponse();

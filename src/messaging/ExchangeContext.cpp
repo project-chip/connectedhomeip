@@ -124,12 +124,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // an error arising below. at the end, we have to close it.
     ExchangeHandle ref(*this);
 
-    // If sending via UDP and NoAutoRequestAck send flag is not specificed,
-    // request reliable transmission.
-    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
-    // Treat unknown peer address as "not UDP", because we have no idea whether
-    // it's safe to do MRP there.
-    bool isUDPTransport = peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
+    bool isUDPTransport = IsUDPTransport();
 
     // this check is ignored by the ExchangeMsgDispatch if !AutoRequestAck()
     bool reliableTransmissionRequested = isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
@@ -499,6 +494,16 @@ void ExchangeContext::MessageHandled()
     }
 
     Close();
+}
+
+bool ExchangeContext::IsUDPTransport()
+{
+    // If sending via UDP and NoAutoRequestAck send flag is not specificed,
+    // request reliable transmission.
+    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    // Treat unknown peer address as "not UDP", because we have no idea whether
+    // it's safe to do MRP there.
+    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
 }
 
 } // namespace Messaging

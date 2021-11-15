@@ -541,9 +541,18 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
 CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 {
     CancelLivenessCheckTimer();
+    System::Clock::Timeout timeout =
+        std::chrono::duration_cast<std::chrono::milliseconds>(System::Clock::Seconds16(mMaxIntervalCeilingSeconds));
+    if (mpExchangeCtx != nullptr && mpExchangeCtx->IsUDPTransport())
+    {
+        System::Clock::Timeout margin = System::Clock::Milliseconds32((CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1) *
+                                                                      mpExchangeCtx->GetIdleRetransmitTimeoutTick());
+        timeout                       = timeout + margin;
+    }
+
     ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %d seconds", mMaxIntervalCeilingSeconds);
     CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        System::Clock::Seconds16(mMaxIntervalCeilingSeconds), OnLivenessTimeoutCallback, this);
+        timeout, OnLivenessTimeoutCallback, this);
 
     if (err != CHIP_NO_ERROR)
     {

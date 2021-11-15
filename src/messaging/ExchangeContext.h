@@ -165,6 +165,7 @@ public:
     void Abort();
 
     void SetResponseTimeout(Timeout timeout);
+    bool IsUDPTransport();
 
 private:
     Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
