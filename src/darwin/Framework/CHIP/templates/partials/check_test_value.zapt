@@ -37,7 +37,7 @@
     {{else if (isCharString type)}}
       XCTAssertTrue([{{actual}} isEqualToString:@"{{expected}}"]);
     {{else}}
-      XCTAssertEqual([{{actual}} {{asObjectiveCNumberType "" type true}}Value], {{expected}}{{asTypeLiteralSuffix type}});
+      XCTAssertEqual([{{actual}} {{asObjectiveCNumberType "" type true}}Value], {{asTypeLiteralSuffix expected type}});
     {{/if}}
   {{/if_is_struct}}
 {{/if}}
