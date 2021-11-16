@@ -290,7 +290,7 @@ class ClusterEventDescriptor:
         writer = tlv.TLVWriter()
         wrapped_value = cls._cluster_object(Value=value)
         cls.event_type.PutFieldToTLV(tag,
-                                         asdict(wrapped_value)['Value'], writer, '')
+                                     asdict(wrapped_value)['Value'], writer, '')
         return writer.encoding
 
     @classmethod
@@ -320,15 +320,14 @@ class ClusterEventDescriptor:
         return make_dataclass('InternalClass',
                               [
                                   ('Value', List[cls.event_type.Type]
-                                  if cls.event_type.IsArray else cls.event_type.Type, field(default=None)),
+                                   if cls.event_type.IsArray else cls.event_type.Type, field(default=None)),
                                   ('descriptor', ClassVar[ClusterObjectDescriptor],
                                    field(
                                        default=ClusterObjectDescriptor(
                                            Fields=[ClusterObjectFieldDescriptor(
                                                Label='Value', Tag=0, Type=cls.event_type.Type, IsArray=cls.event_type.IsArray)]
                                        )
-                                   )
-                                   )
+                                  )
+                                  )
                               ],
                               bases=(ClusterObject,))
-
