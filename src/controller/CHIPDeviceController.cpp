@@ -109,7 +109,8 @@ constexpr uint32_t kSessionEstablishmentTimeout = 40 * kMillisecondsPerSecond;
 
 DeviceController::DeviceController() :
     mOpenPairingSuccessCallback(OnOpenPairingWindowSuccessResponse, this),
-    mOpenPairingFailureCallback(OnOpenPairingWindowFailureResponse, this)
+    mOpenPairingFailureCallback(OnOpenPairingWindowFailureResponse, this), mPIDReadCallback(OnPIDReadResponse, this),
+    mVIDReadCallback(OnVIDReadResponse, this), mVIDPIDReadFailureCallback(OnVIDPIDReadFailureResponse, this)
 {
     mState                    = State::NotInitialized;
     mStorageDelegate          = nullptr;
@@ -353,6 +354,45 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
     return CHIP_NO_ERROR;
 }
 
+void DeviceController::OnPIDReadResponse(void * context, uint16_t value)
+{
+    ChipLogProgress(Controller, "Received PID for the device. Value %d", value);
+    DeviceController * controller       = reinterpret_cast<DeviceController *>(context);
+    controller->mSetupPayload.productID = value;
+
+    if (controller->OpenCommissioningWindowInternal() != CHIP_NO_ERROR)
+    {
+        OnOpenPairingWindowFailureResponse(context, 0);
+    }
+}
+
+void DeviceController::OnVIDReadResponse(void * context, uint16_t value)
+{
+    ChipLogProgress(Controller, "Received VID for the device. Value %d", value);
+
+    DeviceController * controller = reinterpret_cast<DeviceController *>(context);
+
+    controller->mSetupPayload.vendorID = value;
+
+    OperationalDeviceProxy * device =
+        controller->mCASESessionManager->FindExistingSession(controller->mDeviceWithCommissioningWindowOpen);
+    VerifyOrReturn(device != nullptr, ChipLogError(Controller, "Could not find device for opening commissioning window"));
+
+    constexpr EndpointId kBasicClusterEndpoint = 0;
+    chip::Controller::BasicCluster cluster;
+    cluster.Associate(device, kBasicClusterEndpoint);
+
+    Callback::Cancelable * successCallback = controller->mPIDReadCallback.Cancel();
+    Callback::Cancelable * failureCallback = controller->mVIDPIDReadFailureCallback.Cancel();
+    cluster.ReadAttributeProductID(successCallback, failureCallback);
+}
+
+void DeviceController::OnVIDPIDReadFailureResponse(void * context, uint8_t status)
+{
+    ChipLogProgress(Controller, "Failed to read VID/PID for the device. status %d", status);
+    OnOpenPairingWindowFailureResponse(context, status);
+}
+
 void DeviceController::OnOpenPairingWindowSuccessResponse(void * context)
 {
     ChipLogProgress(Controller, "Successfully opened pairing window on the device");
@@ -372,8 +412,7 @@ void DeviceController::OnOpenPairingWindowFailureResponse(void * context, uint8_
     if (controller->mCommissioningWindowCallback != nullptr)
     {
         CHIP_ERROR error = CHIP_ERROR_INVALID_PASE_PARAMETER;
-        // TODO - Use cluster enum chip::app::Clusters::AdministratorCommissioning::StatusCode::kBusy
-        if (status == 1)
+        if (status == EmberAfStatusCode::EMBER_ZCL_STATUS_CODE_BUSY)
         {
             error = CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS;
         }
@@ -395,35 +434,61 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
                                                                  uint16_t discriminator, uint8_t option,
                                                                  Callback::Callback<OnOpenCommissioningWindow> * callback)
 {
-    ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, deviceId);
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    mSetupPayload = SetupPayload();
 
-    OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(deviceId);
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mSetupPayload.version               = 0;
+    mSetupPayload.discriminator         = discriminator;
+    mSetupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
 
-    std::string QRCode;
-    std::string manualPairingCode;
-    SetupPayload payload;
-    CommissioningWindowOption commissioningWindowOption;
-    ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
-
-    payload.discriminator = discriminator;
+    mCommissioningWindowCallback       = callback;
+    mDeviceWithCommissioningWindowOpen = deviceId;
+    mCommissioningWindowTimeout        = timeout;
+    mCommissioningWindowIteration      = iteration;
 
     switch (option)
     {
     case 0:
-        commissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
+        mCommissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
         break;
     case 1:
-        commissioningWindowOption = CommissioningWindowOption::kTokenWithRandomPIN;
+        mCommissioningWindowOption = CommissioningWindowOption::kTokenWithRandomPIN;
         break;
     case 2:
-        commissioningWindowOption = CommissioningWindowOption::kTokenWithProvidedPIN;
+        mCommissioningWindowOption = CommissioningWindowOption::kTokenWithProvidedPIN;
         break;
     default:
         ChipLogError(Controller, "Invalid Pairing Window option");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    if (callback != nullptr && option != 0)
+    {
+        OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(mDeviceWithCommissioningWindowOpen);
+        VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+        constexpr EndpointId kBasicClusterEndpoint = 0;
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(device, kBasicClusterEndpoint);
+
+        Callback::Cancelable * successCallback = mVIDReadCallback.Cancel();
+        Callback::Cancelable * failureCallback = mVIDPIDReadFailureCallback.Cancel();
+        return cluster.ReadAttributeVendorID(successCallback, failureCallback);
+    }
+
+    return OpenCommissioningWindowInternal();
+}
+
+CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
+{
+    ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, mDeviceWithCommissioningWindowOpen);
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+
+    OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(mDeviceWithCommissioningWindowOpen);
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    std::string QRCode;
+    std::string manualPairingCode;
+    ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
 
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
@@ -433,16 +498,13 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
     Callback::Cancelable * successCallback = mOpenPairingSuccessCallback.Cancel();
     Callback::Cancelable * failureCallback = mOpenPairingFailureCallback.Cancel();
 
-    payload.version               = 0;
-    payload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
-
-    mCommissioningWindowCallback = callback;
-    if (commissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
+    if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
-        bool randomSetupPIN = (commissioningWindowOption == CommissioningWindowOption::kTokenWithRandomPIN);
+        bool randomSetupPIN = (mCommissioningWindowOption == CommissioningWindowOption::kTokenWithRandomPIN);
         PASEVerifier verifier;
 
-        ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, iteration, salt, randomSetupPIN, payload.setUpPINCode));
+        ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, mCommissioningWindowIteration, salt, randomSetupPIN,
+                                                               mSetupPayload.setUpPINCode));
 
         uint8_t serializedVerifier[2 * kSpake2p_WS_Length];
         VerifyOrReturnError(sizeof(serializedVerifier) == sizeof(verifier), CHIP_ERROR_INTERNAL);
@@ -450,23 +512,20 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
         memcpy(serializedVerifier, verifier.mW0, kSpake2p_WS_Length);
         memcpy(&serializedVerifier[kSpake2p_WS_Length], verifier.mL, kSpake2p_WS_Length);
 
-        ReturnErrorOnFailure(cluster.OpenCommissioningWindow(successCallback, failureCallback, timeout,
-                                                             ByteSpan(serializedVerifier, sizeof(serializedVerifier)),
-                                                             payload.discriminator, iteration, salt, mPAKEVerifierID++));
+        ReturnErrorOnFailure(cluster.OpenCommissioningWindow(
+            successCallback, failureCallback, mCommissioningWindowTimeout, ByteSpan(serializedVerifier, sizeof(serializedVerifier)),
+            mSetupPayload.discriminator, mCommissioningWindowIteration, salt, mPAKEVerifierID++));
 
-        ReturnErrorOnFailure(ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode));
+        ReturnErrorOnFailure(ManualSetupPayloadGenerator(mSetupPayload).payloadDecimalStringRepresentation(manualPairingCode));
         ChipLogProgress(Controller, "Manual pairing code: [%s]", manualPairingCode.c_str());
 
-        ReturnErrorOnFailure(QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode));
+        ReturnErrorOnFailure(QRCodeSetupPayloadGenerator(mSetupPayload).payloadBase38Representation(QRCode));
         ChipLogProgress(Controller, "SetupQRCode: [%s]", QRCode.c_str());
     }
     else
     {
-        ReturnErrorOnFailure(cluster.OpenBasicCommissioningWindow(successCallback, failureCallback, timeout));
+        ReturnErrorOnFailure(cluster.OpenBasicCommissioningWindow(successCallback, failureCallback, mCommissioningWindowTimeout));
     }
-
-    mSetupPayload                      = payload;
-    mDeviceWithCommissioningWindowOpen = deviceId;
 
     return CHIP_NO_ERROR;
 }

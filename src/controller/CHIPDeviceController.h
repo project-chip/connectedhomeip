@@ -396,10 +396,25 @@ private:
     Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
     Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
 
+    Callback::Callback<Int16uAttributeCallback> mPIDReadCallback;
+    Callback::Callback<Int16uAttributeCallback> mVIDReadCallback;
+    Callback::Callback<DefaultFailureCallback> mVIDPIDReadFailureCallback;
+
+    static void OnPIDReadResponse(void * context, uint16_t value);
+    static void OnVIDReadResponse(void * context, uint16_t value);
+    static void OnVIDPIDReadFailureResponse(void * context, uint8_t status);
+
+    CHIP_ERROR OpenCommissioningWindowInternal();
+
     // TODO - Support opening commissioning window simultaneously on multiple devices
     Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
     SetupPayload mSetupPayload;
     NodeId mDeviceWithCommissioningWindowOpen;
+
+    uint16_t mCommissioningWindowTimeout;
+    uint16_t mCommissioningWindowIteration;
+
+    CommissioningWindowOption mCommissioningWindowOption;
 
     static void OnOpenPairingWindowSuccessResponse(void * context);
     static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
