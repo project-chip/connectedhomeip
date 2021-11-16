@@ -143,7 +143,8 @@ public:
 
     Transport::SecureSession * GetSecureSession(SessionHandle session);
 
-    /// @brief Set the delegate for handling incoming messages. There can be only one message delegate (probably the ExchangeManager)
+    /// @brief Set the delegate for handling incoming messages. There can be only one message delegate (probably the
+    /// ExchangeManager)
     void SetMessageDelegate(SessionMessageDelegate * cb) { mCB = cb; }
 
     /// @brief Set the delegate for handling session creation.
