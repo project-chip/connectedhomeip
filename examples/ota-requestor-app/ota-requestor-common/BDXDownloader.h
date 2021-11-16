@@ -20,16 +20,20 @@
 #include <protocols/bdx/BdxTransferSession.h>
 #include <protocols/bdx/TransferFacilitator.h>
 
+#include "../linux/OTAImageProcessorLinux.h"
+
 #pragma once
 
 class BdxDownloader : public chip::bdx::Initiator
 {
 public:
+    BdxDownloader() { mImageProcessor = chip::Platform::New<chip::OTAImageProcessorLinux>(); }
     void SetInitialExchange(chip::Messaging::ExchangeContext * ec);
 
 private:
     // inherited from bdx::Endpoint
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event);
 
+    chip::OTAImageProcessorInterface * mImageProcessor;
     bool mIsTransferComplete = false;
 };

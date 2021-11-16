@@ -18,6 +18,7 @@
 #include "BDXDownloader.h"
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <protocols/bdx/BdxTransferSession.h>
@@ -25,6 +26,8 @@
 #include <fstream>
 
 using namespace chip::bdx;
+using chip::ByteSpan;
+using chip::OTAImageProcessorParams;
 
 uint32_t numBlocksRead   = 0;
 const char outFilePath[] = "test-ota-out.txt";
@@ -48,6 +51,9 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
     case TransferSession::OutputEventType::kNone:
         if (mIsTransferComplete)
         {
+            err = mImageProcessor->Finalize();
+            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "Finalize failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
             ChipLogDetail(BDX, "Transfer complete! Contents written/appended to %s", outFilePath);
             mTransfer.Reset();
             mIsTransferComplete = false;
@@ -69,16 +75,29 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "SendMessage failed: %" CHIP_ERROR_FORMAT, err.Format()));
         break;
     }
-    case TransferSession::OutputEventType::kAcceptReceived:
+    case TransferSession::OutputEventType::kAcceptReceived: {
+        OTAImageProcessorParams params = {
+            .imageFile = outFilePath,
+            .downloadedBytes = 0,
+            // TODO: Set this to Length field of ReceiveAccept
+            .totalFileBytes = 0,
+        };
+        mImageProcessor->SetOTAImageProcessorParams(params);
+
+        err = mImageProcessor->PrepareDownload();
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "PrepareDownload failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
         VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlockQuery(), ChipLogError(BDX, "PrepareBlockQuery failed"));
         break;
+    }
     case TransferSession::OutputEventType::kBlockReceived: {
         ChipLogDetail(BDX, "Got block length %zu", event.blockdata.Length);
 
-        // TODO: something more elegant than appending to a local file
-        // TODO: while convenient, we should not do a synchronous block write in our example application - this is bad practice
-        std::ofstream otaFile(outFilePath, std::ifstream::out | std::ifstream::ate | std::ifstream::app);
-        otaFile.write(reinterpret_cast<const char *>(event.blockdata.Data), static_cast<std::streamsize>(event.blockdata.Length));
+        ByteSpan block(event.blockdata.Data, event.blockdata.Length);
+        err = mImageProcessor->ProcessBlock(block);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "ProcessBlock failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
+        ChipLogProgress(BDX, "Percent downloaded: %u%%", mImageProcessor->GetPercentComplete());
 
         if (event.blockdata.IsEof)
         {

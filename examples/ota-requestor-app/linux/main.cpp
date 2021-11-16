@@ -62,7 +62,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 // TODO: would be nicer to encapsulate these globals and the callbacks in some sort of class
 ExchangeContext * exchangeCtx = nullptr;
-BdxDownloader bdxDownloader;
+BdxDownloader * bdxDownloader;
 Callback<OnDeviceConnected> mOnConnectedCallback(OnConnected, nullptr);
 Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback(OnConnectionFailure, nullptr);
 
@@ -131,7 +131,7 @@ void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableTyp
         chip::Optional<chip::SessionHandle> session    = operationalDeviceProxy->GetSecureSession();
         if (exchangeMgr != nullptr && session.HasValue())
         {
-            exchangeCtx = exchangeMgr->NewContext(session.Value(), &bdxDownloader);
+            exchangeCtx = exchangeMgr->NewContext(session.Value(), bdxDownloader);
         }
 
         if (exchangeCtx == nullptr)
@@ -141,10 +141,10 @@ void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableTyp
         }
     }
 
-    bdxDownloader.SetInitialExchange(exchangeCtx);
+    bdxDownloader->SetInitialExchange(exchangeCtx);
 
     // This will kick of a timer which will regularly check for updates to the bdx::TransferSession state machine.
-    bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions,
+    bdxDownloader->InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions,
                                    chip::System::Clock::Seconds16(20));
 }
 
@@ -345,6 +345,8 @@ int main(int argc, char * argv[])
 
     // This will allow ExampleOTARequestor to call SendQueryImageCommand
     ExampleOTARequestor::GetInstance().SetConnectToProviderCallback(SendQueryImageCommand);
+
+    bdxDownloader = chip::Platform::New<BdxDownloader>();
 
     // If a delay is provided, QueryImage after the timer expires
     if (delayQueryTimeInSec > 0)
