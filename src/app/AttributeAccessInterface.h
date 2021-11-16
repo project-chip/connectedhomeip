@@ -18,8 +18,9 @@
 
 #pragma once
 
+#include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/MessageDef/AttributeDataIB.h>
+#include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h> // So we can encode lists
@@ -41,23 +42,135 @@
 namespace chip {
 namespace app {
 
-class AttributeValueEncoder : protected TagBoundEncoder
+/**
+ * The AttributeVValueEncoder is a helper class for filling report payloads into AttributeReportIBs.
+ * The attribute value encoder can be initialized with a AttributeEncodeState for saving and recovering its state between encode
+ * sessions (chunkings).
+ *
+ * When Encode returned recoverable errors (e.g. CHIP_ERROR_NO_MEMORY) the state can be used to initialize the AttributeValueEncoder
+ * for future use on the same attribute path.
+ */
+class AttributeValueEncoder
 {
 public:
-    AttributeValueEncoder(TLV::TLVWriter * aWriter, FabricIndex aAccessingFabricIndex) :
-        TagBoundEncoder(aWriter, TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData))),
-        mAccessingFabricIndex(aAccessingFabricIndex)
+    class ListEncodeHelper
+    {
+    public:
+        ListEncodeHelper(AttributeValueEncoder & encoder) : mAttributeValueEncoder(&encoder) {}
+
+        template <typename... Ts>
+        CHIP_ERROR Encode(Ts... aArgs) const
+        {
+            return mAttributeValueEncoder->EncodeListItem(std::forward<Ts>(aArgs)...);
+        }
+
+    private:
+        AttributeValueEncoder * mAttributeValueEncoder;
+    };
+
+    class AttributeEncodeState
+    {
+    public:
+        AttributeEncodeState() : mAllowPartialData(false), mCurrentEncodingListIndex(kInvalidListIndex) {}
+        bool AllowPartialData() const { return mAllowPartialData; }
+
+    private:
+        friend class AttributeValueEncoder;
+
+        bool mAllowPartialData              = false;
+        ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
+    };
+
+    AttributeValueEncoder(AttributeReportIBs::Builder & aAttributeReportIBsBuilder, FabricIndex aAccessingFabricIndex,
+                          const ConcreteAttributePath & aPath, DataVersion aDataVersion,
+                          const AttributeEncodeState & aState = AttributeEncodeState()) :
+        mAttributeReportIBsBuilder(aAttributeReportIBsBuilder),
+        mAccessingFabricIndex(aAccessingFabricIndex), mPath(aPath), mDataVersion(aDataVersion), mEncodeState(aState)
     {}
 
     template <typename... Ts>
     CHIP_ERROR Encode(Ts... aArgs)
     {
         mTriedEncode = true;
-        if (mWriter == nullptr)
+
+        AttributeReportIB::Builder attributeReportIBBuilder = mAttributeReportIBsBuilder.CreateAttributeReport();
+        AttributeDataIB::Builder attributeDataIBBuilder     = attributeReportIBBuilder.CreateAttributeData();
+        AttributePathIB::Builder attributePathIBBuilder     = attributeDataIBBuilder.CreatePath();
+        attributePathIBBuilder.Endpoint(mPath.mEndpointId).Cluster(mPath.mClusterId).Attribute(mPath.mAttributeId);
+
+        // Encode the list index field if we are encoding a single element in an list.
+        if (mCurrentEncodingListIndex != kInvalidListIndex)
         {
+            attributePathIBBuilder.ListIndex(mCurrentEncodingListIndex);
+        }
+
+        ReturnErrorOnFailure(attributePathIBBuilder.EndOfAttributePathIB().GetError());
+
+        ReturnErrorOnFailure(
+            TagBoundEncoder(attributeDataIBBuilder.GetWriter(), TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)))
+                .Encode(std::forward<Ts>(aArgs)...));
+
+        attributeDataIBBuilder.DataVersion(mDataVersion);
+
+        ReturnErrorOnFailure(attributeDataIBBuilder.EndOfAttributeDataIB().GetError());
+        return attributeReportIBBuilder.EndOfAttributeReportIB().GetError();
+    }
+
+    template <typename... Ts>
+    CHIP_ERROR EncodeListItem(Ts... aArgs)
+    {
+        if (mCurrentEncodingListIndex == kInvalidListIndex)
+        {
+            if (mEncodeState.mCurrentEncodingListIndex == kInvalidListIndex)
+            {
+                // Spec 10.5.4.3.1, 10.5.4.6 (Replace a list w/ Multiple IBs)
+                // Put a empty array before encoding the first array element for list chunking.
+                AttributeReportIB::Builder attributeReportIBBuilder = mAttributeReportIBsBuilder.CreateAttributeReport();
+                AttributeDataIB::Builder attributeDataIBBuilder     = attributeReportIBBuilder.CreateAttributeData();
+                AttributePathIB::Builder attributePathIBBuilder     = attributeDataIBBuilder.CreatePath();
+
+                ReturnErrorOnFailure(attributePathIBBuilder.Endpoint(mPath.mEndpointId)
+                                         .Cluster(mPath.mClusterId)
+                                         .Attribute(mPath.mAttributeId)
+                                         .EndOfAttributePathIB()
+                                         .GetError());
+
+                ReturnErrorOnFailure(
+                    TagBoundEncoder(attributeDataIBBuilder.GetWriter(), TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)))
+                        .EncodeList([](const TagBoundEncoder &) -> CHIP_ERROR { return CHIP_NO_ERROR; }));
+
+                attributeDataIBBuilder.DataVersion(mDataVersion).EndOfAttributeDataIB();
+                ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
+                ReturnErrorOnFailure(attributeReportIBBuilder.EndOfAttributeReportIB().GetError());
+                mEncodeState.mCurrentEncodingListIndex = 0;
+            }
+            mCurrentEncodingListIndex = 0;
+        }
+
+        // We make Encode atomic here, so need to tell the caller do not rollback when we met any error during encoding.
+        mEncodeState.mAllowPartialData = true;
+
+        if (mCurrentEncodingListIndex < mEncodeState.mCurrentEncodingListIndex)
+        {
+            // We have encoded this element in previous chunks, skip it.
+            mCurrentEncodingListIndex++;
             return CHIP_NO_ERROR;
         }
-        return TagBoundEncoder::Encode(std::forward<Ts>(aArgs)...);
+
+        TLV::TLVWriter backup;
+        mAttributeReportIBsBuilder.Checkpoint(backup);
+
+        CHIP_ERROR err = Encode(std::forward<Ts>(aArgs)...);
+        if (err != CHIP_NO_ERROR)
+        {
+            // Rollback on error, then EncodeListItem is atomic.
+            mAttributeReportIBsBuilder.Rollback(backup);
+            return err;
+        }
+
+        mCurrentEncodingListIndex++;
+        mEncodeState.mCurrentEncodingListIndex++;
+        return CHIP_NO_ERROR;
     }
 
     /**
@@ -74,11 +187,10 @@ public:
     CHIP_ERROR EncodeList(ListGenerator aCallback)
     {
         mTriedEncode = true;
-        if (mWriter == nullptr)
-        {
-            return CHIP_NO_ERROR;
-        }
-        return TagBoundEncoder::EncodeList(aCallback);
+        ReturnErrorOnFailure(aCallback(ListEncodeHelper(*this)));
+        // The Encode procedure finished without any error, clear the state.
+        mEncodeState = AttributeEncodeState();
+        return CHIP_NO_ERROR;
     }
 
     bool TriedEncode() const { return mTriedEncode; }
@@ -88,18 +200,18 @@ public:
      */
     FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
 
-    // For consumers that can't just do a single Encode call for some reason
-    // (e.g. they're encoding a list a bit at a time).
-    TLV::TLVWriter * PrepareManualEncode()
-    {
-        // If this is called, the consumer is trying to encode a value.
-        mTriedEncode = true;
-        return mWriter;
-    }
+    AttributeEncodeState GetState() { return mEncodeState; }
+
+    void FinishManualEncode() {}
 
 private:
     bool mTriedEncode = false;
+    AttributeReportIBs::Builder & mAttributeReportIBsBuilder;
     const FabricIndex mAccessingFabricIndex;
+    const ConcreteAttributePath mPath;
+    DataVersion mDataVersion;
+    AttributeEncodeState mEncodeState;
+    ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
 };
 
 class AttributeValueDecoder
