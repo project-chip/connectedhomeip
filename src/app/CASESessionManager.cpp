@@ -25,30 +25,34 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(NodeId nodeId, Callback::C
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    Dnssd::ResolvedNodeData * nodeResolutionData = nullptr;
-    Dnssd::ResolvedNodeData cachedResolutionData;
+    Dnssd::ResolvedNodeData resolutionData;
 
     PeerId peerId = GetFabricInfo()->GetPeerIdForNode(nodeId);
 
-    if (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, cachedResolutionData) == CHIP_NO_ERROR)
-    {
-        nodeResolutionData = &cachedResolutionData;
-    }
+    bool nodeIDWasResolved = (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
 
     OperationalDeviceProxy * session = FindExistingSession(nodeId);
     if (session == nullptr)
     {
         // TODO - Implement LRU to evict least recently used session to handle mActiveSessions pool exhaustion
-        session = mActiveSessions.CreateObject(mConfig.sessionInitParams, peerId, nodeResolutionData);
+        if (nodeIDWasResolved)
+        {
+            session = mActiveSessions.CreateObject(mConfig.sessionInitParams, peerId, resolutionData);
+        }
+        else
+        {
+            session = mActiveSessions.CreateObject(mConfig.sessionInitParams, peerId);
+        }
+
         if (session == nullptr)
         {
             onFailure->mCall(onFailure->mContext, nodeId, CHIP_ERROR_NO_MEMORY);
             return CHIP_ERROR_NO_MEMORY;
         }
     }
-    else if (nodeResolutionData != nullptr)
+    else if (nodeIDWasResolved)
     {
-        session->OnNodeIdResolved(nodeResolutionData);
+        session->OnNodeIdResolved(resolutionData);
     }
 
     CHIP_ERROR err = session->Connect(onConnection, onFailure);

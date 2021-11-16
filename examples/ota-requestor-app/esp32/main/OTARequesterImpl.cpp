@@ -294,7 +294,7 @@ void ConnectToProvider(const char * ipAddress, uint32_t nodeId)
 
         PeerId peerID = fabric->GetPeerId();
         peerID.SetNodeId(providerNodeId);
-        operationalDeviceProxy = new chip::OperationalDeviceProxy(initParams, peerID, nullptr);
+        operationalDeviceProxy = new chip::OperationalDeviceProxy(initParams, peerID);
         server->SetOperationalDeviceProxy(operationalDeviceProxy);
 
         // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node

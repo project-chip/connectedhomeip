@@ -73,7 +73,7 @@ class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, public SessionEsta
 {
 public:
     virtual ~OperationalDeviceProxy();
-    OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId, const Dnssd::ResolvedNodeData * nodeResolutionData)
+    OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId)
     {
         VerifyOrReturn(params.Validate() == CHIP_NO_ERROR);
 
@@ -81,6 +81,11 @@ public:
         mPeerId     = peerId;
 
         mState = State::NeedsAddress;
+    }
+
+    OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId, const Dnssd::ResolvedNodeData & nodeResolutionData) :
+        OperationalDeviceProxy(params, peerId)
+    {
         OnNodeIdResolved(nodeResolutionData);
     }
 
@@ -110,20 +115,16 @@ public:
      */
     void OnConnectionExpired(SessionHandle session) override;
 
-    void OnNodeIdResolved(const Dnssd::ResolvedNodeData * nodeResolutionData)
+    void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeResolutionData)
     {
-        if (nodeResolutionData != nullptr)
+        mDeviceAddress = ToPeerAddress(nodeResolutionData);
+
+        mMrpIdleInterval   = nodeResolutionData.GetMrpRetryIntervalIdle().ValueOr(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL);
+        mMrpActiveInterval = nodeResolutionData.GetMrpRetryIntervalActive().ValueOr(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
+
+        if (mState == State::NeedsAddress)
         {
-            mDeviceAddress = ToPeerAddress(*nodeResolutionData);
-
-            mMrpIdleInterval = nodeResolutionData->GetMrpRetryIntervalIdle().ValueOr(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL);
-            mMrpActiveInterval =
-                nodeResolutionData->GetMrpRetryIntervalActive().ValueOr(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
-
-            if (mState == State::NeedsAddress)
-            {
-                mState = State::Initialized;
-            }
+            mState = State::Initialized;
         }
     }
 

@@ -60,6 +60,9 @@ public:
 
     /**
      * Find an existing session for the given node ID, or trigger a new session request.
+     * The caller can optionally provide `onConnection` and `onFailure` callback objects. If provided,
+     * these will be used to inform the caller about successful or failed connection establishment.
+     * If the connection is already established, the `onConnection` callback will be immediately called.
      */
     CHIP_ERROR FindOrEstablishSession(NodeId nodeId, Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
@@ -78,7 +81,20 @@ public:
         return mConfig.sessionInitParams.fabricInfo;
     }
 
+    /**
+     * This API triggers the DNS-SD resolution for the given node ID. The node ID will be looked up
+     * on the fabric that was configured for the CASESessionManager object.
+     *
+     * The results of the DNS-SD resolution request is provided to the class via `ResolverDelegate`
+     * implementation of CASESessionManager.
+     */
     CHIP_ERROR ResolveDeviceAddress(NodeId nodeId);
+
+    /**
+     * This API returns the address and port for the given node ID. It is expected that there is
+     * an ongoing session with the peer node. If the session doesn't exist, the API will return
+     * `CHIP_ERROR_NOT_CONNECTED` error.
+     */
     CHIP_ERROR GetDeviceAddressAndPort(NodeId nodeId, Inet::IPAddress & addr, uint16_t & port);
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
