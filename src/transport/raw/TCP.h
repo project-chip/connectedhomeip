@@ -33,6 +33,7 @@
 #include <inet/TCPEndPoint.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/PoolWrapper.h>
 #include <transport/raw/Base.h>
 
 namespace chip {
@@ -84,8 +85,12 @@ private:
  */
 struct PendingPacket
 {
-    PeerAddress peerAddress;                 // where the packet is being sent to
-    System::PacketBufferHandle packetBuffer; // what data needs to be sent
+    PendingPacket(const PeerAddress & peerAddress, System::PacketBufferHandle && packetBuffer) :
+        mPeerAddress(peerAddress), mPacketBuffer(std::move(packetBuffer))
+    {}
+
+    PeerAddress mPeerAddress;                 // where the packet is being sent to
+    System::PacketBufferHandle mPacketBuffer; // what data needs to be sent
 };
 
 /** Implements a transport using TCP. */
@@ -128,20 +133,10 @@ protected:
     };
 
 public:
-    TCPBase(ActiveConnectionState * activeConnectionsBuffer, size_t bufferSize, PendingPacket * packetBuffers,
-            size_t packetsBuffersSize) :
-        mActiveConnections(activeConnectionsBuffer),
-        mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers), mPendingPacketsSize(packetsBuffersSize)
+    using PendingPacketPoolType = PoolInterface<PendingPacket, const PeerAddress &, System::PacketBufferHandle &&>;
+    TCPBase(ActiveConnectionState * activeConnectionsBuffer, size_t bufferSize, PendingPacketPoolType & packetBuffers) : mActiveConnections(activeConnectionsBuffer), mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers)
     {
         // activeConnectionsBuffer must be initialized by the caller.
-        for (size_t i = 0; i < mPendingPacketsSize; ++i)
-        {
-            mPendingPackets[i].peerAddress = PeerAddress::Uninitialized();
-            // In the typical case, the TCPBase constructor is invoked from the TCP constructor on its mPendingPackets,
-            // which has not yet been initialized. That means we can't do a normal move assignment or construction of
-            // the PacketBufferHandle, since that would call PacketBuffer::Free on the uninitialized data.
-            new (&mPendingPackets[i].packetBuffer) System::PacketBufferHandle();
-        }
     }
     ~TCPBase() override;
 
@@ -266,15 +261,14 @@ private:
     const size_t mActiveConnectionsSize;
 
     // Data to be sent when connections succeed
-    PendingPacket * mPendingPackets;
-    const size_t mPendingPacketsSize;
+    PendingPacketPoolType & mPendingPackets;
 };
 
 template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
 class TCP : public TCPBase
 {
 public:
-    TCP() : TCPBase(mConnectionsBuffer, kActiveConnectionsSize, mPendingPackets, kPendingPacketSize)
+    TCP() : TCPBase(mConnectionsBuffer, kActiveConnectionsSize, mPendingPackets)
     {
         for (size_t i = 0; i < kActiveConnectionsSize; ++i)
         {
@@ -285,7 +279,7 @@ public:
 private:
     friend class TCPTest;
     TCPBase::ActiveConnectionState mConnectionsBuffer[kActiveConnectionsSize];
-    PendingPacket mPendingPackets[kPendingPacketSize];
+    PoolImpl<PendingPacket, kPendingPacketSize, PendingPacketPoolType::Interface> mPendingPackets;
 };
 
 } // namespace Transport
