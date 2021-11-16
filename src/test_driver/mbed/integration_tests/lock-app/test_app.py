@@ -21,7 +21,7 @@ from chip.setup_payload import SetupPayload
 from chip import exceptions
 from chip import ChipDeviceCtrl
 
-from common.utils import scan_chip_ble_devices, connect_device_over_ble, commissioning_wifi
+from common.utils import scan_chip_ble_devices, connect_device_over_ble, commissioning_wifi, close_ble
 
 from common.pigweed_client import PigweedClient
 from device_service import device_service_pb2
@@ -85,6 +85,8 @@ def test_wifi_provisioning(device, network):
 
     ret = commissioning_wifi(devCtrl, network_ssid, network_pass, DEVICE_NODE_ID)
     assert ret == 0
+
+    assert close_ble(devCtrl)
 
 def test_device_info_rpc(device):
     pw_client = PigweedClient(device, RPC_PROTOS)

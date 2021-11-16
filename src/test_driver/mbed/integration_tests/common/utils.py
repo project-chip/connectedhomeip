@@ -154,6 +154,20 @@ def connect_device_over_ble(devCtrl, discriminator, pinCode, nodeId=None):
 
     return nodeId
 
+def close_ble(devCtrl):
+    """
+    Close the BLE connection
+    :param devCtrl: device controller instance
+    :return: true if successful, otherwise false
+    """
+    try:
+        devCtrl.CloseBLEConnection()
+    except exceptions.ChipStackException as ex:
+        log.error("Close BLE connection failed: {}".format(str(ex)))
+        return False
+
+    return True
+
 def commissioning_wifi(devCtrl, ssid, password, nodeId):
     """
     Commissioning a Wi-Fi device 
