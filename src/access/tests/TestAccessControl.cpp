@@ -671,7 +671,7 @@ void TestDeleteEntry(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, ClearAccessControl(accessControl) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, data, ArraySize(data)) == CHIP_NO_ERROR);
 
-            memcpy(&data[pos], &data[pos + count], (ArraySize(data) - count - pos) * sizeof(data[0]));
+            memmove(&data[pos], &data[pos + count], (ArraySize(data) - count - pos) * sizeof(data[0]));
 
             for (size_t i = 0; i < count; ++i)
             {

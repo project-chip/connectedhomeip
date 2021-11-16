@@ -301,7 +301,7 @@ jobs:
               run: |
                   for BUILD_TYPE  in clang python_lib; do
                       case $BUILD_TYPE in
-                          "clang") GN_ARGS='is_clang=true target_os="all"';;
+                          "clang") GN_ARGS='is_clang=true target_os="all" is_asan=true';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
                       scripts/build/gn_gen.sh --args="$GN_ARGS"

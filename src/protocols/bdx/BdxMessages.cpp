@@ -170,7 +170,7 @@ size_t TransferInit::MessageSize() const
 void TransferInit::LogMessage(bdx::MessageType messageType) const
 {
     char fd[kMaxFileDesignatorLen];
-    snprintf(fd, sizeof(fd), "%s", FileDesignator);
+    snprintf(fd, sizeof(fd), "%.*s", static_cast<int>(FileDesLength), FileDesignator);
 
     switch (messageType)
     {
