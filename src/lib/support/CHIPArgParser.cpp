@@ -911,9 +911,9 @@ bool ParseInt(const char * str, int16_t & output)
     const int base   = 10;
     int32_t output32 = 0;
 
-    if ((ParseInt(str, output32, base)) && (output32 <= SHRT_MAX))
+    if ((ParseInt(str, output32, base)) && (output32 <= SHRT_MAX && output32 >= SHRT_MIN))
     {
-        output = static_cast<int16_t>(UINT16_MAX & output32);
+        output = static_cast<int16_t>(output32);
         return true;
     }
 

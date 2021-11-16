@@ -109,9 +109,9 @@ gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_deta
 # Compiles python files
 # Check pybindings was requested
 if [ "$enable_pybindings" == true ]; then
-    ninja -v -C "$OUTPUT_ROOT" pycontroller
+    ninja -C "$OUTPUT_ROOT" pycontroller
 else
-    ninja -v -C "$OUTPUT_ROOT" python
+    ninja -C "$OUTPUT_ROOT" python
 fi
 
 # Create a virtual environment that has access to the built python tools

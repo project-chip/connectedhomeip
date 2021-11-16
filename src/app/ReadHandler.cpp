@@ -506,17 +506,17 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     writer.Init(std::move(packet));
 
     SubscribeResponseMessage::Builder response;
-    ReturnLogErrorOnFailure(response.Init(&writer));
+    ReturnErrorOnFailure(response.Init(&writer));
     response.SubscriptionId(mSubscriptionId)
         .MinIntervalFloorSeconds(mMinIntervalFloorSeconds)
         .MaxIntervalCeilingSeconds(mMaxIntervalCeilingSeconds)
         .EndOfSubscribeResponseMessage();
-    ReturnLogErrorOnFailure(response.GetError());
+    ReturnErrorOnFailure(response.GetError());
 
-    ReturnLogErrorOnFailure(writer.Finalize(&packet));
+    ReturnErrorOnFailure(writer.Finalize(&packet));
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnLogErrorOnFailure(RefreshSubscribeSyncTimer());
+    ReturnErrorOnFailure(RefreshSubscribeSyncTimer());
     mInitialReport = false;
     MoveToState(HandlerState::GeneratingReports);
     if (mpDelegate != nullptr)
@@ -531,11 +531,11 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
 
-    ReturnLogErrorOnFailure(reader.Next());
+    ReturnErrorOnFailure(reader.Next());
     SubscribeRequestMessage::Parser subscribeRequestParser;
-    ReturnLogErrorOnFailure(subscribeRequestParser.Init(reader));
+    ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnLogErrorOnFailure(subscribeRequestParser.CheckSchemaValidity());
+    ReturnErrorOnFailure(subscribeRequestParser.CheckSchemaValidity());
 #endif
 
     AttributePathIBs::Parser attributePathListParser;
@@ -546,9 +546,9 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     }
     else if (err == CHIP_NO_ERROR)
     {
-        ReturnLogErrorOnFailure(ProcessAttributePathList(attributePathListParser));
+        ReturnErrorOnFailure(ProcessAttributePathList(attributePathListParser));
     }
-    ReturnLogErrorOnFailure(err);
+    ReturnErrorOnFailure(err);
 
     EventPaths::Parser eventPathListParser;
     err = subscribeRequestParser.GetEventPaths(&eventPathListParser);
@@ -558,13 +558,14 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     }
     else if (err == CHIP_NO_ERROR)
     {
-        ReturnLogErrorOnFailure(ProcessEventPaths(eventPathListParser));
+        ReturnErrorOnFailure(ProcessEventPaths(eventPathListParser));
     }
-    ReturnLogErrorOnFailure(err);
+    ReturnErrorOnFailure(err);
 
-    ReturnLogErrorOnFailure(subscribeRequestParser.GetMinIntervalSeconds(&mMinIntervalFloorSeconds));
-    ReturnLogErrorOnFailure(subscribeRequestParser.GetMaxIntervalSeconds(&mMaxIntervalCeilingSeconds));
-    ReturnLogErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
+    ReturnErrorOnFailure(subscribeRequestParser.GetMinIntervalSeconds(&mMinIntervalFloorSeconds));
+    ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalSeconds(&mMaxIntervalCeilingSeconds));
+    VerifyOrReturnError(mMinIntervalFloorSeconds < mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
 
     MoveToState(HandlerState::GeneratingReports);
 

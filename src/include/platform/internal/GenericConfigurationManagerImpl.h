@@ -76,10 +76,8 @@ public:
     CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode) override;
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) override;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override;
     CHIP_ERROR _IncrementLifetimeCounter();
-#endif
     CHIP_ERROR GetFailSafeArmed(bool & val) override;
     CHIP_ERROR SetFailSafeArmed(bool val) override;
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
@@ -103,9 +101,7 @@ public:
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
     CHIP_ERROR GetBootReasons(uint32_t & bootReasons) override;
     CHIP_ERROR StoreBootReasons(uint32_t bootReasons) override;
-#if !defined(NDEBUG)
     CHIP_ERROR RunUnitTests(void) override;
-#endif
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;
     void LogDeviceConfig() override;

@@ -17,6 +17,7 @@
 
 // Import helpers from zap core
 const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
+const string       = require(zapPath + 'util/string.js')
 const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 
@@ -55,7 +56,7 @@ function asTestValue()
   } else if (StringHelper.isCharString(this.type)) {
     return '@"Test"';
   } else {
-    return this.min || this.max || 0;
+    return `@(${this.min || this.max || 0})`;
   }
 }
 
@@ -86,7 +87,7 @@ function asObjectiveCNumberType(label, type, asLowerCased)
           case 'uint16_t':
             return 'UnsignedShort';
           case 'uint32_t':
-            return 'UnsignedLong';
+            return 'UnsignedInt';
           case 'uint64_t':
             return 'UnsignedLongLong';
           case 'int8_t':
@@ -94,7 +95,7 @@ function asObjectiveCNumberType(label, type, asLowerCased)
           case 'int16_t':
             return 'Short';
           case 'int32_t':
-            return 'Long';
+            return 'Int';
           case 'int64_t':
             return 'LongLong';
           default:
@@ -114,6 +115,59 @@ function asTestIndex(index)
   return index.toString().padStart(6, 0);
 }
 
+function asUpperCamelCase(label)
+{
+  let str = string.toCamelCase(label, false);
+  return str.replace(/[\.:]/g, '');
+}
+
+async function asObjectiveCClass(type, cluster, options)
+{
+  let pkgId    = await templateUtil.ensureZclPackageId(this);
+  let isStruct = await zclHelper.isStruct(this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
+
+  if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
+    return 'NSArray';
+  }
+
+  if (StringHelper.isOctetString(type)) {
+    return 'NSData';
+  }
+
+  if (StringHelper.isCharString(type)) {
+    return 'NSString';
+  }
+
+  if (isStruct) {
+    return `CHIP${asUpperCamelCase(cluster)}Cluster${asUpperCamelCase(type)}`;
+  }
+
+  return 'NSNumber';
+}
+
+async function asObjectiveCType(type, cluster, options)
+{
+  let typeStr = await asObjectiveCClass.call(this, type, cluster, options);
+  if (this.isNullable || this.isOptional) {
+    typeStr = `${typeStr} * _Nullable`;
+  } else {
+    typeStr = `${typeStr} * _Nonnull`;
+  }
+
+  return typeStr;
+}
+
+async function arrayElementObjectiveCClass(type, cluster, options)
+{
+  options.hash.forceNotList = true;
+  return asObjectiveCClass.call(this, type, cluster, options);
+}
+
+function incrementDepth(depth)
+{
+  return depth + 1;
+}
+
 //
 // Module exports
 //
@@ -122,3 +176,7 @@ exports.asObjectiveCNumberType       = asObjectiveCNumberType;
 exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
 exports.asTestIndex                  = asTestIndex;
 exports.asTestValue                  = asTestValue;
+exports.asObjectiveCClass            = asObjectiveCClass;
+exports.asObjectiveCType             = asObjectiveCType;
+exports.arrayElementObjectiveCClass  = arrayElementObjectiveCClass;
+exports.incrementDepth               = incrementDepth;

@@ -71,6 +71,10 @@ To download and install packages.
 
         $ source ./scripts/activate.sh
 
+-   Target Select
+
+        $ idf.py set-target esp32(or esp32c3)
+
 -   Configuration Options
 
         To choose from the different configuration options, run menuconfig.

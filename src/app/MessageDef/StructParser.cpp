@@ -22,7 +22,7 @@ CHIP_ERROR StructParser::Init(const TLV::TLVReader & aReader)
 {
     mReader.Init(aReader);
     VerifyOrReturnError(TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnLogErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
+    ReturnErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
     return CHIP_NO_ERROR;
 }
 } // namespace app

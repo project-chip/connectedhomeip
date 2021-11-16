@@ -798,6 +798,20 @@ bool emberAfContainsClient(EndpointId endpoint, ClusterId clusterId)
     return (emberAfFindClusterWithMfgCode(endpoint, clusterId, CLUSTER_MASK_CLIENT, EMBER_AF_NULL_MANUFACTURER_CODE) != NULL);
 }
 
+// This will find the first server that has the clusterId given from the index of endpoint, regardless of mfgCode.
+bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
+{
+    if (index == 0xFFFF)
+    {
+        return false;
+    }
+    else
+    {
+        return emberAfFindClusterInTypeWithMfgCode(emAfEndpoints[index].endpointType, clusterId, CLUSTER_MASK_SERVER,
+                                                   EMBER_AF_NULL_MANUFACTURER_CODE);
+    }
+}
+
 // Finds the cluster that matches endpoint, clusterId, direction, and manufacturerCode.
 EmberAfCluster * emberAfFindClusterWithMfgCode(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask,
                                                uint16_t manufacturerCode)

@@ -33,22 +33,6 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadRequestMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // make a copy of the reader here
-    mReader.Init(aReader);
-
-    VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = mReader.EnterContainer(mOuterContainerType);
-
-exit:
-
-    return err;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
 {
@@ -222,11 +206,6 @@ exit:
 CHIP_ERROR ReadRequestMessage::Parser::GetEventNumber(uint64_t * const apEventNumber) const
 {
     return GetUnsignedInteger(kCsTag_EventNumber, apEventNumber);
-}
-
-CHIP_ERROR ReadRequestMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
 }
 
 AttributePathIBs::Builder & ReadRequestMessage::Builder::CreateAttributePathListBuilder()

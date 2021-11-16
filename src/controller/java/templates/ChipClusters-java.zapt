@@ -223,7 +223,11 @@ public class ChipClusters {
         {{else if (isCharString type)}}
         // Add String field here after ByteSpan is properly emitted in C++ layer
         {{else}}
-        {{asJavaBasicTypeForZclType type true}}
+        {{! NOTE: asJavaBasicTypeForZclType ends up sniffing for isArray on the
+            context.  Since we want the type of our _entry_, force isArray to
+            false. }}
+        {{~#*inline "asJavaBasicTypeForEntry"}}{{asJavaBasicTypeForZclType type true}}{{/inline~}}
+        {{> asJavaBasicTypeForEntry isArray=false}}
         {{/if}}
         {{#if isOptional}}
         {{#unless isArray}}

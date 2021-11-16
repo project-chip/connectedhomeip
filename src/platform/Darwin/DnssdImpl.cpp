@@ -522,7 +522,7 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
     char buffer[kDnssdTextMaxSize];
     ReturnErrorOnFailure(PopulateTextRecord(&record, buffer, sizeof(buffer), service->mTextEntries, service->mTextEntrySize));
 
-    ChipLogProgress(chipTool, "Publising service %s on port %u with type: %s on interface id: %" PRIu32, service->mName,
+    ChipLogProgress(DeviceLayer, "Publishing service %s on port %u with type: %s on interface id: %" PRIu32, service->mName,
                     service->mPort, regtype.c_str(), interfaceId);
     return Register(interfaceId, regtype.c_str(), service->mName, service->mPort, &record);
 }

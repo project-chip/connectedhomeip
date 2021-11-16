@@ -133,8 +133,11 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     IPPrefix addrWithPrefix;
     CHIP_ERROR err;
 
+#ifndef __MBED__
+    // Mbed interface name has different format
     err = InterfaceId::InterfaceNameToId("0", intId);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+#endif
 
     err = InterfaceId::Null().GetInterfaceName(intName, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);

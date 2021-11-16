@@ -262,15 +262,7 @@ void OperationalDeviceProxy::Clear()
 {
     mCASESession.Clear();
 
-    mState          = State::Uninitialized;
-    mStatusDelegate = nullptr;
-    if (mInitParams.exchangeMgr)
-    {
-        // Ensure that any exchange contexts we have open get closed now,
-        // because we don't want them to call back in to us after this
-        // point.
-        mInitParams.exchangeMgr->CloseAllContextsForDelegate(this);
-    }
+    mState      = State::Uninitialized;
     mInitParams = DeviceProxyInitParams();
 }
 
@@ -282,34 +274,12 @@ void OperationalDeviceProxy::OnConnectionExpired(SessionHandle session)
     mSecureSession.ClearValue();
 }
 
-CHIP_ERROR OperationalDeviceProxy::OnMessageReceived(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
-                                                     System::PacketBufferHandle && msgBuf)
-{
-    if (mState == State::SecureConnected)
-    {
-        if (mStatusDelegate != nullptr)
-        {
-            mStatusDelegate->OnMessage(std::move(msgBuf));
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
 {
     return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mInitParams.fabricInfo->GetFabricIndex(),
                                                                              GetDeviceId());
 }
 
-OperationalDeviceProxy::~OperationalDeviceProxy()
-{
-    if (mInitParams.exchangeMgr)
-    {
-        // Ensure that any exchange contexts we have open get closed now,
-        // because we don't want them to call back in to us after this
-        // point.
-        mInitParams.exchangeMgr->CloseAllContextsForDelegate(this);
-    }
-}
+OperationalDeviceProxy::~OperationalDeviceProxy() {}
 
 } // namespace chip

@@ -29,7 +29,7 @@ jobs:
         timeout-minutes: 60
         
         env:
-            DOCKER_RUN_VERSION: 0.5.27
+            DOCKER_RUN_VERSION: 0.5.28
             GITHUB_CACHE_PATH: /tmp/cirque-cache/
 
         runs-on: ubuntu-latest
@@ -38,7 +38,7 @@ jobs:
 # need to run with privilege, which isn't supported by job.XXX.contaner
 #  https://github.com/actions/container-action/issues/2
 #         container:
-#             image: connectedhomeip/chip-build-cirque:0.5.27
+#             image: connectedhomeip/chip-build-cirque:0.5.28
 #             volumes:
 #                 - "/tmp:/tmp"
 #                 - "/dev/pts:/dev/pts"
@@ -104,7 +104,8 @@ jobs:
                     chip_build_tests=false \
                     enable_host_gcc_build=true \
                     enable_host_gcc_mbedtls_build=false \
-                    enable_host_clang_build = false
+                    enable_host_clang_build=false \
+                    enable_fake_tests=false
             - name: Run Tests
               timeout-minutes: 25
               run: |
