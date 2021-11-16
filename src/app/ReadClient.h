@@ -68,7 +68,8 @@ public:
          *
          * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
          * @param[in] aEventHeader: The event header in report response.
-         * @param[in] apData: The event data of the given path, will be a nullptr if status is not Success.
+         * @param[in] apData: A TLVReader positioned right on the payload of the event. This will be set to null if the apStatus is
+         * not null.
          * @param[in] apStatus: Event-specific status, containing an InteractionModel::Status code as well as an optional
          *                     cluster-specific status code.
          */
@@ -262,19 +263,21 @@ private:
     const char * GetStateStr() const;
 
     /**
-     * Validate that the Event ID and Cluster ID in the header match that of the type information present in the object before
-     * decoding the data. The template parameter T is generally expected to be a ClusterName::Events::EventName::Type struct
+     * Validate that the Event ID and Cluster ID in the header match that of the type information present in the object and
+     * decode the data. The template parameter T is generally expected to be a ClusterName::Events::EventName::Type struct
      *
      * @param [in] aEventHeader  The header of the event being validated.
-     * @param [in] aEvent         The event data.
+     * @param [in] aEvent        The event data.
+     * @param [in] aReader       The tlv reader.
      */
     template <typename EventDataT>
-    CHIP_ERROR CheckEventHeaderWithClusterObject(const EventHeader & aEventHeader, const EventDataT & aEvent)
+    CHIP_ERROR DecodeEventWithClusterObject(const EventHeader & aEventHeader, const EventDataT & aEvent,
+                                                 TLV::TLVReader & aReader)
     {
         VerifyOrReturnError((aEventHeader.mPath.mEventId == aEvent.GetEventId()) &&
                                 (aEventHeader.mPath.mClusterId == aEvent.GetClusterId()),
                             CHIP_ERROR_INVALID_ARGUMENT);
-        return CHIP_NO_ERROR;
+        return DataModel::Decode(aReader, aEvent);
     }
 
     /**

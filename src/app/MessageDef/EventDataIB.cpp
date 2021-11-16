@@ -404,7 +404,8 @@ CHIP_ERROR EventDataIB::Parser::ProcessEventTimestamp(EventHeader & aEventHeader
     bool hasEpochTimestamp       = false;
     bool hasDeltaSystemTimestamp = false;
     bool hasDeltaEpochTimestamp  = false;
-    err                          = GetDeltaSystemTimestamp(&timeStampVal);
+
+    err = GetDeltaSystemTimestamp(&timeStampVal);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
@@ -424,6 +425,7 @@ CHIP_ERROR EventDataIB::Parser::ProcessEventTimestamp(EventHeader & aEventHeader
     }
     else if (err == CHIP_NO_ERROR)
     {
+        VerifyOrReturnError(aEventHeader.mTimestamp.IsEpoch(), CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT);
         aEventHeader.mTimestamp.mValue += timeStampVal;
         hasDeltaEpochTimestamp = true;
     }

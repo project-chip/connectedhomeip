@@ -110,8 +110,7 @@ struct Timestamp
 {
     enum class Type
     {
-        kInvalid = 0,
-        kSystem,
+        kSystem = 0,
         kEpoch
     };
     Timestamp() {}
@@ -129,11 +128,10 @@ struct Timestamp
         return timestamp;
     }
 
-    bool IsValid() { return mType != Type::kInvalid; }
     bool IsSystem() { return mType == Type::kSystem; }
     bool IsEpoch() { return mType == Type::kEpoch; }
 
-    Type mType      = Type::kInvalid;
+    Type mType      = Type::kSystem;
     uint64_t mValue = 0;
 };
 
@@ -148,9 +146,9 @@ public:
         kUrgent = 0,
         kNotUrgent,
     };
-    EventOptions(void) : mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
+    EventOptions(void) : mTimestamp(Timestamp::Type::kSystem), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
 
-    EventOptions(Type aType) : mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(aType) {}
+    EventOptions(Type aType) : mTimestamp(Timestamp::Type::kSystem), mpEventSchema(nullptr), mUrgent(aType) {}
 
     EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
 

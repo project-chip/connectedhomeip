@@ -310,7 +310,6 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
                  /* no-op: don't write event, but advance current event Number */);
 
     VerifyOrExit(apOptions != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(apOptions->mTimestamp.mType != Timestamp::Type::kInvalid, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     eventReportBuilder.Init(&(apContext->mWriter));
     // TODO: Update IsUrgent, issue 11386
