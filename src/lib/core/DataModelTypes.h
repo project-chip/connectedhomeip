@@ -45,5 +45,6 @@ typedef uint32_t TransactionId;
 
 static constexpr FabricIndex kUndefinedFabricIndex = 0;
 static constexpr EndpointId kInvalidEndpointId     = 0xFFFF;
+static constexpr ListIndex kInvalidListIndex       = 0xFFFF; // List index is a uint16 thus 0xFFFF is a invalid list index.
 
 } // namespace chip

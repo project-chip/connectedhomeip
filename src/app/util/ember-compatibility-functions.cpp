@@ -240,16 +240,65 @@ CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeRepor
 } // anonymous namespace
 
 CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIB::Builder & aAttributeReport)
+                                 AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
 
-    TLV::TLVWriter backup;
-    aAttributeReport.Checkpoint(backup);
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
 
-    AttributeDataIB::Builder attributeDataIBBuilder = aAttributeReport.CreateAttributeData();
+    if (attributeMetadata == nullptr)
+    {
+        AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
+        TLV::TLVWriter writer;
+        attributeReport.Checkpoint(writer);
+
+        // This attribute (or even this cluster) is not actually supported
+        // on this endpoint.
+        return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, writer);
+    }
+
+    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
+    // Value encoder will encode the while AttributeReport, including the path, value and the version.
+    // The AttributeValueEncoder may encode more than one AttributeReportIB for the list chunking feature.
+    if (attrOverride != nullptr)
+    {
+        // TODO: We should probably clone the writer and convert failures here
+        // into status responses, unless our caller already does that.
+        AttributeValueEncoder::AttributeEncodeState state =
+            (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
+        AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex,
+                                           ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
+                                           kTemporaryDataVersion, state);
+        CHIP_ERROR err = attrOverride->Read(aPath, valueEncoder);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            // If the err is not CHIP_NO_ERROR, means the encoding was aborted, then the valueEncoder may save its state.
+            // The state is used by list chunking feature for now.
+            if (apEncoderState != nullptr)
+            {
+                *apEncoderState = valueEncoder.GetState();
+            }
+            return err;
+        }
+
+        if (valueEncoder.TriedEncode())
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
+
+    TLV::TLVWriter backup;
+    attributeReport.Checkpoint(backup);
+
+    // We have verified that the attribute exists.
+    AttributeDataIB::Builder attributeDataIBBuilder = attributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     AttributePathIB::Builder attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
@@ -259,37 +308,13 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         .EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePathIBBuilder.GetError());
 
-    if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
-    {
-        const EmberAfAttributeMetadata * attributeMetadata =
-            emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
-
-        if (attributeMetadata == nullptr)
-        {
-            // This attribute (or even this cluster) is not actually supported
-            // on this endpoint.
-            return SendFailureStatus(aPath, aAttributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, backup);
-        }
-
-        // TODO: We should probably clone the writer and convert failures here
-        // into status responses, unless our caller already does that.
-        TLV::TLVWriter * writer = attributeDataIBBuilder.GetWriter();
-        VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
-        AttributeValueEncoder valueEncoder(writer, aAccessingFabricIndex);
-        ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
-
-        if (valueEncoder.TriedEncode())
-        {
-            return SendSuccessStatus(attributeDataIBBuilder);
-        }
-    }
-
-    EmberAfAttributeMetadata * attributeMetadata = nullptr;
-    EmberAfAttributeSearchRecord record          = { .endpoint         = aPath.mEndpointId,
-                                            .clusterId        = aPath.mClusterId,
-                                            .clusterMask      = CLUSTER_MASK_SERVER,
-                                            .attributeId      = aPath.mAttributeId,
-                                            .manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE };
+    EmberAfAttributeMetadata * attributeMetadata = NULL;
+    EmberAfAttributeSearchRecord record;
+    record.endpoint           = aPath.mEndpointId;
+    record.clusterId          = aPath.mClusterId;
+    record.clusterMask        = CLUSTER_MASK_SERVER;
+    record.attributeId        = aPath.mAttributeId;
+    record.manufacturerCode   = EMBER_AF_NULL_MANUFACTURER_CODE;
     EmberAfStatus emberStatus = emAfReadOrWriteAttribute(&record, &attributeMetadata, attributeData, sizeof(attributeData),
                                                          /* write = */ false);
 
@@ -577,10 +602,10 @@ CHIP_ERROR stringTlvDataToAttributeBuffer(TLV::TLVReader & aReader, bool isOctet
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * metadata, TLV::TLVReader & aReader, uint16_t & dataLen)
+CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, TLV::TLVReader & aReader, uint16_t & dataLen)
 {
-    EmberAfAttributeType expectedType = BaseType(metadata->attributeType);
-    bool isNullable                   = metadata->IsNullable();
+    EmberAfAttributeType expectedType = BaseType(attributeMetadata->attributeType);
+    bool isNullable                   = attributeMetadata->IsNullable();
     switch (expectedType)
     {
     case ZCL_BOOLEAN_ATTRIBUTE_TYPE: // Boolean
