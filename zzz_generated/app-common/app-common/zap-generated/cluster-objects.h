@@ -6843,6 +6843,130 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace StartUp {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kSoftwareVersion = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
+    static constexpr EventId eventId             = 0x00000000;
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    uint32_t softwareVersion;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    uint32_t softwareVersion;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace StartUp
+namespace ShutDown {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000001;
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ShutDown
+namespace Leave {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000002;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000002;
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace Leave
+namespace ReachableChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000003;
+
+enum class Fields
+{
+    kReachableNewValue = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
+    static constexpr EventId eventId             = 0x00000003;
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    bool reachableNewValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    bool reachableNewValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ReachableChanged
+} // namespace Events
 } // namespace Basic
 namespace OtaSoftwareUpdateProvider {
 // Need to convert consumers to using the new enum classes, so we
