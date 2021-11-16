@@ -14,21 +14,14 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
-
 import("${build_root}/toolchain/gcc_toolchain.gni")
 
-gcc_toolchain("${host_os}_${host_cpu}_gcc") {
+gcc_toolchain("fake_${host_cpu}_gcc") {
   toolchain_args = {
+    current_os = host_os
     current_os = host_os
     current_cpu = host_cpu
     is_clang = false
-  }
-}
-
-gcc_toolchain("${host_os}_${host_cpu}_clang") {
-  toolchain_args = {
-    current_os = host_os
-    current_cpu = host_cpu
-    is_clang = true
+    chip_fake_platform = true
   }
 }
