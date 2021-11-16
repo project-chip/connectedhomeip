@@ -169,7 +169,8 @@ class BitMapObjectPool : public internal::StaticAllocatorBitmap, public internal
 {
 public:
     BitMapObjectPool() : StaticAllocatorBitmap(mData.mMemory, mUsage, N, sizeof(T)) {}
-    ~BitMapObjectPool() {
+    ~BitMapObjectPool()
+    {
         // ReleaseAll();
     }
 
@@ -241,7 +242,8 @@ class HeapObjectPool : public internal::Statistics, public internal::PoolCommon<
 {
 public:
     HeapObjectPool() {}
-    ~HeapObjectPool() {
+    ~HeapObjectPool()
+    {
         // TODO(#11880): Release all active objects (or verify that none are active) when destroying the pool.
         // ReleaseAll();
     }
