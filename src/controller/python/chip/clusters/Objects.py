@@ -8536,9 +8536,9 @@ class AdministratorCommissioning(Cluster):
 
     class Enums:
         class StatusCode(IntEnum):
-            kSuccess = 0x00
             kBusy = 0x01
-            kGeneralError = 0x02
+            kPAKEParameterError = 0x02
+            kWindowNotOpen = 0x03
 
     class Commands:
         @dataclass
