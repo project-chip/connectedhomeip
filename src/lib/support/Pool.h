@@ -23,12 +23,11 @@
 
 #pragma once
 
-#include <array>
-#include <assert.h>
 #include <atomic>
 #include <limits>
 #include <new>
 #include <stddef.h>
+#include <utility>
 
 namespace chip {
 
