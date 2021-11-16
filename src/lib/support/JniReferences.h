@@ -102,19 +102,20 @@ public:
     jboolean BooleanToPrimitive(jobject boxedObject);
 
     /**
-     * Creates a boxed type (e.g. java.lang.Integer) based on the the class name ("java/lang/Integer"), constructor JNI signature ("(I)V"), and value.
+     * Creates a boxed type (e.g. java.lang.Integer) based on the the class name ("java/lang/Integer"), constructor JNI signature
+     * ("(I)V"), and value.
      */
     template <class T>
     CHIP_ERROR CreateBoxedObject(std::string boxedTypeClsName, std::string constructorSignature, T value, jobject & outObj)
     {
-        JNIEnv * env = GetEnvForCurrentThread();
+        JNIEnv * env   = GetEnvForCurrentThread();
         CHIP_ERROR err = CHIP_NO_ERROR;
         jclass boxedTypeCls;
         err = GetClassRef(env, boxedTypeClsName.c_str(), boxedTypeCls);
         VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
         jmethodID boxedTypeConstructor = env->GetMethodID(boxedTypeCls, "<init>", constructorSignature.c_str());
-        outObj = env->NewObject(boxedTypeCls, boxedTypeConstructor, value);
+        outObj                         = env->NewObject(boxedTypeCls, boxedTypeConstructor, value);
         env->DeleteGlobalRef(boxedTypeCls);
 
         return err;

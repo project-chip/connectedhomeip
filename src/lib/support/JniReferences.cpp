@@ -196,7 +196,8 @@ CHIP_ERROR JniReferences::CreateOptional(jobject objectToWrap, jobject & outOpti
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR JniReferences::GetOptionalValue(jobject optionalObj, jobject & optionalValue) {
+CHIP_ERROR JniReferences::GetOptionalValue(jobject optionalObj, jobject & optionalValue)
+{
     JNIEnv * env = GetEnvForCurrentThread();
     jclass optionalCls;
     chip::JniReferences::GetInstance().GetClassRef(env, "java/util/Optional", optionalCls);
@@ -207,7 +208,8 @@ CHIP_ERROR JniReferences::GetOptionalValue(jobject optionalObj, jobject & option
     VerifyOrReturnError(isPresentMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
     jboolean isPresent = env->CallBooleanMethod(optionalObj, isPresentMethod);
 
-    if (!isPresent) {
+    if (!isPresent)
+    {
         optionalValue = nullptr;
         return CHIP_NO_ERROR;
     }

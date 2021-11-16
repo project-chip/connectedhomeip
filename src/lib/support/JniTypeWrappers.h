@@ -28,20 +28,20 @@ namespace chip {
 class JniUtfString
 {
 public:
-    JniUtfString(JNIEnv * env, jstring string) : mEnv(env), mString(string) {
-        if (string == nullptr) {
+    JniUtfString(JNIEnv * env, jstring string) : mEnv(env), mString(string)
+    {
+        if (string == nullptr)
+        {
             return;
         }
-        mChars = env->GetStringUTFChars(string, 0);
+        mChars      = env->GetStringUTFChars(string, 0);
         mDataLength = env->GetStringUTFLength(string);
     }
     ~JniUtfString() { mEnv->ReleaseStringUTFChars(mString, mChars); }
 
     const char * c_str() const { return mChars; }
 
-    chip::CharSpan charSpan() const {
-        return chip::CharSpan(c_str(), static_cast<size_t>(size()));
-    }
+    chip::CharSpan charSpan() const { return chip::CharSpan(c_str(), static_cast<size_t>(size())); }
 
     jsize size() const { return mDataLength; }
 
@@ -63,7 +63,8 @@ public:
 
     const jbyte * data() const { return mData; }
 
-    chip::ByteSpan byteSpan() const {
+    chip::ByteSpan byteSpan() const
+    {
         return chip::ByteSpan(reinterpret_cast<const uint8_t *>(data()), static_cast<size_t>(size()));
     }
 
@@ -107,14 +108,13 @@ public:
             env->SetByteArrayRegion(mArray, 0, dataLen, data);
         }
     }
-    ByteArray(JNIEnv * env, chip::ByteSpan data): mEnv(env)
+    ByteArray(JNIEnv * env, chip::ByteSpan data) : mEnv(env)
     {
         mArray = mEnv->NewByteArray(static_cast<jsize>(data.size()));
         if (mArray != nullptr)
         {
-            env->SetByteArrayRegion(mArray, 0, static_cast<jsize>(data.size()), reinterpret_cast<const jbyte*>(data.data()));
+            env->SetByteArrayRegion(mArray, 0, static_cast<jsize>(data.size()), reinterpret_cast<const jbyte *>(data.data()));
         }
-
     }
     ~ByteArray() { mEnv->DeleteLocalRef(mArray); }
 

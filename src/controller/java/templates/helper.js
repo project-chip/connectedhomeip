@@ -253,4 +253,4 @@ exports.convertCTypeToJniSignature             = convertCTypeToJniSignature;
 exports.convertBasicCTypeToJavaBoxedType       = convertBasicCTypeToJavaBoxedType;
 exports.convertAttributeCallbackTypeToJavaName = convertAttributeCallbackTypeToJavaName;
 exports.notLastSupportedEntryTypes             = notLastSupportedEntryTypes;
-exports.notLastSupportedCommandResponseType = notLastSupportedCommandResponseType;
+exports.notLastSupportedCommandResponseType    = notLastSupportedCommandResponseType;
