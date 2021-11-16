@@ -91,7 +91,7 @@ jobs:
               timeout-minutes: 20
               run: scripts/build/gn_build.sh
     build_linux:
-        name: Build on Linux (gcc_release, clang, mbedtls)
+        name: Build on Linux (gcc_release, clang, mbedtls, simulated)
         timeout-minutes: 60
 
         runs-on: ubuntu-latest
@@ -149,7 +149,7 @@ jobs:
 
                       CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
                       CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_build.sh
-                      scripts/tests/gn_tests.sh
+                      BUILD_TYPE="$BUILD_TYPE" scripts/tests/gn_tests.sh
                   done
             - name: Build using build_examples.py
               timeout-minutes: 30
@@ -256,7 +256,7 @@ jobs:
             #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
             #   uses: github/codeql-action/analyze@v1
     build_darwin:
-        name: Build on Darwin (clang, python_lib)
+        name: Build on Darwin (clang, python_lib, simulated)
         timeout-minutes: 90
 
         env:
@@ -310,7 +310,7 @@ jobs:
                       esac
                       CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
                       CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_build.sh
-                      scripts/tests/gn_tests.sh
+                      BUILD_TYPE="$BUILD_TYPE" scripts/tests/gn_tests.sh
                   done
             - name: Uploading diagnostic logs
               uses: actions/upload-artifact@v2
@@ -318,10 +318,6 @@ jobs:
               with:
                   name: crash-log-darwin
                   path: ~/Library/Logs/DiagnosticReports/
-            - name: Build Simulated device app
-              timeout-minutes: 5
-              run: |
-                  ./scripts/examples/gn_build_test_example.sh app1
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage

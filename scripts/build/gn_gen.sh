@@ -31,4 +31,4 @@ set -x
 
 env
 
-gn --root="${CHIP_ROOT}/${CHIP_ROOT_PATH}" gen --check --fail-on-unused-args "${CHIP_ROOT}/out/${BUILD_TYPE}" "$@"
+gn --root="$CHIP_ROOT/$CHIP_ROOT_PATH" gen --check --fail-on-unused-args "$CHIP_ROOT/out/$BUILD_TYPE" "$@"
