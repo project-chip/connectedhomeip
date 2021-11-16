@@ -32,4 +32,3 @@ gcc_toolchain("${host_os}_${host_cpu}_clang") {
     is_clang = true
   }
 }
-
