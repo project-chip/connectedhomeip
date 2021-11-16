@@ -41,6 +41,33 @@
 
 #include <app/util/af-types.h>
 
+namespace chip {
+namespace app {
+
+enum class ListOperation
+{
+    NotList,
+    ReplaceAll,
+    UpdateItem,
+    DeleteItem,
+    AppendItem
+};
+
+/** @brief Reporting List Attribute Change
+ *
+ * This function is called by the framework when a list attribute managed by the
+ * framework changes.  The application should call this function when an
+ * externally-managed list attribute changes.  The application should use the change
+ * notification to inform its reporting decisions.
+ *
+ * @param endpoint
+ * @param clusterId
+ * @param attributeId
+ * @param listOp
+ */
+void MatterReportingListAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                                ListOperation listOp);
+
 /** @brief Reporting Attribute Change
  *
  * This function is called by the framework when an attribute managed by the
@@ -63,3 +90,6 @@ void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::Clu
  * Same but with just an attribute path and no data available.
  */
 void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
+
+}; // namespace app
+}; // namespace chip

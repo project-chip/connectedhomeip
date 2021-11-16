@@ -55,6 +55,7 @@
 #include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
+using namespace chip::app;
 
 //------------------------------------------------------------------------------
 

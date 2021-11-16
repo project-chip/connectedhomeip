@@ -144,8 +144,9 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
                 if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
                 {
                     // If General Diagnostics cluster is implemented on this endpoint
-                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                           GeneralDiagnostics::Attributes::NetworkInterfaces::Id);
+                    MatterReportingListAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                               GeneralDiagnostics::Attributes::NetworkInterfaces::Id,
+                                                               ListOperation::ReplaceAll);
                 }
             }
         }

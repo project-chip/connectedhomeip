@@ -53,6 +53,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 
 using namespace chip;
+using namespace chip::app;
 
 //------------------------------------------------------------------------------
 // Globals

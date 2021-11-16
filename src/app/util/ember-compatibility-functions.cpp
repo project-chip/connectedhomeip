@@ -600,8 +600,13 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     return apWriteHandler->AddStatus(attributePathParams, imCode);
 }
 
-} // namespace app
-} // namespace chip
+void MatterReportingListAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                                ListOperation listOp)
+{
+    // TODO: We need to trigger the reporting based on detailed list operations; delete/update/append...
+    // At this moment, we just mark the list attribute as dirty to send all fields in report.
+    MatterReportingAttributeChangeCallback(endpoint, clusterId, attributeId);
+}
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                             uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
@@ -628,3 +633,6 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // context without requiring any explicit 'start' or 'end' change calls into the engine to book-end the change.
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
+
+} // namespace app
+} // namespace chip

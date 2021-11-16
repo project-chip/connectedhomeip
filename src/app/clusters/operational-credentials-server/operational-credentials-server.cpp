@@ -164,13 +164,14 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & 
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr uint16_t kMaxRspLen = 900;
 
-void fabricListChanged()
+void fabricListChanged(ListOperation operation)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to fabricListChanged");
 
     // Currently, we only manage FabricsList attribute in endpoint 0, OperationalCredentials cluster is always required to be on
     // EP0.
-    MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::FabricsList::Id);
+    MatterReportingListAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::FabricsList::Id,
+                                               operation);
     MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
                                            OperationalCredentials::Attributes::CommissionedFabrics::Id);
 }
@@ -200,7 +201,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     void OnFabricDeletedFromStorage(FabricIndex fabricId) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%" PRIu8 " was deleted from fabric storage.", fabricId);
-        fabricListChanged();
+        fabricListChanged(ListOperation::DeleteItem);
     }
 
     // Gets called when a fabric is loaded into the FabricTable from KVS store.
@@ -211,7 +212,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
                        fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
-        fabricListChanged();
+        fabricListChanged(ListOperation::UpdateItem);
     }
 
     // Gets called when a fabric in FabricTable is persisted to KVS store.
@@ -222,7 +223,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
                        ", NodeId " ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
                        fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
-        fabricListChanged();
+        fabricListChanged(ListOperation::AppendItem);
     }
 };
 
@@ -273,7 +274,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
     app::DnssdServer::Instance().StartServer();
 
 exit:
-    fabricListChanged();
+    fabricListChanged(ListOperation::DeleteItem);
     emberAfSendImmediateDefaultResponse(status);
     if (err == CHIP_NO_ERROR)
     {
@@ -321,7 +322,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
-    fabricListChanged();
+    fabricListChanged(ListOperation::UpdateItem);
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
@@ -690,8 +691,9 @@ exit:
     }
     else
     {
-        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                               OperationalCredentials::Attributes::TrustedRootCertificates::Id);
+        MatterReportingListAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                                   OperationalCredentials::Attributes::TrustedRootCertificates::Id,
+                                                   ListOperation::AppendItem);
     }
 
     return true;
@@ -704,8 +706,9 @@ bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
 
-    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                           OperationalCredentials::Attributes::TrustedRootCertificates::Id);
+    MatterReportingListAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                               OperationalCredentials::Attributes::TrustedRootCertificates::Id,
+                                               ListOperation::DeleteItem);
 
     return true;
 }
