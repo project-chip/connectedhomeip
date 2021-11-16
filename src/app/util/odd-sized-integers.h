@@ -78,18 +78,18 @@ struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>>
     // BIGENDIAN_CPU to match how the attribute store works, because that's
     // what where our data buffer is eventually ending up or coming from.
 #if BIGENDIAN_CPU
-    static constexpr int highIndex  = 0;
-    static constexpr int lowIndex = ByteSize - 1;
-    static constexpr int lowerIndex = 1;
-    static constexpr int raiseIndex = -1;
+    static constexpr int highIndex     = 0;
+    static constexpr int lowIndex      = ByteSize - 1;
+    static constexpr int lowerIndex    = 1;
+    static constexpr int raiseIndex    = -1;
     static constexpr int pastLowIndex  = ByteSize;
     static constexpr int pastHighIndex = -1;
 #else  // BIGENDIAN_CPU
-    static constexpr int highIndex  = ByteSize - 1;
-    static constexpr int lowIndex   = 0;
-    static constexpr int lowerIndex = -1;
-    static constexpr int raiseIndex = 1;
-    static constexpr int pastLowIndex   = -1;
+    static constexpr int highIndex     = ByteSize - 1;
+    static constexpr int lowIndex      = 0;
+    static constexpr int lowerIndex    = -1;
+    static constexpr int raiseIndex    = 1;
+    static constexpr int pastLowIndex  = -1;
     static constexpr int pastHighIndex = ByteSize;
 #endif // BIGENDIAN_CPU
 
@@ -118,11 +118,13 @@ struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>>
         return value;
     }
 
-    static constexpr void WorkingToStorage(WorkingType workingValue, StorageType & storageValue) {
+    static constexpr void WorkingToStorage(WorkingType workingValue, StorageType & storageValue)
+    {
         // We can just grab the low ByteSize bytes of workingValue.
-        for (int i = lowIndex; i != pastHighIndex; i += raiseIndex) {
+        for (int i = lowIndex; i != pastHighIndex; i += raiseIndex)
+        {
             storageValue[i] = workingValue & 0xFF;
-            workingValue = workingValue >> 8;
+            workingValue    = workingValue >> 8;
         }
     }
 
