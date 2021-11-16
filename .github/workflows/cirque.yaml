@@ -104,7 +104,8 @@ jobs:
                     chip_build_tests=false \
                     enable_host_gcc_build=true \
                     enable_host_gcc_mbedtls_build=false \
-                    enable_host_clang_build = false
+                    enable_host_clang_build = false \
+                    enable_fake_tests = false
             - name: Run Tests
               timeout-minutes: 25
               run: |
