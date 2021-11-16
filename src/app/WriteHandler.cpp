@@ -202,7 +202,13 @@ CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayl
     }
     SuccessOrExit(err);
 
-    err = writeRequestParser.GetAttributeReportIBs(&AttributeDataIBsParser);
+    err = writeRequestParser.GetTimedRequest(&mIsTimedRequest);
+    SuccessOrExit(err);
+
+    err = writeRequestParser.GetIsFabricFiltered(&mIsFabricFiltered);
+    SuccessOrExit(err);
+
+    err = writeRequestParser.GetWriteRequests(&AttributeDataIBsParser);
     SuccessOrExit(err);
     AttributeDataIBsParser.GetReader(&AttributeDataIBsReader);
     err = ProcessAttributeDataIBs(AttributeDataIBsReader);
