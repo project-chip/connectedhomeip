@@ -3550,6 +3550,32 @@ public class ClusterReadMapping {
     readPumpConfigurationAndControlInteractionInfo.put(
         "readSpeedAttribute", readPumpConfigurationAndControlSpeedAttributeInteractionInfo);
     Map<String, CommandParameterInfo>
+        readPumpConfigurationAndControlLifetimeRunningHoursCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPumpConfigurationAndControlLifetimeRunningHoursAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
+                  .readLifetimeRunningHoursAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readPumpConfigurationAndControlLifetimeRunningHoursCommandParams);
+    readPumpConfigurationAndControlInteractionInfo.put(
+        "readLifetimeRunningHoursAttribute",
+        readPumpConfigurationAndControlLifetimeRunningHoursAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPumpConfigurationAndControlPowerCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPumpConfigurationAndControlPowerAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
+                  .readPowerAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readPumpConfigurationAndControlPowerCommandParams);
+    readPumpConfigurationAndControlInteractionInfo.put(
+        "readPowerAttribute", readPumpConfigurationAndControlPowerAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
         readPumpConfigurationAndControlLifetimeEnergyConsumedCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readPumpConfigurationAndControlLifetimeEnergyConsumedAttributeInteractionInfo =

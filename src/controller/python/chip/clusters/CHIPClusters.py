@@ -3145,6 +3145,20 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000015: {
+                "attributeName": "LifetimeRunningHours",
+                "attributeId": 0x00000015,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000016: {
+                "attributeName": "Power",
+                "attributeId": 0x00000016,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
             0x00000017: {
                 "attributeName": "LifetimeEnergyConsumed",
                 "attributeId": 0x00000017,
@@ -6564,6 +6578,18 @@ class ChipClusters:
     def ClusterPumpConfigurationAndControl_SubscribeAttributeSpeed(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Speed(device, ZCLendpoint, minInterval, maxInterval)
 
+    def ClusterPumpConfigurationAndControl_ReadAttributeLifetimeRunningHours(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeRunningHours(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_SubscribeAttributeLifetimeRunningHours(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_LifetimeRunningHours(device, ZCLendpoint, minInterval, maxInterval)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributePower(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Power(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_SubscribeAttributePower(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Power(device, ZCLendpoint, minInterval, maxInterval)
+
     def ClusterPumpConfigurationAndControl_ReadAttributeLifetimeEnergyConsumed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeEnergyConsumed(device, ZCLendpoint, ZCLgroupid)
 
@@ -9876,6 +9902,22 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Speed.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Speed.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute LifetimeRunningHours
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeRunningHours.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeRunningHours.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl SubscribeAttribute LifetimeRunningHours
+        self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_LifetimeRunningHours.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_LifetimeRunningHours.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute Power
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Power.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Power.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl SubscribeAttribute Power
+        self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Power.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Power.restype = ctypes.c_uint32
         # Cluster PumpConfigurationAndControl ReadAttribute LifetimeEnergyConsumed
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeEnergyConsumed.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

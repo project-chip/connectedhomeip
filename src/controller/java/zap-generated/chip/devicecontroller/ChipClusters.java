@@ -8902,6 +8902,40 @@ public class ChipClusters {
       reportSpeedAttribute(chipClusterPtr, callback);
     }
 
+    public void readLifetimeRunningHoursAttribute(LongAttributeCallback callback) {
+      readLifetimeRunningHoursAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeLifetimeRunningHoursAttribute(DefaultClusterCallback callback, long value) {
+      writeLifetimeRunningHoursAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void subscribeLifetimeRunningHoursAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeLifetimeRunningHoursAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportLifetimeRunningHoursAttribute(LongAttributeCallback callback) {
+      reportLifetimeRunningHoursAttribute(chipClusterPtr, callback);
+    }
+
+    public void readPowerAttribute(LongAttributeCallback callback) {
+      readPowerAttribute(chipClusterPtr, callback);
+    }
+
+    public void writePowerAttribute(DefaultClusterCallback callback, long value) {
+      writePowerAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void subscribePowerAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribePowerAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportPowerAttribute(LongAttributeCallback callback) {
+      reportPowerAttribute(chipClusterPtr, callback);
+    }
+
     public void readLifetimeEnergyConsumedAttribute(LongAttributeCallback callback) {
       readLifetimeEnergyConsumedAttribute(chipClusterPtr, callback);
     }
@@ -9148,6 +9182,28 @@ public class ChipClusters {
 
     private native void reportSpeedAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readLifetimeRunningHoursAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void writeLifetimeRunningHoursAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, long value);
+
+    private native void subscribeLifetimeRunningHoursAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportLifetimeRunningHoursAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readPowerAttribute(long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void writePowerAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, long value);
+
+    private native void subscribePowerAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportPowerAttribute(long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readLifetimeEnergyConsumedAttribute(
         long chipClusterPtr, LongAttributeCallback callback);

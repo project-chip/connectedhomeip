@@ -12,6 +12,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage-null-handling.h>
+#include <app/util/odd-sized-integers.h>
 
 namespace chip {
 namespace app {
@@ -58,24 +59,25 @@ EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value)
     {{>value}}.reduce_size(length);
     return status;
     {{else}}
-    NumericAttributeTraits<{{asUnderlyingZclType type}}>::StorageType temp;
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, {{>clusterId}}, Id, reinterpret_cast<uint8_t *>(&temp), sizeof(temp));
+    NumericAttributeTraits<{{accessorTraitType type}}>::StorageType temp;
+    uint8_t * readable = NumericAttributeTraits<{{accessorTraitType type}}>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, {{>clusterId}}, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     {{#if isNullable}}
-    if (NumericAttributeTraits<{{asUnderlyingZclType type}}>::IsNullValue(temp))
+    if (NumericAttributeTraits<{{accessorTraitType type}}>::IsNullValue(temp))
     {
         value.SetNull();
     }
     else
     {
-        value.SetNonNull() = temp;
+        value.SetNonNull() = NumericAttributeTraits<{{accessorTraitType type}}>::StorageToWorking(temp);
     }
     {{else}}
-    if (!NumericAttributeTraits<{{asUnderlyingZclType type}}>::CanRepresentValue(/* isNullable = */ {{isNullable}}, temp))
+    if (!NumericAttributeTraits<{{accessorTraitType type}}>::CanRepresentValue(/* isNullable = */ {{isNullable}}, temp))
     {
         return EMBER_ZCL_STATUS_INVALID_VALUE;
     }
-    *value = temp;
+    *value = NumericAttributeTraits<{{accessorTraitType type}}>::StorageToWorking(temp);
     {{/if}}
     return status;
     {{/if}}
@@ -92,11 +94,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} value)
     memcpy(&zclString[{{>sizingBytes}}], value.data(), value.size());
     return emberAfWriteServerAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPE);
     {{else}}
-    if (!NumericAttributeTraits<{{asUnderlyingZclType type}}>::CanRepresentValue(/* isNullable = */ {{isNullable}}, value))
+    if (!NumericAttributeTraits<{{accessorTraitType type}}>::CanRepresentValue(/* isNullable = */ {{isNullable}}, value))
     {
         return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
     }
-    return emberAfWriteServerAttribute(endpoint, {{>clusterId}}, Id, (uint8_t *) &value, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    NumericAttributeTraits<{{accessorTraitType type}}>::StorageType storageValue;
+    NumericAttributeTraits<{{accessorTraitType type}}>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<{{accessorTraitType type}}>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, {{>clusterId}}, Id, writable, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPE);
     {{/if}}
 }
 
@@ -107,8 +112,10 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     uint8_t zclString[{{>sizingBytes}}] = { {{#if (isShortString type)}}0xFF{{else}}0xFF, 0xFF{{/if}} };
     return emberAfWriteServerAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPE);
     {{else}}
-    auto value = NumericAttributeTraits<{{asUnderlyingZclType type}}>::kNullValue;
-    return emberAfWriteServerAttribute(endpoint, {{>clusterId}}, Id, reinterpret_cast<uint8_t *>(&value), ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPE);
+    NumericAttributeTraits<{{accessorTraitType type}}>::StorageType value;
+    NumericAttributeTraits<{{accessorTraitType type}}>::SetNull(value);
+    uint8_t * writable = NumericAttributeTraits<{{accessorTraitType type}}>::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, {{>clusterId}}, Id, writable, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPE);
     {{/if}}
 }
 

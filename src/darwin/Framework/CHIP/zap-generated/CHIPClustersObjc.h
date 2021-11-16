@@ -2174,6 +2174,20 @@ NS_ASSUME_NONNULL_BEGIN
                                responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeSpeedWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeLifetimeRunningHoursWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)subscribeAttributeLifetimeRunningHoursWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLifetimeRunningHoursWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePowerWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributePowerWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)subscribeAttributePowerWithMinInterval:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                               responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePowerWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeLifetimeEnergyConsumedWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeLifetimeEnergyConsumedWithMinInterval:(uint16_t)minInterval
                                                     maxInterval:(uint16_t)maxInterval
