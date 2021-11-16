@@ -23,7 +23,7 @@ CHIP_ERROR TestCommand::RunCommand()
     return mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
-void TestCommand::OnDeviceConnectedFn(void * context, chip::DeviceProxy * device)
+void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
 {
     ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
     auto * command = static_cast<TestCommand *>(context);

@@ -532,7 +532,7 @@ struct GetDeviceCallbacks
         mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnConnectionFailureFn, this), mCallback(callback)
     {}
 
-    static void OnDeviceConnectedFn(void * context, DeviceProxy * device)
+    static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
     {
         auto * self = static_cast<GetDeviceCallbacks *>(context);
         self->mCallback(device, CHIP_NO_ERROR.AsInteger());

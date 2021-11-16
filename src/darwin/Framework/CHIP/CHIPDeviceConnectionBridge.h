@@ -48,7 +48,7 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnected;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectFailed;
 
-    static void OnConnected(void * context, chip::DeviceProxy * device);
+    static void OnConnected(void * context, chip::OperationalDeviceProxy * device);
     static void OnConnectionFailure(void * context, chip::NodeId deviceId, CHIP_ERROR error);
 };
 

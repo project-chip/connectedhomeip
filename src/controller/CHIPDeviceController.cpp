@@ -675,12 +675,6 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
 CHIP_ERROR DeviceCommissioner::GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                   Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
-    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == deviceId &&
-        mDeviceBeingCommissioned->IsSecureConnected())
-    {
-        onConnection->mCall(onConnection->mContext, mDeviceBeingCommissioned);
-        return CHIP_NO_ERROR;
-    }
     return DeviceController::GetConnectedDevice(deviceId, onConnection, onFailure);
 }
 
@@ -1557,7 +1551,7 @@ void DeviceCommissioner::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHI
 
 #endif
 
-void DeviceCommissioner::OnDeviceConnectedFn(void * context, DeviceProxy * device)
+void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));

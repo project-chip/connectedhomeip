@@ -66,7 +66,7 @@ struct DeviceProxyInitParams
 
 class OperationalDeviceProxy;
 
-typedef void (*OnDeviceConnected)(void * context, DeviceProxy * device);
+typedef void (*OnDeviceConnected)(void * context, OperationalDeviceProxy * device);
 typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
 
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, SessionReleaseDelegate, public SessionEstablishmentDelegate
