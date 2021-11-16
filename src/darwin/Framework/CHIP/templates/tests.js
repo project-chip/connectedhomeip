@@ -168,6 +168,7 @@ function getTests()
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
+    'TestGroupMessaging',
   ];
 
   const SoftwareDiagnostics = [
