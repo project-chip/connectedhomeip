@@ -22,9 +22,6 @@
 
 #pragma once
 
-#include <lib/support/CodeUtils.h>
-
-#include <assert.h>
 #include <atomic>
 #include <limits>
 #include <new>
