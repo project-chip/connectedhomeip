@@ -95,7 +95,6 @@ pw_python_action("python") {
     {
       src_dir = "."
       sources = [
-        "ChipReplStartup.py",
         "chip-device-ctrl.py",
         "chip-repl.py",
         "chip/ChipBleBase.py",
@@ -104,6 +103,7 @@ pw_python_action("python") {
         "chip/ChipCommissionableNodeCtrl.py",
         "chip/ChipCoreBluetoothMgr.py",
         "chip/ChipDeviceCtrl.py",
+        "chip/ChipReplStartup.py",
         "chip/ChipStack.py",
         "chip/ChipUtility.py",
         "chip/__init__.py",
