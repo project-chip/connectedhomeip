@@ -938,7 +938,7 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
     FreeRendezvousSession();
 
-    if (mDeviceBeingCommissioned != nullptr)
+    if (mDeviceBeingCommissioned != nullptr && mIsIPRendezvous)
     {
         // Release the commissionee device. For BLE, this is stored,
         // for IP commissioning, we have taken a reference to the
