@@ -36,15 +36,6 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR StatusIB::Parser::Init(const TLV::TLVReader & aReader)
-{
-    // make a copy of the reader here
-    mReader.Init(aReader);
-    VerifyOrReturnError(TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR StatusIB::Parser::DecodeStatusIB(StatusIB & aStatusIB) const
 {
     TLV::TLVReader reader;

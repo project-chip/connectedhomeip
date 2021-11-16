@@ -16,9 +16,9 @@
  */
 
 #pragma once
-#include "Builder.h"
 #include "EventPaths.h"
-#include "Parser.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -36,13 +36,9 @@ enum
     kCsTag_MaxIntervalCeilingSeconds = 2,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public StructParser
 {
 public:
-    /**
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this response
-     */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
@@ -83,11 +79,9 @@ public:
     CHIP_ERROR GetMaxIntervalCeilingSeconds(uint16_t * const apMaxIntervalCeilingSeconds) const;
 };
 
-class Builder : public chip::app::Builder
+class Builder : public StructBuilder
 {
 public:
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
-
     /**
      *  @brief final subscription Id for the subscription back to the client.s.
      */
