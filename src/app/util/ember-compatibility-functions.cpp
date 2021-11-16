@@ -33,6 +33,7 @@
 #include <app/util/attribute-table.h>
 #include <app/util/ember-compatibility-functions.h>
 #include <app/util/error-mapping.h>
+#include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -198,7 +199,7 @@ CHIP_ERROR attributeBufferToNumericTlvData(TLV::TLVWriter & writer, bool isNulla
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    return writer.Put(tag, static_cast<T>(value));
+    return NumericAttributeTraits<T>::Encode(writer, tag, value);
 }
 
 } // anonymous namespace
@@ -283,9 +284,33 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
             ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint16_t>(*writer, isNullable));
             break;
         }
+        case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
+        {
+            using IntType = OddSizedInteger<3, false>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
+            break;
+        }
         case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
         {
             ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint32_t>(*writer, isNullable));
+            break;
+        }
+        case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
+        {
+            using IntType = OddSizedInteger<5, false>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
+            break;
+        }
+        case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
+        {
+            using IntType = OddSizedInteger<6, false>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
+            break;
+        }
+        case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
+        {
+            using IntType = OddSizedInteger<7, false>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
             break;
         }
         case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
@@ -303,9 +328,33 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
             ReturnErrorOnFailure(attributeBufferToNumericTlvData<int16_t>(*writer, isNullable));
             break;
         }
+        case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
+        {
+            using IntType = OddSizedInteger<3, true>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
+            break;
+        }
         case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
         {
             ReturnErrorOnFailure(attributeBufferToNumericTlvData<int32_t>(*writer, isNullable));
+            break;
+        }
+        case ZCL_INT40S_ATTRIBUTE_TYPE: // Signed 40-bit integer
+        {
+            using IntType = OddSizedInteger<5, true>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
+            break;
+        }
+        case ZCL_INT48S_ATTRIBUTE_TYPE: // Signed 48-bit integer
+        {
+            using IntType = OddSizedInteger<6, true>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
+            break;
+        }
+        case ZCL_INT56S_ATTRIBUTE_TYPE: // Signed 56-bit integer
+        {
+            using IntType = OddSizedInteger<7, true>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
             break;
         }
         case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
@@ -459,14 +508,14 @@ CHIP_ERROR numericTlvDataToAttributeBuffer(TLV::TLVReader & aReader, bool isNull
     static_assert(sizeof(value) <= sizeof(attributeData), "Value cannot fit into attribute data");
     if (isNullable && aReader.GetType() == TLV::kTLVType_Null)
     {
-        value = NumericAttributeTraits<T>::kNullValue;
+        NumericAttributeTraits<T>::SetNull(value);
     }
     else
     {
-        T val;
+        typename NumericAttributeTraits<T>::WorkingType val;
         ReturnErrorOnFailure(aReader.Get(val));
         VerifyOrReturnError(NumericAttributeTraits<T>::CanRepresentValue(isNullable, val), CHIP_ERROR_INVALID_ARGUMENT);
-        value = val;
+        NumericAttributeTraits<T>::WorkingToStorage(val, value);
     }
     dataLen = sizeof(value);
     memcpy(attributeData, &value, sizeof(value));
@@ -515,16 +564,56 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * metadata, TLV::TLVR
         return numericTlvDataToAttributeBuffer<uint8_t>(aReader, isNullable, dataLen);
     case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
         return numericTlvDataToAttributeBuffer<uint16_t>(aReader, isNullable, dataLen);
+    case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
+    {
+        using IntType = OddSizedInteger<3, false>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
     case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
         return numericTlvDataToAttributeBuffer<uint32_t>(aReader, isNullable, dataLen);
+    case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
+    {
+        using IntType = OddSizedInteger<5, false>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
+    case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
+    {
+        using IntType = OddSizedInteger<6, false>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
+    case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
+    {
+        using IntType = OddSizedInteger<7, false>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
     case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
         return numericTlvDataToAttributeBuffer<uint64_t>(aReader, isNullable, dataLen);
     case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
         return numericTlvDataToAttributeBuffer<int8_t>(aReader, isNullable, dataLen);
     case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
         return numericTlvDataToAttributeBuffer<int16_t>(aReader, isNullable, dataLen);
+    case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
+    {
+        using IntType = OddSizedInteger<3, true>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
     case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
         return numericTlvDataToAttributeBuffer<int32_t>(aReader, isNullable, dataLen);
+    case ZCL_INT40S_ATTRIBUTE_TYPE: // Signed 40-bit integer
+    {
+        using IntType = OddSizedInteger<5, true>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
+    case ZCL_INT48S_ATTRIBUTE_TYPE: // Signed 48-bit integer
+    {
+        using IntType = OddSizedInteger<6, true>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
+    case ZCL_INT56S_ATTRIBUTE_TYPE: // Signed 56-bit integer
+    {
+        using IntType = OddSizedInteger<7, true>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
     case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
         return numericTlvDataToAttributeBuffer<int64_t>(aReader, isNullable, dataLen);
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string

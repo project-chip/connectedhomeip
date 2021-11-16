@@ -1277,6 +1277,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSpeedWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeLifetimeRunningHoursWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePowerWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributePowerWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeLifetimeEnergyConsumedWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeOperationModeWithResponseHandler:(ResponseHandler)responseHandler;

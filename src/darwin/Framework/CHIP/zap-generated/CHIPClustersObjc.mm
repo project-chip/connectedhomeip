@@ -5356,6 +5356,46 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)readAttributeLifetimeRunningHoursWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeLifetimeRunningHours(success, failure);
+    });
+}
+
+- (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        ListFreer listFreer;
+        using TypeInfo = PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedIntValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)readAttributePowerWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributePower(success, failure);
+    });
+}
+
+- (void)writeAttributePowerWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        ListFreer listFreer;
+        using TypeInfo = PumpConfigurationAndControl::Attributes::Power::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedIntValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
 - (void)readAttributeLifetimeEnergyConsumedWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
