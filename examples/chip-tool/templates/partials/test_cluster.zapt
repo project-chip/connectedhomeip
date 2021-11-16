@@ -164,7 +164,7 @@ class {{filename}}: public TestCommand
         {{else}}
         chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
         {{#if isGroupCommand}}
-        cluster.Associate(groupId, mDevice);
+        cluster.AssociateWithGroup(mDevice, groupId);
         {{else}}
         cluster.Associate(mDevice, endpoint);
         {{/if}}

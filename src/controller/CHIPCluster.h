@@ -51,7 +51,7 @@ public:
     virtual ~ClusterBase() {}
 
     CHIP_ERROR Associate(DeviceProxy * device, EndpointId endpoint);
-    CHIP_ERROR Associate(GroupId groupId, DeviceProxy * device);
+    CHIP_ERROR AssociateWithGroup(DeviceProxy * device, GroupId groupId);
 
     void Dissociate();
 
