@@ -1,0 +1,57 @@
+{{> header}}
+{{#if (chip_has_client_clusters)}}
+
+package chip.devicecontroller;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.HashMap;
+import chip.clusterinfo.ClusterInfo;
+import chip.clusterinfo.InteractionInfo;
+import chip.clusterinfo.CommandParameterInfo;
+import chip.clusterinfo.DelegatedClusterCallback;
+import chip.clusterinfo.ClusterCommandCallback;
+import chip.clusterinfo.CommandResponseInfo;
+import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
+import chip.devicecontroller.ClusterInfoMapping.DelegatedIntegerAttributeCallback;
+
+
+
+public class ClusterReadMapping {
+
+  public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
+    ClusterInfoMapping clusterInfoMapping = new ClusterInfoMapping();
+    Map<String, Map<String, InteractionInfo>> readAttributeMap = new HashMap<>();
+    {{#chip_client_clusters}}
+       Map<String, InteractionInfo> read{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
+        {{#chip_server_cluster_attributes}}
+        Map<String, CommandParameterInfo> read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster).read{{asUpperCamelCase name}}Attribute(
+            {{#if isList}}
+              (ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback) callback
+            {{else}}
+              (ChipClusters.{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback) callback
+            {{/if}}
+            );
+          },
+          {{#if isList}}
+            () -> clusterInfoMapping.new Delegated{{asUpperCamelCase name}}AttributeCallback(),
+          {{else}}
+            () -> clusterInfoMapping.new Delegated{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback(),
+          {{/if}}
+          read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams
+        );
+        read{{asUpperCamelCase ../name}}InteractionInfo.put("read{{asUpperCamelCase name}}Attribute", read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo);
+        {{/chip_server_cluster_attributes}}
+        readAttributeMap.put("{{asLowerCamelCase name}}", read{{asUpperCamelCase name}}InteractionInfo);
+        {{/chip_client_clusters}}
+        return readAttributeMap;
+  }
+}
+
+{{/if}}
+

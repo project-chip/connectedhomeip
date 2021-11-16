@@ -15,6 +15,8 @@ import chip.clusterinfo.DelegatedClusterCallback;
 import chip.clusterinfo.ClusterCommandCallback;
 import chip.clusterinfo.CommandResponseInfo;
 import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
+import chip.devicecontroller.ClusterReadMapping;
+import chip.devicecontroller.ClusterWriteMapping;
 
 
 public class ClusterInfoMapping {
@@ -261,9 +263,9 @@ public class ClusterInfoMapping {
     Map<String, ClusterInfo> clusterMap = initializeClusterMap();
     Map<String, Map<String, InteractionInfo>> commandMap = getCommandMap();
     combineCommand(clusterMap, commandMap);
-    Map<String, Map<String, InteractionInfo>> readAttributeMap = getReadAttributeMap();
+    Map<String, Map<String, InteractionInfo>> readAttributeMap = new ClusterReadMapping().getReadAttributeMap();
     combineCommand(clusterMap, readAttributeMap);
-    Map<String, Map<String, InteractionInfo>> writeAttributeMap = getWriteAttributeMap();
+    Map<String, Map<String, InteractionInfo>> writeAttributeMap = new ClusterWriteMapping().getWriteAttributeMap();
     combineCommand(clusterMap, writeAttributeMap);
     return clusterMap;
  }
@@ -336,65 +338,6 @@ public class ClusterInfoMapping {
      return commandMap;
   }
 
- public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
-   Map<String, Map<String, InteractionInfo>> readAttributeMap = new HashMap<>();
-   {{#chip_client_clusters}}
-      Map<String, InteractionInfo> read{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
-     // read attribute
-       {{#chip_server_cluster_attributes}}
-       Map<String, CommandParameterInfo> read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-       InteractionInfo read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo = new InteractionInfo(
-         (cluster, callback, commandArguments) -> {
-           ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster).read{{asUpperCamelCase name}}Attribute(
-           {{#if isList}}
-             (ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback) callback
-           {{else}}
-             (ChipClusters.{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback) callback
-           {{/if}}
-           );
-         },
-         {{#if isList}}
-           () -> new Delegated{{asUpperCamelCase name}}AttributeCallback(),
-         {{else}}
-           () -> new Delegated{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback(),
-         {{/if}}
-         read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams
-       );
-       read{{asUpperCamelCase ../name}}InteractionInfo.put("read{{asUpperCamelCase name}}Attribute", read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo);
-       {{/chip_server_cluster_attributes}}
-       readAttributeMap.put("{{asLowerCamelCase name}}", read{{asUpperCamelCase name}}InteractionInfo);
-       {{/chip_client_clusters}}
-       return readAttributeMap;
- }
-
- public Map<String, Map<String, InteractionInfo>> getWriteAttributeMap() {
-   Map<String, Map<String, InteractionInfo>> writeAttributeMap = new HashMap<>();
-   {{#chip_client_clusters}}
-     Map<String, InteractionInfo> write{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
-     // write attribute
-       {{#chip_server_cluster_attributes}}
-       {{#if isWritableAttribute}}
-       Map<String, CommandParameterInfo> write{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-       CommandParameterInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameterInfo = new CommandParameterInfo("value", {{asJavaBasicType type}}.class);
-       write{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams.put("value",{{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameterInfo);
-       InteractionInfo write{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo = new InteractionInfo(
-         (cluster, callback, commandArguments) -> {
-           ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster).write{{asUpperCamelCase name}}Attribute(
-             (DefaultClusterCallback) callback,
-             ({{asJavaBoxedType type}})
-             commandArguments.get("value")
-           );
-         },
-         () -> new DelegatedDefaultClusterCallback(),
-         write{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams
-       );
-       write{{asUpperCamelCase ../name}}InteractionInfo.put("write{{asUpperCamelCase name}}Attribute", write{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo);
-       {{/if}}
-       {{/chip_server_cluster_attributes}}
-       writeAttributeMap.put("{{asLowerCamelCase name}}", write{{asUpperCamelCase name}}InteractionInfo);
-   {{/chip_client_clusters}}
-   return writeAttributeMap;
- }
 }
 
 {{/if}}
