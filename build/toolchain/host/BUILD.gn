@@ -33,7 +33,7 @@ gcc_toolchain("${host_os}_${host_cpu}_clang") {
   }
 }
 
-if (defined(chip_fake_plaform)) {
+if (defined(chip_fake_platform)) {
   gcc_toolchain("fake_${host_cpu}_gcc") {
     toolchain_args = {
       current_os = host_os
