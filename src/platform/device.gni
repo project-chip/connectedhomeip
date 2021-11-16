@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
 import("${chip_root}/src/ble/ble.gni")
 
 declare_args() {
@@ -22,6 +21,7 @@ declare_args() {
   chip_device_platform = "auto"
   chip_platform_target = ""
 
+  # Substitue fake platform when building with chip_device_platform=auto.
   chip_fake_platform = false
 }
 
