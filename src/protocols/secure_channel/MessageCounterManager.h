@@ -49,6 +49,7 @@ public:
     CHIP_ERROR StartSync(SessionHandle session, Transport::SecureSession * state) override;
     CHIP_ERROR QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, SessionHandle session,
                                                 Transport::SecureSession * state, const Transport::PeerAddress & peerAddress,
+                                                const Transport::PeerAddress & localAddress,
                                                 System::PacketBufferHandle && msgBuf) override;
 
     /**
@@ -74,7 +75,7 @@ public:
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToReceiveTable(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+    CHIP_ERROR AddToReceiveTable(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, const Transport::PeerAddress & localAddress,
                                  System::PacketBufferHandle && msgBuf);
 
 private:
@@ -91,6 +92,7 @@ private:
     struct ReceiveTableEntry
     {
         Transport::PeerAddress peerAddress; /**< The peer address for the message*/
+        Transport::PeerAddress localAddress; /**< The local address for the message*/
         System::PacketBufferHandle msgBuf;  /**< A handle to the PacketBuffer object holding the message data. */
     };
 

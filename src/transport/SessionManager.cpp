@@ -206,7 +206,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle sessionHandle, cons
 
     if (mTransportMgr != nullptr)
     {
-        return mTransportMgr->SendMessage(*destination, std::move(msgBuf));
+        // TODO: use correct local address. Now we are using unspecified local address for backward compatibility
+        return mTransportMgr->SendMessage(*destination, PeerAddress(destination->GetTransportType()), std::move(msgBuf));
     }
     else
     {
@@ -314,26 +315,26 @@ void SessionManager::CancelExpiryTimer()
     }
 }
 
-void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
+void SessionManager::OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
 {
     PacketHeader packetHeader;
 
-    ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
+    ReturnOnFailure(packetHeader.DecodeAndConsume(message));
 
     if (packetHeader.IsEncrypted())
     {
         if (packetHeader.IsGroupSession())
         {
-            SecureGroupMessageDispatch(packetHeader, peerAddress, std::move(msg));
+            SecureGroupMessageDispatch(packetHeader, peer, std::move(message));
         }
         else
         {
-            SecureUnicastMessageDispatch(packetHeader, peerAddress, std::move(msg));
+            SecureUnicastMessageDispatch(packetHeader, peer, std::move(message));
         }
     }
     else
     {
-        MessageDispatch(packetHeader, peerAddress, std::move(msg));
+        MessageDispatch(packetHeader, peer, std::move(message));
     }
 }
 

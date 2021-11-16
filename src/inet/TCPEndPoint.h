@@ -29,6 +29,7 @@
 
 #include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
+#include <inet/IPPacketInfo.h>
 #include <inet/InetInterface.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/support/Pool.h>
@@ -150,9 +151,7 @@ public:
     /**
      * @brief   Initiate a TCP connection.
      *
-     * @param[in]   addr        the destination IP address
-     * @param[in]   port        the destination TCP port
-     * @param[in]   intfId      an optional network interface indicator
+     * @param[in]   addrInfo  Specify the peer/local address/port, and interface to use
      *
      * @retval  CHIP_NO_ERROR       success: \c msg is queued for transmit.
      * @retval  CHIP_ERROR_NOT_IMPLEMENTED  system implementation not complete.
@@ -165,11 +164,10 @@ public:
      * @retval  other                   another system or platform error
      *
      * @details
-     *      If possible, then this method initiates a TCP connection to the
-     *      destination \c addr (with \c intfId used as the scope
-     *      identifier for IPv6 link-local destinations) and \c port.
+     *      This method initiates a TCP connection to the destination addr/port given by addrInfo, using source
+     *      addr/port given by addrInfo, using the given interface in addrInfo.
      */
-    CHIP_ERROR Connect(const IPAddress & addr, uint16_t port, InterfaceId intfId = InterfaceId::Null());
+    CHIP_ERROR Connect(const IPPacketInfo & addrInfo);
 
     /**
      * @brief   Extract IP address and TCP port of remote endpoint.
@@ -700,7 +698,7 @@ protected:
      */
     virtual CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr) = 0;
     virtual CHIP_ERROR ListenImpl(uint16_t backlog)                                                            = 0;
-    virtual CHIP_ERROR ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId)                  = 0;
+    virtual CHIP_ERROR ConnectImpl(const IPPacketInfo & addrInfo)                  = 0;
     virtual CHIP_ERROR SendQueuedImpl(bool queueWasEmpty)                                                      = 0;
     virtual CHIP_ERROR SetUserTimeoutImpl(uint32_t userTimeoutMillis)                                          = 0;
     virtual CHIP_ERROR DriveSendingImpl()                                                                      = 0;
@@ -741,7 +739,7 @@ private:
     // TCPEndPoint overrides.
     CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr) override;
     CHIP_ERROR ListenImpl(uint16_t backlog) override;
-    CHIP_ERROR ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId) override;
+    CHIP_ERROR ConnectImpl(const IPPacketInfo & addrInfo) override;
     CHIP_ERROR SendQueuedImpl(bool queueWasEmpty) override;
     CHIP_ERROR SetUserTimeoutImpl(uint32_t userTimeoutMillis) override;
     CHIP_ERROR DriveSendingImpl() override;
@@ -816,7 +814,7 @@ private:
     // TCPEndPoint overrides.
     CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr) override;
     CHIP_ERROR ListenImpl(uint16_t backlog) override;
-    CHIP_ERROR ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId) override;
+    CHIP_ERROR ConnectImpl(const IPPacketInfo & addrInfo) override;
     CHIP_ERROR SendQueuedImpl(bool queueWasEmpty) override;
     CHIP_ERROR SetUserTimeoutImpl(uint32_t userTimeoutMillis) override;
     CHIP_ERROR DriveSendingImpl() override;

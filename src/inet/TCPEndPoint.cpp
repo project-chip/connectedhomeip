@@ -184,7 +184,7 @@ CHIP_ERROR TCPEndPointImplLwIP::ListenImpl(uint16_t backlog)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPEndPointImplLwIP::ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId)
+CHIP_ERROR TCPEndPointImplLwIP::ConnectImpl(const IPPacketInfo & addrInfo)
 {
     CHIP_ERROR res         = CHIP_NO_ERROR;
     IPAddressType addrType = addr.Type();
@@ -1297,55 +1297,53 @@ CHIP_ERROR TCPEndPointImplSockets::ListenImpl(uint16_t backlog)
     return res;
 }
 
-CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId)
+CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPPacketInfo & addrInfo)
 {
-    IPAddressType addrType = addr.Type();
+    VerifyOrReturnError(addrInfo.DestAddress.Type() != IPAddressType::kAny, CHIP_ERROR_INVALID_ARGUMENT); // Dest must be given
+    VerifyOrReturnError(addrInfo.SrcAddress.Type() == IPAddressType::kAny || addrInfo.SrcAddress.Type() == addrInfo.DestAddress.Type(), CHIP_ERROR_INVALID_ARGUMENT);
+    IPAddressType addrType = addrInfo.DestAddress.Type();
 
     ReturnErrorOnFailure(GetSocket(addrType));
 
-    if (!intfId.IsPresent())
+    // The behavior when connecting to an IPv6 link-local address without specifying an outbound
+    // interface is ambiguous. So prevent it in all cases.
+    if (!addrInfo.Interface.IsPresent() && addrInfo.DestAddress.IsIPv6LinkLocal())
     {
-        // The behavior when connecting to an IPv6 link-local address without specifying an outbound
-        // interface is ambiguous. So prevent it in all cases.
-        if (addr.IsIPv6LinkLocal())
-        {
-            return INET_ERROR_WRONG_ADDRESS_TYPE;
-        }
+        return INET_ERROR_WRONG_ADDRESS_TYPE;
     }
-    else
+
+    if (addrInfo.Interface.IsPresent() && addrInfo.SrcAddress.Type() == IPAddressType::kAny)
     {
         // Try binding to the interface
-
-        // If destination is link-local then there is no need to bind to
-        // interface or address on the interface.
-
-        if (!addr.IsIPv6LinkLocal())
-        {
 #ifdef SO_BINDTODEVICE
-            struct ::ifreq ifr;
-            memset(&ifr, 0, sizeof(ifr));
+        struct ::ifreq ifr;
+        memset(&ifr, 0, sizeof(ifr));
 
-            ReturnErrorOnFailure(intfId.GetInterfaceName(ifr.ifr_name, sizeof(ifr.ifr_name)));
+        ReturnErrorOnFailure(addrInfo.Interface.GetInterfaceName(ifr.ifr_name, sizeof(ifr.ifr_name)));
 
-            // Attempt to bind to the interface using SO_BINDTODEVICE which requires privileged access.
-            // If the permission is denied(EACCES) because CHIP is running in a context
-            // that does not have privileged access, choose a source address on the
-            // interface to bind the connetion to.
-            int r = setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, &ifr, sizeof(ifr));
-            if (r < 0 && errno != EACCES)
-            {
-                return CHIP_ERROR_POSIX(errno);
-            }
-
-            if (r < 0)
-#endif // SO_BINDTODEVICE
-            {
-                // Attempting to initiate a connection via a specific interface is not allowed.
-                // The only way to do this is to bind the local to an address on the desired
-                // interface.
-                ReturnErrorOnFailure(BindSrcAddrFromIntf(addrType, intfId));
-            }
+        // Attempt to bind to the interface using SO_BINDTODEVICE which requires privileged access.
+        // If the permission is denied(EACCES) because CHIP is running in a context
+        // that does not have privileged access, choose a source address on the
+        // interface to bind the connetion to.
+        int r = setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, &ifr, sizeof(ifr));
+        if (r < 0 && errno != EACCES)
+        {
+            return CHIP_ERROR_POSIX(errno);
         }
+
+        if (r < 0)
+#endif // SO_BINDTODEVICE
+        {
+            // Attempting to initiate a connection via a specific interface is not allowed.
+            // The only way to do this is to bind the local to an address on the desired
+            // interface.
+            ReturnErrorOnFailure(BindSrcAddrFromIntf(addrType, addrInfo.Interface));
+        }
+    }
+
+    if (addrInfo.SrcAddress.Type() != IPAddressType::kAny || addrInfo.SrcPort != 0)
+    {
+        ReturnErrorOnFailure(BindImpl(addrType, addrInfo.SrcAddress, addrInfo.SrcPort, true));
     }
 
     // Disable generation of SIGPIPE.
@@ -1367,10 +1365,10 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
     if (addrType == IPAddressType::kIPv6)
     {
         sa.in6.sin6_family   = AF_INET6;
-        sa.in6.sin6_port     = htons(port);
+        sa.in6.sin6_port     = htons(addrInfo.DestPort);
         sa.in6.sin6_flowinfo = 0;
-        sa.in6.sin6_addr     = addr.ToIPv6();
-        sa.in6.sin6_scope_id = intfId.GetPlatformInterface();
+        sa.in6.sin6_addr     = addrInfo.DestAddress.ToIPv6();
+        sa.in6.sin6_scope_id = addrInfo.Interface.GetPlatformInterface();
         sockaddrsize         = sizeof(sockaddr_in6);
         sockaddrptr          = reinterpret_cast<const sockaddr *>(&sa.in6);
     }
@@ -1378,8 +1376,8 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
     else if (addrType == IPAddressType::kIPv4)
     {
         sa.in.sin_family = AF_INET;
-        sa.in.sin_port   = htons(port);
-        sa.in.sin_addr   = addr.ToIPv4();
+        sa.in.sin_port   = htons(addrInfo.DestPort);
+        sa.in.sin_addr   = addrInfo.DestAddress.ToIPv4();
         sockaddrsize     = sizeof(sockaddr_in);
         sockaddrptr      = reinterpret_cast<const sockaddr *>(&sa.in);
     }
@@ -2376,12 +2374,12 @@ CHIP_ERROR TCPEndPoint::Listen(uint16_t backlog)
     return res;
 }
 
-CHIP_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, InterfaceId intfId)
+CHIP_ERROR TCPEndPoint::Connect(const IPPacketInfo & addrInfo)
 {
     VerifyOrReturnError(mState == State::kReady || mState == State::kBound, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR res = CHIP_NO_ERROR;
 
-    ReturnErrorOnFailure(ConnectImpl(addr, port, intfId));
+    ReturnErrorOnFailure(ConnectImpl(addrInfo));
 
     StartConnectTimerIfSet();
 

@@ -22,9 +22,9 @@
 
 namespace chip {
 
-CHIP_ERROR TransportMgrBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR TransportMgrBase::SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
 {
-    return mTransport->SendMessage(address, std::move(msgBuf));
+    return mTransport->SendMessage(peer, local, std::move(message));
 }
 
 void TransportMgrBase::Disconnect(const Transport::PeerAddress & address)
@@ -50,26 +50,38 @@ void TransportMgrBase::Close()
     mTransport      = nullptr;
 }
 
-void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
+void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
 {
-    if (msg->HasChainedBuffer())
+    if (message->HasChainedBuffer())
     {
         // Something in the lower levels messed up.
-        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
-        peerAddress.ToString(addrBuffer);
-        ChipLogError(Inet, "message from %s dropped due to lower layers not ensuring a single packet buffer.", addrBuffer);
+        char peerAddrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        char localAddrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        peer.ToString(peerAddrBuffer);
+        local.ToString(localAddrBuffer);
+        ChipLogError(Inet, "message %s -> %s dropped due to lower layers not ensuring a single packet buffer.", peerAddrBuffer, localAddrBuffer);
         return;
     }
 
     if (mSessionManager != nullptr)
     {
-        mSessionManager->OnMessageReceived(peerAddress, std::move(msg));
+
+#if CHIP_DETAIL_LOGGING
+        char peerAddrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        char localAddrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        peer.ToString(peerAddrBuffer);
+        local.ToString(localAddrBuffer);
+        ChipLogProgress(Inet, "message %s -> %s received.", peerAddrBuffer, localAddrBuffer);
+#endif // CHIP_DETAIL_LOGGING
+        mSessionManager->OnMessageReceived(peer, local, std::move(message));
     }
     else
     {
-        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
-        peerAddress.ToString(addrBuffer);
-        ChipLogError(Inet, "message from %s is dropped since no corresponding handler is set in TransportMgr.", addrBuffer);
+        char peerAddrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        char localAddrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        peer.ToString(peerAddrBuffer);
+        local.ToString(localAddrBuffer);
+        ChipLogError(Inet, "message from %s -> %s is dropped since no corresponding handler is set in TransportMgr.", peerAddrBuffer, localAddrBuffer);
     }
 }
 

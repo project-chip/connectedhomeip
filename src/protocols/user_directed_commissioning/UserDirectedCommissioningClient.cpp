@@ -30,7 +30,7 @@ namespace Protocols {
 namespace UserDirectedCommissioning {
 
 CHIP_ERROR UserDirectedCommissioningClient::SendUDCMessage(TransportMgrBase * transportMgr, System::PacketBufferHandle && payload,
-                                                           chip::Transport::PeerAddress peerAddress)
+                                                           const chip::Transport::PeerAddress & peer, const chip::Transport::PeerAddress & local)
 {
     CHIP_ERROR err = EncodeUDCMessage(std::move(payload));
     if (err != CHIP_NO_ERROR)
@@ -42,7 +42,7 @@ CHIP_ERROR UserDirectedCommissioningClient::SendUDCMessage(TransportMgrBase * tr
     // send UDC message 5 times per spec (no ACK on this message)
     for (unsigned int i = 0; i < 5; i++)
     {
-        err = transportMgr->SendMessage(peerAddress, std::move(payload));
+        err = transportMgr->SendMessage(peer, local, std::move(payload));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "UDC SendMessage failed, err: %s\n", chip::ErrorStr(err));

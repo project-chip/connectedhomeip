@@ -30,13 +30,13 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msg)
+void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
 {
     ChipLogProgress(AppServer, "UserDirectedCommissioningServer::OnMessageReceived");
 
     PacketHeader packetHeader;
 
-    ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
+    ReturnOnFailure(packetHeader.DecodeAndConsume(message));
 
     if (packetHeader.IsEncrypted())
     {
@@ -45,11 +45,11 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
     }
 
     PayloadHeader payloadHeader;
-    ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
+    ReturnOnFailure(payloadHeader.DecodeAndConsume(message));
 
     char instanceName[Dnssd::Commissionable::kInstanceNameMaxLength + 1];
-    size_t instanceNameLength = std::min<size_t>(msg->DataLength(), Dnssd::Commissionable::kInstanceNameMaxLength);
-    msg->Read(Uint8::from_char(instanceName), instanceNameLength);
+    size_t instanceNameLength = std::min<size_t>(message->DataLength(), Dnssd::Commissionable::kInstanceNameMaxLength);
+    message->Read(Uint8::from_char(instanceName), instanceNameLength);
 
     instanceName[instanceNameLength] = '\0';
 

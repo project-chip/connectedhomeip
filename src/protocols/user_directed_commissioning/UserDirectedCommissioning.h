@@ -95,15 +95,15 @@ public:
      *
      * @param transportMgr  A transport to use for sending the message.
      * @param payload       A PacketBufferHandle with the payload.
-     * @param peerAddress   Address of destination.
+     * @param peer          Address of destination.
+     * @param local         Source address to use.
      *
      * @return CHIP_ERROR_NO_MEMORY if allocation fails.
      *         Other CHIP_ERROR codes as returned by the lower layers.
      *
      */
 
-    CHIP_ERROR SendUDCMessage(TransportMgrBase * transportMgr, System::PacketBufferHandle && payload,
-                              chip::Transport::PeerAddress peerAddress);
+    CHIP_ERROR SendUDCMessage(TransportMgrBase * transportMgr, System::PacketBufferHandle && payload, const chip::Transport::PeerAddress & peer, const chip::Transport::PeerAddress & local);
 
     /**
      * Encode a User Directed Commissioning message.
@@ -195,7 +195,7 @@ private:
     InstanceNameResolver * mInstanceNameResolver         = nullptr;
     UserConfirmationProvider * mUserConfirmationProvider = nullptr;
 
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override;
 
     UDCClients<kMaxUDCClients> mUdcClients; // < Active UDC clients
 };

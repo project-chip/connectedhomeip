@@ -253,14 +253,8 @@ public:
 
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
 
-    /**
-     * @brief
-     *   Handle received secure message. Implements TransportMgrDelegate
-     *
-     * @param source    the source address of the package
-     * @param msgBuf    the buffer containing a full CHIP message (except for the optional length field).
-     */
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
+    // Implementation TransportMgrDelegate Interface
+    void OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override;
 
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress)
     {

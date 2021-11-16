@@ -700,7 +700,14 @@ static CHIP_ERROR PrepareTransportForSend()
             sTCPIPEndPoint->OnDataSent         = HandleTCPDataSent;
             sTCPIPEndPoint->OnDataReceived     = HandleTCPDataReceived;
 
-            lStatus = sTCPIPEndPoint->Connect(sDestinationAddress, kTCPPort, gInterfaceId);
+            Inet::IPPacketInfo addrInfo;
+            addrInfo.Clear();
+            addrInfo.DestAddress = sDestinationAddress;
+            addrInfo.DestPort    = kTCPPort;
+            addrInfo.SrcAddress = IPAddress::Any;
+            addrInfo.SrcPort  = 0;
+            addrInfo.Interface = gInterfaceId;
+            lStatus = sTCPIPEndPoint->Connect(addrInfo);
             INET_FAIL_ERROR(lStatus, "TCPEndPoint::Connect failed");
         }
     }

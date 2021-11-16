@@ -86,27 +86,27 @@ public:
         {
             auto item = std::move(_this->mPendingMessageQueue.front());
             _this->mPendingMessageQueue.pop();
-            _this->HandleMessageReceived(item.mDestinationAddress, std::move(item.mPendingMessage));
+            _this->HandleMessageReceived(item.mDestinationAddress, item.mSourceAddress, std::move(item.mPendingMessage));
         }
     }
 
-    CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override
     {
         ReturnErrorOnFailure(mMessageSendError);
         mSentMessageCount++;
 
         if (mNumMessagesToDrop == 0)
         {
-            System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
+            System::PacketBufferHandle receivedMessage = message.CloneData();
 
             if (mAsyncMessageDispatch)
             {
-                mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
+                mPendingMessageQueue.push(PendingMessageItem(peer, local, std::move(receivedMessage)));
                 mSystemLayer->ScheduleWork(OnMessageReceived, this);
             }
             else
             {
-                HandleMessageReceived(address, std::move(receivedMessage));
+                HandleMessageReceived(peer, local, std::move(receivedMessage));
             }
         }
         else
@@ -131,11 +131,12 @@ public:
 
     struct PendingMessageItem
     {
-        PendingMessageItem(const Transport::PeerAddress destinationAddress, System::PacketBufferHandle && pendingMessage) :
-            mDestinationAddress(destinationAddress), mPendingMessage(std::move(pendingMessage))
+        PendingMessageItem(const Transport::PeerAddress peer, const Transport::PeerAddress local, System::PacketBufferHandle && pendingMessage) :
+            mDestinationAddress(peer), mSourceAddress(local), mPendingMessage(std::move(pendingMessage))
         {}
 
         const Transport::PeerAddress mDestinationAddress;
+        const Transport::PeerAddress mSourceAddress;
         System::PacketBufferHandle mPendingMessage;
     };
 

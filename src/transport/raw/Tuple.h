@@ -81,9 +81,9 @@ template <typename... TransportTypes>
 class Tuple : public Base
 {
 public:
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override
     {
-        return SendMessageImpl<0>(address, std::move(msgBuf));
+        return SendMessageImpl<0>(peer, local, std::move(message));
     }
 
     bool CanSendToPeer(const PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
@@ -181,24 +181,24 @@ private:
      * @tparam N the index of the underlying transport to run SendMessage throug.
      *
      * @param address where to send the message
-     * @param msgBuf the message to send.  Includes all CHIP message fields except optional length.
+     * @param message the message to send.  Includes all CHIP message fields except optional length.
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR SendMessageImpl(const PeerAddress & address, System::PacketBufferHandle && msgBuf)
+    CHIP_ERROR SendMessageImpl(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
     {
         Base * base = &std::get<N>(mTransports);
-        if (base->CanSendToPeer(address))
+        if (base->CanSendToPeer(peer))
         {
-            return base->SendMessage(address, std::move(msgBuf));
+            return base->SendMessage(peer, local, std::move(message));
         }
-        return SendMessageImpl<N + 1>(address, std::move(msgBuf));
+        return SendMessageImpl<N + 1>(peer, local, std::move(message));
     }
 
     /**
      * SendMessageImpl when N is out of range. Always returns an error code.
      */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR SendMessageImpl(const PeerAddress & address, System::PacketBufferHandle msgBuf)
+    CHIP_ERROR SendMessageImpl(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
     {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }

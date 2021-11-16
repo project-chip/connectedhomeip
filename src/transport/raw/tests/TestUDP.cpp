@@ -58,19 +58,19 @@ public:
     MockTransportMgrDelegate(nlTestSuite * inSuite) : mSuite(inSuite) {}
     ~MockTransportMgrDelegate() override {}
 
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override
+    void OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override
     {
         PacketHeader packetHeader;
 
-        CHIP_ERROR err = packetHeader.DecodeAndConsume(msgBuf);
+        CHIP_ERROR err = packetHeader.DecodeAndConsume(message);
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(mSuite, packetHeader.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, packetHeader.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
         NL_TEST_ASSERT(mSuite, packetHeader.GetMessageCounter() == kMessageCounter);
 
-        size_t data_len = msgBuf->DataLength();
-        int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
+        size_t data_len = message->DataLength();
+        int compare     = memcmp(message->Start(), PAYLOAD, data_len);
         NL_TEST_ASSERT(mSuite, compare == 0);
 
         ReceiveHandlerCallCount++;

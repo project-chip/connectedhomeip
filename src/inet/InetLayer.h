@@ -52,6 +52,7 @@
 #include <inet/EndPointBasis.h>
 #include <inet/IANAConstants.h>
 #include <inet/IPAddress.h>
+#include <inet/IPPacketInfo.h>
 #include <inet/IPPrefix.h>
 #include <inet/InetError.h>
 #include <inet/InetInterface.h>
@@ -139,28 +140,6 @@ private:
     chip::System::Layer * mSystemLayer;
 
     bool IsIdleTimerRunning();
-};
-
-/**
- *  @class IPPacketInfo
- *
- *  @brief
- *     Information about an incoming/outgoing message/connection.
- *
- *   @warning
- *     Do not alter the contents of this class without first reading and understanding
- *     the code/comments in UDPEndPoint::GetPacketInfo().
- */
-class IPPacketInfo
-{
-public:
-    IPAddress SrcAddress;  /**< The source IPAddress in the packet. */
-    IPAddress DestAddress; /**< The destination IPAddress in the packet. */
-    InterfaceId Interface; /**< The interface identifier for the connection. */
-    uint16_t SrcPort;      /**< The source port in the packet. */
-    uint16_t DestPort;     /**< The destination port in the packet. */
-
-    void Clear();
 };
 
 } // namespace Inet

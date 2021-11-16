@@ -26,6 +26,7 @@
 #include <stdio.h>
 
 #include <inet/IPAddress.h>
+#include <inet/IPPacketInfo.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPMemString.h>
@@ -63,7 +64,7 @@ class PeerAddress
 {
 public:
     PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined) {}
-    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) {}
+    PeerAddress(const Inet::IPAddress & addr, Type type, uint16_t port = CHIP_PORT, Inet::InterfaceId interface = Inet::InterfaceId::Null()) : mIPAddress(addr), mTransportType(type), mPort(port), mInterface(interface) {}
     PeerAddress(Type type) : mTransportType(type) {}
 
     PeerAddress(PeerAddress &&)      = default;
@@ -190,12 +191,14 @@ public:
     static PeerAddress Uninitialized() { return PeerAddress(Inet::IPAddress::Any, Type::kUndefined); }
 
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
+    static PeerAddress UDP() { return PeerAddress(Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId interface)
     {
         return UDP(addr).SetPort(port).SetInterface(interface);
     }
+    static PeerAddress TCP() { return PeerAddress(Type::kTcp); }
     static PeerAddress TCP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kTcp); }
     static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port) { return TCP(addr).SetPort(port); }
     static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId interface)
@@ -225,6 +228,28 @@ private:
     uint16_t mPort               = CHIP_PORT; ///< Relevant for UDP data sending.
     Inet::InterfaceId mInterface = Inet::InterfaceId::Null();
 };
+
+inline CHIP_ERROR AddressToPktInfo(Inet::IPPacketInfo & addrInfo, const Transport::PeerAddress & peer, const Transport::PeerAddress & local)
+{
+    addrInfo.Clear();
+
+    addrInfo.DestAddress = peer.GetIPAddress();
+    addrInfo.DestPort    = peer.GetPort();
+    addrInfo.SrcAddress = local.GetIPAddress();
+    addrInfo.SrcPort  = local.GetPort();
+
+    if (peer.GetInterface().IsPresent())
+    {
+        VerifyOrReturnError(!local.GetInterface().IsPresent() || peer.GetInterface() == local.GetInterface(), CHIP_ERROR_INVALID_ARGUMENT);
+        addrInfo.Interface = peer.GetInterface();
+    }
+    else
+    {
+        addrInfo.Interface = local.GetInterface();
+    }
+
+    return CHIP_NO_ERROR;
+}
 
 } // namespace Transport
 } // namespace chip

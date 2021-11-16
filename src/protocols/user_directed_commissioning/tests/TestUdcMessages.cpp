@@ -147,11 +147,15 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
     // prepare peerAddress for handleMessage
     Inet::IPAddress commissioner;
     Inet::IPAddress::FromString("127.0.0.1", commissioner);
-    uint16_t port                      = 11100;
-    Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(commissioner, port);
+    Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(commissioner, 11100);
+
+    // prepare localAddress for handleMessage
+    Inet::IPAddress device;
+    Inet::IPAddress::FromString("127.0.0.1", device);
+    Transport::PeerAddress localAddress = Transport::PeerAddress::UDP(device, 11101);
 
     // test OnMessageReceived
-    mUdcTransportMgr->HandleMessageReceived(peerAddress, std::move(payloadBuf));
+    mUdcTransportMgr->HandleMessageReceived(peerAddress, localAddress, std::move(payloadBuf));
 
     // check if the state is set for the instance name sent
     state = udcServer.GetUDCClients().FindUDCClientState(nameBuffer);
@@ -169,7 +173,7 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
     udcClient.EncodeUDCMessage(std::move(payloadBuf));
 
     // test OnMessageReceived again
-    mUdcTransportMgr->HandleMessageReceived(peerAddress, std::move(payloadBuf));
+    mUdcTransportMgr->HandleMessageReceived(peerAddress, localAddress, std::move(payloadBuf));
 
     // verify it was not called
     NL_TEST_ASSERT(inSuite, !testCallback.mFindCommissionableNodeCalled);
@@ -181,7 +185,7 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
     udcClient.EncodeUDCMessage(std::move(payloadBuf));
 
     // test OnMessageReceived again
-    mUdcTransportMgr->HandleMessageReceived(peerAddress, std::move(payloadBuf));
+    mUdcTransportMgr->HandleMessageReceived(peerAddress, localAddress, std::move(payloadBuf));
 
     // verify it was called
     NL_TEST_ASSERT(inSuite, testCallback.mFindCommissionableNodeCalled);

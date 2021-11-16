@@ -85,9 +85,10 @@ private:
  */
 struct PendingPacket
 {
-    PendingPacket(const PeerAddress & peerAddress, System::PacketBufferHandle && packetBuffer) : mPeerAddress(peerAddress), mPacketBuffer(std::move(packetBuffer)) {}
+    PendingPacket(const PeerAddress & peerAddress, const PeerAddress & localAddress, System::PacketBufferHandle && packetBuffer) : mPeerAddress(peerAddress), mLocalAddress(localAddress), mPacketBuffer(std::move(packetBuffer)) {}
 
     PeerAddress mPeerAddress;                 // where the packet is being sent to
+    PeerAddress mLocalAddress;                // which local address to use
     System::PacketBufferHandle mPacketBuffer; // what data needs to be sent
 };
 
@@ -131,7 +132,8 @@ protected:
     };
 
 public:
-    TCPBase(ActiveConnectionState * activeConnectionsBuffer, size_t bufferSize, PoolInterface<PendingPacket, const PeerAddress &, System::PacketBufferHandle &&> & packetBuffers) : mActiveConnections(activeConnectionsBuffer), mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers)
+    using PendingPacketPoolType = PoolInterface<PendingPacket, const PeerAddress &, const PeerAddress &, System::PacketBufferHandle &&>;
+    TCPBase(ActiveConnectionState * activeConnectionsBuffer, size_t bufferSize, PendingPacketPoolType & packetBuffers) : mActiveConnections(activeConnectionsBuffer), mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers)
     {
         // activeConnectionsBuffer must be initialized by the caller.
     }
@@ -154,7 +156,7 @@ public:
      */
     void Close() override;
 
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override;
 
     void Disconnect(const PeerAddress & address) override;
 
@@ -183,43 +185,46 @@ private:
      * Find an active connection to the given peer or return nullptr if
      * no active connection exists.
      */
-    ActiveConnectionState * FindActiveConnection(const PeerAddress & addr);
+    ActiveConnectionState * FindActiveConnection(const PeerAddress & peer, const PeerAddress & local);
     ActiveConnectionState * FindActiveConnection(const Inet::TCPEndPoint * endPoint);
 
     /**
      * Sends the specified message once a connection has been established.
      *
-     * @param addr - what peer to connect to
-     * @param msg - what buffer to send once a connection has been established.
+     * @param peer  - what peer to connect to
+     * @param local - what local address to bind
+     * @param msg   - what buffer to send once a connection has been established.
      *
      * Ownership of msg is taken over and will be freed at some unspecified time
      * in the future (once connection succeeds/fails).
      */
-    CHIP_ERROR SendAfterConnect(const PeerAddress & addr, System::PacketBufferHandle && msg);
+    CHIP_ERROR SendAfterConnect(const PeerAddress & peer, const PeerAddress & local, System::PacketBufferHandle && msg);
 
     /**
      * Process a single received buffer from the specified peer address.
      *
      * @param endPoint the source end point from which the data comes from
      * @param peerAddress the peer the data is coming from
+     * @param localAddress The local end the data is received.
      * @param buffer the actual data
      *
      * Ownership of buffer is taken over and will be freed (or re-enqueued to the endPoint receive queue)
      * as needed during processing.
      */
-    CHIP_ERROR ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
+    CHIP_ERROR ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress, const PeerAddress & localAddress,
                                      System::PacketBufferHandle && buffer);
 
     /**
      * Process a single message of the specified size from a buffer.
      *
      * @param[in]     peerAddress   The peer the data is coming from.
+     * @param[in]     localAddress  The local end the data is received.
      * @param[in,out] state         The connection state, which contains the message. On entry, the payload points to the message
      *                              body (after the length). On exit, it points after the message (or the queue is null, if there
      *                              is no other data).
      * @param[in]     messageSize   Size of the single message.
      */
-    CHIP_ERROR ProcessSingleMessage(const PeerAddress & peerAddress, ActiveConnectionState * state, uint16_t messageSize);
+    CHIP_ERROR ProcessSingleMessage(const PeerAddress & peerAddress, const PeerAddress & localAddress, ActiveConnectionState * state, uint16_t messageSize);
 
     // Callback handler for TCPEndPoint. TCP message receive handler.
     // @see TCPEndpoint::OnDataReceivedFunct
@@ -258,7 +263,7 @@ private:
     const size_t mActiveConnectionsSize;
 
     // Data to be sent when connections succeed
-    PoolInterface<PendingPacket, const PeerAddress &, System::PacketBufferHandle &&> & mPendingPackets;
+    PendingPacketPoolType & mPendingPackets;
 };
 
 template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
@@ -276,7 +281,7 @@ public:
 private:
     friend class TCPTest;
     TCPBase::ActiveConnectionState mConnectionsBuffer[kActiveConnectionsSize];
-    PoolImpl<PendingPacket, kPendingPacketSize, std::tuple<PendingPacket, const PeerAddress &, System::PacketBufferHandle &&>> mPendingPackets;
+    PoolImpl<PendingPacket, kPendingPacketSize, PendingPacketPoolType::Interface> mPendingPackets;
 };
 
 } // namespace Transport

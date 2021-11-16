@@ -89,16 +89,16 @@ public:
         mCallback     = callback;
         mCallbackData = callback_data;
     }
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override
+    void OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override
     {
         PacketHeader packetHeader;
 
-        CHIP_ERROR error = packetHeader.DecodeAndConsume(msgBuf);
+        CHIP_ERROR error = packetHeader.DecodeAndConsume(message);
         NL_TEST_ASSERT(mSuite, error == CHIP_NO_ERROR);
 
         if (mCallback)
         {
-            int err = mCallback(msgBuf->Start(), msgBuf->DataLength(), mReceiveHandlerCallCount, mCallbackData);
+            int err = mCallback(message->Start(), message->DataLength(), mReceiveHandlerCallCount, mCallbackData);
             NL_TEST_ASSERT(mSuite, err == 0);
         }
 
@@ -131,7 +131,7 @@ public:
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
         // Should be able to send a message to itself by just calling send.
-        err = tcp.SendMessage(Transport::PeerAddress::TCP(addr), std::move(buffer));
+        err = tcp.SendMessage(Transport::PeerAddress::TCP(addr), Transport::PeerAddress::TCP(IPAddress::Any, 0), std::move(buffer));
         if (err == CHIP_ERROR_POSIX(EADDRNOTAVAIL))
         {
             // TODO(#2698): the underlying system does not support IPV6. This early return
@@ -386,7 +386,8 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
 
     Transport::PeerAddress lPeerAddress    = Transport::PeerAddress::TCP(addr);
-    TCPBase::ActiveConnectionState * state = tcp.FindActiveConnection(lPeerAddress);
+    Transport::PeerAddress lLocalAddress    = Transport::PeerAddress::TCP(IPAddress::Any, 0);
+    TCPBase::ActiveConnectionState * state = tcp.FindActiveConnection(lPeerAddress, lLocalAddress);
     NL_TEST_ASSERT(inSuite, state != nullptr);
     Inet::TCPEndPoint * lEndPoint = state->mEndPoint;
     NL_TEST_ASSERT(inSuite, lEndPoint != nullptr);
@@ -398,14 +399,14 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     // Test a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 111, 0 }));
-    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, lLocalAddress, std::move(testData[0].mHandle));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 1);
 
     // Test a message in a chain of three packet buffers. The message length is split accross buffers.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 1, 122, 123, 0 }));
-    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, lLocalAddress, std::move(testData[0].mHandle));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 1);
 
@@ -414,7 +415,7 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 131, 0 }));
     NL_TEST_ASSERT(inSuite, testData[1].Init((const uint16_t[]){ 132, 0 }));
     testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
-    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, lLocalAddress, std::move(testData[0].mHandle));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 2);
 
@@ -423,7 +424,7 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 141, 142, 0 }));
     NL_TEST_ASSERT(inSuite, testData[1].Init((const uint16_t[]){ 143, 144, 0 }));
     testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
-    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, lLocalAddress, std::move(testData[0].mHandle));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 2);
 
@@ -433,7 +434,7 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 51, System::PacketBuffer::kMaxSizeWithoutReserve, 0 }));
     // Sending only the first buffer of the long chain. This should be enough to trigger the error.
     System::PacketBufferHandle head = testData[0].mHandle.PopHead();
-    err                             = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(head));
+    err                             = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, lLocalAddress, std::move(head));
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_MESSAGE_TOO_LONG);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 0);
 

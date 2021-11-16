@@ -37,7 +37,7 @@ namespace chip {
 namespace Shell {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-static CHIP_ERROR SendUDC(bool printHeader, chip::Transport::PeerAddress commissioner)
+static CHIP_ERROR SendUDC(bool printHeader, const chip::Transport::PeerAddress & peer, const chip::Transport::PeerAddress & local)
 {
     streamer_t * sout = streamer_get();
 
@@ -46,7 +46,7 @@ static CHIP_ERROR SendUDC(bool printHeader, chip::Transport::PeerAddress commiss
         streamer_printf(sout, "SendUDC:        ");
     }
 
-    Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner);
+    Server::GetInstance().SendUserDirectedCommissioningRequest(peer, local);
 
     streamer_printf(sout, "done\r\n");
 
@@ -92,7 +92,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         chip::Inet::IPAddress commissioner;
         chip::Inet::IPAddress::FromString(argv[1], commissioner);
         uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
-        return error  = SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port));
+        return error  = SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port), chip::Transport::PeerAddress::UDP());
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     else if (strcmp(argv[0], "setdiscoverytimeout") == 0)

@@ -87,18 +87,19 @@ CHIP_ERROR BLEBase::SetEndPoint(Ble::BLEEndPoint * endPoint)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BLEBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR BLEBase::SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
 {
-    ReturnErrorCodeIf(address.GetTransportType() != Type::kBle, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(peer.GetTransportType() != Type::kBle, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(local.GetTransportType() != Type::kBle, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
 
     if (mState == State::kConnected)
     {
-        ReturnErrorOnFailure(mBleEndPoint->Send(std::move(msgBuf)));
+        ReturnErrorOnFailure(mBleEndPoint->Send(std::move(message)));
     }
     else
     {
-        ReturnErrorOnFailure(SendAfterConnect(std::move(msgBuf)));
+        ReturnErrorOnFailure(SendAfterConnect(std::move(message)));
     }
 
     return CHIP_NO_ERROR;
@@ -153,7 +154,7 @@ void BLEBase::OnBleConnectionError(CHIP_ERROR err)
 
 void BLEBase::OnEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHandle && buffer)
 {
-    HandleMessageReceived(Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
+    HandleMessageReceived(Transport::PeerAddress(Transport::Type::kBle), Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
 }
 
 void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err)

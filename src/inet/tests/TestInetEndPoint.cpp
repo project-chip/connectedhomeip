@@ -308,7 +308,14 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
     err = testTCPEP1->Listen(4);
 #if INET_CONFIG_ENABLE_IPV4
-    err = testTCPEP1->Connect(addr_v4, 4000, intId);
+    Inet::IPPacketInfo addrInfo;
+    addrInfo.Clear();
+    addrInfo.DestAddress = addr_v4;
+    addrInfo.DestPort    = 4000;
+    addrInfo.SrcAddress = IPAddress::Any;
+    addrInfo.SrcPort  = 0;
+    addrInfo.Interface = intId;
+    err = testTCPEP1->Connect(addrInfo);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_IPV4
 

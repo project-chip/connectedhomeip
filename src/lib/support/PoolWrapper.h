@@ -28,6 +28,9 @@ template<typename U, typename... ConstructorArguments>
 class PoolInterface
 {
 public:
+    // For convenient use in PoolImpl
+    using Interface = std::tuple<U, ConstructorArguments...>;
+
     virtual ~PoolInterface() {}
 
     virtual U * CreateObject(ConstructorArguments &&... args) = 0;
