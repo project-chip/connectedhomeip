@@ -91,6 +91,23 @@ private:
     EmberEventControl eventControls[EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT];
 };
 
+struct OnOffEffect
+{
+    using OffWithEffectTriggerCommand = void (*)(OnOffEffect *);
+
+    chip::EndpointId mEndpoint;
+    OffWithEffectTriggerCommand mOffWithEffectTrigger = nullptr;
+    uint8_t mEffectIdentifier;
+    uint8_t mEffectVariant;
+    bool mActive = false;
+
+    OnOffEffect(
+        chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
+        uint8_t effectIdentifier = static_cast<uint8_t>(EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF),
+        uint8_t effectVariant = static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS));
+    ~OnOffEffect();
+};
+
 /**********************************************************
  * Global
  *********************************************************/

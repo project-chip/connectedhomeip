@@ -68,7 +68,14 @@ using namespace chip::app::Clusters::OnOff;
  * Attributes Definition
  *********************************************************/
 
+static std::array<OnOffEffect *, EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT> instances = { 0 };
 OnOffServer OnOffServer::instance;
+
+/**********************************************************
+ * Function definition
+ *********************************************************/
+
+static OnOffEffect * inst(EndpointId endpoint);
 
 /**********************************************************
  * OnOff Implementation
@@ -307,6 +314,9 @@ bool OnOffServer::offWithEffectCommand(uint8_t effectId, uint8_t effectVariant)
     bool globalSceneControl = false;
     OnOff::Attributes::GlobalSceneControl::Get(endpoint, &globalSceneControl);
 
+    bool isOnBeforeCommand = false;
+    OnOff::Attributes::OnOff::Get(endpoint, &isOnBeforeCommand);
+
     if (globalSceneControl)
     {
         OnOff::Attributes::GlobalSceneControl::Set(endpoint, false);
@@ -317,6 +327,20 @@ bool OnOffServer::offWithEffectCommand(uint8_t effectId, uint8_t effectVariant)
     else
     {
         status = setOnOffValue(endpoint, Commands::Off::Id, false);
+    }
+
+    // Only apply effect if OnOff is on
+    if (isOnBeforeCommand)
+    {
+        OnOffEffect * effect = inst(endpoint);
+
+        if (effect != nullptr && effect->mOffWithEffectTrigger != nullptr)
+        {
+            effect->mEffectIdentifier = effectId;
+            effect->mEffectVariant    = effectVariant;
+
+            effect->mOffWithEffectTrigger(effect);
+        }
     }
 
     emberAfSendImmediateDefaultResponse(status);
@@ -510,6 +534,59 @@ EmberEventControl * OnOffServer::configureEventControl(EndpointId endpoint)
 
     return controller;
 }
+
+/**********************************************************
+ * OnOffEffect Implementation
+ *********************************************************/
+
+static OnOffEffect * inst(EndpointId endpoint)
+{
+    for (size_t i = 0; i < instances.size(); i++)
+    {
+        if (nullptr != instances[i] && endpoint == instances[i]->mEndpoint)
+        {
+            return instances[i];
+        }
+    }
+
+    return nullptr;
+}
+
+static inline void reg(OnOffEffect * inst)
+{
+    for (size_t i = 0; i < instances.size(); i++)
+    {
+        if (nullptr == instances[i])
+        {
+            instances[i] = inst;
+            break;
+        }
+    }
+}
+
+static inline void unreg(OnOffEffect * inst)
+{
+    for (size_t i = 0; i < instances.size(); i++)
+    {
+        if (inst == instances[i])
+        {
+            instances[i] = nullptr;
+        }
+    }
+}
+
+OnOffEffect::OnOffEffect(chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger, uint8_t effectIdentifier,
+                         uint8_t effectVariant) :
+    mEndpoint(endpoint),
+    mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant)
+{
+    reg(this);
+};
+
+OnOffEffect::~OnOffEffect()
+{
+    unreg(this);
+};
 
 /**********************************************************
  * Callbacks Implementation
