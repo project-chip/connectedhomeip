@@ -97,7 +97,8 @@ private:
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
                                                  bool * apHasMoreChunks);
     CHIP_ERROR RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
-                                   const ConcreteAttributePath & aClusterInfo);
+                                   const ConcreteAttributePath & aClusterInfo,
+                                   AttributeValueEncoder::AttributeEncodeState * apEncoderState);
     EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
 
     /**

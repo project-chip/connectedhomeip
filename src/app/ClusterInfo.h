@@ -45,8 +45,6 @@ private:
     static constexpr ClusterId kInvalidClusterId     = 0xFFFF'FFFF;
     static constexpr AttributeId kInvalidAttributeId = 0xFFFF'FFFF;
     static constexpr EventId kInvalidEventId         = 0xFFFF'FFFF;
-    // ListIndex is a uint16 number, thus 0xFFFF is not a valid list index.
-    static constexpr ListIndex kInvalidListIndex = 0xFFFF;
 
 public:
     bool IsAttributePathSupersetOf(const ClusterInfo & other) const
