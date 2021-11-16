@@ -194,6 +194,7 @@ private:
     bool mActiveSubscription = false;
     NodeId mInitiatorNodeId  = kUndefinedNodeId;
     FabricIndex mFabricIndex = 0;
+    bool mIsFabricFiltered   = false;
 };
 } // namespace app
 } // namespace chip
