@@ -134,7 +134,8 @@ protected:
 
 public:
     using PendingPacketPoolType = PoolInterface<PendingPacket, const PeerAddress &, System::PacketBufferHandle &&>;
-    TCPBase(ActiveConnectionState * activeConnectionsBuffer, size_t bufferSize, PendingPacketPoolType & packetBuffers) : mActiveConnections(activeConnectionsBuffer), mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers)
+    TCPBase(ActiveConnectionState * activeConnectionsBuffer, size_t bufferSize, PendingPacketPoolType & packetBuffers) :
+        mActiveConnections(activeConnectionsBuffer), mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers)
     {
         // activeConnectionsBuffer must be initialized by the caller.
     }
