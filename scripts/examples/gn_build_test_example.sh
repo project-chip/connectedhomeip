@@ -23,7 +23,7 @@ set -e
 CHIP_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"/../..
 
 INPUT_DIR="$CHIP_ROOT/examples/placeholder/linux"
-OUTPUT_DIR="$CHIP_ROOT/out/debug/placeholder"
+OUTPUT_DIR="$CHIP_ROOT/zzz_generated/placeholder"
 
 source "$CHIP_ROOT/scripts/activate.sh"
 

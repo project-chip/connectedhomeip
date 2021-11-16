@@ -138,15 +138,17 @@ jobs:
             - name: Setup Build, Run Build and Run Tests
               timeout-minutes: 50
               run: |
-                  for BUILD_TYPE  in gcc_release clang mbedtls; do
+                  for BUILD_TYPE  in gcc_release clang mbedtls simulated; do
+                      unset CHIP_ROOT_PATH
                       case $BUILD_TYPE in
                           "gcc_release") GN_ARGS='is_debug=false';;
                           "clang") GN_ARGS='is_clang=true';;
                           "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
+                          "simulated") GN_ARGS='chip_tests_zap_config="app1" chip_project_config_include_dirs=["../../examples/placeholder/linux/apps/app1/include", "../../config/standalone"] chip_config_network_layer_ble=false' CHIP_ROOT_PATH=examples/placeholder/linux;;
                       esac
 
-                      scripts/build/gn_gen.sh --args="$GN_ARGS"
-                      scripts/build/gn_build.sh
+                      CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
+                      CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_build.sh
                       scripts/tests/gn_tests.sh
                   done
             - name: Build using build_examples.py
@@ -299,13 +301,15 @@ jobs:
               # the examples-linux-standalone.yaml tests on darwin without too
               # much code duplication.
               run: |
-                  for BUILD_TYPE  in clang python_lib; do
+                  for BUILD_TYPE  in clang python_lib simulated; do
+                      unset CHIP_ROOT_PATH
                       case $BUILD_TYPE in
                           "clang") GN_ARGS='is_clang=true target_os="all"';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
+                          "simulated") GN_ARGS='chip_tests_zap_config="app1" chip_project_config_include_dirs=["../../examples/placeholder/linux/apps/app1/include", "../../config/standalone"] chip_config_network_layer_ble=false' CHIP_ROOT_PATH=examples/placeholder/linux;;
                       esac
-                      scripts/build/gn_gen.sh --args="$GN_ARGS"
-                      scripts/build/gn_build.sh
+                      CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
+                      CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_build.sh
                       scripts/tests/gn_tests.sh
                   done
             - name: Uploading diagnostic logs
@@ -314,6 +318,10 @@ jobs:
               with:
                   name: crash-log-darwin
                   path: ~/Library/Logs/DiagnosticReports/
+            - name: Build Simulated device app
+              timeout-minutes: 5
+              run: |
+                  ./scripts/examples/gn_build_test_example.sh app1
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage
