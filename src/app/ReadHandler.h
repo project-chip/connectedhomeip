@@ -98,7 +98,7 @@ public:
      *  Send ReportData to initiator
      *
      *  @param[in]    aPayload             A payload that has read request data
-     *  @param[in]    aMoreChunks          A flags indicating there will be more chunks for this read request
+     *  @param[in]    aMoreChunks          A flags indicating there will be more chunks expected to be sent for this read request
      *
      *  @retval #Others If fails to send report data
      *  @retval #CHIP_NO_ERROR On success.
@@ -135,7 +135,8 @@ public:
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
     void SetDirty()
     {
-        mDirty                       = true;
+        mDirty = true;
+        // The interested path in this report is changed, make the path iterator ready to emit paths by reset it.
         mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
     }
     void ClearDirty() { mDirty = false; }
@@ -151,8 +152,8 @@ private:
         Initialized,       ///< The handler has been initialized and is ready
         GeneratingReports, ///< The handler has received either a Read or Subscribe request and is the process of generating a
                            ///< report.
-        AwaitingChunkingResponse, ///< The handler just sent a report chunk and is waiting a status response.
-        AwaitingReportResponse,   ///< The handler has sent the last report chunk to the client and is awaiting a status response.
+        AwaitingChunkingResponse, ///< The handler just sent a report chunked report and is awaiting a status response.
+        AwaitingReportResponse,   ///< The handler has sent the last chunked report to the client and is awaiting a status response.
     };
 
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);

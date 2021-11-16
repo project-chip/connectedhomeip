@@ -146,6 +146,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
         {
             mpExchangeCtx->WillSendMessage();
         }
+        // Trigger ReportingEngine run for sending next chunk of data.
         SuccessOrExit(err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
         break;
     case HandlerState::AwaitingReportResponse:

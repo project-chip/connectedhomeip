@@ -804,6 +804,7 @@ void TestReadInteraction::TestReadChunking(nlTestSuite * apSuite, void * apConte
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
     NL_TEST_ASSERT(apSuite, !delegate.mReadError);

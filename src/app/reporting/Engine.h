@@ -92,8 +92,10 @@ private:
      */
     CHIP_ERROR BuildAndSendSingleReportData(ReadHandler * apReadHandler);
 
-    CHIP_ERROR BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler);
-    CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler);
+    CHIP_ERROR BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
+                                                       bool * apHasMoreChunks);
+    CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
+                                                 bool * apHasMoreChunks);
     CHIP_ERROR RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
                                    const ConcreteAttributePath & aClusterInfo);
     EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
@@ -108,19 +110,13 @@ private:
      * Send Report via ReadHandler
      *
      */
-    CHIP_ERROR SendReport(ReadHandler * apReadHandler, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR SendReport(ReadHandler * apReadHandler, System::PacketBufferHandle && aPayload, bool aHasMoreChunks);
 
     /**
      * Generate and send the report data request when there exists subscription or read request
      *
      */
     static void Run(System::Layer * aSystemLayer, void * apAppState);
-
-    /**
-     * Boolean to show if more chunk message on the way
-     *
-     */
-    bool mMoreChunkedMessages = false;
 
     /**
      * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times

@@ -1093,10 +1093,8 @@ public:
     /**
      * Reserve some buffer for encoding future fields.
      *
-     * @retval #CHIP_NO_ERROR      Successfully reserved required buffer size.
-     * @retval #CHIP_ERROR_NO_MEMORY
-     *                              The reserved buffer size cannot fits into the remaining buffer size.
-     * @retval other                Other CHIP or platform-specific errors returned by the configured
+     * @retval #CHIP_NO_ERROR        Successfully reserved required buffer size.
+     * @retval #CHIP_ERROR_NO_MEMORY The reserved buffer size cannot fits into the remaining buffer size.
      */
     CHIP_ERROR ReserveBuffer(uint32_t aBufferSize)
     {
@@ -1109,9 +1107,8 @@ public:
     /**
      * Release previously reserved buffer.
      *
-     * @retval #CHIP_NO_ERROR      Successfully reserved required buffer size.
-     * @retval #CHIP_ERROR_NO_MEMORY
-     *                              The released buffer is larger than previously reserved buffer size..
+     * @retval #CHIP_NO_ERROR        Successfully released reserved buffer size.
+     * @retval #CHIP_ERROR_NO_MEMORY The released buffer is larger than previously reserved buffer size.
      */
     CHIP_ERROR UnreserveBuffer(uint32_t aBufferSize)
     {
