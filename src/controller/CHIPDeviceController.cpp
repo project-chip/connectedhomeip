@@ -342,7 +342,11 @@ void DeviceController::PersistNextKeyId()
 CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-    return mCASESessionManager->GetDeviceAddressAndPort(peerId.GetNodeId(), addr, port);
+    Transport::PeerAddress peerAddr;
+    ReturnErrorOnFailure(mCASESessionManager->GetPeerAddress(peerId.GetNodeId(), peerAddr));
+    addr = peerAddr.GetIPAddress();
+    port = peerAddr.GetPort();
+    return CHIP_NO_ERROR;
 }
 
 void DeviceController::OnOpenPairingWindowSuccessResponse(void * context)

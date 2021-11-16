@@ -165,6 +165,8 @@ public:
 
     bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const override;
 
+    Transport::PeerAddress GetPeerAddress() const { return mDeviceAddress; }
+
     static Transport::PeerAddress ToPeerAddress(const Dnssd::ResolvedNodeData & nodeData)
     {
         Inet::InterfaceId interfaceId = Inet::InterfaceId::Null();

@@ -46,17 +46,16 @@ struct CASESessionManagerConfig
 class CASESessionManager : public Messaging::ExchangeMgrDelegate, public Dnssd::ResolverDelegate
 {
 public:
+    CASESessionManager() = delete;
+
     CASESessionManager(CASESessionManagerConfig & params)
     {
         VerifyOrReturn(params.sessionInitParams.Validate() == CHIP_NO_ERROR);
 
-        mConfig      = params;
-        mInitialized = true;
+        mConfig = params;
     }
 
     virtual ~CASESessionManager() {}
-
-    void Shutdown() { mInitialized = false; }
 
     /**
      * Find an existing session for the given node ID, or trigger a new session request.
@@ -71,15 +70,7 @@ public:
 
     void ReleaseSession(NodeId nodeId);
 
-    FabricInfo * GetFabricInfo()
-    {
-        if (!mInitialized)
-        {
-            return nullptr;
-        }
-
-        return mConfig.sessionInitParams.fabricInfo;
-    }
+    FabricInfo * GetFabricInfo() { return mConfig.sessionInitParams.fabricInfo; }
 
     /**
      * This API triggers the DNS-SD resolution for the given node ID. The node ID will be looked up
@@ -91,11 +82,14 @@ public:
     CHIP_ERROR ResolveDeviceAddress(NodeId nodeId);
 
     /**
-     * This API returns the address and port for the given node ID. It is expected that there is
+     * This API returns the address for the given node ID.
+     * If the CASESessionManager is configured with a DNS-SD cache, the cache is looked up
+     * for the node ID.
+     * If the DNS-SD cache is not available, the CASESessionManager looks up the list for
      * an ongoing session with the peer node. If the session doesn't exist, the API will return
      * `CHIP_ERROR_NOT_CONNECTED` error.
      */
-    CHIP_ERROR GetDeviceAddressAndPort(NodeId nodeId, Inet::IPAddress & addr, uint16_t & port);
+    CHIP_ERROR GetPeerAddress(NodeId nodeId, Transport::PeerAddress & addr);
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
     void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
@@ -113,8 +107,6 @@ private:
     BitMapObjectPool<OperationalDeviceProxy, CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES> mActiveSessions;
 
     CASESessionManagerConfig mConfig;
-
-    bool mInitialized = false;
 };
 
 } // namespace chip

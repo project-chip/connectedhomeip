@@ -23,8 +23,6 @@ namespace chip {
 CHIP_ERROR CASESessionManager::FindOrEstablishSession(NodeId nodeId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-
     Dnssd::ResolvedNodeData resolutionData;
 
     PeerId peerId = GetFabricInfo()->GetPeerIdForNode(nodeId);
@@ -71,14 +69,12 @@ void CASESessionManager::ReleaseSession(NodeId nodeId)
 
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(NodeId nodeId)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     return Dnssd::Resolver::Instance().ResolveNodeId(GetFabricInfo()->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny);
 }
 
 void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)
 {
     ChipLogProgress(Controller, "Address resolved for node: 0x" ChipLogFormatX64, ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
-    VerifyOrReturn(mInitialized, ChipLogError(Controller, "OnNodeIdResolved was called in uninitialized state"));
 
     if (mConfig.dnsCache != nullptr)
     {
@@ -99,13 +95,19 @@ void CASESessionManager::OnNodeIdResolutionFailed(const PeerId & peer, CHIP_ERRO
     ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
 }
 
-CHIP_ERROR CASESessionManager::GetDeviceAddressAndPort(NodeId nodeId, Inet::IPAddress & addr, uint16_t & port)
+CHIP_ERROR CASESessionManager::GetPeerAddress(NodeId nodeId, Transport::PeerAddress & addr)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    if (mConfig.dnsCache != nullptr)
+    {
+        Dnssd::ResolvedNodeData resolutionData;
+        ReturnErrorOnFailure(mConfig.dnsCache->Lookup(GetFabricInfo()->GetPeerIdForNode(nodeId), resolutionData));
+        addr = OperationalDeviceProxy::ToPeerAddress(resolutionData);
+        return CHIP_NO_ERROR;
+    }
 
     OperationalDeviceProxy * session = FindExistingSession(nodeId);
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);
-    VerifyOrReturnError(session->GetAddress(addr, port), CHIP_ERROR_NOT_CONNECTED);
+    addr = session->GetPeerAddress();
     return CHIP_NO_ERROR;
 }
 
@@ -116,8 +118,6 @@ void CASESessionManager::OnNewConnection(SessionHandle sessionHandle, Messaging:
 
 void CASESessionManager::OnConnectionExpired(SessionHandle sessionHandle, Messaging::ExchangeManager * mgr)
 {
-    VerifyOrReturn(mInitialized, ChipLogError(Controller, "OnConnectionExpired was called in uninitialized state"));
-
     OperationalDeviceProxy * session = FindSession(sessionHandle);
     VerifyOrReturn(session != nullptr,
                    ChipLogDetail(Controller, "OnConnectionExpired was called for unknown device, ignoring it."));
