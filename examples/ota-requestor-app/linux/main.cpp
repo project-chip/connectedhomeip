@@ -272,7 +272,7 @@ void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::Fabri
     };
 
     chip::OperationalDeviceProxy * operationalDeviceProxy =
-        chip::Platform::New<chip::OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(peerNodeId));
+        chip::Platform::New<chip::OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(peerNodeId), nullptr);
     if (operationalDeviceProxy == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Failed in creating an instance of OperationalDeviceProxy");
