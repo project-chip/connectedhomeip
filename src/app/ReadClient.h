@@ -271,8 +271,7 @@ private:
      * @param [in] aReader       The tlv reader.
      */
     template <typename EventDataT>
-    CHIP_ERROR DecodeEventWithClusterObject(const EventHeader & aEventHeader, const EventDataT & aEvent,
-                                                 TLV::TLVReader & aReader)
+    CHIP_ERROR DecodeEventWithClusterObject(const EventHeader & aEventHeader, const EventDataT & aEvent, TLV::TLVReader & aReader)
     {
         VerifyOrReturnError((aEventHeader.mPath.mEventId == aEvent.GetEventId()) &&
                                 (aEventHeader.mPath.mClusterId == aEvent.GetClusterId()),
