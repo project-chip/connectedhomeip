@@ -29,6 +29,6 @@
   {{else if (isOctetString type)}}
     {{target}} = [[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral definedValue}}" length:{{definedValue.length}}];
   {{else}}
-    {{target}} = [NSNumber numberWith{{asObjectiveCNumberType definedValue type false}}:{{definedValue}}];
+    {{target}} = [NSNumber numberWith{{asObjectiveCNumberType definedValue type false}}:{{definedValue}}{{asTypeLiteralSuffix type}}];
   {{/if_is_struct}}
 {{/if}}

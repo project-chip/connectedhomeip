@@ -1,14 +1,14 @@
 {{#if isOptional}}
   if ({{source}} != nil) {
-    auto & definedValue = {{target}}.Emplace();
-    {{>encode_value target="definedValue" source=source cluster=cluster isOptional=false}}
+    auto & definedValue_{{depth}} = {{target}}.Emplace();
+    {{>encode_value target=(concat "definedValue_" depth) source=source cluster=cluster errorCode=errorCode depth=(incrementDepth depth) isOptional=false}}
   }
 {{else if isNullable}}
   if ({{source}} == nil) {
     {{target}}.SetNull();
   } else {
-    auto & nonNullValue = {{target}}.SetNonNull();
-    {{>encode_value target="nonNullValue" source=source cluster=cluster isNullable=false}}
+    auto & nonNullValue_{{depth}} = {{target}}.SetNonNull();
+    {{>encode_value target=(concat "nonNullValue_" depth) source=source cluster=cluster errorCode=errorCode depth=(incrementDepth depth) isNullable=false}}
   }
 {{else if isArray}}
   {{! TODO: This is not great, with its fallible allocation and
@@ -18,44 +18,45 @@
       we are right now it may not (e.g. for a nullable list we're
       inside an "else" block here).  }}
   {
-    using ListType = decltype({{target}});
+    using ListType = std::remove_reference_t<decltype({{target}})>;
     using ListMemberType = ListMemberTypeGetter<ListType>::Type;
     if ({{source}}.count != 0) {
-      auto * listHolder = new ListHolder<ListMemberType>({{source}}.count);
-      if (listHolder == nullptr || listHolder->mList == nullptr) {
-        // Now what?
-        return;
+      auto * listHolder_{{depth}} = new ListHolder<ListMemberType>({{source}}.count);
+      if (listHolder_{{depth}} == nullptr || listHolder_{{depth}}->mList == nullptr) {
+        {{errorCode}}
       }
-      listFreer.add(listHolder);
+      listFreer.add(listHolder_{{depth}});
       for (size_t i = 0; i < {{source}}.count; ++i) {
         if (![{{source}}[i] isKindOfClass:[{{asObjectiveCClass type cluster forceNotList=true}} class]]) {
-          // Wrong kind of value, now what?
-          return;
+          // Wrong kind of value.
+          {{errorCode}}
         }
-        auto element = ({{asObjectiveCClass type cluster forceNotList=true}} *){{source}}[i];
-        {{>encode_value target="listHolder->mList[i]" source="element" cluster=cluster isArray=false}}
+        auto element_{{depth}} = ({{asObjectiveCClass type cluster forceNotList=true}} *){{source}}[i];
+        {{>encode_value target=(concat "listHolder_" depth "->mList[i]") source=(concat "element_" depth) cluster=cluster errorCode=errorCode depth=(incrementDepth depth) isArray=false}}
       }
-      {{target}} = ListType(listHolder->mList, {{source}}.count);
+      {{target}} = ListType(listHolder_{{depth}}->mList, {{source}}.count);
     } else {
       {{target}} = ListType();
     }
   }
-{{else if isStruct}}
-  {{#zcl_struct_items_by_struct_name type}}
-    {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "." (asUpperCamelCase label)) cluster=../cluster}}
-  {{/zcl_struct_items_by_struct_name}}
 {{else if (isOctetString type)}}
   {{target}} = [self asByteSpan:{{source}}];
 {{else if (isCharString type)}}
   {{target}} = [self asCharSpan:{{source}}];
 {{else}}
-  {{#if_chip_enum type}}
-    {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
+  {{#if_is_struct type}}
+    {{#zcl_struct_items_by_struct_name type}}
+     {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "." (asUpperCamelCase label)) cluster=../cluster errorCode=../errorCode depth=(incrementDepth ../depth)}}
+    {{/zcl_struct_items_by_struct_name}}
   {{else}}
-    {{#if_is_bitmap type}}
+    {{#if_chip_enum type}}
       {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
     {{else}}
-      {{target}} = {{source}}.{{asObjectiveCNumberType source type true}}Value;
-    {{/if_is_bitmap}}
-  {{/if_chip_enum}}
+      {{#if_is_bitmap type}}
+        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
+      {{else}}
+        {{target}} = {{source}}.{{asObjectiveCNumberType source type true}}Value;
+      {{/if_is_bitmap}}
+    {{/if_chip_enum}}
+  {{/if_is_struct}}
 {{/if}}
