@@ -541,16 +541,14 @@
                 self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice
                                                                        endpoint:0
                                                                           queue:dispatch_get_main_queue()];
-                NSData * networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
-                NSData * credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
-                uint64_t breadcrumb = 0;
-                uint32_t timeoutMs = 3000;
+                __auto_type * payload = [[CHIPNetworkCommissioningClusterAddWiFiNetworkPayload alloc] init];
+                payload.Ssid = [ssid dataUsingEncoding:NSUTF8StringEncoding];
+                payload.Credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
+                payload.Breadcrumb = @(0);
+                payload.TimeoutMs = @(3000);
 
                 __weak typeof(self) weakSelf = self;
-                [self->_cluster addWiFiNetwork:networkId
-                                   credentials:credentials
-                                    breadcrumb:breadcrumb
-                                     timeoutMs:timeoutMs
+                [self->_cluster addWiFiNetwork:payload
                                responseHandler:^(NSError * error, NSDictionary * values) {
                                    [weakSelf onAddNetworkResponse:error isWiFi:YES];
                                }];
@@ -571,13 +569,13 @@
                 self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice
                                                                        endpoint:0
                                                                           queue:dispatch_get_main_queue()];
-                uint64_t breadcrumb = 0;
-                uint32_t timeoutMs = 3000;
+                __auto_type * payload = [[CHIPNetworkCommissioningClusterAddThreadNetworkPayload alloc] init];
+                payload.OperationalDataset = threadDataSet;
+                payload.Breadcrumb = @(0);
+                payload.TimeoutMs = @(3000);
 
                 __weak typeof(self) weakSelf = self;
-                [self->_cluster addThreadNetwork:threadDataSet
-                                      breadcrumb:breadcrumb
-                                       timeoutMs:timeoutMs
+                [self->_cluster addThreadNetwork:payload
                                  responseHandler:^(NSError * error, NSDictionary * values) {
                                      [weakSelf onAddNetworkResponse:error isWiFi:NO];
                                  }];
@@ -598,21 +596,19 @@
         return;
     }
 
-    NSData * networkId;
+    __auto_type * payload = [[CHIPNetworkCommissioningClusterEnableNetworkPayload alloc] init];
     if (isWiFi) {
         NSString * ssid = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
-        networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
+        payload.NetworkID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     } else {
         uint8_t tempThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
-        networkId = [NSData dataWithBytes:tempThreadNetworkId length:sizeof(tempThreadNetworkId)];
+        payload.NetworkID = [NSData dataWithBytes:tempThreadNetworkId length:sizeof(tempThreadNetworkId)];
     }
-    uint64_t breadcrumb = 0;
-    uint32_t timeoutMs = 3000;
+    payload.Breadcrumb = @(0);
+    payload.TimeoutMs = @(3000);
 
     __weak typeof(self) weakSelf = self;
-    [_cluster enableNetwork:networkId
-                 breadcrumb:breadcrumb
-                  timeoutMs:timeoutMs
+    [_cluster enableNetwork:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 [weakSelf onEnableNetworkResponse:err];
             }];

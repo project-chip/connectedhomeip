@@ -139,7 +139,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster test:^(NSError * err, NSDictionary * values) {
+    [cluster test:[[CHIPTestClusterClusterTestPayload alloc] init] responseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
@@ -151,7 +151,7 @@ CHIPDevice * GetConnectedDevice()
 
     // Reuse the CHIPCluster Object for multiple times.
 
-    [cluster test:^(NSError * err, NSDictionary * values) {
+    [cluster test:[[CHIPTestClusterClusterTestPayload alloc] init] responseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
@@ -197,7 +197,7 @@ CHIPDevice * GetConnectedDevice()
     CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:{{asExpectedEndpointForCluster (asUpperCamelCase parent.name)}} queue:queue];
     XCTAssertNotNil(cluster);
 
-    {{asObjectiveCBasicType type}} value = {{asTestValue}};
+    {{asObjectiveCType type parent.name}} value = {{asTestValue}};
     [cluster writeAttribute{{asUpperCamelCase name}}WithValue:value responseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} Error: %@", err);
         XCTAssertEqual(err.code, 0);

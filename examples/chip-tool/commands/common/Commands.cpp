@@ -258,7 +258,7 @@ void Commands::ShowCommand(std::string executable, std::string clusterName, Comm
         bool isOptional = command->GetArgumentIsOptional(i);
         if (isOptional)
         {
-            arguments += "[";
+            arguments += "[--";
         }
         arguments += command->GetArgumentName(i);
         if (isOptional)

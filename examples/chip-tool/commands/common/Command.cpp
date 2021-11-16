@@ -32,33 +32,69 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+constexpr const char * kOptionalArgumentPrefix = "--";
+constexpr size_t kOptionalArgumentPrefixLength = 2;
+
 bool Command::InitArguments(int argc, char ** argv)
 {
     bool isValidCommand = false;
-    size_t argsCount    = mArgs.size();
 
-    size_t argsOptionalCount = 0;
-    for (size_t i = 0; i < argsCount; i++)
+    size_t argvExtraArgsCount = (size_t) argc;
+    size_t mandatoryArgsCount = 0;
+    size_t optionalArgsCount  = 0;
+    for (size_t i = 0; i < mArgs.size(); i++)
     {
         if (mArgs[i].optional)
         {
-            argsOptionalCount++;
+            optionalArgsCount++;
+        }
+        else
+        {
+            mandatoryArgsCount++;
+            argvExtraArgsCount--;
         }
     }
 
-    VerifyOrExit((size_t)(argc) >= (argsCount - argsOptionalCount) && (size_t)(argc) <= argsCount,
-                 ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %zu", argc, argsCount));
+    VerifyOrExit((size_t)(argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
+                 ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %zu", argc, mandatoryArgsCount));
 
-    for (size_t i = 0; i < (size_t) argc; i++)
+    // Initialize mandatory arguments
+    for (size_t i = 0; i < mandatoryArgsCount; i++)
     {
-        if (!InitArgument(i, argv[i]))
+        char * arg = argv[i];
+        if (!InitArgument(i, arg))
         {
             ExitNow();
         }
     }
 
-    for (size_t i = (size_t) argc; i < argsCount; i++)
+    // Initialize optional arguments
+    // Optional arguments expect a name and a value, so i is increased by 2 on every step.
+    for (size_t i = mandatoryArgsCount; i < (size_t) argc; i += 2)
     {
+        bool found = false;
+        for (size_t j = mandatoryArgsCount; j < mandatoryArgsCount + optionalArgsCount; j++)
+        {
+            // optional arguments starts with kOptionalArgumentPrefix
+            if (strlen(argv[i]) <= kOptionalArgumentPrefixLength &&
+                strncmp(argv[i], kOptionalArgumentPrefix, kOptionalArgumentPrefixLength) != 0)
+            {
+                continue;
+            }
+
+            if (strcmp(argv[i] + strlen(kOptionalArgumentPrefix), mArgs[j].name) == 0)
+            {
+                found = true;
+
+                VerifyOrExit((size_t) argc > (i + 1),
+                             ChipLogError(chipTool, "InitArgs: Optional argument %s missing value.", argv[i]));
+                if (!InitArgument(j, argv[i + 1]))
+                {
+                    ExitNow();
+                }
+            }
+        }
+        VerifyOrExit(found, ChipLogError(chipTool, "InitArgs: Optional argument %s does not exist.", argv[i]));
     }
 
     isValidCommand = true;
@@ -353,7 +389,7 @@ size_t Command::AddArgument(const char * name, const char * value, bool optional
 size_t Command::AddArgument(const char * name, char ** value, bool optional)
 {
     Argument arg;
-    arg.type     = ArgumentType::CharString;
+    arg.type     = ArgumentType::String;
     arg.name     = name;
     arg.value    = reinterpret_cast<void *>(value);
     arg.optional = optional;

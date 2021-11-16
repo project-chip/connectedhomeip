@@ -104,39 +104,4 @@ protected:
     uint32_t mMrpActiveInterval = CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL;
 };
 
-/**
- * This class defines an interface for an object that the user of Device
- * can register as a delegate. The delegate object will be called by the
- * Device when a new message or status update is received from the corresponding
- * CHIP device.
- */
-class DLL_EXPORT DeviceStatusDelegate
-{
-public:
-    virtual ~DeviceStatusDelegate() {}
-
-    /**
-     * @brief
-     *   Called when a message is received from the device.
-     *
-     * @param[in] msg Received message buffer.
-     */
-    virtual void OnMessage(System::PacketBufferHandle && msg) = 0;
-
-    /**
-     * @brief
-     *   Called when response to OpenPairingWindow is received from the device.
-     *
-     * @param[in] status CHIP_NO_ERROR on success, or corresponding error.
-     */
-    virtual void OnPairingWindowOpenStatus(CHIP_ERROR status){};
-
-    /**
-     * @brief
-     *   Called when device status is updated.
-     *
-     */
-    virtual void OnStatusChange(void){};
-};
-
 } // namespace chip

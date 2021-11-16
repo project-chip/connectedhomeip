@@ -133,8 +133,6 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     // TODO Exchange Mgr needs to be able to track multiple delegates. Delegate API should be able to query for the right delegate
     // to handle events.
-    ReturnErrorOnFailure(
-        params.systemState->ExchangeMgr()->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this));
     params.systemState->ExchangeMgr()->SetDelegate(this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -301,29 +299,6 @@ CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-}
-
-CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                               System::PacketBufferHandle && msgBuf)
-{
-    OperationalDeviceProxy * device = nullptr;
-
-    VerifyOrExit(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
-    VerifyOrExit(ec != nullptr, ChipLogError(Controller, "OnMessageReceived was called with null exchange"));
-
-    device = FindOperationalDevice(ec->GetSessionHandle());
-    VerifyOrExit(device != nullptr, ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
-
-    device->OnMessageReceived(ec, payloadHeader, std::move(msgBuf));
-
-exit:
-    return CHIP_NO_ERROR;
-}
-
-void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
-{
-    ChipLogProgress(Controller, "Time out! failed to receive response from Exchange: " ChipLogFormatExchange,
-                    ChipLogValueExchange(ec));
 }
 
 void DeviceController::OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) {}
@@ -963,7 +938,7 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
     FreeRendezvousSession();
 
-    if (mDeviceBeingCommissioned != nullptr)
+    if (mDeviceBeingCommissioned != nullptr && mIsIPRendezvous)
     {
         // Release the commissionee device. For BLE, this is stored,
         // for IP commissioning, we have taken a reference to the

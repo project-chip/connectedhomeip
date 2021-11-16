@@ -234,3 +234,8 @@ target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
 
 # Make the component dependent on our CHIP build
 add_dependencies(${COMPONENT_LIB} chip_gn)
+
+if(CONFIG_ENABLE_PW_RPC)
+    set(WRAP_FUNCTIONS esp_log_write)
+    target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${WRAP_FUNCTIONS}")
+endif()

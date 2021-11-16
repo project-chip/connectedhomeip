@@ -624,6 +624,8 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         SuccessOrExit(err);
     }
 
+    VerifyOrExit(aReadPrepareParams.mMinIntervalFloorSeconds < aReadPrepareParams.mMaxIntervalCeilingSeconds,
+                 err = CHIP_ERROR_INVALID_ARGUMENT);
     request.MinIntervalSeconds(aReadPrepareParams.mMinIntervalFloorSeconds)
         .MaxIntervalSeconds(aReadPrepareParams.mMaxIntervalCeilingSeconds)
         .KeepSubscriptions(aReadPrepareParams.mKeepSubscriptions)
@@ -648,10 +650,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        AbortExistingExchangeContext();
-    }
-    if (err != CHIP_NO_ERROR)
-    {
+        ChipLogError(DataManagement, "Failed to send subscribe request: %" CHIP_ERROR_FORMAT, err.Format());
         Shutdown();
     }
     return err;

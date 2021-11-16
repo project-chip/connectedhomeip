@@ -22,8 +22,13 @@
 #import "CHIPCallbackBridge_internal.h"
 #import "CHIPCluster_internal.h"
 #import "CHIPClustersObjc_internal.h"
+#import "CHIPCommandPayloadsObjc.h"
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
+#import "CHIPListUtils_internal.h"
+#import "CHIPStructsObjc.h"
+
+#include <type_traits>
 
 using chip::Callback::Callback;
 using chip::Callback::Cancelable;
@@ -36,10 +41,11 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)getSetupPIN:(NSString *)tempAccountIdentifier responseHandler:(ResponseHandler)responseHandler
+- (void)getSetupPIN:(CHIPAccountLoginClusterGetSetupPINPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     AccountLogin::Commands::GetSetupPIN::Type request;
-    request.tempAccountIdentifier = [self asCharSpan:tempAccountIdentifier];
+    request.tempAccountIdentifier = [self asCharSpan:payload.TempAccountIdentifier];
 
     new CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -49,14 +55,15 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)login:(NSString *)tempAccountIdentifier setupPIN:(NSString *)setupPIN responseHandler:(ResponseHandler)responseHandler
+- (void)login:(CHIPAccountLoginClusterLoginPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     AccountLogin::Commands::Login::Type request;
-    request.tempAccountIdentifier = [self asCharSpan:tempAccountIdentifier];
-    request.setupPIN = [self asCharSpan:setupPIN];
+    request.tempAccountIdentifier = [self asCharSpan:payload.TempAccountIdentifier];
+    request.setupPIN = [self asCharSpan:payload.SetupPIN];
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -78,47 +85,47 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)openBasicCommissioningWindow:(uint16_t)commissioningTimeout responseHandler:(ResponseHandler)responseHandler
+- (void)openBasicCommissioningWindow:(CHIPAdministratorCommissioningClusterOpenBasicCommissioningWindowPayload * _Nonnull)payload
+                     responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
-    request.commissioningTimeout = commissioningTimeout;
+    request.commissioningTimeout = payload.CommissioningTimeout.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)openCommissioningWindow:(uint16_t)commissioningTimeout
-                   PAKEVerifier:(NSData *)PAKEVerifier
-                  discriminator:(uint16_t)discriminator
-                     iterations:(uint32_t)iterations
-                           salt:(NSData *)salt
-                     passcodeID:(uint16_t)passcodeID
+- (void)openCommissioningWindow:(CHIPAdministratorCommissioningClusterOpenCommissioningWindowPayload * _Nonnull)payload
                 responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
-    request.commissioningTimeout = commissioningTimeout;
-    request.PAKEVerifier = [self asByteSpan:PAKEVerifier];
-    request.discriminator = discriminator;
-    request.iterations = iterations;
-    request.salt = [self asByteSpan:salt];
-    request.passcodeID = passcodeID;
+    request.commissioningTimeout = payload.CommissioningTimeout.unsignedShortValue;
+    request.PAKEVerifier = [self asByteSpan:payload.PAKEVerifier];
+    request.discriminator = payload.Discriminator.unsignedShortValue;
+    request.iterations = payload.Iterations.unsignedIntValue;
+    request.salt = [self asByteSpan:payload.Salt];
+    request.passcodeID = payload.PasscodeID.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)revokeCommissioning:(ResponseHandler)responseHandler
+- (void)revokeCommissioning:(CHIPAdministratorCommissioningClusterRevokeCommissioningPayload * _Nonnull)payload
+            responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     AdministratorCommissioning::Commands::RevokeCommissioning::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -140,13 +147,15 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)changeStatus:(uint8_t)status responseHandler:(ResponseHandler)responseHandler
+- (void)changeStatus:(CHIPApplicationBasicClusterChangeStatusPayload * _Nonnull)payload
+     responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ApplicationBasic::Commands::ChangeStatus::Type request;
-    request.status = static_cast<decltype(request.status)>(status);
+    request.status = static_cast<std::remove_reference_t<decltype(request.status)>>(payload.Status.unsignedCharValue);
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -217,15 +226,14 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)launchApp:(NSString *)data
-    catalogVendorId:(uint16_t)catalogVendorId
-      applicationId:(NSString *)applicationId
+- (void)launchApp:(CHIPApplicationLauncherClusterLaunchAppPayload * _Nonnull)payload
     responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ApplicationLauncher::Commands::LaunchApp::Type request;
-    request.data = [self asCharSpan:data];
-    request.catalogVendorId = catalogVendorId;
-    request.applicationId = [self asCharSpan:applicationId];
+    request.data = [self asCharSpan:payload.Data];
+    request.catalogVendorId = payload.CatalogVendorId.unsignedShortValue;
+    request.applicationId = [self asCharSpan:payload.ApplicationId];
 
     new CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -273,26 +281,28 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)renameOutput:(uint8_t)index name:(NSString *)name responseHandler:(ResponseHandler)responseHandler
+- (void)renameOutput:(CHIPAudioOutputClusterRenameOutputPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     AudioOutput::Commands::RenameOutput::Type request;
-    request.index = index;
-    request.name = [self asCharSpan:name];
+    request.index = payload.Index.unsignedCharValue;
+    request.name = [self asCharSpan:payload.Name];
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)selectOutput:(uint8_t)index responseHandler:(ResponseHandler)responseHandler
+- (void)selectOutput:(CHIPAudioOutputClusterSelectOutputPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     AudioOutput::Commands::SelectOutput::Type request;
-    request.index = index;
+    request.index = payload.Index.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -329,24 +339,28 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)barrierControlGoToPercent:(uint8_t)percentOpen responseHandler:(ResponseHandler)responseHandler
+- (void)barrierControlGoToPercent:(CHIPBarrierControlClusterBarrierControlGoToPercentPayload * _Nonnull)payload
+                  responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BarrierControl::Commands::BarrierControlGoToPercent::Type request;
-    request.percentOpen = percentOpen;
+    request.percentOpen = payload.PercentOpen.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)barrierControlStop:(ResponseHandler)responseHandler
+- (void)barrierControlStop:(CHIPBarrierControlClusterBarrierControlStopPayload * _Nonnull)payload
+           responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BarrierControl::Commands::BarrierControlStop::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -396,12 +410,13 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)mfgSpecificPing:(ResponseHandler)responseHandler
+- (void)mfgSpecificPing:(CHIPBasicClusterMfgSpecificPingPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Basic::Commands::MfgSpecificPing::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -449,10 +464,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeUserLabelWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeUserLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeUserLabel(success, failure, [self asCharSpan:value]);
+        ListFreer listFreer;
+        using TypeInfo = Basic::Attributes::UserLabel::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = [self asCharSpan:value];
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -463,10 +484,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeLocationWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeLocationWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeLocation(success, failure, [self asCharSpan:value]);
+        ListFreer listFreer;
+        using TypeInfo = Basic::Attributes::Location::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = [self asCharSpan:value];
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -540,10 +567,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeLocalConfigDisabledWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeLocalConfigDisabledWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeLocalConfigDisabled(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = Basic::Attributes::LocalConfigDisabled::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.boolValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -577,10 +610,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOutOfServiceWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOutOfServiceWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOutOfService(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = BinaryInputBasic::Attributes::OutOfService::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.boolValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -591,10 +630,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributePresentValueWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributePresentValueWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributePresentValue(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = BinaryInputBasic::Attributes::PresentValue::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.boolValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -659,39 +704,33 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)bind:(uint64_t)nodeId
-            groupId:(uint16_t)groupId
-         endpointId:(uint16_t)endpointId
-          clusterId:(uint32_t)clusterId
-    responseHandler:(ResponseHandler)responseHandler
+- (void)bind:(CHIPBindingClusterBindPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Binding::Commands::Bind::Type request;
-    request.nodeId = nodeId;
-    request.groupId = groupId;
-    request.endpointId = endpointId;
-    request.clusterId = clusterId;
+    request.nodeId = payload.NodeId.unsignedLongLongValue;
+    request.groupId = payload.GroupId.unsignedShortValue;
+    request.endpointId = payload.EndpointId.unsignedShortValue;
+    request.clusterId = payload.ClusterId.unsignedIntValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)unbind:(uint64_t)nodeId
-            groupId:(uint16_t)groupId
-         endpointId:(uint16_t)endpointId
-          clusterId:(uint32_t)clusterId
-    responseHandler:(ResponseHandler)responseHandler
+- (void)unbind:(CHIPBindingClusterUnbindPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Binding::Commands::Unbind::Type request;
-    request.nodeId = nodeId;
-    request.groupId = groupId;
-    request.endpointId = endpointId;
-    request.clusterId = clusterId;
+    request.nodeId = payload.NodeId.unsignedLongLongValue;
+    request.groupId = payload.GroupId.unsignedShortValue;
+    request.endpointId = payload.EndpointId.unsignedShortValue;
+    request.clusterId = payload.ClusterId.unsignedIntValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -755,177 +794,219 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)disableAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler
+- (void)disableAction:(CHIPBridgedActionsClusterDisableActionPayload * _Nonnull)payload
+      responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BridgedActions::Commands::DisableAction::Type request;
-    request.actionID = actionID;
-    request.invokeID = chip::Optional<uint32_t>(invokeID);
+    request.actionID = payload.ActionID.unsignedShortValue;
+    if (payload.InvokeID != nil) {
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0 = payload.InvokeID.unsignedIntValue;
+    }
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)disableActionWithDuration:(uint16_t)actionID
-                         invokeID:(uint32_t)invokeID
-                         duration:(uint32_t)duration
+- (void)disableActionWithDuration:(CHIPBridgedActionsClusterDisableActionWithDurationPayload * _Nonnull)payload
                   responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BridgedActions::Commands::DisableActionWithDuration::Type request;
-    request.actionID = actionID;
-    request.invokeID = chip::Optional<uint32_t>(invokeID);
-    request.duration = duration;
+    request.actionID = payload.ActionID.unsignedShortValue;
+    if (payload.InvokeID != nil) {
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0 = payload.InvokeID.unsignedIntValue;
+    }
+    request.duration = payload.Duration.unsignedIntValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)enableAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler
+- (void)enableAction:(CHIPBridgedActionsClusterEnableActionPayload * _Nonnull)payload
+     responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BridgedActions::Commands::EnableAction::Type request;
-    request.actionID = actionID;
-    request.invokeID = chip::Optional<uint32_t>(invokeID);
+    request.actionID = payload.ActionID.unsignedShortValue;
+    if (payload.InvokeID != nil) {
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0 = payload.InvokeID.unsignedIntValue;
+    }
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)enableActionWithDuration:(uint16_t)actionID
-                        invokeID:(uint32_t)invokeID
-                        duration:(uint32_t)duration
+- (void)enableActionWithDuration:(CHIPBridgedActionsClusterEnableActionWithDurationPayload * _Nonnull)payload
                  responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BridgedActions::Commands::EnableActionWithDuration::Type request;
-    request.actionID = actionID;
-    request.invokeID = chip::Optional<uint32_t>(invokeID);
-    request.duration = duration;
+    request.actionID = payload.ActionID.unsignedShortValue;
+    if (payload.InvokeID != nil) {
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0 = payload.InvokeID.unsignedIntValue;
+    }
+    request.duration = payload.Duration.unsignedIntValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)instantAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler
+- (void)instantAction:(CHIPBridgedActionsClusterInstantActionPayload * _Nonnull)payload
+      responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BridgedActions::Commands::InstantAction::Type request;
-    request.actionID = actionID;
-    request.invokeID = chip::Optional<uint32_t>(invokeID);
+    request.actionID = payload.ActionID.unsignedShortValue;
+    if (payload.InvokeID != nil) {
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0 = payload.InvokeID.unsignedIntValue;
+    }
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)instantActionWithTransition:(uint16_t)actionID
-                           invokeID:(uint32_t)invokeID
-                     transitionTime:(uint16_t)transitionTime
+- (void)instantActionWithTransition:(CHIPBridgedActionsClusterInstantActionWithTransitionPayload * _Nonnull)payload
                     responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BridgedActions::Commands::InstantActionWithTransition::Type request;
-    request.actionID = actionID;
-    request.invokeID = chip::Optional<uint32_t>(invokeID);
-    request.transitionTime = transitionTime;
+    request.actionID = payload.ActionID.unsignedShortValue;
+    if (payload.InvokeID != nil) {
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0 = payload.InvokeID.unsignedIntValue;
+    }
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)pauseAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler
+- (void)pauseAction:(CHIPBridgedActionsClusterPauseActionPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BridgedActions::Commands::PauseAction::Type request;
-    request.actionID = actionID;
-    request.invokeID = chip::Optional<uint32_t>(invokeID);
+    request.actionID = payload.ActionID.unsignedShortValue;
+    if (payload.InvokeID != nil) {
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0 = payload.InvokeID.unsignedIntValue;
+    }
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)pauseActionWithDuration:(uint16_t)actionID
-                       invokeID:(uint32_t)invokeID
-                       duration:(uint32_t)duration
+- (void)pauseActionWithDuration:(CHIPBridgedActionsClusterPauseActionWithDurationPayload * _Nonnull)payload
                 responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BridgedActions::Commands::PauseActionWithDuration::Type request;
-    request.actionID = actionID;
-    request.invokeID = chip::Optional<uint32_t>(invokeID);
-    request.duration = duration;
+    request.actionID = payload.ActionID.unsignedShortValue;
+    if (payload.InvokeID != nil) {
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0 = payload.InvokeID.unsignedIntValue;
+    }
+    request.duration = payload.Duration.unsignedIntValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)resumeAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler
+- (void)resumeAction:(CHIPBridgedActionsClusterResumeActionPayload * _Nonnull)payload
+     responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BridgedActions::Commands::ResumeAction::Type request;
-    request.actionID = actionID;
-    request.invokeID = chip::Optional<uint32_t>(invokeID);
+    request.actionID = payload.ActionID.unsignedShortValue;
+    if (payload.InvokeID != nil) {
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0 = payload.InvokeID.unsignedIntValue;
+    }
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)startAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler
+- (void)startAction:(CHIPBridgedActionsClusterStartActionPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BridgedActions::Commands::StartAction::Type request;
-    request.actionID = actionID;
-    request.invokeID = chip::Optional<uint32_t>(invokeID);
+    request.actionID = payload.ActionID.unsignedShortValue;
+    if (payload.InvokeID != nil) {
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0 = payload.InvokeID.unsignedIntValue;
+    }
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)startActionWithDuration:(uint16_t)actionID
-                       invokeID:(uint32_t)invokeID
-                       duration:(uint32_t)duration
+- (void)startActionWithDuration:(CHIPBridgedActionsClusterStartActionWithDurationPayload * _Nonnull)payload
                 responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BridgedActions::Commands::StartActionWithDuration::Type request;
-    request.actionID = actionID;
-    request.invokeID = chip::Optional<uint32_t>(invokeID);
-    request.duration = duration;
+    request.actionID = payload.ActionID.unsignedShortValue;
+    if (payload.InvokeID != nil) {
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0 = payload.InvokeID.unsignedIntValue;
+    }
+    request.duration = payload.Duration.unsignedIntValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)stopAction:(uint16_t)actionID invokeID:(uint32_t)invokeID responseHandler:(ResponseHandler)responseHandler
+- (void)stopAction:(CHIPBridgedActionsClusterStopActionPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     BridgedActions::Commands::StopAction::Type request;
-    request.actionID = actionID;
-    request.invokeID = chip::Optional<uint32_t>(invokeID);
+    request.actionID = payload.ActionID.unsignedShortValue;
+    if (payload.InvokeID != nil) {
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0 = payload.InvokeID.unsignedIntValue;
+    }
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -998,10 +1079,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeUserLabelWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeUserLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeUserLabel(success, failure, [self asCharSpan:value]);
+        ListFreer listFreer;
+        using TypeInfo = BridgedDeviceBasic::Attributes::UserLabel::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = [self asCharSpan:value];
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -1091,390 +1178,332 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)colorLoopSet:(uint8_t)updateFlags
-              action:(uint8_t)action
-           direction:(uint8_t)direction
-                time:(uint16_t)time
-            startHue:(uint16_t)startHue
-         optionsMask:(uint8_t)optionsMask
-     optionsOverride:(uint8_t)optionsOverride
-     responseHandler:(ResponseHandler)responseHandler
+- (void)colorLoopSet:(CHIPColorControlClusterColorLoopSetPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::ColorLoopSet::Type request;
-    request.updateFlags = static_cast<decltype(request.updateFlags)>(updateFlags);
-    request.action = static_cast<decltype(request.action)>(action);
-    request.direction = static_cast<decltype(request.direction)>(direction);
-    request.time = time;
-    request.startHue = startHue;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.updateFlags
+        = static_cast<std::remove_reference_t<decltype(request.updateFlags)>>(payload.UpdateFlags.unsignedCharValue);
+    request.action = static_cast<std::remove_reference_t<decltype(request.action)>>(payload.Action.unsignedCharValue);
+    request.direction = static_cast<std::remove_reference_t<decltype(request.direction)>>(payload.Direction.unsignedCharValue);
+    request.time = payload.Time.unsignedShortValue;
+    request.startHue = payload.StartHue.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)enhancedMoveHue:(uint8_t)moveMode
-                   rate:(uint16_t)rate
-            optionsMask:(uint8_t)optionsMask
-        optionsOverride:(uint8_t)optionsOverride
+- (void)enhancedMoveHue:(CHIPColorControlClusterEnhancedMoveHuePayload * _Nonnull)payload
         responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::EnhancedMoveHue::Type request;
-    request.moveMode = static_cast<decltype(request.moveMode)>(moveMode);
-    request.rate = rate;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(payload.MoveMode.unsignedCharValue);
+    request.rate = payload.Rate.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)enhancedMoveToHue:(uint16_t)enhancedHue
-                direction:(uint8_t)direction
-           transitionTime:(uint16_t)transitionTime
-              optionsMask:(uint8_t)optionsMask
-          optionsOverride:(uint8_t)optionsOverride
+- (void)enhancedMoveToHue:(CHIPColorControlClusterEnhancedMoveToHuePayload * _Nonnull)payload
           responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::EnhancedMoveToHue::Type request;
-    request.enhancedHue = enhancedHue;
-    request.direction = static_cast<decltype(request.direction)>(direction);
-    request.transitionTime = transitionTime;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.enhancedHue = payload.EnhancedHue.unsignedShortValue;
+    request.direction = static_cast<std::remove_reference_t<decltype(request.direction)>>(payload.Direction.unsignedCharValue);
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)enhancedMoveToHueAndSaturation:(uint16_t)enhancedHue
-                            saturation:(uint8_t)saturation
-                        transitionTime:(uint16_t)transitionTime
-                           optionsMask:(uint8_t)optionsMask
-                       optionsOverride:(uint8_t)optionsOverride
+- (void)enhancedMoveToHueAndSaturation:(CHIPColorControlClusterEnhancedMoveToHueAndSaturationPayload * _Nonnull)payload
                        responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type request;
-    request.enhancedHue = enhancedHue;
-    request.saturation = saturation;
-    request.transitionTime = transitionTime;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.enhancedHue = payload.EnhancedHue.unsignedShortValue;
+    request.saturation = payload.Saturation.unsignedCharValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)enhancedStepHue:(uint8_t)stepMode
-               stepSize:(uint16_t)stepSize
-         transitionTime:(uint16_t)transitionTime
-            optionsMask:(uint8_t)optionsMask
-        optionsOverride:(uint8_t)optionsOverride
+- (void)enhancedStepHue:(CHIPColorControlClusterEnhancedStepHuePayload * _Nonnull)payload
         responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::EnhancedStepHue::Type request;
-    request.stepMode = static_cast<decltype(request.stepMode)>(stepMode);
-    request.stepSize = stepSize;
-    request.transitionTime = transitionTime;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(payload.StepMode.unsignedCharValue);
+    request.stepSize = payload.StepSize.unsignedShortValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)moveColor:(int16_t)rateX
-              rateY:(int16_t)rateY
-        optionsMask:(uint8_t)optionsMask
-    optionsOverride:(uint8_t)optionsOverride
-    responseHandler:(ResponseHandler)responseHandler
+- (void)moveColor:(CHIPColorControlClusterMoveColorPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::MoveColor::Type request;
-    request.rateX = rateX;
-    request.rateY = rateY;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.rateX = payload.RateX.shortValue;
+    request.rateY = payload.RateY.shortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)moveColorTemperature:(uint8_t)moveMode
-                        rate:(uint16_t)rate
-     colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum
-     colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum
-                 optionsMask:(uint8_t)optionsMask
-             optionsOverride:(uint8_t)optionsOverride
+- (void)moveColorTemperature:(CHIPColorControlClusterMoveColorTemperaturePayload * _Nonnull)payload
              responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::MoveColorTemperature::Type request;
-    request.moveMode = static_cast<decltype(request.moveMode)>(moveMode);
-    request.rate = rate;
-    request.colorTemperatureMinimum = colorTemperatureMinimum;
-    request.colorTemperatureMaximum = colorTemperatureMaximum;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(payload.MoveMode.unsignedCharValue);
+    request.rate = payload.Rate.unsignedShortValue;
+    request.colorTemperatureMinimum = payload.ColorTemperatureMinimum.unsignedShortValue;
+    request.colorTemperatureMaximum = payload.ColorTemperatureMaximum.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)moveHue:(uint8_t)moveMode
-               rate:(uint8_t)rate
-        optionsMask:(uint8_t)optionsMask
-    optionsOverride:(uint8_t)optionsOverride
-    responseHandler:(ResponseHandler)responseHandler
+- (void)moveHue:(CHIPColorControlClusterMoveHuePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::MoveHue::Type request;
-    request.moveMode = static_cast<decltype(request.moveMode)>(moveMode);
-    request.rate = rate;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(payload.MoveMode.unsignedCharValue);
+    request.rate = payload.Rate.unsignedCharValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)moveSaturation:(uint8_t)moveMode
-                  rate:(uint8_t)rate
-           optionsMask:(uint8_t)optionsMask
-       optionsOverride:(uint8_t)optionsOverride
+- (void)moveSaturation:(CHIPColorControlClusterMoveSaturationPayload * _Nonnull)payload
        responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::MoveSaturation::Type request;
-    request.moveMode = static_cast<decltype(request.moveMode)>(moveMode);
-    request.rate = rate;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(payload.MoveMode.unsignedCharValue);
+    request.rate = payload.Rate.unsignedCharValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)moveToColor:(uint16_t)colorX
-             colorY:(uint16_t)colorY
-     transitionTime:(uint16_t)transitionTime
-        optionsMask:(uint8_t)optionsMask
-    optionsOverride:(uint8_t)optionsOverride
-    responseHandler:(ResponseHandler)responseHandler
+- (void)moveToColor:(CHIPColorControlClusterMoveToColorPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::MoveToColor::Type request;
-    request.colorX = colorX;
-    request.colorY = colorY;
-    request.transitionTime = transitionTime;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.colorX = payload.ColorX.unsignedShortValue;
+    request.colorY = payload.ColorY.unsignedShortValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)moveToColorTemperature:(uint16_t)colorTemperature
-                transitionTime:(uint16_t)transitionTime
-                   optionsMask:(uint8_t)optionsMask
-               optionsOverride:(uint8_t)optionsOverride
+- (void)moveToColorTemperature:(CHIPColorControlClusterMoveToColorTemperaturePayload * _Nonnull)payload
                responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::MoveToColorTemperature::Type request;
-    request.colorTemperature = colorTemperature;
-    request.transitionTime = transitionTime;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.colorTemperature = payload.ColorTemperature.unsignedShortValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)moveToHue:(uint8_t)hue
-          direction:(uint8_t)direction
-     transitionTime:(uint16_t)transitionTime
-        optionsMask:(uint8_t)optionsMask
-    optionsOverride:(uint8_t)optionsOverride
-    responseHandler:(ResponseHandler)responseHandler
+- (void)moveToHue:(CHIPColorControlClusterMoveToHuePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::MoveToHue::Type request;
-    request.hue = hue;
-    request.direction = static_cast<decltype(request.direction)>(direction);
-    request.transitionTime = transitionTime;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.hue = payload.Hue.unsignedCharValue;
+    request.direction = static_cast<std::remove_reference_t<decltype(request.direction)>>(payload.Direction.unsignedCharValue);
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)moveToHueAndSaturation:(uint8_t)hue
-                    saturation:(uint8_t)saturation
-                transitionTime:(uint16_t)transitionTime
-                   optionsMask:(uint8_t)optionsMask
-               optionsOverride:(uint8_t)optionsOverride
+- (void)moveToHueAndSaturation:(CHIPColorControlClusterMoveToHueAndSaturationPayload * _Nonnull)payload
                responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::MoveToHueAndSaturation::Type request;
-    request.hue = hue;
-    request.saturation = saturation;
-    request.transitionTime = transitionTime;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.hue = payload.Hue.unsignedCharValue;
+    request.saturation = payload.Saturation.unsignedCharValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)moveToSaturation:(uint8_t)saturation
-          transitionTime:(uint16_t)transitionTime
-             optionsMask:(uint8_t)optionsMask
-         optionsOverride:(uint8_t)optionsOverride
+- (void)moveToSaturation:(CHIPColorControlClusterMoveToSaturationPayload * _Nonnull)payload
          responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::MoveToSaturation::Type request;
-    request.saturation = saturation;
-    request.transitionTime = transitionTime;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.saturation = payload.Saturation.unsignedCharValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)stepColor:(int16_t)stepX
-              stepY:(int16_t)stepY
-     transitionTime:(uint16_t)transitionTime
-        optionsMask:(uint8_t)optionsMask
-    optionsOverride:(uint8_t)optionsOverride
-    responseHandler:(ResponseHandler)responseHandler
+- (void)stepColor:(CHIPColorControlClusterStepColorPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::StepColor::Type request;
-    request.stepX = stepX;
-    request.stepY = stepY;
-    request.transitionTime = transitionTime;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.stepX = payload.StepX.shortValue;
+    request.stepY = payload.StepY.shortValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)stepColorTemperature:(uint8_t)stepMode
-                    stepSize:(uint16_t)stepSize
-              transitionTime:(uint16_t)transitionTime
-     colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum
-     colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum
-                 optionsMask:(uint8_t)optionsMask
-             optionsOverride:(uint8_t)optionsOverride
+- (void)stepColorTemperature:(CHIPColorControlClusterStepColorTemperaturePayload * _Nonnull)payload
              responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::StepColorTemperature::Type request;
-    request.stepMode = static_cast<decltype(request.stepMode)>(stepMode);
-    request.stepSize = stepSize;
-    request.transitionTime = transitionTime;
-    request.colorTemperatureMinimum = colorTemperatureMinimum;
-    request.colorTemperatureMaximum = colorTemperatureMaximum;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(payload.StepMode.unsignedCharValue);
+    request.stepSize = payload.StepSize.unsignedShortValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.colorTemperatureMinimum = payload.ColorTemperatureMinimum.unsignedShortValue;
+    request.colorTemperatureMaximum = payload.ColorTemperatureMaximum.unsignedShortValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)stepHue:(uint8_t)stepMode
-           stepSize:(uint8_t)stepSize
-     transitionTime:(uint8_t)transitionTime
-        optionsMask:(uint8_t)optionsMask
-    optionsOverride:(uint8_t)optionsOverride
-    responseHandler:(ResponseHandler)responseHandler
+- (void)stepHue:(CHIPColorControlClusterStepHuePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::StepHue::Type request;
-    request.stepMode = static_cast<decltype(request.stepMode)>(stepMode);
-    request.stepSize = stepSize;
-    request.transitionTime = transitionTime;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(payload.StepMode.unsignedCharValue);
+    request.stepSize = payload.StepSize.unsignedCharValue;
+    request.transitionTime = payload.TransitionTime.unsignedCharValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)stepSaturation:(uint8_t)stepMode
-              stepSize:(uint8_t)stepSize
-        transitionTime:(uint8_t)transitionTime
-           optionsMask:(uint8_t)optionsMask
-       optionsOverride:(uint8_t)optionsOverride
+- (void)stepSaturation:(CHIPColorControlClusterStepSaturationPayload * _Nonnull)payload
        responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::StepSaturation::Type request;
-    request.stepMode = static_cast<decltype(request.stepMode)>(stepMode);
-    request.stepSize = stepSize;
-    request.transitionTime = transitionTime;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(payload.StepMode.unsignedCharValue);
+    request.stepSize = payload.StepSize.unsignedCharValue;
+    request.transitionTime = payload.TransitionTime.unsignedCharValue;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)stopMoveStep:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride responseHandler:(ResponseHandler)responseHandler
+- (void)stopMoveStep:(CHIPColorControlClusterStopMoveStepPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ColorControl::Commands::StopMoveStep::Type request;
-    request.optionsMask = optionsMask;
-    request.optionsOverride = optionsOverride;
+    request.optionsMask = payload.OptionsMask.unsignedCharValue;
+    request.optionsOverride = payload.OptionsOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -1645,10 +1674,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeColorControlOptionsWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeColorControlOptionsWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeColorControlOptions(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::ColorControlOptions::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedCharValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -1792,10 +1827,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeWhitePointXWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeWhitePointX(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::WhitePointX::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -1806,10 +1847,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeWhitePointYWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeWhitePointY(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::WhitePointY::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -1820,10 +1867,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeColorPointRXWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeColorPointRX(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::ColorPointRX::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -1834,10 +1887,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeColorPointRYWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeColorPointRY(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::ColorPointRY::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -1848,10 +1907,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeColorPointRIntensityWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeColorPointRIntensity(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::ColorPointRIntensity::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedCharValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -1862,10 +1927,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeColorPointGXWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeColorPointGX(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::ColorPointGX::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -1876,10 +1947,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeColorPointGYWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeColorPointGY(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::ColorPointGY::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -1890,10 +1967,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeColorPointGIntensityWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeColorPointGIntensity(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::ColorPointGIntensity::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedCharValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -1904,10 +1987,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeColorPointBXWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeColorPointBX(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::ColorPointBX::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -1918,10 +2007,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeColorPointBYWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeColorPointBY(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::ColorPointBY::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -1932,10 +2027,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeColorPointBIntensityWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeColorPointBIntensity(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::ColorPointBIntensity::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedCharValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -2023,10 +2124,17 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(NSNumber * _Nonnull)value
+                                             responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeStartUpColorTemperatureMireds(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -2046,11 +2154,13 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)launchContent:(bool)autoPlay data:(NSString *)data responseHandler:(ResponseHandler)responseHandler
+- (void)launchContent:(CHIPContentLauncherClusterLaunchContentPayload * _Nonnull)payload
+      responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ContentLauncher::Commands::LaunchContent::Type request;
-    request.autoPlay = autoPlay;
-    request.data = [self asCharSpan:data];
+    request.autoPlay = payload.AutoPlay.boolValue;
+    request.data = [self asCharSpan:payload.Data];
 
     new CHIPContentLauncherClusterLaunchContentResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2060,11 +2170,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)launchURL:(NSString *)contentURL displayString:(NSString *)displayString responseHandler:(ResponseHandler)responseHandler
+- (void)launchURL:(CHIPContentLauncherClusterLaunchURLPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ContentLauncher::Commands::LaunchURL::Type request;
-    request.contentURL = [self asCharSpan:contentURL];
-    request.displayString = [self asCharSpan:displayString];
+    request.contentURL = [self asCharSpan:payload.ContentURL];
+    request.displayString = [self asCharSpan:payload.DisplayString];
 
     new CHIPContentLauncherClusterLaunchURLResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2154,15 +2265,15 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)retrieveLogsRequest:(uint8_t)intent
-          requestedProtocol:(uint8_t)requestedProtocol
-     transferFileDesignator:(NSData *)transferFileDesignator
+- (void)retrieveLogsRequest:(CHIPDiagnosticLogsClusterRetrieveLogsRequestPayload * _Nonnull)payload
             responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DiagnosticLogs::Commands::RetrieveLogsRequest::Type request;
-    request.intent = static_cast<decltype(request.intent)>(intent);
-    request.requestedProtocol = static_cast<decltype(request.requestedProtocol)>(requestedProtocol);
-    request.transferFileDesignator = [self asByteSpan:transferFileDesignator];
+    request.intent = static_cast<std::remove_reference_t<decltype(request.intent)>>(payload.Intent.unsignedCharValue);
+    request.requestedProtocol
+        = static_cast<std::remove_reference_t<decltype(request.requestedProtocol)>>(payload.RequestedProtocol.unsignedCharValue);
+    request.transferFileDesignator = [self asByteSpan:payload.TransferFileDesignator];
 
     new CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2181,8 +2292,9 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)clearAllPins:(ResponseHandler)responseHandler
+- (void)clearAllPins:(CHIPDoorLockClusterClearAllPinsPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::ClearAllPins::Type request;
 
     new CHIPDoorLockClusterClearAllPinsResponseCallbackBridge(
@@ -2193,8 +2305,9 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)clearAllRfids:(ResponseHandler)responseHandler
+- (void)clearAllRfids:(CHIPDoorLockClusterClearAllRfidsPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::ClearAllRfids::Type request;
 
     new CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge(
@@ -2205,10 +2318,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)clearHolidaySchedule:(uint8_t)scheduleId responseHandler:(ResponseHandler)responseHandler
+- (void)clearHolidaySchedule:(CHIPDoorLockClusterClearHolidaySchedulePayload * _Nonnull)payload
+             responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::ClearHolidaySchedule::Type request;
-    request.scheduleId = scheduleId;
+    request.scheduleId = payload.ScheduleId.unsignedCharValue;
 
     new CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2218,10 +2333,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)clearPin:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler
+- (void)clearPin:(CHIPDoorLockClusterClearPinPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::ClearPin::Type request;
-    request.userId = userId;
+    request.userId = payload.UserId.unsignedShortValue;
 
     new CHIPDoorLockClusterClearPinResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2231,10 +2347,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)clearRfid:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler
+- (void)clearRfid:(CHIPDoorLockClusterClearRfidPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::ClearRfid::Type request;
-    request.userId = userId;
+    request.userId = payload.UserId.unsignedShortValue;
 
     new CHIPDoorLockClusterClearRfidResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2244,11 +2361,13 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)clearWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler
+- (void)clearWeekdaySchedule:(CHIPDoorLockClusterClearWeekdaySchedulePayload * _Nonnull)payload
+             responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::ClearWeekdaySchedule::Type request;
-    request.scheduleId = scheduleId;
-    request.userId = userId;
+    request.scheduleId = payload.ScheduleId.unsignedCharValue;
+    request.userId = payload.UserId.unsignedShortValue;
 
     new CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2258,11 +2377,13 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)clearYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler
+- (void)clearYeardaySchedule:(CHIPDoorLockClusterClearYeardaySchedulePayload * _Nonnull)payload
+             responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::ClearYeardaySchedule::Type request;
-    request.scheduleId = scheduleId;
-    request.userId = userId;
+    request.scheduleId = payload.ScheduleId.unsignedCharValue;
+    request.userId = payload.UserId.unsignedShortValue;
 
     new CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2272,10 +2393,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)getHolidaySchedule:(uint8_t)scheduleId responseHandler:(ResponseHandler)responseHandler
+- (void)getHolidaySchedule:(CHIPDoorLockClusterGetHolidaySchedulePayload * _Nonnull)payload
+           responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::GetHolidaySchedule::Type request;
-    request.scheduleId = scheduleId;
+    request.scheduleId = payload.ScheduleId.unsignedCharValue;
 
     new CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2285,10 +2408,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)getLogRecord:(uint16_t)logIndex responseHandler:(ResponseHandler)responseHandler
+- (void)getLogRecord:(CHIPDoorLockClusterGetLogRecordPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::GetLogRecord::Type request;
-    request.logIndex = logIndex;
+    request.logIndex = payload.LogIndex.unsignedShortValue;
 
     new CHIPDoorLockClusterGetLogRecordResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2298,10 +2422,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)getPin:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler
+- (void)getPin:(CHIPDoorLockClusterGetPinPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::GetPin::Type request;
-    request.userId = userId;
+    request.userId = payload.UserId.unsignedShortValue;
 
     new CHIPDoorLockClusterGetPinResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2311,10 +2436,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)getRfid:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler
+- (void)getRfid:(CHIPDoorLockClusterGetRfidPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::GetRfid::Type request;
-    request.userId = userId;
+    request.userId = payload.UserId.unsignedShortValue;
 
     new CHIPDoorLockClusterGetRfidResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2324,10 +2450,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)getUserType:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler
+- (void)getUserType:(CHIPDoorLockClusterGetUserTypePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::GetUserType::Type request;
-    request.userId = userId;
+    request.userId = payload.UserId.unsignedShortValue;
 
     new CHIPDoorLockClusterGetUserTypeResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2337,11 +2464,13 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)getWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler
+- (void)getWeekdaySchedule:(CHIPDoorLockClusterGetWeekdaySchedulePayload * _Nonnull)payload
+           responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::GetWeekdaySchedule::Type request;
-    request.scheduleId = scheduleId;
-    request.userId = userId;
+    request.scheduleId = payload.ScheduleId.unsignedCharValue;
+    request.userId = payload.UserId.unsignedShortValue;
 
     new CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2351,11 +2480,13 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)getYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler
+- (void)getYeardaySchedule:(CHIPDoorLockClusterGetYeardaySchedulePayload * _Nonnull)payload
+           responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::GetYeardaySchedule::Type request;
-    request.scheduleId = scheduleId;
-    request.userId = userId;
+    request.scheduleId = payload.ScheduleId.unsignedCharValue;
+    request.userId = payload.UserId.unsignedShortValue;
 
     new CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2365,10 +2496,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)lockDoor:(NSData *)pin responseHandler:(ResponseHandler)responseHandler
+- (void)lockDoor:(CHIPDoorLockClusterLockDoorPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::LockDoor::Type request;
-    request.pin = [self asByteSpan:pin];
+    request.pin = [self asByteSpan:payload.Pin];
 
     new CHIPDoorLockClusterLockDoorResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2378,17 +2510,15 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)setHolidaySchedule:(uint8_t)scheduleId
-                localStartTime:(uint32_t)localStartTime
-                  localEndTime:(uint32_t)localEndTime
-    operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday
-               responseHandler:(ResponseHandler)responseHandler
+- (void)setHolidaySchedule:(CHIPDoorLockClusterSetHolidaySchedulePayload * _Nonnull)payload
+           responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::SetHolidaySchedule::Type request;
-    request.scheduleId = scheduleId;
-    request.localStartTime = localStartTime;
-    request.localEndTime = localEndTime;
-    request.operatingModeDuringHoliday = operatingModeDuringHoliday;
+    request.scheduleId = payload.ScheduleId.unsignedCharValue;
+    request.localStartTime = payload.LocalStartTime.unsignedIntValue;
+    request.localEndTime = payload.LocalEndTime.unsignedIntValue;
+    request.operatingModeDuringHoliday = payload.OperatingModeDuringHoliday.unsignedCharValue;
 
     new CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2398,17 +2528,14 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)setPin:(uint16_t)userId
-         userStatus:(uint8_t)userStatus
-           userType:(uint8_t)userType
-                pin:(NSData *)pin
-    responseHandler:(ResponseHandler)responseHandler
+- (void)setPin:(CHIPDoorLockClusterSetPinPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::SetPin::Type request;
-    request.userId = userId;
-    request.userStatus = static_cast<decltype(request.userStatus)>(userStatus);
-    request.userType = static_cast<decltype(request.userType)>(userType);
-    request.pin = [self asByteSpan:pin];
+    request.userId = payload.UserId.unsignedShortValue;
+    request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(payload.UserStatus.unsignedCharValue);
+    request.userType = static_cast<std::remove_reference_t<decltype(request.userType)>>(payload.UserType.unsignedCharValue);
+    request.pin = [self asByteSpan:payload.Pin];
 
     new CHIPDoorLockClusterSetPinResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2418,17 +2545,14 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)setRfid:(uint16_t)userId
-         userStatus:(uint8_t)userStatus
-           userType:(uint8_t)userType
-                 id:(NSData *)id
-    responseHandler:(ResponseHandler)responseHandler
+- (void)setRfid:(CHIPDoorLockClusterSetRfidPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::SetRfid::Type request;
-    request.userId = userId;
-    request.userStatus = static_cast<decltype(request.userStatus)>(userStatus);
-    request.userType = static_cast<decltype(request.userType)>(userType);
-    request.id = [self asByteSpan:id];
+    request.userId = payload.UserId.unsignedShortValue;
+    request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(payload.UserStatus.unsignedCharValue);
+    request.userType = static_cast<std::remove_reference_t<decltype(request.userType)>>(payload.UserType.unsignedCharValue);
+    request.id = [self asByteSpan:payload.Id];
 
     new CHIPDoorLockClusterSetRfidResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2438,11 +2562,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)setUserType:(uint16_t)userId userType:(uint8_t)userType responseHandler:(ResponseHandler)responseHandler
+- (void)setUserType:(CHIPDoorLockClusterSetUserTypePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::SetUserType::Type request;
-    request.userId = userId;
-    request.userType = static_cast<decltype(request.userType)>(userType);
+    request.userId = payload.UserId.unsignedShortValue;
+    request.userType = static_cast<std::remove_reference_t<decltype(request.userType)>>(payload.UserType.unsignedCharValue);
 
     new CHIPDoorLockClusterSetUserTypeResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2452,23 +2577,18 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)setWeekdaySchedule:(uint8_t)scheduleId
-                    userId:(uint16_t)userId
-                  daysMask:(uint8_t)daysMask
-                 startHour:(uint8_t)startHour
-               startMinute:(uint8_t)startMinute
-                   endHour:(uint8_t)endHour
-                 endMinute:(uint8_t)endMinute
+- (void)setWeekdaySchedule:(CHIPDoorLockClusterSetWeekdaySchedulePayload * _Nonnull)payload
            responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::SetWeekdaySchedule::Type request;
-    request.scheduleId = scheduleId;
-    request.userId = userId;
-    request.daysMask = static_cast<decltype(request.daysMask)>(daysMask);
-    request.startHour = startHour;
-    request.startMinute = startMinute;
-    request.endHour = endHour;
-    request.endMinute = endMinute;
+    request.scheduleId = payload.ScheduleId.unsignedCharValue;
+    request.userId = payload.UserId.unsignedShortValue;
+    request.daysMask = static_cast<std::remove_reference_t<decltype(request.daysMask)>>(payload.DaysMask.unsignedCharValue);
+    request.startHour = payload.StartHour.unsignedCharValue;
+    request.startMinute = payload.StartMinute.unsignedCharValue;
+    request.endHour = payload.EndHour.unsignedCharValue;
+    request.endMinute = payload.EndMinute.unsignedCharValue;
 
     new CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2478,17 +2598,15 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)setYeardaySchedule:(uint8_t)scheduleId
-                    userId:(uint16_t)userId
-            localStartTime:(uint32_t)localStartTime
-              localEndTime:(uint32_t)localEndTime
+- (void)setYeardaySchedule:(CHIPDoorLockClusterSetYeardaySchedulePayload * _Nonnull)payload
            responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::SetYeardaySchedule::Type request;
-    request.scheduleId = scheduleId;
-    request.userId = userId;
-    request.localStartTime = localStartTime;
-    request.localEndTime = localEndTime;
+    request.scheduleId = payload.ScheduleId.unsignedCharValue;
+    request.userId = payload.UserId.unsignedShortValue;
+    request.localStartTime = payload.LocalStartTime.unsignedIntValue;
+    request.localEndTime = payload.LocalEndTime.unsignedIntValue;
 
     new CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2498,10 +2616,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)unlockDoor:(NSData *)pin responseHandler:(ResponseHandler)responseHandler
+- (void)unlockDoor:(CHIPDoorLockClusterUnlockDoorPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::UnlockDoor::Type request;
-    request.pin = [self asByteSpan:pin];
+    request.pin = [self asByteSpan:payload.Pin];
 
     new CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2511,11 +2630,13 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(NSData *)pin responseHandler:(ResponseHandler)responseHandler
+- (void)unlockWithTimeout:(CHIPDoorLockClusterUnlockWithTimeoutPayload * _Nonnull)payload
+          responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     DoorLock::Commands::UnlockWithTimeout::Type request;
-    request.timeoutInSeconds = timeoutInSeconds;
-    request.pin = [self asByteSpan:pin];
+    request.timeoutInSeconds = payload.TimeoutInSeconds.unsignedShortValue;
+    request.pin = [self asByteSpan:payload.Pin];
 
     new CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2674,12 +2795,14 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)resetCounts:(ResponseHandler)responseHandler
+- (void)resetCounts:(CHIPEthernetNetworkDiagnosticsClusterResetCountsPayload * _Nonnull)payload
+    responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     EthernetNetworkDiagnostics::Commands::ResetCounts::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -2832,15 +2955,14 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)armFailSafe:(uint16_t)expiryLengthSeconds
-         breadcrumb:(uint64_t)breadcrumb
-          timeoutMs:(uint32_t)timeoutMs
+- (void)armFailSafe:(CHIPGeneralCommissioningClusterArmFailSafePayload * _Nonnull)payload
     responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     GeneralCommissioning::Commands::ArmFailSafe::Type request;
-    request.expiryLengthSeconds = expiryLengthSeconds;
-    request.breadcrumb = breadcrumb;
-    request.timeoutMs = timeoutMs;
+    request.expiryLengthSeconds = payload.ExpiryLengthSeconds.unsignedShortValue;
+    request.breadcrumb = payload.Breadcrumb.unsignedLongLongValue;
+    request.timeoutMs = payload.TimeoutMs.unsignedIntValue;
 
     new CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2850,8 +2972,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)commissioningComplete:(ResponseHandler)responseHandler
+- (void)commissioningComplete:(CHIPGeneralCommissioningClusterCommissioningCompletePayload * _Nonnull)payload
+              responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     GeneralCommissioning::Commands::CommissioningComplete::Type request;
 
     new CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(
@@ -2863,17 +2987,15 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)setRegulatoryConfig:(uint8_t)location
-                countryCode:(NSString *)countryCode
-                 breadcrumb:(uint64_t)breadcrumb
-                  timeoutMs:(uint32_t)timeoutMs
+- (void)setRegulatoryConfig:(CHIPGeneralCommissioningClusterSetRegulatoryConfigPayload * _Nonnull)payload
             responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
-    request.location = static_cast<decltype(request.location)>(location);
-    request.countryCode = [self asCharSpan:countryCode];
-    request.breadcrumb = breadcrumb;
-    request.timeoutMs = timeoutMs;
+    request.location = static_cast<std::remove_reference_t<decltype(request.location)>>(payload.Location.unsignedCharValue);
+    request.countryCode = [self asCharSpan:payload.CountryCode];
+    request.breadcrumb = payload.Breadcrumb.unsignedLongLongValue;
+    request.timeoutMs = payload.TimeoutMs.unsignedIntValue;
 
     new CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2891,10 +3013,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeBreadcrumbWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeBreadcrumbWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeBreadcrumb(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = GeneralCommissioning::Attributes::Breadcrumb::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedLongLongValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -3006,11 +3134,12 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)addGroup:(uint16_t)groupId groupName:(NSString *)groupName responseHandler:(ResponseHandler)responseHandler
+- (void)addGroup:(CHIPGroupsClusterAddGroupPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Groups::Commands::AddGroup::Type request;
-    request.groupId = groupId;
-    request.groupName = [self asCharSpan:groupName];
+    request.groupId = payload.GroupId.unsignedShortValue;
+    request.groupName = [self asCharSpan:payload.GroupName];
 
     new CHIPGroupsClusterAddGroupResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3020,25 +3149,49 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)addGroupIfIdentifying:(uint16_t)groupId groupName:(NSString *)groupName responseHandler:(ResponseHandler)responseHandler
+- (void)addGroupIfIdentifying:(CHIPGroupsClusterAddGroupIfIdentifyingPayload * _Nonnull)payload
+              responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Groups::Commands::AddGroupIfIdentifying::Type request;
-    request.groupId = groupId;
-    request.groupName = [self asCharSpan:groupName];
+    request.groupId = payload.GroupId.unsignedShortValue;
+    request.groupName = [self asCharSpan:payload.GroupName];
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)getGroupMembership:(uint8_t)groupCount groupList:(uint16_t)groupList responseHandler:(ResponseHandler)responseHandler
+- (void)getGroupMembership:(CHIPGroupsClusterGetGroupMembershipPayload * _Nonnull)payload
+           responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Groups::Commands::GetGroupMembership::Type request;
-    request.groupCount = groupCount;
-    request.groupList = chip::app::DataModel::List<const uint16_t>();
-    ;
+    request.groupCount = payload.GroupCount.unsignedCharValue;
+    {
+        using ListType = std::remove_reference_t<decltype(request.groupList)>;
+        using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+        if (payload.GroupList.count != 0) {
+            auto * listHolder_0 = new ListHolder<ListMemberType>(payload.GroupList.count);
+            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                return;
+            }
+            listFreer.add(listHolder_0);
+            for (size_t i = 0; i < payload.GroupList.count; ++i) {
+                if (![payload.GroupList[i] isKindOfClass:[NSNumber class]]) {
+                    // Wrong kind of value.
+                    return;
+                }
+                auto element_0 = (NSNumber *) payload.GroupList[i];
+                listHolder_0->mList[i] = element_0.unsignedShortValue;
+            }
+            request.groupList = ListType(listHolder_0->mList, payload.GroupList.count);
+        } else {
+            request.groupList = ListType();
+        }
+    }
 
     new CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3048,21 +3201,23 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)removeAllGroups:(ResponseHandler)responseHandler
+- (void)removeAllGroups:(CHIPGroupsClusterRemoveAllGroupsPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Groups::Commands::RemoveAllGroups::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)removeGroup:(uint16_t)groupId responseHandler:(ResponseHandler)responseHandler
+- (void)removeGroup:(CHIPGroupsClusterRemoveGroupPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Groups::Commands::RemoveGroup::Type request;
-    request.groupId = groupId;
+    request.groupId = payload.GroupId.unsignedShortValue;
 
     new CHIPGroupsClusterRemoveGroupResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3072,10 +3227,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)viewGroup:(uint16_t)groupId responseHandler:(ResponseHandler)responseHandler
+- (void)viewGroup:(CHIPGroupsClusterViewGroupPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Groups::Commands::ViewGroup::Type request;
-    request.groupId = groupId;
+    request.groupId = payload.GroupId.unsignedShortValue;
 
     new CHIPGroupsClusterViewGroupResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3108,20 +3264,22 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)identify:(uint16_t)identifyTime responseHandler:(ResponseHandler)responseHandler
+- (void)identify:(CHIPIdentifyClusterIdentifyPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Identify::Commands::Identify::Type request;
-    request.identifyTime = identifyTime;
+    request.identifyTime = payload.IdentifyTime.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)identifyQuery:(ResponseHandler)responseHandler
+- (void)identifyQuery:(CHIPIdentifyClusterIdentifyQueryPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Identify::Commands::IdentifyQuery::Type request;
 
     new CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(
@@ -3132,16 +3290,17 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)triggerEffect:(uint8_t)effectIdentifier
-        effectVariant:(uint8_t)effectVariant
-      responseHandler:(ResponseHandler)responseHandler
+- (void)triggerEffect:(CHIPIdentifyClusterTriggerEffectPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Identify::Commands::TriggerEffect::Type request;
-    request.effectIdentifier = static_cast<decltype(request.effectIdentifier)>(effectIdentifier);
-    request.effectVariant = static_cast<decltype(request.effectVariant)>(effectVariant);
+    request.effectIdentifier
+        = static_cast<std::remove_reference_t<decltype(request.effectIdentifier)>>(payload.EffectIdentifier.unsignedCharValue);
+    request.effectVariant
+        = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(payload.EffectVariant.unsignedCharValue);
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -3154,10 +3313,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeIdentifyTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeIdentifyTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeIdentifyTime(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = Identify::Attributes::IdentifyTime::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -3254,10 +3419,11 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)sendKey:(uint8_t)keyCode responseHandler:(ResponseHandler)responseHandler
+- (void)sendKey:(CHIPKeypadInputClusterSendKeyPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     KeypadInput::Commands::SendKey::Type request;
-    request.keyCode = static_cast<decltype(request.keyCode)>(keyCode);
+    request.keyCode = static_cast<std::remove_reference_t<decltype(request.keyCode)>>(payload.KeyCode.unsignedCharValue);
 
     new CHIPKeypadInputClusterSendKeyResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3283,127 +3449,123 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)move:(uint8_t)moveMode
-               rate:(uint8_t)rate
-         optionMask:(uint8_t)optionMask
-     optionOverride:(uint8_t)optionOverride
-    responseHandler:(ResponseHandler)responseHandler
+- (void)move:(CHIPLevelControlClusterMovePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     LevelControl::Commands::Move::Type request;
-    request.moveMode = static_cast<decltype(request.moveMode)>(moveMode);
-    request.rate = rate;
-    request.optionMask = optionMask;
-    request.optionOverride = optionOverride;
+    request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(payload.MoveMode.unsignedCharValue);
+    request.rate = payload.Rate.unsignedCharValue;
+    request.optionMask = payload.OptionMask.unsignedCharValue;
+    request.optionOverride = payload.OptionOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)moveToLevel:(uint8_t)level
-     transitionTime:(uint16_t)transitionTime
-         optionMask:(uint8_t)optionMask
-     optionOverride:(uint8_t)optionOverride
-    responseHandler:(ResponseHandler)responseHandler
+- (void)moveToLevel:(CHIPLevelControlClusterMoveToLevelPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     LevelControl::Commands::MoveToLevel::Type request;
-    request.level = level;
-    request.transitionTime = transitionTime;
-    request.optionMask = optionMask;
-    request.optionOverride = optionOverride;
+    request.level = payload.Level.unsignedCharValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.optionMask = payload.OptionMask.unsignedCharValue;
+    request.optionOverride = payload.OptionOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)moveToLevelWithOnOff:(uint8_t)level transitionTime:(uint16_t)transitionTime responseHandler:(ResponseHandler)responseHandler
+- (void)moveToLevelWithOnOff:(CHIPLevelControlClusterMoveToLevelWithOnOffPayload * _Nonnull)payload
+             responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     LevelControl::Commands::MoveToLevelWithOnOff::Type request;
-    request.level = level;
-    request.transitionTime = transitionTime;
+    request.level = payload.Level.unsignedCharValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)moveWithOnOff:(uint8_t)moveMode rate:(uint8_t)rate responseHandler:(ResponseHandler)responseHandler
-{
-    LevelControl::Commands::MoveWithOnOff::Type request;
-    request.moveMode = static_cast<decltype(request.moveMode)>(moveMode);
-    request.rate = rate;
-
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)step:(uint8_t)stepMode
-           stepSize:(uint8_t)stepSize
-     transitionTime:(uint16_t)transitionTime
-         optionMask:(uint8_t)optionMask
-     optionOverride:(uint8_t)optionOverride
-    responseHandler:(ResponseHandler)responseHandler
-{
-    LevelControl::Commands::Step::Type request;
-    request.stepMode = static_cast<decltype(request.stepMode)>(stepMode);
-    request.stepSize = stepSize;
-    request.transitionTime = transitionTime;
-    request.optionMask = optionMask;
-    request.optionOverride = optionOverride;
-
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)stepWithOnOff:(uint8_t)stepMode
-             stepSize:(uint8_t)stepSize
-       transitionTime:(uint16_t)transitionTime
+- (void)moveWithOnOff:(CHIPLevelControlClusterMoveWithOnOffPayload * _Nonnull)payload
       responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
+    LevelControl::Commands::MoveWithOnOff::Type request;
+    request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(payload.MoveMode.unsignedCharValue);
+    request.rate = payload.Rate.unsignedCharValue;
+
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)step:(CHIPLevelControlClusterStepPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
+{
+    ListFreer listFreer;
+    LevelControl::Commands::Step::Type request;
+    request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(payload.StepMode.unsignedCharValue);
+    request.stepSize = payload.StepSize.unsignedCharValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.optionMask = payload.OptionMask.unsignedCharValue;
+    request.optionOverride = payload.OptionOverride.unsignedCharValue;
+
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)stepWithOnOff:(CHIPLevelControlClusterStepWithOnOffPayload * _Nonnull)payload
+      responseHandler:(ResponseHandler)responseHandler
+{
+    ListFreer listFreer;
     LevelControl::Commands::StepWithOnOff::Type request;
-    request.stepMode = static_cast<decltype(request.stepMode)>(stepMode);
-    request.stepSize = stepSize;
-    request.transitionTime = transitionTime;
+    request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(payload.StepMode.unsignedCharValue);
+    request.stepSize = payload.StepSize.unsignedCharValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)stop:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride responseHandler:(ResponseHandler)responseHandler
+- (void)stop:(CHIPLevelControlClusterStopPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     LevelControl::Commands::Stop::Type request;
-    request.optionMask = optionMask;
-    request.optionOverride = optionOverride;
+    request.optionMask = payload.OptionMask.unsignedCharValue;
+    request.optionOverride = payload.OptionOverride.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)stopWithOnOff:(ResponseHandler)responseHandler
+- (void)stopWithOnOff:(CHIPLevelControlClusterStopWithOnOffPayload * _Nonnull)payload
+      responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     LevelControl::Commands::StopWithOnOff::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -3484,10 +3646,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOptionsWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOptionsWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOptions(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = LevelControl::Attributes::Options::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedCharValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -3498,10 +3666,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOnOffTransitionTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOnOffTransitionTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOnOffTransitionTime(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = LevelControl::Attributes::OnOffTransitionTime::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -3512,10 +3686,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOnLevelWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOnLevelWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOnLevel(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = LevelControl::Attributes::OnLevel::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedCharValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -3526,10 +3706,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOnTransitionTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOnTransitionTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOnTransitionTime(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = LevelControl::Attributes::OnTransitionTime::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -3540,10 +3726,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOffTransitionTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOffTransitionTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOffTransitionTime(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = LevelControl::Attributes::OffTransitionTime::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -3554,10 +3746,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeDefaultMoveRateWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeDefaultMoveRateWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeDefaultMoveRate(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = LevelControl::Attributes::DefaultMoveRate::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedCharValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -3568,10 +3766,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeStartUpCurrentLevelWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeStartUpCurrentLevelWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeStartUpCurrentLevel(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = LevelControl::Attributes::StartUpCurrentLevel::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedCharValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -3591,12 +3795,13 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)sleep:(ResponseHandler)responseHandler
+- (void)sleep:(CHIPLowPowerClusterSleepPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     LowPower::Commands::Sleep::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -3618,48 +3823,54 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)hideInputStatus:(ResponseHandler)responseHandler
+- (void)hideInputStatus:(CHIPMediaInputClusterHideInputStatusPayload * _Nonnull)payload
+        responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaInput::Commands::HideInputStatus::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)renameInput:(uint8_t)index name:(NSString *)name responseHandler:(ResponseHandler)responseHandler
+- (void)renameInput:(CHIPMediaInputClusterRenameInputPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaInput::Commands::RenameInput::Type request;
-    request.index = index;
-    request.name = [self asCharSpan:name];
+    request.index = payload.Index.unsignedCharValue;
+    request.name = [self asCharSpan:payload.Name];
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)selectInput:(uint8_t)index responseHandler:(ResponseHandler)responseHandler
+- (void)selectInput:(CHIPMediaInputClusterSelectInputPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaInput::Commands::SelectInput::Type request;
-    request.index = index;
+    request.index = payload.Index.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)showInputStatus:(ResponseHandler)responseHandler
+- (void)showInputStatus:(CHIPMediaInputClusterShowInputStatusPayload * _Nonnull)payload
+        responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaInput::Commands::ShowInputStatus::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -3696,8 +3907,10 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)mediaFastForward:(ResponseHandler)responseHandler
+- (void)mediaFastForward:(CHIPMediaPlaybackClusterMediaFastForwardPayload * _Nonnull)payload
+         responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaPlayback::Commands::MediaFastForward::Type request;
 
     new CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackBridge(
@@ -3708,8 +3921,9 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)mediaNext:(ResponseHandler)responseHandler
+- (void)mediaNext:(CHIPMediaPlaybackClusterMediaNextPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaPlayback::Commands::MediaNext::Type request;
 
     new CHIPMediaPlaybackClusterMediaNextResponseCallbackBridge(
@@ -3720,8 +3934,9 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)mediaPause:(ResponseHandler)responseHandler
+- (void)mediaPause:(CHIPMediaPlaybackClusterMediaPausePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaPlayback::Commands::MediaPause::Type request;
 
     new CHIPMediaPlaybackClusterMediaPauseResponseCallbackBridge(
@@ -3732,8 +3947,9 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)mediaPlay:(ResponseHandler)responseHandler
+- (void)mediaPlay:(CHIPMediaPlaybackClusterMediaPlayPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaPlayback::Commands::MediaPlay::Type request;
 
     new CHIPMediaPlaybackClusterMediaPlayResponseCallbackBridge(
@@ -3744,8 +3960,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)mediaPrevious:(ResponseHandler)responseHandler
+- (void)mediaPrevious:(CHIPMediaPlaybackClusterMediaPreviousPayload * _Nonnull)payload
+      responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaPlayback::Commands::MediaPrevious::Type request;
 
     new CHIPMediaPlaybackClusterMediaPreviousResponseCallbackBridge(
@@ -3756,8 +3974,9 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)mediaRewind:(ResponseHandler)responseHandler
+- (void)mediaRewind:(CHIPMediaPlaybackClusterMediaRewindPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaPlayback::Commands::MediaRewind::Type request;
 
     new CHIPMediaPlaybackClusterMediaRewindResponseCallbackBridge(
@@ -3768,10 +3987,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)mediaSeek:(uint64_t)position responseHandler:(ResponseHandler)responseHandler
+- (void)mediaSeek:(CHIPMediaPlaybackClusterMediaSeekPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaPlayback::Commands::MediaSeek::Type request;
-    request.position = position;
+    request.position = payload.Position.unsignedLongLongValue;
 
     new CHIPMediaPlaybackClusterMediaSeekResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3781,10 +4001,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)mediaSkipBackward:(uint64_t)deltaPositionMilliseconds responseHandler:(ResponseHandler)responseHandler
+- (void)mediaSkipBackward:(CHIPMediaPlaybackClusterMediaSkipBackwardPayload * _Nonnull)payload
+          responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaPlayback::Commands::MediaSkipBackward::Type request;
-    request.deltaPositionMilliseconds = deltaPositionMilliseconds;
+    request.deltaPositionMilliseconds = payload.DeltaPositionMilliseconds.unsignedLongLongValue;
 
     new CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3794,10 +4016,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)mediaSkipForward:(uint64_t)deltaPositionMilliseconds responseHandler:(ResponseHandler)responseHandler
+- (void)mediaSkipForward:(CHIPMediaPlaybackClusterMediaSkipForwardPayload * _Nonnull)payload
+         responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaPlayback::Commands::MediaSkipForward::Type request;
-    request.deltaPositionMilliseconds = deltaPositionMilliseconds;
+    request.deltaPositionMilliseconds = payload.DeltaPositionMilliseconds.unsignedLongLongValue;
 
     new CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3807,8 +4031,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)mediaStartOver:(ResponseHandler)responseHandler
+- (void)mediaStartOver:(CHIPMediaPlaybackClusterMediaStartOverPayload * _Nonnull)payload
+       responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaPlayback::Commands::MediaStartOver::Type request;
 
     new CHIPMediaPlaybackClusterMediaStartOverResponseCallbackBridge(
@@ -3819,8 +4045,9 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)mediaStop:(ResponseHandler)responseHandler
+- (void)mediaStop:(CHIPMediaPlaybackClusterMediaStopPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     MediaPlayback::Commands::MediaStop::Type request;
 
     new CHIPMediaPlaybackClusterMediaStopResponseCallbackBridge(
@@ -3903,13 +4130,14 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)changeToMode:(uint8_t)newMode responseHandler:(ResponseHandler)responseHandler
+- (void)changeToMode:(CHIPModeSelectClusterChangeToModePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ModeSelect::Commands::ChangeToMode::Type request;
-    request.newMode = newMode;
+    request.newMode = payload.NewMode.unsignedCharValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -3956,10 +4184,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOnModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOnModeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOnMode(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = ModeSelect::Attributes::OnMode::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedCharValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -3993,15 +4227,14 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)addThreadNetwork:(NSData *)operationalDataset
-              breadcrumb:(uint64_t)breadcrumb
-               timeoutMs:(uint32_t)timeoutMs
+- (void)addThreadNetwork:(CHIPNetworkCommissioningClusterAddThreadNetworkPayload * _Nonnull)payload
          responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     NetworkCommissioning::Commands::AddThreadNetwork::Type request;
-    request.operationalDataset = [self asByteSpan:operationalDataset];
-    request.breadcrumb = breadcrumb;
-    request.timeoutMs = timeoutMs;
+    request.operationalDataset = [self asByteSpan:payload.OperationalDataset];
+    request.breadcrumb = payload.Breadcrumb.unsignedLongLongValue;
+    request.timeoutMs = payload.TimeoutMs.unsignedIntValue;
 
     new CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4011,17 +4244,15 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)addWiFiNetwork:(NSData *)ssid
-           credentials:(NSData *)credentials
-            breadcrumb:(uint64_t)breadcrumb
-             timeoutMs:(uint32_t)timeoutMs
+- (void)addWiFiNetwork:(CHIPNetworkCommissioningClusterAddWiFiNetworkPayload * _Nonnull)payload
        responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     NetworkCommissioning::Commands::AddWiFiNetwork::Type request;
-    request.ssid = [self asByteSpan:ssid];
-    request.credentials = [self asByteSpan:credentials];
-    request.breadcrumb = breadcrumb;
-    request.timeoutMs = timeoutMs;
+    request.ssid = [self asByteSpan:payload.Ssid];
+    request.credentials = [self asByteSpan:payload.Credentials];
+    request.breadcrumb = payload.Breadcrumb.unsignedLongLongValue;
+    request.timeoutMs = payload.TimeoutMs.unsignedIntValue;
 
     new CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4031,15 +4262,14 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)disableNetwork:(NSData *)networkID
-            breadcrumb:(uint64_t)breadcrumb
-             timeoutMs:(uint32_t)timeoutMs
+- (void)disableNetwork:(CHIPNetworkCommissioningClusterDisableNetworkPayload * _Nonnull)payload
        responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     NetworkCommissioning::Commands::DisableNetwork::Type request;
-    request.networkID = [self asByteSpan:networkID];
-    request.breadcrumb = breadcrumb;
-    request.timeoutMs = timeoutMs;
+    request.networkID = [self asByteSpan:payload.NetworkID];
+    request.breadcrumb = payload.Breadcrumb.unsignedLongLongValue;
+    request.timeoutMs = payload.TimeoutMs.unsignedIntValue;
 
     new CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4049,15 +4279,14 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)enableNetwork:(NSData *)networkID
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
+- (void)enableNetwork:(CHIPNetworkCommissioningClusterEnableNetworkPayload * _Nonnull)payload
       responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     NetworkCommissioning::Commands::EnableNetwork::Type request;
-    request.networkID = [self asByteSpan:networkID];
-    request.breadcrumb = breadcrumb;
-    request.timeoutMs = timeoutMs;
+    request.networkID = [self asByteSpan:payload.NetworkID];
+    request.breadcrumb = payload.Breadcrumb.unsignedLongLongValue;
+    request.timeoutMs = payload.TimeoutMs.unsignedIntValue;
 
     new CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4067,15 +4296,14 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)removeNetwork:(NSData *)networkID
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
+- (void)removeNetwork:(CHIPNetworkCommissioningClusterRemoveNetworkPayload * _Nonnull)payload
       responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     NetworkCommissioning::Commands::RemoveNetwork::Type request;
-    request.networkID = [self asByteSpan:networkID];
-    request.breadcrumb = breadcrumb;
-    request.timeoutMs = timeoutMs;
+    request.networkID = [self asByteSpan:payload.NetworkID];
+    request.breadcrumb = payload.Breadcrumb.unsignedLongLongValue;
+    request.timeoutMs = payload.TimeoutMs.unsignedIntValue;
 
     new CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4085,15 +4313,14 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)scanNetworks:(NSData *)ssid
-          breadcrumb:(uint64_t)breadcrumb
-           timeoutMs:(uint32_t)timeoutMs
+- (void)scanNetworks:(CHIPNetworkCommissioningClusterScanNetworksPayload * _Nonnull)payload
      responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     NetworkCommissioning::Commands::ScanNetworks::Type request;
-    request.ssid = [self asByteSpan:ssid];
-    request.breadcrumb = breadcrumb;
-    request.timeoutMs = timeoutMs;
+    request.ssid = [self asByteSpan:payload.Ssid];
+    request.breadcrumb = payload.Breadcrumb.unsignedLongLongValue;
+    request.timeoutMs = payload.TimeoutMs.unsignedIntValue;
 
     new CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4103,15 +4330,14 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)updateThreadNetwork:(NSData *)operationalDataset
-                 breadcrumb:(uint64_t)breadcrumb
-                  timeoutMs:(uint32_t)timeoutMs
+- (void)updateThreadNetwork:(CHIPNetworkCommissioningClusterUpdateThreadNetworkPayload * _Nonnull)payload
             responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     NetworkCommissioning::Commands::UpdateThreadNetwork::Type request;
-    request.operationalDataset = [self asByteSpan:operationalDataset];
-    request.breadcrumb = breadcrumb;
-    request.timeoutMs = timeoutMs;
+    request.operationalDataset = [self asByteSpan:payload.OperationalDataset];
+    request.breadcrumb = payload.Breadcrumb.unsignedLongLongValue;
+    request.timeoutMs = payload.TimeoutMs.unsignedIntValue;
 
     new CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4122,17 +4348,15 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)updateWiFiNetwork:(NSData *)ssid
-              credentials:(NSData *)credentials
-               breadcrumb:(uint64_t)breadcrumb
-                timeoutMs:(uint32_t)timeoutMs
+- (void)updateWiFiNetwork:(CHIPNetworkCommissioningClusterUpdateWiFiNetworkPayload * _Nonnull)payload
           responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     NetworkCommissioning::Commands::UpdateWiFiNetwork::Type request;
-    request.ssid = [self asByteSpan:ssid];
-    request.credentials = [self asByteSpan:credentials];
-    request.breadcrumb = breadcrumb;
-    request.timeoutMs = timeoutMs;
+    request.ssid = [self asByteSpan:payload.Ssid];
+    request.credentials = [self asByteSpan:payload.Credentials];
+    request.breadcrumb = payload.Breadcrumb.unsignedLongLongValue;
+    request.timeoutMs = payload.TimeoutMs.unsignedIntValue;
 
     new CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4166,11 +4390,13 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)applyUpdateRequest:(NSData *)updateToken newVersion:(uint32_t)newVersion responseHandler:(ResponseHandler)responseHandler
+- (void)applyUpdateRequest:(CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestPayload * _Nonnull)payload
+           responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type request;
-    request.updateToken = [self asByteSpan:updateToken];
-    request.newVersion = newVersion;
+    request.updateToken = [self asByteSpan:payload.UpdateToken];
+    request.newVersion = payload.NewVersion.unsignedIntValue;
 
     new CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4180,42 +4406,68 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)notifyUpdateApplied:(NSData *)updateToken
-            softwareVersion:(uint32_t)softwareVersion
+- (void)notifyUpdateApplied:(CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedPayload * _Nonnull)payload
             responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type request;
-    request.updateToken = [self asByteSpan:updateToken];
-    request.softwareVersion = softwareVersion;
+    request.updateToken = [self asByteSpan:payload.UpdateToken];
+    request.softwareVersion = payload.SoftwareVersion.unsignedIntValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)queryImage:(uint16_t)vendorId
-              productId:(uint16_t)productId
-        softwareVersion:(uint32_t)softwareVersion
-     protocolsSupported:(uint8_t)protocolsSupported
-        hardwareVersion:(uint16_t)hardwareVersion
-               location:(NSString *)location
-    requestorCanConsent:(bool)requestorCanConsent
-    metadataForProvider:(NSData *)metadataForProvider
-        responseHandler:(ResponseHandler)responseHandler
+- (void)queryImage:(CHIPOtaSoftwareUpdateProviderClusterQueryImagePayload * _Nonnull)payload
+    responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OtaSoftwareUpdateProvider::Commands::QueryImage::Type request;
-    request.vendorId = static_cast<decltype(request.vendorId)>(vendorId);
-    request.productId = productId;
-    request.softwareVersion = softwareVersion;
-    request.protocolsSupported
-        = chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol>();
-    ;
-    request.hardwareVersion = chip::Optional<uint16_t>(hardwareVersion);
-    request.location = chip::Optional<chip::CharSpan>([self asCharSpan:location]);
-    request.requestorCanConsent = chip::Optional<bool>(requestorCanConsent);
-    request.metadataForProvider = chip::Optional<chip::ByteSpan>([self asByteSpan:metadataForProvider]);
+    request.vendorId = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(payload.VendorId.unsignedShortValue);
+    request.productId = payload.ProductId.unsignedShortValue;
+    request.softwareVersion = payload.SoftwareVersion.unsignedIntValue;
+    {
+        using ListType = std::remove_reference_t<decltype(request.protocolsSupported)>;
+        using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+        if (payload.ProtocolsSupported.count != 0) {
+            auto * listHolder_0 = new ListHolder<ListMemberType>(payload.ProtocolsSupported.count);
+            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                return;
+            }
+            listFreer.add(listHolder_0);
+            for (size_t i = 0; i < payload.ProtocolsSupported.count; ++i) {
+                if (![payload.ProtocolsSupported[i] isKindOfClass:[NSNumber class]]) {
+                    // Wrong kind of value.
+                    return;
+                }
+                auto element_0 = (NSNumber *) payload.ProtocolsSupported[i];
+                listHolder_0->mList[i]
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i])>>(element_0.unsignedCharValue);
+            }
+            request.protocolsSupported = ListType(listHolder_0->mList, payload.ProtocolsSupported.count);
+        } else {
+            request.protocolsSupported = ListType();
+        }
+    }
+    if (payload.HardwareVersion != nil) {
+        auto & definedValue_0 = request.hardwareVersion.Emplace();
+        definedValue_0 = payload.HardwareVersion.unsignedShortValue;
+    }
+    if (payload.Location != nil) {
+        auto & definedValue_0 = request.location.Emplace();
+        definedValue_0 = [self asCharSpan:payload.Location];
+    }
+    if (payload.RequestorCanConsent != nil) {
+        auto & definedValue_0 = request.requestorCanConsent.Emplace();
+        definedValue_0 = payload.RequestorCanConsent.boolValue;
+    }
+    if (payload.MetadataForProvider != nil) {
+        auto & definedValue_0 = request.metadataForProvider.Emplace();
+        definedValue_0 = [self asByteSpan:payload.MetadataForProvider];
+    }
 
     new CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4241,20 +4493,22 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)announceOtaProvider:(uint64_t)providerLocation
-                   vendorId:(uint16_t)vendorId
-         announcementReason:(uint8_t)announcementReason
-            metadataForNode:(NSData *)metadataForNode
+- (void)announceOtaProvider:(CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderPayload * _Nonnull)payload
             responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type request;
-    request.providerLocation = providerLocation;
-    request.vendorId = static_cast<decltype(request.vendorId)>(vendorId);
-    request.announcementReason = static_cast<decltype(request.announcementReason)>(announcementReason);
-    request.metadataForNode = chip::Optional<chip::ByteSpan>([self asByteSpan:metadataForNode]);
+    request.providerLocation = payload.ProviderLocation.unsignedLongLongValue;
+    request.vendorId = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(payload.VendorId.unsignedShortValue);
+    request.announcementReason
+        = static_cast<std::remove_reference_t<decltype(request.announcementReason)>>(payload.AnnouncementReason.unsignedCharValue);
+    if (payload.MetadataForNode != nil) {
+        auto & definedValue_0 = request.metadataForNode.Emplace();
+        definedValue_0 = [self asByteSpan:payload.MetadataForNode];
+    }
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -4267,10 +4521,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeDefaultOtaProviderWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeDefaultOtaProviderWithValue:(NSData * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeDefaultOtaProvider(success, failure, [self asByteSpan:value]);
+        ListFreer listFreer;
+        using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = [self asByteSpan:value];
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -4353,75 +4613,81 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)off:(ResponseHandler)responseHandler
+- (void)off:(CHIPOnOffClusterOffPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OnOff::Commands::Off::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)offWithEffect:(uint8_t)effectId effectVariant:(uint8_t)effectVariant responseHandler:(ResponseHandler)responseHandler
+- (void)offWithEffect:(CHIPOnOffClusterOffWithEffectPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OnOff::Commands::OffWithEffect::Type request;
-    request.effectId = static_cast<decltype(request.effectId)>(effectId);
-    request.effectVariant = static_cast<decltype(request.effectVariant)>(effectVariant);
+    request.effectId = static_cast<std::remove_reference_t<decltype(request.effectId)>>(payload.EffectId.unsignedCharValue);
+    request.effectVariant
+        = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(payload.EffectVariant.unsignedCharValue);
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)on:(ResponseHandler)responseHandler
+- (void)on:(CHIPOnOffClusterOnPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OnOff::Commands::On::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)onWithRecallGlobalScene:(ResponseHandler)responseHandler
+- (void)onWithRecallGlobalScene:(CHIPOnOffClusterOnWithRecallGlobalScenePayload * _Nonnull)payload
+                responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OnOff::Commands::OnWithRecallGlobalScene::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)onWithTimedOff:(uint8_t)onOffControl
-                onTime:(uint16_t)onTime
-           offWaitTime:(uint16_t)offWaitTime
-       responseHandler:(ResponseHandler)responseHandler
+- (void)onWithTimedOff:(CHIPOnOffClusterOnWithTimedOffPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OnOff::Commands::OnWithTimedOff::Type request;
-    request.onOffControl = static_cast<decltype(request.onOffControl)>(onOffControl);
-    request.onTime = onTime;
-    request.offWaitTime = offWaitTime;
+    request.onOffControl
+        = static_cast<std::remove_reference_t<decltype(request.onOffControl)>>(payload.OnOffControl.unsignedCharValue);
+    request.onTime = payload.OnTime.unsignedShortValue;
+    request.offWaitTime = payload.OffWaitTime.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)toggle:(ResponseHandler)responseHandler
+- (void)toggle:(CHIPOnOffClusterTogglePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OnOff::Commands::Toggle::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -4467,10 +4733,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOnTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOnTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOnTime(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = OnOff::Attributes::OnTime::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -4481,10 +4753,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOffWaitTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOffWaitTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOffWaitTime(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = OnOff::Attributes::OffWaitTime::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -4495,10 +4773,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeStartUpOnOffWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeStartUpOnOffWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeStartUpOnOff(success, failure, static_cast<uint8_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = OnOff::Attributes::StartUpOnOff::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -4539,10 +4823,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeSwitchActionsWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeSwitchActionsWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeSwitchActions(success, failure, static_cast<uint8_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -4562,19 +4852,18 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)addNOC:(NSData *)NOCValue
-          ICACValue:(NSData *)ICACValue
-           IPKValue:(NSData *)IPKValue
-      caseAdminNode:(uint64_t)caseAdminNode
-      adminVendorId:(uint16_t)adminVendorId
-    responseHandler:(ResponseHandler)responseHandler
+- (void)addNOC:(CHIPOperationalCredentialsClusterAddNOCPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OperationalCredentials::Commands::AddNOC::Type request;
-    request.NOCValue = [self asByteSpan:NOCValue];
-    request.ICACValue = chip::Optional<chip::ByteSpan>([self asByteSpan:ICACValue]);
-    request.IPKValue = [self asByteSpan:IPKValue];
-    request.caseAdminNode = caseAdminNode;
-    request.adminVendorId = adminVendorId;
+    request.NOCValue = [self asByteSpan:payload.NOCValue];
+    if (payload.ICACValue != nil) {
+        auto & definedValue_0 = request.ICACValue.Emplace();
+        definedValue_0 = [self asByteSpan:payload.ICACValue];
+    }
+    request.IPKValue = [self asByteSpan:payload.IPKValue];
+    request.caseAdminNode = payload.CaseAdminNode.unsignedLongLongValue;
+    request.adminVendorId = payload.AdminVendorId.unsignedShortValue;
 
     new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4584,22 +4873,26 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)addTrustedRootCertificate:(NSData *)rootCertificate responseHandler:(ResponseHandler)responseHandler
+- (void)addTrustedRootCertificate:(CHIPOperationalCredentialsClusterAddTrustedRootCertificatePayload * _Nonnull)payload
+                  responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
-    request.rootCertificate = [self asByteSpan:rootCertificate];
+    request.rootCertificate = [self asByteSpan:payload.RootCertificate];
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)attestationRequest:(NSData *)attestationNonce responseHandler:(ResponseHandler)responseHandler
+- (void)attestationRequest:(CHIPOperationalCredentialsClusterAttestationRequestPayload * _Nonnull)payload
+           responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OperationalCredentials::Commands::AttestationRequest::Type request;
-    request.attestationNonce = [self asByteSpan:attestationNonce];
+    request.attestationNonce = [self asByteSpan:payload.AttestationNonce];
 
     new CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4609,10 +4902,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)certificateChainRequest:(uint8_t)certificateType responseHandler:(ResponseHandler)responseHandler
+- (void)certificateChainRequest:(CHIPOperationalCredentialsClusterCertificateChainRequestPayload * _Nonnull)payload
+                responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OperationalCredentials::Commands::CertificateChainRequest::Type request;
-    request.certificateType = certificateType;
+    request.certificateType = payload.CertificateType.unsignedCharValue;
 
     new CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4623,10 +4918,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)opCSRRequest:(NSData *)CSRNonce responseHandler:(ResponseHandler)responseHandler
+- (void)opCSRRequest:(CHIPOperationalCredentialsClusterOpCSRRequestPayload * _Nonnull)payload
+     responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OperationalCredentials::Commands::OpCSRRequest::Type request;
-    request.CSRNonce = [self asByteSpan:CSRNonce];
+    request.CSRNonce = [self asByteSpan:payload.CSRNonce];
 
     new CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4636,10 +4933,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)removeFabric:(uint8_t)fabricIndex responseHandler:(ResponseHandler)responseHandler
+- (void)removeFabric:(CHIPOperationalCredentialsClusterRemoveFabricPayload * _Nonnull)payload
+     responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OperationalCredentials::Commands::RemoveFabric::Type request;
-    request.fabricIndex = fabricIndex;
+    request.fabricIndex = payload.FabricIndex.unsignedCharValue;
 
     new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4649,22 +4948,26 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)removeTrustedRootCertificate:(NSData *)trustedRootIdentifier responseHandler:(ResponseHandler)responseHandler
+- (void)removeTrustedRootCertificate:(CHIPOperationalCredentialsClusterRemoveTrustedRootCertificatePayload * _Nonnull)payload
+                     responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type request;
-    request.trustedRootIdentifier = [self asByteSpan:trustedRootIdentifier];
+    request.trustedRootIdentifier = [self asByteSpan:payload.TrustedRootIdentifier];
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)updateFabricLabel:(NSString *)label responseHandler:(ResponseHandler)responseHandler
+- (void)updateFabricLabel:(CHIPOperationalCredentialsClusterUpdateFabricLabelPayload * _Nonnull)payload
+          responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OperationalCredentials::Commands::UpdateFabricLabel::Type request;
-    request.label = [self asCharSpan:label];
+    request.label = [self asCharSpan:payload.Label];
 
     new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4674,11 +4977,16 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)updateNOC:(NSData *)NOCValue ICACValue:(NSData *)ICACValue responseHandler:(ResponseHandler)responseHandler
+- (void)updateNOC:(CHIPOperationalCredentialsClusterUpdateNOCPayload * _Nonnull)payload
+    responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     OperationalCredentials::Commands::UpdateNOC::Type request;
-    request.NOCValue = [self asByteSpan:NOCValue];
-    request.ICACValue = chip::Optional<chip::ByteSpan>([self asByteSpan:ICACValue]);
+    request.NOCValue = [self asByteSpan:payload.NOCValue];
+    if (payload.ICACValue != nil) {
+        auto & definedValue_0 = request.ICACValue.Emplace();
+        definedValue_0 = [self asByteSpan:payload.ICACValue];
+    }
 
     new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5062,10 +5370,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOperationModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOperationModeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOperationMode(success, failure, static_cast<uint8_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5076,10 +5390,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeControlModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeControlModeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeControlMode(success, failure, static_cast<uint8_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5195,23 +5515,38 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)addScene:(uint16_t)groupId
-            sceneId:(uint8_t)sceneId
-     transitionTime:(uint16_t)transitionTime
-          sceneName:(NSString *)sceneName
-          clusterId:(uint32_t)clusterId
-             length:(uint8_t)length
-              value:(uint8_t)value
-    responseHandler:(ResponseHandler)responseHandler
+- (void)addScene:(CHIPScenesClusterAddScenePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Scenes::Commands::AddScene::Type request;
-    request.groupId = groupId;
-    request.sceneId = sceneId;
-    request.transitionTime = transitionTime;
-    request.sceneName = [self asCharSpan:sceneName];
-    request.extensionFieldSets
-        = chip::app::DataModel::List<const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type>();
-    ;
+    request.groupId = payload.GroupId.unsignedShortValue;
+    request.sceneId = payload.SceneId.unsignedCharValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
+    request.sceneName = [self asCharSpan:payload.SceneName];
+    {
+        using ListType = std::remove_reference_t<decltype(request.extensionFieldSets)>;
+        using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+        if (payload.ExtensionFieldSets.count != 0) {
+            auto * listHolder_0 = new ListHolder<ListMemberType>(payload.ExtensionFieldSets.count);
+            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                return;
+            }
+            listFreer.add(listHolder_0);
+            for (size_t i = 0; i < payload.ExtensionFieldSets.count; ++i) {
+                if (![payload.ExtensionFieldSets[i] isKindOfClass:[CHIPScenesClusterSceneExtensionFieldSet class]]) {
+                    // Wrong kind of value.
+                    return;
+                }
+                auto element_0 = (CHIPScenesClusterSceneExtensionFieldSet *) payload.ExtensionFieldSets[i];
+                listHolder_0->mList[i].clusterId = element_0.ClusterId.unsignedIntValue;
+                listHolder_0->mList[i].length = element_0.Length.unsignedCharValue;
+                listHolder_0->mList[i].value = element_0.Value.unsignedCharValue;
+            }
+            request.extensionFieldSets = ListType(listHolder_0->mList, payload.ExtensionFieldSets.count);
+        } else {
+            request.extensionFieldSets = ListType();
+        }
+    }
 
     new CHIPScenesClusterAddSceneResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5221,10 +5556,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)getSceneMembership:(uint16_t)groupId responseHandler:(ResponseHandler)responseHandler
+- (void)getSceneMembership:(CHIPScenesClusterGetSceneMembershipPayload * _Nonnull)payload
+           responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Scenes::Commands::GetSceneMembership::Type request;
-    request.groupId = groupId;
+    request.groupId = payload.GroupId.unsignedShortValue;
 
     new CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5234,27 +5571,26 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)recallScene:(uint16_t)groupId
-            sceneId:(uint8_t)sceneId
-     transitionTime:(uint16_t)transitionTime
-    responseHandler:(ResponseHandler)responseHandler
+- (void)recallScene:(CHIPScenesClusterRecallScenePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Scenes::Commands::RecallScene::Type request;
-    request.groupId = groupId;
-    request.sceneId = sceneId;
-    request.transitionTime = transitionTime;
+    request.groupId = payload.GroupId.unsignedShortValue;
+    request.sceneId = payload.SceneId.unsignedCharValue;
+    request.transitionTime = payload.TransitionTime.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)removeAllScenes:(uint16_t)groupId responseHandler:(ResponseHandler)responseHandler
+- (void)removeAllScenes:(CHIPScenesClusterRemoveAllScenesPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Scenes::Commands::RemoveAllScenes::Type request;
-    request.groupId = groupId;
+    request.groupId = payload.GroupId.unsignedShortValue;
 
     new CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5264,11 +5600,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)removeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId responseHandler:(ResponseHandler)responseHandler
+- (void)removeScene:(CHIPScenesClusterRemoveScenePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Scenes::Commands::RemoveScene::Type request;
-    request.groupId = groupId;
-    request.sceneId = sceneId;
+    request.groupId = payload.GroupId.unsignedShortValue;
+    request.sceneId = payload.SceneId.unsignedCharValue;
 
     new CHIPScenesClusterRemoveSceneResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5278,11 +5615,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)storeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId responseHandler:(ResponseHandler)responseHandler
+- (void)storeScene:(CHIPScenesClusterStoreScenePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Scenes::Commands::StoreScene::Type request;
-    request.groupId = groupId;
-    request.sceneId = sceneId;
+    request.groupId = payload.GroupId.unsignedShortValue;
+    request.sceneId = payload.SceneId.unsignedCharValue;
 
     new CHIPScenesClusterStoreSceneResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5292,11 +5630,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)viewScene:(uint16_t)groupId sceneId:(uint8_t)sceneId responseHandler:(ResponseHandler)responseHandler
+- (void)viewScene:(CHIPScenesClusterViewScenePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Scenes::Commands::ViewScene::Type request;
-    request.groupId = groupId;
-    request.sceneId = sceneId;
+    request.groupId = payload.GroupId.unsignedShortValue;
+    request.sceneId = payload.SceneId.unsignedCharValue;
 
     new CHIPScenesClusterViewSceneResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5357,12 +5696,14 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)resetWatermarks:(ResponseHandler)responseHandler
+- (void)resetWatermarks:(CHIPSoftwareDiagnosticsClusterResetWatermarksPayload * _Nonnull)payload
+        responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     SoftwareDiagnostics::Commands::ResetWatermarks::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -5476,10 +5817,11 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)changeChannel:(NSString *)match responseHandler:(ResponseHandler)responseHandler
+- (void)changeChannel:(CHIPTvChannelClusterChangeChannelPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TvChannel::Commands::ChangeChannel::Type request;
-    request.match = [self asCharSpan:match];
+    request.match = [self asCharSpan:payload.Match];
 
     new CHIPTvChannelClusterChangeChannelResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5489,28 +5831,29 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)changeChannelByNumber:(uint16_t)majorNumber
-                  minorNumber:(uint16_t)minorNumber
+- (void)changeChannelByNumber:(CHIPTvChannelClusterChangeChannelByNumberPayload * _Nonnull)payload
               responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TvChannel::Commands::ChangeChannelByNumber::Type request;
-    request.majorNumber = majorNumber;
-    request.minorNumber = minorNumber;
+    request.majorNumber = payload.MajorNumber.unsignedShortValue;
+    request.minorNumber = payload.MinorNumber.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)skipChannel:(uint16_t)count responseHandler:(ResponseHandler)responseHandler
+- (void)skipChannel:(CHIPTvChannelClusterSkipChannelPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TvChannel::Commands::SkipChannel::Type request;
-    request.count = count;
+    request.count = payload.Count.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -5554,11 +5897,13 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)navigateTarget:(uint8_t)target data:(NSString *)data responseHandler:(ResponseHandler)responseHandler
+- (void)navigateTarget:(CHIPTargetNavigatorClusterNavigateTargetPayload * _Nonnull)payload
+       responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TargetNavigator::Commands::NavigateTarget::Type request;
-    request.target = target;
-    request.data = [self asCharSpan:data];
+    request.target = payload.Target.unsignedCharValue;
+    request.data = [self asCharSpan:payload.Data];
 
     new CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5674,22 +6019,25 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)test:(ResponseHandler)responseHandler
+- (void)test:(CHIPTestClusterClusterTestPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TestCluster::Commands::Test::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)testAddArguments:(uint8_t)arg1 arg2:(uint8_t)arg2 responseHandler:(ResponseHandler)responseHandler
+- (void)testAddArguments:(CHIPTestClusterClusterTestAddArgumentsPayload * _Nonnull)payload
+         responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TestCluster::Commands::TestAddArguments::Type request;
-    request.arg1 = arg1;
-    request.arg2 = arg2;
+    request.arg1 = payload.Arg1.unsignedCharValue;
+    request.arg2 = payload.Arg2.unsignedCharValue;
 
     new CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5699,11 +6047,13 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)testEnumsRequest:(uint16_t)arg1 arg2:(uint8_t)arg2 responseHandler:(ResponseHandler)responseHandler
+- (void)testEnumsRequest:(CHIPTestClusterClusterTestEnumsRequestPayload * _Nonnull)payload
+         responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TestCluster::Commands::TestEnumsRequest::Type request;
-    request.arg1 = static_cast<decltype(request.arg1)>(arg1);
-    request.arg2 = static_cast<decltype(request.arg2)>(arg2);
+    request.arg1 = static_cast<std::remove_reference_t<decltype(request.arg1)>>(payload.Arg1.unsignedShortValue);
+    request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(payload.Arg2.unsignedCharValue);
 
     new CHIPTestClusterClusterTestEnumsResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5713,11 +6063,33 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)testListInt8UArgumentRequest:(uint8_t)arg1 responseHandler:(ResponseHandler)responseHandler
+- (void)testListInt8UArgumentRequest:(CHIPTestClusterClusterTestListInt8UArgumentRequestPayload * _Nonnull)payload
+                     responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
-    request.arg1 = chip::app::DataModel::List<const uint8_t>();
-    ;
+    {
+        using ListType = std::remove_reference_t<decltype(request.arg1)>;
+        using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+        if (payload.Arg1.count != 0) {
+            auto * listHolder_0 = new ListHolder<ListMemberType>(payload.Arg1.count);
+            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                return;
+            }
+            listFreer.add(listHolder_0);
+            for (size_t i = 0; i < payload.Arg1.count; ++i) {
+                if (![payload.Arg1[i] isKindOfClass:[NSNumber class]]) {
+                    // Wrong kind of value.
+                    return;
+                }
+                auto element_0 = (NSNumber *) payload.Arg1[i];
+                listHolder_0->mList[i] = element_0.unsignedCharValue;
+            }
+            request.arg1 = ListType(listHolder_0->mList, payload.Arg1.count);
+        } else {
+            request.arg1 = ListType();
+        }
+    }
 
     new CHIPTestClusterClusterBooleanResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5727,11 +6099,33 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)testListInt8UReverseRequest:(uint8_t)arg1 responseHandler:(ResponseHandler)responseHandler
+- (void)testListInt8UReverseRequest:(CHIPTestClusterClusterTestListInt8UReverseRequestPayload * _Nonnull)payload
+                    responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TestCluster::Commands::TestListInt8UReverseRequest::Type request;
-    request.arg1 = chip::app::DataModel::List<const uint8_t>();
-    ;
+    {
+        using ListType = std::remove_reference_t<decltype(request.arg1)>;
+        using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+        if (payload.Arg1.count != 0) {
+            auto * listHolder_0 = new ListHolder<ListMemberType>(payload.Arg1.count);
+            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                return;
+            }
+            listFreer.add(listHolder_0);
+            for (size_t i = 0; i < payload.Arg1.count; ++i) {
+                if (![payload.Arg1[i] isKindOfClass:[NSNumber class]]) {
+                    // Wrong kind of value.
+                    return;
+                }
+                auto element_0 = (NSNumber *) payload.Arg1[i];
+                listHolder_0->mList[i] = element_0.unsignedCharValue;
+            }
+            request.arg1 = ListType(listHolder_0->mList, payload.Arg1.count);
+        } else {
+            request.arg1 = ListType();
+        }
+    }
 
     new CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5741,17 +6135,40 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)testListStructArgumentRequest:(uint8_t)a
-                                    b:(bool)b
-                                    c:(uint8_t)c
-                                    d:(NSData *)d
-                                    e:(NSString *)e
-                                    f:(uint8_t)f
+- (void)testListStructArgumentRequest:(CHIPTestClusterClusterTestListStructArgumentRequestPayload * _Nonnull)payload
                       responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TestCluster::Commands::TestListStructArgumentRequest::Type request;
-    request.arg1 = chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>();
-    ;
+    {
+        using ListType = std::remove_reference_t<decltype(request.arg1)>;
+        using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+        if (payload.Arg1.count != 0) {
+            auto * listHolder_0 = new ListHolder<ListMemberType>(payload.Arg1.count);
+            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                return;
+            }
+            listFreer.add(listHolder_0);
+            for (size_t i = 0; i < payload.Arg1.count; ++i) {
+                if (![payload.Arg1[i] isKindOfClass:[CHIPTestClusterClusterSimpleStruct class]]) {
+                    // Wrong kind of value.
+                    return;
+                }
+                auto element_0 = (CHIPTestClusterClusterSimpleStruct *) payload.Arg1[i];
+                listHolder_0->mList[i].a = element_0.A.unsignedCharValue;
+                listHolder_0->mList[i].b = element_0.B.boolValue;
+                listHolder_0->mList[i].c
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i].c)>>(element_0.C.unsignedCharValue);
+                listHolder_0->mList[i].d = [self asByteSpan:element_0.D];
+                listHolder_0->mList[i].e = [self asCharSpan:element_0.E];
+                listHolder_0->mList[i].f
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i].f)>>(element_0.F.unsignedCharValue);
+            }
+            request.arg1 = ListType(listHolder_0->mList, payload.Arg1.count);
+        } else {
+            request.arg1 = ListType();
+        }
+    }
 
     new CHIPTestClusterClusterBooleanResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5761,21 +6178,33 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)testNotHandled:(ResponseHandler)responseHandler
+- (void)testNotHandled:(CHIPTestClusterClusterTestNotHandledPayload * _Nonnull)payload
+       responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TestCluster::Commands::TestNotHandled::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)testNullableOptionalRequest:(uint8_t)arg1 responseHandler:(ResponseHandler)responseHandler
+- (void)testNullableOptionalRequest:(CHIPTestClusterClusterTestNullableOptionalRequestPayload * _Nonnull)payload
+                    responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TestCluster::Commands::TestNullableOptionalRequest::Type request;
-    request.arg1 = chip::Optional<chip::app::DataModel::Nullable<uint8_t>>(chip::app::DataModel::Nullable<uint8_t>(arg1));
+    if (payload.Arg1 != nil) {
+        auto & definedValue_0 = request.arg1.Emplace();
+        if (payload.Arg1 == nil) {
+            definedValue_0.SetNull();
+        } else {
+            auto & nonNullValue_1 = definedValue_0.SetNonNull();
+            nonNullValue_1 = payload.Arg1.unsignedCharValue;
+        }
+    }
 
     new CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5785,8 +6214,9 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)testSpecific:(ResponseHandler)responseHandler
+- (void)testSpecific:(CHIPTestClusterClusterTestSpecificPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TestCluster::Commands::TestSpecific::Type request;
 
     new CHIPTestClusterClusterTestSpecificResponseCallbackBridge(
@@ -5797,17 +6227,17 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)testStructArgumentRequest:(uint8_t)a
-                                b:(bool)b
-                                c:(uint8_t)c
-                                d:(NSData *)d
-                                e:(NSString *)e
-                                f:(uint8_t)f
+- (void)testStructArgumentRequest:(CHIPTestClusterClusterTestStructArgumentRequestPayload * _Nonnull)payload
                   responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TestCluster::Commands::TestStructArgumentRequest::Type request;
-    request.arg1 = chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type();
-    ;
+    request.arg1.a = payload.Arg1.A.unsignedCharValue;
+    request.arg1.b = payload.Arg1.B.boolValue;
+    request.arg1.c = static_cast<std::remove_reference_t<decltype(request.arg1.c)>>(payload.Arg1.C.unsignedCharValue);
+    request.arg1.d = [self asByteSpan:payload.Arg1.D];
+    request.arg1.e = [self asCharSpan:payload.Arg1.E];
+    request.arg1.f = static_cast<std::remove_reference_t<decltype(request.arg1.f)>>(payload.Arg1.F.unsignedCharValue);
 
     new CHIPTestClusterClusterBooleanResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5817,12 +6247,14 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)testUnknownCommand:(ResponseHandler)responseHandler
+- (void)testUnknownCommand:(CHIPTestClusterClusterTestUnknownCommandPayload * _Nonnull)payload
+           responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     TestCluster::Commands::TestUnknownCommand::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -5835,10 +6267,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeBooleanWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeBooleanWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeBoolean(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Boolean::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.boolValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5849,10 +6287,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeBitmap8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeBitmap8WithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeBitmap8(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Bitmap8::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedCharValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5863,10 +6307,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeBitmap16WithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeBitmap16WithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeBitmap16(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Bitmap16::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5877,10 +6327,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeBitmap32WithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeBitmap32WithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeBitmap32(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Bitmap32::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedIntValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5891,10 +6347,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeBitmap64WithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeBitmap64WithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeBitmap64(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Bitmap64::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedLongLongValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5905,10 +6367,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeInt8uWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeInt8uWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeInt8u(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Int8u::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedCharValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5919,10 +6387,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeInt16uWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeInt16uWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeInt16u(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Int16u::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedShortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5933,10 +6407,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeInt32uWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeInt32uWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeInt32u(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Int32u::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedIntValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5947,10 +6427,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeInt64uWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeInt64uWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeInt64u(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Int64u::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedLongLongValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5961,10 +6447,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeInt8sWithValue:(int8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeInt8sWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeInt8s(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Int8s::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.charValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5975,10 +6467,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeInt16sWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeInt16sWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeInt16s(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Int16s::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.shortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -5989,10 +6487,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeInt32sWithValue:(int32_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeInt32sWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeInt32s(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Int32s::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.intValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6003,10 +6507,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeInt64sWithValue:(int64_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeInt64sWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeInt64s(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Int64s::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.longLongValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6017,10 +6527,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeEnum8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeEnum8WithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeEnum8(success, failure, static_cast<uint8_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Enum8::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6031,10 +6547,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeEnum16WithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeEnum16WithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeEnum16(success, failure, static_cast<uint16_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Enum16::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6045,10 +6567,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOctetStringWithValue:(NSData * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOctetString(success, failure, [self asByteSpan:value]);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::OctetString::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = [self asByteSpan:value];
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6083,10 +6611,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeLongOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeLongOctetStringWithValue:(NSData * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeLongOctetString(success, failure, [self asByteSpan:value]);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::LongOctetString::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = [self asByteSpan:value];
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6097,10 +6631,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeCharStringWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeCharStringWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeCharString(success, failure, [self asCharSpan:value]);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::CharString::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = [self asCharSpan:value];
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6111,10 +6651,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeLongCharStringWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeLongCharStringWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeLongCharString(success, failure, [self asCharSpan:value]);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::LongCharString::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = [self asCharSpan:value];
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6125,10 +6671,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeEpochUsWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeEpochUsWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeEpochUs(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::EpochUs::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedLongLongValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6139,10 +6691,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeEpochSWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeEpochSWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeEpochS(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::EpochS::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedIntValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6153,10 +6711,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeVendorIdWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeVendorIdWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeVendorId(success, failure, static_cast<chip::VendorId>(value));
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::VendorId::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6175,10 +6739,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeUnsupportedWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeUnsupportedWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeUnsupported(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::Unsupported::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.boolValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6189,10 +6759,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableBooleanWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableBooleanWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableBoolean(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableBoolean::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.boolValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6203,10 +6784,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableBitmap8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableBitmap8WithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableBitmap8(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableBitmap8::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.unsignedCharValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6217,10 +6809,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableBitmap16WithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableBitmap16WithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableBitmap16(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableBitmap16::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.unsignedShortValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6231,10 +6834,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableBitmap32WithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableBitmap32WithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableBitmap32(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableBitmap32::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.unsignedIntValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6245,10 +6859,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableBitmap64WithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableBitmap64WithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableBitmap64(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableBitmap64::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.unsignedLongLongValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6259,10 +6884,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableInt8uWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableInt8uWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableInt8u(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableInt8u::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.unsignedCharValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6273,10 +6909,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableInt16uWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableInt16uWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableInt16u(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableInt16u::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.unsignedShortValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6287,10 +6934,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableInt32uWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableInt32uWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableInt32u(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableInt32u::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.unsignedIntValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6301,10 +6959,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableInt64uWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableInt64uWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableInt64u(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableInt64u::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.unsignedLongLongValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6315,10 +6984,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableInt8sWithValue:(int8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableInt8sWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableInt8s(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableInt8s::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.charValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6329,10 +7009,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableInt16sWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableInt16sWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableInt16s(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableInt16s::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.shortValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6343,10 +7034,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableInt32sWithValue:(int32_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableInt32sWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableInt32s(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableInt32s::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.intValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6357,10 +7059,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableInt64sWithValue:(int64_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableInt64sWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableInt64s(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableInt64s::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = value.longLongValue;
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6371,10 +7084,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableEnum8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableEnum8WithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableEnum8(success, failure, static_cast<uint8_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableEnum8::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6385,10 +7109,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableEnum16WithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableEnum16WithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableEnum16(success, failure, static_cast<uint16_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableEnum16::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedShortValue);
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6399,10 +7134,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableOctetStringWithValue:(NSData * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableOctetString(success, failure, [self asByteSpan:value]);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableOctetString::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = [self asByteSpan:value];
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6413,10 +7159,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeNullableCharStringWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNullableCharStringWithValue:(NSString * _Nullable)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeNullableCharString(success, failure, [self asCharSpan:value]);
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::NullableCharString::TypeInfo;
+        TypeInfo::Type cppValue;
+        if (value == nil) {
+            cppValue.SetNull();
+        } else {
+            auto & nonNullValue_0 = cppValue.SetNonNull();
+            nonNullValue_0 = [self asCharSpan:value];
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6436,69 +7193,99 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)clearWeeklySchedule:(ResponseHandler)responseHandler
+- (void)clearWeeklySchedule:(CHIPThermostatClusterClearWeeklySchedulePayload * _Nonnull)payload
+            responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     Thermostat::Commands::ClearWeeklySchedule::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)getRelayStatusLog:(ResponseHandler)responseHandler
-{
-    Thermostat::Commands::GetRelayStatusLog::Type request;
-
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)getWeeklySchedule:(uint8_t)daysToReturn modeToReturn:(uint8_t)modeToReturn responseHandler:(ResponseHandler)responseHandler
-{
-    Thermostat::Commands::GetWeeklySchedule::Type request;
-    request.daysToReturn = static_cast<decltype(request.daysToReturn)>(daysToReturn);
-    request.modeToReturn = static_cast<decltype(request.modeToReturn)>(modeToReturn);
-
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)setWeeklySchedule:(uint8_t)numberOfTransitionsForSequence
-     dayOfWeekForSequence:(uint8_t)dayOfWeekForSequence
-          modeForSequence:(uint8_t)modeForSequence
-                  payload:(uint8_t)payload
+- (void)getRelayStatusLog:(CHIPThermostatClusterGetRelayStatusLogPayload * _Nonnull)payload
           responseHandler:(ResponseHandler)responseHandler
 {
-    Thermostat::Commands::SetWeeklySchedule::Type request;
-    request.numberOfTransitionsForSequence = numberOfTransitionsForSequence;
-    request.dayOfWeekForSequence = static_cast<decltype(request.dayOfWeekForSequence)>(dayOfWeekForSequence);
-    request.modeForSequence = static_cast<decltype(request.modeForSequence)>(modeForSequence);
-    request.payload = chip::app::DataModel::List<const uint8_t>();
-    ;
+    ListFreer listFreer;
+    Thermostat::Commands::GetRelayStatusLog::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)setpointRaiseLower:(uint8_t)mode amount:(int8_t)amount responseHandler:(ResponseHandler)responseHandler
+- (void)getWeeklySchedule:(CHIPThermostatClusterGetWeeklySchedulePayload * _Nonnull)payload
+          responseHandler:(ResponseHandler)responseHandler
 {
-    Thermostat::Commands::SetpointRaiseLower::Type request;
-    request.mode = static_cast<decltype(request.mode)>(mode);
-    request.amount = amount;
+    ListFreer listFreer;
+    Thermostat::Commands::GetWeeklySchedule::Type request;
+    request.daysToReturn
+        = static_cast<std::remove_reference_t<decltype(request.daysToReturn)>>(payload.DaysToReturn.unsignedCharValue);
+    request.modeToReturn
+        = static_cast<std::remove_reference_t<decltype(request.modeToReturn)>>(payload.ModeToReturn.unsignedCharValue);
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)setWeeklySchedule:(CHIPThermostatClusterSetWeeklySchedulePayload * _Nonnull)payload
+          responseHandler:(ResponseHandler)responseHandler
+{
+    ListFreer listFreer;
+    Thermostat::Commands::SetWeeklySchedule::Type request;
+    request.numberOfTransitionsForSequence = payload.NumberOfTransitionsForSequence.unsignedCharValue;
+    request.dayOfWeekForSequence = static_cast<std::remove_reference_t<decltype(request.dayOfWeekForSequence)>>(
+        payload.DayOfWeekForSequence.unsignedCharValue);
+    request.modeForSequence
+        = static_cast<std::remove_reference_t<decltype(request.modeForSequence)>>(payload.ModeForSequence.unsignedCharValue);
+    {
+        using ListType = std::remove_reference_t<decltype(request.payload)>;
+        using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+        if (payload.Payload.count != 0) {
+            auto * listHolder_0 = new ListHolder<ListMemberType>(payload.Payload.count);
+            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                return;
+            }
+            listFreer.add(listHolder_0);
+            for (size_t i = 0; i < payload.Payload.count; ++i) {
+                if (![payload.Payload[i] isKindOfClass:[NSNumber class]]) {
+                    // Wrong kind of value.
+                    return;
+                }
+                auto element_0 = (NSNumber *) payload.Payload[i];
+                listHolder_0->mList[i] = element_0.unsignedCharValue;
+            }
+            request.payload = ListType(listHolder_0->mList, payload.Payload.count);
+        } else {
+            request.payload = ListType();
+        }
+    }
+
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)setpointRaiseLower:(CHIPThermostatClusterSetpointRaiseLowerPayload * _Nonnull)payload
+           responseHandler:(ResponseHandler)responseHandler
+{
+    ListFreer listFreer;
+    Thermostat::Commands::SetpointRaiseLower::Type request;
+    request.mode = static_cast<std::remove_reference_t<decltype(request.mode)>>(payload.Mode.unsignedCharValue);
+    request.amount = payload.Amount.charValue;
+
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -6565,10 +7352,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOccupiedCoolingSetpointWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOccupiedCoolingSetpointWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOccupiedCoolingSetpoint(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.shortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6579,10 +7372,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeOccupiedHeatingSetpointWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOccupiedHeatingSetpointWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeOccupiedHeatingSetpoint(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.shortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6593,10 +7392,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeMinHeatSetpointLimitWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeMinHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeMinHeatSetpointLimit(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.shortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6607,10 +7412,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeMaxHeatSetpointLimitWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeMaxHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeMaxHeatSetpointLimit(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.shortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6621,10 +7432,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeMinCoolSetpointLimitWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeMinCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeMinCoolSetpointLimit(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.shortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6635,10 +7452,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeMaxCoolSetpointLimitWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeMaxCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeMaxCoolSetpointLimit(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.shortValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6649,10 +7472,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeMinSetpointDeadBandWithValue:(int8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeMinSetpointDeadBandWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeMinSetpointDeadBand(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = Thermostat::Attributes::MinSetpointDeadBand::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.charValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6663,10 +7492,17 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeControlSequenceOfOperationWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeControlSequenceOfOperationWithValue:(NSNumber * _Nonnull)value
+                                          responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeControlSequenceOfOperation(success, failure, static_cast<uint8_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6677,10 +7513,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeSystemModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeSystemModeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeSystemMode(success, failure, static_cast<uint8_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = Thermostat::Attributes::SystemMode::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6735,10 +7577,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeTemperatureDisplayModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeTemperatureDisplayModeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeTemperatureDisplayMode(success, failure, static_cast<uint8_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6749,10 +7597,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeKeypadLockoutWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeKeypadLockoutWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeKeypadLockout(success, failure, static_cast<uint8_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6763,10 +7617,17 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeScheduleProgrammingVisibilityWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeScheduleProgrammingVisibilityWithValue:(NSNumber * _Nonnull)value
+                                             responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeScheduleProgrammingVisibility(success, failure, static_cast<uint8_t>(value));
+        ListFreer listFreer;
+        using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
@@ -6786,12 +7647,14 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)resetCounts:(ResponseHandler)responseHandler
+- (void)resetCounts:(CHIPThreadNetworkDiagnosticsClusterResetCountsPayload * _Nonnull)payload
+    responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     ThreadNetworkDiagnostics::Commands::ResetCounts::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -7282,12 +8145,14 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)resetCounts:(ResponseHandler)responseHandler
+- (void)resetCounts:(CHIPWiFiNetworkDiagnosticsClusterResetCountsPayload * _Nonnull)payload
+    responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     WiFiNetworkDiagnostics::Commands::ResetCounts::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -7400,88 +8265,95 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)downOrClose:(ResponseHandler)responseHandler
+- (void)downOrClose:(CHIPWindowCoveringClusterDownOrClosePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     WindowCovering::Commands::DownOrClose::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)goToLiftPercentage:(uint8_t)liftPercentageValue
-    liftPercent100thsValue:(uint16_t)liftPercent100thsValue
+- (void)goToLiftPercentage:(CHIPWindowCoveringClusterGoToLiftPercentagePayload * _Nonnull)payload
            responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     WindowCovering::Commands::GoToLiftPercentage::Type request;
-    request.liftPercentageValue = liftPercentageValue;
-    request.liftPercent100thsValue = liftPercent100thsValue;
+    request.liftPercentageValue = payload.LiftPercentageValue.unsignedCharValue;
+    request.liftPercent100thsValue = payload.LiftPercent100thsValue.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)goToLiftValue:(uint16_t)liftValue responseHandler:(ResponseHandler)responseHandler
+- (void)goToLiftValue:(CHIPWindowCoveringClusterGoToLiftValuePayload * _Nonnull)payload
+      responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     WindowCovering::Commands::GoToLiftValue::Type request;
-    request.liftValue = liftValue;
+    request.liftValue = payload.LiftValue.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)goToTiltPercentage:(uint8_t)tiltPercentageValue
-    tiltPercent100thsValue:(uint16_t)tiltPercent100thsValue
+- (void)goToTiltPercentage:(CHIPWindowCoveringClusterGoToTiltPercentagePayload * _Nonnull)payload
            responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     WindowCovering::Commands::GoToTiltPercentage::Type request;
-    request.tiltPercentageValue = tiltPercentageValue;
-    request.tiltPercent100thsValue = tiltPercent100thsValue;
+    request.tiltPercentageValue = payload.TiltPercentageValue.unsignedCharValue;
+    request.tiltPercent100thsValue = payload.TiltPercent100thsValue.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)goToTiltValue:(uint16_t)tiltValue responseHandler:(ResponseHandler)responseHandler
+- (void)goToTiltValue:(CHIPWindowCoveringClusterGoToTiltValuePayload * _Nonnull)payload
+      responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     WindowCovering::Commands::GoToTiltValue::Type request;
-    request.tiltValue = tiltValue;
+    request.tiltValue = payload.TiltValue.unsignedShortValue;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)stopMotion:(ResponseHandler)responseHandler
+- (void)stopMotion:(CHIPWindowCoveringClusterStopMotionPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     WindowCovering::Commands::StopMotion::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)upOrOpen:(ResponseHandler)responseHandler
+- (void)upOrOpen:(CHIPWindowCoveringClusterUpOrOpenPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
+    ListFreer listFreer;
     WindowCovering::Commands::UpOrOpen::Type request;
 
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+    new CHIPCommandSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
@@ -7739,10 +8611,16 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)writeAttributeModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.WriteAttributeMode(success, failure, value);
+        ListFreer listFreer;
+        using TypeInfo = WindowCovering::Attributes::Mode::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedCharValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 

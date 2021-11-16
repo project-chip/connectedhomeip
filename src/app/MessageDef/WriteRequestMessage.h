@@ -24,8 +24,8 @@
 
 #include "AttributeDataIBs.h"
 #include "AttributeDataVersionList.h"
-#include "Builder.h"
-#include "Parser.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -43,18 +43,9 @@ enum
     kCsTag_MoreChunkedMessages      = 3,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public StructParser
 {
 public:
-    /**
-     *  @brief Initialize the parser object with TLVReader
-     *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this request
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
-
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -109,18 +100,9 @@ public:
     CHIP_ERROR GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const;
 };
 
-class Builder : public chip::app::Builder
+class Builder : public StructBuilder
 {
 public:
-    /**
-     *  @brief Initialize a WriteRequestMessage::Builder for writing into a TLV stream
-     *
-     *  @param [in] apWriter    A pointer to TLVWriter
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
-
     /**
      *  @brief This can be used to optionally signal to the server that no responses are to be sent back.
      *  @param [in] aSuppressResponse true if client need to signal suppress response
