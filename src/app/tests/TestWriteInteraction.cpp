@@ -124,7 +124,7 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     WriteRequestMessage::Builder writeRequestBuilder;
     err = writeRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    AttributeDataIBs::Builder attributeDataIBsBuilder = writeRequestBuilder.CreateAttributeDataIBsBuilder();
+    AttributeDataIBs::Builder attributeDataIBsBuilder = writeRequestBuilder.CreateWriteRequests();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
     AttributeDataIB::Builder attributeDataIBBuilder = attributeDataIBsBuilder.CreateAttributeDataIBBuilder();
     NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
@@ -155,7 +155,7 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
 
     attributeDataIBsBuilder.EndOfAttributeDataIBs();
     NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
-    writeRequestBuilder.EndOfWriteRequestMessage();
+    writeRequestBuilder.TimedRequest(false).IsFabricFiltered(false).EndOfWriteRequestMessage();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);

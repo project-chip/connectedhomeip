@@ -2262,6 +2262,50 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE    CHIP_CORE_ERROR(0xcf)
 
 /**
+ * @def CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE
+ *
+ * @brief
+ *   The WriteRequestMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd0)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The WriteResponseMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE    CHIP_CORE_ERROR(0xd1)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE
+ *
+ * @brief
+ *   The ReadRequestMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd2)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE
+ *
+ * @brief
+ *   The SubscribeRequestMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd3)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The SubscribeResponseMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE    CHIP_CORE_ERROR(0xd4)
+/**
  *  @}
  */
 
