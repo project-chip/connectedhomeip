@@ -59,7 +59,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
     if (endpoint == 0x00)
     {
-        err = aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        err = aEncoder.EncodeList([](auto encoder) -> CHIP_ERROR {
             for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
             {
                 if (emberAfEndpointIndexIsEnabled(index))
@@ -85,7 +85,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
 CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    CHIP_ERROR err = aEncoder.EncodeList([&endpoint](auto encoder) -> CHIP_ERROR {
         Descriptor::Structs::DeviceType::Type deviceStruct;
         uint16_t index = emberAfIndexFromEndpoint(endpoint);
 
@@ -99,7 +99,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 
 CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server)
 {
-    CHIP_ERROR err = aEncoder.EncodeList([&endpoint, server](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    CHIP_ERROR err = aEncoder.EncodeList([&endpoint, server](auto encoder) -> CHIP_ERROR {
         uint16_t clusterCount = emberAfClusterCount(endpoint, server);
 
         for (uint8_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++)

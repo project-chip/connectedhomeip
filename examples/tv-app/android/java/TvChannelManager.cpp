@@ -160,7 +160,7 @@ CHIP_ERROR TvChannelManager::getTvChannelList(chip::app::AttributeValueEncoder &
     VerifyOrExit(mGetChannelListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    return aEncoder.EncodeList([env, this](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([env, this](const auto & encoder) -> CHIP_ERROR {
         jobjectArray channelInfoList = (jobjectArray) env->CallObjectMethod(mTvChannelManagerObject, mGetChannelListMethod);
         jint length                  = env->GetArrayLength(channelInfoList);
         for (jint i = 0; i < length; i++)
