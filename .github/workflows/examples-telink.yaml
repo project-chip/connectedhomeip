@@ -44,14 +44,6 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-            - name: Build example Telink Lighting App
-              run: |
-                ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'telink-*' build"
-                .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                  telink tlsr9518adk80d lighting-app \
-                  out/telink-tlsr9518adk80d-light/zephyr/zephyr.elf \
-                  /tmp/bloat_reports/
 
             - name: Get parent for size reports
               run: |
@@ -61,6 +53,15 @@ jobs:
                   MERGE_PARENT=$GH_EVENT_BASE
                 fi
                 echo "GH_EVENT_PARENT=$MERGE_PARENT" >>$GITHUB_ENV
+
+            - name: Build example Telink Lighting App
+              run: |
+                ./scripts/run_in_build_env.sh \
+                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'telink-*' build"
+                .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                  telink tlsr9518adk80d lighting-app \
+                  out/telink-tlsr9518adk80d-light/zephyr/zephyr.elf \
+                  /tmp/bloat_reports/
 
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
