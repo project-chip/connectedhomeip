@@ -39,23 +39,6 @@ class OnOffServer
 {
 public:
     /**********************************************************
-     * Enums
-     *********************************************************/
-
-    enum EffectIdentifier
-    {
-        IDENTIFIER_DELAYED_OFF = 0x00,
-        IDENTIFIER_DYING_LIGHT = 0x01,
-    };
-
-    enum EffectVariant
-    {
-        VARIANT_DEFAULT  = 0x00,
-        VARIANT_EFFECT_1 = 0x01,
-        VARIANT_EFFECT_2 = 0x02,
-    };
-
-    /**********************************************************
      * Functions Definitions
      *********************************************************/
 

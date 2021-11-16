@@ -139,7 +139,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
 
             // Stop timer on the endpoint
             emberEventControlSetInactive(getEventControl(endpoint));
-            emberAfOnOffClusterPrintln("On Command - Stop Timer");
+            emberAfOnOffClusterPrintln("On/Toggle Command - Stop Timer");
         }
 
         Attributes::GlobalSceneControl::Set(endpoint, true);
