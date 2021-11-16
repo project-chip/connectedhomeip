@@ -743,6 +743,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBootReasonsWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeActiveHardwareFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeActiveRadioFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeActiveNetworkFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

@@ -731,6 +731,141 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
 chip::Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>
     gGeneralDiagnosticsNetworkInterfacesListAttributeCallback{ OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse,
                                                                nullptr };
+static void OnGeneralDiagnosticsActiveHardwareFaultsListAttributeResponse(void * context,
+                                                                          const chip::app::DataModel::DecodableList<uint8_t> & list)
+{
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  [");
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+        ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
+#endif // CHIP_PROGRESS_LOGGING
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  ]");
+
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>
+    gGeneralDiagnosticsActiveHardwareFaultsListAttributeCallback{ OnGeneralDiagnosticsActiveHardwareFaultsListAttributeResponse,
+                                                                  nullptr };
+static void OnGeneralDiagnosticsActiveRadioFaultsListAttributeResponse(void * context,
+                                                                       const chip::app::DataModel::DecodableList<uint8_t> & list)
+{
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  [");
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+        ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
+#endif // CHIP_PROGRESS_LOGGING
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  ]");
+
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>
+    gGeneralDiagnosticsActiveRadioFaultsListAttributeCallback{ OnGeneralDiagnosticsActiveRadioFaultsListAttributeResponse,
+                                                               nullptr };
+static void OnGeneralDiagnosticsActiveNetworkFaultsListAttributeResponse(void * context,
+                                                                         const chip::app::DataModel::DecodableList<uint8_t> & list)
+{
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  [");
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+        ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
+#endif // CHIP_PROGRESS_LOGGING
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  ]");
+
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>
+    gGeneralDiagnosticsActiveNetworkFaultsListAttributeCallback{ OnGeneralDiagnosticsActiveNetworkFaultsListAttributeResponse,
+                                                                 nullptr };
 static void OnGroupKeyManagementGroupsListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & list)
@@ -4683,6 +4818,45 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_BootReaso
     chip::Controller::GeneralDiagnosticsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ReadAttributeBootReasons(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_ActiveHardwareFaults(chip::DeviceProxy * device,
+                                                                                            chip::EndpointId ZCLendpointId,
+                                                                                            chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .ReadAttributeActiveHardwareFaults(gGeneralDiagnosticsActiveHardwareFaultsListAttributeCallback.Cancel(),
+                                           gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_ActiveRadioFaults(chip::DeviceProxy * device,
+                                                                                         chip::EndpointId ZCLendpointId,
+                                                                                         chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .ReadAttributeActiveRadioFaults(gGeneralDiagnosticsActiveRadioFaultsListAttributeCallback.Cancel(),
+                                        gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_ActiveNetworkFaults(chip::DeviceProxy * device,
+                                                                                           chip::EndpointId ZCLendpointId,
+                                                                                           chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .ReadAttributeActiveNetworkFaults(gGeneralDiagnosticsActiveNetworkFaultsListAttributeCallback.Cancel(),
+                                          gDefaultFailureCallback.Cancel())
+        .AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision(chip::DeviceProxy * device,
