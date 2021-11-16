@@ -1,3 +1,4 @@
+# Copyright 2020 The Pigweed Authors
 # Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Substitue fake platform when building with chip_device_platform=auto.
-  chip_fake_platform = false
+import("//build_overrides/build.gni")
+import("${build_root}/toolchain/gcc_toolchain.gni")
+
+gcc_toolchain("fake_${host_cpu}_gcc") {
+  toolchain_args = {
+    current_os = host_os
+    current_os = host_os
+    current_cpu = host_cpu
+    is_clang = false
+    chip_fake_platform = true
+  }
 }
