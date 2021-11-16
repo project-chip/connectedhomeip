@@ -85,7 +85,9 @@ private:
  */
 struct PendingPacket
 {
-    PendingPacket(const PeerAddress & peerAddress, const PeerAddress & localAddress, System::PacketBufferHandle && packetBuffer) : mPeerAddress(peerAddress), mLocalAddress(localAddress), mPacketBuffer(std::move(packetBuffer)) {}
+    PendingPacket(const PeerAddress & peerAddress, const PeerAddress & localAddress, System::PacketBufferHandle && packetBuffer) :
+        mPeerAddress(peerAddress), mLocalAddress(localAddress), mPacketBuffer(std::move(packetBuffer))
+    {}
 
     PeerAddress mPeerAddress;                 // where the packet is being sent to
     PeerAddress mLocalAddress;                // which local address to use
@@ -132,8 +134,10 @@ protected:
     };
 
 public:
-    using PendingPacketPoolType = PoolInterface<PendingPacket, const PeerAddress &, const PeerAddress &, System::PacketBufferHandle &&>;
-    TCPBase(ActiveConnectionState * activeConnectionsBuffer, size_t bufferSize, PendingPacketPoolType & packetBuffers) : mActiveConnections(activeConnectionsBuffer), mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers)
+    using PendingPacketPoolType =
+        PoolInterface<PendingPacket, const PeerAddress &, const PeerAddress &, System::PacketBufferHandle &&>;
+    TCPBase(ActiveConnectionState * activeConnectionsBuffer, size_t bufferSize, PendingPacketPoolType & packetBuffers) :
+        mActiveConnections(activeConnectionsBuffer), mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers)
     {
         // activeConnectionsBuffer must be initialized by the caller.
     }
@@ -156,7 +160,8 @@ public:
      */
     void Close() override;
 
-    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override;
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                           System::PacketBufferHandle && message) override;
 
     void Disconnect(const PeerAddress & address) override;
 
@@ -211,8 +216,8 @@ private:
      * Ownership of buffer is taken over and will be freed (or re-enqueued to the endPoint receive queue)
      * as needed during processing.
      */
-    CHIP_ERROR ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress, const PeerAddress & localAddress,
-                                     System::PacketBufferHandle && buffer);
+    CHIP_ERROR ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
+                                     const PeerAddress & localAddress, System::PacketBufferHandle && buffer);
 
     /**
      * Process a single message of the specified size from a buffer.
@@ -224,7 +229,8 @@ private:
      *                              is no other data).
      * @param[in]     messageSize   Size of the single message.
      */
-    CHIP_ERROR ProcessSingleMessage(const PeerAddress & peerAddress, const PeerAddress & localAddress, ActiveConnectionState * state, uint16_t messageSize);
+    CHIP_ERROR ProcessSingleMessage(const PeerAddress & peerAddress, const PeerAddress & localAddress,
+                                    ActiveConnectionState * state, uint16_t messageSize);
 
     // Callback handler for TCPEndPoint. TCP message receive handler.
     // @see TCPEndpoint::OnDataReceivedFunct

@@ -22,7 +22,8 @@
 
 namespace chip {
 
-CHIP_ERROR TransportMgrBase::SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
+CHIP_ERROR TransportMgrBase::SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                                         System::PacketBufferHandle && message)
 {
     return mTransport->SendMessage(peer, local, std::move(message));
 }
@@ -50,7 +51,8 @@ void TransportMgrBase::Close()
     mTransport      = nullptr;
 }
 
-void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
+void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                                             System::PacketBufferHandle && message)
 {
     if (message->HasChainedBuffer())
     {
@@ -59,7 +61,8 @@ void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peer
         char localAddrBuffer[Transport::PeerAddress::kMaxToStringSize];
         peer.ToString(peerAddrBuffer);
         local.ToString(localAddrBuffer);
-        ChipLogError(Inet, "message %s -> %s dropped due to lower layers not ensuring a single packet buffer.", peerAddrBuffer, localAddrBuffer);
+        ChipLogError(Inet, "message %s -> %s dropped due to lower layers not ensuring a single packet buffer.", peerAddrBuffer,
+                     localAddrBuffer);
         return;
     }
 
@@ -81,7 +84,8 @@ void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peer
         char localAddrBuffer[Transport::PeerAddress::kMaxToStringSize];
         peer.ToString(peerAddrBuffer);
         local.ToString(localAddrBuffer);
-        ChipLogError(Inet, "message from %s -> %s is dropped since no corresponding handler is set in TransportMgr.", peerAddrBuffer, localAddrBuffer);
+        ChipLogError(Inet, "message from %s -> %s is dropped since no corresponding handler is set in TransportMgr.",
+                     peerAddrBuffer, localAddrBuffer);
     }
 }
 

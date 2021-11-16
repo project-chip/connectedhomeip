@@ -103,7 +103,8 @@ public:
      *
      */
 
-    CHIP_ERROR SendUDCMessage(TransportMgrBase * transportMgr, System::PacketBufferHandle && payload, const chip::Transport::PeerAddress & peer, const chip::Transport::PeerAddress & local);
+    CHIP_ERROR SendUDCMessage(TransportMgrBase * transportMgr, System::PacketBufferHandle && payload,
+                              const chip::Transport::PeerAddress & peer, const chip::Transport::PeerAddress & local);
 
     /**
      * Encode a User Directed Commissioning message.
@@ -195,7 +196,8 @@ private:
     InstanceNameResolver * mInstanceNameResolver         = nullptr;
     UserConfirmationProvider * mUserConfirmationProvider = nullptr;
 
-    void OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override;
+    void OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                           System::PacketBufferHandle && message) override;
 
     UDCClients<kMaxUDCClients> mUdcClients; // < Active UDC clients
 };

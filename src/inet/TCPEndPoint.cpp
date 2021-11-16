@@ -1300,7 +1300,9 @@ CHIP_ERROR TCPEndPointImplSockets::ListenImpl(uint16_t backlog)
 CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPPacketInfo & addrInfo)
 {
     VerifyOrReturnError(addrInfo.DestAddress.Type() != IPAddressType::kAny, CHIP_ERROR_INVALID_ARGUMENT); // Dest must be given
-    VerifyOrReturnError(addrInfo.SrcAddress.Type() == IPAddressType::kAny || addrInfo.SrcAddress.Type() == addrInfo.DestAddress.Type(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(addrInfo.SrcAddress.Type() == IPAddressType::kAny ||
+                            addrInfo.SrcAddress.Type() == addrInfo.DestAddress.Type(),
+                        CHIP_ERROR_INVALID_ARGUMENT);
     IPAddressType addrType = addrInfo.DestAddress.Type();
 
     ReturnErrorOnFailure(GetSocket(addrType));

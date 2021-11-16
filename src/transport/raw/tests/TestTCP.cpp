@@ -89,7 +89,8 @@ public:
         mCallback     = callback;
         mCallbackData = callback_data;
     }
-    void OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override
+    void OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                           System::PacketBufferHandle && message) override
     {
         PacketHeader packetHeader;
 
@@ -386,7 +387,7 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
 
     Transport::PeerAddress lPeerAddress    = Transport::PeerAddress::TCP(addr);
-    Transport::PeerAddress lLocalAddress    = Transport::PeerAddress::TCP(IPAddress::Any, 0);
+    Transport::PeerAddress lLocalAddress   = Transport::PeerAddress::TCP(IPAddress::Any, 0);
     TCPBase::ActiveConnectionState * state = tcp.FindActiveConnection(lPeerAddress, lLocalAddress);
     NL_TEST_ASSERT(inSuite, state != nullptr);
     Inet::TCPEndPoint * lEndPoint = state->mEndPoint;

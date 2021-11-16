@@ -95,7 +95,8 @@ void UDP::Close()
     mState = State::kNotReady;
 }
 
-CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
+CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                            System::PacketBufferHandle && message)
 {
     VerifyOrReturnError(peer.GetTransportType() == Type::kUdp, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(local.GetTransportType() == Type::kUdp, CHIP_ERROR_INVALID_ARGUMENT);
@@ -109,9 +110,9 @@ CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & peer, const Transport
 
 void UDP::OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle && buffer, const Inet::IPPacketInfo * pktInfo)
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    UDP * udp               = reinterpret_cast<UDP *>(endPoint->mAppState);
-    PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort, pktInfo->Interface);
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    UDP * udp                = reinterpret_cast<UDP *>(endPoint->mAppState);
+    PeerAddress peerAddress  = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort, pktInfo->Interface);
     PeerAddress localAddress = PeerAddress::UDP(pktInfo->DestAddress, pktInfo->DestPort, pktInfo->Interface);
 
     udp->HandleMessageReceived(peerAddress, localAddress, std::move(buffer));

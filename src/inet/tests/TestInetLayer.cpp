@@ -704,10 +704,10 @@ static CHIP_ERROR PrepareTransportForSend()
             addrInfo.Clear();
             addrInfo.DestAddress = sDestinationAddress;
             addrInfo.DestPort    = kTCPPort;
-            addrInfo.SrcAddress = IPAddress::Any;
-            addrInfo.SrcPort  = 0;
-            addrInfo.Interface = gInterfaceId;
-            lStatus = sTCPIPEndPoint->Connect(addrInfo);
+            addrInfo.SrcAddress  = IPAddress::Any;
+            addrInfo.SrcPort     = 0;
+            addrInfo.Interface   = gInterfaceId;
+            lStatus              = sTCPIPEndPoint->Connect(addrInfo);
             INET_FAIL_ERROR(lStatus, "TCPEndPoint::Connect failed");
         }
     }

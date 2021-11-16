@@ -37,7 +37,8 @@ class RawTransportDelegate
 {
 public:
     virtual ~RawTransportDelegate() {}
-    virtual void HandleMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) = 0;
+    virtual void HandleMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                                       System::PacketBufferHandle && message) = 0;
 };
 
 /**
@@ -63,7 +64,8 @@ public:
      *
      * On connection-oriented transports, sending a message implies connecting to the target first.
      */
-    virtual CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) = 0;
+    virtual CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                                   System::PacketBufferHandle && message) = 0;
 
     /**
      * Determine if this transport can SendMessage to the specified peer address.
@@ -87,7 +89,8 @@ protected:
      * Method used by subclasses to notify that a packet has been received after
      * any associated headers have been decoded.
      */
-    void HandleMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
+    void HandleMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                               System::PacketBufferHandle && message)
     {
         mDelegate->HandleMessageReceived(peer, local, std::move(message));
     }

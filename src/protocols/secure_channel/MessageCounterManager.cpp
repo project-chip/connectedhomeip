@@ -117,7 +117,8 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
     }
 }
 
-CHIP_ERROR MessageCounterManager::AddToReceiveTable(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress, const Transport::PeerAddress & localAddress,
+CHIP_ERROR MessageCounterManager::AddToReceiveTable(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                                    const Transport::PeerAddress & localAddress,
                                                     System::PacketBufferHandle && msgBuf)
 {
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(msgBuf));
@@ -126,9 +127,9 @@ CHIP_ERROR MessageCounterManager::AddToReceiveTable(const PacketHeader & packetH
     {
         if (entry.msgBuf.IsNull())
         {
-            entry.peerAddress = peerAddress;
+            entry.peerAddress  = peerAddress;
             entry.localAddress = localAddress;
-            entry.msgBuf      = std::move(msgBuf);
+            entry.msgBuf       = std::move(msgBuf);
 
             return CHIP_NO_ERROR;
         }

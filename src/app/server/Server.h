@@ -57,7 +57,8 @@ public:
                     uint16_t unsecureServicePort = CHIP_UDC_PORT);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    CHIP_ERROR SendUserDirectedCommissioningRequest(const chip::Transport::PeerAddress & peer, const chip::Transport::PeerAddress & local);
+    CHIP_ERROR SendUserDirectedCommissioningRequest(const chip::Transport::PeerAddress & peer,
+                                                    const chip::Transport::PeerAddress & local);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     CHIP_ERROR AddTestCommissioning();

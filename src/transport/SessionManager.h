@@ -254,7 +254,8 @@ public:
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
 
     // Implementation TransportMgrDelegate Interface
-    void OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override;
+    void OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                           System::PacketBufferHandle && message) override;
 
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress)
     {

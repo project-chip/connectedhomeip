@@ -46,7 +46,8 @@ public:
     void Clear();
 };
 
-static_assert(std::is_standard_layout<IPPacketInfo>::value, "IPPacketInfo must be standard layout, because its bytes represents is used in LwIP");
+static_assert(std::is_standard_layout<IPPacketInfo>::value,
+              "IPPacketInfo must be standard layout, because its bytes represents is used in LwIP");
 
 } // namespace Inet
 } // namespace chip

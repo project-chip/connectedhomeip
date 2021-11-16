@@ -64,7 +64,11 @@ class PeerAddress
 {
 public:
     PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined) {}
-    PeerAddress(const Inet::IPAddress & addr, Type type, uint16_t port = CHIP_PORT, Inet::InterfaceId interface = Inet::InterfaceId::Null()) : mIPAddress(addr), mTransportType(type), mPort(port), mInterface(interface) {}
+    PeerAddress(const Inet::IPAddress & addr, Type type, uint16_t port = CHIP_PORT,
+                Inet::InterfaceId interface = Inet::InterfaceId::Null()) :
+        mIPAddress(addr),
+        mTransportType(type), mPort(port), mInterface(interface)
+    {}
     PeerAddress(Type type) : mTransportType(type) {}
 
     PeerAddress(PeerAddress &&)      = default;
@@ -229,18 +233,20 @@ private:
     Inet::InterfaceId mInterface = Inet::InterfaceId::Null();
 };
 
-inline CHIP_ERROR AddressToPktInfo(Inet::IPPacketInfo & addrInfo, const Transport::PeerAddress & peer, const Transport::PeerAddress & local)
+inline CHIP_ERROR AddressToPktInfo(Inet::IPPacketInfo & addrInfo, const Transport::PeerAddress & peer,
+                                   const Transport::PeerAddress & local)
 {
     addrInfo.Clear();
 
     addrInfo.DestAddress = peer.GetIPAddress();
     addrInfo.DestPort    = peer.GetPort();
-    addrInfo.SrcAddress = local.GetIPAddress();
-    addrInfo.SrcPort  = local.GetPort();
+    addrInfo.SrcAddress  = local.GetIPAddress();
+    addrInfo.SrcPort     = local.GetPort();
 
     if (peer.GetInterface().IsPresent())
     {
-        VerifyOrReturnError(!local.GetInterface().IsPresent() || peer.GetInterface() == local.GetInterface(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!local.GetInterface().IsPresent() || peer.GetInterface() == local.GetInterface(),
+                            CHIP_ERROR_INVALID_ARGUMENT);
         addrInfo.Interface = peer.GetInterface();
     }
     else

@@ -315,7 +315,8 @@ void SessionManager::CancelExpiryTimer()
     }
 }
 
-void SessionManager::OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
+void SessionManager::OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                                       System::PacketBufferHandle && message)
 {
     PacketHeader packetHeader;
 

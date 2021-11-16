@@ -698,7 +698,7 @@ protected:
      */
     virtual CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr) = 0;
     virtual CHIP_ERROR ListenImpl(uint16_t backlog)                                                            = 0;
-    virtual CHIP_ERROR ConnectImpl(const IPPacketInfo & addrInfo)                  = 0;
+    virtual CHIP_ERROR ConnectImpl(const IPPacketInfo & addrInfo)                                              = 0;
     virtual CHIP_ERROR SendQueuedImpl(bool queueWasEmpty)                                                      = 0;
     virtual CHIP_ERROR SetUserTimeoutImpl(uint32_t userTimeoutMillis)                                          = 0;
     virtual CHIP_ERROR DriveSendingImpl()                                                                      = 0;

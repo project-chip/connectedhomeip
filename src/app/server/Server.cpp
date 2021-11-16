@@ -192,7 +192,8 @@ void Server::Shutdown()
 // NOTE: UDC client is located in Server.cpp because it really only makes sense
 // to send UDC from a Matter device. The UDC message payload needs to include the device's
 // randomly generated service name.
-CHIP_ERROR Server::SendUserDirectedCommissioningRequest(const chip::Transport::PeerAddress & peer, const chip::Transport::PeerAddress & local)
+CHIP_ERROR Server::SendUserDirectedCommissioningRequest(const chip::Transport::PeerAddress & peer,
+                                                        const chip::Transport::PeerAddress & local)
 {
     ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
 

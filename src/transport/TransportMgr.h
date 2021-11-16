@@ -51,7 +51,8 @@ public:
      * @param local  the destination/local address of the package
      * @param message the buffer containing a full CHIP message (except for the optional length field).
      */
-    virtual void OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) = 0;
+    virtual void OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                                   System::PacketBufferHandle && message) = 0;
 };
 
 template <typename... TransportTypes>

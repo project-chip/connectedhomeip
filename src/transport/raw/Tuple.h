@@ -81,7 +81,8 @@ template <typename... TransportTypes>
 class Tuple : public Base
 {
 public:
-    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                           System::PacketBufferHandle && message) override
     {
         return SendMessageImpl<0>(peer, local, std::move(message));
     }
@@ -184,7 +185,8 @@ private:
      * @param message the message to send.  Includes all CHIP message fields except optional length.
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR SendMessageImpl(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
+    CHIP_ERROR SendMessageImpl(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                               System::PacketBufferHandle && message)
     {
         Base * base = &std::get<N>(mTransports);
         if (base->CanSendToPeer(peer))
@@ -198,7 +200,8 @@ private:
      * SendMessageImpl when N is out of range. Always returns an error code.
      */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR SendMessageImpl(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
+    CHIP_ERROR SendMessageImpl(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                               System::PacketBufferHandle && message)
     {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }

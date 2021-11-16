@@ -30,7 +30,8 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
+void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                                                        System::PacketBufferHandle && message)
 {
     ChipLogProgress(AppServer, "UserDirectedCommissioningServer::OnMessageReceived");
 

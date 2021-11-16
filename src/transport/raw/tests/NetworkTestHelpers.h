@@ -90,7 +90,8 @@ public:
         }
     }
 
-    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                           System::PacketBufferHandle && message) override
     {
         ReturnErrorOnFailure(mMessageSendError);
         mSentMessageCount++;
@@ -131,8 +132,10 @@ public:
 
     struct PendingMessageItem
     {
-        PendingMessageItem(const Transport::PeerAddress peer, const Transport::PeerAddress local, System::PacketBufferHandle && pendingMessage) :
-            mDestinationAddress(peer), mSourceAddress(local), mPendingMessage(std::move(pendingMessage))
+        PendingMessageItem(const Transport::PeerAddress peer, const Transport::PeerAddress local,
+                           System::PacketBufferHandle && pendingMessage) :
+            mDestinationAddress(peer),
+            mSourceAddress(local), mPendingMessage(std::move(pendingMessage))
         {}
 
         const Transport::PeerAddress mDestinationAddress;

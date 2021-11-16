@@ -35,7 +35,8 @@ class TransportMgrBase : public Transport::RawTransportDelegate
 public:
     CHIP_ERROR Init(Transport::Base * transport);
 
-    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message);
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                           System::PacketBufferHandle && message);
 
     void Close();
 
@@ -43,7 +44,8 @@ public:
 
     void SetSessionManager(TransportMgrDelegate * sessionManager) { mSessionManager = sessionManager; }
 
-    void HandleMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override;
+    void HandleMessageReceived(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                               System::PacketBufferHandle && message) override;
 
 private:
     TransportMgrDelegate * mSessionManager = nullptr;

@@ -24,7 +24,7 @@
 namespace chip {
 
 /// Provides an interface over a pool implementation which doesn't expose the size and the actual type of the pool.
-template<typename U, typename... ConstructorArguments>
+template <typename U, typename... ConstructorArguments>
 class PoolInterface
 {
 public:
@@ -33,21 +33,20 @@ public:
 
     virtual ~PoolInterface() {}
 
-    virtual U * CreateObject(ConstructorArguments &&... args) = 0;
-    virtual void ReleaseObject(U * element) = 0;
+    virtual U * CreateObject(ConstructorArguments &&... args)              = 0;
+    virtual void ReleaseObject(U * element)                                = 0;
     virtual void ResetObject(U * element, ConstructorArguments &&... args) = 0;
 
     template <typename Function>
     bool ForEachActiveObject(Function && function)
     {
-        auto proxy = [&] (U * target) -> bool { return function(target); };
-        return ForEachActiveObjectInner(&proxy, [](void * context, U * target) -> bool {
-            return (*static_cast<decltype(proxy)*>(context))(target);
-        });
+        auto proxy = [&](U * target) -> bool { return function(target); };
+        return ForEachActiveObjectInner(
+            &proxy, [](void * context, U * target) -> bool { return (*static_cast<decltype(proxy) *>(context))(target); });
     }
 
 protected:
-    using Lambda = bool (*)(void *, U *);
+    using Lambda                                                         = bool (*)(void *, U *);
     virtual bool ForEachActiveObjectInner(void * context, Lambda lambda) = 0;
 };
 
@@ -68,22 +67,18 @@ public:
         return Impl().CreateObject(std::forward<ConstructorArguments>(args)...);
     }
 
-    virtual void ReleaseObject(U * element) override
-    {
-        Impl().ReleaseObject(static_cast<T*>(element));
-    }
+    virtual void ReleaseObject(U * element) override { Impl().ReleaseObject(static_cast<T *>(element)); }
 
     virtual void ResetObject(U * element, ConstructorArguments &&... args) override
     {
-        return Impl().ResetObject(static_cast<T*>(element), std::forward<ConstructorArguments>(args)...);
+        return Impl().ResetObject(static_cast<T *>(element), std::forward<ConstructorArguments>(args)...);
     }
 
 protected:
-    virtual bool ForEachActiveObjectInner(void * context, typename PoolInterface<U, ConstructorArguments...>::Lambda lambda) override
+    virtual bool ForEachActiveObjectInner(void * context,
+                                          typename PoolInterface<U, ConstructorArguments...>::Lambda lambda) override
     {
-        return Impl().ForEachActiveObject([&] (T * target) {
-            return lambda(context, static_cast<U*>(target));
-        });
+        return Impl().ForEachActiveObject([&](T * target) { return lambda(context, static_cast<U *>(target)); });
     }
 
     virtual BitMapObjectPool<T, N> & Impl() = 0;
@@ -108,10 +103,7 @@ public:
     virtual ~PoolImpl() override {}
 
 protected:
-    virtual BitMapObjectPool<T, N> & Impl() override
-    {
-        return mImpl;
-    }
+    virtual BitMapObjectPool<T, N> & Impl() override { return mImpl; }
 
 private:
     BitMapObjectPool<T, N> mImpl;

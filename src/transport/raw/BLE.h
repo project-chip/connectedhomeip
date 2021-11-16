@@ -82,7 +82,8 @@ public:
      */
     CHIP_ERROR Init(const BleListenParameters & param);
 
-    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message) override;
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                           System::PacketBufferHandle && message) override;
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override
     {

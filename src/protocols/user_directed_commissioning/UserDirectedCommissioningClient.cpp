@@ -30,7 +30,8 @@ namespace Protocols {
 namespace UserDirectedCommissioning {
 
 CHIP_ERROR UserDirectedCommissioningClient::SendUDCMessage(TransportMgrBase * transportMgr, System::PacketBufferHandle && payload,
-                                                           const chip::Transport::PeerAddress & peer, const chip::Transport::PeerAddress & local)
+                                                           const chip::Transport::PeerAddress & peer,
+                                                           const chip::Transport::PeerAddress & local)
 {
     CHIP_ERROR err = EncodeUDCMessage(std::move(payload));
     if (err != CHIP_NO_ERROR)

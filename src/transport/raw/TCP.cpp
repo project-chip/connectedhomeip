@@ -184,7 +184,8 @@ TCPBase::ActiveConnectionState * TCPBase::FindActiveConnection(const Inet::TCPEn
     return nullptr;
 }
 
-CHIP_ERROR TCPBase::SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
+CHIP_ERROR TCPBase::SendMessage(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                                System::PacketBufferHandle && message)
 {
     // Sent buffer data format is:
     //    - packet size as a uint16_t
@@ -218,15 +219,16 @@ CHIP_ERROR TCPBase::SendMessage(const Transport::PeerAddress & peer, const Trans
     }
 }
 
-CHIP_ERROR TCPBase::SendAfterConnect(const Transport::PeerAddress & peer, const Transport::PeerAddress & local, System::PacketBufferHandle && message)
+CHIP_ERROR TCPBase::SendAfterConnect(const Transport::PeerAddress & peer, const Transport::PeerAddress & local,
+                                     System::PacketBufferHandle && message)
 {
     // This will initiate a connection to the specified peer
-    bool alreadyConnecting       = false;
+    bool alreadyConnecting = false;
 
     // Iterate through the ENTIRE array. If a pending packet for
     // the address already exists, this means a connection is pending and
     // does NOT need to be re-established.
-    mPendingPackets.ForEachActiveObject([&] (PendingPacket * pending) {
+    mPendingPackets.ForEachActiveObject([&](PendingPacket * pending) {
         if (pending->mPeerAddress == peer && pending->mLocalAddress == local)
         {
             // same destination exists.
@@ -278,8 +280,8 @@ CHIP_ERROR TCPBase::SendAfterConnect(const Transport::PeerAddress & peer, const 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress, const PeerAddress & localAddress,
-                                          System::PacketBufferHandle && buffer)
+CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
+                                          const PeerAddress & localAddress, System::PacketBufferHandle && buffer)
 {
     ActiveConnectionState * state = FindActiveConnection(endPoint);
     VerifyOrReturnError(state != nullptr, CHIP_ERROR_INTERNAL);
@@ -317,7 +319,8 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, const PeerAddress & localAddress, ActiveConnectionState * state, uint16_t messageSize)
+CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, const PeerAddress & localAddress,
+                                         ActiveConnectionState * state, uint16_t messageSize)
 {
     // We enter with `state->mReceived` containing at least one full message, perhaps in a chain.
     // `state->mReceived->Start()` currently points to the message data.
@@ -389,10 +392,11 @@ void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, CHIP_ERROR inet
     PeerAddress addr = PeerAddress::TCP(ipAddress, port, interfaceId);
 
     // Send any pending packets
-    tcp->mPendingPackets.ForEachActiveObject([&] (PendingPacket * pending) {
-        if (pending->mPeerAddress == addr) {
-            foundPendingPacket = true;
-            System::PacketBufferHandle buffer   = std::move(pending->mPacketBuffer);
+    tcp->mPendingPackets.ForEachActiveObject([&](PendingPacket * pending) {
+        if (pending->mPeerAddress == addr)
+        {
+            foundPendingPacket                = true;
+            System::PacketBufferHandle buffer = std::move(pending->mPacketBuffer);
             tcp->mPendingPackets.ReleaseObject(pending);
 
             if ((inetErr == CHIP_NO_ERROR) && (err == CHIP_NO_ERROR))
