@@ -68,7 +68,7 @@ using namespace chip::app::Clusters::OnOff;
  * Attributes Definition
  *********************************************************/
 
-static std::array<OnOffEffect *, EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT> instances = { 0 };
+static std::array<OnOffEffect *, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT> instances = { 0 };
 OnOffServer OnOffServer::instance;
 
 /**********************************************************

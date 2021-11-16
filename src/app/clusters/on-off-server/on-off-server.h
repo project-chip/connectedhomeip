@@ -71,7 +71,7 @@ private:
      *********************************************************/
 
     static OnOffServer instance;
-    EmberEventControl eventControls[EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT];
+    EmberEventControl eventControls[EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT];
 };
 
 struct OnOffEffect
