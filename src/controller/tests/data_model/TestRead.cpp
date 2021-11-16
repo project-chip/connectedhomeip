@@ -59,12 +59,14 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 }
 
 CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIB::Builder & aAttributeReport)
+                                 AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
 
     if (responseDirective == kSendDataResponse)
     {
-        AttributeDataIB::Builder attributeData = aAttributeReport.CreateAttributeData();
+        auto attributeReport                   = aAttributeReports.CreateAttributeReport();
+        AttributeDataIB::Builder attributeData = attributeReport.CreateAttributeData();
         TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
         TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
 
@@ -85,11 +87,13 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()),
                                                chip::TLV::ContextTag(chip::to_underlying(AttributeDataIB::Tag::kData)), value));
         attributeData.EndOfAttributeDataIB();
-        return CHIP_NO_ERROR;
+        attributeData.EndOfAttributeDataIB();
+        return attributeReport.EndOfAttributeReportIB().GetError();
     }
     else
     {
-        AttributeStatusIB::Builder attributeStatus = aAttributeReport.CreateAttributeStatus();
+        auto attributeReport                       = aAttributeReports.CreateAttributeReport();
+        AttributeStatusIB::Builder attributeStatus = attributeReport.CreateAttributeStatus();
         AttributePathIB::Builder attributePath     = attributeStatus.CreatePath();
         attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
@@ -98,7 +102,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
         attributeStatus.EndOfAttributeStatusIB();
         ReturnErrorOnFailure(attributeStatus.GetError());
-        return CHIP_NO_ERROR;
+        return attributeReport.EndOfAttributeReportIB().GetError();
     }
 
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

@@ -82,7 +82,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadListIfSupported(CHIP_ERROR (Diagnost
 
     if ((GetDiagnosticDataProvider().*getter)(faultList) == CHIP_NO_ERROR)
     {
-        err = aEncoder.EncodeList([&faultList](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        err = aEncoder.EncodeList([&faultList](const AttributeValueEncoder::ListEncodeHelper & encoder) -> CHIP_ERROR {
             for (auto fault : faultList)
             {
                 ReturnErrorOnFailure(encoder.Encode(fault));
