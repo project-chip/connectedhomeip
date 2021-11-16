@@ -92,7 +92,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadListIfSupported(CHIP_ERROR (Platform
     }
     else
     {
-        err = aEncoder.Encode(DataModel::List<EndpointId>());
+        err = aEncoder.Encode(DataModel::List<uint8_t>());
     }
 
     return err;
