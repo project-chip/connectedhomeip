@@ -1,0 +1,30 @@
+jobject {{asSymbol label}};
+{{#if isOptional}}
+if (!dataResponse.{{asLowerCamelCase label}}.HasValue()) {
+  chip::JniReferences::GetInstance().CreateOptional(nullptr, {{asSymbol label}});
+} else {
+{{#if isNullable}}
+if (dataResponse.{{asLowerCamelCase label}}.Value().IsNull()) {
+  chip::JniReferences::GetInstance().CreateOptional(nullptr, {{asSymbol label}});
+} else {
+{{/if}}
+{{/if}}
+{{~#*inline "item"}}dataResponse.{{asLowerCamelCase name}}{{#if isOptional}}.Value(){{/if}}{{#if isNullable}}.Value(){{/if}}{{/inline}}
+{{#if isArray}}
+{{asSymbol label}} = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+{{else if (isOctetString type)}}
+{{asSymbol label}} = chip::ByteArray(env, {{>item}}).jniValue();
+{{else if (isCharString type)}}
+{{asSymbol label}} = chip::UtfString(env, {{>item}}).jniValue();
+{{else}}
+std::string {{asSymbol label}}ClassName = "java/lang/{{asJavaBasicTypeForZclType type true}}";
+std::string {{asSymbol label}}CtorSignature = "({{asJniSignature type false}})V";
+chip::JniReferences::GetInstance().CreateBoxedObject<{{chipType}}>({{asSymbol label}}ClassName.c_str(), {{asSymbol label}}CtorSignature.c_str(), {{>item}}, {{asSymbol label}});
+{{/if}}
+{{#if isOptional}}
+chip::JniReferences::GetInstance().CreateOptional({{asSymbol label}}, {{asSymbol label}});
+{{#if isNullable}}
+}
+{{/if}}
+}
+{{/if}}

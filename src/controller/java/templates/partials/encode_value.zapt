@@ -1,0 +1,58 @@
+{{#if isOptional}}
+chip::JniReferences::GetInstance().GetOptionalValue({{label}}, {{label}});
+{{/if}}
+{{#if isNullable}}
+  {{#if_chip_enum type}}
+    decltype(request.{{label}}) {{label}}Primitive;
+    if ({{label}} != nullptr) {
+      {{label}}Primitive = static_cast<decltype(request.{{label}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{label}}));
+    }
+  {{else}}
+  {{#if_is_bitmap type}}
+    decltype(request.{{label}}) {{label}}Primitive;
+    if ({{label}} != nullptr) {
+      {{label}}Primitive = static_cast<decltype(request.{{label}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{label}}));
+    }
+  {{else}}
+    {{chipType}} {{label}}Primitive;
+    if ({{label}} != nullptr) {
+      {{label}}Primitive = chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{label}});
+    }
+  {{/if_is_bitmap}}
+  {{/if_chip_enum}}
+{{/if}}
+{{#*inline "value"}}
+{{! TODO Implement complex types parsing in order to properly set the request parameters }}
+{{#if isArray}}
+{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}()
+{{else if isStruct}}
+{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}()
+{{else if (isOctetString type)}}
+chip::JniByteArray(env, static_cast<jbyteArray>({{label}})).byteSpan()
+{{else if (isCharString type)}}
+chip::JniUtfString(env, static_cast<jstring>({{label}})).charSpan()
+{{else}}
+  {{#if_chip_enum type}}
+    static_cast<decltype(request.{{label}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{label}}))
+  {{else}}
+    {{#if_is_bitmap type}}
+      static_cast<decltype(request.{{label}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{label}}))
+    {{else}}
+      static_cast<decltype(request.{{label}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{label}}))
+    {{/if_is_bitmap}}
+  {{/if_chip_enum}}
+{{/if}}
+{{/inline}}
+request.{{label}} =
+{{#if isOptional}}
+{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}(
+{{/if}}
+{{#if isNullable}}
+  {{label}} == nullptr ? chip::app::DataModel::Nullable<{{chipType}}>() : chip::app::DataModel::Nullable<{{chipType}}>({{label}}Primitive)
+  {{else}}
+{{! TODO If the inline partial is indented, generation fails with "result.split is not a function". }}
+{{>value}}
+{{/if}}
+{{#if isOptional}}
+)
+{{/if}};

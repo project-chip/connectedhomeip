@@ -34,6 +34,8 @@ shared_library("jni") {
     "CHIPDeviceController-JNI.cpp",
     "zap-generated/CHIPClusters-JNI.cpp",
     "zap-generated/CHIPClustersRead-JNI.cpp",
+    "zap-generated/CHIPInvokeCallbacks.cpp",
+    "zap-generated/CHIPInvokeCallbacks.h",
     "zap-generated/CHIPReadCallbacks.cpp",
     "zap-generated/CHIPReadCallbacks.h",
   ]

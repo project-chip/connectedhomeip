@@ -101,7 +101,9 @@ function asJavaBoxedType(type)
 
 function asJniBasicType(type, useBoxedTypes)
 {
-  if (StringHelper.isOctetString(type)) {
+  if (this.isOptional) {
+    return 'jobject';
+  } else if (StringHelper.isOctetString(type)) {
     return 'jbyteArray';
   } else if (StringHelper.isCharString(type)) {
     return 'jstring';
@@ -221,28 +223,20 @@ function notLastSupportedEntryTypes(context, options)
   }
 }
 
-function omitCommaForFirstNonStatusCommand(id, index)
+function notLastSupportedCommandResponseType(items, options)
 {
-  let promise = templateUtil.ensureZclPackageId(this)
-                    .then((pkgId) => { return queryCommand.selectCommandArgumentsByCommandId(this.global.db, id, pkgId) })
-                    .catch(err => {
-                      console.log(err);
-                      throw err;
-                    })
-                    .then((result) => {
-                      // Currently, we omit array types, so don't count it as a valid non-status command.
-                      let firstNonStatusCommandIndex = result.findIndex((command) => !command.isArray);
-                      if (firstNonStatusCommandIndex == -1 || firstNonStatusCommandIndex != index) {
-                        return ", ";
-                      }
-                      return "";
-                    })
-                    .catch(err => {
-                      console.log(err);
-                      throw err;
-                    });
+  if (items.length == 0) {
+    return
+  }
 
-  return templateUtil.templatePromise(this.global, promise);
+  let lastIndex = items.length - 1;
+  while (items[lastIndex].isArray) {
+    lastIndex--;
+  }
+
+  if (this.index != lastIndex) {
+    return options.fn(this);
+  }
 }
 
 //
@@ -258,5 +252,5 @@ exports.convertBasicCTypeToJniType             = convertBasicCTypeToJniType;
 exports.convertCTypeToJniSignature             = convertCTypeToJniSignature;
 exports.convertBasicCTypeToJavaBoxedType       = convertBasicCTypeToJavaBoxedType;
 exports.convertAttributeCallbackTypeToJavaName = convertAttributeCallbackTypeToJavaName;
-exports.omitCommaForFirstNonStatusCommand      = omitCommaForFirstNonStatusCommand;
 exports.notLastSupportedEntryTypes             = notLastSupportedEntryTypes;
+exports.notLastSupportedCommandResponseType = notLastSupportedCommandResponseType;
