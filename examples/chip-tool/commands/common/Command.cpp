@@ -389,7 +389,7 @@ size_t Command::AddArgument(const char * name, const char * value, bool optional
 size_t Command::AddArgument(const char * name, char ** value, bool optional)
 {
     Argument arg;
-    arg.type     = ArgumentType::CharString;
+    arg.type     = ArgumentType::String;
     arg.name     = name;
     arg.value    = reinterpret_cast<void *>(value);
     arg.optional = optional;
