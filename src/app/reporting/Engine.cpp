@@ -62,23 +62,17 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 
 CHIP_ERROR
 Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
-                            const ConcreteReadAttributePath & aPath)
+                            const ConcreteReadAttributePath & aPath, AttributeValueEncoder::AttributeEncodeState * aEncoderState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    AttributeReportIB::Builder attributeReport = aAttributeReportIBs.CreateAttributeReport();
-    err                                        = attributeReport.GetError();
-    SuccessOrExit(attributeReport.GetError());
 
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
                   aPath.mAttributeId);
 
     MatterPreAttributeReadCallback(aPath);
-    err = ReadSingleClusterData(aAccessingFabricIndex, aPath, attributeReport);
+    err = ReadSingleClusterData(aAccessingFabricIndex, aPath, aAttributeReportIBs, aEncoderState);
     MatterPostAttributeReadCallback(aPath);
     SuccessOrExit(err);
-    attributeReport.EndOfAttributeReportIB();
-    err = attributeReport.GetError();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -136,19 +130,36 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     continue;
                 }
             }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 731bf6d2f (Update AttributeValueEncoder)
             // If we are processing a read request, or the initial report of a subscription, just regard all paths as dirty paths.
             TLV::TLVWriter attributeBackup;
             attributeReportIBs.Checkpoint(attributeBackup);
             ConcreteReadAttributePath pathForRetrieval(readPath);
-            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, pathForRetrieval);
+            // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
+            AttributeValueEncoder::AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
+            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, pathForRetrieval, &encodeState);
             if (err != CHIP_NO_ERROR)
             {
-                // We met a error during writing reports, one common case is we are running out of buffer, rollback the
-                // attributeReportIB to avoid any partial data.
-                attributeReportIBs.Rollback(attributeBackup);
+                if (encodeState.AllowPartialData())
+                {
+                    // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
+                    attributeDataWritten = true;
+                    apReadHandler->SetAttributeEncodeState(encodeState);
+                }
+                else
+                {
+                    // We met a error during writing reports, one common case is we are running out of buffer, rollback the
+                    // attributeReportIB to avoid any partial data.
+                    attributeReportIBs.Rollback(attributeBackup);
+                    apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+                }
             }
             SuccessOrExit(err);
+            // Successfully encoded the attribute, clear the internal state.
+            apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
             attributeDataWritten = true;
         }
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more

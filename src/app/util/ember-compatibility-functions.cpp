@@ -234,19 +234,69 @@ CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeRepor
 } // anonymous namespace
 
 CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIB::Builder & aAttributeReport)
+                                 AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
+
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
+
+    if (attributeMetadata == nullptr)
+    {
+        AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
+        TLV::TLVWriter writer;
+        attributeReport.Checkpoint(writer);
+
+        // This attribute (or even this cluster) is not actually supported
+        // on this endpoint.
+        return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, writer);
+    }
+
+    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
+    // Value encoder will encode the while AttributeReport, including the path, value and the version.
+    // The AttributeValueEncoder may encode more than one AttributeReportIB for the list chunking feature.
+    if (attrOverride != nullptr)
+    {
+        // TODO: We should probably clone the writer and convert failures here
+        // into status responses, unless our caller already does that.
+        AttributeValueEncoder::AttributeEncodeState state =
+            (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
+        AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex,
+                                           ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
+                                           kTemporaryDataVersion, state);
+        CHIP_ERROR err = attrOverride->Read(aPath, valueEncoder);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            // If the err is not CHIP_NO_ERROR, means the encoding was aborted, then the valueEncoder may save its state.
+            // The state is used by list chunking feature for now.
+            if (apEncoderState != nullptr)
+            {
+                *apEncoderState = valueEncoder.GetState();
+            }
+            return err;
+        }
+
+        if (valueEncoder.TriedEncode())
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
     AttributeDataIB::Builder attributeDataIBBuilder;
     AttributePathIB::Builder attributePathIBBuilder;
     AttributeStatusIB::Builder attributeStatusIBBuilder;
     TLV::TLVWriter * writer = nullptr;
     TLV::TLVWriter backup;
-    aAttributeReport.Checkpoint(backup);
 
-    attributeDataIBBuilder = aAttributeReport.CreateAttributeData();
+    attributeReport.Checkpoint(backup);
+
+    // We have verified that the attribute exists.
+    attributeDataIBBuilder = attributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
@@ -256,35 +306,6 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         .Attribute(aPath.mAttributeId)
         .EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePathIBBuilder.GetError());
-
-    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
-    if (attrOverride != nullptr)
-    {
-        const EmberAfAttributeMetadata * attributeMetadata =
-            emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
-
-        if (attributeMetadata == nullptr)
-        {
-            // This attribute (or even this cluster) is not actually supported
-            // on this endpoint.
-            return SendFailureStatus(aPath, aAttributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, backup);
-        }
-
-        // TODO: We should probably clone the writer and convert failures here
-        // into status responses, unless our caller already does that.
-        writer = attributeDataIBBuilder.GetWriter();
-        VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
-        AttributeValueEncoder valueEncoder(writer, aAccessingFabricIndex);
-        ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
-
-        if (valueEncoder.TriedEncode())
-        {
-            // TODO: Add DataVersion support
-            attributeDataIBBuilder.DataVersion(kTemporaryDataVersion).EndOfAttributeDataIB();
-            ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
-            return CHIP_NO_ERROR;
-        }
-    }
 
     EmberAfAttributeMetadata * metadata = NULL;
     EmberAfAttributeSearchRecord record;
@@ -517,7 +538,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     }
     else
     {
-        ReturnErrorOnFailure(SendFailureStatus(aPath, aAttributeReport, imStatus, backup));
+        ReturnErrorOnFailure(SendFailureStatus(aPath, attributeReport, imStatus, backup));
     }
 
     return CHIP_NO_ERROR;

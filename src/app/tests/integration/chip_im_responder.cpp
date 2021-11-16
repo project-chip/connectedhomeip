@@ -111,16 +111,10 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
 }
 
 CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIB::Builder & aAttributeReport)
+                                 AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
-    AttributeDataIB::Builder attributeData = aAttributeReport.CreateAttributeData();
-    AttributePathIB::Builder attributePath = attributeData.CreatePath();
-    VerifyOrReturnError(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
-    attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
-    ReturnErrorOnFailure(attributePath.GetError());
-    ReturnErrorOnFailure(AttributeValueEncoder(attributeData.GetWriter(), 0).Encode(kTestFieldValue1));
-    attributeData.DataVersion(0).EndOfAttributeDataIB();
-    ReturnErrorOnFailure(attributeData.GetError());
+    ReturnErrorOnFailure(AttributeValueEncoder(aAttributeReports, 0, aPath, 0).Encode(kTestFieldValue1));
     return CHIP_NO_ERROR;
 }
 

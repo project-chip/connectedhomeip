@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/ClusterInfo.h>
 #include <app/EventManagement.h>
@@ -140,11 +141,15 @@ public:
         // If the contents of the global dirty set have changed, we need to reset the iterator since the paths
         // we've sent up till now are no longer valid and need to be invalidated.
         mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
+        mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
     }
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
     FabricIndex GetAccessingFabricIndex() const { return mFabricIndex; }
+
+    const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
+    void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
 
 private:
     friend class TestReadInteraction;
@@ -213,7 +218,10 @@ private:
     NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
     FabricIndex mFabricIndex                                 = 0;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
-    bool mIsFabricFiltered                                   = false;
+    // The detailed encoding state for a single attribute, used by list chunking feature.
+    AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState = AttributeValueEncoder::AttributeEncodeState();
+
+    bool mIsFabricFiltered = false;
 };
 } // namespace app
 } // namespace chip
