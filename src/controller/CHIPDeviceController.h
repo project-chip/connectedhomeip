@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <app/CASESessionManager.h>
 #include <app/DeviceControllerInteractionModelDelegate.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/OperationalDeviceProxy.h>
@@ -216,17 +217,6 @@ public:
      */
     virtual CHIP_ERROR Shutdown();
 
-    CHIP_ERROR GetOperationalDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                    Callback::Callback<OnDeviceConnectionFailure> * onFailure)
-    {
-        return GetOperationalDeviceWithAddress(deviceId, Transport::PeerAddress::UDP(Inet::IPAddress::Any), onConnection,
-                                               onFailure);
-    }
-
-    CHIP_ERROR GetOperationalDeviceWithAddress(NodeId deviceId, const Transport::PeerAddress & addr,
-                                               Callback::Callback<OnDeviceConnected> * onConnection,
-                                               Callback::Callback<OnDeviceConnectionFailure> * onFailure);
-
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**
@@ -243,8 +233,8 @@ public:
     virtual CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
-        return GetOperationalDeviceWithAddress(deviceId, Transport::PeerAddress::UDP(Inet::IPAddress::Any), onConnection,
-                                               onFailure);
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        return mCASESessionManager->FindOrEstablishSession(deviceId, onConnection, onFailure);
     }
 
     /**
@@ -255,7 +245,11 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR UpdateDevice(NodeId deviceId);
+    CHIP_ERROR UpdateDevice(NodeId deviceId)
+    {
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        return mCASESessionManager->ResolveDeviceAddress(deviceId);
+    }
 
     /**
      * @brief
@@ -336,15 +330,6 @@ public:
      */
     uint64_t GetFabricId() const { return mFabricId; }
 
-    DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate()
-    {
-        if (mSystemState != nullptr)
-        {
-            return mSystemState->IMDelegate();
-        }
-        return nullptr;
-    }
-
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
 
 protected:
@@ -356,7 +341,9 @@ protected:
 
     State mState;
 
-    BitMapObjectPool<OperationalDeviceProxy, kNumMaxActiveDevices> mOperationalDevices;
+    CASESessionManager * mCASESessionManager = nullptr;
+
+    Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> mDNSCache;
 
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
@@ -390,7 +377,7 @@ protected:
     uint16_t mVendorId;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override {}
     void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -401,11 +388,7 @@ protected:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 private:
-    OperationalDeviceProxy * FindOperationalDevice(SessionHandle session);
-    OperationalDeviceProxy * FindOperationalDevice(NodeId id);
     void ReleaseOperationalDevice(OperationalDeviceProxy * device);
-
-    void ReleaseAllDevices();
 
     Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
     Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;

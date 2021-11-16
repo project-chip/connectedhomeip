@@ -24,10 +24,11 @@
  *    messages to and from the corresponding CHIP devices.
  */
 
-#include <app/OperationalDeviceProxy.h>
+#include "OperationalDeviceProxy.h"
 
-#include <app/CommandSender.h>
-#include <app/ReadPrepareParams.h>
+#include "CommandSender.h"
+#include "ReadPrepareParams.h"
+
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/Resolver.h>
