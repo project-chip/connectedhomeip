@@ -48,7 +48,7 @@ jobs:
             - name: Get parent for size reports
               run: |
                 MERGE_PARENT="$(git --no-pager log -1 --pretty=tformat:%s | sed -n -e 's/Merge [0-9a-f]\+ into //p')"
-                if test -z "${MERGE_PARENT}" || test "${GH_EVENT_PARENT}" == 0
+                if test -z "${MERGE_PARENT}" || test "${GH_EVENT_PARENT}" = 0
                 then
                   MERGE_PARENT=$GH_EVENT_BASE
                 fi
