@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     # Tests for UInt32 attribute
 
     - label: "Write attribute INT32U Value"

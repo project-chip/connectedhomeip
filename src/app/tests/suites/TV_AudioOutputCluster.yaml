@@ -19,6 +19,10 @@ config:
     endpoint: 2
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Read attribute Audio Output list"
       command: "readAttribute"
       attribute: "Audio Output List"

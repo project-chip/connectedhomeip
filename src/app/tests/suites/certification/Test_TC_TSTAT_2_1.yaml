@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     #issue  #11524 disabled steps are for attributes not supported in YAML framework
     - label: "Reads mandatory attributes from DUT: LocalTemperature"
       disabled: true
