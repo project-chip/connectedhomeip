@@ -66,7 +66,7 @@ constexpr SubjectId Node(NodeId node)
 
 constexpr SubjectId CAT(uint16_t catId, uint16_t catVersion)
 {
-    return { .node = kTestSubjectCAT | (catId << 16) | catVersion };
+    return { .node = kTestSubjectCAT | (static_cast<uint64_t>(catId) << 16) | catVersion };
 }
 
 constexpr SubjectId Group(GroupId group)
@@ -280,7 +280,7 @@ public:
             else if ((p->node & kTestSubjectCATMask) == kTestSubjectCAT)
             {
                 if (((p->node & ~kTestSubjectCATMask) >> 16) == subject.cat.id &&
-                    (p->node & ~kTestSubjectMask) <= subject.cat.version)
+                    (p->node & ~kTestSubjectCATVersionMask) <= subject.cat.version)
                 {
                     return true;
                 }
