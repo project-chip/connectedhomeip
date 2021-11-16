@@ -136,7 +136,7 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
 
 CHIP_ERROR TestAttrAccess::ReadListInt8uAttribute(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const AttributeValueEncoder::ListEncodeHelper & encoder) -> CHIP_ERROR {
         for (uint8_t index = 0; index < kAttributeListLength; index++)
         {
             ReturnErrorOnFailure(encoder.Encode(gListUint8Data[index]));
@@ -166,7 +166,7 @@ CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(AttributeValueDecoder & aDeco
 
 CHIP_ERROR TestAttrAccess::ReadListOctetStringAttribute(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const AttributeValueEncoder::ListEncodeHelper & encoder) -> CHIP_ERROR {
         for (uint8_t index = 0; index < kAttributeListLength; index++)
         {
             ByteSpan span(gListOctetStringData[index].Data(), gListOctetStringData[index].Length());
@@ -200,7 +200,7 @@ CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(AttributeValueDecoder &
 
 CHIP_ERROR TestAttrAccess::ReadListStructOctetStringAttribute(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const AttributeValueEncoder::ListEncodeHelper & encoder) -> CHIP_ERROR {
         for (uint8_t index = 0; index < kAttributeListLength; index++)
         {
             Structs::TestListStructOctet::Type structOctet;
@@ -246,7 +246,7 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(AttributeValueDec
 
 CHIP_ERROR TestAttrAccess::ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const AttributeValueEncoder::ListEncodeHelper & encoder) -> CHIP_ERROR {
         // Just encode a single default-initialized
         // entry for now.
         Structs::NullablesAndOptionalsStruct::Type entry;

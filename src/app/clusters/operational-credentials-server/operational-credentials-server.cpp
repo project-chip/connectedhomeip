@@ -89,7 +89,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadCommissionedFabrics(EndpointId 
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const AttributeValueEncoder::ListEncodeHelper & encoder) -> CHIP_ERROR {
         for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
         {
             if (!fabricInfo.IsInitialized())
@@ -114,7 +114,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const AttributeValueEncoder::ListEncodeHelper & encoder) -> CHIP_ERROR {
         for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
         {
             ByteSpan cert;
