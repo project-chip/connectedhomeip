@@ -64,7 +64,7 @@ public:
          * The ReadClient object MUST continue to exist after this call is completed.
          *
          * @param[in]  apReadClient         The read client which initialized the read transaction.
-         * @param[in]  apEventReportsReader TLV reader positioned at the list that contains the events.  The
+         * @param[in]  aEventReports        TLV reader positioned at the list that contains the events.  The
          *                                  implementation of EventStreamReceived is expected to call Next() on the reader to
          *                                  advance it to the first element of the list, then process the elements from beginning to
          *                                  the end. The callee is expected to consume all events.
@@ -215,7 +215,7 @@ private:
      *      - SubscribeResponseProcessed
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
+     *  @param[in]    apCallback       InteractionModelDelegate set by application.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
