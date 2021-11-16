@@ -32,7 +32,7 @@ public:
         if (string == nullptr) {
             return;
         }
-        mChars = env->GetStringUTFChars(string, 0); 
+        mChars = env->GetStringUTFChars(string, 0);
         mDataLength = env->GetStringUTFLength(string);
     }
     ~JniUtfString() { mEnv->ReleaseStringUTFChars(mString, mChars); }
@@ -64,9 +64,9 @@ public:
     const jbyte * data() const { return mData; }
 
     chip::ByteSpan byteSpan() const {
-        return chip::ByteSpan(reinterpret_cast<const uint8_t *>(data()), static_cast<size_t>(size())); 
+        return chip::ByteSpan(reinterpret_cast<const uint8_t *>(data()), static_cast<size_t>(size()));
     }
-    
+
     jsize size() const { return mDataLength; }
 
 private:
