@@ -13602,6 +13602,86 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeSpeed(Callback::Ca
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeLifetimeRunningHours(Callback::Cancelable * onSuccessCallback,
+                                                                                 Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000015;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
+CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeLifetimeRunningHours(Callback::Cancelable * onSuccessCallback,
+                                                                                  Callback::Cancelable * onFailureCallback,
+                                                                                  uint32_t value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::LifetimeRunningHours::Id),
+        value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeLifetimeRunningHours(Callback::Cancelable * onSuccessCallback,
+                                                                                      Callback::Cancelable * onFailureCallback,
+                                                                                      uint16_t minInterval, uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::LifetimeRunningHours::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeLifetimeRunningHours(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::LifetimeRunningHours::Id, onReportCallback,
+                                     BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributePower(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000016;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
+CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributePower(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback, uint32_t value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::Power::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributePower(Callback::Cancelable * onSuccessCallback,
+                                                                       Callback::Cancelable * onFailureCallback,
+                                                                       uint16_t minInterval, uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::Power::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributePower(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::Power::Id, onReportCallback,
+                                     BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeLifetimeEnergyConsumed(Callback::Cancelable * onSuccessCallback,
                                                                                    Callback::Cancelable * onFailureCallback)
 {
