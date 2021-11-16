@@ -40260,6 +40260,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 0 : Log a simple message\n");
             err = TestLogASimpleMessage_0();
             break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Do a simple user prompt message\n");
+            err = TestDoASimpleUserPromptMessage_1();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -40271,13 +40275,15 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 1;
+    const uint16_t mTestCount = 2;
 
     //
     // Tests methods
     //
 
     CHIP_ERROR TestLogASimpleMessage_0() { return Log("This is a simple message"); }
+
+    CHIP_ERROR TestDoASimpleUserPromptMessage_1() { return UserPrompt("This is a simple message"); }
 };
 
 class TestSaveAs : public TestCommand
