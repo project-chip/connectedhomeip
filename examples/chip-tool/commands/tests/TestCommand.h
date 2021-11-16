@@ -51,6 +51,7 @@ public:
     /////////// GlobalCommands Interface /////////
     CHIP_ERROR Wait(chip::System::Clock::Timeout ms);
     CHIP_ERROR WaitForMs(uint16_t ms) { return Wait(chip::System::Clock::Milliseconds32(ms)); }
+    CHIP_ERROR WaitForCommissionee();
     CHIP_ERROR Log(const char * message);
 
 protected:

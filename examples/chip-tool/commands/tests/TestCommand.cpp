@@ -20,6 +20,18 @@
 
 CHIP_ERROR TestCommand::RunCommand()
 {
+    if (mPICSFilePath.HasValue())
+    {
+        PICS.SetValue(PICSBooleanReader::Read(mPICSFilePath.Value()));
+    }
+
+    NextTest();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TestCommand::WaitForCommissionee()
+{
     return mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
@@ -30,10 +42,6 @@ void TestCommand::OnDeviceConnectedFn(void * context, chip::DeviceProxy * device
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
     command->mDevice = device;
 
-    if (command->mPICSFilePath.HasValue())
-    {
-        command->PICS.SetValue(PICSBooleanReader::Read(command->mPICSFilePath.Value()));
-    }
     command->NextTest();
 }
 
