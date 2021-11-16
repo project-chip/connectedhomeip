@@ -808,9 +808,6 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     // TODO maybe remove FreeRendezvousSession() since mNextKeyID is always persisted immediately
     PersistNextKeyId();
 
-    mDeviceCommissioningInProgress = true;
-    mNodeIdBeingCommissioned       = remoteDeviceId;
-
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -840,7 +837,6 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     FreeRendezvousSession();
 
     ReleaseCommissioneeDevice(device);
-    mDeviceCommissioningInProgress = false;
     return CHIP_NO_ERROR;
 }
 
@@ -890,7 +886,6 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
         ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
         mDeviceBeingCommissioned = nullptr;
     }
-    mDeviceCommissioningInProgress = false;
 }
 
 void DeviceCommissioner::OnSessionEstablished()
@@ -1538,12 +1533,8 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
 
     mDNSCache.Insert(nodeData);
 
-    if (mDeviceCommissioningInProgress && mNodeIdBeingCommissioned == nodeData.mPeerId.GetNodeId())
-    {
-        mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId.GetNodeId(), &mOnDeviceConnectedCallback,
-                                                    &mOnDeviceConnectionFailureCallback);
-    }
-
+    mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId.GetNodeId(), &mOnDeviceConnectedCallback,
+                                                &mOnDeviceConnectionFailureCallback);
     DeviceController::OnNodeIdResolved(nodeData);
 }
 
@@ -1585,7 +1576,6 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, DeviceProxy * devic
 
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connected callback with null pairing delegate. Ignoring"));
-    commissioner->mDeviceCommissioningInProgress = false;
     commissioner->mPairingDelegate->OnCommissioningComplete(device->GetDeviceId(), CHIP_NO_ERROR);
 }
 
@@ -1597,7 +1587,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, NodeId devi
                    ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
-    commissioner->mDeviceCommissioningInProgress = false;
     commissioner->mPairingDelegate->OnCommissioningComplete(deviceId, error);
 }
 
@@ -1795,8 +1784,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         {
             mPairingDelegate->OnCommissioningComplete(mDeviceOperational->GetDeviceId(), CHIP_NO_ERROR);
         }
-        mDeviceOperational             = nullptr;
-        mDeviceCommissioningInProgress = false;
+        mDeviceOperational = nullptr;
         break;
     case CommissioningStage::kSecurePairing:
     case CommissioningStage::kError:

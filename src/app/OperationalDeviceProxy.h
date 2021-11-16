@@ -80,20 +80,8 @@ public:
         mInitParams = params;
         mPeerId     = peerId;
 
-        if (nodeResolutionData != nullptr)
-        {
-            mDeviceAddress = ToPeerAddress(*nodeResolutionData);
-
-            mMrpIdleInterval = nodeResolutionData->GetMrpRetryIntervalIdle().ValueOr(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL);
-            mMrpActiveInterval =
-                nodeResolutionData->GetMrpRetryIntervalActive().ValueOr(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
-
-            mState = State::Initialized;
-        }
-        else
-        {
-            mState = State::NeedsAddress;
-        }
+        mState = State::NeedsAddress;
+        OnNodeIdResolved(nodeResolutionData);
     }
 
     void Clear();
@@ -121,6 +109,23 @@ public:
      *   The object releases all resources associated with the connection.
      */
     void OnConnectionExpired(SessionHandle session) override;
+
+    void OnNodeIdResolved(const Dnssd::ResolvedNodeData * nodeResolutionData)
+    {
+        if (nodeResolutionData != nullptr)
+        {
+            mDeviceAddress = ToPeerAddress(*nodeResolutionData);
+
+            mMrpIdleInterval = nodeResolutionData->GetMrpRetryIntervalIdle().ValueOr(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL);
+            mMrpActiveInterval =
+                nodeResolutionData->GetMrpRetryIntervalActive().ValueOr(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
+
+            if (mState == State::NeedsAddress)
+            {
+                mState = State::Initialized;
+            }
+        }
+    }
 
     /**
      *  Mark any open session with the device as expired.

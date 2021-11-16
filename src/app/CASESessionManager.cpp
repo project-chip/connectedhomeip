@@ -24,19 +24,20 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(NodeId nodeId, Callback::C
                                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+
+    Dnssd::ResolvedNodeData * nodeResolutionData = nullptr;
+    Dnssd::ResolvedNodeData cachedResolutionData;
+
+    PeerId peerId = GetFabricInfo()->GetPeerIdForNode(nodeId);
+
+    if (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, cachedResolutionData) == CHIP_NO_ERROR)
+    {
+        nodeResolutionData = &cachedResolutionData;
+    }
+
     OperationalDeviceProxy * session = FindExistingSession(nodeId);
     if (session == nullptr)
     {
-        Dnssd::ResolvedNodeData * nodeResolutionData = nullptr;
-        Dnssd::ResolvedNodeData cachedResolutionData;
-
-        PeerId peerId = GetFabricInfo()->GetPeerIdForNode(nodeId);
-
-        if (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, cachedResolutionData) == CHIP_NO_ERROR)
-        {
-            nodeResolutionData = &cachedResolutionData;
-        }
-
         // TODO - Implement LRU to evict least recently used session to handle mActiveSessions pool exhaustion
         session = mActiveSessions.CreateObject(mConfig.sessionInitParams, peerId, nodeResolutionData);
         if (session == nullptr)
@@ -44,6 +45,10 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(NodeId nodeId, Callback::C
             onFailure->mCall(onFailure->mContext, nodeId, CHIP_ERROR_NO_MEMORY);
             return CHIP_ERROR_NO_MEMORY;
         }
+    }
+    else if (nodeResolutionData != nullptr)
+    {
+        session->OnNodeIdResolved(nodeResolutionData);
     }
 
     CHIP_ERROR err = session->Connect(onConnection, onFailure);

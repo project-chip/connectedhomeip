@@ -607,9 +607,6 @@ private:
        persist the device list */
     bool mPairedDevicesUpdated;
 
-    bool mDeviceCommissioningInProgress = false;
-    NodeId mNodeIdBeingCommissioned;
-
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
 
     BitMapObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
