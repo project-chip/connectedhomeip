@@ -14,9 +14,9 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
-import("//src/platform/device.gni")
 
 import("${build_root}/toolchain/gcc_toolchain.gni")
+import("${build_root}/chip/fake_platform.gni")
 
 gcc_toolchain("${host_os}_${host_cpu}_gcc") {
   toolchain_args = {
