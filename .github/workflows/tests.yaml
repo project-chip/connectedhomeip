@@ -66,10 +66,6 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build simulated device
-              timeout-minutes: 5
-              run: |
-                  scripts/examples/gn_build_test_example.sh app1
             - name: Build all clusters app
               timeout-minutes: 5
               run: |
@@ -171,10 +167,6 @@ jobs:
                   # The idea is to not upload our objdir unless builds have
                   # actually succeeded, because that just wastes space.
                   rsync -a out/debug/standalone/ objdir-clone || true
-            - name: Build simulated device
-              timeout-minutes: 5
-              run: |
-                  scripts/examples/gn_build_test_example.sh app1
             - name: Run Test Suites
               timeout-minutes: 35
               run: |
