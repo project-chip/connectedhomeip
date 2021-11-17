@@ -86,6 +86,8 @@ private:
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
+    CHIP_ERROR _GetNetworkInterfaces(NetworkInterface ** netifpp);
+    void _ReleaseNetworkInterfaces(NetworkInterface * netifp);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     using Flags = GenericConnectivityManagerImpl_WiFi::ConnectivityFlags;
     // ===== Members that implement the ConnectivityManager abstract interface.
