@@ -222,21 +222,20 @@ static void TestAttestationElements_Deconstruction(nlTestSuite * inSuite, void *
         0xae, 0xdf, 0x41, 0x38, 0x36, 0x5b, 0x0a, 0x22, 0x57, 0x14, 0x9c, 0x9a, 0x12, 0x3e, 0x0d, 0x30, 0xaa
     };
     constexpr uint8_t attestationNonceTestVector[] = { 0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d,
-                                                              0x2c, 0xf3, 0x1d, 0xb2, 0xb4, 0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a,
-                                                              0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2 };
+                                                       0x2c, 0xf3, 0x1d, 0xb2, 0xb4, 0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a,
+                                                       0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2 };
     constexpr uint32_t timestampTestVector         = 677103357;
-    constexpr uint8_t vendorReserved1TestVector[] = { 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
-                                                             0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31 };
-    constexpr uint8_t vendorReserved3TestVector[] = {
-        0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
-        0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65
-    };
-    const ByteSpan vendorReservedArrayTestVector[] = { ByteSpan{vendorReserved1TestVector},
-                                                       ByteSpan{vendorReserved3TestVector} };
-    constexpr uint16_t vendorIdTestVector              = 0xFFF1;
-    constexpr uint16_t profileNumTestVector            = 0x003E;
+    constexpr uint8_t vendorReserved1TestVector[]  = { 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
+                                                      0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31 };
+    constexpr uint8_t vendorReserved3TestVector[]  = { 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
+                                                      0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65 };
+    const ByteSpan vendorReservedArrayTestVector[] = { ByteSpan{ vendorReserved1TestVector },
+                                                       ByteSpan{ vendorReserved3TestVector } };
+    constexpr uint16_t vendorIdTestVector          = 0xFFF1;
+    constexpr uint16_t profileNumTestVector        = 0x003E;
 
-    const ByteSpan kTestCases[] = { ByteSpan{attestationElementsTestVectorOnlyKnownTags}, ByteSpan{attestationElementsTestVectorWithOneUnknownTag} };
+    const ByteSpan kTestCases[] = { ByteSpan{ attestationElementsTestVectorOnlyKnownTags },
+                                    ByteSpan{ attestationElementsTestVectorWithOneUnknownTag } };
 
     // Try all test cases and see they are all OK
     for (const ByteSpan & attestationElementsTestCase : kTestCases)
@@ -249,8 +248,8 @@ static void TestAttestationElements_Deconstruction(nlTestSuite * inSuite, void *
         DeviceAttestationVendorReservedDeconstructor vendorReserved;
 
         err = DeconstructAttestationElements(attestationElementsTestCase, certificationDeclarationDeconstructed,
-                                            attestationNonceDeconstructed, timestampDeconstructed, firmwareInfoDeconstructed,
-                                            vendorReserved);
+                                             attestationNonceDeconstructed, timestampDeconstructed, firmwareInfoDeconstructed,
+                                             vendorReserved);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, certificationDeclarationDeconstructed.data_equal(ByteSpan(certificationDeclarationTestVector)));

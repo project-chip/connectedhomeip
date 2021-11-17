@@ -61,7 +61,7 @@ public:
                 break;
         }
         // positioned to first context tag (vendor reserved data)
-        mIsInitialized = true;
+        mIsInitialized  = true;
         mIsAtFirstToken = true;
         return CHIP_NO_ERROR;
     }
@@ -112,7 +112,7 @@ public:
 private:
     size_t mNumVendorReservedData; // number of VendorReserved entries (could be 0)
     ByteSpan mAttestationData;
-    bool mIsInitialized = false;
+    bool mIsInitialized  = false;
     bool mIsAtFirstToken = false;
     TLV::ContiguousBufferTLVReader mTlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
