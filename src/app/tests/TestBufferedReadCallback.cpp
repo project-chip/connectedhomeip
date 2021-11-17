@@ -536,7 +536,7 @@ void DataSeriesGenerator::Generate()
 void RunAndValidateSequence(std::vector<ValidationInstruction> instructionList)
 {
     DataSeriesValidator validator(instructionList);
-    BufferedReadCallback bufferedCallback(&validator);
+    BufferedReadCallback bufferedCallback(validator);
     DataSeriesGenerator generator(bufferedCallback, instructionList);
     generator.Generate();
 

@@ -41,7 +41,7 @@ void BufferedReadCallback::OnReportEnd()
 
 CHIP_ERROR BufferedReadCallback::GenerateListTLV(System::PacketBufferTLVReader & aReader)
 {
-    System::PacketBufferHandle handle = System::PacketBufferHandle::New(1000);
+    System::PacketBufferHandle handle = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     System::PacketBufferTLVWriter writer;
     CHIP_ERROR err;
     TLV::TLVType outerType;
@@ -105,6 +105,11 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteAttributePath & aPath,
             err = writer.Finalize(&handle);
             SuccessOrExit(err);
 
+            // Compact the buffer down to a more reasonably sized packet buffer
+            // if we can.
+            //
+            handle.RightSize();
+
             mBufferedList.push_back(std::move(handle));
         }
 
@@ -123,6 +128,12 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteAttributePath & aPath,
 
         err = writer.Finalize(&handle);
         SuccessOrExit(err);
+
+        //
+        // Compact the buffer down to a more reasonably sized packet buffer
+        // if we can.
+        //
+        handle.RightSize();
 
         mBufferedList.push_back(std::move(handle));
     }
@@ -182,6 +193,11 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ReadClient * apReadC
     reader.Next();
 
     mCallback.OnAttributeData(apReadClient, mBufferedPath, &reader, statusIB);
+
+    //
+    // Clear out our buffered contents to free up allocated buffers
+    //
+    mBufferedList.clear();
 
 exit:
     return err;

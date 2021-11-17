@@ -52,6 +52,8 @@ public:
         mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone), mBufferedReadAdapter(*this)
     {}
 
+    app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
+
 private:
     void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & status) override
