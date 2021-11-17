@@ -316,8 +316,8 @@ void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, 
     service.mInterface   = interfaceId;
     service.mProtocol    = context->protocol;
 
-    CopyString(service.mName, name);
-    CopyString(service.mType, type);
+    Platform::CopyString(service.mName, name);
+    Platform::CopyString(service.mType, type);
 
     // only the first token after '.' should be included in the type
     for (char * p = service.mType; *p != '\0'; p++)
@@ -429,7 +429,7 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
         err = TXTRecordGetItemAtIndex(txtLen, txtRecord, i, kDnssdKeyMaxSize, key, &valueLen, &valuePtr);
         VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
-        CopyString(value, reinterpret_cast<const char *>(valuePtr));
+        Platform::CopyString(value, reinterpret_cast<const char *>(valuePtr));
         value[valueLen] = 0;
 
         sdCtx->textEntries.push_back(TextEntry{ strdup(key), reinterpret_cast<const uint8_t *>(strdup(value)), valueLen });
