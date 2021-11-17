@@ -179,7 +179,6 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
-    CHIP_ERROR SendStatusResponse(CHIP_ERROR aError);
 
 private:
     friend class TestReadInteraction;
