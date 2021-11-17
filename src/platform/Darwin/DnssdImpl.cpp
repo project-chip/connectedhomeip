@@ -429,6 +429,12 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
         err = TXTRecordGetItemAtIndex(txtLen, txtRecord, i, kDnssdKeyMaxSize, key, &valueLen, &valuePtr);
         VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
+        if (valueLen >= sizeof(value))
+        {
+            // Truncation, but nothing better we can do
+            valueLen = sizeof(value) - 1;
+        }
+
         memcpy(value, valuePtr, valueLen - 1);
         value[valueLen] = 0;
 
