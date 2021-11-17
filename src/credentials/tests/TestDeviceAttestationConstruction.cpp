@@ -180,9 +180,8 @@ static void TestAttestationElements_Construction(nlTestSuite * inSuite, void * i
 
 static void TestAttestationElements_Deconstruction(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    static constexpr uint8_t attestationElementsTestVector[] = {
+    // This is a test case with only the known TLV tags fields
+    constexpr uint8_t attestationElementsTestVectorOnlyKnownTags[] = {
         0x15, 0x30, 0x01, 0x70, 0xd2, 0x84, 0x4b, 0xa2, 0x01, 0x26, 0x04, 0x46, 0x63, 0x73, 0x61, 0x63, 0x64, 0x30, 0xa0,
         0x58, 0x1d, 0x15, 0x25, 0x01, 0x88, 0x99, 0x25, 0x02, 0xfe, 0xff, 0x25, 0x03, 0xd2, 0x04, 0x25, 0x04, 0x2e, 0x16,
         0x24, 0x05, 0xaa, 0x25, 0x06, 0xde, 0xc0, 0x25, 0x07, 0x94, 0x26, 0x18, 0x58, 0x40, 0x96, 0x57, 0x2d, 0xd6, 0x3c,
@@ -196,7 +195,25 @@ static void TestAttestationElements_Deconstruction(nlTestSuite * inSuite, void *
         0xff, 0x3e, 0x00, 0x03, 0x00, 0x18, 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76,
         0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x18
     };
-    static constexpr uint8_t certificationDeclarationTestVector[] = {
+
+    // The following case has an extra top-level context-specific tag (254) with value 0xDEADBEEF, in the right order,
+    // that should not cause a failure and merely be ignored.
+    constexpr uint8_t attestationElementsTestVectorWithOneUnknownTag[] = {
+        0x15, 0x30, 0x01, 0x70, 0xd2, 0x84, 0x4b, 0xa2, 0x01, 0x26, 0x04, 0x46, 0x63, 0x73, 0x61, 0x63, 0x64, 0x30, 0xa0,
+        0x58, 0x1d, 0x15, 0x25, 0x01, 0x88, 0x99, 0x25, 0x02, 0xfe, 0xff, 0x25, 0x03, 0xd2, 0x04, 0x25, 0x04, 0x2e, 0x16,
+        0x24, 0x05, 0xaa, 0x25, 0x06, 0xde, 0xc0, 0x25, 0x07, 0x94, 0x26, 0x18, 0x58, 0x40, 0x96, 0x57, 0x2d, 0xd6, 0x3c,
+        0x03, 0x64, 0x0b, 0x28, 0x67, 0x02, 0xbd, 0x6b, 0xba, 0x48, 0xac, 0x7c, 0x83, 0x54, 0x9b, 0x68, 0x73, 0x29, 0x47,
+        0x48, 0xb9, 0x51, 0xd5, 0xab, 0x66, 0x62, 0x2e, 0x9d, 0x26, 0x10, 0x41, 0xf8, 0x0e, 0x97, 0x49, 0xfe, 0xff, 0x78,
+        0x10, 0x02, 0x49, 0x67, 0xae, 0xdf, 0x41, 0x38, 0x36, 0x5b, 0x0a, 0x22, 0x57, 0x14, 0x9c, 0x9a, 0x12, 0x3e, 0x0d,
+        0x30, 0xaa, 0x30, 0x02, 0x20, 0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d, 0x2c, 0xf3, 0x1d,
+        0xb2, 0xb4, 0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a, 0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2, 0x26,
+        0x03, 0xfd, 0xc6, 0x5b, 0x28, 0x26, 0xfe, 0xef, 0xbe, 0xad, 0xde, 0xd0, 0xf1, 0xff, 0x3e, 0x00, 0x01, 0x00, 0x17,
+        0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
+        0x76, 0x65, 0x64, 0x31, 0xd0, 0xf1, 0xff, 0x3e, 0x00, 0x03, 0x00, 0x18, 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f,
+        0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x18,
+    };
+
+    constexpr uint8_t certificationDeclarationTestVector[] = {
         0xd2, 0x84, 0x4b, 0xa2, 0x01, 0x26, 0x04, 0x46, 0x63, 0x73, 0x61, 0x63, 0x64, 0x30, 0xa0, 0x58, 0x1d, 0x15, 0x25,
         0x01, 0x88, 0x99, 0x25, 0x02, 0xfe, 0xff, 0x25, 0x03, 0xd2, 0x04, 0x25, 0x04, 0x2e, 0x16, 0x24, 0x05, 0xaa, 0x25,
         0x06, 0xde, 0xc0, 0x25, 0x07, 0x94, 0x26, 0x18, 0x58, 0x40, 0x96, 0x57, 0x2d, 0xd6, 0x3c, 0x03, 0x64, 0x0b, 0x28,
@@ -204,54 +221,61 @@ static void TestAttestationElements_Deconstruction(nlTestSuite * inSuite, void *
         0xab, 0x66, 0x62, 0x2e, 0x9d, 0x26, 0x10, 0x41, 0xf8, 0x0e, 0x97, 0x49, 0xfe, 0xff, 0x78, 0x10, 0x02, 0x49, 0x67,
         0xae, 0xdf, 0x41, 0x38, 0x36, 0x5b, 0x0a, 0x22, 0x57, 0x14, 0x9c, 0x9a, 0x12, 0x3e, 0x0d, 0x30, 0xaa
     };
-    static constexpr uint8_t attestationNonceTestVector[] = { 0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d,
+    constexpr uint8_t attestationNonceTestVector[] = { 0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d,
                                                               0x2c, 0xf3, 0x1d, 0xb2, 0xb4, 0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a,
                                                               0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2 };
-    static constexpr uint32_t timestampTestVector         = 677103357;
-    static constexpr uint8_t vendorReserved1TestVector[] = { 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
+    constexpr uint32_t timestampTestVector         = 677103357;
+    constexpr uint8_t vendorReserved1TestVector[] = { 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
                                                              0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31 };
-    static constexpr uint8_t vendorReserved3TestVector[] = {
+    constexpr uint8_t vendorReserved3TestVector[] = {
         0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
         0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65
     };
-    static constexpr ByteSpan vendorReservedArrayTestVector[] = { ByteSpan(vendorReserved1TestVector),
-                                                                  ByteSpan(vendorReserved3TestVector) };
-    static constexpr uint16_t vendorIdTestVector              = 0xFFF1;
-    static constexpr uint16_t profileNumTestVector            = 0x003E;
+    const ByteSpan vendorReservedArrayTestVector[] = { ByteSpan{vendorReserved1TestVector},
+                                                       ByteSpan{vendorReserved3TestVector} };
+    constexpr uint16_t vendorIdTestVector              = 0xFFF1;
+    constexpr uint16_t profileNumTestVector            = 0x003E;
 
-    ByteSpan certificationDeclarationDeconstructed;
-    ByteSpan attestationNonceDeconstructed;
-    uint32_t timestampDeconstructed;
-    ByteSpan firmwareInfoDeconstructed;
-    DeviceAttestationVendorReservedDeconstructor vendorReserved;
+    const ByteSpan kTestCases[] = { ByteSpan{attestationElementsTestVectorOnlyKnownTags}, ByteSpan{attestationElementsTestVectorWithOneUnknownTag} };
 
-    err = DeconstructAttestationElements(ByteSpan(attestationElementsTestVector), certificationDeclarationDeconstructed,
-                                         attestationNonceDeconstructed, timestampDeconstructed, firmwareInfoDeconstructed,
-                                         vendorReserved);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, certificationDeclarationDeconstructed.data_equal(ByteSpan(certificationDeclarationTestVector)));
-    NL_TEST_ASSERT(inSuite, attestationNonceDeconstructed.data_equal(ByteSpan(attestationNonceTestVector)));
-    NL_TEST_ASSERT(inSuite, timestampTestVector == timestampDeconstructed);
-    NL_TEST_ASSERT(inSuite, firmwareInfoDeconstructed.empty());
-    NL_TEST_ASSERT(inSuite, ArraySize(vendorReservedArrayTestVector) == vendorReserved.GetNumberOfElements());
-    struct VendorReservedElement element;
-
-    while (vendorReserved.GetNextVendorReservedElement(element) == CHIP_NO_ERROR)
+    // Try all test cases and see they are all OK
+    for (const ByteSpan & attestationElementsTestCase : kTestCases)
     {
-        NL_TEST_ASSERT(inSuite, vendorIdTestVector == element.vendorId);
-        NL_TEST_ASSERT(inSuite, profileNumTestVector == element.profileNum);
-        switch (element.tagNum)
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        ByteSpan certificationDeclarationDeconstructed;
+        ByteSpan attestationNonceDeconstructed;
+        uint32_t timestampDeconstructed;
+        ByteSpan firmwareInfoDeconstructed;
+        DeviceAttestationVendorReservedDeconstructor vendorReserved;
+
+        err = DeconstructAttestationElements(attestationElementsTestCase, certificationDeclarationDeconstructed,
+                                            attestationNonceDeconstructed, timestampDeconstructed, firmwareInfoDeconstructed,
+                                            vendorReserved);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(inSuite, certificationDeclarationDeconstructed.data_equal(ByteSpan(certificationDeclarationTestVector)));
+        NL_TEST_ASSERT(inSuite, attestationNonceDeconstructed.data_equal(ByteSpan(attestationNonceTestVector)));
+        NL_TEST_ASSERT(inSuite, timestampTestVector == timestampDeconstructed);
+        NL_TEST_ASSERT(inSuite, firmwareInfoDeconstructed.empty());
+        NL_TEST_ASSERT(inSuite, ArraySize(vendorReservedArrayTestVector) == vendorReserved.GetNumberOfElements());
+        struct VendorReservedElement element;
+
+        while (vendorReserved.GetNextVendorReservedElement(element) == CHIP_NO_ERROR)
         {
-        case 1:
-            NL_TEST_ASSERT(inSuite, element.vendorReservedData.data_equal(vendorReservedArrayTestVector[0]));
-            break;
-        case 3:
-            NL_TEST_ASSERT(inSuite, element.vendorReservedData.data_equal(vendorReservedArrayTestVector[1]));
-            break;
-        default:
-            NL_TEST_ASSERT(inSuite, 0);
-            break;
+            NL_TEST_ASSERT(inSuite, vendorIdTestVector == element.vendorId);
+            NL_TEST_ASSERT(inSuite, profileNumTestVector == element.profileNum);
+            switch (element.tagNum)
+            {
+            case 1:
+                NL_TEST_ASSERT(inSuite, element.vendorReservedData.data_equal(vendorReservedArrayTestVector[0]));
+                break;
+            case 3:
+                NL_TEST_ASSERT(inSuite, element.vendorReservedData.data_equal(vendorReservedArrayTestVector[1]));
+                break;
+            default:
+                NL_TEST_ASSERT(inSuite, 0);
+                break;
+            }
         }
     }
 }
@@ -424,7 +448,7 @@ static void TestAttestationElements_DeconstructionUnordered(nlTestSuite * inSuit
     err = DeconstructAttestationElements(ByteSpan(attestationElementsUnorderedTestVector), certificationDeclarationDeconstructed,
                                          attestationNonceDeconstructed, timestampDeconstructed, firmwareInfoDeconstructed,
                                          vendorReserved);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 }
 
 /**
