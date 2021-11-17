@@ -78,7 +78,7 @@ public:
      * Retrieve the value of an attribute from the cache (if present) given a concrete path and decode
      * is using DataModel::Decode into the in-out argument 'value'.
      *
-     * The template parameter AttributeObjectTypeT is generally expected to be a 
+     * The template parameter AttributeObjectTypeT is generally expected to be a
      * ClusterName::Attributes::AttributeName::DecodableType, but any
      * object that can be decoded using the DataModel::Decode machinery will work.
      *
@@ -89,10 +89,10 @@ public:
     CHIP_ERROR Get(ConcreteAttributePath &path, AttributeObjectTypeT &value);
 
     /*
-     * Retrieve the value of an entire cluster instance from the cache (if present) given a path 
+     * Retrieve the value of an entire cluster instance from the cache (if present) given a path
      * and decode it using DataModel::Decode into the in-out argument 'value'.
      *
-     * The template parameter ClusterObjectT is generally expected to be a 
+     * The template parameter ClusterObjectT is generally expected to be a
      * ClusterName::DecodableType, but any
      * object that can be decoded using the DataModel::Decode machinery will work.
      *
@@ -114,7 +114,7 @@ public:
     size_t GetNumEndpoints();
     size_t GetNumClusters(EndpointId endpointId);
     size_t GetNumAttributes(EndpointId endpointId, ClusterId clusterId);
-  
+
     /*
      * Execute an iterator function that is called for every attribute
      * in a given endpoint and cluster and is passed in a concrete attribute path
@@ -155,7 +155,7 @@ private:
     using AttributeState = Variant<System::PacketBufferHandle, StatusIB>;
     using ClusterState = std::map<AttributeId, AttributeState>;
     using EndpointState = std::map<ClusterId, ClusterState>;
-    
+
     //
     // ReadClient::Callback
     //
