@@ -195,8 +195,8 @@ enum class Fields {
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::{{asUpperCamelCase priority}};
-    static constexpr EventId eventId = {{asMEI manufacturerCode code}};
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_event_fields}}
