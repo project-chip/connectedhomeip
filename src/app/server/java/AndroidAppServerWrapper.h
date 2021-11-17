@@ -17,6 +17,11 @@
  */
 
 #pragma once
+#include <jni.h>
 #include <lib/core/CHIPError.h>
 
 CHIP_ERROR ChipAndroidAppInit(void);
+
+jint AndroidAppServerJNI_OnLoad(JavaVM * jvm, void * reserved);
+
+void AndroidAppServerJNI_OnUnload(JavaVM * jvm, void * reserved);

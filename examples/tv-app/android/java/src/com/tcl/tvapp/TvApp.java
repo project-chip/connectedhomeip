@@ -15,11 +15,12 @@
  *   limitations under the License.
  *
  */
-package chip.appserver;
+package com.tcl.tvapp;
 
-/** Controller to interact with the CHIP device. */
-public class ChipAppServer {
-  private static final String TAG = ChipAppServer.class.getSimpleName();
+public class TvApp {
+  public TvApp() {}
 
-  public native boolean startApp();
+  static {
+    System.loadLibrary("TvApp");
+  }
 }

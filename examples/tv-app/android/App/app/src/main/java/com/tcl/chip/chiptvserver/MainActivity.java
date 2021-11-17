@@ -15,6 +15,7 @@ import chip.platform.PreferencesKeyValueStoreManager;
 import chip.setuppayload.DiscoveryCapability;
 import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
+import com.tcl.tvapp.TvApp;
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     mQrCodeImg = findViewById(R.id.qrCodeImg);
     mQrCodeTxt = findViewById(R.id.qrCodeTxt);
     mManualPairingCodeTxt = findViewById(R.id.manualPairingCodeTxt);
-    ChipAppServer chipAppServer = new ChipAppServer();
+    TvApp tvApp = new TvApp();
     AndroidChipPlatform chipPlatform =
         new AndroidChipPlatform(
             new AndroidBleManager(),
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
       e.printStackTrace();
     }
 
+    ChipAppServer chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
   }
 }

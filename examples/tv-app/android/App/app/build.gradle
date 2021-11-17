@@ -31,16 +31,19 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs/jniLibs']
+
+            // uncomment this code to debug
+//            java.srcDirs = [
+//                    'src/main/java',
+//                    '../../third_party/connectedhomeip/src/setup_payload/java/src',
+//                    '../../third_party/connectedhomeip/src/platform/android/java',
+//                    '../../java/src',
+//            ]
         }
     }
-
-
-
-
 }
 
 dependencies {
