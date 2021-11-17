@@ -429,7 +429,7 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
         err = TXTRecordGetItemAtIndex(txtLen, txtRecord, i, kDnssdKeyMaxSize, key, &valueLen, &valuePtr);
         VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
-        strncpy(value, reinterpret_cast<const char *>(valuePtr), valueLen);
+        CopyString(value, reinterpret_cast<const char *>(valuePtr));
         value[valueLen] = 0;
 
         sdCtx->textEntries.push_back(TextEntry{ strdup(key), reinterpret_cast<const uint8_t *>(strdup(value)), valueLen });
