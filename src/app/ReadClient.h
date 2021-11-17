@@ -64,7 +64,7 @@ public:
          * The ReadClient object MUST continue to exist after this call is completed.
          *
          * @param[in]  apReadClient         The read client which initialized the read transaction.
-         * @param[in]  apEventReportsReader TLV reader positioned at the list that contains the events.  The
+         * @param[in]  aEventReports        TLV reader positioned at the list that contains the events.  The
          *                                  implementation of EventStreamReceived is expected to call Next() on the reader to
          *                                  advance it to the first element of the list, then process the elements from beginning to
          *                                  the end. The callee is expected to consume all events.
@@ -179,7 +179,6 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
-    CHIP_ERROR SendStatusResponse(CHIP_ERROR aError);
 
 private:
     friend class TestReadInteraction;
@@ -215,7 +214,7 @@ private:
      *      - SubscribeResponseProcessed
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
+     *  @param[in]    apCallback       InteractionModelDelegate set by application.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
@@ -266,6 +265,7 @@ private:
     Callback * mpCallback                      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
     bool mInitialReport                        = true;
+    bool mPendingMoreChunks                    = false;
     uint16_t mMinIntervalFloorSeconds          = 0;
     uint16_t mMaxIntervalCeilingSeconds        = 0;
     uint64_t mSubscriptionId                   = 0;

@@ -17,6 +17,22 @@
  */
 
 #pragma once
-#include <lib/core/CHIPError.h>
 
-CHIP_ERROR ChipAndroidAppInit(void);
+#include <app/MessageDef/StatusIB.h>
+#include <messaging/ExchangeContext.h>
+#include <protocols/interaction_model/Constants.h>
+#include <system/TLVPacketBufferBackingStore.h>
+
+namespace chip {
+namespace app {
+static constexpr size_t kMaxSecureSduLengthBytes = 1024;
+
+class StatusResponse
+{
+public:
+    static CHIP_ERROR SendStatusResponse(Protocols::InteractionModel::Status aStatus,
+                                         Messaging::ExchangeContext * apExchangeContext, bool aExpectResponse);
+    static CHIP_ERROR ProcessStatusResponse(System::PacketBufferHandle && aPayload, StatusIB & aStatus);
+};
+} // namespace app
+} // namespace chip

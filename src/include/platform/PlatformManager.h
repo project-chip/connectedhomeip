@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
+#include <platform/GeneralFaults.h>
 #include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
 
@@ -203,6 +204,10 @@ public:
     CHIP_ERROR GetUpTime(uint64_t & upTime);
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
     CHIP_ERROR GetBootReasons(uint8_t & bootReasons);
+
+    CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults);
+    CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults);
+    CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults);
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool IsChipStackLockedByCurrentThread() const;
@@ -493,6 +498,21 @@ inline CHIP_ERROR PlatformManager::GetTotalOperationalHours(uint32_t & totalOper
 inline CHIP_ERROR PlatformManager::GetBootReasons(uint8_t & bootReasons)
 {
     return static_cast<ImplClass *>(this)->_GetBootReasons(bootReasons);
+}
+
+inline CHIP_ERROR PlatformManager::GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
+{
+    return static_cast<ImplClass *>(this)->_GetActiveHardwareFaults(hardwareFaults);
+}
+
+inline CHIP_ERROR PlatformManager::GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
+{
+    return static_cast<ImplClass *>(this)->_GetActiveRadioFaults(radioFaults);
+}
+
+inline CHIP_ERROR PlatformManager::GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
+{
+    return static_cast<ImplClass *>(this)->_GetActiveNetworkFaults(networkFaults);
 }
 
 } // namespace DeviceLayer

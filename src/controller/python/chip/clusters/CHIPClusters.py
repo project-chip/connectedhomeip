@@ -1741,6 +1741,21 @@ class ChipClusters:
                 "attributeId": 0x00000004,
                 "type": "int",
             },
+            0x00000005: {
+                "attributeName": "ActiveHardwareFaults",
+                "attributeId": 0x00000005,
+                "type": "int",
+            },
+            0x00000006: {
+                "attributeName": "ActiveRadioFaults",
+                "attributeId": 0x00000006,
+                "type": "int",
+            },
+            0x00000007: {
+                "attributeName": "ActiveNetworkFaults",
+                "attributeId": 0x00000007,
+                "type": "int",
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -6133,6 +6148,15 @@ class ChipClusters:
     def ClusterGeneralDiagnostics_ReadAttributeBootReasons(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_BootReasons(device, ZCLendpoint, ZCLgroupid)
 
+    def ClusterGeneralDiagnostics_ReadAttributeActiveHardwareFaults(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ActiveHardwareFaults(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterGeneralDiagnostics_ReadAttributeActiveRadioFaults(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ActiveRadioFaults(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterGeneralDiagnostics_ReadAttributeActiveNetworkFaults(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ActiveNetworkFaults(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterGeneralDiagnostics_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -8480,6 +8504,18 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_BootReasons.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_BootReasons.restype = ctypes.c_uint32
+        # Cluster GeneralDiagnostics ReadAttribute ActiveHardwareFaults
+        self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ActiveHardwareFaults.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ActiveHardwareFaults.restype = ctypes.c_uint32
+        # Cluster GeneralDiagnostics ReadAttribute ActiveRadioFaults
+        self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ActiveRadioFaults.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ActiveRadioFaults.restype = ctypes.c_uint32
+        # Cluster GeneralDiagnostics ReadAttribute ActiveNetworkFaults
+        self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ActiveNetworkFaults.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ActiveNetworkFaults.restype = ctypes.c_uint32
         # Cluster GeneralDiagnostics ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

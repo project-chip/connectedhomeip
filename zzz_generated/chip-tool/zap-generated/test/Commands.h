@@ -36096,6 +36096,54 @@ private:
     void OnSuccessResponse_7() { ThrowSuccessResponse(); }
 };
 
+class TestGroupMessaging : public TestCommand
+{
+public:
+    TestGroupMessaging() : TestCommand("TestGroupMessaging"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestGroupMessaging\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestGroupMessaging\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    //
+    // Tests methods
+    //
+};
+
 class Test_TC_DIAGSW_1_1 : public TestCommand
 {
 public:
@@ -36647,6 +36695,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestIdentifyCluster>(),
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<TestModeSelectCluster>(),
+        make_unique<TestGroupMessaging>(),
         make_unique<Test_TC_DIAGSW_1_1>(),
         make_unique<TestSubscribe_OnOff>(),
     };

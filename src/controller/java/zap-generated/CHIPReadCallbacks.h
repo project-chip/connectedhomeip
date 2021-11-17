@@ -469,6 +469,48 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback
+    : public chip::Callback::Callback<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback(jobject javaCallback);
+
+    ~CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback();
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback
+    : public chip::Callback::Callback<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback(jobject javaCallback);
+
+    ~CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback();
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback
+    : public chip::Callback::Callback<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback(jobject javaCallback);
+
+    ~CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback();
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPGroupKeyManagementGroupsAttributeCallback : public chip::Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>
 {
 public:

@@ -275,7 +275,7 @@ const char * WriteHandler::GetStateStr() const
 void WriteHandler::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
-    ChipLogDetail(DataManagement, "IM RH moving to [%s]", GetStateStr());
+    ChipLogDetail(DataManagement, "IM WH moving to [%s]", GetStateStr());
 }
 
 void WriteHandler::ClearState()

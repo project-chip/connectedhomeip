@@ -3086,6 +3086,30 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)readAttributeActiveHardwareFaultsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReadAttributeActiveHardwareFaults(success, failure);
+        });
+}
+
+- (void)readAttributeActiveRadioFaultsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReadAttributeActiveRadioFaults(success, failure);
+        });
+}
+
+- (void)readAttributeActiveNetworkFaultsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReadAttributeActiveNetworkFaults(success, failure);
+        });
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {

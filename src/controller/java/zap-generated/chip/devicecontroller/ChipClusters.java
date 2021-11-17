@@ -3325,6 +3325,24 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
+    public interface ActiveHardwareFaultsAttributeCallback {
+      void onSuccess(List<Integer> valueList);
+
+      void onError(Exception ex);
+    }
+
+    public interface ActiveRadioFaultsAttributeCallback {
+      void onSuccess(List<Integer> valueList);
+
+      void onError(Exception ex);
+    }
+
+    public interface ActiveNetworkFaultsAttributeCallback {
+      void onSuccess(List<Integer> valueList);
+
+      void onError(Exception ex);
+    }
+
     public void readNetworkInterfacesAttribute(NetworkInterfacesAttributeCallback callback) {
       readNetworkInterfacesAttribute(chipClusterPtr, callback);
     }
@@ -3345,6 +3363,18 @@ public class ChipClusters {
       readBootReasonsAttribute(chipClusterPtr, callback);
     }
 
+    public void readActiveHardwareFaultsAttribute(ActiveHardwareFaultsAttributeCallback callback) {
+      readActiveHardwareFaultsAttribute(chipClusterPtr, callback);
+    }
+
+    public void readActiveRadioFaultsAttribute(ActiveRadioFaultsAttributeCallback callback) {
+      readActiveRadioFaultsAttribute(chipClusterPtr, callback);
+    }
+
+    public void readActiveNetworkFaultsAttribute(ActiveNetworkFaultsAttributeCallback callback) {
+      readActiveNetworkFaultsAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -3362,6 +3392,15 @@ public class ChipClusters {
 
     private native void readBootReasonsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readActiveHardwareFaultsAttribute(
+        long chipClusterPtr, ActiveHardwareFaultsAttributeCallback callback);
+
+    private native void readActiveRadioFaultsAttribute(
+        long chipClusterPtr, ActiveRadioFaultsAttributeCallback callback);
+
+    private native void readActiveNetworkFaultsAttribute(
+        long chipClusterPtr, ActiveNetworkFaultsAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

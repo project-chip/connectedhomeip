@@ -216,6 +216,7 @@ cppreference
 CPROTO
 cpuapp
 cpython
+CQM
 crypto
 cryptographic
 CSA

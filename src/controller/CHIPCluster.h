@@ -51,6 +51,7 @@ public:
     virtual ~ClusterBase() {}
 
     CHIP_ERROR Associate(DeviceProxy * device, EndpointId endpoint);
+    CHIP_ERROR AssociateWithGroup(DeviceProxy * device, GroupId groupId);
 
     void Dissociate();
 
@@ -110,8 +111,9 @@ public:
             }
         };
 
-        return chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId,
-                                                          requestData, onSuccessCb, onFailureCb);
+        return chip::Controller::WriteAttribute<AttrType>((mSessionHandle.HasValue()) ? mSessionHandle.Value()
+                                                                                      : mDevice->GetSecureSession().Value(),
+                                                          mEndpoint, clusterId, attributeId, requestData, onSuccessCb, onFailureCb);
     }
 
     template <typename AttributeInfo>
@@ -179,6 +181,7 @@ protected:
     const ClusterId mClusterId;
     DeviceProxy * mDevice;
     EndpointId mEndpoint;
+    chip::Optional<SessionHandle> mSessionHandle;
 };
 
 } // namespace Controller

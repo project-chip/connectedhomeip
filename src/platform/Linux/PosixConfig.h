@@ -103,7 +103,6 @@ public:
     static CHIP_ERROR FactoryResetCounters();
     static void RunConfigUnitTest();
 
-protected:
     // NVS Namespace helper functions.
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);

@@ -5685,6 +5685,39 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeBootReasons(Callback::Cancela
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
+CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeActiveHardwareFaults(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000005;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             GeneralDiagnosticsClusterActiveHardwareFaultsListAttributeFilter);
+}
+
+CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeActiveRadioFaults(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000006;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             GeneralDiagnosticsClusterActiveRadioFaultsListAttributeFilter);
+}
+
+CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeActiveNetworkFaults(Callback::Cancelable * onSuccessCallback,
+                                                                       Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000007;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             GeneralDiagnosticsClusterActiveNetworkFaultsListAttributeFilter);
+}
+
 CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback)
 {

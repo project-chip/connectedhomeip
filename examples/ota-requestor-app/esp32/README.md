@@ -65,11 +65,11 @@ After this step device should reboot and start running hello world example.
 
 -   Build the [Linux OTA Provider](../../ota-provider-app/linux)
 -   Run the Linux OTA Provider with
-    [hello world OTA image](http://shubhamdp.github.io/esp_ota/esp32/hello-world-flash-in-ota-provider-partition.bin).
+    [hello world OTA image](http://shubhamdp.github.io/esp_ota/esp32/hello-world-for-linux-provider.bin).
     This OTA image is built for ESP32, it will not work on other devices.
 
 ```
-./out/debug/chip-ota-provider-app -f hello-world-flash-in-ota-provider-partition.bin
+./out/debug/chip-ota-provider-app -f hello-world-for-linux-provider.bin
 ```
 
 -   Provision the Linux OTA Provider using chip-tool

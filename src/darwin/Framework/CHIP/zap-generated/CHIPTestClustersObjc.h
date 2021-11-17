@@ -379,6 +379,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeUpTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeTotalOperationalHoursWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBootReasonsWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeActiveHardwareFaultsWithValue:(NSArray * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeActiveRadioFaultsWithValue:(NSArray * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeActiveNetworkFaultsWithValue:(NSArray * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 
 @end

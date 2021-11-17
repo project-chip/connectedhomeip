@@ -81,6 +81,8 @@ android_library("java") {
     "src/chip/devicecontroller/PaseVerifierParams.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
+    "zap-generated/chip/devicecontroller/ClusterReadMapping.java",
+    "zap-generated/chip/devicecontroller/ClusterWriteMapping.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

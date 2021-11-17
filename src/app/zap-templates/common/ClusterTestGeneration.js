@@ -33,6 +33,7 @@ const { asUpperCamelCase }              = require(basePath + 'src/app/zap-templa
 
 const kClusterName       = 'cluster';
 const kEndpointName      = 'endpoint';
+const kGroupId           = 'groupId';
 const kCommandName       = 'command';
 const kWaitCommandName   = 'wait';
 const kIndexName         = 'index';
@@ -117,6 +118,10 @@ function setDefaultTypeForCommand(test)
     test.commandName      = 'Write';
     test.isAttribute      = true;
     test.isWriteAttribute = true;
+    if ((kGroupId in test)) {
+      test.isGroupCommand = true;
+      test.groupId        = parseInt(test[kGroupId], 10);
+    }
     break;
 
   case 'subscribeAttribute':
