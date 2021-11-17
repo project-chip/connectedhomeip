@@ -164,7 +164,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
     // hardwareVersion: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
     // location: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), location.data()));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), location));
     // requestorCanConsent: boolean
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), requestorCanConsent));
     // metadataForProvider: octetString
@@ -189,10 +189,9 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReadAttributeClusterRevision(Callba
                                                                           Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000FFFD;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }

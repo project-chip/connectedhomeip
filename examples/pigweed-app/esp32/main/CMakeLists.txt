@@ -30,8 +30,6 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed/esp32"
                       PRIV_REQUIRES bt chip)
 
-idf_component_get_property(chip_lib chip COMPONENT_LIB)
-
 get_filename_component(CHIP_ROOT ../third_party/connectedhomeip REALPATH)
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 
@@ -46,12 +44,3 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
     pw_rpc.nanopb.echo_service
     pw_rpc.server
 )
-
-set(WRAP_FUNCTIONS esp_log_write)
-target_link_libraries(${chip_lib} INTERFACE "-Wl,--wrap=${WRAP_FUNCTIONS}")
-
-set_property(TARGET ${chip_lib} APPEND PROPERTY LINK_LIBRARIES ${COMPONENT_LIB})
-target_include_directories(${chip_lib} PUBLIC
-                          "$<TARGET_FILE_DIR:${chip_lib}>/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb_rpc"
-                          "$<TARGET_FILE_DIR:${chip_lib}>/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb"
-                          "$<TARGET_FILE_DIR:${chip_lib}>/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/pwpb")

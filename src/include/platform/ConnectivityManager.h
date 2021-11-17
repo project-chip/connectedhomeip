@@ -27,6 +27,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -155,7 +156,13 @@ public:
         kSlowAdvertising = 1,
     };
 
-    struct ThreadPollingConfig;
+    enum class SEDPollingMode
+    {
+        Idle   = 0,
+        Active = 1,
+    };
+
+    struct SEDPollingConfig;
 
     void SetDelegate(ConnectivityManagerDelegate * delegate) { mDelegate = delegate; }
     ConnectivityManagerDelegate * GetDelegate() const { return mDelegate; }
@@ -190,8 +197,6 @@ public:
     bool IsThreadApplicationControlled();
     ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ThreadDeviceType deviceType);
-    void GetThreadPollingConfig(ThreadPollingConfig & pollingConfig);
-    CHIP_ERROR SetThreadPollingConfig(const ThreadPollingConfig & pollingConfig);
     bool IsThreadAttached();
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
@@ -208,6 +213,28 @@ public:
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp);
     void ReleaseNetworkInterfaces(NetworkInterface * netifp);
 
+// Sleepy end device methods
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    CHIP_ERROR GetSEDPollingConfig(SEDPollingConfig & pollingConfig);
+
+    /**
+     * Sets Sleepy End Device polling configuration and posts kSEDPollingIntervalChange event to inform other software
+     * modules about the change.
+     *
+     * @param[in]  pollingConfig  polling intervals configuration to be set
+     */
+    CHIP_ERROR SetSEDPollingConfig(const SEDPollingConfig & pollingConfig);
+
+    /**
+     * Requests setting Sleepy End Device fast polling interval on or off.
+     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the fast polling
+     * consumers counter. Fast polling mode is set if the consumers counter is bigger than 0.
+     *
+     * @param[in]  onOff  true if fast polling should be enabled and false otherwise.
+     */
+    CHIP_ERROR RequestSEDFastPollingMode(bool onOff);
+#endif
+
     // Ethernet network diagnostics methods
     CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate);
     CHIP_ERROR GetEthFullDuplex(bool & fullDuplex);
@@ -221,6 +248,7 @@ public:
     CHIP_ERROR ResetEthNetworkDiagnosticsCounts();
 
     // WiFi network diagnostics methods
+    CHIP_ERROR GetWiFiBssId(ByteSpan & value);
     CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
     CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber);
@@ -291,15 +319,15 @@ protected:
 };
 
 /**
- * Information describing the desired Thread polling behavior of a device.
+ * Information describing the desired polling behavior of a sleepy end device (SED).
  */
-struct ConnectivityManager::ThreadPollingConfig
+struct ConnectivityManager::SEDPollingConfig
 {
-    uint32_t ActivePollingIntervalMS; /**< Interval at which the device polls its parent Thread router when
+    uint32_t FastPollingIntervalMS; /**< Interval at which the device polls its parent
                                            when there are active chip exchanges in progress. Only meaningful
                                            when the device is acting as a sleepy end node. */
 
-    uint32_t InactivePollingIntervalMS; /**< Interval at which the device polls its parent Thread router when
+    uint32_t SlowPollingIntervalMS; /**< Interval at which the device polls its parent
                                              when there are NO active chip exchanges in progress. Only meaningful
                                              when the device is acting as a sleepy end node. */
 
@@ -493,6 +521,11 @@ inline CHIP_ERROR ConnectivityManager::ResetEthNetworkDiagnosticsCounts()
     return static_cast<ImplClass *>(this)->_ResetEthNetworkDiagnosticsCounts();
 }
 
+inline CHIP_ERROR ConnectivityManager::GetWiFiBssId(ByteSpan & value)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiBssId(value);
+}
+
 inline CHIP_ERROR ConnectivityManager::GetWiFiSecurityType(uint8_t & securityType)
 {
     return static_cast<ImplClass *>(this)->_GetWiFiSecurityType(securityType);
@@ -588,15 +621,22 @@ inline CHIP_ERROR ConnectivityManager::SetThreadDeviceType(ThreadDeviceType devi
     return static_cast<ImplClass *>(this)->_SetThreadDeviceType(deviceType);
 }
 
-inline void ConnectivityManager::GetThreadPollingConfig(ThreadPollingConfig & pollingConfig)
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+inline CHIP_ERROR ConnectivityManager::GetSEDPollingConfig(SEDPollingConfig & pollingConfig)
 {
-    return static_cast<ImplClass *>(this)->_GetThreadPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_GetSEDPollingConfig(pollingConfig);
 }
 
-inline CHIP_ERROR ConnectivityManager::SetThreadPollingConfig(const ThreadPollingConfig & pollingConfig)
+inline CHIP_ERROR ConnectivityManager::SetSEDPollingConfig(const SEDPollingConfig & pollingConfig)
 {
-    return static_cast<ImplClass *>(this)->_SetThreadPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_SetSEDPollingConfig(pollingConfig);
 }
+
+inline CHIP_ERROR ConnectivityManager::RequestSEDFastPollingMode(bool onOff)
+{
+    return static_cast<ImplClass *>(this)->_RequestSEDFastPollingMode(onOff);
+}
+#endif
 
 inline bool ConnectivityManager::IsThreadAttached()
 {

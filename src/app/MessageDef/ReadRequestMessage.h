@@ -24,7 +24,7 @@
 #pragma once
 
 #include "AttributeDataVersionList.h"
-#include "AttributePathList.h"
+#include "AttributePathIBs.h"
 #include "Builder.h"
 #include "EventPaths.h"
 
@@ -48,17 +48,9 @@ enum
     kCsTag_EventNumber              = 3,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public StructParser
 {
 public:
-    /**
-     *  @brief Initialize the parser object with TLVReader
-     *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this request
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
@@ -77,14 +69,14 @@ public:
 #endif
 
     /**
-     *  @brief Get a TLVReader for the AttributePathList. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the AttributePathIBs. Next() must be called before accessing them.
      *
      *  @param [in] apAttributePathList    A pointer to an attribute path list parser.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const;
+    CHIP_ERROR GetPathList(AttributePathIBs::Parser * const apAttributePathList) const;
 
     /**
      *  @brief Get a TLVReader for the EventPaths. Next() must be called before accessing them.
@@ -117,24 +109,15 @@ public:
     CHIP_ERROR GetEventNumber(uint64_t * const apEventNumber) const;
 };
 
-class Builder : public chip::app::Builder
+class Builder : public StructBuilder
 {
 public:
     /**
-     *  @brief Initialize a ReadRequestMessage::Builder for writing into a TLV stream
+     *  @brief Initialize a AttributePathIBs::Builder for writing into the TLV stream
      *
-     *  @param [in] apWriter    A pointer to TLVWriter
-     *
-     *  @return #CHIP_NO_ERROR on success
+     *  @return A reference to AttributePathIBs::Builder
      */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
-
-    /**
-     *  @brief Initialize a AttributePathList::Builder for writing into the TLV stream
-     *
-     *  @return A reference to AttributePathList::Builder
-     */
-    AttributePathList::Builder & CreateAttributePathListBuilder();
+    AttributePathIBs::Builder & CreateAttributePathListBuilder();
 
     /**
      *  @brief Initialize a EventPaths::Builder for writing into the TLV stream
@@ -165,7 +148,7 @@ public:
     ReadRequestMessage::Builder & EndOfReadRequestMessage();
 
 private:
-    AttributePathList::Builder mAttributePathListBuilder;
+    AttributePathIBs::Builder mAttributePathListBuilder;
     EventPaths::Builder mEventPathsBuilder;
     AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
 };

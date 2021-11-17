@@ -22,7 +22,7 @@
  */
 
 #include <lib/support/CodeUtils.h>
-#include <system/LwIPEventSupport.h>
+#include <system/PlatformEventSupport.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 #include <system/SystemLayerImplLwIP.h>
@@ -30,7 +30,7 @@
 namespace chip {
 namespace System {
 
-LayerImplLwIP::LayerImplLwIP() : mHandlingTimerComplete(false), mEventDelegateList(nullptr) {}
+LayerImplLwIP::LayerImplLwIP() : mHandlingTimerComplete(false) {}
 
 CHIP_ERROR LayerImplLwIP::Init()
 {
@@ -95,96 +95,6 @@ CHIP_ERROR LayerImplLwIP::ScheduleWork(TimerCompleteCallback onComplete, void * 
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
     return ScheduleLambda([timer] { timer->HandleComplete(); });
-}
-
-bool LayerLwIP::EventHandlerDelegate::IsInitialized() const
-{
-    return mFunction != nullptr;
-}
-
-void LayerLwIP::EventHandlerDelegate::Init(EventHandlerFunction aFunction)
-{
-    mFunction     = aFunction;
-    mNextDelegate = nullptr;
-}
-
-void LayerLwIP::EventHandlerDelegate::Prepend(const LayerLwIP::EventHandlerDelegate *& aDelegateList)
-{
-    mNextDelegate = aDelegateList;
-    aDelegateList = this;
-}
-
-CHIP_ERROR LayerImplLwIP::AddEventHandlerDelegate(EventHandlerDelegate & aDelegate)
-{
-    LwIPEventHandlerDelegate & lDelegate = static_cast<LwIPEventHandlerDelegate &>(aDelegate);
-    VerifyOrReturnError(lDelegate.GetFunction() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    lDelegate.Prepend(mEventDelegateList);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LayerImplLwIP::ScheduleLambdaBridge(const LambdaBridge & bridge)
-{
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-
-    CHIP_ERROR lReturn = PlatformEventing::ScheduleLambdaBridge(*this, bridge);
-    if (lReturn != CHIP_NO_ERROR)
-    {
-        ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer lambda event: %s", ErrorStr(lReturn));
-    }
-    return lReturn;
-}
-
-CHIP_ERROR LayerImplLwIP::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
-{
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-
-    CHIP_ERROR lReturn = PlatformEventing::PostEvent(*this, aTarget, aEventType, aArgument);
-    if (lReturn != CHIP_NO_ERROR)
-    {
-        ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer event (type %d): %s", aEventType, ErrorStr(lReturn));
-    }
-    return lReturn;
-}
-
-/**
- * This implements the actual dispatch and handling of a CHIP System Layer event.
- *
- *  @param[in,out]  aTarget     A reference to the layer object to which the event is targeted.
- *  @param[in]      aEventType  The event / message type to handle.
- *  @param[in]      aArgument   The argument associated with the event / message.
- *
- *  @retval   CHIP_NO_ERROR                 On success.
- *  @retval   CHIP_ERROR_INCORRECT_STATE    If the state of the InetLayer object is incorrect.
- *  @retval   CHIP_ERROR_UNEXPECTED_EVENT   If the event type is unrecognized.
- */
-CHIP_ERROR LayerImplLwIP::HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
-{
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-
-    // Prevent the target object from being freed while dispatching the event.
-    aTarget.Retain();
-
-    CHIP_ERROR lReturn                              = CHIP_ERROR_UNEXPECTED_EVENT;
-    const LwIPEventHandlerDelegate * lEventDelegate = static_cast<const LwIPEventHandlerDelegate *>(mEventDelegateList);
-
-    while (lReturn == CHIP_ERROR_UNEXPECTED_EVENT && lEventDelegate != nullptr)
-    {
-        lReturn        = lEventDelegate->GetFunction()(aTarget, aEventType, aArgument);
-        lEventDelegate = lEventDelegate->GetNextDelegate();
-    }
-
-    if (lReturn == CHIP_ERROR_UNEXPECTED_EVENT)
-    {
-        ChipLogError(chipSystemLayer, "Unexpected event type %d", aEventType);
-    }
-
-    /*
-      Release the reference to the target object. When the object's lifetime finally comes to an end, in most cases this will be
-      the release call that decrements the ref count to zero.
-      */
-    aTarget.Release();
-
-    return lReturn;
 }
 
 /**

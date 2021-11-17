@@ -148,6 +148,17 @@ bool emberAfContainsServerWithMfgCode(chip::EndpointId endpoint, chip::ClusterId
 bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
+ * @brief Returns true if endpoint of given index contains the ZCL server with specified id.
+ *
+ * This function returns true if
+ * the endpoint of given index contains server of a given cluster.
+ * If this function is used with a manufacturer specific clusterId
+ * then this will return the first cluster that it finds in the Cluster table.
+ * and will not return any other clusters that share that id.
+ */
+bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
+
+/**
  * @brief Returns true if endpoint contains cluster client.
  *
  * This function returns true if

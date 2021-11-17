@@ -33,29 +33,13 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadRequestMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // make a copy of the reader here
-    mReader.Init(aReader);
-
-    VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = mReader.EnterContainer(mOuterContainerType);
-
-exit:
-
-    return err;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
-    AttributePathList::Parser attributePathList;
+    AttributePathIBs::Parser AttributePathIBs;
     EventPaths::Parser eventPathList;
     AttributeDataVersionList::Parser attributeDataVersionList;
     PRETTY_PRINT("ReadRequestMessage =");
@@ -74,11 +58,11 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
             TagPresenceMask |= (1 << kCsTag_AttributePathList);
             VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-            attributePathList.Init(reader);
+            AttributePathIBs.Init(reader);
 
             PRETTY_PRINT_INCDEPTH();
 
-            err = attributePathList.CheckSchemaValidity();
+            err = AttributePathIBs.CheckSchemaValidity();
             SuccessOrExit(err);
 
             PRETTY_PRINT_DECDEPTH();
@@ -119,11 +103,11 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
             TagPresenceMask |= (1 << kCsTag_AttributePathList);
             VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-            attributePathList.Init(reader);
+            AttributePathIBs.Init(reader);
 
             PRETTY_PRINT_INCDEPTH();
 
-            err = attributePathList.CheckSchemaValidity();
+            err = AttributePathIBs.CheckSchemaValidity();
             SuccessOrExit(err);
 
             PRETTY_PRINT_DECDEPTH();
@@ -161,7 +145,7 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR ReadRequestMessage::Parser::GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const
+CHIP_ERROR ReadRequestMessage::Parser::GetPathList(AttributePathIBs::Parser * const apAttributePathList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -224,12 +208,7 @@ CHIP_ERROR ReadRequestMessage::Parser::GetEventNumber(uint64_t * const apEventNu
     return GetUnsignedInteger(kCsTag_EventNumber, apEventNumber);
 }
 
-CHIP_ERROR ReadRequestMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
-}
-
-AttributePathList::Builder & ReadRequestMessage::Builder::CreateAttributePathListBuilder()
+AttributePathIBs::Builder & ReadRequestMessage::Builder::CreateAttributePathListBuilder()
 {
     // skip if error has already been set
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributePathListBuilder.ResetError(mError));

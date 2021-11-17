@@ -203,11 +203,11 @@
             if (chipDevice) {
                 CHIPTemperatureMeasurement * cluster =
                     [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
-
+                // TODO - Fix temperature reporting in iOS CHIPTool
+                /*
                 [cluster
                     subscribeAttributeMeasuredValueWithMinInterval:minIntervalSeconds
                                                        maxInterval:maxIntervalSeconds
-                                                            change:deltaInCelsius
                                                    responseHandler:^(NSError * error, NSDictionary * values) {
                                                        if (error == nil)
                                                            return;
@@ -221,6 +221,7 @@
                     NSNumber * value = values[@"value"];
                     [self updateTempInUI:value.shortValue];
                 }];
+                 */
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }

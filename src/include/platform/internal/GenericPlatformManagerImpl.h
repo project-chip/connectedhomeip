@@ -61,15 +61,20 @@ protected:
     CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
     CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
     CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
+    CHIP_ERROR _GetThreadMetrics(ThreadMetrics ** threadMetricsOut);
+    void _ReleaseThreadMetrics(ThreadMetrics * threadMetrics);
 
     CHIP_ERROR _GetRebootCount(uint16_t & rebootCount);
     CHIP_ERROR _GetUpTime(uint64_t & upTime);
     CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
     CHIP_ERROR _GetBootReasons(uint8_t & bootReasons);
 
+    CHIP_ERROR _GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults);
+    CHIP_ERROR _GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults);
+    CHIP_ERROR _GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults);
+
     // ===== Support methods that can be overridden by the implementation subclass.
 
-    void DispatchEventToSystemLayer(const ChipDeviceEvent * event);
     void DispatchEventToDeviceLayer(const ChipDeviceEvent * event);
     void DispatchEventToApplication(const ChipDeviceEvent * event);
     static void HandleMessageLayerActivityChanged(bool messageLayerIsActive);
@@ -102,6 +107,16 @@ inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetCurrentHeapHighWate
 }
 
 template <class ImplClass>
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline void GenericPlatformManagerImpl<ImplClass>::_ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{}
+
+template <class ImplClass>
 inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetRebootCount(uint16_t & rebootCount)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -121,6 +136,25 @@ inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetTotalOperationalHou
 
 template <class ImplClass>
 inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBootReasons(uint8_t & bootReasons)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR
+GenericPlatformManagerImpl<ImplClass>::_GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

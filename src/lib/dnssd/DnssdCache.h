@@ -24,7 +24,7 @@
 #include <inet/InetLayer.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/PeerId.h>
-#include <system/SystemTimer.h>
+#include <lib/dnssd/Resolver.h>
 #include <system/TimeSource.h>
 
 // set MDNS_LOGGING to enable logging -- sometimes used in debug/test programs -- traces the behavior
@@ -43,7 +43,7 @@ class DnssdCache
 public:
     DnssdCache() : elementsUsed(CACHE_SIZE)
     {
-        for (DnssdCacheEntry & e : mLookupTable)
+        for (ResolvedNodeData & e : mLookupTable)
         {
             // each unused entry decrements the count
             MarkEntryUnused(e);
@@ -55,30 +55,23 @@ public:
     // return error if cache is full
     // TODO:   have an eviction policy so if the cache is full, an entry may be deleted.
     //         One policy may be Least-time-to-live
-    CHIP_ERROR Insert(PeerId peerId, const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId iface, uint32_t TTLms)
+    CHIP_ERROR Insert(const ResolvedNodeData & nodeData)
     {
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
-        DnssdCacheEntry * entry;
+        ResolvedNodeData * entry;
 
-        entry = FindPeerId(peerId, currentTime);
+        entry = FindPeerId(nodeData.mPeerId, currentTime);
         if (entry)
         {
-            // update timeout if found entry
-            entry->expiryTime = currentTime + TTLms;
-            entry->TTL        = TTLms; // in case it changes */
+            *entry = nodeData;
             return CHIP_NO_ERROR;
         }
 
         VerifyOrReturnError(entry = findSlot(currentTime), CHIP_ERROR_TOO_MANY_KEYS);
 
         // have a free slot for this entry
-        entry->peerId     = peerId;
-        entry->ipAddr     = addr;
-        entry->port       = port;
-        entry->ifaceId    = iface;
-        entry->TTL        = TTLms;
-        entry->expiryTime = currentTime + TTLms;
+        *entry = nodeData;
         elementsUsed++;
 
         return CHIP_NO_ERROR;
@@ -86,8 +79,8 @@ public:
 
     CHIP_ERROR Delete(PeerId peerId)
     {
-        DnssdCacheEntry * pentry;
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        ResolvedNodeData * pentry;
+        const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
         VerifyOrReturnError(pentry = FindPeerId(peerId, currentTime), CHIP_ERROR_KEY_NOT_FOUND);
 
@@ -96,16 +89,14 @@ public:
     }
 
     // given a peerId, find the parameters if its in the cache, or return error
-    CHIP_ERROR Lookup(PeerId peerId, Inet::IPAddress & addr, uint16_t & port, Inet::InterfaceId & iface)
+    CHIP_ERROR Lookup(PeerId peerId, ResolvedNodeData & nodeData)
     {
-        DnssdCacheEntry * pentry;
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
+        ResolvedNodeData * pentry;
+        const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
         VerifyOrReturnError(pentry = FindPeerId(peerId, currentTime), CHIP_ERROR_KEY_NOT_FOUND);
 
-        addr  = pentry->ipAddr;
-        port  = pentry->port;
-        iface = pentry->ifaceId;
+        nodeData = *pentry;
 
         return CHIP_NO_ERROR;
     }
@@ -116,48 +107,41 @@ public:
         int i = 0;
 
         MdnsLogProgress(Discovery, "cache size = %d", elementsUsed);
-        for (DnssdCacheEntry & e : mLookupTable)
+        for (ResolvedNodeData & e : mLookupTable)
         {
-            if (e.peerId == nullPeerId)
+            if (e.mPeerId == nullPeerId)
             {
                 MdnsLogProgress(Discovery, "Entry %d unused", i);
             }
             else
             {
-                char address[100];
-
-                e.ipAddr.ToString(address, sizeof address);
-                MdnsLogProgress(Discovery, "Entry %d: node %lx fabric %lx, port = %d, address = %s", i, e.peerId.GetNodeId(),
-                                e.peerId.GetFabricId(), e.port, address);
+                MdnsLogProgress(Discovery, "Entry %d: node %lx fabric %lx, port = %d", i, e.mPeerId.GetNodeId(),
+                                e.peerId.GetFabricId(), e.port);
+                for (size_t j = 0; j < e.mNumIPs; ++j)
+                {
+                    char address[Inet::IPAddress::kMaxStringLength];
+                    e.mAddress[i].ToString(address);
+                    MdnsLogProgress(Discovery, "    address %d: %s", j, address);
+                }
             }
             i++;
         }
     }
 
 private:
-    struct DnssdCacheEntry
-    {
-        PeerId peerId;
-        Inet::IPAddress ipAddr;
-        uint16_t port;
-        Inet::InterfaceId ifaceId;
-        uint64_t TTL;        // from mdns record -- units?
-        uint64_t expiryTime; // units?
-    };
     PeerId nullPeerId; // indicates a cache entry is unused
     int elementsUsed;  // running count of how many entries are used -- for a sanity check
 
-    DnssdCacheEntry mLookupTable[CACHE_SIZE];
-    Time::TimeSource<Time::Source::kSystem> mTimeSource;
+    ResolvedNodeData mLookupTable[CACHE_SIZE];
 
-    DnssdCacheEntry * findSlot(uint64_t currentTime)
+    ResolvedNodeData * findSlot(System::Clock::Timestamp currentTime)
     {
-        for (DnssdCacheEntry & entry : mLookupTable)
+        for (ResolvedNodeData & entry : mLookupTable)
         {
-            if (entry.peerId == nullPeerId)
+            if (entry.mPeerId == nullPeerId)
                 return &entry;
 
-            if (entry.expiryTime <= currentTime)
+            if (entry.mExpiryTime <= currentTime)
             {
                 MarkEntryUnused(entry);
                 return &entry;
@@ -166,13 +150,13 @@ private:
         return nullptr;
     }
 
-    DnssdCacheEntry * FindPeerId(PeerId peerId, uint64_t current_time)
+    ResolvedNodeData * FindPeerId(PeerId peerId, System::Clock::Timestamp current_time)
     {
-        for (DnssdCacheEntry & entry : mLookupTable)
+        for (ResolvedNodeData & entry : mLookupTable)
         {
-            if (entry.peerId == peerId)
+            if (entry.mPeerId == peerId)
             {
-                if (entry.expiryTime < current_time)
+                if (entry.mExpiryTime < current_time)
                 {
                     MarkEntryUnused(entry);
                     break; // return nullptr
@@ -180,7 +164,7 @@ private:
                 else
                     return &entry;
             }
-            if (entry.peerId != nullPeerId && entry.expiryTime < current_time)
+            if (entry.mPeerId != nullPeerId && entry.mExpiryTime < current_time)
             {
                 MarkEntryUnused(entry);
             }
@@ -190,9 +174,9 @@ private:
     }
 
     // have a method to mark ununused --  so its easy to change
-    void MarkEntryUnused(DnssdCacheEntry & pentry)
+    void MarkEntryUnused(ResolvedNodeData & pentry)
     {
-        pentry.peerId = nullPeerId;
+        pentry.mPeerId = nullPeerId;
         elementsUsed--;
     }
 };

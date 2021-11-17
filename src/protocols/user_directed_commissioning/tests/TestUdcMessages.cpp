@@ -256,11 +256,11 @@ void TestUDCClients(nlTestSuite * inSuite, void * inContext)
 
     // test re-activation
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == mUdcClients.CreateNewUDCClientState(instanceName4, &state));
-    uint64_t expirationTime = state->GetExpirationTimeMs();
-    state->SetExpirationTimeMs(expirationTime - 1);
-    NL_TEST_ASSERT(inSuite, (expirationTime - 1) == state->GetExpirationTimeMs());
+    System::Clock::Timestamp expirationTime = state->GetExpirationTime();
+    state->SetExpirationTime(expirationTime - System::Clock::Milliseconds64(1));
+    NL_TEST_ASSERT(inSuite, (expirationTime - System::Clock::Milliseconds64(1)) == state->GetExpirationTime());
     mUdcClients.MarkUDCClientActive(state);
-    NL_TEST_ASSERT(inSuite, (expirationTime - 1) < state->GetExpirationTimeMs());
+    NL_TEST_ASSERT(inSuite, (expirationTime - System::Clock::Milliseconds64(1)) < state->GetExpirationTime());
 }
 
 // Test Suite

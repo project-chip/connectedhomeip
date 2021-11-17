@@ -30,10 +30,10 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "AttributeDataList.h"
-#include "Builder.h"
-#include "EventList.h"
-#include "Parser.h"
+#include "AttributeReportIBs.h"
+#include "EventReports.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 
 namespace chip {
 namespace app {
@@ -42,23 +42,14 @@ enum
 {
     kCsTag_SuppressResponse    = 0,
     kCsTag_SubscriptionId      = 1,
-    kCsTag_AttributeDataList   = 2,
-    kCsTag_EventDataList       = 3,
+    kCsTag_AttributeReportIBs  = 2,
+    kCsTag_EventReports        = 3,
     kCsTag_MoreChunkedMessages = 4,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public StructParser
 {
 public:
-    /**
-     *  @brief Initialize the parser object with TLVReader
-     *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this ReportDataMessage
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
@@ -100,24 +91,24 @@ public:
     /**
      *  @brief Get a TLVReader for the AttributesDataList. Next() must be called before accessing them.
      *
-     *  @param [in] apAttributeDataList    A pointer to apAttributeDataList
+     *  @param [in] apAttributeReportIBs    A pointer to apAttributeReportIBs
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Array
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributeDataList(AttributeDataList::Parser * const apAttributeDataList) const;
+    CHIP_ERROR GetAttributeReportIBs(AttributeReportIBs::Parser * const apAttributeReportIBs) const;
 
     /**
-     *  @brief Get a TLVReader for the EventDataList. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the EventReports. Next() must be called before accessing them.
      *
-     *  @param [in] apEventDataList    A pointer to apEventDataList
+     *  @param [in] apEventReports    A pointer to apEventReports
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Array
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventDataList(EventList::Parser * const apEventDataList) const;
+    CHIP_ERROR GetEventReports(EventReports::Parser * const apEventReports) const;
 
     /**
      *  @brief Check whether there are more chunked messages in a transaction. Next() must be called before accessing them.
@@ -130,18 +121,9 @@ public:
     CHIP_ERROR GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const;
 };
 
-class Builder : public chip::app::Builder
+class Builder : public StructBuilder
 {
 public:
-    /**
-     *  @brief Initialize a ReportDataMessage::Builder for writing into a TLV stream
-     *
-     *  @param [in] apWriter    A pointer to TLVWriter
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
-
     /**
      *  @brief Inject SuppressResponse into the TLV stream to indicate whether a response (a StatusResponseMessage specifically)
      *  is to be sent back to the request.
@@ -166,18 +148,18 @@ public:
     ReportDataMessage::Builder & SubscriptionId(const uint64_t aSubscriptionId);
 
     /**
-     *  @brief Initialize a AttributeDataList::Builder for writing into the TLV stream
+     *  @brief Initialize a AttributeReportIBs::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataList::Builder
+     *  @return A reference to AttributeReportIBs::Builder
      */
-    AttributeDataList::Builder & CreateAttributeDataListBuilder();
+    AttributeReportIBs::Builder & CreateAttributeReportIBs();
 
     /**
-     *  @brief Initialize a EventList::Builder for writing into the TLV stream
+     *  @brief Initialize a EventReports::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventList::Builder
+     *  @return A reference to EventReports::Builder
      */
-    EventList::Builder & CreateEventDataListBuilder();
+    EventReports::Builder & CreateEventReports();
 
     /**
      *  @brief This flag is set to ‘true’ when there are more chunked messages in a transaction.
@@ -194,8 +176,8 @@ public:
     ReportDataMessage::Builder & EndOfReportDataMessage();
 
 private:
-    AttributeDataList::Builder mAttributeDataListBuilder;
-    EventList::Builder mEventDataListBuilder;
+    AttributeReportIBs::Builder mAttributeReportIBsBuilder;
+    EventReports::Builder mEventReportsBuilder;
 };
 }; // namespace ReportDataMessage
 

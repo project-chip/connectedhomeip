@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
@@ -34,10 +35,7 @@ import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
 import com.google.chip.chiptool.util.DeviceIdUtil
 import com.google.chip.chiptool.util.FragmentUtil
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
@@ -52,13 +50,14 @@ class DeviceProvisioningFragment : Fragment() {
       ProvisionNetworkType.fromName(arguments?.getString(ARG_PROVISION_NETWORK_TYPE))
     )
 
-  private val scope = CoroutineScope(Dispatchers.Main + Job())
+  private lateinit var scope: CoroutineScope
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    scope = viewLifecycleOwner.lifecycleScope
     deviceInfo = checkNotNull(requireArguments().getParcelable(ARG_DEVICE_INFO))
     return inflater.inflate(R.layout.single_fragment_container, container, false).apply {
       if (savedInstanceState == null) {
@@ -74,7 +73,6 @@ class DeviceProvisioningFragment : Fragment() {
   override fun onStop() {
     super.onStop()
     gatt = null
-    scope.cancel()
   }
 
   private fun pairDeviceWithAddress() {

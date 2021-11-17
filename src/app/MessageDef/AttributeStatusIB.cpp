@@ -1,8 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Google LLC.
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -15,15 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines AttributeStatusIB parser and builder in CHIP interaction model
- *
- */
 
 #include "AttributeStatusIB.h"
-
 #include "MessageDefHelper.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -31,64 +25,14 @@
 
 #include <app/AppBuildConfig.h>
 
-using namespace chip;
-using namespace chip::TLV;
-
 namespace chip {
 namespace app {
-CHIP_ERROR AttributeStatusIB::Builder::Init(chip::TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
-}
-
-AttributePath::Builder & AttributeStatusIB::Builder::CreateAttributePathBuilder()
-{
-    // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributePathBuilder.ResetError(mError));
-
-    mError = mAttributePathBuilder.Init(mpWriter, kCsTag_AttributePath);
-
-exit:
-    return mAttributePathBuilder;
-}
-
-StatusIB::Builder & AttributeStatusIB::Builder::CreateStatusIBBuilder()
-{
-    // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mStatusIBBuilder.ResetError(mError));
-
-    mError = mStatusIBBuilder.Init(mpWriter, kCsTag_StatusIB);
-
-exit:
-    return mStatusIBBuilder;
-}
-
-AttributeStatusIB::Builder & AttributeStatusIB::Builder::EndOfAttributeStatusIB()
-{
-    EndOfContainer();
-    return *this;
-}
-
-CHIP_ERROR AttributeStatusIB::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // make a copy of the reader here
-    mReader.Init(aReader);
-    VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = mReader.EnterContainer(mOuterContainerType);
-
-exit:
-    return err;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR AttributeStatusIB::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    uint16_t TagPresenceMask = 0;
-    chip::TLV::TLVReader reader;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    int TagPresenceMask = 0;
+    TLV::TLVReader reader;
 
     PRETTY_PRINT("AttributeStatusIB =");
     PRETTY_PRINT("{");
@@ -98,105 +42,99 @@ CHIP_ERROR AttributeStatusIB::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(chip::TLV::IsContextTag(reader.GetTag()), err = CHIP_ERROR_INVALID_TLV_TAG);
-        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
+        switch (tagNum)
         {
-        case kCsTag_AttributePath:
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributePath)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_AttributePath);
+        case to_underlying(Tag::kPath):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kPath));
             {
-                AttributePath::Parser path;
-                err = path.Init(reader);
-                SuccessOrExit(err);
+                AttributePathIB::Parser path;
+                ReturnErrorOnFailure(path.Init(reader));
 
                 PRETTY_PRINT_INCDEPTH();
-                err = path.CheckSchemaValidity();
-                SuccessOrExit(err);
+                ReturnErrorOnFailure(path.CheckSchemaValidity());
                 PRETTY_PRINT_DECDEPTH();
             }
             break;
-        case kCsTag_StatusIB:
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_StatusIB)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_StatusIB);
+        case to_underlying(Tag::kErrorStatus):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kErrorStatus))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kErrorStatus));
             {
-                StatusIB::Parser status;
-                err = status.Init(reader);
-                SuccessOrExit(err);
+                StatusIB::Parser errorStatus;
+                ReturnErrorOnFailure(errorStatus.Init(reader));
 
                 PRETTY_PRINT_INCDEPTH();
-                err = status.CheckSchemaValidity();
-                SuccessOrExit(err);
+                ReturnErrorOnFailure(errorStatus.CheckSchemaValidity());
                 PRETTY_PRINT_DECDEPTH();
             }
             break;
         default:
-            ExitNow(err = CHIP_ERROR_INVALID_TLV_TAG);
+            PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
+            break;
         }
     }
 
     PRETTY_PRINT("},");
     PRETTY_PRINT("");
 
-    // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // check for required fields:
-        const uint16_t RequiredFields = (1 << kCsTag_AttributePath) | (1 << kCsTag_StatusIB);
+        const int RequiredFields = (1 << to_underlying(Tag::kPath)) | (1 << to_underlying(Tag::kErrorStatus));
 
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {
             err = CHIP_NO_ERROR;
         }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_ELEMENT;
-        }
     }
-    SuccessOrExit(err);
-    err = reader.ExitContainer(mOuterContainerType);
 
-exit:
-
-    return err;
+    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
+    return CHIP_NO_ERROR;
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR AttributeStatusIB::Parser::GetAttributePath(AttributePath::Parser * const apAttributePath) const
+CHIP_ERROR AttributeStatusIB::Parser::GetPath(AttributePathIB::Parser * const apPath) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
-
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributePath), reader);
-    SuccessOrExit(err);
-
-    VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = apAttributePath->Init(reader);
-    SuccessOrExit(err);
-
-exit:
-    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
-
-    return err;
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
+    ReturnErrorOnFailure(apPath->Init(reader));
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AttributeStatusIB::Parser::GetStatusIB(StatusIB::Parser * const apStatusIB) const
+CHIP_ERROR AttributeStatusIB::Parser::GetErrorStatus(StatusIB::Parser * const apErrorStatus) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
-
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_StatusIB), reader);
-    SuccessOrExit(err);
-
-    VerifyOrExit(chip::TLV::kTLVType_Structure == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = apStatusIB->Init(reader);
-    SuccessOrExit(err);
-
-exit:
-    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
-
-    return err;
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kErrorStatus)), reader));
+    ReturnErrorOnFailure(apErrorStatus->Init(reader));
+    return CHIP_NO_ERROR;
 }
-}; // namespace app
-}; // namespace chip
+
+AttributePathIB::Builder & AttributeStatusIB::Builder::CreatePath()
+{
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mPath.Init(mpWriter, to_underlying(Tag::kPath));
+    }
+    return mPath;
+}
+
+StatusIB::Builder & AttributeStatusIB::Builder::CreateErrorStatus()
+{
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mErrorStatus.Init(mpWriter, to_underlying(Tag::kErrorStatus));
+    }
+    return mErrorStatus;
+}
+
+AttributeStatusIB::Builder & AttributeStatusIB::Builder::EndOfAttributeStatusIB()
+{
+    EndOfContainer();
+    return *this;
+}
+} // namespace app
+} // namespace chip

@@ -63,13 +63,13 @@ public:
          * Notification that a list of events is received on the given read client.
          * The ReadClient object MUST continue to exist after this call is completed.
          *
-         * @param[in]  apReadClient The read client which initialized the read transaction.
-         * @param[in]  apEventListReader  TLV reader positioned at the list that contains the events.  The
-         *                                implementation of EventStreamReceived is expected to call Next() on the reader to
-         *                                advance it to the first element of the list, then process the elements from beginning to
-         *                                the end. The callee is expected to consume all events.
+         * @param[in]  apReadClient         The read client which initialized the read transaction.
+         * @param[in]  aEventReports        TLV reader positioned at the list that contains the events.  The
+         *                                  implementation of EventStreamReceived is expected to call Next() on the reader to
+         *                                  advance it to the first element of the list, then process the elements from beginning to
+         *                                  the end. The callee is expected to consume all events.
          */
-        virtual void OnEventData(const ReadClient * apReadClient, TLV::TLVReader & aEventList) {}
+        virtual void OnEventData(const ReadClient * apReadClient, TLV::TLVReader & aEventReports) {}
 
         /**
          * OnResponse will be called when a report data response has been received and processed for the given path.
@@ -81,11 +81,11 @@ public:
          *   - Receiving attribute data as reports of subscriptions
          *   - Receiving attribute data as initial reports of subscriptions
          *
-         * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
-         * @param[in] aPath: The attribute path field in report response.
-         * @param[in] apData: The attribute data of the given path, will be a nullptr if status is not Success.
-         * @param[in] aStatus: Attribute-specific status, containing an InteractionModel::Status code as well as an optional
-         *                     cluster-specific status code.
+         * @param[in] apReadClient The read client object that initiated the read or subscribe transaction.
+         * @param[in] aPath        The attribute path field in report response.
+         * @param[in] apData       The attribute data of the given path, will be a nullptr if status is not Success.
+         * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
+         *                         optional cluster-specific status code.
          */
         virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, TLV::TLVReader * apData,
                                      const StatusIB & aStatus)
@@ -97,7 +97,7 @@ public:
          * The ReadClient object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call before it shuts down the object.
          *
-         * @param[in] apReadClient: The read client object that initiated the read transaction.
+         * @param[in] apReadClient The read client object that initiated the read transaction.
          */
         virtual void OnSubscriptionEstablished(const ReadClient * apReadClient) {}
 
@@ -112,8 +112,8 @@ public:
          * The ReadClient object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call before it shuts down the object.
          *
-         * @param[in] apReadClient: The read client object that initiated the attribute read transaction.
-         * @param[in] aError: A system error code that conveys the overall error code.
+         * @param[in] apReadClient The read client object that initiated the attribute read transaction.
+         * @param[in] aError       A system error code that conveys the overall error code.
          */
         virtual void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) {}
 
@@ -126,7 +126,7 @@ public:
          *      - Be called even in error circumstances.
          *      - Only be called after a successful call to SendWriteRequest as been made.
          *
-         * @param[in] apReadClient: The read client object of the terminated read transaction.
+         * @param[in] apReadClient The read client object of the terminated read transaction.
          */
         virtual void OnDone(ReadClient * apReadClient) = 0;
     };
@@ -175,16 +175,16 @@ public:
         return mInteractionType == InteractionType::Subscribe ? returnType(mSubscriptionId) : returnType::Missing();
     }
 
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
-    CHIP_ERROR SendStatusResponse(CHIP_ERROR aError);
 
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
 
-    enum class ClientState
+    enum class ClientState : uint8_t
     {
         Uninitialized = 0,         ///< The client has not been initialized
         Initialized,               ///< The client has been initialized and is ready for a SendReadRequest
@@ -214,7 +214,7 @@ private:
      *      - SubscribeResponseProcessed
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
+     *  @param[in]    apCallback       InteractionModelDelegate set by application.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
@@ -239,9 +239,9 @@ private:
 
     CHIP_ERROR GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
                                   size_t aEventPathParamsListSize);
-    CHIP_ERROR GenerateAttributePathList(AttributePathList::Builder & aAttributeathListBuilder,
+    CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
-    CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
+    CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
 
     void ClearExchangeContext() { mpExchangeCtx = nullptr; }
     static void OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState);
@@ -249,6 +249,7 @@ private:
     CHIP_ERROR RefreshLivenessCheckTimer();
     void CancelLivenessCheckTimer();
     void MoveToState(const ClientState aTargetState);
+    CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ClusterInfo & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;
@@ -264,10 +265,12 @@ private:
     Callback * mpCallback                      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
     bool mInitialReport                        = true;
+    bool mPendingMoreChunks                    = false;
     uint16_t mMinIntervalFloorSeconds          = 0;
     uint16_t mMaxIntervalCeilingSeconds        = 0;
     uint64_t mSubscriptionId                   = 0;
     NodeId mPeerNodeId                         = kUndefinedNodeId;
+    FabricIndex mFabricIndex                   = kUndefinedFabricIndex;
     InteractionType mInteractionType           = InteractionType::Read;
 };
 

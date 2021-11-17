@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
 #include <lib/support/Span.h>
 
@@ -23,10 +24,14 @@ namespace Attributes {
 
 {{/first}}
 {{#if clusterRef}}
-{{#if (canHaveSimpleAccessors type)}}
+{{#if (canHaveSimpleAccessors this)}}
 namespace {{asUpperCamelCase label}} {
-EmberAfStatus Get(chip::EndpointId endpoint, {{#if (isCharString type)}}chip::MutableCharSpan{{else if (isOctetString type)}}chip::MutableByteSpan{{else}}{{asUnderlyingZclType type}} *{{/if}} value); // {{type}} {{isArray}}
+EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value); // {{type}} {{isArray}}
 EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} value);
+{{#if isNullable}}
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<{{asUnderlyingZclType type}}> & value);
+{{/if}}
 } // namespace {{asUpperCamelCase label}}
 
 {{/if}}

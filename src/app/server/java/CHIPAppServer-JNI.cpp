@@ -21,7 +21,7 @@
  *      Implementation of JNI bridge for CHIP App Server for Android TV apps
  *
  */
-#include "AppMain.h"
+#include "AndroidAppServerWrapper.h"
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
@@ -53,7 +53,7 @@ pthread_t sIOThread               = PTHREAD_NULL;
 jclass sChipAppServerExceptionCls = NULL;
 } // namespace
 
-jint JNI_OnLoad(JavaVM * jvm, void * reserved)
+jint AndroidAppServerJNI_OnLoad(JavaVM * jvm, void * reserved)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
@@ -91,7 +91,7 @@ exit:
     return (err == CHIP_NO_ERROR) ? JNI_VERSION_1_6 : JNI_ERR;
 }
 
-void JNI_OnUnload(JavaVM * jvm, void * reserved)
+void AndroidAppServerJNI_OnUnload(JavaVM * jvm, void * reserved)
 {
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "JNI_OnUnload() called");

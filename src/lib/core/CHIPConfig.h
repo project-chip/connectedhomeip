@@ -1833,6 +1833,18 @@
 #endif // CHIP_DETAIL_LOGGING
 
 /**
+ *  @def CHIP_AUTOMATION_LOGGING
+ *
+ *  @brief
+ *    If asserted (1), enable logging of all messages in the
+ *    chip::Logging::kLogCategory_Automation category.
+ *
+ */
+#ifndef CHIP_AUTOMATION_LOGGING
+#define CHIP_AUTOMATION_LOGGING 1
+#endif // CHIP_AUTOMATION_LOGGING
+
+/**
  * CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
  *
  * The maximum size (in bytes) of a log message
@@ -2572,13 +2584,93 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC
  *
- * @brief Enable or disable attribute read with complex type.
- *
+ * Defines the number of access control entries supported per fabric in the
+ * example access control code.
  */
-#ifndef CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
-#define CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ 1
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 3
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY
+ *
+ * Defines the number of access control subjects supported per entry in the
+ * example access control code.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY 4
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY
+ *
+ * Defines the number of access control targets supported per entry in the
+ * example access control code.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY 3
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORAGE_POOL_SIZE
+ *
+ * Defines the entry storage pool size in the example access control code.
+ * It's possible to get by with only one.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORAGE_POOL_SIZE
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORAGE_POOL_SIZE 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE
+ *
+ * Defines the entry delegate pool size in the example access control code.
+ * It's possible to get by with only one.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_ITERATOR_DELEGATE_POOL_SIZE
+ *
+ * Defines the entry iterator delegate pool size in the example access control code.
+ * It's possible to get by with only one.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_ITERATOR_DELEGATE_POOL_SIZE
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_ITERATOR_DELEGATE_POOL_SIZE 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT
+ *
+ * Support fast copy in the example access control implementation.
+ *
+ * At least one of "fast" or "flexible" copy support must be enabled.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
+ *
+ * Support flexible copy in the example access control implementation.
+ *
+ * Only needed if mixing the example access control implementation with other
+ * non-example access control delegate implementations; omitting it saves space.
+ *
+ * At least one of "fast" or "flexible" copy support must be enabled.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT 0
+#endif
+
+#if !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT && !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
+#error                                                                                                                             \
+    "Please enable at least one of CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT or CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT"
 #endif
 
 /**

@@ -19,15 +19,6 @@
 
 namespace chip {
 namespace app {
-CHIP_ERROR StatusResponseMessage::Parser::Init(const TLV::TLVReader & aReader)
-{
-    // make a copy of the reader here
-    mReader.Init(aReader);
-    VerifyOrReturnLogError(TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnLogErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR StatusResponseMessage::Parser::CheckSchemaValidity() const
 {
@@ -42,23 +33,23 @@ CHIP_ERROR StatusResponseMessage::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnLogError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case kCsTag_Status:
-            VerifyOrReturnLogError(!statusTagPresence, CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(!statusTagPresence, CHIP_ERROR_INVALID_TLV_TAG);
             statusTagPresence = true;
-            VerifyOrReturnLogError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 uint16_t status;
-                ReturnLogErrorOnFailure(reader.Get(status));
+                ReturnErrorOnFailure(reader.Get(status));
                 PRETTY_PRINT("\tStatus = 0x%" PRIx16 ",", status);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
         default:
-            ReturnLogErrorOnFailure(CHIP_ERROR_INVALID_TLV_TAG);
+            ReturnErrorOnFailure(CHIP_ERROR_INVALID_TLV_TAG);
         }
     }
     PRETTY_PRINT("}");
@@ -68,7 +59,7 @@ CHIP_ERROR StatusResponseMessage::Parser::CheckSchemaValidity() const
     {
         err = CHIP_NO_ERROR;
     }
-    ReturnLogErrorOnFailure(err);
+    ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -79,11 +70,6 @@ CHIP_ERROR StatusResponseMessage::Parser::GetStatus(Protocols::InteractionModel:
     CHIP_ERROR err  = GetUnsignedInteger(kCsTag_Status, &status);
     aStatus         = static_cast<Protocols::InteractionModel::Status>(status);
     return err;
-}
-
-CHIP_ERROR StatusResponseMessage::Builder::Init(TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
 }
 
 StatusResponseMessage::Builder & StatusResponseMessage::Builder::Status(const Protocols::InteractionModel::Status aStatus)

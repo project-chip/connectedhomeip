@@ -77,5 +77,17 @@ inline PlatformManager & PlatformMgr(void)
 {
     return PlatformManagerImpl::sInstance;
 }
+
+/**
+ * Returns the platform-specific implementation of the PlatformManager singleton object.
+ *
+ * chip applications can use this to gain access to features of the PlatformManager
+ * that are specific to the ESP32 platform.
+ */
+inline PlatformManagerImpl & PlatformMgrImpl()
+{
+    return PlatformManagerImpl::sInstance;
+}
+
 } // namespace DeviceLayer
 } // namespace chip

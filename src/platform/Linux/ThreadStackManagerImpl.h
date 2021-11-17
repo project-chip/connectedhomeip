@@ -64,13 +64,13 @@ public:
 
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
 
-    void _GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig);
-
-    CHIP_ERROR _SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
+#endif
 
     bool _HaveMeshConnectivity();
-
-    void _OnMessageLayerActivityChanged(bool messageLayerIsActive);
 
     CHIP_ERROR _GetAndLogThreadStatsCounters();
 

@@ -532,16 +532,17 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
     BrowseContext * browseContext = chip::Platform::New<BrowseContext>();
     AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
 
-    browseContext->mInstance = this;
-    browseContext->mContext  = context;
-    browseContext->mCallback = callback;
+    browseContext->mInstance    = this;
+    browseContext->mContext     = context;
+    browseContext->mCallback    = callback;
+    browseContext->mAddressType = addressType;
     if (!interface.IsPresent())
     {
         avahiInterface = AVAHI_IF_UNSPEC;
     }
 
-    browser = avahi_service_browser_new(mClient, avahiInterface, ToAvahiProtocol(addressType), GetFullType(type, protocol).c_str(),
-                                        nullptr, static_cast<AvahiLookupFlags>(0), HandleBrowse, browseContext);
+    browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, GetFullType(type, protocol).c_str(), nullptr,
+                                        static_cast<AvahiLookupFlags>(0), HandleBrowse, browseContext);
     // Otherwise the browser will be freed in the callback
     if (browser == nullptr)
     {
@@ -613,9 +614,10 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
 
             Platform::CopyString(service.mName, name);
             CopyTypeWithoutProtocol(service.mType, type);
-            service.mProtocol    = GetProtocolInType(type);
-            service.mAddressType = ToAddressType(protocol);
-            service.mInterface   = Inet::InterfaceId::Null();
+            service.mProtocol      = GetProtocolInType(type);
+            service.mAddressType   = context->mAddressType;
+            service.mTransportType = ToAddressType(protocol);
+            service.mInterface     = Inet::InterfaceId::Null();
             if (interface != AVAHI_IF_UNSPEC)
             {
                 service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
@@ -645,9 +647,9 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     }
 }
 
-CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdServiceProtocol protocol,
-                              chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface,
-                              DnssdResolveCallback callback, void * context)
+CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
+                              Inet::IPAddressType transportType, Inet::InterfaceId interface, DnssdResolveCallback callback,
+                              void * context)
 {
     AvahiServiceResolver * resolver;
     AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
@@ -661,7 +663,8 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
     {
         avahiInterface = AVAHI_IF_UNSPEC;
     }
-    resolver = avahi_service_resolver_new(mClient, avahiInterface, ToAvahiProtocol(addressType), name,
+
+    resolver = avahi_service_resolver_new(mClient, avahiInterface, ToAvahiProtocol(transportType), name,
                                           GetFullType(type, protocol).c_str(), nullptr, ToAvahiProtocol(addressType),
                                           static_cast<AvahiLookupFlags>(0), HandleResolve, resolveContext);
     // Otherwise the resolver will be freed in the callback
@@ -701,6 +704,8 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         result.mPort        = port;
         result.mAddressType = ToAddressType(protocol);
         result.mInterface   = Inet::InterfaceId::Null();
+        // It's not clear if we can get the actual value from avahi, so just assume default.
+        result.mTtlSeconds = AVAHI_DEFAULT_TTL_HOST_NAME;
         if (interface != AVAHI_IF_UNSPEC)
         {
             result.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
@@ -813,18 +818,10 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
                             void * context)
 
 {
-    CHIP_ERROR error;
+    VerifyOrReturnError(browseResult != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (browseResult != nullptr)
-    {
-        error = MdnsAvahi::GetInstance().Resolve(browseResult->mName, browseResult->mType, browseResult->mProtocol,
-                                                 browseResult->mAddressType, interface, callback, context);
-    }
-    else
-    {
-        error = CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    return error;
+    return MdnsAvahi::GetInstance().Resolve(browseResult->mName, browseResult->mType, browseResult->mProtocol,
+                                            browseResult->mAddressType, Inet::IPAddressType::kAny, interface, callback, context);
 }
 
 } // namespace Dnssd

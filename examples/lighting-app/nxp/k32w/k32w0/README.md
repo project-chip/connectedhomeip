@@ -31,7 +31,7 @@ network.
 
 ## Introduction
 
-![K32W061 DK6](../../platform/nxp/k32w/k32w0/doc/images/k32w-dk6.jpg)
+![K32W061 DK6](../../../../platform/nxp/k32w/k32w0/doc/images/k32w-dk6.jpg)
 
 The K32W0 lighting example application provides a working demonstration of a
 light bulb device, built using the Project CHIP codebase and the NXP K32W061
@@ -61,7 +61,7 @@ Deployment of this firmware configuration requires the K32W061 board setups
 using the K32W0/JN5189 module board, SE051 Expansion board and Generic Expansion
 board as shown below:
 
-![SE051H  + K32W061 DK6](../../platform/nxp/k32w/k32w0/doc/images/k32w-se.jpg)
+![SE051H  + K32W061 DK6](../../../../platform/nxp/k32w/k32w0/doc/images/k32w-se.jpg)
 
 The SE051H Secure Element extension may be used for best in class security and
 offloading some of the Project CHIP cryptographic operations. Depending on your
@@ -167,7 +167,7 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
     SDK. Once the account is created, login and follow the steps for downloading
     SDK_2_6_4_K32W061DK6. The SDK Builder UI selection should be similar with
     the one from the image below.
-    ![MCUXpresso SDK Download](../../platform/nxp/k32w/k32w0/doc/images/mcux-sdk-download.JPG)
+    ![MCUXpresso SDK Download](../../../../platform/nxp/k32w/k32w0/doc/images/mcux-sdk-download.JPG)
 
 -   Start building the application either with Secure Element or without
     -   with Secure Element
@@ -216,7 +216,7 @@ The resulting output file can be found in out/debug/chip-k32w061-light-example.
 ## Flashing and debugging
 
 Program the firmware using the official
-[OpenThread Flash Instructions](https://github.com/openthread/openthread/blob/master/examples/platforms/k32w/k32w061/README.md#flash-binaries).
+[OpenThread Flash Instructions](https://github.com/openthread/ot-nxp/tree/main/src/k32w0/k32w061#flash-binaries).
 
 All you have to do is to replace the Openthread binaries from the above
 documentation with _out/debug/chip-k32w061-light-example.bin_ if DK6Programmer

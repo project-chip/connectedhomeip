@@ -327,10 +327,6 @@ CHIP_ERROR AndroidDeviceControllerWrapper::InitializeOperationalCredentialsIssue
     return CHIP_NO_ERROR;
 }
 
-void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle && msg) {}
-
-void AndroidDeviceControllerWrapper::OnStatusChange(void) {}
-
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
     ChipLogProgress(chipTool, "KVS: Getting key %s", key);

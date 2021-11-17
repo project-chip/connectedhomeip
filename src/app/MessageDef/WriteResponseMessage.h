@@ -14,18 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines WriteResponseMessage parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
 
-#include "AttributeStatusList.h"
-#include "Builder.h"
+#include "AttributeStatuses.h"
+#include "StructBuilder.h"
 
-#include "Parser.h"
+#include "StructParser.h"
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -35,23 +30,14 @@
 namespace chip {
 namespace app {
 namespace WriteResponseMessage {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_AttributeStatusList = 0,
+    kWriteResponses = 0,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public StructParser
 {
 public:
-    /**
-     *  @brief Initialize the parser object with TLVReader
-     *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this response
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
-
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -66,41 +52,32 @@ public:
     CHIP_ERROR CheckSchemaValidity() const;
 
     /**
-     *  @brief Get a TLVReader for the AttributeStatusList. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the AttributeStatuses. Next() must be called before accessing them.
      *
-     *  @param [in] apAttributeStatusList    A pointer to apAttributeStatusList
+     *  @param [in] apWriteResponses    A pointer to apWriteResponses
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributeStatusList(AttributeStatusList::Parser * const apAttributeStatusList) const;
+    CHIP_ERROR GetWriteResponses(AttributeStatuses::Parser * const apWriteResponses) const;
 };
 
-class Builder : public chip::app::Builder
+class Builder : public StructBuilder
 {
 public:
     /**
-     *  @brief Initialize a WriteResponseMessage::Builder for writing into a TLV stream
+     *  @brief Initialize a AttributeStatuses::Builder for writing into the TLV stream
      *
-     *  @param [in] apWriter    A pointer to TLVWriter
-     *
-     *  @return #CHIP_NO_ERROR on success
+     *  @return A reference to AttributeStatuses::Builder
      */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
+    AttributeStatuses::Builder & CreateWriteResponses();
 
     /**
-     *  @brief Initialize a AttributeStatusList::Builder for writing into the TLV stream
+     *  @brief Get reference to AttributeStatuses::Builder
      *
-     *  @return A reference to AttributeStatusList::Builder
+     *  @return A reference to AttributeStatuses::Builder
      */
-    AttributeStatusList::Builder & CreateAttributeStatusListBuilder();
-
-    /**
-     *  @brief Get reference to AttributeStatusList::Builder
-     *
-     *  @return A reference to AttributeStatusList::Builder
-     */
-    AttributeStatusList::Builder & GetAttributeStatusListBuilder();
+    AttributeStatuses::Builder & GetWriteResponses();
 
     /**
      *  @brief Mark the end of this WriteResponseMessage
@@ -110,8 +87,8 @@ public:
     WriteResponseMessage::Builder & EndOfWriteResponseMessage();
 
 private:
-    AttributeStatusList::Builder mAttributeStatusListBuilder;
+    AttributeStatuses::Builder mWriteResponses;
 };
-}; // namespace WriteResponseMessage
-}; // namespace app
-}; // namespace chip
+} // namespace WriteResponseMessage
+} // namespace app
+} // namespace chip

@@ -33,7 +33,9 @@ const { asUpperCamelCase }              = require(basePath + 'src/app/zap-templa
 
 const kClusterName       = 'cluster';
 const kEndpointName      = 'endpoint';
+const kGroupId           = 'groupId';
 const kCommandName       = 'command';
+const kWaitCommandName   = 'wait';
 const kIndexName         = 'index';
 const kValuesName        = 'values';
 const kConstraintsName   = 'constraints';
@@ -41,6 +43,7 @@ const kArgumentsName     = 'arguments';
 const kResponseName      = 'response';
 const kDisabledName      = 'disabled';
 const kResponseErrorName = 'error';
+const kPICSName          = 'PICS';
 
 class NullObject {
   toString()
@@ -70,6 +73,39 @@ function setDefault(test, name, defaultValue)
 
 function setDefaultType(test)
 {
+  if (kWaitCommandName in test) {
+    setDefaultTypeForWaitCommand(test);
+  } else {
+    setDefaultTypeForCommand(test);
+  }
+}
+
+function setDefaultTypeForWaitCommand(test)
+{
+  const type = test[kWaitCommandName];
+  switch (type) {
+  case 'readAttribute':
+    test.isAttribute     = true;
+    test.isReadAttribute = true;
+    break;
+  case 'writeAttribute':
+    test.isAttribute      = true;
+    test.isWriteAttribute = true;
+    break;
+  case 'subscribeAttribute':
+    test.isAttribute          = true;
+    test.isSubscribeAttribute = true;
+    break;
+  default:
+    test.isCommand = true;
+    break;
+  }
+
+  test.isWait = true;
+}
+
+function setDefaultTypeForCommand(test)
+{
   const type = test[kCommandName];
   switch (type) {
   case 'readAttribute':
@@ -82,6 +118,10 @@ function setDefaultType(test)
     test.commandName      = 'Write';
     test.isAttribute      = true;
     test.isWriteAttribute = true;
+    if ((kGroupId in test)) {
+      test.isGroupCommand = true;
+      test.groupId        = parseInt(test[kGroupId], 10);
+    }
     break;
 
   case 'subscribeAttribute':
@@ -101,6 +141,26 @@ function setDefaultType(test)
     test.isCommand   = true;
     break;
   }
+
+  test.isWait = false;
+}
+
+function setDefaultPICS(test)
+{
+  const defaultPICS = '';
+  setDefault(test, kPICSName, defaultPICS);
+
+  if (test[kPICSName] == '') {
+    return;
+  }
+
+  const items = test[kPICSName].split(/[&|() !]+/g).filter(item => item.length);
+  items.forEach(key => {
+    if (!PICS.has(key)) {
+      const errorStr = 'PICS database does not contains any defined value for: ' + key;
+      throwError(test, errorStr);
+    }
+  })
 }
 
 function setDefaultArguments(test)
@@ -155,6 +215,11 @@ function setDefaultResponse(test)
     throwError(test, errorStr);
   }
 
+  // Step that waits for a particular event does not requires constraints nor expected values.
+  if (test.isWait) {
+    return;
+  }
+
   if (!test.isAttribute) {
     return;
   }
@@ -196,6 +261,7 @@ function setDefaults(test, defaultConfig)
   setDefault(test, kClusterName, defaultClusterName);
   setDefault(test, kEndpointName, defaultEndpointId);
   setDefault(test, kDisabledName, defaultDisabled);
+  setDefaultPICS(test);
   setDefaultArguments(test);
   setDefaultResponse(test);
 }
@@ -250,6 +316,7 @@ function parse(filename)
 
   // Filter disabled tests
   yaml.tests = yaml.tests.filter(test => !test.disabled);
+
   yaml.tests.forEach((test, index) => {
     setDefault(test, kIndexName, index);
   });
@@ -344,9 +411,31 @@ function assertCommandOrAttribute(context)
   });
 }
 
+const PICS = (() => {
+  let filepath = path.resolve(__dirname, basePath + certificationPath + 'PICS.yaml');
+  const data   = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
+  const yaml   = YAML.parse(data);
+
+  const getAll = () => yaml.PICS;
+  const get = (id) => has(id) ? yaml.PICS.filter(pics => pics.id == id)[0] : null;
+  const has = (id) => !!(yaml.PICS.filter(pics => pics.id == id)).length;
+
+  const PICS = {
+    getAll : getAll,
+    get : get,
+    has : has,
+  };
+  return PICS;
+})();
+
 //
 // Templates
 //
+function chip_tests_pics(options)
+{
+  return templateUtil.collectBlocks(PICS.getAll(), options, this);
+}
+
 function chip_tests(list, options)
 {
   const items = Array.isArray(list) ? list : list.split(',');
@@ -369,18 +458,40 @@ function isTestOnlyCluster(name)
   return testOnlyClusters.includes(name);
 }
 
-function chip_tests_item_response_type(options)
+// test_cluster_command_value and test_cluster_value-equals are recursive partials using #each. At some point the |global|
+// context is lost and it fails. Make sure to attach the global context as a property of the | value |
+// that is evaluated.
+function attachGlobal(global, value)
 {
-  const promise = assertCommandOrAttribute(this).then(item => {
-    if (item.hasSpecificResponse) {
-      return 'Clusters::' + asUpperCamelCase(this.cluster) + '::Commands::' + asUpperCamelCase(item.response.name)
-          + '::DecodableType';
+  if (Array.isArray(value)) {
+    value = value.map(v => attachGlobal(global, v));
+  } else if (value instanceof Object) {
+    for (key in value) {
+      if (key == "global") {
+        continue;
+      }
+      value[key] = attachGlobal(global, value[key]);
     }
+  } else if (value === null) {
+    value = new NullObject();
+  } else {
+    switch (typeof value) {
+    case 'number':
+      value = new Number(value);
+      break;
+    case 'string':
+      value = new String(value);
+      break;
+    case 'boolean':
+      value = new Boolean(value);
+      break;
+    default:
+      throw new Error('Unsupported value: ' + JSON.stringify(value));
+    }
+  }
 
-    return 'DataModel::NullObjectType';
-  });
-
-  return asPromise.call(this, promise, options);
+  value.global = global;
+  return value;
 }
 
 function chip_tests_item_parameters(options)
@@ -390,8 +501,8 @@ function chip_tests_item_parameters(options)
   const promise = assertCommandOrAttribute(this).then(item => {
     if (this.isAttribute && !this.isWriteAttribute) {
       if (this.isSubscribeAttribute) {
-        const minInterval = { name : 'minInterval', type : 'in16u', chipType : 'uint16_t', definedValue : this.minInterval };
-        const maxInterval = { name : 'maxInterval', type : 'in16u', chipType : 'uint16_t', definedValue : this.maxInterval };
+        const minInterval = { name : 'minInterval', type : 'int16u', chipType : 'uint16_t', definedValue : this.minInterval };
+        const maxInterval = { name : 'maxInterval', type : 'int16u', chipType : 'uint16_t', definedValue : this.maxInterval };
         return [ minInterval, maxInterval ];
       }
       return [];
@@ -410,41 +521,6 @@ function chip_tests_item_parameters(options)
             'Missing "' + commandArg.name + '" in arguments list: \n\t* '
                 + commandValues.map(command => command.name).join('\n\t* '));
       }
-      // test_cluster_command_value is a recursive partial using #each. At some point the |global|
-      // context is lost and it fails. Make sure to attach the global context as a property of the | value |
-      // that is evaluated.
-      function attachGlobal(global, value)
-      {
-        if (Array.isArray(value)) {
-          value = value.map(v => attachGlobal(global, v));
-        } else if (value instanceof Object) {
-          for (key in value) {
-            if (key == "global") {
-              continue;
-            }
-            value[key] = attachGlobal(global, value[key]);
-          }
-        } else if (value === null) {
-          value = new NullObject();
-        } else {
-          switch (typeof value) {
-          case 'number':
-            value = new Number(value);
-            break;
-          case 'string':
-            value = new String(value);
-            break;
-          case 'boolean':
-            value = new Boolean(value);
-            break;
-          default:
-            throw new Error('Unsupported value: ' + JSON.stringify(value));
-          }
-        }
-
-        value.global = global;
-        return value;
-      }
       commandArg.definedValue = attachGlobal(this.global, expected.value);
 
       return commandArg;
@@ -461,6 +537,9 @@ function chip_tests_item_response_parameters(options)
   const responseValues = this.response.values.slice();
 
   const promise = assertCommandOrAttribute(this).then(item => {
+    if (this.isWriteAttribute) {
+      return [];
+    }
     const responseArgs = item.response.arguments;
 
     const responses = responseArgs.map(responseArg => {
@@ -471,7 +550,7 @@ function chip_tests_item_response_parameters(options)
         const expected = responseValues.splice(expectedIndex, 1)[0];
         if ('value' in expected) {
           responseArg.hasExpectedValue = true;
-          responseArg.expectedValue    = expected.value;
+          responseArg.expectedValue    = attachGlobal(this.global, expected.value);
         }
 
         if ('constraints' in expected) {
@@ -503,13 +582,32 @@ function isLiteralNull(value, options)
   return (value === null) || (value instanceof NullObject);
 }
 
+function expectedValueHasProp(value, name)
+{
+  return name in value;
+}
+
+function octetStringEscapedForCLiteral(value)
+{
+  return value.replace(/\p{Control}/gu, ch => {
+    let code = ch.charCodeAt(0);
+    code     = code.toString();
+    if (code.length == 1) {
+      code = "0" + code;
+    }
+    return "\\x" + code;
+  });
+}
+
 //
 // Module exports
 //
 exports.chip_tests                          = chip_tests;
 exports.chip_tests_items                    = chip_tests_items;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
-exports.chip_tests_item_response_type       = chip_tests_item_response_type;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
+exports.chip_tests_pics                     = chip_tests_pics;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
+exports.expectedValueHasProp                = expectedValueHasProp;
+exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;

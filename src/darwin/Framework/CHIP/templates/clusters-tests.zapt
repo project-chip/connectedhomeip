@@ -105,12 +105,6 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 
-    XCTestExpectation * addressExpectation = [self expectationWithDescription:@"Address Updated"];
-    pairing.expectation = addressExpectation;
-    [controller updateDevice:kDeviceId fabricId:0];
-
-    [self waitForExpectationsWithTimeout:kAddressResolveTimeoutInSeconds handler:nil];
-
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
     [controller getConnectedDevice:kDeviceId
                              queue:dispatch_get_main_queue()
@@ -145,7 +139,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster test:^(NSError * err, NSDictionary * values) {
+    [cluster test:[[CHIPTestClusterClusterTestPayload alloc] init] responseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
@@ -157,7 +151,7 @@ CHIPDevice * GetConnectedDevice()
 
     // Reuse the CHIPCluster Object for multiple times.
 
-    [cluster test:^(NSError * err, NSDictionary * values) {
+    [cluster test:[[CHIPTestClusterClusterTestPayload alloc] init] responseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
@@ -171,6 +165,9 @@ CHIPDevice * GetConnectedDevice()
 {{#chip_client_clusters}}
 {{#unless (isStrEqual "Test Cluster" name)}}
 {{#unless (isStrEqual "Basic" name)}}
+{{#unless (isStrEqual "Thermostat" name)}}
+{{! TODO: Re-enable Illuminance Measurement once Darwin tests can deal with actual null values being delivered for TLV null. }}
+{{#unless (isStrEqual "Illuminance Measurement" name)}}
 {{#chip_server_cluster_attributes}}
 - (void)testSendCluster{{asUpperCamelCase parent.name}}ReadAttribute{{asUpperCamelCase name}}WithResponseHandler
 {
@@ -200,7 +197,7 @@ CHIPDevice * GetConnectedDevice()
     CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:{{asExpectedEndpointForCluster (asUpperCamelCase parent.name)}} queue:queue];
     XCTAssertNotNil(cluster);
 
-    {{asObjectiveCBasicType type}} value = {{asTestValue}};
+    {{asObjectiveCType type parent.name}} value = {{asTestValue}};
     [cluster writeAttribute{{asUpperCamelCase name}}WithValue:value responseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} Error: %@", err);
         XCTAssertEqual(err.code, 0);
@@ -211,6 +208,8 @@ CHIPDevice * GetConnectedDevice()
 }
 {{/if}}
 {{/chip_server_cluster_attributes}}
+{{/unless}}
+{{/unless}}
 {{/unless}}
 {{/unless}}
 {{/chip_client_clusters}}

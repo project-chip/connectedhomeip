@@ -19,6 +19,7 @@
 const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
 const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const queryCommand = require(zapPath + 'db/query-command.js')
 const zclQuery     = require(zapPath + 'db/query-zcl.js')
 const cHelper      = require(zapPath + 'generator/helper-c.js')
 const string       = require(zapPath + 'util/string.js')
@@ -106,7 +107,7 @@ var endpointClusterWithInit = [
   'Pump Configuration and Control',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
-var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
+var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Thermostat User Interface Configuration' ];
 var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
 
 /**
@@ -367,7 +368,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
   }
 
-  let promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  let typeStr = await templateUtil.ensureZclPackageId(this).then(fn.bind(this));
   if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
     passByReference = true;
     // If we did not have a namespace provided, we can assume we're inside
@@ -375,13 +376,13 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     let listNamespace = options.hash.ns ? "chip::app::" : ""
     if (isDecodable)
     {
-      promise = promise.then(typeStr => `${listNamespace}DataModel::DecodableList<${typeStr}>`);
+      typeStr = `${listNamespace}DataModel::DecodableList<${typeStr}>`;
     }
     else
     {
       // Use const ${typeStr} so that consumers don't have to create non-const
       // data to encode.
-      promise = promise.then(typeStr => `${listNamespace}DataModel::List<const ${typeStr}>`);
+      typeStr = `${listNamespace}DataModel::List<const ${typeStr}>`;
     }
   }
   if (this.isNullable && !options.hash.forceNotNullable) {
@@ -389,19 +390,19 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     // If we did not have a namespace provided, we can assume we're inside
     // chip::app::.
     let ns  = options.hash.ns ? "chip::app::" : ""
-    promise = promise.then(typeStr => `${ns}DataModel::Nullable<${typeStr}>`);
+    typeStr = `${ns}DataModel::Nullable<${typeStr}>`;
   }
   if (this.isOptional && !options.hash.forceNotOptional) {
     passByReference = true;
     // If we did not have a namespace provided, we can assume we're inside
     // chip::.
     let ns  = options.hash.ns ? "chip::" : ""
-    promise = promise.then(typeStr => `${ns}Optional<${typeStr}>`);
+    typeStr = `${ns}Optional<${typeStr}>`;
   }
   if (options.hash.isArgument && passByReference) {
-    promise = promise.then(typeStr => `const ${typeStr} &`);
+    typeStr = `const ${typeStr} &`;
   }
-  return templateUtil.templatePromise(this.global, promise)
+  return templateUtil.templatePromise(this.global, Promise.resolve(typeStr))
 }
 
 function zapTypeToEncodableClusterObjectType(type, options)
@@ -414,36 +415,11 @@ function zapTypeToDecodableClusterObjectType(type, options)
   return zapTypeToClusterObjectType.call(this, type, true, options)
 }
 
-function zapTypeToPythonClusterObjectType(type, options)
+async function _zapTypeToPythonClusterObjectType(type, options)
 {
-  if (StringHelper.isCharString(type)) {
-    return 'str';
-  }
-
-  if (StringHelper.isOctetString(type)) {
-    return 'bytes';
-  }
-
-  if ([ 'single', 'double' ].includes(type.toLowerCase())) {
-    return 'float';
-  }
-
-  if (type.toLowerCase() == 'boolean') {
-    return 'bool'
-  }
-
-  // #10748: asUnderlyingZclType will emit wrong types for int{48|56|64}(u), so we process all int values here.
-  if (type.toLowerCase().match(/^int\d+$/)) {
-    return 'int'
-  }
-
-  if (type.toLowerCase().match(/^int\d+u$/)) {
-    return 'uint'
-  }
-
   async function fn(pkgId)
   {
-    const ns          = asUpperCamelCase(options.hash.ns);
+    const ns          = options.hash.ns;
     const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
     if (await typeChecker('isEnum')) {
@@ -451,11 +427,36 @@ function zapTypeToPythonClusterObjectType(type, options)
     }
 
     if (await typeChecker('isBitmap')) {
-      return 'int';
+      return 'uint';
     }
 
     if (await typeChecker('isStruct')) {
       return ns + '.Structs.' + type;
+    }
+
+    if (StringHelper.isCharString(type)) {
+      return 'str';
+    }
+
+    if (StringHelper.isOctetString(type)) {
+      return 'bytes';
+    }
+
+    if ([ 'single', 'double' ].includes(type.toLowerCase())) {
+      return 'float';
+    }
+
+    if (type.toLowerCase() == 'boolean') {
+      return 'bool'
+    }
+
+    // #10748: asUnderlyingZclType will emit wrong types for int{48|56|64}(u), so we process all int values here.
+    if (type.toLowerCase().match(/^int\d+$/)) {
+      return 'int'
+    }
+
+    if (type.toLowerCase().match(/^int\d+u$/)) {
+      return 'uint'
     }
 
     resolvedType = await zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
@@ -468,12 +469,38 @@ function zapTypeToPythonClusterObjectType(type, options)
         return 'uint'
       }
     }
-
-    throw "Unhandled type " + resolvedType + " (from " + type + ")"
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  let promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
+    promise = promise.then(typeStr => `typing.List[${typeStr}]`);
+  }
+
+  const isNull     = (this.isNullable && !options.hash.forceNotNullable);
+  const isOptional = (this.isOptional && !options.hash.forceNotOptional);
+
+  if (isNull && isOptional) {
+    promise = promise.then(typeStr => `typing.Union[None, Nullable, ${typeStr}]`);
+  } else if (isNull) {
+    promise = promise.then(typeStr => `typing.Union[Nullable, ${typeStr}]`);
+  } else if (isOptional) {
+    promise = promise.then(typeStr => `typing.Optional[${typeStr}]`);
+  }
+
   return templateUtil.templatePromise(this.global, promise)
+}
+
+function zapTypeToPythonClusterObjectType(type, options)
+{
+  return _zapTypeToPythonClusterObjectType.call(this, type, options)
+}
+
+async function getResponseCommandName(responseRef, options)
+{
+  let pkgId = await templateUtil.ensureZclPackageId(this);
+
+  const { db, sessionId } = this.global;
+  return queryCommand.selectCommandById(db, responseRef, pkgId).then(response => asUpperCamelCase(response.name));
 }
 
 //
@@ -491,3 +518,4 @@ exports.asMEI                               = asMEI;
 exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
 exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectType;
 exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;
+exports.getResponseCommandName              = getResponseCommandName;

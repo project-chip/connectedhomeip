@@ -37,7 +37,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.23
+            image: connectedhomeip/chip-build:0.5.28
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -80,10 +80,10 @@ jobs:
 
                   scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
-              timeout-minutes: 5
+              timeout-minutes: 8
               run: scripts/build/gn_build.sh
             - name: Run Tests
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: RUN_HAPPY_TESTS=1 scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512

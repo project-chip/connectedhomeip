@@ -1,14 +1,17 @@
 {{#if header}}
-class CHIP{{> @partial-block}}Bridge : public CHIPCallbackBridge<{{> @partial-block}}>
+{{#*inline "callbackType"}}{{#if (isStrEqual partial-type "Command")}}CHIP{{> @partial-block}}Type{{else}}{{> @partial-block}}{{/if}}{{/inline}}
+class CHIP{{> @partial-block}}Bridge : public CHIPCallbackBridge<{{>callbackType}}>
 {
 public:
     CHIP{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action, bool keepAlive = false)
-      : CHIPCallbackBridge<{{> @partial-block}}>(queue, handler, action, OnSuccessFn, keepAlive)
+      : CHIPCallbackBridge<{{>callbackType}}>(queue, handler, action, OnSuccessFn, keepAlive)
       {};
     
     static void OnSuccessFn(void * context
       {{#if (isStrEqual partial-type "Command")}}
-      {{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}}
+      , const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data
+      {{else if (isStrEqual partial-type "CommandStatus")}}
+      , const chip::app::DataModel::NullObjectType &
       {{else if (isStrEqual partial-type "List")}}
       , {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list
       {{else if partial-type}}
@@ -20,7 +23,9 @@ public:
 {{else}}
 void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
   {{#if (isStrEqual partial-type "Command")}}
-  {{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}}
+  , const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data
+  {{else if (isStrEqual partial-type "CommandStatus")}}
+  , const chip::app::DataModel::NullObjectType &
   {{else if (isStrEqual partial-type "List")}}
   , {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list
   {{else if partial-type}}
@@ -30,20 +35,15 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
 )
 {
     {{#if (isStrEqual partial-type "Command")}}
-    DispatchSuccess(context, @{
-      {{#chip_cluster_response_arguments}}
-      {{#if isArray}}
-      // {{asSymbol label}} : {{asUnderlyingZclType type}}
-      // Conversion from this type to Objc is not properly implemented yet
-      {{else if (isOctetString type)}}
-      @"{{asSymbol label}}" : [NSData dataWithBytes:{{asSymbol label}}.data() length:{{asSymbol label}}.size()],
-      {{else if (isCharString type)}}
-      @"{{asSymbol label}}" : [[NSString alloc] initWithBytes:{{asSymbol label}}.data() length:{{asSymbol label}}.size() encoding:NSUTF8StringEncoding],
-      {{else}}
-      @"{{asSymbol label}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:{{asSymbol label}}],
-      {{/if}}
-      {{/chip_cluster_response_arguments}}
-    });
+    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    {{#chip_cluster_response_arguments}}
+    {
+      id value;
+      {{>decode_value target="value" source=(concat "data." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE); return;"}}
+      response[@"{{asUpperCamelCase label}}"] = value;
+    }
+    {{/chip_cluster_response_arguments}}
+    DispatchSuccess(context, response);
     {{else if (isStrEqual partial-type "List")}}
     id array = [[NSMutableArray alloc] init];
     auto iter = list.begin();
@@ -60,16 +60,16 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
           {{! TODO: Add support for nullable types, probably by having a templated ToObjectiveCType function }}
           {{else if isArray}}
           {{! TODO: Add support for list members of structs in list attributes }}
-          @"{{name}}": [[NSMutableArray alloc] init],
+          @"{{asUpperCamelCase name}}": [[NSMutableArray alloc] init],
           {{else if (isOctetString type)}}
-          @"{{name}}" : [NSData dataWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size()],
+          @"{{asUpperCamelCase name}}" : [NSData dataWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size()],
           {{else if (isCharString type)}}
-          @"{{name}}" : [[NSString alloc] initWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size() encoding:NSUTF8StringEncoding],
+          @"{{asUpperCamelCase name}}" : [[NSString alloc] initWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size() encoding:NSUTF8StringEncoding],
           {{else if isStruct}}
           {{! TODO: Add support for struct members of structs in list attributes }}
-          @"{{name}}": @{}
+          @"{{asUpperCamelCase name}}": @{}
           {{else}}
-          @"{{name}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entry.{{asLowerCamelCase name}}],
+          @"{{asUpperCamelCase name}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entry.{{asLowerCamelCase name}}],
           {{/if}}
           {{/chip_attribute_list_entryTypes}}
         }];
@@ -92,6 +92,8 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
     DispatchSuccess(context, @{ @"value": [NSData dataWithBytes: value.data() length: value.size()] });
     {{else if (isCharString partial-type)}}
     DispatchSuccess(context, @{ @"value": [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding] });
+    {{else if (isStrEqual partial-type "CommandStatus")}}
+    DispatchSuccess(context, nil);
     {{else if partial-type}}
     DispatchSuccess(context, @{ @"value": [NSNumber numberWith{{asObjectiveCNumberType name partial-type false}}:value] });
     {{else}}

@@ -19,23 +19,13 @@
 
 namespace chip {
 namespace app {
-CHIP_ERROR SubscribeRequestMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    // make a copy of the reader here
-    mReader.Init(aReader);
-
-    VerifyOrReturnLogError(chip::TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnLogErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
-    AttributePathList::Parser attributePathList;
+    AttributePathIBs::Parser AttributePathIBs;
     EventPaths::Parser eventPathList;
     AttributeDataVersionList::Parser attributeDataVersionList;
     PRETTY_PRINT("SubscribeRequestMessage =");
@@ -46,106 +36,106 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnLogError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (chip::TLV::TagNumFromTag(reader.GetTag()))
         {
         case kCsTag_AttributePathList:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_AttributePathList)), CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(!(TagPresenceMask & (1 << kCsTag_AttributePathList)), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_AttributePathList);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
-            attributePathList.Init(reader);
+            AttributePathIBs.Init(reader);
 
             PRETTY_PRINT_INCDEPTH();
-            ReturnLogErrorOnFailure(attributePathList.CheckSchemaValidity());
+            ReturnErrorOnFailure(AttributePathIBs.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
             break;
         case kCsTag_EventPaths:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_EventPaths)), CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(!(TagPresenceMask & (1 << kCsTag_EventPaths)), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_EventPaths);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
             eventPathList.Init(reader);
 
             PRETTY_PRINT_INCDEPTH();
 
-            ReturnLogErrorOnFailure(eventPathList.CheckSchemaValidity());
+            ReturnErrorOnFailure(eventPathList.CheckSchemaValidity());
 
             PRETTY_PRINT_DECDEPTH();
             break;
         case kCsTag_AttributeDataVersionList:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_AttributeDataVersionList)), CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(!(TagPresenceMask & (1 << kCsTag_AttributeDataVersionList)), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_AttributeDataVersionList);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
             attributeDataVersionList.Init(reader);
 
             PRETTY_PRINT_INCDEPTH();
-            ReturnLogErrorOnFailure(attributeDataVersionList.CheckSchemaValidity());
+            ReturnErrorOnFailure(attributeDataVersionList.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
             break;
         case kCsTag_EventNumber:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_EventNumber)), CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(!(TagPresenceMask & (1 << kCsTag_EventNumber)), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_EventNumber);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 uint64_t eventNumber;
-                ReturnLogErrorOnFailure(reader.Get(eventNumber));
+                ReturnErrorOnFailure(reader.Get(eventNumber));
                 PRETTY_PRINT("\tEventNumber = 0x%" PRIx64 ",", eventNumber);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
         case kCsTag_MinIntervalSeconds:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MinIntervalSeconds)), CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(!(TagPresenceMask & (1 << kCsTag_MinIntervalSeconds)), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_MinIntervalSeconds);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 uint16_t minIntervalSeconds;
-                ReturnLogErrorOnFailure(reader.Get(minIntervalSeconds));
+                ReturnErrorOnFailure(reader.Get(minIntervalSeconds));
                 PRETTY_PRINT("\tMinIntervalSeconds = 0x%" PRIx16 ",", minIntervalSeconds);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
         case kCsTag_MaxIntervalSeconds:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MaxIntervalSeconds)), CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(!(TagPresenceMask & (1 << kCsTag_MaxIntervalSeconds)), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_MaxIntervalSeconds);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 uint16_t maxIntervalSeconds;
-                ReturnLogErrorOnFailure(reader.Get(maxIntervalSeconds));
+                ReturnErrorOnFailure(reader.Get(maxIntervalSeconds));
                 PRETTY_PRINT("\tkMaxInterval = 0x%" PRIx16 ",", maxIntervalSeconds);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
         case kCsTag_KeepSubscriptions:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_KeepSubscriptions)), CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(!(TagPresenceMask & (1 << kCsTag_KeepSubscriptions)), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_KeepSubscriptions);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(chip::TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 bool keepSubscriptions;
-                ReturnLogErrorOnFailure(reader.Get(keepSubscriptions));
+                ReturnErrorOnFailure(reader.Get(keepSubscriptions));
                 PRETTY_PRINT("\tKeepSubscriptions = %s, ", keepSubscriptions ? "true" : "false");
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
         case kCsTag_IsProxy:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_IsProxy)), CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(!(TagPresenceMask & (1 << kCsTag_IsProxy)), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_IsProxy);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(chip::TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 bool isProxy;
-                ReturnLogErrorOnFailure(reader.Get(isProxy));
+                ReturnErrorOnFailure(reader.Get(isProxy));
                 PRETTY_PRINT("\tIsProxy = %s, ", isProxy ? "true" : "false");
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
         default:
-            ReturnLogErrorOnFailure(CHIP_ERROR_INVALID_TLV_TAG);
+            ReturnErrorOnFailure(CHIP_ERROR_INVALID_TLV_TAG);
         }
     }
 
@@ -160,24 +150,24 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
             err = CHIP_NO_ERROR;
         }
     }
-    ReturnLogErrorOnFailure(err);
+    ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR SubscribeRequestMessage::Parser::GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const
+CHIP_ERROR SubscribeRequestMessage::Parser::GetPathList(AttributePathIBs::Parser * const apAttributePathList) const
 {
     TLV::TLVReader reader;
-    ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributePathList), reader));
-    VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributePathList), reader));
+    VerifyOrReturnError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
     return apAttributePathList->Init(reader);
 }
 
 CHIP_ERROR SubscribeRequestMessage::Parser::GetEventPaths(EventPaths::Parser * const apEventPaths) const
 {
     TLV::TLVReader reader;
-    ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_EventPaths), reader));
-    VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_EventPaths), reader));
+    VerifyOrReturnError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
     return apEventPaths->Init(reader);
 }
 
@@ -186,8 +176,8 @@ SubscribeRequestMessage::Parser::GetAttributeDataVersionList(
     AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
 {
     TLV::TLVReader reader;
-    ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributeDataVersionList), reader));
-    VerifyOrReturnLogError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributeDataVersionList), reader));
+    VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
     return apAttributeDataVersionList->Init(reader);
 }
 
@@ -216,12 +206,7 @@ CHIP_ERROR SubscribeRequestMessage::Parser::GetIsProxy(bool * const apIsProxy) c
     return GetSimpleValue(kCsTag_IsProxy, chip::TLV::kTLVType_Boolean, apIsProxy);
 }
 
-CHIP_ERROR SubscribeRequestMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
-}
-
-AttributePathList::Builder & SubscribeRequestMessage::Builder::CreateAttributePathListBuilder()
+AttributePathIBs::Builder & SubscribeRequestMessage::Builder::CreateAttributePathListBuilder()
 {
     if (mError == CHIP_NO_ERROR)
     {

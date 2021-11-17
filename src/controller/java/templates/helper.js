@@ -99,13 +99,16 @@ function asJavaBoxedType(type)
   }
 }
 
-function asJniBasicType(type)
+function asJniBasicType(type, useBoxedTypes)
 {
   if (StringHelper.isOctetString(type)) {
     return 'jbyteArray';
   } else if (StringHelper.isCharString(type)) {
     return 'jstring';
   } else {
+    if (useBoxedTypes) {
+      return 'jobject';
+    }
     return convertBasicCTypeToJniType(ChipTypesHelper.asBasicType(this.chipType));
   }
 }
@@ -145,13 +148,13 @@ function asJniBasicTypeForZclType(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asJniSignature(type)
+function asJniSignature(type, useBoxedTypes)
 {
   function fn(pkgId)
   {
     const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      return convertCTypeToJniSignature(ChipTypesHelper.asBasicType(zclType));
+      return convertCTypeToJniSignature(ChipTypesHelper.asBasicType(zclType), useBoxedTypes);
     })
   }
 
@@ -162,9 +165,15 @@ function asJniSignature(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function convertCTypeToJniSignature(cType)
+function convertCTypeToJniSignature(cType, useBoxedTypes)
 {
-  const javaType = convertBasicCTypeToJavaType(cType);
+  let javaType;
+  if (useBoxedTypes) {
+    javaType = convertBasicCTypeToJavaBoxedType(cType);
+  } else {
+    javaType = convertBasicCTypeToJavaType(cType);
+  }
+
   switch (javaType) {
   case 'int':
     return 'I';
@@ -172,6 +181,12 @@ function convertCTypeToJniSignature(cType)
     return 'J';
   case 'boolean':
     return 'Z';
+  case 'Boolean':
+    return 'Ljava/lang/Boolean;';
+  case 'Integer':
+    return 'Ljava/lang/Integer;';
+  case 'Long':
+    return 'Ljava/lang/Long;';
   default:
     error = 'Unhandled Java type ' + javaType + ' for C type ' + cType;
     throw error;
@@ -187,6 +202,22 @@ function convertAttributeCallbackTypeToJavaName(cType)
     return 'CharString';
   } else {
     return convertBasicCTypeToJavaBoxedType(cType);
+  }
+}
+
+function notLastSupportedEntryTypes(context, options)
+{
+  if (context.items.length == 0) {
+    return
+  }
+
+  let lastIndex = context.items.length - 1;
+  while (context.items[lastIndex].isStruct || context.items[lastIndex].isArray) {
+    lastIndex--;
+  }
+
+  if (this.index != lastIndex) {
+    return options.fn(this);
   }
 }
 
@@ -228,3 +259,4 @@ exports.convertCTypeToJniSignature             = convertCTypeToJniSignature;
 exports.convertBasicCTypeToJavaBoxedType       = convertBasicCTypeToJavaBoxedType;
 exports.convertAttributeCallbackTypeToJavaName = convertAttributeCallbackTypeToJavaName;
 exports.omitCommaForFirstNonStatusCommand      = omitCommaForFirstNonStatusCommand;
+exports.notLastSupportedEntryTypes             = notLastSupportedEntryTypes;

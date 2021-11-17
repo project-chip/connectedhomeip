@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/util/basic-types.h>
 #include <lib/support/Span.h>
@@ -150,10 +151,29 @@ private:
     void ErasePersistentInfo();
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);
-    void GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig);
-    CHIP_ERROR SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    CHIP_ERROR GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
+
+    /**
+     * Sets Sleepy End Device polling configuration and posts kSEDPollingIntervalChange event to inform other software
+     * modules about the change.
+     *
+     * @param[in]  pollingConfig  polling intervals configuration to be set
+     */
+    CHIP_ERROR SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
+
+    /**
+     * Requests setting Sleepy End Device fast polling interval on or off.
+     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the fast polling
+     * consumers counter. Fast polling mode is set if the consumers counter is bigger than 0.
+     *
+     * @param[in]  onOff  true if fast polling should be enabled and false otherwise.
+     */
+    CHIP_ERROR RequestSEDFastPollingMode(bool onOff);
+#endif
+
     bool HaveMeshConnectivity();
-    void OnMessageLayerActivityChanged(bool messageLayerIsActive);
 
 protected:
     // Construction/destruction limited to subclasses.
@@ -342,24 +362,26 @@ inline CHIP_ERROR ThreadStackManager::SetThreadDeviceType(ConnectivityManager::T
     return static_cast<ImplClass *>(this)->_SetThreadDeviceType(deviceType);
 }
 
-inline void ThreadStackManager::GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig)
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+inline CHIP_ERROR ThreadStackManager::GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig)
 {
-    static_cast<ImplClass *>(this)->_GetThreadPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_GetSEDPollingConfig(pollingConfig);
 }
 
-inline CHIP_ERROR ThreadStackManager::SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig)
+inline CHIP_ERROR ThreadStackManager::SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig)
 {
-    return static_cast<ImplClass *>(this)->_SetThreadPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_SetSEDPollingConfig(pollingConfig);
 }
+
+inline CHIP_ERROR ThreadStackManager::RequestSEDFastPollingMode(bool onOff)
+{
+    return static_cast<ImplClass *>(this)->_RequestSEDFastPollingMode(onOff);
+}
+#endif
 
 inline bool ThreadStackManager::HaveMeshConnectivity()
 {
     return static_cast<ImplClass *>(this)->_HaveMeshConnectivity();
-}
-
-inline void ThreadStackManager::OnMessageLayerActivityChanged(bool messageLayerIsActive)
-{
-    return static_cast<ImplClass *>(this)->_OnMessageLayerActivityChanged(messageLayerIsActive);
 }
 
 inline CHIP_ERROR ThreadStackManager::GetAndLogThreadStatsCounters()

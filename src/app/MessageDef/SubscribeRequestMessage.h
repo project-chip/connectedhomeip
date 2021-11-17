@@ -18,10 +18,10 @@
 #pragma once
 
 #include "AttributeDataVersionList.h"
-#include "AttributePathList.h"
-#include "Builder.h"
+#include "AttributePathIBs.h"
 #include "EventPaths.h"
-#include "Parser.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -44,13 +44,9 @@ enum
     kCsTag_IsProxy                  = 7,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public StructParser
 {
 public:
-    /**
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this request
-     */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
@@ -67,12 +63,12 @@ public:
 #endif
 
     /**
-     *  @brief Get a TLVReader for the AttributePathList. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the AttributePathIBs. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const;
+    CHIP_ERROR GetPathList(AttributePathIBs::Parser * const apAttributePathList) const;
 
     /**
      *  @brief Get a TLVReader for the EventPaths. Next() must be called before accessing them.
@@ -128,12 +124,10 @@ public:
     CHIP_ERROR GetIsProxy(bool * const apIsProxy) const;
 };
 
-class Builder : public chip::app::Builder
+class Builder : public StructBuilder
 {
 public:
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
-
-    AttributePathList::Builder & CreateAttributePathListBuilder();
+    AttributePathIBs::Builder & CreateAttributePathListBuilder();
 
     /**
      *  @brief Initialize a EventPaths::Builder for writing into the TLV stream
@@ -174,7 +168,7 @@ public:
     SubscribeRequestMessage::Builder & EndOfSubscribeRequestMessage();
 
 private:
-    AttributePathList::Builder mAttributePathListBuilder;
+    AttributePathIBs::Builder mAttributePathListBuilder;
     EventPaths::Builder mEventPathsBuilder;
     AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
 };

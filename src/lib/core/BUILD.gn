@@ -46,6 +46,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_ERROR_LOGGING=${chip_error_logging}",
     "CHIP_PROGRESS_LOGGING=${chip_progress_logging}",
     "CHIP_DETAIL_LOGGING=${chip_detail_logging}",
+    "CHIP_AUTOMATION_LOGGING=${chip_automation_logging}",
     "CHIP_CONFIG_SHORT_ERROR_STR=${chip_config_short_error_str}",
     "CHIP_CONFIG_ENABLE_ARG_PARSER=${chip_config_enable_arg_parser}",
     "CHIP_TARGET_STYLE_UNIX=${chip_target_style_unix}",

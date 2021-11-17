@@ -41,7 +41,7 @@
 namespace chip {
 
 static constexpr FabricIndex kMinValidFabricIndex     = 1;
-static constexpr FabricIndex kMaxValidFabricIndex     = std::min(UINT8_MAX, CHIP_CONFIG_MAX_DEVICE_ADMINS);
+static constexpr FabricIndex kMaxValidFabricIndex     = std::min<FabricIndex>(UINT8_MAX - 1, CHIP_CONFIG_MAX_DEVICE_ADMINS);
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 // KVS store is sensitive to length of key strings, based on the underlying
@@ -139,6 +139,13 @@ public:
     }
 
     PeerId GetPeerId() const { return mOperationalId; }
+    PeerId GetPeerIdForNode(const NodeId node) const
+    {
+        PeerId peer = mOperationalId;
+        peer.SetNodeId(node);
+        return peer;
+    }
+
     FabricId GetFabricId() const { return mFabricId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
     uint16_t GetVendorId() const { return mVendorId; }

@@ -76,6 +76,8 @@ public:
 
     bool IsEncryptionRequired() const { return mDispatch->IsEncryptionRequired(); }
 
+    bool IsGroupExchangeContext() const { return (mSession.HasValue() && mSession.Value().IsGroupSession()); }
+
     /**
      *  Send a CHIP message on this exchange.
      *
@@ -237,6 +239,18 @@ private:
      * re-evaluate out state to see whether we should still be open.
      */
     void MessageHandled();
+
+    /**
+     * Updates Sleepy End Device polling interval in the following way:
+     * - does nothing for exchanges over Bluetooth LE
+     * - set IDLE polling mode if all conditions are met:
+     *   - device doesn't expect getting response nor sending message
+     *   - there is no other active exchange than the current one
+     * - set ACTIVE polling mode if any of the conditions is met:
+     *   - device expects getting response or sending message
+     *   - there is another active exchange
+     */
+    void UpdateSEDPollingMode();
 };
 
 } // namespace Messaging

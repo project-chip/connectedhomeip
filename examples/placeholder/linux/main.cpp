@@ -17,13 +17,18 @@
  */
 
 #include "AppMain.h"
-
-#include <cassert>
-#include <lib/support/CodeUtils.h>
+#include "MatterCallbacks.h"
 
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+
+    auto test = GetTargetTest();
+    if (test != nullptr)
+    {
+        test->NextTest();
+    }
+
     ChipLinuxAppMainLoop();
     return 0;
 }

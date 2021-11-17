@@ -1,0 +1,134 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 18.2.2. [TC-BI-2.2] Primary functionality with server as DUT
+
+config:
+    cluster: "Binary Input (Basic)"
+    endpoint: 1
+
+tests:
+    - label: "Reads PresentValue attribute from DUT"
+      command: "readAttribute"
+      attribute: "present value"
+      response:
+          value: 0
+
+    - label: "Reads OutOfService attribute from DUT"
+      command: "readAttribute"
+      attribute: "out of service"
+      response:
+          value: 0
+
+    - label: "Reads StatusFlags attribute from DUT"
+      command: "readAttribute"
+      attribute: "status flags"
+      response:
+          value: 0
+
+    #issue #11475 User action needed, need to implement in YAML framework
+    - label: "Operate on device to change the sensor value to TRUE"
+      disabled: true
+
+    - label: "Reads PresentValue attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "present value"
+      response:
+          value: 1
+
+    #issue #11475 User action needed, need to implement in YAML framework
+    - label: "Operate on device to change the sensor value to FALSE"
+      disabled: true
+
+    - label: "Reads PresentValue attribute from DUT"
+      command: "readAttribute"
+      attribute: "present value"
+      response:
+          value: 0
+
+    #issue #11475 User action needed, need to implement in YAML framework
+    - label: "Operate on device to Trigger an OutOfService state"
+      disabled: true
+
+    - label: "Reads OutOfService attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "out of service"
+      response:
+          value: 1
+
+    - label: "Reads StatusFlags attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "status flags"
+      response:
+          value: 4
+
+    #issue #11475 User action needed, need to implement in YAML framework
+    - label: "Operate on device to Clear the OutOfService state if possible"
+      disabled: true
+
+    - label: "Reads OutOfService attribute from DUT"
+      command: "readAttribute"
+      attribute: "out of service"
+      response:
+          value: 0
+
+    - label: "Reads StatusFlags attribute from DUT"
+      command: "readAttribute"
+      attribute: "status flags"
+      response:
+          value: 0
+
+    #issue #11475 User action needed, need to implement in YAML framework
+    - label: "Operate on device to Trigger an Alarm state"
+      disabled: true
+
+    - label: "Reads StatusFlags attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "status flags"
+      response:
+          value: 1
+
+    - label: "Operate on device to Clear the Alarm state if possible"
+      disabled: true
+
+    - label: "Reads StatusFlags attribute from DUT"
+      command: "readAttribute"
+      attribute: "status flags"
+      response:
+          value: 0
+
+    #issue #11475 User action needed, need to implement in YAML framework
+    - label: "Operate on device to Trigger an Fault state"
+      disabled: true
+
+    - label: "Reads StatusFlags attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "status flags"
+      response:
+          value: 2
+
+    #issue #11475 User action needed, need to implement in YAML framework
+    - label: "Operate on device to Clear the Fault state if possible"
+      disabled: true
+
+    - label: "Reads StatusFlags attribute from DUT"
+      command: "readAttribute"
+      attribute: "status flags"
+      response:
+          value: 0

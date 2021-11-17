@@ -51,7 +51,7 @@ struct CertificationElements
     uint16_t VendorId;
     uint16_t ProductIds[kMaxProductIdsCountPerCD];
     uint8_t ProductIdsCount;
-    uint16_t DeviceTypeId;
+    uint32_t DeviceTypeId;
     char CertificateId[kCertificateIdLength + 1];
     uint8_t SecurityLevel;
     uint16_t SecurityInformation;

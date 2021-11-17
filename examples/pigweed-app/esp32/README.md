@@ -36,13 +36,13 @@ The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
 -   Clone the Espressif ESP-IDF and checkout
-    [v4.3 tag](https://github.com/espressif/esp-idf/releases/v4.3)
+    [v4.4 tag](https://github.com/espressif/esp-idf/releases/v4.4)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout v4.3
+          $ git checkout release/v4.4
           $ git submodule update --init
           $ ./install.sh
 
@@ -70,6 +70,10 @@ To download and install packages.
     If packages are already installed then simply activate them.
 
         $ source ./scripts/activate.sh
+
+-   Target Select
+
+        $ idf.py set-target esp32(or esp32c3)
 
 -   Configuration Options
 

@@ -17,6 +17,7 @@ need to incorporate this into their own middleware
 
 -   write a RIO patch, upstream to lwip
     -   Ensure patch is RFC compliant (especially re: expiry)
+-   UPDATE: Patch is available at https://savannah.nongnu.org/patch/?10114
 
 ## Address Scopes
 

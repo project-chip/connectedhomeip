@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "AttributeDataList.h"
+#include "AttributeDataIBs.h"
 #include "AttributeDataVersionList.h"
-#include "Builder.h"
-#include "Parser.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -38,23 +38,14 @@ namespace WriteRequestMessage {
 enum
 {
     kCsTag_SuppressResponse         = 0,
-    kCsTag_AttributeDataList        = 1,
+    kCsTag_AttributeDataIBs         = 1,
     kCsTag_AttributeDataVersionList = 2,
     kCsTag_MoreChunkedMessages      = 3,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public StructParser
 {
 public:
-    /**
-     *  @brief Initialize the parser object with TLVReader
-     *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this request
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
-
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -79,14 +70,14 @@ public:
     CHIP_ERROR GetSuppressResponse(bool * const apSuppressResponse) const;
 
     /**
-     *  @brief Get a TLVReader for the AttributePathList. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the AttributePathIBs. Next() must be called before accessing them.
      *
-     *  @param [in] apAttributeDataList    A pointer to apAttributeDataList
+     *  @param [in] apAttributeDataIBs    A pointer to apAttributeDataIBs
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributeDataList(AttributeDataList::Parser * const apAttributeDataList) const;
+    CHIP_ERROR GetAttributeReportIBs(AttributeDataIBs::Parser * const apAttributeDataIBs) const;
 
     /**
      *  @brief Get a TLVReader for the AttributeDataVersionList. Next() must be called before accessing them.
@@ -109,18 +100,9 @@ public:
     CHIP_ERROR GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const;
 };
 
-class Builder : public chip::app::Builder
+class Builder : public StructBuilder
 {
 public:
-    /**
-     *  @brief Initialize a WriteRequestMessage::Builder for writing into a TLV stream
-     *
-     *  @param [in] apWriter    A pointer to TLVWriter
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
-
     /**
      *  @brief This can be used to optionally signal to the server that no responses are to be sent back.
      *  @param [in] aSuppressResponse true if client need to signal suppress response
@@ -129,11 +111,11 @@ public:
     WriteRequestMessage::Builder & SuppressResponse(const bool aSuppressResponse);
 
     /**
-     *  @brief Initialize a AttributeDataList::Builder for writing into the TLV stream
+     *  @brief Initialize a AttributeDataIBs::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataList::Builder
+     *  @return A reference to AttributeDataIBs::Builder
      */
-    AttributeDataList::Builder & CreateAttributeDataListBuilder();
+    AttributeDataIBs::Builder & CreateAttributeDataIBsBuilder();
 
     /**
      *  @brief Initialize a AttributeDataVersionList::Builder for writing into the TLV stream
@@ -143,13 +125,13 @@ public:
     AttributeDataVersionList::Builder & CreateAttributeDataVersionListBuilder();
 
     /**
-     *  @brief Set True if the set of AttributeDataElements have to be sent across multiple packets in a single transaction
+     *  @brief Set True if the set of AttributeDataIBs have to be sent across multiple packets in a single transaction
      *  @param [in] aMoreChunkedMessages  true if more chunked messaged is needed
      *  @return A reference to *this
      */
     WriteRequestMessage::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
 
-    AttributeDataList::Builder & GetAttributeDataListBuilder();
+    AttributeDataIBs::Builder & GetAttributeReportIBsBuilder();
 
     /**
      *  @brief Mark the end of this WriteRequestMessage
@@ -159,7 +141,7 @@ public:
     WriteRequestMessage::Builder & EndOfWriteRequestMessage();
 
 private:
-    AttributeDataList::Builder mAttributeDataListBuilder;
+    AttributeDataIBs::Builder mAttributeDataIBsBuilder;
     AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
 };
 }; // namespace WriteRequestMessage
