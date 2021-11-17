@@ -43,7 +43,6 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(System::PacketBufferTLVReader &
 {
     System::PacketBufferHandle handle = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     System::PacketBufferTLVWriter writer;
-    CHIP_ERROR err;
     TLV::TLVType outerType;
 
     //
@@ -52,8 +51,7 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(System::PacketBufferTLVReader &
     //
     writer.Init(std::move(handle), /* useChainedBuffers */ true);
 
-    err = writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Array, outerType);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Array, outerType));
 
     for (auto & bufHandle : mBufferedList)
     {
@@ -61,21 +59,16 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(System::PacketBufferTLVReader &
 
         reader.Init(std::move(bufHandle));
 
-        err = reader.Next();
-        SuccessOrExit(err);
-
-        err = writer.CopyElement(TLV::AnonymousTag, reader);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.Next());
+        ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag, reader));
     }
 
-    err = writer.EndContainer(outerType);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(writer.EndContainer(outerType));
 
     writer.Finalize(&handle);
     aReader.Init(std::move(handle));
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteAttributePath & aPath, TLV::TLVReader * apData)
@@ -86,11 +79,10 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteAttributePath & aPath,
     {
         TLV::TLVType outerContainer;
 
-        VerifyOrExit(apData->GetType() == TLV::kTLVType_Array, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
+        VerifyOrReturnError(apData->GetType() == TLV::kTLVType_Array, CHIP_ERROR_INVALID_TLV_ELEMENT);
         mBufferedList.clear();
 
-        err = apData->EnterContainer(outerContainer);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(apData->EnterContainer(outerContainer));
 
         while ((err = apData->Next()) == CHIP_NO_ERROR)
         {
@@ -99,11 +91,8 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteAttributePath & aPath,
 
             writer.Init(std::move(handle), false);
 
-            err = writer.CopyElement(TLV::AnonymousTag, *apData);
-            SuccessOrExit(err);
-
-            err = writer.Finalize(&handle);
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag, *apData));
+            ReturnErrorOnFailure(writer.Finalize(&handle));
 
             // Compact the buffer down to a more reasonably sized packet buffer
             // if we can.
@@ -113,8 +102,7 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteAttributePath & aPath,
             mBufferedList.push_back(std::move(handle));
         }
 
-        err = apData->ExitContainer(outerContainer);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(apData->ExitContainer(outerContainer));
     }
     else if (aPath.mListOp == ConcreteAttributePath::ListOperation::AppendItem)
     {
@@ -123,11 +111,8 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteAttributePath & aPath,
 
         writer.Init(std::move(handle), false);
 
-        err = writer.CopyElement(TLV::AnonymousTag, *apData);
-        SuccessOrExit(err);
-
-        err = writer.Finalize(&handle);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag, *apData));
+        ReturnErrorOnFailure(writer.Finalize(&handle));
 
         //
         // Compact the buffer down to a more reasonably sized packet buffer
@@ -138,15 +123,12 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteAttributePath & aPath,
         mBufferedList.push_back(std::move(handle));
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath,
                                                       const StatusIB & aStatusIB, bool endOfReport)
 {
-    CHIP_ERROR err;
-
     if (aPath == mBufferedPath)
     {
         //
@@ -178,8 +160,7 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ReadClient * apReadC
     StatusIB statusIB;
     System::PacketBufferTLVReader reader;
 
-    err = GenerateListTLV(reader);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(GenerateListTLV(reader));
 
     //
     // Update the list operation to now reflect the delivery of the entire list
@@ -199,15 +180,12 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ReadClient * apReadC
     //
     mBufferedList.clear();
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void BufferedReadCallback::OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath,
                                            TLV::TLVReader * apData, const StatusIB & aStatus)
 {
-    CHIP_ERROR err;
-
     //
     // First, let's dispatch to our registered callback any buffered up list data from previous calls.
     //
@@ -218,8 +196,7 @@ void BufferedReadCallback::OnAttributeData(const ReadClient * apReadClient, cons
     //
     if (aPath.IsListOperation() && aStatus.mStatus == Protocols::InteractionModel::Status::Success)
     {
-        err = BufferData(aPath, apData);
-        SuccessOrExit(err);
+        ReturnOnFailure(BufferData(aPath, apData));
     }
     else
     {
@@ -230,10 +207,7 @@ void BufferedReadCallback::OnAttributeData(const ReadClient * apReadClient, cons
     // Update our latched buffered path.
     //
     mBufferedPath = aPath;
-
-exit:
-    return;
 }
 
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines read client for a CHIP Interaction Data model
- *
- */
-
 #pragma once
 
 #include "system/SystemPacketBuffer.h"
@@ -83,5 +77,5 @@ private:
     Callback & mCallback;
 };
 
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip
