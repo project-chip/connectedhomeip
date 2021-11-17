@@ -18,32 +18,19 @@
 
 /**
  *    @file
- *     This file contains the constants for the mocked attribute-storage.cpp
+ *     This file contains functions for the mocked attribute-storage.cpp
  */
 
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
+#include <app/MessageDef/AttributeReportIB.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace Test {
-constexpr EndpointId kMockEndpoint1   = 0xFFFE;
-constexpr EndpointId kMockEndpoint2   = 0xFFFD;
-constexpr EndpointId kMockEndpoint3   = 0xFFFC;
-constexpr EndpointId kMockEndpointMin = 0xFFF1;
-
-constexpr AttributeId MockAttributeId(const uint16_t & id)
-{
-    return (0xFFF1'0000 | id);
-}
-
-constexpr AttributeId MockClusterId(const uint16_t & id)
-{
-    return (0xFFF1'0000 | id);
-}
-
+CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const app::ConcreteAttributePath & aPath,
+                                     app::AttributeReportIB::Builder & aAttributeReport);
 } // namespace Test
 } // namespace chip
