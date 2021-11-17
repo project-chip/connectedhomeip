@@ -8,6 +8,11 @@
 #import "CHIPClustersObjc_internal.h"
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
+#import "CHIPStructsObjc.h"
+#import "CHIPCommandPayloadsObjc.h"
+#import "CHIPListUtils_internal.h"
+
+#include <type_traits>
 
 using chip::Callback::Callback;
 using chip::Callback::Cancelable;
@@ -22,14 +27,14 @@ using namespace chip::app::Clusters;
 }
 
 {{#chip_cluster_commands}}
-{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}DefaultSuccess{{/if}}{{/inline}}
-{{#if (zcl_command_arguments_count this.id)}}
-- (void){{asLowerCamelCase name}}:{{#chip_cluster_command_arguments_with_structs_expanded}}{{#not_first}}{{asLowerCamelCase label}}:{{/not_first}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_cluster_command_arguments_with_structs_expanded}}responseHandler:(ResponseHandler)responseHandler
-{{else}}
-- (void){{asLowerCamelCase name}}:(ResponseHandler)responseHandler
-{{/if}}
+{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
+- (void){{asLowerCamelCase name}}:(CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Payload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
 {
-    {{>encode_command}}
+    ListFreer listFreer;
+    {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
+    {{#chip_cluster_command_arguments}}
+    {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "payload." (asUpperCamelCase label)) cluster=parent.parent.name errorCode="return;" depth=0}}
+    {{/chip_cluster_command_arguments}}
 
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
@@ -51,21 +56,16 @@ using namespace chip::app::Clusters;
 
 {{#if isWritableAttribute}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
-{{#*inline "callbackParams"}},
-  {{#if_chip_enum type}}
-    static_cast<{{chipType}}>(value)
-  {{else if (isOctetString type)}}
-    [self asByteSpan:value]
-  {{else if (isCharString type)}}
-    [self asCharSpan:value]
-  {{else}}
-    value
-  {{/if_chip_enum}}
-{{/inline}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.Write{{>attribute}}(success, failure{{>callbackParams}});
+        ListFreer listFreer;
+        using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+        TypeInfo::Type cppValue;
+        {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
+        auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 

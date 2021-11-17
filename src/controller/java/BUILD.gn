@@ -69,10 +69,10 @@ android_library("java") {
   sources = [
     "src/chip/clusterinfo/ClusterCommandCallback.java",
     "src/chip/clusterinfo/ClusterInfo.java",
-    "src/chip/clusterinfo/CommandInfo.java",
     "src/chip/clusterinfo/CommandParameterInfo.java",
     "src/chip/clusterinfo/CommandResponseInfo.java",
     "src/chip/clusterinfo/DelegatedClusterCallback.java",
+    "src/chip/clusterinfo/InteractionInfo.java",
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
@@ -81,6 +81,8 @@ android_library("java") {
     "src/chip/devicecontroller/PaseVerifierParams.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
+    "zap-generated/chip/devicecontroller/ClusterReadMapping.java",
+    "zap-generated/chip/devicecontroller/ClusterWriteMapping.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

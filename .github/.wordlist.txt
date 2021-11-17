@@ -39,6 +39,7 @@ AppConfig
 ApplicationBasic
 ApplicationIdentifier
 ApplicationLauncher
+ApplyUpdateRequest
 approver
 appspot
 aps
@@ -215,6 +216,7 @@ cppreference
 CPROTO
 cpuapp
 cpython
+CQM
 crypto
 cryptographic
 CSA
@@ -340,6 +342,7 @@ env
 esd
 ESPPORT
 Espressif
+esptool
 eth
 EthernetNetworkDiagnostics
 ethernets
@@ -690,6 +693,11 @@ optionsMask
 optionsOverride
 orgs
 OTA
+OTAProviderIpAddress
+OTAProviderNodeId
+OTAProviderSerialPort
+OTARequesterImpl
+OTARequestorSerialPort
 OTBR
 otcli
 PAA
@@ -848,6 +856,7 @@ SetpointRaiseLower
 SetUpPINCode
 SetupQRCode
 sexualized
+shubhamdp
 SIGINT
 SiLabs
 SiliconLabs

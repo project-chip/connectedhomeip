@@ -35,8 +35,13 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
+    "AttributePathExpandIterator.cpp",
+    "AttributePathExpandIterator.h",
     "AttributePathParams.cpp",
+    "AttributePathParams.h",
     "BufferedReadCallback.cpp",
+    "CASESessionManager.cpp",
+    "CASESessionManager.h",
     "Command.cpp",
     "Command.h",
     "CommandHandler.cpp",
@@ -113,6 +118,8 @@ static_library("app") {
     "OperationalDeviceProxy.h",
     "ReadClient.cpp",
     "ReadHandler.cpp",
+    "StatusResponse.cpp",
+    "StatusResponse.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
     "decoder.cpp",
@@ -120,13 +127,6 @@ static_library("app") {
     "reporting/Engine.cpp",
     "reporting/Engine.h",
   ]
-
-  if (chip_ip_commissioning) {
-    defines = [
-      "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=1",
-      "CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY=1",
-    ]
-  }
 
   public_deps = [
     ":app_buildconfig",

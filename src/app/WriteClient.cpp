@@ -244,26 +244,26 @@ CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::T
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    if (session.IsGroupSession())
-    {
-        // Exchange will be closed by WriteClientHandle::SendWriteRequest for group messages
-        err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
-                                         Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
-    }
-    else
-    {
-        mpExchangeCtx->SetResponseTimeout(timeout);
 
-        err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
-                                         Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
-        SuccessOrExit(err);
-        MoveToState(State::AwaitingResponse);
-    }
+    mpExchangeCtx->SetResponseTimeout(timeout);
+
+    // kExpectResponse is ignored by ExchangeContext in case of groupcast
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+    SuccessOrExit(err);
+
+    MoveToState(State::AwaitingResponse);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ClearExistingExchangeContext();
+    }
+
+    if (session.IsGroupSession())
+    {
+        // Always shutdown on Group communication
+        Shutdown();
     }
 
     return err;
@@ -277,15 +277,23 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
     // This should never fail because even if SendWriteRequest is called
     // back-to-back, the second call will call Close() on the first exchange,
     // which clears the OnMessageReceived callback.
+    VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrDie(apExchangeContext == mpExchangeCtx);
-
-    // Verify that the message is an Write Response. If not, this is an unexpected message.
-    // Signal the error through the error callback and shutdown the client.
-    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse),
-                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-
-    err = ProcessWriteResponseMessage(std::move(aPayload));
+    if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse))
+    {
+        err = ProcessWriteResponseMessage(std::move(aPayload));
+        SuccessOrExit(err);
+    }
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    {
+        StatusIB status;
+        err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    }
 
 exit:
     if (mpCallback != nullptr)
@@ -361,7 +369,7 @@ CHIP_ERROR WriteClientHandle::SendWriteRequest(SessionHandle session, System::Cl
 
     // Transferring ownership of the underlying WriteClient to the IM layer. IM will manage its lifetime.
     // For groupcast writes, there is no transfer of ownership since the interaction is done upon transmission of the action
-    if (err == CHIP_NO_ERROR && !session.IsGroupSession())
+    if (err == CHIP_NO_ERROR)
     {
         // Release the WriteClient without closing it.
         mpWriteClient = nullptr;

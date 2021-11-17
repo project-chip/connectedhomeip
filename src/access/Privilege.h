@@ -18,13 +18,15 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace chip {
 namespace Access {
 
 // Using bitfield values so privilege set and auth mode can be stored together.
 // Privilege set can have more than one value expressed (e.g. View,
 // ProxyView, and Operate).
-enum class Privilege
+enum class Privilege : uint8_t
 {
     kView       = 1 << 0,
     kProxyView  = 1 << 1,

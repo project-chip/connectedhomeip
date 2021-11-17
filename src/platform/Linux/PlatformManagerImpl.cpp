@@ -33,6 +33,7 @@
 #include <thread>
 
 #include <arpa/inet.h>
+#include <dirent.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <malloc.h>
@@ -286,6 +287,61 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentH
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR PlatformManagerImpl::_GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+    DIR * proc_dir = opendir("/proc/self/task");
+
+    if (proc_dir == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Failed to open current process task directory");
+    }
+    else
+    {
+        ThreadMetrics * head = nullptr;
+        struct dirent * entry;
+
+        /* proc available, iterate through tasks... */
+        while ((entry = readdir(proc_dir)) != NULL)
+        {
+            if (entry->d_name[0] == '.')
+                continue;
+
+            ThreadMetrics * thread = new ThreadMetrics();
+
+            strncpy(thread->NameBuf, entry->d_name, kMaxThreadNameLength);
+            thread->NameBuf[kMaxThreadNameLength] = '\0';
+            thread->name                          = CharSpan(thread->NameBuf, strlen(thread->NameBuf));
+            thread->id                            = atoi(entry->d_name);
+
+            // TODO: Get stack info of each thread
+            thread->stackFreeCurrent = 0;
+            thread->stackFreeMinimum = 0;
+            thread->stackSize        = 0;
+
+            thread->Next = head;
+            head         = thread;
+        }
+
+        closedir(proc_dir);
+
+        *threadMetricsOut = head;
+        err               = CHIP_NO_ERROR;
+    }
+
+    return err;
+}
+
+void PlatformManagerImpl::_ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{
+    while (threadMetrics)
+    {
+        ThreadMetrics * del = threadMetrics;
+        threadMetrics       = threadMetrics->Next;
+        delete del;
+    }
+}
+
 CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
 {
     uint32_t count = 0;
@@ -344,6 +400,44 @@ CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
     }
 
     return err;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
+{
+#if CHIP_CONFIG_TEST
+    // On Linux Simulation, set following hardware faults statically.
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
+#endif
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
+{
+#if CHIP_CONFIG_TEST
+    // On Linux Simulation, set following radio faults statically.
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
+#endif
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
+{
+#if CHIP_CONFIG_TEST
+    // On Linux Simulation, set following radio faults statically.
+    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
+    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
+#endif
+
+    return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)

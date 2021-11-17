@@ -26,7 +26,7 @@ step. To install these components manually, follow these steps:
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout release/v4.3
+          $ git checkout release/v4.4
           $ git submodule update --init
           $ ./install.sh
 
@@ -54,6 +54,10 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     If packages are already installed then simply activate them.
 
         $ source ./scripts/activate.sh
+
+-   Select IDF Target
+
+        $ idf.py set-target esp32(or esp32c3)
 
 -   Configuration Options
 

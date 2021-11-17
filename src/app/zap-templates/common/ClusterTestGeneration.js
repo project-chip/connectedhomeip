@@ -33,6 +33,7 @@ const { asUpperCamelCase }              = require(basePath + 'src/app/zap-templa
 
 const kClusterName       = 'cluster';
 const kEndpointName      = 'endpoint';
+const kGroupId           = 'groupId';
 const kCommandName       = 'command';
 const kWaitCommandName   = 'wait';
 const kIndexName         = 'index';
@@ -117,6 +118,10 @@ function setDefaultTypeForCommand(test)
     test.commandName      = 'Write';
     test.isAttribute      = true;
     test.isWriteAttribute = true;
+    if ((kGroupId in test)) {
+      test.isGroupCommand = true;
+      test.groupId        = parseInt(test[kGroupId], 10);
+    }
     break;
 
   case 'subscribeAttribute':
@@ -149,10 +154,13 @@ function setDefaultPICS(test)
     return;
   }
 
-  if (!PICS.has(test[kPICSName])) {
-    const errorStr = 'PICS database does not contains any defined value for: ' + test[kPICSName];
-    throwError(test, errorStr);
-  }
+  const items = test[kPICSName].split(/[&|() !]+/g).filter(item => item.length);
+  items.forEach(key => {
+    if (!PICS.has(key)) {
+      const errorStr = 'PICS database does not contains any defined value for: ' + key;
+      throwError(test, errorStr);
+    }
+  })
 }
 
 function setDefaultArguments(test)
@@ -308,9 +316,6 @@ function parse(filename)
 
   // Filter disabled tests
   yaml.tests = yaml.tests.filter(test => !test.disabled);
-
-  // Filter tests based on PICS
-  yaml.tests = yaml.tests.filter(test => test[kPICSName] == '' || PICS.get(test[kPICSName]).value == true);
 
   yaml.tests.forEach((test, index) => {
     setDefault(test, kIndexName, index);

@@ -40,7 +40,25 @@ using namespace chip::app::Clusters::TestCluster;
 using namespace chip::app::Clusters::TestCluster::Commands;
 using namespace chip::app::Clusters::TestCluster::Attributes;
 
+// The number of elements in the test attribute list
+constexpr uint8_t kAttributeListLength = 4;
+
+// The maximum length of the test attribute list element in bytes
+constexpr uint8_t kAttributeEntryLength = 6;
+
 namespace {
+
+class OctetStringData
+{
+public:
+    uint8_t * Data() { return mDataBuf; }
+    size_t Length() const { return mDataLen; }
+    void SetLength(size_t size) { mDataLen = size; }
+
+private:
+    uint8_t mDataBuf[kAttributeEntryLength];
+    size_t mDataLen = 0;
+};
 
 class TestAttrAccess : public AttributeAccessInterface
 {
@@ -49,15 +67,24 @@ public:
     TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id) {}
 
     CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
     CHIP_ERROR ReadListInt8uAttribute(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteListInt8uAttribute(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListOctetStringAttribute(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteListOctetStringAttribute(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListStructOctetStringAttribute(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteListStructOctetStringAttribute(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteListNullablesAndOptionalsStructAttribute(AttributeValueDecoder & aDecoder);
 };
 
 TestAttrAccess gAttrAccess;
+uint8_t gListUint8Data[kAttributeListLength];
+OctetStringData gListOctetStringData[kAttributeListLength];
+OctetStringData gListOperationalCert[kAttributeListLength];
+Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLength];
 
 CHIP_ERROR TestAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -83,52 +110,138 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeVa
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TestAttrAccess::Write(const ConcreteAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case ListInt8u::Id: {
+        return WriteListInt8uAttribute(aDecoder);
+    }
+    case ListOctetString::Id: {
+        return WriteListOctetStringAttribute(aDecoder);
+    }
+    case ListStructOctetString::Id: {
+        return WriteListStructOctetStringAttribute(aDecoder);
+    }
+    case ListNullablesAndOptionalsStruct::Id: {
+        return WriteListNullablesAndOptionalsStructAttribute(aDecoder);
+    }
+    default: {
+        break;
+    }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR TestAttrAccess::ReadListInt8uAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-        constexpr uint8_t maxValue = 4;
-        for (uint8_t value = 1; value <= maxValue; value++)
+        for (uint8_t index = 0; index < kAttributeListLength; index++)
         {
-            ReturnErrorOnFailure(encoder.Encode(value));
+            ReturnErrorOnFailure(encoder.Encode(gListUint8Data[index]));
         }
         return CHIP_NO_ERROR;
     });
 }
 
+CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(AttributeValueDecoder & aDecoder)
+{
+    ListInt8u::TypeInfo::DecodableType list;
+
+    ReturnErrorOnFailure(aDecoder.Decode(list));
+
+    uint8_t index = 0;
+    auto iter     = list.begin();
+    while (iter.Next())
+    {
+        auto & entry = iter.GetValue();
+
+        VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        gListUint8Data[index++] = entry;
+    }
+
+    return iter.GetStatus();
+}
+
 CHIP_ERROR TestAttrAccess::ReadListOctetStringAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-        constexpr uint16_t attributeCount = 4;
-        char data[6]                      = { 'T', 'e', 's', 't', 'N', '\0' };
-
-        for (uint8_t index = 0; index < attributeCount; index++)
+        for (uint8_t index = 0; index < kAttributeListLength; index++)
         {
-            snprintf(data + strlen(data) - 1, 2, "%d", index);
-            ByteSpan span(Uint8::from_char(data), strlen(data));
+            ByteSpan span(gListOctetStringData[index].Data(), gListOctetStringData[index].Length());
             ReturnErrorOnFailure(encoder.Encode(span));
         }
         return CHIP_NO_ERROR;
     });
 }
 
+CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(AttributeValueDecoder & aDecoder)
+{
+    ListOctetString::TypeInfo::DecodableType list;
+
+    ReturnErrorOnFailure(aDecoder.Decode(list));
+
+    uint8_t index = 0;
+    auto iter     = list.begin();
+    while (iter.Next())
+    {
+        const auto & entry = iter.GetValue();
+
+        VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(entry.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(gListOctetStringData[index].Data(), entry.data(), entry.size());
+        gListOctetStringData[index].SetLength(entry.size());
+        index++;
+    }
+
+    return iter.GetStatus();
+}
+
 CHIP_ERROR TestAttrAccess::ReadListStructOctetStringAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-        constexpr uint16_t attributeCount = 4;
-        char data[6]                      = { 'T', 'e', 's', 't', 'N', '\0' };
-
-        for (uint8_t index = 0; index < attributeCount; index++)
+        for (uint8_t index = 0; index < kAttributeListLength; index++)
         {
-            snprintf(data + strlen(data) - 1, 2, "%d", index);
-            ByteSpan span(Uint8::from_char(data), strlen(data));
-
             Structs::TestListStructOctet::Type structOctet;
-            structOctet.fabricIndex     = index;
-            structOctet.operationalCert = span;
+            structOctet.fabricIndex     = listStructOctetStringData[index].fabricIndex;
+            structOctet.operationalCert = listStructOctetStringData[index].operationalCert;
             ReturnErrorOnFailure(encoder.Encode(structOctet));
         }
+
         return CHIP_NO_ERROR;
     });
+}
+
+CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(AttributeValueDecoder & aDecoder)
+{
+    ListStructOctetString::TypeInfo::DecodableType list;
+
+    ReturnErrorOnFailure(aDecoder.Decode(list));
+
+    uint8_t index = 0;
+    auto iter     = list.begin();
+    while (iter.Next())
+    {
+        const auto & entry = iter.GetValue();
+
+        VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(entry.operationalCert.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(gListOperationalCert[index].Data(), entry.operationalCert.data(), entry.operationalCert.size());
+        gListOperationalCert[index].SetLength(entry.operationalCert.size());
+
+        listStructOctetStringData[index].fabricIndex = entry.fabricIndex;
+        listStructOctetStringData[index].operationalCert =
+            ByteSpan(gListOperationalCert[index].Data(), gListOperationalCert[index].Length());
+        index++;
+    }
+
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_INVALID_DATA_LIST;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TestAttrAccess::ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder)
@@ -142,6 +255,11 @@ CHIP_ERROR TestAttrAccess::ReadListNullablesAndOptionalsStructAttribute(Attribut
     });
 }
 
+CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(AttributeValueDecoder & aDecoder)
+{
+    // TODO Add yaml test case for NullablesAndOptionalsStruct list
+    return CHIP_NO_ERROR;
+}
 } // namespace
 
 bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,

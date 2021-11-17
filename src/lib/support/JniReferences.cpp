@@ -19,13 +19,9 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
 namespace chip {
-
-pthread_mutex_t * JniReferences::GetStackLock()
-{
-    return &mStackLock;
-}
 
 void JniReferences::SetJavaVm(JavaVM * jvm, const char * clsType)
 {
@@ -181,6 +177,23 @@ void JniReferences::ThrowError(JNIEnv * env, jclass exceptionCls, CHIP_ERROR err
     jthrowable outEx = (jthrowable) env->NewObject(exceptionCls, constructor, static_cast<jint>(errToThrow.AsInteger()), jerrStr);
     VerifyOrReturn(!env->ExceptionCheck());
     env->Throw(outEx);
+}
+
+CHIP_ERROR JniReferences::CreateOptional(jobject objectToWrap, jobject & outOptional)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass optionalCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/util/Optional", optionalCls);
+    VerifyOrReturnError(optionalCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    chip::JniClass jniClass(optionalCls);
+
+    jmethodID ofMethod = env->GetStaticMethodID(optionalCls, "ofNullable", "(Ljava/lang/Object;)Ljava/util/Optional;");
+    VerifyOrReturnError(ofMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    outOptional = env->CallStaticObjectMethod(optionalCls, ofMethod, objectToWrap);
+
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

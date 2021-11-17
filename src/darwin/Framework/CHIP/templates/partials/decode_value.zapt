@@ -1,0 +1,40 @@
+{{#if isOptional}}
+  if ({{source}}.HasValue()) {
+    {{>decode_value target=target source=(concat source ".Value()") cluster=cluster errorCode=errorCode isOptional=false}}
+  } else {
+    {{! TODO: Should just use nil here, but we're still adding these to
+        dictionaries for now }}
+    {{target}} = [NSNull null];
+  }
+{{else if isNullable}}
+  if ({{source}}.IsNull()) {
+    {{! Again, should use nil here }}
+    {{target}} = [NSNull null];
+  } else {
+    {{>decode_value target=target source=(concat source ".Value()") cluster=cluster errorCode=errorCode isNullable=false}}
+  }
+{{else if isArray}}
+  {{target}} = [[NSMutableArray alloc] init];
+  auto iter = {{source}}.begin();
+  while (iter.Next()) {
+    auto & entry = iter.GetValue();
+    auto * newElement = [[{{asObjectiveCClass type cluster forceNotList=true}} alloc] init];
+    {{>decode_value target="newElement" source="entry" cluster=cluster errorCode=errorCode isArray=false}}
+    [{{target}} addObject:newElement];
+  }
+  if (iter.GetStatus() != CHIP_NO_ERROR) {
+    {{errorCode}}
+  }
+{{else}}
+  {{#if_is_struct type}}
+    {{#zcl_struct_items_by_struct_name type}}
+      {{>decode_value target=(concat ../target "." (asUpperCamelCase label)) source=(concat ../source "." (asLowerCamelCase label)) cluster=../cluster}}
+    {{/zcl_struct_items_by_struct_name}}
+  {{else if (isOctetString type)}}
+    {{target}} = [NSData dataWithBytes:{{source}}.data() length:{{source}}.size()];
+  {{else if (isCharString type)}}
+    {{target}} = [[NSString alloc] initWithBytes:{{source}}.data() length:{{source}}.size() encoding:NSUTF8StringEncoding];
+  {{else}}
+    {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}];
+  {{/if_is_struct}}
+{{/if}}

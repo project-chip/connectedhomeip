@@ -827,7 +827,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 
     case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id: {
         otDeviceRole role = otThreadGetDeviceRole(mOTInst);
-        err               = encoder.Encode(role);
+        err               = encoder.Encode(static_cast<uint8_t>(role));
     }
     break;
 
@@ -867,8 +867,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
-        // List and structure not yet functionnal
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        err = encoder.Encode(DataModel::List<EndpointId>());
+
         // TO DO When list is functionnal.
         // Determined limit of otNeighborInfo list
         // pReadLength = sizeof(otNeighborInfo) * 20;
@@ -895,8 +895,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
-        // List not yet functionnal
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        err = encoder.Encode(DataModel::List<EndpointId>());
     }
     break;
 
@@ -1222,7 +1221,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id: {
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        err = encoder.Encode(DataModel::List<EndpointId>());
+
         // Stuct type nopt yet supported
         // if (otDatasetIsCommissioned(mOTInst))
         // {
@@ -1258,6 +1258,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id: {
+        err = encoder.Encode(DataModel::List<EndpointId>());
+
         // Structure not yet supported
         // if (otDatasetIsCommissioned(mOTInst))
         // {
@@ -1276,10 +1278,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
-        // List not yet supported
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
-        break;
+        err = encoder.Encode(DataModel::List<EndpointId>());
     }
+    break;
 
     default: {
         err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

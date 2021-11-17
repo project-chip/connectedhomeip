@@ -16,8 +16,8 @@
  */
 
 #pragma once
-#include "Builder.h"
-#include "Parser.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -33,13 +33,9 @@ enum class Tag : uint8_t
     kTimeoutMs = 0,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public StructParser
 {
 public:
-    /**
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this request
-     */
-    CHIP_ERROR Init(const TLV::TLVReader & aReader);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
@@ -66,11 +62,9 @@ public:
     CHIP_ERROR GetTimeoutMs(uint16_t * const apTimeoutMs) const;
 };
 
-class Builder : public chip::app::Builder
+class Builder : public StructBuilder
 {
 public:
-    CHIP_ERROR Init(TLV::TLVWriter * const apWriter);
-
     /**
      *  @brief Timeout value, sent by a client to a server, if there is a preceding successful Timed Request action,
      *  the following action SHALL be received before the end of the Timeout interval.

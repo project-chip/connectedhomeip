@@ -90,47 +90,15 @@ void CommissioneeDeviceProxy::OnNewConnection(SessionHandle session)
 {
     mState = ConnectionState::SecureConnected;
     mSecureSession.SetValue(session);
-
-    // Reset the message counters here because this is the first time we get a handle to the secure session.
-    // Since CHIPDevices can be serialized/deserialized in the middle of what is conceptually a single PASE session
-    // we need to restore the session counters along with the session information.
-    Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
-    VerifyOrReturn(secureSession != nullptr);
-    MessageCounter & localCounter = secureSession->GetSessionMessageCounter().GetLocalMessageCounter();
-    if (localCounter.SetCounter(mLocalMessageCounter) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Unable to restore local counter to %" PRIu32, mLocalMessageCounter);
-    }
-    Transport::PeerMessageCounter & peerCounter = secureSession->GetSessionMessageCounter().GetPeerMessageCounter();
-    peerCounter.SetCounter(mPeerMessageCounter);
 }
 
-void CommissioneeDeviceProxy::OnConnectionExpired(SessionHandle session)
+void CommissioneeDeviceProxy::OnSessionReleased(SessionHandle session)
 {
     VerifyOrReturn(mSecureSession.HasValue() && mSecureSession.Value() == session,
                    ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));
     mState = ConnectionState::NotConnected;
     mSecureSession.ClearValue();
 }
-
-CHIP_ERROR CommissioneeDeviceProxy::OnMessageReceived(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
-                                                      System::PacketBufferHandle && msgBuf)
-{
-    if (mState == ConnectionState::SecureConnected)
-    {
-        if (mStatusDelegate != nullptr)
-        {
-            mStatusDelegate->OnMessage(std::move(msgBuf));
-        }
-        else
-        {
-            HandleDataModelMessage(exchange, std::move(msgBuf));
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-
-void CommissioneeDeviceProxy::OnResponseTimeout(Messaging::ExchangeContext * ec) {}
 
 CHIP_ERROR CommissioneeDeviceProxy::CloseSession()
 {
@@ -178,18 +146,10 @@ void CommissioneeDeviceProxy::Reset()
 
     mState          = ConnectionState::NotConnected;
     mSessionManager = nullptr;
-    mStatusDelegate = nullptr;
     mInetLayer      = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     mBleLayer = nullptr;
 #endif
-    if (mExchangeMgr)
-    {
-        // Ensure that any exchange contexts we have open get closed now,
-        // because we don't want them to call back in to us after this
-        // point.
-        mExchangeMgr->CloseAllContextsForDelegate(this);
-    }
     mExchangeMgr = nullptr;
 
     ReleaseDAC();
@@ -307,14 +267,6 @@ CHIP_ERROR CommissioneeDeviceProxy::SetPAI(const chip::ByteSpan & pai)
 
 CommissioneeDeviceProxy::~CommissioneeDeviceProxy()
 {
-    if (mExchangeMgr)
-    {
-        // Ensure that any exchange contexts we have open get closed now,
-        // because we don't want them to call back in to us after this
-        // point.
-        mExchangeMgr->CloseAllContextsForDelegate(this);
-    }
-
     ReleaseDAC();
     ReleasePAI();
 }

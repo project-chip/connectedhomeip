@@ -125,13 +125,6 @@ public:
     CHIP_ERROR NewUDPEndPoint(UDPEndPoint ** retEndPoint);
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
-    // DNS Resolution
-
-    CHIP_ERROR GetInterfaceFromAddr(const IPAddress & addr, InterfaceId & intfId);
-
-    CHIP_ERROR GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr);
-    bool MatchLocalIPv6Subnet(const IPAddress & addr);
-
     void * GetPlatformData();
     void SetPlatformData(void * aPlatformData);
 

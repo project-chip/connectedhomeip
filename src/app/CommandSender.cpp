@@ -26,6 +26,7 @@
 #include "Command.h"
 #include "CommandHandler.h"
 #include "InteractionModelEngine.h"
+#include "StatusResponse.h"
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -91,20 +92,29 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
                                             System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
+    StatusIB status(Protocols::InteractionModel::Status::Failure);
     VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse),
-                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-
-    err = ProcessInvokeResponse(std::move(aPayload));
+    if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse))
+    {
+        err = ProcessInvokeResponse(std::move(aPayload));
+        SuccessOrExit(err);
+        status.mStatus = Protocols::InteractionModel::Status::Success;
+    }
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    {
+        err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    }
 
 exit:
     if (mpCallback != nullptr)
     {
         if (err != CHIP_NO_ERROR)
         {
-            StatusIB status;
-            status.mStatus = Protocols::InteractionModel::Status::Failure;
             mpCallback->OnError(this, status, err);
         }
     }

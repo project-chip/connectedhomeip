@@ -39,7 +39,10 @@ static_library("helpers") {
 chip_test_suite("tests") {
   output_name = "libRawTransportTests"
 
-  test_sources = [ "TestMessageHeader.cpp" ]
+  test_sources = [
+    "TestMessageHeader.cpp",
+    "TestPeerAddress.cpp",
+  ]
 
   if (current_os != "mac") {
     test_sources += [ "TestTCP.cpp" ]

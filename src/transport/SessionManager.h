@@ -35,7 +35,9 @@
 #include <transport/CryptoContext.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/SecureSessionTable.h>
+#include <transport/SessionDelegate.h>
 #include <transport/SessionHandle.h>
+#include <transport/SessionMessageDelegate.h>
 #include <transport/TransportMgr.h>
 #include <transport/UnauthenticatedSessionTable.h>
 #include <transport/raw/Base.h>
@@ -113,67 +115,6 @@ private:
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
 };
 
-/**
- * @brief
- *   This class provides a skeleton for the callback functions. The functions will be
- *   called by SecureSssionMgrBase object on specific events. If the user of SessionManager
- *   is interested in receiving these callbacks, they can specialize this class and handle
- *   each trigger in their implementation of this class.
- */
-class DLL_EXPORT SessionManagerDelegate
-{
-public:
-    enum class DuplicateMessage : uint8_t
-    {
-        Yes,
-        No,
-    };
-
-    /**
-     * @brief
-     *   Called when a new message is received. The function must internally release the
-     *   msgBuf after processing it.
-     *
-     * @param packetHeader  The message header
-     * @param payloadHeader The payload header
-     * @param session       The handle to the secure session
-     * @param source        The sender's address
-     * @param isDuplicate   The message is a duplicate of previously received message
-     * @param msgBuf        The received message
-     */
-    virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SessionHandle session,
-                                   const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
-                                   System::PacketBufferHandle && msgBuf)
-    {}
-
-    /**
-     * @brief
-     *   Called when received message processing resulted in error
-     *
-     * @param error   error code
-     * @param source  network entity that sent the message
-     */
-    virtual void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source) {}
-
-    /**
-     * @brief
-     *   Called when a new pairing is being established
-     *
-     * @param session The handle to the secure session
-     */
-    virtual void OnNewConnection(SessionHandle session) {}
-
-    /**
-     * @brief
-     *   Called when a new connection is closing
-     *
-     * @param session The handle to the secure session
-     */
-    virtual void OnConnectionExpired(SessionHandle session) {}
-
-    virtual ~SessionManagerDelegate() {}
-};
-
 class DLL_EXPORT SessionManager : public TransportMgrDelegate
 {
 public:
@@ -202,14 +143,59 @@ public:
 
     Transport::SecureSession * GetSecureSession(SessionHandle session);
 
-    /**
-     * @brief
-     *   Set the callback object.
-     *
-     * @details
-     *   Release if there was an existing callback object
-     */
-    void SetDelegate(SessionManagerDelegate * cb) { mCB = cb; }
+    /// @brief Set the delegate for handling incoming messages. There can be only one message delegate (probably the
+    /// ExchangeManager)
+    void SetMessageDelegate(SessionMessageDelegate * cb) { mCB = cb; }
+
+    /// @brief Set the delegate for handling session creation.
+    void RegisterCreationDelegate(SessionCreationDelegate & cb)
+    {
+#ifndef NDEBUG
+        mSessionCreationDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionCreationDelegate> * i) {
+            VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
+            return true;
+        });
+#endif
+        std::reference_wrapper<SessionCreationDelegate> * slot = mSessionCreationDelegates.CreateObject(cb);
+        VerifyOrDie(slot != nullptr);
+    }
+
+    void UnregisterCreationDelegate(SessionCreationDelegate & cb)
+    {
+        mSessionCreationDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionCreationDelegate> * i) {
+            if (std::addressof(cb) == std::addressof(i->get()))
+            {
+                mSessionCreationDelegates.ReleaseObject(i);
+                return false;
+            }
+            return true;
+        });
+    }
+
+    /// @brief Set the delegate for handling session release.
+    void RegisterReleaseDelegate(SessionReleaseDelegate & cb)
+    {
+#ifndef NDEBUG
+        mSessionReleaseDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionReleaseDelegate> * i) {
+            VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
+            return true;
+        });
+#endif
+        std::reference_wrapper<SessionReleaseDelegate> * slot = mSessionReleaseDelegates.CreateObject(cb);
+        VerifyOrDie(slot != nullptr);
+    }
+
+    void UnregisterReleaseDelegate(SessionReleaseDelegate & cb)
+    {
+        mSessionReleaseDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionReleaseDelegate> * i) {
+            if (std::addressof(cb) == std::addressof(i->get()))
+            {
+                mSessionReleaseDelegates.ReleaseObject(i);
+                return false;
+            }
+            return true;
+        });
+    }
 
     /**
      * @brief
@@ -292,7 +278,16 @@ private:
     Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions; // < Active connections to other peers
     State mState;                                                                         // < Initialization state of the object
 
-    SessionManagerDelegate * mCB                                       = nullptr;
+    SessionMessageDelegate * mCB = nullptr;
+    BitMapObjectPool<std::reference_wrapper<SessionCreationDelegate>, CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES>
+        mSessionCreationDelegates;
+
+    // TODO: This is a temporary solution to release sessions, in the near future, SessionReleaseDelegate will be
+    //       directly associated with the every SessionHandle. Then the callback function is called on over the handle
+    //       delegate directly, in order to prevent dangling handles.
+    BitMapObjectPool<std::reference_wrapper<SessionReleaseDelegate>, CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES>
+        mSessionReleaseDelegates;
+
     TransportMgrBase * mTransportMgr                                   = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
 
@@ -323,6 +318,8 @@ private:
 
     void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                          System::PacketBufferHandle && msg);
+
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);
 
     static bool IsControlMessage(PayloadHeader & payloadHeader)
     {

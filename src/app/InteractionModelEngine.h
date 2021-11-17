@@ -47,6 +47,7 @@
 #include <app/InteractionModelDelegate.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
+#include <app/StatusResponse.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
@@ -54,9 +55,6 @@
 
 namespace chip {
 namespace app {
-
-static constexpr size_t kMaxSecureSduLengthBytes = 1024;
-
 /**
  * @class InteractionModelEngine
  *
@@ -177,6 +175,11 @@ public:
 
     uint16_t GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const;
 
+    /**
+     * The Magic number of this InteractionModelEngine, the magic number is set during Init()
+     */
+    uint32_t GetMagicNumber() { return mMagic; }
+
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
     void ReleaseClusterInfoList(ClusterInfo *& aClusterInfo);
@@ -197,28 +200,34 @@ private:
 
     void OnDone(CommandHandler & apCommandObj) override;
 
-    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                System::PacketBufferHandle && aPayload);
+    /**
+     * Called when Interaction Model receives a Command Request message.  Errors processing
+     * the Command Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
+     * expected to set it to success if it does not want an automatic status response message to be sent.
+     */
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                      System::PacketBufferHandle && aPayload);
+                                      System::PacketBufferHandle && aPayload, Protocols::InteractionModel::Status & aStatus);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
-     * the Read Request are handled entirely within this function.
+     * the Read Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
+     * expected to set it to success if it does not want an automatic status response message to be sent.
      */
 
     CHIP_ERROR OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                    System::PacketBufferHandle && aPayload, ReadHandler::InteractionType aInteractionType);
+                                    System::PacketBufferHandle && aPayload, ReadHandler::InteractionType aInteractionType,
+                                    Protocols::InteractionModel::Status & aStatus);
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
-     * the Write Request are handled entirely within this function.
+     * the Write Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
+     * expected to set it to success if it does not want an automatic status response message to be sent.
      */
     CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                              System::PacketBufferHandle && aPayload);
+                              System::PacketBufferHandle && aPayload, Protocols::InteractionModel::Status & aStatus);
 
     /**This function handles processing of un-solicited ReportData messages on the client, which can
      * only occur post subscription establishment
@@ -245,6 +254,10 @@ private:
     reporting::Engine mReportingEngine;
     ClusterInfo mClusterInfoPool[CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS];
     ClusterInfo * mpNextAvailableClusterInfo = nullptr;
+
+    // A magic number for tracking values between stack Shutdown()-s and Init()-s.
+    // An ObjectHandle is valid iff. its magic equals to this one.
+    uint32_t mMagic = 0;
 };
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,

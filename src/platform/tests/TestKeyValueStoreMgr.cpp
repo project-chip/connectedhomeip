@@ -230,8 +230,8 @@ static const nlTest sTests[] = { NL_TEST_DEF("Test KeyValueStoreMgr_EmptyStringK
                                  NL_TEST_DEF("Test KeyValueStoreMgr_StructKey", TestKeyValueStoreMgr_StructKey),
                                  NL_TEST_DEF("Test KeyValueStoreMgr_UpdateKeyValue", TestKeyValueStoreMgr_UpdateKeyValue),
                                  NL_TEST_DEF("Test KeyValueStoreMgr_TooSmallBufferRead", TestKeyValueStoreMgr_TooSmallBufferRead),
-#ifndef __ZEPHYR__
-                                 // Zephyr platform does not support partial or offset reads yet.
+#if !defined(__ZEPHYR__) && !defined(__MBED__)
+                                 // Zephyr and Mbed platforms do not support partial or offset reads yet.
                                  NL_TEST_DEF("Test KeyValueStoreMgr_MultiReadKey", TestKeyValueStoreMgr_MultiReadKey),
 #endif
 #ifdef __ZEPHYR__

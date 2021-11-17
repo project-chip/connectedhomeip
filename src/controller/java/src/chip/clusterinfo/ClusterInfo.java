@@ -6,9 +6,10 @@ import java.util.Map;
 /** ClusterInfo maps commands and provides a constructor function for a cluster. */
 public class ClusterInfo {
   private final ClusterConstructor createClusterFunction;
-  private final Map<String, CommandInfo> commands;
+  private final Map<String, InteractionInfo> commands;
 
-  public ClusterInfo(ClusterConstructor createClusterFunction, Map<String, CommandInfo> commands) {
+  public ClusterInfo(
+      ClusterConstructor createClusterFunction, Map<String, InteractionInfo> commands) {
     this.createClusterFunction = createClusterFunction;
     this.commands = commands;
   }
@@ -17,11 +18,11 @@ public class ClusterInfo {
     return createClusterFunction;
   }
 
-  public Map<String, CommandInfo> getCommands() {
+  public Map<String, InteractionInfo> getCommands() {
     return commands;
   }
 
-  public void combineCommands(Map<String, CommandInfo> newCommands) {
+  public void combineCommands(Map<String, InteractionInfo> newCommands) {
     this.commands.putAll(newCommands);
   }
 
