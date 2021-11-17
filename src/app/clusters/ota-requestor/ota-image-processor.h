@@ -34,7 +34,7 @@ public:
     virtual CHIP_ERROR PrepareDownload() = 0;
 
     // Must not be a blocking call to support cases that require IO to elements such as // external peripherals/radios
-    virtual CHIP_ERROR ProcessBlock(ByteSpan & data) = 0;
+    virtual CHIP_ERROR ProcessBlock(chip::ByteSpan & data) = 0;
 
     // Close file, close persistent storage, etc
     virtual CHIP_ERROR Finalize() = 0;
@@ -44,4 +44,7 @@ public:
     // Clean up the download which could mean erasing everything that was written,
     // releasing buffers, etc.
     virtual CHIP_ERROR Abort() = 0;
+
+    // Destructor
+    virtual ~OTAImageProcessor() = default;
 };

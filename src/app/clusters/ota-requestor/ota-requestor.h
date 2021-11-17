@@ -36,10 +36,23 @@ public:
     void TriggerImmediateQuery();
 
     // A setter for the delegate class pointer
-    void setOtaRequestorDriver(OTARequestorDriver * driver);
+    void setOtaRequestorDriver(OTARequestorDriver *driver) { otaRequestorDriver = driver; }
 
     // Application interface declarations end
 
+    // Virtual functions from OTARequestorInterface start
+    // Handler for the AnnounceOTAProvider command
+    bool HandleAnnounceOTAProvider(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) {return true;}
+
+    // TBD: This probably doesn't need to be a method OTARequestorInterface as the response handler is
+    // explicitly supplied at command invocation
+    // Handler for the QueryImageResponse command
+    // virtual bool HandleQueryImageResponse(chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType) = 0;
+    // Virtual functions from OTARequestorInterface end
+
 private:
     OTARequestorDriver * otaRequestorDriver;
+
 };

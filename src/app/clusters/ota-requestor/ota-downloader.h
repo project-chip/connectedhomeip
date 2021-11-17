@@ -23,7 +23,7 @@
  * must include this file
  */
 
-#include <ota-image-processor.h>
+#include "ota-image-processor.h"
 
 #pragma once
 
@@ -51,9 +51,22 @@ public:
     void virtual OnBlockProcessed(blockActionType action);
 
     // A setter for the delegate class pointer
-    void setImageProcessorDelegate(OTAImageProcessor * delegate)
+    void setImageProcessorDelegate(OTAImageProcessor * delegate);
 
-        // API declarations end
+    // Setter for imageProcessorDelegate
+    void setDelegate(OTAImageProcessor *delegate) { imageProcessorDelegate = delegate; }
 
-        private : OTAImageProcessor * imageProcessorDelegate;
+    // API declarations end
+
+    // Destructor
+    virtual ~OTADownloader() = default;
+ private:
+    OTAImageProcessor * imageProcessorDelegate;
 };
+
+
+// Set the object implementing OTADownloader
+void SetDownloaderInstance(OTADownloader *instance);
+
+// Get the object implementing OTADownloaderInterface
+OTADownloader* GetDownloaderInstance();

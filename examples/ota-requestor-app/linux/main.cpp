@@ -16,6 +16,238 @@
  *    limitations under the License.
  */
 
+//#include <app-common/zap-generated/callback.h>
+//#include <app-common/zap-generated/cluster-objects.h>
+
+
+#include <app/OperationalDeviceProxy.h>
+#include <app/server/Server.h>
+// #include <app/util/util.h>
+// #include <controller/CHIPDeviceControllerFactory.h>
+// #include <controller/CommissioneeDeviceProxy.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+// #include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <platform/CHIPDeviceLayer.h>
+// #include <zap-generated/CHIPClientCallbacks.h>
+// #include <zap-generated/CHIPClusters.h>
+
+//#include "BDXDownloader.h"
+//#include "ExampleOTARequestor.h"
+
+
+#include "linux-ota-requestor-driver.h"
+#include "linux-ota-image-processor.h"
+#include "app/clusters/ota-requestor/ota-requestor.h"
+#include "app/clusters/ota-requestor/ota-downloader.h"
+
+using chip::ByteSpan;
+using chip::CharSpan;
+using chip::DeviceProxy;
+using chip::EndpointId;
+using chip::FabricIndex;
+using chip::NodeId;
+using chip::OnDeviceConnected;
+using chip::OnDeviceConnectionFailure;
+using chip::PeerId;
+using chip::Server;
+using chip::VendorId;
+//using chip::bdx::TransferSession;
+using chip::Callback::Callback;
+using chip::Inet::IPAddress;
+using chip::System::Layer;
+using chip::Transport::PeerAddress;
+using namespace chip::ArgParser;
+using namespace chip::Messaging;
+using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
+
+bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
+
+constexpr uint16_t kOptionProviderNodeId      = 'n';
+constexpr uint16_t kOptionProviderFabricIndex = 'f';
+constexpr uint16_t kOptionUdpPort             = 'u';
+constexpr uint16_t kOptionDiscriminator       = 'd';
+constexpr uint16_t kOptionIPAddress           = 'i';
+constexpr uint16_t kOptionDelayQuery          = 'q';
+
+const char * ipAddress          = NULL;
+NodeId providerNodeId           = 0x0;
+FabricIndex providerFabricIndex = 1;
+uint16_t requestorSecurePort    = 0;
+uint16_t setupDiscriminator     = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
+uint16_t delayQueryTimeInSec    = 0;
+
+OptionDef cmdLineOptionsDef[] = {
+    { "providerNodeId", chip::ArgParser::kArgumentRequired, kOptionProviderNodeId },
+    { "providerFabricIndex", chip::ArgParser::kArgumentRequired, kOptionProviderFabricIndex },
+    { "udpPort", chip::ArgParser::kArgumentRequired, kOptionUdpPort },
+    { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
+    // TODO: This can be removed once OperationalDeviceProxy can resolve the IP Address from Node ID
+    { "ipaddress", chip::ArgParser::kArgumentRequired, kOptionIPAddress },
+    { "delayQuery", chip::ArgParser::kArgumentRequired, kOptionDelayQuery },
+    {},
+};
+
+OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
+                             "  -n/--providerNodeId <node ID>\n"
+                             "        Node ID of the OTA Provider to connect to (hex format)\n\n"
+                             "        This assumes that you've already commissioned the OTA Provider node with chip-tool.\n"
+                             "  -f/--providerFabricIndex <fabric index>\n"
+                             "        Fabric index of the OTA Provider to connect to. If none is specified, default value is 1.\n\n"
+                             "        This assumes that you've already commissioned the OTA Provider node with chip-tool.\n"
+                             "  -u/--udpPort <UDP port number>\n"
+                             "        UDP Port that the OTA Requestor listens on for secure connections.\n"
+                             "  -d/--discriminator <discriminator>\n"
+                             "        A 12-bit value used to discern between multiple commissionable CHIP device\n"
+                             "        advertisements. If none is specified, default value is 3840.\n"
+                             "  -i/--ipaddress <IP Address>\n"
+                             "        The IP Address of the OTA Provider to connect to. This value must be supplied.\n"
+                             "  -q/--delayQuery <Time in seconds>\n"
+                             "        From boot up, the amount of time to wait before triggering the QueryImage\n"
+                             "        command. If none or zero is supplied, QueryImage will not be triggered.\n" };
+
+HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
+
+OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
+
+bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
+{
+    bool retval = true;
+
+    switch (aIdentifier)
+    {
+    case kOptionProviderNodeId:
+        if (1 != sscanf(aValue, "%" PRIX64, &providerNodeId))
+        {
+            PrintArgError("%s: unable to parse Node ID: %s\n", aProgram, aValue);
+        }
+        break;
+    case kOptionProviderFabricIndex:
+        providerFabricIndex = static_cast<uint8_t>(strtol(aValue, NULL, 0));
+
+        if (kOptionProviderFabricIndex == 0)
+        {
+            PrintArgError("%s: Input ERROR: Fabric Index may not be zero\n", aProgram);
+            retval = false;
+        }
+        break;
+    case kOptionUdpPort:
+        requestorSecurePort = static_cast<uint16_t>(strtol(aValue, NULL, 0));
+
+        if (requestorSecurePort == 0)
+        {
+            PrintArgError("%s: Input ERROR: udpPort may not be zero\n", aProgram);
+            retval = false;
+        }
+        break;
+    case kOptionDiscriminator:
+        setupDiscriminator = static_cast<uint16_t>(strtol(aValue, NULL, 0));
+
+        if (setupDiscriminator > 0xFFF)
+        {
+            PrintArgError("%s: Input ERROR: setupDiscriminator value %s is out of range \n", aProgram, aValue);
+            retval = false;
+        }
+        break;
+    case kOptionIPAddress:
+        ipAddress = aValue;
+        ChipLogError(SoftwareUpdate, "IP Address = %s", aValue);
+        break;
+    case kOptionDelayQuery:
+        delayQueryTimeInSec = static_cast<uint16_t>(strtol(aValue, NULL, 0));
+        break;
+    default:
+        PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
+        retval = false;
+        break;
+    }
+
+    return (retval);
+}
+
+int main(int argc, char * argv[])
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
+    {
+
+        ChipLogError(SoftwareUpdate, "FAILED to initialize memory");
+        return 1;
+    }
+
+    if (chip::DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "FAILED to initialize chip stack");
+        return 1;
+    }
+
+    if (!chip::ArgParser::ParseArgs(argv[0], argc, argv, allOptions))
+    {
+        return 1;
+    }
+
+    chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
+
+    // Set discriminator to user specified value
+    ChipLogProgress(SoftwareUpdate, "Setting discriminator to: %d", setupDiscriminator);
+    err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %" CHIP_ERROR_FORMAT, err.Format());
+        return 1;
+    }
+
+    // Init Data Model and CHIP App Server with user specified UDP port
+    Server::GetInstance().Init(nullptr, requestorSecurePort);
+    ChipLogProgress(SoftwareUpdate, "Initializing the Application Server. Listening on UDP port %d", requestorSecurePort);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+
+    // This will allow ExampleOTARequestor to call SendQueryImageCommand REFACTOR DELETE THIS
+    //    ExampleOTARequestor::GetInstance().SetConnectToProviderCallback(SendQueryImageCommand);
+
+
+    // Initialize and interconnect the Requestor objects
+
+    // Initialize the instance of the main Requestor Class
+    OTARequestor *requestorCore = new OTARequestor;
+    SetRequestorInstance(requestorCore);
+
+    LinuxOTARequestorDriver *requestorUser = new LinuxOTARequestorDriver;
+
+    // Connect the two objects
+    requestorCore->setOtaRequestorDriver(requestorUser);
+
+    OTADownloader *downloaderCore = new OTADownloader;
+    SetDownloaderInstance(downloaderCore);
+
+    LinuxOTAImageProcessor *downloaderUser = new LinuxOTAImageProcessor;
+
+    // Connect the two objects
+    downloaderCore->setDelegate(downloaderUser);
+
+
+   // If a delay is provided, QueryImage after the timer expires REFACTOR DELETE THIS ??
+   // if (delayQueryTimeInSec > 0)
+   // {
+   //   chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
+   //                                                 OnStartDelayTimerHandler, nullptr);
+   // }
+
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
+
+    return 0;
+}
+
+
+
+
+
+#if 0 // LISS
+
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/OperationalDeviceProxy.h>
@@ -345,3 +577,5 @@ int main(int argc, char * argv[])
 
     return 0;
 }
+
+#endif // LISS

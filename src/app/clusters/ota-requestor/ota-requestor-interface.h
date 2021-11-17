@@ -36,6 +36,20 @@ public:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) = 0;
 
+    // TBD: This probably doesn't need to be a method OTARequestorInterface as the response handler is
+    // explicitly supplied at command invocation
     // Handler for the QueryImageResponse command
-    virtual bool HandleQueryImageResponse(QueryImageResponse::DecodableType) = 0;
+    // virtual bool HandleQueryImageResponse(chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType) = 0;
+
+    // Destructor
+    virtual ~OTARequestorInterface() = default;
 };
+
+// The instance of the class implementing OTARequestorInterface must be managed through
+// the following global getter and setter functions.
+
+// Set the object implementing OTARequestorInterface
+void SetRequestorInstance(OTARequestorInterface *instance);
+
+// Get the object implementing OTARequestorInterface
+OTARequestorInterface* GetRequestorInstance();

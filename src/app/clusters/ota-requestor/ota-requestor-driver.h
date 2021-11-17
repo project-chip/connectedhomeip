@@ -38,5 +38,5 @@ public:
     virtual void ImageDownloadComplete() = 0;
 
     // Destructor
-    virtual ~OTARequestorDriver() = 0;
+    virtual ~OTARequestorDriver() = default;
 };
