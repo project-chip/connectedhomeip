@@ -312,20 +312,15 @@ void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, 
 
     VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
 
-    char * tokens  = strdup(type);
-    char * regtype = strtok(tokens, ".");
-    free(tokens);
-
     DnssdService service = {};
     service.mInterface   = interfaceId;
     service.mProtocol    = context->protocol;
 
-    strncpy(service.mName, name, sizeof(service.mName));
-    service.mName[Common::kInstanceNameMaxLength] = 0;
+    chip::Platform::CopyString(service.mName, name);
 
-    strncpy(service.mType, regtype, sizeof(service.mType));
-    service.mType[kDnssdTypeMaxSize] = 0;
-
+    const char * dot = strchr(type, '.');
+    size_t len       = dot == nullptr ? sizeof(type) : dot - type;
+    chip::Platform::CopyString(service.mType, chip::CharSpan(type, len));
     context->services.push_back(service);
 }
 
