@@ -21,7 +21,7 @@ import("${chip_root}/src/platform/device.gni")
 declare_args() {
   # Platform DNSsd should always be running on darwin. On Linux
   # this depends on avahi being available and running.
-  chip_enable_dnssd_tests = platform == "darwin"
+  chip_enable_dnssd_tests = chip_device_platform == "darwin"
 }
 
 if (chip_device_platform != "none" && chip_device_platform != "fake") {
