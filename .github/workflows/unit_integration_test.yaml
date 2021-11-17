@@ -84,7 +84,7 @@ jobs:
               run: scripts/build/gn_build.sh
             - name: Run Tests
               timeout-minutes: 15
-              run: RUN_HAPPY_TESTS=1 scripts/tests/gn_tests.sh
+              run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage
