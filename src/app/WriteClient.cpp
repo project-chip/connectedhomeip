@@ -169,9 +169,7 @@ TLV::TLVWriter * WriteClient::GetAttributeDataIBTLVWriter()
 CHIP_ERROR WriteClient::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
                                                AttributeDataIB::Builder aAttributeDataIB)
 {
-    // We do not support wildcard write now, reject them on client side.
-    VerifyOrReturnError(!aAttributePathParams.HasWildcard() && aAttributePathParams.IsValidAttributePath(),
-                        CHIP_ERROR_INVALID_PATH_LIST);
+    VerifyOrReturnError(aAttributePathParams.IsValidAttributePath(), CHIP_ERROR_INVALID_PATH_LIST);
     return aAttributePathParams.BuildAttributePath(aAttributeDataIB.CreatePath());
 }
 
@@ -257,13 +255,15 @@ CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::T
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(DataManagement, "Write client failed to SendWriteRequest");
         ClearExistingExchangeContext();
     }
 
     if (session.IsGroupSession())
     {
         // Always shutdown on Group communication
-        Shutdown();
+        ChipLogDetail(DataManagement, "Closing on group Communication ");
+        ShutdownInternal();
     }
 
     return err;
