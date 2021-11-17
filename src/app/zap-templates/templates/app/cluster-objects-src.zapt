@@ -93,6 +93,23 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 {{/zcl_commands}}
 } // namespace Commands
 
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader &reader, ConcreteAttributePath &path) {
+    switch (path.mAttributeId)
+    {
+{{#zcl_attributes_server}}
+    case Attributes::{{asUpperCamelCase label}}::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
+        break;
+{{/zcl_attributes_server}}
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+}
+
 namespace Events {
 {{#zcl_events}}
 namespace {{asUpperCamelCase name}} {

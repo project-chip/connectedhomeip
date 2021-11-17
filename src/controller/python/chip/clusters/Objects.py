@@ -27962,7 +27962,7 @@ class TestCluster(Cluster):
             value: 'TestCluster.Enums.SimpleEnum' = 0
 
         @dataclass
-        class Struct(ClusterAttributeDescriptor):
+        class StructAttr(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x050F

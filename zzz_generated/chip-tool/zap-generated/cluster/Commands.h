@@ -35169,7 +35169,7 @@ private:
 | * VendorId                                                          | 0x0022 |
 | * ListNullablesAndOptionalsStruct                                   | 0x0023 |
 | * EnumAttr                                                          | 0x0024 |
-| * Struct                                                            | 0x0025 |
+| * StructAttr                                                        | 0x0025 |
 | * RangeRestrictedInt8u                                              | 0x0026 |
 | * RangeRestrictedInt8s                                              | 0x0027 |
 | * RangeRestrictedInt16u                                             | 0x0028 |

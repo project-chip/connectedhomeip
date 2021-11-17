@@ -37,7 +37,13 @@ struct ConcreteAttributePath
 
     bool operator==(const ConcreteAttributePath & other) const
     {
-        return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mAttributeId == other.mAttributeId;
+        return (mEndpointId == other.mEndpointId) && (mClusterId == other.mClusterId) && (mAttributeId == other.mAttributeId);
+    }
+
+    bool operator<(const ConcreteAttributePath & path) const
+    {
+        return (mEndpointId < path.mEndpointId) || (!(mEndpointId < path.mEndpointId) && (mClusterId < path.mClusterId)) ||
+            (!(mClusterId < path.mClusterId) && (mAttributeId < path.mAttributeId));
     }
 
     EndpointId mEndpointId   = 0;

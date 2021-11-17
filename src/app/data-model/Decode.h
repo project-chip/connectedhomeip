@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -100,6 +101,32 @@ template <typename X,
 CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 {
     return x.Decode(reader);
+}
+
+/*
+ * @brief
+ *
+ * This specific variant decodes to TLV a cluster object that contains all attributes encapsulated within a single, monolithic
+ * cluster object.
+ *
+ * Each attribute in the cluster is decoded based on the provided ConcreteAttributePath. The TLVReader is to be positioned right on
+ * the data value for the specified attribute.
+ *
+ * This API depends on the presence of a Decode method on the object to present. The signature of that method
+ * is as follows:
+ *
+ * CHIP_ERROR <Object>::Decode(TLVReader &reader, ConcreteAttributePath &path);
+ *
+ */
+template <typename X,
+          typename std::enable_if_t<std::is_class<X>::value &&
+                                        std::is_same<decltype(std::declval<X>().Decode(std::declval<TLV::TLVReader &>(),
+                                                                                       std::declval<ConcreteAttributePath &>())),
+                                                     CHIP_ERROR>::value,
+                                    X> * = nullptr>
+CHIP_ERROR Decode(TLV::TLVReader & reader, ConcreteAttributePath & path, X & x)
+{
+    return x.Decode(reader, path);
 }
 
 /*
