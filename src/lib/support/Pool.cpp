@@ -120,6 +120,7 @@ HeapObjectListNode * HeapObjectList::FindNode(void * object) const
 using Lambda = bool (*)(void *, void *);
 bool HeapObjectList::ForEachNode(void * context, bool lambda(void * context, void * object))
 {
+    ++mIterationDepth;
     bool result            = true;
     bool anyReleased       = false;
     HeapObjectListNode * p = mNext;
@@ -139,7 +140,8 @@ bool HeapObjectList::ForEachNode(void * context, bool lambda(void * context, voi
         }
         p = p->mNext;
     }
-    if (anyReleased)
+    --mIterationDepth;
+    if (mIterationDepth == 0 && anyReleased)
     {
         // Remove nodes for released objects.
         p = mNext;

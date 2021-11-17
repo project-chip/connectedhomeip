@@ -139,7 +139,7 @@ struct HeapObjectListNode
 
 struct HeapObjectList : HeapObjectListNode
 {
-    HeapObjectList() { mNext = mPrev = this; }
+    HeapObjectList() : mIterationDepth(0) { mNext = mPrev = this; }
 
     void Append(HeapObjectListNode * node)
     {
@@ -152,6 +152,8 @@ struct HeapObjectList : HeapObjectListNode
     HeapObjectListNode * FindNode(void * object) const;
 
     bool ForEachNode(void * context, bool lambda(void * context, void * object));
+
+    size_t mIterationDepth;
 };
 
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
@@ -159,9 +161,35 @@ struct HeapObjectList : HeapObjectListNode
 } // namespace internal
 
 /**
+ * @class ObjectPool
+ *
+ * Depending on build configuration, ObjectPool is either a fixed-size static pool or a heap-allocated pool.
+ *
+ * @tparam T    Type of element to be allocated.
+ * @tparam N    Number of elements in the pool, in the fixed-size case.
+ *
+ * @fn CreateObject
+ * @memberof ObjectPool
+ *
+ * Create an object from the pool. Forwards its arguments to construct a T.
+ *
+ * @fn ReleaseObject
+ * @memberof ObjectPool
+ * @param object   Pointer to object to release (or return to the pool). Its destructor runs.
+ *
+ * @fn ForEachActiveObject
+ * @memberof ObjectPool
+ * @param visitor   A function that takes a T* and returns true to continue iterating or false to stop iterating.
+ * @returns false if a visitor call returned false, true otherwise.
+ *
+ * Iteration may be nested. ReleaseObject() can be called during iteration, on the current object or any other.
+ * CreateObject() can be called, but it is undefined whether or not a newly created object will be visited.
+ */
+
+/**
  * A class template used for allocating objects from a fixed-size static pool.
  *
- *  @tparam     T   a subclass of element to be allocated.
+ *  @tparam     T   type of element to be allocated.
  *  @tparam     N   a positive integer max number of elements the pool provides.
  */
 template <class T, size_t N>
@@ -235,7 +263,7 @@ private:
 /**
  * A class template used for allocating objects from the heap.
  *
- *  @tparam     T   a class to be allocated.
+ *  @tparam     T   type to be allocated.
  */
 template <class T>
 class HeapObjectPool : public internal::Statistics, public internal::PoolCommon<T>
