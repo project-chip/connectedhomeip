@@ -150,7 +150,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  static class DelegatedDefaultClusterCallback
+  public static class DelegatedDefaultClusterCallback
       implements DefaultClusterCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 

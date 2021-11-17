@@ -20,7 +20,7 @@ import chip.devicecontroller.ClusterWriteMapping;
 
 public class ClusterInfoMapping {
 
-  static public class DelegatedCharStringAttributeCallback implements ChipClusters.CharStringAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCharStringAttributeCallback implements ChipClusters.CharStringAttributeCallback, DelegatedClusterCallback {
     /** Indicates a successful read for a CHAR_STRING attribute. */
     private ClusterCommandCallback callback;
 
@@ -43,7 +43,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  static public class DelegatedOctetStringAttributeCallback implements ChipClusters.OctetStringAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedOctetStringAttributeCallback implements ChipClusters.OctetStringAttributeCallback, DelegatedClusterCallback {
     /** Indicates a successful read for an OCTET_STRING attribute. */
     private ClusterCommandCallback callback;
 
@@ -66,7 +66,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  static public class DelegatedIntegerAttributeCallback implements ChipClusters.IntegerAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedIntegerAttributeCallback implements ChipClusters.IntegerAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
     @Override
@@ -88,7 +88,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  static public class DelegatedLongAttributeCallback implements ChipClusters.LongAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedLongAttributeCallback implements ChipClusters.LongAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
     @Override
@@ -110,7 +110,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  static public class DelegatedBooleanAttributeCallback implements ChipClusters.BooleanAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedBooleanAttributeCallback implements ChipClusters.BooleanAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
     @Override
@@ -132,7 +132,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  static class DelegatedDefaultClusterCallback implements DefaultClusterCallback, DelegatedClusterCallback {
+  public static class DelegatedDefaultClusterCallback implements DefaultClusterCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
     @Override
@@ -154,7 +154,7 @@ public class ClusterInfoMapping {
   }
   {{#chip_client_clusters}}
   {{#chip_cluster_responses}}
-      static public class Delegated{{asUpperCamelCase name}}Callback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Callback, DelegatedClusterCallback {
+      public static class Delegated{{asUpperCamelCase name}}Callback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Callback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -202,7 +202,7 @@ public class ClusterInfoMapping {
 
       {{/if}}
 
-      static public class Delegated{{asUpperCamelCase name}}AttributeCallback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback, DelegatedClusterCallback {
+      public static class Delegated{{asUpperCamelCase name}}AttributeCallback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
