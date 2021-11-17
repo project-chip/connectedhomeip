@@ -279,6 +279,7 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "DeviceControlServer.cpp",
+      "DiagnosticDataProvider.cpp",
       "Entropy.cpp",
       "GeneralUtils.cpp",
       "Globals.cpp",
