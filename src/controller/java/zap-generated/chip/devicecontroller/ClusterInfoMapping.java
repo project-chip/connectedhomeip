@@ -1364,6 +1364,84 @@ public class ClusterInfoMapping {
     }
   }
 
+  public class DelegatedActiveHardwareFaultsAttributeCallback
+      implements ChipClusters.GeneralDiagnosticsCluster.ActiveHardwareFaultsAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo("valueList", "List<Integer>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public class DelegatedActiveRadioFaultsAttributeCallback
+      implements ChipClusters.GeneralDiagnosticsCluster.ActiveRadioFaultsAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo("valueList", "List<Integer>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public class DelegatedActiveNetworkFaultsAttributeCallback
+      implements ChipClusters.GeneralDiagnosticsCluster.ActiveNetworkFaultsAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo("valueList", "List<Integer>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public class DelegatedGroupsAttributeCallback
       implements ChipClusters.GroupKeyManagementCluster.GroupsAttributeCallback,
           DelegatedClusterCallback {
@@ -10430,6 +10508,51 @@ public class ClusterInfoMapping {
             readGeneralDiagnosticsBootReasonsCommandParams);
     readGeneralDiagnosticsInteractionInfo.put(
         "readBootReasonsAttribute", readGeneralDiagnosticsBootReasonsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readGeneralDiagnosticsActiveHardwareFaultsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGeneralDiagnosticsActiveHardwareFaultsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralDiagnosticsCluster) cluster)
+                  .readActiveHardwareFaultsAttribute(
+                      (ChipClusters.GeneralDiagnosticsCluster.ActiveHardwareFaultsAttributeCallback)
+                          callback);
+            },
+            () -> new DelegatedActiveHardwareFaultsAttributeCallback(),
+            readGeneralDiagnosticsActiveHardwareFaultsCommandParams);
+    readGeneralDiagnosticsInteractionInfo.put(
+        "readActiveHardwareFaultsAttribute",
+        readGeneralDiagnosticsActiveHardwareFaultsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readGeneralDiagnosticsActiveRadioFaultsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGeneralDiagnosticsActiveRadioFaultsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralDiagnosticsCluster) cluster)
+                  .readActiveRadioFaultsAttribute(
+                      (ChipClusters.GeneralDiagnosticsCluster.ActiveRadioFaultsAttributeCallback)
+                          callback);
+            },
+            () -> new DelegatedActiveRadioFaultsAttributeCallback(),
+            readGeneralDiagnosticsActiveRadioFaultsCommandParams);
+    readGeneralDiagnosticsInteractionInfo.put(
+        "readActiveRadioFaultsAttribute",
+        readGeneralDiagnosticsActiveRadioFaultsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readGeneralDiagnosticsActiveNetworkFaultsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGeneralDiagnosticsActiveNetworkFaultsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralDiagnosticsCluster) cluster)
+                  .readActiveNetworkFaultsAttribute(
+                      (ChipClusters.GeneralDiagnosticsCluster.ActiveNetworkFaultsAttributeCallback)
+                          callback);
+            },
+            () -> new DelegatedActiveNetworkFaultsAttributeCallback(),
+            readGeneralDiagnosticsActiveNetworkFaultsCommandParams);
+    readGeneralDiagnosticsInteractionInfo.put(
+        "readActiveNetworkFaultsAttribute",
+        readGeneralDiagnosticsActiveNetworkFaultsAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readGeneralDiagnosticsClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readGeneralDiagnosticsClusterRevisionAttributeInteractionInfo =

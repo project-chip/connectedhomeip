@@ -2346,6 +2346,33 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
     command->SetCommandExitStatus(err);
 }
 
+static void OnGeneralDiagnosticsActiveHardwareFaultsListAttributeResponse(void * context,
+                                                                          const chip::app::DataModel::DecodableList<uint8_t> & list)
+{
+    CHIP_ERROR err = LogValue("OnGeneralDiagnosticsActiveHardwareFaultsListAttributeResponse", 0, list);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+}
+
+static void OnGeneralDiagnosticsActiveRadioFaultsListAttributeResponse(void * context,
+                                                                       const chip::app::DataModel::DecodableList<uint8_t> & list)
+{
+    CHIP_ERROR err = LogValue("OnGeneralDiagnosticsActiveRadioFaultsListAttributeResponse", 0, list);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+}
+
+static void OnGeneralDiagnosticsActiveNetworkFaultsListAttributeResponse(void * context,
+                                                                         const chip::app::DataModel::DecodableList<uint8_t> & list)
+{
+    CHIP_ERROR err = LogValue("OnGeneralDiagnosticsActiveNetworkFaultsListAttributeResponse", 0, list);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+}
+
 static void OnGroupKeyManagementGroupsListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & list)
@@ -13060,6 +13087,9 @@ private:
 | * UpTime                                                            | 0x0002 |
 | * TotalOperationalHours                                             | 0x0003 |
 | * BootReasons                                                       | 0x0004 |
+| * ActiveHardwareFaults                                              | 0x0005 |
+| * ActiveRadioFaults                                                 | 0x0006 |
+| * ActiveNetworkFaults                                               | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -13230,6 +13260,111 @@ public:
 private:
     chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ActiveHardwareFaults
+ */
+class ReadGeneralDiagnosticsActiveHardwareFaults : public ModelCommand
+{
+public:
+    ReadGeneralDiagnosticsActiveHardwareFaults() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "active-hardware-faults");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGeneralDiagnosticsActiveHardwareFaults()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0033) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GeneralDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeActiveHardwareFaults(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>(
+            OnGeneralDiagnosticsActiveHardwareFaultsListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ActiveRadioFaults
+ */
+class ReadGeneralDiagnosticsActiveRadioFaults : public ModelCommand
+{
+public:
+    ReadGeneralDiagnosticsActiveRadioFaults() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "active-radio-faults");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGeneralDiagnosticsActiveRadioFaults()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0033) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GeneralDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeActiveRadioFaults(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>(
+            OnGeneralDiagnosticsActiveRadioFaultsListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ActiveNetworkFaults
+ */
+class ReadGeneralDiagnosticsActiveNetworkFaults : public ModelCommand
+{
+public:
+    ReadGeneralDiagnosticsActiveNetworkFaults() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "active-network-faults");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGeneralDiagnosticsActiveNetworkFaults()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0033) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GeneralDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeActiveNetworkFaults(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>(
+            OnGeneralDiagnosticsActiveNetworkFaultsListAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -30859,6 +30994,9 @@ void registerClusterGeneralDiagnostics(Commands & commands)
         make_unique<ReadGeneralDiagnosticsUpTime>(),                //
         make_unique<ReadGeneralDiagnosticsTotalOperationalHours>(), //
         make_unique<ReadGeneralDiagnosticsBootReasons>(),           //
+        make_unique<ReadGeneralDiagnosticsActiveHardwareFaults>(),  //
+        make_unique<ReadGeneralDiagnosticsActiveRadioFaults>(),     //
+        make_unique<ReadGeneralDiagnosticsActiveNetworkFaults>(),   //
         make_unique<ReadGeneralDiagnosticsClusterRevision>(),       //
     };
 

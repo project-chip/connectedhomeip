@@ -352,6 +352,60 @@ void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, @ { @"value" : array });
 };
 
+void CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
+        [array addObject:[NSNumber numberWithUnsignedChar:entry]];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
+void CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
+        [array addObject:[NSNumber numberWithUnsignedChar:entry]];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
+void CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
+{
+    id array = [[NSMutableArray alloc] init];
+    auto iter = list.begin();
+    while (iter.Next()) {
+        auto & entry = iter.GetValue();
+        (void) entry; // All our types below might be unsupported
+        [array addObject:[NSNumber numberWithUnsignedChar:entry]];
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
 void CHIPGroupKeyManagementGroupsListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & list)
 {
