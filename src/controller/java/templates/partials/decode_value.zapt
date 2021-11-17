@@ -12,6 +12,7 @@ if (dataResponse.{{asLowerCamelCase label}}.Value().IsNull()) {
 {{~#*inline "item"}}dataResponse.{{asLowerCamelCase name}}{{#if isOptional}}.Value(){{/if}}{{#if isNullable}}.Value(){{/if}}{{/inline}}
 {{#if isArray}}
 {{asSymbol label}} = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+{{! TODO: Use if_is_struct, which works better for nested types. Currently can't because inline partials aren't found in its else block. }}
 {{else if isStruct}}
 {{asSymbol label}} = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
 {{else if (isOctetString type)}}

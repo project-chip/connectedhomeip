@@ -11,6 +11,7 @@ chip::JniReferences::GetInstance().GetOptionalValue({{source}}, {{source}});
   {{#if isArray}}
   {{! TODO: Support array types. }}
   {{else if isStruct}}
+  {{! TODO: Use if_is_struct, which works better for nested types. Currently can't because inline partials aren't found in its else block. }}
   {{! TODO: Support struct types. }}
   {{else if (isOctetString type)}}
     chip::ByteSpan {{source}}Value;
