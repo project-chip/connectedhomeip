@@ -108,6 +108,12 @@
 #define CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER
 #endif
 
+#if defined(ZCL_USING_ACL_CLUSTER_SERVER) || defined(ZCL_USING_ACL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ACL_CLUSTER { ZCL_ACL_CLUSTER_ID, 31, "ACL" },
+#else
+#define CHIP_PRINTCLUSTER_ACL_CLUSTER
+#endif
+
 #if defined(ZCL_USING_POLL_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_POLL_CONTROL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER { ZCL_POLL_CONTROL_CLUSTER_ID, 32, "Poll Control" },
 #else
@@ -136,6 +142,28 @@
 #define CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER { ZCL_OTA_REQUESTOR_CLUSTER_ID, 42, "OTA Software Update Requestor" },
 #else
 #define CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER
+#endif
+
+#if defined(ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_LOCALIZATION_CONFIGURATION_CLUSTER                                                                       \
+    { ZCL_LOCALIZATION_CONFIGURATION_CLUSTER_ID, 43, "Localization Configuration" },
+#else
+#define CHIP_PRINTCLUSTER_LOCALIZATION_CONFIGURATION_CLUSTER
+#endif
+
+#if defined(ZCL_USING_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_SERVER) ||                                                          \
+    defined(ZCL_USING_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER                                                                 \
+    { ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_ID, 46, "Bridged Device Basic Information" },
+#else
+#define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER
+#endif
+
+#if defined(ZCL_USING_POWER_SOURCE_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_POWER_SOURCE_CONFIGURATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_POWER_SOURCE_CONFIGURATION_CLUSTER                                                                       \
+    { ZCL_POWER_SOURCE_CONFIGURATION_CLUSTER_ID, 46, "Power Source Configuration" },
+#else
+#define CHIP_PRINTCLUSTER_POWER_SOURCE_CONFIGURATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_POWER_SOURCE_CLUSTER_SERVER) || defined(ZCL_USING_POWER_SOURCE_CLUSTER_CLIENT)
@@ -193,6 +221,25 @@
     { ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID, 55, "Ethernet Network Diagnostics" },
 #else
 #define CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER
+#endif
+
+#if defined(ZCL_USING_LOCALIZATION_TIME_FORMAT_CLUSTER_SERVER) || defined(ZCL_USING_LOCALIZATION_TIME_FORMAT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_LOCALIZATION_TIME_FORMAT_CLUSTER                                                                         \
+    { ZCL_LOCALIZATION_TIME_FORMAT_CLUSTER_ID, 56, "Localization Time Format" },
+#else
+#define CHIP_PRINTCLUSTER_LOCALIZATION_TIME_FORMAT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_LOCALIZATION_UNIT_CLUSTER_SERVER) || defined(ZCL_USING_LOCALIZATION_UNIT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_LOCALIZATION_UNIT_CLUSTER { ZCL_LOCALIZATION_UNIT_CLUSTER_ID, 56, "Localization Unit" },
+#else
+#define CHIP_PRINTCLUSTER_LOCALIZATION_UNIT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TIME_SYNCHRONIZATION_CLUSTER { ZCL_TIME_SYNCHRONIZATION_CLUSTER_ID, 56, "Time Synchronization" },
+#else
+#define CHIP_PRINTCLUSTER_TIME_SYNCHRONIZATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_CLIENT)
@@ -759,11 +806,15 @@
     CHIP_PRINTCLUSTER_POWER_PROFILE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER                                                                                           \
+    CHIP_PRINTCLUSTER_ACL_CLUSTER                                                                                                  \
     CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER                                                                                        \
+    CHIP_PRINTCLUSTER_LOCALIZATION_CONFIGURATION_CLUSTER                                                                           \
+    CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER                                                                     \
+    CHIP_PRINTCLUSTER_POWER_SOURCE_CONFIGURATION_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_POWER_SOURCE_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER                                                                                \
@@ -773,6 +824,9 @@
     CHIP_PRINTCLUSTER_THREAD_NETWORK_DIAGNOSTICS_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_LOCALIZATION_TIME_FORMAT_CLUSTER                                                                             \
+    CHIP_PRINTCLUSTER_LOCALIZATION_UNIT_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_TIME_SYNCHRONIZATION_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                          \
