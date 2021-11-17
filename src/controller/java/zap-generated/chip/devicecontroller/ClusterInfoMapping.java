@@ -33,7 +33,7 @@ import java.util.Map;
 
 public class ClusterInfoMapping {
 
-  public class DelegatedCharStringAttributeCallback
+  public static class DelegatedCharStringAttributeCallback
       implements ChipClusters.CharStringAttributeCallback, DelegatedClusterCallback {
     /** Indicates a successful read for a CHAR_STRING attribute. */
     private ClusterCommandCallback callback;
@@ -57,7 +57,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedOctetStringAttributeCallback
+  public static class DelegatedOctetStringAttributeCallback
       implements ChipClusters.OctetStringAttributeCallback, DelegatedClusterCallback {
     /** Indicates a successful read for an OCTET_STRING attribute. */
     private ClusterCommandCallback callback;
@@ -81,7 +81,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedIntegerAttributeCallback
+  public static class DelegatedIntegerAttributeCallback
       implements ChipClusters.IntegerAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -104,7 +104,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedLongAttributeCallback
+  public static class DelegatedLongAttributeCallback
       implements ChipClusters.LongAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -127,7 +127,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedBooleanAttributeCallback
+  public static class DelegatedBooleanAttributeCallback
       implements ChipClusters.BooleanAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -150,7 +150,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  class DelegatedDefaultClusterCallback
+  static class DelegatedDefaultClusterCallback
       implements DefaultClusterCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -173,7 +173,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedGetSetupPINResponseCallback
+  public static class DelegatedGetSetupPINResponseCallback
       implements ChipClusters.AccountLoginCluster.GetSetupPINResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -197,7 +197,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedLaunchAppResponseCallback
+  public static class DelegatedLaunchAppResponseCallback
       implements ChipClusters.ApplicationLauncherCluster.LaunchAppResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -223,7 +223,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedApplicationLauncherListAttributeCallback
+  public static class DelegatedApplicationLauncherListAttributeCallback
       implements ChipClusters.ApplicationLauncherCluster.ApplicationLauncherListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -249,7 +249,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedAudioOutputListAttributeCallback
+  public static class DelegatedAudioOutputListAttributeCallback
       implements ChipClusters.AudioOutputCluster.AudioOutputListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -277,7 +277,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedActionListAttributeCallback
+  public static class DelegatedActionListAttributeCallback
       implements ChipClusters.BridgedActionsCluster.ActionListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -304,7 +304,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedEndpointListAttributeCallback
+  public static class DelegatedEndpointListAttributeCallback
       implements ChipClusters.BridgedActionsCluster.EndpointListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -332,7 +332,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedLaunchContentResponseCallback
+  public static class DelegatedLaunchContentResponseCallback
       implements ChipClusters.ContentLauncherCluster.LaunchContentResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -359,7 +359,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedLaunchURLResponseCallback
+  public static class DelegatedLaunchURLResponseCallback
       implements ChipClusters.ContentLauncherCluster.LaunchURLResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -386,7 +386,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedAcceptsHeaderListAttributeCallback
+  public static class DelegatedAcceptsHeaderListAttributeCallback
       implements ChipClusters.ContentLauncherCluster.AcceptsHeaderListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -412,7 +412,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedSupportedStreamingTypesAttributeCallback
+  public static class DelegatedSupportedStreamingTypesAttributeCallback
       implements ChipClusters.ContentLauncherCluster.SupportedStreamingTypesAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -438,7 +438,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedDeviceListAttributeCallback
+  public static class DelegatedDeviceListAttributeCallback
       implements ChipClusters.DescriptorCluster.DeviceListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -465,7 +465,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedServerListAttributeCallback
+  public static class DelegatedServerListAttributeCallback
       implements ChipClusters.DescriptorCluster.ServerListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -490,7 +490,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedClientListAttributeCallback
+  public static class DelegatedClientListAttributeCallback
       implements ChipClusters.DescriptorCluster.ClientListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -515,7 +515,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedPartsListAttributeCallback
+  public static class DelegatedPartsListAttributeCallback
       implements ChipClusters.DescriptorCluster.PartsListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -541,7 +541,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedRetrieveLogsResponseCallback
+  public static class DelegatedRetrieveLogsResponseCallback
       implements ChipClusters.DiagnosticLogsCluster.RetrieveLogsResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -572,7 +572,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedClearAllPinsResponseCallback
+  public static class DelegatedClearAllPinsResponseCallback
       implements ChipClusters.DoorLockCluster.ClearAllPinsResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -596,7 +596,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedClearAllRfidsResponseCallback
+  public static class DelegatedClearAllRfidsResponseCallback
       implements ChipClusters.DoorLockCluster.ClearAllRfidsResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -620,7 +620,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedClearHolidayScheduleResponseCallback
+  public static class DelegatedClearHolidayScheduleResponseCallback
       implements ChipClusters.DoorLockCluster.ClearHolidayScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -644,7 +644,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedClearPinResponseCallback
+  public static class DelegatedClearPinResponseCallback
       implements ChipClusters.DoorLockCluster.ClearPinResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -667,7 +667,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedClearRfidResponseCallback
+  public static class DelegatedClearRfidResponseCallback
       implements ChipClusters.DoorLockCluster.ClearRfidResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -690,7 +690,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedClearWeekdayScheduleResponseCallback
+  public static class DelegatedClearWeekdayScheduleResponseCallback
       implements ChipClusters.DoorLockCluster.ClearWeekdayScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -714,7 +714,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedClearYeardayScheduleResponseCallback
+  public static class DelegatedClearYeardayScheduleResponseCallback
       implements ChipClusters.DoorLockCluster.ClearYeardayScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -738,7 +738,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedGetHolidayScheduleResponseCallback
+  public static class DelegatedGetHolidayScheduleResponseCallback
       implements ChipClusters.DoorLockCluster.GetHolidayScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -778,7 +778,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedGetLogRecordResponseCallback
+  public static class DelegatedGetLogRecordResponseCallback
       implements ChipClusters.DoorLockCluster.GetLogRecordResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -822,7 +822,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedGetPinResponseCallback
+  public static class DelegatedGetPinResponseCallback
       implements ChipClusters.DoorLockCluster.GetPinResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -851,7 +851,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedGetRfidResponseCallback
+  public static class DelegatedGetRfidResponseCallback
       implements ChipClusters.DoorLockCluster.GetRfidResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -880,7 +880,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedGetUserTypeResponseCallback
+  public static class DelegatedGetUserTypeResponseCallback
       implements ChipClusters.DoorLockCluster.GetUserTypeResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -906,7 +906,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedGetWeekdayScheduleResponseCallback
+  public static class DelegatedGetWeekdayScheduleResponseCallback
       implements ChipClusters.DoorLockCluster.GetWeekdayScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -952,7 +952,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedGetYeardayScheduleResponseCallback
+  public static class DelegatedGetYeardayScheduleResponseCallback
       implements ChipClusters.DoorLockCluster.GetYeardayScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -987,7 +987,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedLockDoorResponseCallback
+  public static class DelegatedLockDoorResponseCallback
       implements ChipClusters.DoorLockCluster.LockDoorResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1010,7 +1010,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedSetHolidayScheduleResponseCallback
+  public static class DelegatedSetHolidayScheduleResponseCallback
       implements ChipClusters.DoorLockCluster.SetHolidayScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1034,7 +1034,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedSetPinResponseCallback
+  public static class DelegatedSetPinResponseCallback
       implements ChipClusters.DoorLockCluster.SetPinResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1057,7 +1057,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedSetRfidResponseCallback
+  public static class DelegatedSetRfidResponseCallback
       implements ChipClusters.DoorLockCluster.SetRfidResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1080,7 +1080,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedSetUserTypeResponseCallback
+  public static class DelegatedSetUserTypeResponseCallback
       implements ChipClusters.DoorLockCluster.SetUserTypeResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1104,7 +1104,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedSetWeekdayScheduleResponseCallback
+  public static class DelegatedSetWeekdayScheduleResponseCallback
       implements ChipClusters.DoorLockCluster.SetWeekdayScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1128,7 +1128,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedSetYeardayScheduleResponseCallback
+  public static class DelegatedSetYeardayScheduleResponseCallback
       implements ChipClusters.DoorLockCluster.SetYeardayScheduleResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1152,7 +1152,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedUnlockDoorResponseCallback
+  public static class DelegatedUnlockDoorResponseCallback
       implements ChipClusters.DoorLockCluster.UnlockDoorResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1175,7 +1175,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedUnlockWithTimeoutResponseCallback
+  public static class DelegatedUnlockWithTimeoutResponseCallback
       implements ChipClusters.DoorLockCluster.UnlockWithTimeoutResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1199,7 +1199,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedLabelListAttributeCallback
+  public static class DelegatedLabelListAttributeCallback
       implements ChipClusters.FixedLabelCluster.LabelListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1226,7 +1226,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedArmFailSafeResponseCallback
+  public static class DelegatedArmFailSafeResponseCallback
       implements ChipClusters.GeneralCommissioningCluster.ArmFailSafeResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1252,7 +1252,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedCommissioningCompleteResponseCallback
+  public static class DelegatedCommissioningCompleteResponseCallback
       implements ChipClusters.GeneralCommissioningCluster.CommissioningCompleteResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1278,7 +1278,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedSetRegulatoryConfigResponseCallback
+  public static class DelegatedSetRegulatoryConfigResponseCallback
       implements ChipClusters.GeneralCommissioningCluster.SetRegulatoryConfigResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1304,7 +1304,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedBasicCommissioningInfoListAttributeCallback
+  public static class DelegatedBasicCommissioningInfoListAttributeCallback
       implements ChipClusters.GeneralCommissioningCluster
               .BasicCommissioningInfoListAttributeCallback,
           DelegatedClusterCallback {
@@ -1335,7 +1335,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedNetworkInterfacesAttributeCallback
+  public static class DelegatedNetworkInterfacesAttributeCallback
       implements ChipClusters.GeneralDiagnosticsCluster.NetworkInterfacesAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1364,7 +1364,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedActiveHardwareFaultsAttributeCallback
+  public static class DelegatedActiveHardwareFaultsAttributeCallback
       implements ChipClusters.GeneralDiagnosticsCluster.ActiveHardwareFaultsAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1390,7 +1390,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedActiveRadioFaultsAttributeCallback
+  public static class DelegatedActiveRadioFaultsAttributeCallback
       implements ChipClusters.GeneralDiagnosticsCluster.ActiveRadioFaultsAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1416,7 +1416,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedActiveNetworkFaultsAttributeCallback
+  public static class DelegatedActiveNetworkFaultsAttributeCallback
       implements ChipClusters.GeneralDiagnosticsCluster.ActiveNetworkFaultsAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1442,7 +1442,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedGroupsAttributeCallback
+  public static class DelegatedGroupsAttributeCallback
       implements ChipClusters.GroupKeyManagementCluster.GroupsAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1469,7 +1469,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedGroupKeysAttributeCallback
+  public static class DelegatedGroupKeysAttributeCallback
       implements ChipClusters.GroupKeyManagementCluster.GroupKeysAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1497,7 +1497,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedAddGroupResponseCallback
+  public static class DelegatedAddGroupResponseCallback
       implements ChipClusters.GroupsCluster.AddGroupResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1522,7 +1522,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedGetGroupMembershipResponseCallback
+  public static class DelegatedGetGroupMembershipResponseCallback
       implements ChipClusters.GroupsCluster.GetGroupMembershipResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1553,7 +1553,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedRemoveGroupResponseCallback
+  public static class DelegatedRemoveGroupResponseCallback
       implements ChipClusters.GroupsCluster.RemoveGroupResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1578,7 +1578,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedViewGroupResponseCallback
+  public static class DelegatedViewGroupResponseCallback
       implements ChipClusters.GroupsCluster.ViewGroupResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1605,7 +1605,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedIdentifyQueryResponseCallback
+  public static class DelegatedIdentifyQueryResponseCallback
       implements ChipClusters.IdentifyCluster.IdentifyQueryResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1629,7 +1629,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedSendKeyResponseCallback
+  public static class DelegatedSendKeyResponseCallback
       implements ChipClusters.KeypadInputCluster.SendKeyResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1652,7 +1652,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedMediaInputListAttributeCallback
+  public static class DelegatedMediaInputListAttributeCallback
       implements ChipClusters.MediaInputCluster.MediaInputListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1679,7 +1679,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedMediaFastForwardResponseCallback
+  public static class DelegatedMediaFastForwardResponseCallback
       implements ChipClusters.MediaPlaybackCluster.MediaFastForwardResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1704,7 +1704,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedMediaNextResponseCallback
+  public static class DelegatedMediaNextResponseCallback
       implements ChipClusters.MediaPlaybackCluster.MediaNextResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1729,7 +1729,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedMediaPauseResponseCallback
+  public static class DelegatedMediaPauseResponseCallback
       implements ChipClusters.MediaPlaybackCluster.MediaPauseResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1754,7 +1754,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedMediaPlayResponseCallback
+  public static class DelegatedMediaPlayResponseCallback
       implements ChipClusters.MediaPlaybackCluster.MediaPlayResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1779,7 +1779,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedMediaPreviousResponseCallback
+  public static class DelegatedMediaPreviousResponseCallback
       implements ChipClusters.MediaPlaybackCluster.MediaPreviousResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1804,7 +1804,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedMediaRewindResponseCallback
+  public static class DelegatedMediaRewindResponseCallback
       implements ChipClusters.MediaPlaybackCluster.MediaRewindResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1829,7 +1829,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedMediaSeekResponseCallback
+  public static class DelegatedMediaSeekResponseCallback
       implements ChipClusters.MediaPlaybackCluster.MediaSeekResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1854,7 +1854,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedMediaSkipBackwardResponseCallback
+  public static class DelegatedMediaSkipBackwardResponseCallback
       implements ChipClusters.MediaPlaybackCluster.MediaSkipBackwardResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1879,7 +1879,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedMediaSkipForwardResponseCallback
+  public static class DelegatedMediaSkipForwardResponseCallback
       implements ChipClusters.MediaPlaybackCluster.MediaSkipForwardResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1904,7 +1904,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedMediaStartOverResponseCallback
+  public static class DelegatedMediaStartOverResponseCallback
       implements ChipClusters.MediaPlaybackCluster.MediaStartOverResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1929,7 +1929,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedMediaStopResponseCallback
+  public static class DelegatedMediaStopResponseCallback
       implements ChipClusters.MediaPlaybackCluster.MediaStopResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1954,7 +1954,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedSupportedModesAttributeCallback
+  public static class DelegatedSupportedModesAttributeCallback
       implements ChipClusters.ModeSelectCluster.SupportedModesAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -1981,7 +1981,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedAddThreadNetworkResponseCallback
+  public static class DelegatedAddThreadNetworkResponseCallback
       implements ChipClusters.NetworkCommissioningCluster.AddThreadNetworkResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2007,7 +2007,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedAddWiFiNetworkResponseCallback
+  public static class DelegatedAddWiFiNetworkResponseCallback
       implements ChipClusters.NetworkCommissioningCluster.AddWiFiNetworkResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2033,7 +2033,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedDisableNetworkResponseCallback
+  public static class DelegatedDisableNetworkResponseCallback
       implements ChipClusters.NetworkCommissioningCluster.DisableNetworkResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2059,7 +2059,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedEnableNetworkResponseCallback
+  public static class DelegatedEnableNetworkResponseCallback
       implements ChipClusters.NetworkCommissioningCluster.EnableNetworkResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2085,7 +2085,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedRemoveNetworkResponseCallback
+  public static class DelegatedRemoveNetworkResponseCallback
       implements ChipClusters.NetworkCommissioningCluster.RemoveNetworkResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2111,7 +2111,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedScanNetworksResponseCallback
+  public static class DelegatedScanNetworksResponseCallback
       implements ChipClusters.NetworkCommissioningCluster.ScanNetworksResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2146,7 +2146,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedUpdateThreadNetworkResponseCallback
+  public static class DelegatedUpdateThreadNetworkResponseCallback
       implements ChipClusters.NetworkCommissioningCluster.UpdateThreadNetworkResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2172,7 +2172,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedUpdateWiFiNetworkResponseCallback
+  public static class DelegatedUpdateWiFiNetworkResponseCallback
       implements ChipClusters.NetworkCommissioningCluster.UpdateWiFiNetworkResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2198,7 +2198,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedApplyUpdateResponseCallback
+  public static class DelegatedApplyUpdateResponseCallback
       implements ChipClusters.OtaSoftwareUpdateProviderCluster.ApplyUpdateResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2225,7 +2225,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedQueryImageResponseCallback
+  public static class DelegatedQueryImageResponseCallback
       implements ChipClusters.OtaSoftwareUpdateProviderCluster.QueryImageResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2277,7 +2277,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedAttestationResponseCallback
+  public static class DelegatedAttestationResponseCallback
       implements ChipClusters.OperationalCredentialsCluster.AttestationResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2304,7 +2304,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedCertificateChainResponseCallback
+  public static class DelegatedCertificateChainResponseCallback
       implements ChipClusters.OperationalCredentialsCluster.CertificateChainResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2329,7 +2329,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedNOCResponseCallback
+  public static class DelegatedNOCResponseCallback
       implements ChipClusters.OperationalCredentialsCluster.NOCResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2357,7 +2357,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedOpCSRResponseCallback
+  public static class DelegatedOpCSRResponseCallback
       implements ChipClusters.OperationalCredentialsCluster.OpCSRResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2385,7 +2385,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedFabricsListAttributeCallback
+  public static class DelegatedFabricsListAttributeCallback
       implements ChipClusters.OperationalCredentialsCluster.FabricsListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2413,7 +2413,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedTrustedRootCertificatesAttributeCallback
+  public static class DelegatedTrustedRootCertificatesAttributeCallback
       implements ChipClusters.OperationalCredentialsCluster
               .TrustedRootCertificatesAttributeCallback,
           DelegatedClusterCallback {
@@ -2440,7 +2440,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedActiveBatteryFaultsAttributeCallback
+  public static class DelegatedActiveBatteryFaultsAttributeCallback
       implements ChipClusters.PowerSourceCluster.ActiveBatteryFaultsAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2466,7 +2466,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedAddSceneResponseCallback
+  public static class DelegatedAddSceneResponseCallback
       implements ChipClusters.ScenesCluster.AddSceneResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -2493,7 +2493,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedGetSceneMembershipResponseCallback
+  public static class DelegatedGetSceneMembershipResponseCallback
       implements ChipClusters.ScenesCluster.GetSceneMembershipResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2528,7 +2528,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedRemoveAllScenesResponseCallback
+  public static class DelegatedRemoveAllScenesResponseCallback
       implements ChipClusters.ScenesCluster.RemoveAllScenesResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2554,7 +2554,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedRemoveSceneResponseCallback
+  public static class DelegatedRemoveSceneResponseCallback
       implements ChipClusters.ScenesCluster.RemoveSceneResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -2581,7 +2581,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedStoreSceneResponseCallback
+  public static class DelegatedStoreSceneResponseCallback
       implements ChipClusters.ScenesCluster.StoreSceneResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -2608,7 +2608,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedViewSceneResponseCallback
+  public static class DelegatedViewSceneResponseCallback
       implements ChipClusters.ScenesCluster.ViewSceneResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -2645,7 +2645,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedThreadMetricsAttributeCallback
+  public static class DelegatedThreadMetricsAttributeCallback
       implements ChipClusters.SoftwareDiagnosticsCluster.ThreadMetricsAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2673,7 +2673,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedChangeChannelResponseCallback
+  public static class DelegatedChangeChannelResponseCallback
       implements ChipClusters.TvChannelCluster.ChangeChannelResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2702,7 +2702,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedTvChannelListAttributeCallback
+  public static class DelegatedTvChannelListAttributeCallback
       implements ChipClusters.TvChannelCluster.TvChannelListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2729,7 +2729,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedNavigateTargetResponseCallback
+  public static class DelegatedNavigateTargetResponseCallback
       implements ChipClusters.TargetNavigatorCluster.NavigateTargetResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2755,7 +2755,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedTargetNavigatorListAttributeCallback
+  public static class DelegatedTargetNavigatorListAttributeCallback
       implements ChipClusters.TargetNavigatorCluster.TargetNavigatorListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2784,7 +2784,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedBooleanResponseCallback
+  public static class DelegatedBooleanResponseCallback
       implements ChipClusters.TestClusterCluster.BooleanResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -2807,7 +2807,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedTestAddArgumentsResponseCallback
+  public static class DelegatedTestAddArgumentsResponseCallback
       implements ChipClusters.TestClusterCluster.TestAddArgumentsResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2831,7 +2831,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedTestEnumsResponseCallback
+  public static class DelegatedTestEnumsResponseCallback
       implements ChipClusters.TestClusterCluster.TestEnumsResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2857,7 +2857,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedTestListInt8UReverseResponseCallback
+  public static class DelegatedTestListInt8UReverseResponseCallback
       implements ChipClusters.TestClusterCluster.TestListInt8UReverseResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2884,7 +2884,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedTestNullableOptionalResponseCallback
+  public static class DelegatedTestNullableOptionalResponseCallback
       implements ChipClusters.TestClusterCluster.TestNullableOptionalResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2916,7 +2916,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedTestSpecificResponseCallback
+  public static class DelegatedTestSpecificResponseCallback
       implements ChipClusters.TestClusterCluster.TestSpecificResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2940,7 +2940,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedListInt8uAttributeCallback
+  public static class DelegatedListInt8uAttributeCallback
       implements ChipClusters.TestClusterCluster.ListInt8uAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2966,7 +2966,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedListOctetStringAttributeCallback
+  public static class DelegatedListOctetStringAttributeCallback
       implements ChipClusters.TestClusterCluster.ListOctetStringAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -2992,7 +2992,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedListStructOctetStringAttributeCallback
+  public static class DelegatedListStructOctetStringAttributeCallback
       implements ChipClusters.TestClusterCluster.ListStructOctetStringAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -3020,7 +3020,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedListNullablesAndOptionalsStructAttributeCallback
+  public static class DelegatedListNullablesAndOptionalsStructAttributeCallback
       implements ChipClusters.TestClusterCluster.ListNullablesAndOptionalsStructAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -3049,7 +3049,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedNeighborTableListAttributeCallback
+  public static class DelegatedNeighborTableListAttributeCallback
       implements ChipClusters.ThreadNetworkDiagnosticsCluster.NeighborTableListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -3078,7 +3078,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedRouteTableListAttributeCallback
+  public static class DelegatedRouteTableListAttributeCallback
       implements ChipClusters.ThreadNetworkDiagnosticsCluster.RouteTableListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -3107,7 +3107,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedSecurityPolicyAttributeCallback
+  public static class DelegatedSecurityPolicyAttributeCallback
       implements ChipClusters.ThreadNetworkDiagnosticsCluster.SecurityPolicyAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -3136,7 +3136,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedOperationalDatasetComponentsAttributeCallback
+  public static class DelegatedOperationalDatasetComponentsAttributeCallback
       implements ChipClusters.ThreadNetworkDiagnosticsCluster
               .OperationalDatasetComponentsAttributeCallback,
           DelegatedClusterCallback {
@@ -3167,7 +3167,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public class DelegatedActiveNetworkFaultsListAttributeCallback
+  public static class DelegatedActiveNetworkFaultsListAttributeCallback
       implements ChipClusters.ThreadNetworkDiagnosticsCluster
               .ActiveNetworkFaultsListAttributeCallback,
           DelegatedClusterCallback {

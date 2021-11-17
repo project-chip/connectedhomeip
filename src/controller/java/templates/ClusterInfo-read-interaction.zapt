@@ -3,26 +3,15 @@
 
 package chip.devicecontroller;
 
-import java.util.ArrayList;
+import chip.clusterinfo.CommandParameterInfo;
+import chip.clusterinfo.InteractionInfo;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import chip.clusterinfo.ClusterInfo;
-import chip.clusterinfo.InteractionInfo;
-import chip.clusterinfo.CommandParameterInfo;
-import chip.clusterinfo.DelegatedClusterCallback;
-import chip.clusterinfo.ClusterCommandCallback;
-import chip.clusterinfo.CommandResponseInfo;
-import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
-import chip.devicecontroller.ClusterInfoMapping.DelegatedIntegerAttributeCallback;
-
-
 
 public class ClusterReadMapping {
 
   public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
-    ClusterInfoMapping clusterInfoMapping = new ClusterInfoMapping();
     Map<String, Map<String, InteractionInfo>> readAttributeMap = new HashMap<>();
     {{#chip_client_clusters}}
        Map<String, InteractionInfo> read{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
@@ -39,9 +28,9 @@ public class ClusterReadMapping {
             );
           },
           {{#if isList}}
-            () -> clusterInfoMapping.new Delegated{{asUpperCamelCase name}}AttributeCallback(),
+            () -> new ClusterInfoMapping.Delegated{{asUpperCamelCase name}}AttributeCallback(),
           {{else}}
-            () -> clusterInfoMapping.new Delegated{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback(),
+            () -> new ClusterInfoMapping.Delegated{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback(),
           {{/if}}
           read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams
         );
@@ -54,4 +43,3 @@ public class ClusterReadMapping {
 }
 
 {{/if}}
-

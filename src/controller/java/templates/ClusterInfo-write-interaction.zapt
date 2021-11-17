@@ -3,23 +3,15 @@
 
 package chip.devicecontroller;
 
-import java.util.ArrayList;
+import chip.clusterinfo.CommandParameterInfo;
+import chip.clusterinfo.InteractionInfo;
+import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import chip.clusterinfo.ClusterInfo;
-import chip.clusterinfo.InteractionInfo;
-import chip.clusterinfo.CommandParameterInfo;
-import chip.clusterinfo.DelegatedClusterCallback;
-import chip.clusterinfo.ClusterCommandCallback;
-import chip.clusterinfo.CommandResponseInfo;
-import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
-
 
 public class ClusterWriteMapping {
   public Map<String, Map<String, InteractionInfo>> getWriteAttributeMap() {
-    ClusterInfoMapping clusterInfoMapping = new ClusterInfoMapping();
     Map<String, Map<String, InteractionInfo>> writeAttributeMap = new HashMap<>();
     {{#chip_client_clusters}}
       Map<String, InteractionInfo> write{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
@@ -36,7 +28,7 @@ public class ClusterWriteMapping {
               commandArguments.get("value")
             );
           },
-          () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+          () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
           write{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams
         );
         write{{asUpperCamelCase ../name}}InteractionInfo.put("write{{asUpperCamelCase name}}Attribute", write{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo);

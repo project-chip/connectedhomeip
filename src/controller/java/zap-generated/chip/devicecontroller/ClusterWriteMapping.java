@@ -28,7 +28,6 @@ import java.util.Map;
 
 public class ClusterWriteMapping {
   public Map<String, Map<String, InteractionInfo>> getWriteAttributeMap() {
-    ClusterInfoMapping clusterInfoMapping = new ClusterInfoMapping();
     Map<String, Map<String, InteractionInfo>> writeAttributeMap = new HashMap<>();
     Map<String, InteractionInfo> writeAccountLoginInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("accountLogin", writeAccountLoginInteractionInfo);
@@ -57,7 +56,7 @@ public class ClusterWriteMapping {
                   .writeUserLabelAttribute(
                       (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeBasicUserLabelCommandParams);
     writeBasicInteractionInfo.put(
         "writeUserLabelAttribute", writeBasicUserLabelAttributeInteractionInfo);
@@ -73,7 +72,7 @@ public class ClusterWriteMapping {
                   .writeLocationAttribute(
                       (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeBasicLocationCommandParams);
     writeBasicInteractionInfo.put(
         "writeLocationAttribute", writeBasicLocationAttributeInteractionInfo);
@@ -90,7 +89,7 @@ public class ClusterWriteMapping {
                   .writeLocalConfigDisabledAttribute(
                       (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeBasicLocalConfigDisabledCommandParams);
     writeBasicInteractionInfo.put(
         "writeLocalConfigDisabledAttribute", writeBasicLocalConfigDisabledAttributeInteractionInfo);
@@ -109,7 +108,7 @@ public class ClusterWriteMapping {
                   .writeOutOfServiceAttribute(
                       (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeBinaryInputBasicOutOfServiceCommandParams);
     writeBinaryInputBasicInteractionInfo.put(
         "writeOutOfServiceAttribute", writeBinaryInputBasicOutOfServiceAttributeInteractionInfo);
@@ -126,7 +125,7 @@ public class ClusterWriteMapping {
                   .writePresentValueAttribute(
                       (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeBinaryInputBasicPresentValueCommandParams);
     writeBinaryInputBasicInteractionInfo.put(
         "writePresentValueAttribute", writeBinaryInputBasicPresentValueAttributeInteractionInfo);
@@ -151,7 +150,7 @@ public class ClusterWriteMapping {
                   .writeUserLabelAttribute(
                       (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeBridgedDeviceBasicUserLabelCommandParams);
     writeBridgedDeviceBasicInteractionInfo.put(
         "writeUserLabelAttribute", writeBridgedDeviceBasicUserLabelAttributeInteractionInfo);
@@ -170,7 +169,7 @@ public class ClusterWriteMapping {
                   .writeColorControlOptionsAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlColorControlOptionsCommandParams);
     writeColorControlInteractionInfo.put(
         "writeColorControlOptionsAttribute",
@@ -188,7 +187,7 @@ public class ClusterWriteMapping {
                   .writeWhitePointXAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlWhitePointXCommandParams);
     writeColorControlInteractionInfo.put(
         "writeWhitePointXAttribute", writeColorControlWhitePointXAttributeInteractionInfo);
@@ -205,7 +204,7 @@ public class ClusterWriteMapping {
                   .writeWhitePointYAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlWhitePointYCommandParams);
     writeColorControlInteractionInfo.put(
         "writeWhitePointYAttribute", writeColorControlWhitePointYAttributeInteractionInfo);
@@ -222,7 +221,7 @@ public class ClusterWriteMapping {
                   .writeColorPointRXAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlColorPointRXCommandParams);
     writeColorControlInteractionInfo.put(
         "writeColorPointRXAttribute", writeColorControlColorPointRXAttributeInteractionInfo);
@@ -239,7 +238,7 @@ public class ClusterWriteMapping {
                   .writeColorPointRYAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlColorPointRYCommandParams);
     writeColorControlInteractionInfo.put(
         "writeColorPointRYAttribute", writeColorControlColorPointRYAttributeInteractionInfo);
@@ -256,7 +255,7 @@ public class ClusterWriteMapping {
                   .writeColorPointRIntensityAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlColorPointRIntensityCommandParams);
     writeColorControlInteractionInfo.put(
         "writeColorPointRIntensityAttribute",
@@ -274,7 +273,7 @@ public class ClusterWriteMapping {
                   .writeColorPointGXAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlColorPointGXCommandParams);
     writeColorControlInteractionInfo.put(
         "writeColorPointGXAttribute", writeColorControlColorPointGXAttributeInteractionInfo);
@@ -291,7 +290,7 @@ public class ClusterWriteMapping {
                   .writeColorPointGYAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlColorPointGYCommandParams);
     writeColorControlInteractionInfo.put(
         "writeColorPointGYAttribute", writeColorControlColorPointGYAttributeInteractionInfo);
@@ -308,7 +307,7 @@ public class ClusterWriteMapping {
                   .writeColorPointGIntensityAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlColorPointGIntensityCommandParams);
     writeColorControlInteractionInfo.put(
         "writeColorPointGIntensityAttribute",
@@ -326,7 +325,7 @@ public class ClusterWriteMapping {
                   .writeColorPointBXAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlColorPointBXCommandParams);
     writeColorControlInteractionInfo.put(
         "writeColorPointBXAttribute", writeColorControlColorPointBXAttributeInteractionInfo);
@@ -343,7 +342,7 @@ public class ClusterWriteMapping {
                   .writeColorPointBYAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlColorPointBYCommandParams);
     writeColorControlInteractionInfo.put(
         "writeColorPointBYAttribute", writeColorControlColorPointBYAttributeInteractionInfo);
@@ -360,7 +359,7 @@ public class ClusterWriteMapping {
                   .writeColorPointBIntensityAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlColorPointBIntensityCommandParams);
     writeColorControlInteractionInfo.put(
         "writeColorPointBIntensityAttribute",
@@ -378,7 +377,7 @@ public class ClusterWriteMapping {
                   .writeStartUpColorTemperatureMiredsAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeColorControlStartUpColorTemperatureMiredsCommandParams);
     writeColorControlInteractionInfo.put(
         "writeStartUpColorTemperatureMiredsAttribute",
@@ -416,7 +415,7 @@ public class ClusterWriteMapping {
                   .writeBreadcrumbAttribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeGeneralCommissioningBreadcrumbCommandParams);
     writeGeneralCommissioningInteractionInfo.put(
         "writeBreadcrumbAttribute", writeGeneralCommissioningBreadcrumbAttributeInteractionInfo);
@@ -440,7 +439,7 @@ public class ClusterWriteMapping {
                   .writeIdentifyTimeAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeIdentifyIdentifyTimeCommandParams);
     writeIdentifyInteractionInfo.put(
         "writeIdentifyTimeAttribute", writeIdentifyIdentifyTimeAttributeInteractionInfo);
@@ -462,7 +461,7 @@ public class ClusterWriteMapping {
                   .writeOptionsAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeLevelControlOptionsCommandParams);
     writeLevelControlInteractionInfo.put(
         "writeOptionsAttribute", writeLevelControlOptionsAttributeInteractionInfo);
@@ -479,7 +478,7 @@ public class ClusterWriteMapping {
                   .writeOnOffTransitionTimeAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeLevelControlOnOffTransitionTimeCommandParams);
     writeLevelControlInteractionInfo.put(
         "writeOnOffTransitionTimeAttribute",
@@ -496,7 +495,7 @@ public class ClusterWriteMapping {
                   .writeOnLevelAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeLevelControlOnLevelCommandParams);
     writeLevelControlInteractionInfo.put(
         "writeOnLevelAttribute", writeLevelControlOnLevelAttributeInteractionInfo);
@@ -513,7 +512,7 @@ public class ClusterWriteMapping {
                   .writeOnTransitionTimeAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeLevelControlOnTransitionTimeCommandParams);
     writeLevelControlInteractionInfo.put(
         "writeOnTransitionTimeAttribute",
@@ -531,7 +530,7 @@ public class ClusterWriteMapping {
                   .writeOffTransitionTimeAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeLevelControlOffTransitionTimeCommandParams);
     writeLevelControlInteractionInfo.put(
         "writeOffTransitionTimeAttribute",
@@ -549,7 +548,7 @@ public class ClusterWriteMapping {
                   .writeDefaultMoveRateAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeLevelControlDefaultMoveRateCommandParams);
     writeLevelControlInteractionInfo.put(
         "writeDefaultMoveRateAttribute", writeLevelControlDefaultMoveRateAttributeInteractionInfo);
@@ -566,7 +565,7 @@ public class ClusterWriteMapping {
                   .writeStartUpCurrentLevelAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeLevelControlStartUpCurrentLevelCommandParams);
     writeLevelControlInteractionInfo.put(
         "writeStartUpCurrentLevelAttribute",
@@ -591,7 +590,7 @@ public class ClusterWriteMapping {
                   .writeOnModeAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeModeSelectOnModeCommandParams);
     writeModeSelectInteractionInfo.put(
         "writeOnModeAttribute", writeModeSelectOnModeAttributeInteractionInfo);
@@ -618,7 +617,7 @@ public class ClusterWriteMapping {
                   .writeDefaultOtaProviderAttribute(
                       (DefaultClusterCallback) callback, (byte[]) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeOtaSoftwareUpdateRequestorDefaultOtaProviderCommandParams);
     writeOtaSoftwareUpdateRequestorInteractionInfo.put(
         "writeDefaultOtaProviderAttribute",
@@ -640,7 +639,7 @@ public class ClusterWriteMapping {
                   .writeOnTimeAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeOnOffOnTimeCommandParams);
     writeOnOffInteractionInfo.put("writeOnTimeAttribute", writeOnOffOnTimeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeOnOffOffWaitTimeCommandParams =
@@ -655,7 +654,7 @@ public class ClusterWriteMapping {
                   .writeOffWaitTimeAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeOnOffOffWaitTimeCommandParams);
     writeOnOffInteractionInfo.put(
         "writeOffWaitTimeAttribute", writeOnOffOffWaitTimeAttributeInteractionInfo);
@@ -671,7 +670,7 @@ public class ClusterWriteMapping {
                   .writeStartUpOnOffAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeOnOffStartUpOnOffCommandParams);
     writeOnOffInteractionInfo.put(
         "writeStartUpOnOffAttribute", writeOnOffStartUpOnOffAttributeInteractionInfo);
@@ -691,7 +690,7 @@ public class ClusterWriteMapping {
                   .writeSwitchActionsAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeOnOffSwitchConfigurationSwitchActionsCommandParams);
     writeOnOffSwitchConfigurationInteractionInfo.put(
         "writeSwitchActionsAttribute",
@@ -718,7 +717,7 @@ public class ClusterWriteMapping {
                   .writeOperationModeAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writePumpConfigurationAndControlOperationModeCommandParams);
     writePumpConfigurationAndControlInteractionInfo.put(
         "writeOperationModeAttribute",
@@ -736,7 +735,7 @@ public class ClusterWriteMapping {
                   .writeControlModeAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writePumpConfigurationAndControlControlModeCommandParams);
     writePumpConfigurationAndControlInteractionInfo.put(
         "writeControlModeAttribute",
@@ -772,7 +771,7 @@ public class ClusterWriteMapping {
                   .writeBooleanAttribute(
                       (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterBooleanCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeBooleanAttribute", writeTestClusterBooleanAttributeInteractionInfo);
@@ -788,7 +787,7 @@ public class ClusterWriteMapping {
                   .writeBitmap8Attribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterBitmap8CommandParams);
     writeTestClusterInteractionInfo.put(
         "writeBitmap8Attribute", writeTestClusterBitmap8AttributeInteractionInfo);
@@ -804,7 +803,7 @@ public class ClusterWriteMapping {
                   .writeBitmap16Attribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterBitmap16CommandParams);
     writeTestClusterInteractionInfo.put(
         "writeBitmap16Attribute", writeTestClusterBitmap16AttributeInteractionInfo);
@@ -820,7 +819,7 @@ public class ClusterWriteMapping {
                   .writeBitmap32Attribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterBitmap32CommandParams);
     writeTestClusterInteractionInfo.put(
         "writeBitmap32Attribute", writeTestClusterBitmap32AttributeInteractionInfo);
@@ -836,7 +835,7 @@ public class ClusterWriteMapping {
                   .writeBitmap64Attribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterBitmap64CommandParams);
     writeTestClusterInteractionInfo.put(
         "writeBitmap64Attribute", writeTestClusterBitmap64AttributeInteractionInfo);
@@ -852,7 +851,7 @@ public class ClusterWriteMapping {
                   .writeInt8uAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterInt8uCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeInt8uAttribute", writeTestClusterInt8uAttributeInteractionInfo);
@@ -868,7 +867,7 @@ public class ClusterWriteMapping {
                   .writeInt16uAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterInt16uCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeInt16uAttribute", writeTestClusterInt16uAttributeInteractionInfo);
@@ -884,7 +883,7 @@ public class ClusterWriteMapping {
                   .writeInt32uAttribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterInt32uCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeInt32uAttribute", writeTestClusterInt32uAttributeInteractionInfo);
@@ -900,7 +899,7 @@ public class ClusterWriteMapping {
                   .writeInt64uAttribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterInt64uCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeInt64uAttribute", writeTestClusterInt64uAttributeInteractionInfo);
@@ -916,7 +915,7 @@ public class ClusterWriteMapping {
                   .writeInt8sAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterInt8sCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeInt8sAttribute", writeTestClusterInt8sAttributeInteractionInfo);
@@ -932,7 +931,7 @@ public class ClusterWriteMapping {
                   .writeInt16sAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterInt16sCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeInt16sAttribute", writeTestClusterInt16sAttributeInteractionInfo);
@@ -948,7 +947,7 @@ public class ClusterWriteMapping {
                   .writeInt32sAttribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterInt32sCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeInt32sAttribute", writeTestClusterInt32sAttributeInteractionInfo);
@@ -964,7 +963,7 @@ public class ClusterWriteMapping {
                   .writeInt64sAttribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterInt64sCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeInt64sAttribute", writeTestClusterInt64sAttributeInteractionInfo);
@@ -980,7 +979,7 @@ public class ClusterWriteMapping {
                   .writeEnum8Attribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterEnum8CommandParams);
     writeTestClusterInteractionInfo.put(
         "writeEnum8Attribute", writeTestClusterEnum8AttributeInteractionInfo);
@@ -996,7 +995,7 @@ public class ClusterWriteMapping {
                   .writeEnum16Attribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterEnum16CommandParams);
     writeTestClusterInteractionInfo.put(
         "writeEnum16Attribute", writeTestClusterEnum16AttributeInteractionInfo);
@@ -1013,7 +1012,7 @@ public class ClusterWriteMapping {
                   .writeOctetStringAttribute(
                       (DefaultClusterCallback) callback, (byte[]) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterOctetStringCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeOctetStringAttribute", writeTestClusterOctetStringAttributeInteractionInfo);
@@ -1030,7 +1029,7 @@ public class ClusterWriteMapping {
                   .writeLongOctetStringAttribute(
                       (DefaultClusterCallback) callback, (byte[]) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterLongOctetStringCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeLongOctetStringAttribute", writeTestClusterLongOctetStringAttributeInteractionInfo);
@@ -1046,7 +1045,7 @@ public class ClusterWriteMapping {
                   .writeCharStringAttribute(
                       (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterCharStringCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeCharStringAttribute", writeTestClusterCharStringAttributeInteractionInfo);
@@ -1063,7 +1062,7 @@ public class ClusterWriteMapping {
                   .writeLongCharStringAttribute(
                       (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterLongCharStringCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeLongCharStringAttribute", writeTestClusterLongCharStringAttributeInteractionInfo);
@@ -1079,7 +1078,7 @@ public class ClusterWriteMapping {
                   .writeEpochUsAttribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterEpochUsCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeEpochUsAttribute", writeTestClusterEpochUsAttributeInteractionInfo);
@@ -1095,7 +1094,7 @@ public class ClusterWriteMapping {
                   .writeEpochSAttribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterEpochSCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeEpochSAttribute", writeTestClusterEpochSAttributeInteractionInfo);
@@ -1111,7 +1110,7 @@ public class ClusterWriteMapping {
                   .writeVendorIdAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterVendorIdCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeVendorIdAttribute", writeTestClusterVendorIdAttributeInteractionInfo);
@@ -1128,7 +1127,7 @@ public class ClusterWriteMapping {
                   .writeUnsupportedAttribute(
                       (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterUnsupportedCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeUnsupportedAttribute", writeTestClusterUnsupportedAttributeInteractionInfo);
@@ -1145,7 +1144,7 @@ public class ClusterWriteMapping {
                   .writeNullableBooleanAttribute(
                       (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableBooleanCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableBooleanAttribute", writeTestClusterNullableBooleanAttributeInteractionInfo);
@@ -1162,7 +1161,7 @@ public class ClusterWriteMapping {
                   .writeNullableBitmap8Attribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableBitmap8CommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableBitmap8Attribute", writeTestClusterNullableBitmap8AttributeInteractionInfo);
@@ -1179,7 +1178,7 @@ public class ClusterWriteMapping {
                   .writeNullableBitmap16Attribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableBitmap16CommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableBitmap16Attribute", writeTestClusterNullableBitmap16AttributeInteractionInfo);
@@ -1196,7 +1195,7 @@ public class ClusterWriteMapping {
                   .writeNullableBitmap32Attribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableBitmap32CommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableBitmap32Attribute", writeTestClusterNullableBitmap32AttributeInteractionInfo);
@@ -1213,7 +1212,7 @@ public class ClusterWriteMapping {
                   .writeNullableBitmap64Attribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableBitmap64CommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableBitmap64Attribute", writeTestClusterNullableBitmap64AttributeInteractionInfo);
@@ -1230,7 +1229,7 @@ public class ClusterWriteMapping {
                   .writeNullableInt8uAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableInt8uCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableInt8uAttribute", writeTestClusterNullableInt8uAttributeInteractionInfo);
@@ -1247,7 +1246,7 @@ public class ClusterWriteMapping {
                   .writeNullableInt16uAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableInt16uCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableInt16uAttribute", writeTestClusterNullableInt16uAttributeInteractionInfo);
@@ -1264,7 +1263,7 @@ public class ClusterWriteMapping {
                   .writeNullableInt32uAttribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableInt32uCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableInt32uAttribute", writeTestClusterNullableInt32uAttributeInteractionInfo);
@@ -1281,7 +1280,7 @@ public class ClusterWriteMapping {
                   .writeNullableInt64uAttribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableInt64uCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableInt64uAttribute", writeTestClusterNullableInt64uAttributeInteractionInfo);
@@ -1298,7 +1297,7 @@ public class ClusterWriteMapping {
                   .writeNullableInt8sAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableInt8sCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableInt8sAttribute", writeTestClusterNullableInt8sAttributeInteractionInfo);
@@ -1315,7 +1314,7 @@ public class ClusterWriteMapping {
                   .writeNullableInt16sAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableInt16sCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableInt16sAttribute", writeTestClusterNullableInt16sAttributeInteractionInfo);
@@ -1332,7 +1331,7 @@ public class ClusterWriteMapping {
                   .writeNullableInt32sAttribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableInt32sCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableInt32sAttribute", writeTestClusterNullableInt32sAttributeInteractionInfo);
@@ -1349,7 +1348,7 @@ public class ClusterWriteMapping {
                   .writeNullableInt64sAttribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableInt64sCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableInt64sAttribute", writeTestClusterNullableInt64sAttributeInteractionInfo);
@@ -1366,7 +1365,7 @@ public class ClusterWriteMapping {
                   .writeNullableEnum8Attribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableEnum8CommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableEnum8Attribute", writeTestClusterNullableEnum8AttributeInteractionInfo);
@@ -1383,7 +1382,7 @@ public class ClusterWriteMapping {
                   .writeNullableEnum16Attribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableEnum16CommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableEnum16Attribute", writeTestClusterNullableEnum16AttributeInteractionInfo);
@@ -1400,7 +1399,7 @@ public class ClusterWriteMapping {
                   .writeNullableOctetStringAttribute(
                       (DefaultClusterCallback) callback, (byte[]) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableOctetStringCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableOctetStringAttribute",
@@ -1418,7 +1417,7 @@ public class ClusterWriteMapping {
                   .writeNullableCharStringAttribute(
                       (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterNullableCharStringCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeNullableCharStringAttribute",
@@ -1438,7 +1437,7 @@ public class ClusterWriteMapping {
                   .writeOccupiedCoolingSetpointAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeThermostatOccupiedCoolingSetpointCommandParams);
     writeThermostatInteractionInfo.put(
         "writeOccupiedCoolingSetpointAttribute",
@@ -1456,7 +1455,7 @@ public class ClusterWriteMapping {
                   .writeOccupiedHeatingSetpointAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeThermostatOccupiedHeatingSetpointCommandParams);
     writeThermostatInteractionInfo.put(
         "writeOccupiedHeatingSetpointAttribute",
@@ -1474,7 +1473,7 @@ public class ClusterWriteMapping {
                   .writeMinHeatSetpointLimitAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeThermostatMinHeatSetpointLimitCommandParams);
     writeThermostatInteractionInfo.put(
         "writeMinHeatSetpointLimitAttribute",
@@ -1492,7 +1491,7 @@ public class ClusterWriteMapping {
                   .writeMaxHeatSetpointLimitAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeThermostatMaxHeatSetpointLimitCommandParams);
     writeThermostatInteractionInfo.put(
         "writeMaxHeatSetpointLimitAttribute",
@@ -1510,7 +1509,7 @@ public class ClusterWriteMapping {
                   .writeMinCoolSetpointLimitAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeThermostatMinCoolSetpointLimitCommandParams);
     writeThermostatInteractionInfo.put(
         "writeMinCoolSetpointLimitAttribute",
@@ -1528,7 +1527,7 @@ public class ClusterWriteMapping {
                   .writeMaxCoolSetpointLimitAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeThermostatMaxCoolSetpointLimitCommandParams);
     writeThermostatInteractionInfo.put(
         "writeMaxCoolSetpointLimitAttribute",
@@ -1546,7 +1545,7 @@ public class ClusterWriteMapping {
                   .writeMinSetpointDeadBandAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeThermostatMinSetpointDeadBandCommandParams);
     writeThermostatInteractionInfo.put(
         "writeMinSetpointDeadBandAttribute",
@@ -1564,7 +1563,7 @@ public class ClusterWriteMapping {
                   .writeControlSequenceOfOperationAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeThermostatControlSequenceOfOperationCommandParams);
     writeThermostatInteractionInfo.put(
         "writeControlSequenceOfOperationAttribute",
@@ -1581,7 +1580,7 @@ public class ClusterWriteMapping {
                   .writeSystemModeAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeThermostatSystemModeCommandParams);
     writeThermostatInteractionInfo.put(
         "writeSystemModeAttribute", writeThermostatSystemModeAttributeInteractionInfo);
@@ -1605,7 +1604,7 @@ public class ClusterWriteMapping {
                           (DefaultClusterCallback) callback,
                           (Integer) commandArguments.get("value"));
                 },
-                () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+                () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
                 writeThermostatUserInterfaceConfigurationTemperatureDisplayModeCommandParams);
     writeThermostatUserInterfaceConfigurationInteractionInfo.put(
         "writeTemperatureDisplayModeAttribute",
@@ -1624,7 +1623,7 @@ public class ClusterWriteMapping {
                   .writeKeypadLockoutAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeThermostatUserInterfaceConfigurationKeypadLockoutCommandParams);
     writeThermostatUserInterfaceConfigurationInteractionInfo.put(
         "writeKeypadLockoutAttribute",
@@ -1647,7 +1646,7 @@ public class ClusterWriteMapping {
                           (DefaultClusterCallback) callback,
                           (Integer) commandArguments.get("value"));
                 },
-                () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+                () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
                 writeThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCommandParams);
     writeThermostatUserInterfaceConfigurationInteractionInfo.put(
         "writeScheduleProgrammingVisibilityAttribute",
@@ -1675,7 +1674,7 @@ public class ClusterWriteMapping {
                   .writeModeAttribute(
                       (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
             },
-            () -> clusterInfoMapping.new DelegatedDefaultClusterCallback(),
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeWindowCoveringModeCommandParams);
     writeWindowCoveringInteractionInfo.put(
         "writeModeAttribute", writeWindowCoveringModeAttributeInteractionInfo);
