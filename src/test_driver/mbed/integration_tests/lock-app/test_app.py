@@ -86,6 +86,9 @@ def test_wifi_provisioning(device, network):
     ret = commissioning_wifi(devCtrl, network_ssid, network_pass, DEVICE_NODE_ID)
     assert ret == 0
 
+    ret = device.wait_for_output("Event - StationConnected")
+    assert ret != None and len(ret) > 0
+
     assert close_ble(devCtrl)
 
 def test_device_info_rpc(device):
