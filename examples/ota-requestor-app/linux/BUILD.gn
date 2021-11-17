@@ -23,6 +23,7 @@ executable("chip-ota-requestor-app") {
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
+    "${chip_root}/src/transport",
   ]
 
   cflags = [ "-Wconversion" ]

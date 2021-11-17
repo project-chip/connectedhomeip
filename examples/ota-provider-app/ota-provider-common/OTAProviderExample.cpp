@@ -20,17 +20,22 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
+#include <app/server/Server.h>
 #include <app/util/af.h>
 #include <crypto/RandUtils.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMemString.h>
-#include <protocols/secure_channel/PASESession.h> // For chip::kTestDeviceNodeId
+#include <transport/FabricTable.h>
 
 #include <string.h>
 
 using chip::ByteSpan;
 using chip::CharSpan;
+using chip::FabricIndex;
+using chip::FabricInfo;
+using chip::NodeId;
 using chip::Optional;
+using chip::Server;
 using chip::Span;
 using chip::app::Clusters::OTAProviderDelegate;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
@@ -57,10 +62,9 @@ void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
     }
 }
 
-bool GenerateBdxUri(const Span<char> & fileDesignator, Span<char> outUri, size_t availableSize)
+bool GenerateBdxUri(NodeId nodeId, const Span<char> & fileDesignator, Span<char> outUri, size_t availableSize)
 {
     static constexpr char bdxPrefix[] = "bdx://";
-    chip::NodeId nodeId               = chip::kTestDeviceNodeId; // TODO: read this dynamically
     size_t nodeIdHexStrLen            = sizeof(nodeId) * 2;
     size_t expectedLength             = strlen(bdxPrefix) + nodeIdHexStrLen + 1 + fileDesignator.size();
 
@@ -115,9 +119,15 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
     if (strlen(mOTAFilePath))
     {
+        // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the provider
+        // supplying the response is not the provider supplying the OTA image.
+        FabricIndex fabricIndex = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
+        FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+        NodeId nodeId           = fabricInfo->GetPeerId().GetNodeId();
+
         // Only doing BDX transport for now
-        GenerateBdxUri(Span<char>(mOTAFilePath, strlen(mOTAFilePath)), Span<char>(uriBuf, 0), kUriMaxLen);
-        ChipLogDetail(SoftwareUpdate, "generated URI: %s", uriBuf);
+        GenerateBdxUri(nodeId, Span<char>(mOTAFilePath, strlen(mOTAFilePath)), Span<char>(uriBuf, kUriMaxLen), kUriMaxLen);
+        ChipLogDetail(SoftwareUpdate, "generated URI: %.*s", static_cast<int>(strlen(uriBuf)), uriBuf);
     }
 
     // Set Status for the Query Image Response
