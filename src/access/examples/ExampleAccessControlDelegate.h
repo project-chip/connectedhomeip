@@ -16,13 +16,13 @@
  */
 #pragma once
 
-#include "access/AccessControlDataProvider.h"
+#include "access/AccessControl.h"
 
 namespace chip {
 namespace Access {
 namespace Examples {
 
-AccessControlDataProvider * GetExampleAccessControlDataProvider();
+AccessControl::Delegate & GetAccessControlDelegate();
 
 } // namespace Examples
 } // namespace Access

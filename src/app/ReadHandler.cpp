@@ -134,25 +134,9 @@ CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayl
 CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Protocols::InteractionModel::Status statusCode;
-    StatusResponseMessage::Parser response;
-    System::PacketBufferTLVReader reader;
-    reader.Init(std::move(aPayload));
-    reader.Next();
-    err = response.Init(reader);
+    StatusIB status;
+    err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
     SuccessOrExit(err);
-
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = response.CheckSchemaValidity();
-    SuccessOrExit(err);
-#endif
-
-    err = response.GetStatus(statusCode);
-    SuccessOrExit(err);
-
-    ChipLogProgress(DataManagement, "In state %s, receive status response, status code is %" PRIu16, GetStateStr(),
-                    to_underlying(statusCode));
-    VerifyOrExit((statusCode == Protocols::InteractionModel::Status::Success), err = CHIP_ERROR_INVALID_ARGUMENT);
     switch (mState)
     {
     case HandlerState::AwaitingReportResponse:

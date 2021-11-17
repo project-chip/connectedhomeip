@@ -56,7 +56,7 @@ function asTestValue()
   } else if (StringHelper.isCharString(this.type)) {
     return '@"Test"';
   } else {
-    return this.min || this.max || 0;
+    return `@(${this.min || this.max || 0})`;
   }
 }
 
@@ -163,6 +163,11 @@ async function arrayElementObjectiveCClass(type, cluster, options)
   return asObjectiveCClass.call(this, type, cluster, options);
 }
 
+function incrementDepth(depth)
+{
+  return depth + 1;
+}
+
 //
 // Module exports
 //
@@ -174,3 +179,4 @@ exports.asTestValue                  = asTestValue;
 exports.asObjectiveCClass            = asObjectiveCClass;
 exports.asObjectiveCType             = asObjectiveCType;
 exports.arrayElementObjectiveCClass  = arrayElementObjectiveCClass;
+exports.incrementDepth               = incrementDepth;

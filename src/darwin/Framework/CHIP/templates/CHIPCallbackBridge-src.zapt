@@ -6,6 +6,7 @@
 #import "CHIPCommandPayloadsObjc.h"
 
 {{#>CHIPCallbackBridge partial-type=""            }}DefaultSuccessCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="CommandStatus"}}CommandSuccessCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge partial-type="Octet_String"}}OctetStringAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge partial-type="Char_String" }}CharStringAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge partial-type="Boolean"     }}BooleanAttributeCallback{{/CHIPCallbackBridge}}
@@ -21,7 +22,7 @@
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-{{#>CHIPCallbackBridge partial-type="List"        }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}ListAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="List" isArray=false}}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}ListAttributeCallback{{/CHIPCallbackBridge}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}

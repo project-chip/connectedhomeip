@@ -84,6 +84,14 @@ void CHIP{{chipCallback.name}}AttributeCallback::CallbackFn(void * context, {{ch
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
 
+{{! NOTE: Some of our helpers rely on broken ZAP APIs that sniff for "isArray"
+    when we are just trying to work with the type of an array element.  Fix
+    that by defining some inline partials that let us force isArray to false as
+    needed. }}
+{{~#*inline "asUnboxedJniSignature"}}{{asJniSignature type false}}{{/inline}}
+{{~#*inline "asUnboxedJniSignatureForEntry"}}{{> asUnboxedJniSignature isArray=false}}{{/inline~}}
+{{~#*inline "asBoxedJavaBasicType"}}{{asJavaBasicTypeForZclType type true}}{{/inline~}}
+{{~#*inline "asBoxedJavaBasicTypeForEntry"}}{{>asBoxedJavaBasicType isArray=false}}{{/inline~}}
 CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback) :
     chip::Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>(CallbackFn, this)
 {
@@ -217,9 +225,9 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         jobject {{asLowerCamelCase name}} = nullptr;
         if (!{{asLowerCamelCase name}}Null && {{asLowerCamelCase name}}HasValue) {
             jclass {{asLowerCamelCase name}}EntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/{{asJavaBasicTypeForZclType type true}}", {{asLowerCamelCase name}}EntryCls);
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/{{>asBoxedJavaBasicTypeForEntry}}", {{asLowerCamelCase name}}EntryCls);
             chip::JniClass {{asLowerCamelCase name}}JniClass({{asLowerCamelCase name}}EntryCls);
-            jmethodID {{asLowerCamelCase name}}EntryTypeCtor = env->GetMethodID({{asLowerCamelCase name}}EntryCls, "<init>", "({{asJniSignature type false}})V");
+            jmethodID {{asLowerCamelCase name}}EntryTypeCtor = env->GetMethodID({{asLowerCamelCase name}}EntryCls, "<init>", "({{>asUnboxedJniSignatureForEntry}})V");
             {{asLowerCamelCase name}} = env->NewObject({{asLowerCamelCase name}}EntryCls, {{asLowerCamelCase name}}EntryTypeCtor, {{asLowerCamelCase name}}Value);
         }
         {{/if}}
@@ -252,7 +260,6 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
         {{else}}
         bool entryNull = false;
-        {{#unless isArray}}
         {{#unless isStruct}}
         {{#if isNullable}}
         {{chipType}} entryValue;
@@ -263,7 +270,6 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         {{else}}
         {{chipType}} entryValue = entry;
         {{/if}}
-        {{/unless}}
         {{/unless}}
 
         {{#if isStruct}}
@@ -284,9 +290,9 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         jobject entryObject = nullptr;
         if (!entryNull) {
             jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/{{asJavaBasicTypeForZclType type true}}", entryTypeCls);
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/{{>asBoxedJavaBasicTypeForEntry}}", entryTypeCls);
             chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "({{asJniSignature type false}})V");
+            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "({{>asUnboxedJniSignatureForEntry}})V");
             entryObject = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
         }
         {{/if}}

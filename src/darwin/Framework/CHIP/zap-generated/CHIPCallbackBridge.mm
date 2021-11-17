@@ -23,6 +23,11 @@
 
 void CHIPDefaultSuccessCallbackBridge::OnSuccessFn(void * context) { DispatchSuccess(context, nil); };
 
+void CHIPCommandSuccessCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::NullObjectType &)
+{
+    DispatchSuccess(context, nil);
+};
+
 void CHIPOctetStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::ByteSpan value)
 {
     DispatchSuccess(context, @ { @"value" : [NSData dataWithBytes:value.data() length:value.size()] });

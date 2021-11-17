@@ -127,4 +127,5 @@ public:
 protected:
     chip::app::ConcreteCommandPath mCommandPath;
     chip::app::ConcreteAttributePath mAttributePath;
+    chip::Optional<chip::EndpointId> mEndpointId;
 };

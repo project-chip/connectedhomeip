@@ -23,7 +23,9 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/DecodableList.h>
 
-typedef void (*CHIPDefaultSuccessCallbackType)(void *, const chip::app::DataModel::NullObjectType &);
+typedef void (*CommandSuccessCallback)(void *, const chip::app::DataModel::NullObjectType &);
+using CHIPCommandSuccessCallbackType = CommandSuccessCallback;
+typedef void (*CHIPDefaultSuccessCallbackType)(void *);
 typedef void (*CHIPDefaultFailureCallbackType)(void *, EmberAfStatus);
 
 typedef void (*CHIPAccountLoginClusterGetSetupPINResponseCallbackType)(
@@ -187,6 +189,16 @@ public:
         CHIPCallbackBridge<DefaultSuccessCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context);
+};
+
+class CHIPCommandSuccessCallbackBridge : public CHIPCallbackBridge<CommandSuccessCallback>
+{
+public:
+    CHIPCommandSuccessCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                     bool keepAlive = false) :
+        CHIPCallbackBridge<CommandSuccessCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::NullObjectType &);
 };
 
 class CHIPOctetStringAttributeCallbackBridge : public CHIPCallbackBridge<OctetStringAttributeCallback>

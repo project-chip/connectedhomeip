@@ -430,7 +430,7 @@ void BLEManagerImpl::ConfigureAdvertisements(void)
         /* Default device name is CHIP-<DISCRIMINATOR> */
         deviceDiscriminator = mDeviceIdInfo.GetDeviceDiscriminator();
 
-        localDeviceNameLen = strlen(CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX) + sizeof(deviceDiscriminator);
+        localDeviceNameLen = strlen(CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX) + CHIPOBLE_DEVICE_DESC_LENGTH;
 
         memset(sInstance.mDeviceName, 0, GAP_DEVICE_NAME_LEN);
         snprintf(sInstance.mDeviceName, GAP_DEVICE_NAME_LEN, "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX,

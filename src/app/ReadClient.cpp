@@ -25,6 +25,7 @@
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
+#include <app/StatusResponse.h>
 
 namespace chip {
 namespace app {
@@ -189,46 +190,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadClient::SendStatusResponse(CHIP_ERROR aError)
-{
-    using Protocols::InteractionModel::Status;
-
-    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-    VerifyOrReturnLogError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
-
-    System::PacketBufferTLVWriter writer;
-    writer.Init(std::move(msgBuf));
-
-    StatusResponseMessage::Builder response;
-    ReturnLogErrorOnFailure(response.Init(&writer));
-    Status statusCode = Status::Success;
-    if (aError != CHIP_NO_ERROR)
-    {
-        statusCode = Status::InvalidSubscription;
-    }
-    response.Status(statusCode);
-    ReturnLogErrorOnFailure(response.GetError());
-    ReturnLogErrorOnFailure(writer.Finalize(&msgBuf));
-    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    if (IsSubscriptionType())
-    {
-        if (IsAwaitingInitialReport())
-        {
-            MoveToState(ClientState::AwaitingSubscribeResponse);
-        }
-        else
-        {
-            RefreshLivenessCheckTimer();
-        }
-    }
-    ReturnLogErrorOnFailure(
-        mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::StatusResponse, std::move(msgBuf),
-                                   Messaging::SendFlags(IsAwaitingSubscribeResponse() ? Messaging::SendMessageFlags::kExpectResponse
-                                                                                      : Messaging::SendMessageFlags::kNone)));
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ReadClient::GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
                                           size_t aEventPathParamsListSize)
 {
@@ -285,6 +246,13 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
         // ExchangeContext::HandleMessage automatically closes a context if no other messages need to
         // be sent or received.
         mpExchangeCtx = nullptr;
+        SuccessOrExit(err);
+    }
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    {
+        StatusIB status;
+        VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
+        err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
         SuccessOrExit(err);
     }
     else
@@ -425,7 +393,22 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
 
 exit:
-    SendStatusResponse(err);
+    if (IsSubscriptionType())
+    {
+        if (IsAwaitingInitialReport())
+        {
+            MoveToState(ClientState::AwaitingSubscribeResponse);
+        }
+        else
+        {
+            RefreshLivenessCheckTimer();
+        }
+    }
+
+    StatusResponse::SendStatusResponse(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
+                                                            : Protocols::InteractionModel::Status::InvalidSubscription,
+                                       mpExchangeCtx, IsAwaitingSubscribeResponse());
+
     if (!mInitialReport)
     {
         mpExchangeCtx = nullptr;

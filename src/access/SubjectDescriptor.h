@@ -21,24 +21,15 @@
 #include "AuthMode.h"
 
 #include <lib/core/DataModelTypes.h>
-#include <lib/core/GroupId.h>
 #include <lib/core/NodeId.h>
-#include <lib/core/PasscodeId.h>
 
 namespace chip {
 namespace Access {
 
-union SubjectId
-{
-    PasscodeId passcode;
-    NodeId node;
-    GroupId group;
-};
-
 struct SubjectDescriptor
 {
     // Holds FabricIndex of fabric, 0 if no fabric.
-    FabricIndex fabricIndex = 0;
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
 
     // Holds AuthMode of subject(s), kNone if no access.
     AuthMode authMode = AuthMode::kNone;
@@ -47,7 +38,7 @@ struct SubjectDescriptor
 
     // Holds subjects according to auth mode, and the latter two are only valid
     // if auth mode is CASE.
-    SubjectId subjects[3] = {};
+    NodeId subjects[3] = { kUndefinedNodeId, kUndefinedNodeId, kUndefinedNodeId };
 };
 
 } // namespace Access

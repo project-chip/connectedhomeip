@@ -53,6 +53,7 @@ public:
     bool HasFabricIndex() const { return (mFabric != kUndefinedFabricIndex); }
     FabricIndex GetFabricIndex() const { return mFabric; }
     void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
+    void SetGroupId(GroupId groupId) { mGroupId.SetValue(groupId); }
 
     bool operator==(const SessionHandle & that) const
     {

@@ -16,36 +16,23 @@
  *    limitations under the License.
  */
 
-#include "ExampleAccessControlDataProvider.h"
+#pragma once
 
-namespace {
-
-using chip::FabricIndex;
-using namespace chip::Access;
-
-class ExampleDataProvider : public AccessControlDataProvider
-{
-    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
-
-    void Finish() override {}
-
-    EntryIterator * Entries() const override { return nullptr; }
-
-    EntryIterator * Entries(FabricIndex fabricIndex) const override { return nullptr; }
-};
-
-} // namespace
+#include <app/MessageDef/StatusIB.h>
+#include <messaging/ExchangeContext.h>
+#include <protocols/interaction_model/Constants.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
-namespace Access {
-namespace Examples {
+namespace app {
+static constexpr size_t kMaxSecureSduLengthBytes = 1024;
 
-AccessControlDataProvider * GetExampleAccessControlDataProvider()
+class StatusResponse
 {
-    static ExampleDataProvider exampleProvider;
-    return &exampleProvider;
-}
-
-} // namespace Examples
-} // namespace Access
+public:
+    static CHIP_ERROR SendStatusResponse(Protocols::InteractionModel::Status aStatus,
+                                         Messaging::ExchangeContext * apExchangeContext, bool aExpectResponse);
+    static CHIP_ERROR ProcessStatusResponse(System::PacketBufferHandle && aPayload, StatusIB & aStatus);
+};
+} // namespace app
 } // namespace chip
