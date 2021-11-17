@@ -415,7 +415,6 @@ template("ti_simplelink_sdk") {
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.c",
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/host/gatt_uuid.c",
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/host/gattservapp_util.c",
-      "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/app/ble_user_config.c",
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/app/icall_api_lite.c",
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/src/icall_cc2650.c",
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/src/icall_user_config.c",
@@ -430,6 +429,7 @@ template("ti_simplelink_sdk") {
 
       # Move this into the SDK
       "${chip_root}/src/platform/cc13x2_26x2/chipOBleProfile.c",
+      "${chip_root}/src/platform/cc13x2_26x2/ble_user_config.c",
     ]
 
     configs -= [ "${build_root}/config/compiler:std_default" ]
