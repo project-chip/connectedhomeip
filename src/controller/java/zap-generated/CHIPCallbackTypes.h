@@ -1015,8 +1015,8 @@ typedef void (*CHIPTestClusterClusterListNullablesAndOptionalsStructAttributeCal
     void *, const chip::app::Clusters::TestCluster::Attributes::ListNullablesAndOptionalsStruct::TypeInfo::DecodableType &);
 typedef void (*CHIPTestClusterClusterEnumAttrAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::EnumAttr::TypeInfo::DecodableArgType);
-typedef void (*CHIPTestClusterClusterStructAttributeCallbackType)(
-    void *, chip::app::Clusters::TestCluster::Attributes::Struct::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterStructAttrAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::StructAttr::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterRangeRestrictedInt8uAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterRangeRestrictedInt8sAttributeCallbackType)(
