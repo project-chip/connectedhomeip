@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+
+  <cluster>
+    <domain>General</domain>
+    <name>Bridged Device Basic Information</name>
+    <code>0x002e</code>
+    <define>BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This Cluster serves two purposes towards a Node communicating with a Bridge:
+indicate that the functionality on the Endpoint where it is placed (and its Parts) is bridged from
+a non-CHIP technology, and
+provide a centralized collection of attributes that the Node MAY collect to aid in conveying
+information regarding the Bridged Device to a user, such as the vendor name, the model name,
+or user-assigned name.</description>
+    <!-- Base data types -->
+
+    <!-- Test Commands -->
+
+  </cluster>
+</configurator>
