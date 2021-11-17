@@ -158,10 +158,9 @@ public:
 {{/last}}
 {{/zcl_commands}}
 
-{{#zcl_attributes_server}}
-{{#first}}
 namespace Attributes {
-{{/first}}
+
+{{#zcl_attributes_server}}
 namespace {{asUpperCamelCase label}} {
     struct TypeInfo {
     {{! forceNotOptional=true because the optionality is on the attribute
@@ -181,10 +180,21 @@ namespace {{asUpperCamelCase label}} {
         static constexpr bool MustUseTimedWrite() { return {{mustUseTimedWrite}}; }
     };
 } // namespace {{asUpperCamelCase label}}
-{{#last}}
-} // namespace Attributes
-{{/last}}
 {{/zcl_attributes_server}}
+
+struct TypeInfo
+{
+    struct DecodableType {
+        static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase name}}::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader &reader, const ConcreteAttributePath &path);
+
+{{#zcl_attributes_server}}
+        Attributes::{{asUpperCamelCase label}}::TypeInfo::DecodableType {{asLowerCamelCase label}};
+{{/zcl_attributes_server}}
+    };
+};
+} // namespace Attributes
 {{#zcl_events}}
 {{#first}}
 namespace Events {
