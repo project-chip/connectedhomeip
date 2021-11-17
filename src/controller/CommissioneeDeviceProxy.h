@@ -79,7 +79,7 @@ struct ControllerDeviceInitParams
     Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 };
 
-class CommissioneeDeviceProxy : public DeviceProxy
+class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
 {
 public:
     ~CommissioneeDeviceProxy();
@@ -165,13 +165,13 @@ public:
 
     /**
      * @brief
-     *   Called when a connection is closing.
+     *   Called when the associated session is released
      *
      *   The receiver should release all resources associated with the connection.
      *
      * @param session A handle to the secure session
      */
-    void OnConnectionExpired(SessionHandle session) override;
+    void OnSessionReleased(SessionHandle session) override;
 
     /**
      *  In case there exists an open session to the device, mark it as expired.

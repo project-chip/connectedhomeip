@@ -2674,5 +2674,23 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES
+ *
+ * @brief Defines the max number of SessionCreationDelegates
+ */
+#ifndef CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES
+#define CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
+ *
+ * @brief Defines the max number of SessionReleaseDelegate
+ */
+#ifndef CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
+#define CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES 2
+#endif
+
+/**
  * @}
  */

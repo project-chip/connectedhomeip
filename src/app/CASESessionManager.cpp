@@ -111,18 +111,12 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(NodeId nodeId, Transport::PeerAddr
     return CHIP_NO_ERROR;
 }
 
-void CASESessionManager::OnNewConnection(SessionHandle sessionHandle, Messaging::ExchangeManager * mgr)
-{
-    // TODO Update the MRP params based on the MRP params extracted from CASE, when this is available.
-}
-
-void CASESessionManager::OnConnectionExpired(SessionHandle sessionHandle, Messaging::ExchangeManager * mgr)
+void CASESessionManager::OnSessionReleased(SessionHandle sessionHandle)
 {
     OperationalDeviceProxy * session = FindSession(sessionHandle);
-    VerifyOrReturn(session != nullptr,
-                   ChipLogDetail(Controller, "OnConnectionExpired was called for unknown device, ignoring it."));
+    VerifyOrReturn(session != nullptr, ChipLogDetail(Controller, "OnSessionReleased was called for unknown device, ignoring it."));
 
-    session->OnConnectionExpired(sessionHandle);
+    session->OnSessionReleased(sessionHandle);
 }
 
 OperationalDeviceProxy * CASESessionManager::FindSession(SessionHandle session)

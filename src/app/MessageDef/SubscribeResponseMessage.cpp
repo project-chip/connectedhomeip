@@ -88,6 +88,10 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
         {
             err = CHIP_NO_ERROR;
         }
+        else
+        {
+            err = CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE;
+        }
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);

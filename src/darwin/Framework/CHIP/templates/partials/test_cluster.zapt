@@ -21,7 +21,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     {{#if isCommand}}
     __auto_type * payload = [[CHIP{{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase command}}Payload alloc] init];
     {{#chip_tests_item_parameters}}
-      {{>test_value target=(concat "payload." (asUpperCamelCase label)) definedValue=definedValue cluster=parent.cluster}}
+      {{>test_value target=(concat "payload." (asStructPropertyName label)) definedValue=definedValue cluster=parent.cluster}}
     {{/chip_tests_item_parameters}}
     [cluster {{asLowerCamelCase command}}:payload responseHandler:^(NSError * err, NSDictionary * values) {
     {{else if isSubscribeAttribute}}
@@ -68,7 +68,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         {{#chip_tests_item_response_parameters}}
         {{#if hasExpectedValue}}
         {
-          id actualValue = values[@"{{#if parent.isAttribute}}value{{else}}{{asUpperCamelCase name}}{{/if}}"];
+          id actualValue = values[@"{{#if parent.isAttribute}}value{{else}}{{asStructPropertyName name}}{{/if}}"];
           {{>check_test_value actual="actualValue" expected=expectedValue cluster=../cluster}}
         }
         {{/if}}
