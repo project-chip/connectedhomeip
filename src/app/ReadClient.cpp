@@ -374,7 +374,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     {
         chip::TLV::TLVReader EventReportsReader;
         EventReports.GetReader(&EventReportsReader);
-        mpCallback->OnEventData(this, EventReportsReader);
+        err = ProcessEventReportIBs(EventReportsReader);
+        SuccessOrExit(err);
     }
 
     err                         = report.GetAttributeReportIBs(&attributeReportIBs);
@@ -497,6 +498,37 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
                 this, ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId), &dataReader,
                 statusIB);
         }
+    }
+
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
+CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while (CHIP_NO_ERROR == (err = aEventReportIBsReader.Next()))
+    {
+        TLV::TLVReader dataReader;
+        EventReportIB::Parser report;
+        EventDataIB::Parser data;
+        EventHeader header;
+
+        TLV::TLVReader reader = aEventReportIBsReader;
+        ReturnErrorOnFailure(report.Init(reader));
+
+        ReturnErrorOnFailure(report.GetEventData(&data));
+
+        header.mTimestamp = mEventTimestamp;
+        ReturnErrorOnFailure(data.DecodeEventHeader(header));
+        mEventTimestamp = header.mTimestamp;
+
+        ReturnErrorOnFailure(data.GetData(&dataReader));
+
+        mpCallback->OnEventData(this, header, &dataReader, nullptr);
     }
 
     if (CHIP_END_OF_TLV == err)
