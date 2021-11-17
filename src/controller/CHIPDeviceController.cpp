@@ -109,8 +109,7 @@ constexpr uint32_t kSessionEstablishmentTimeout = 40 * kMillisecondsPerSecond;
 
 DeviceController::DeviceController() :
     mOpenPairingSuccessCallback(OnOpenPairingWindowSuccessResponse, this),
-    mOpenPairingFailureCallback(OnOpenPairingWindowFailureResponse, this), mPIDReadCallback(OnPIDReadResponse, this),
-    mVIDReadCallback(OnVIDReadResponse, this), mVIDPIDReadFailureCallback(OnVIDPIDReadFailureResponse, this)
+    mOpenPairingFailureCallback(OnOpenPairingWindowFailureResponse, this)
 {
     mState                    = State::NotInitialized;
     mStorageDelegate          = nullptr;
@@ -376,18 +375,26 @@ void DeviceController::OnVIDReadResponse(void * context, uint16_t value)
 
     OperationalDeviceProxy * device =
         controller->mCASESessionManager->FindExistingSession(controller->mDeviceWithCommissioningWindowOpen);
-    VerifyOrReturn(device != nullptr, ChipLogError(Controller, "Could not find device for opening commissioning window"));
+    if (device == nullptr)
+    {
+        ChipLogError(Controller, "Could not find device for opening commissioning window");
+        OnOpenPairingWindowFailureResponse(context, 0);
+        return;
+    }
 
     constexpr EndpointId kBasicClusterEndpoint = 0;
     chip::Controller::BasicCluster cluster;
     cluster.Associate(device, kBasicClusterEndpoint);
 
-    Callback::Cancelable * successCallback = controller->mPIDReadCallback.Cancel();
-    Callback::Cancelable * failureCallback = controller->mVIDPIDReadFailureCallback.Cancel();
-    cluster.ReadAttributeProductID(successCallback, failureCallback);
+    if (cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductID::TypeInfo>(
+            context, OnPIDReadResponse, OnVIDPIDReadFailureResponse) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Could not read PID for opening commissioning window");
+        OnOpenPairingWindowFailureResponse(context, 0);
+    }
 }
 
-void DeviceController::OnVIDPIDReadFailureResponse(void * context, uint8_t status)
+void DeviceController::OnVIDPIDReadFailureResponse(void * context, EmberAfStatus status)
 {
     ChipLogProgress(Controller, "Failed to read VID/PID for the device. status %d", status);
     OnOpenPairingWindowFailureResponse(context, status);
@@ -470,9 +477,8 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, kBasicClusterEndpoint);
 
-        Callback::Cancelable * successCallback = mVIDReadCallback.Cancel();
-        Callback::Cancelable * failureCallback = mVIDPIDReadFailureCallback.Cancel();
-        return cluster.ReadAttributeVendorID(successCallback, failureCallback);
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, OnVIDReadResponse,
+                                                                                                 OnVIDPIDReadFailureResponse);
     }
 
     return OpenCommissioningWindowInternal();
