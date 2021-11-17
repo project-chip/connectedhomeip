@@ -22,9 +22,9 @@
 #include "system/TLVPacketBufferBackingStore.h"
 #include <app/AttributePathParams.h>
 #include <app/ReadClient.h>
-#include <vector>
-#include <map>
 #include <lib/support/Variant.h>
+#include <map>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -55,21 +55,22 @@ namespace app {
 class AttributeCache : public ReadClient::Callback
 {
 public:
-    class Callback : public ReadClient::Callback {
+    class Callback : public ReadClient::Callback
+    {
         /*
          * Called anytime an attribute value has changed in the cache
          */
-        virtual void OnAttributeChanged(ConcreteAttributePath &path) {};
+        virtual void OnAttributeChanged(ConcreteAttributePath & path){};
 
         /*
          * Called anytime any attribute in a cluster has changed in the cache
          */
-        virtual void OnClusterChanged(EndpointId endpointId, ClusterId clusterId) {};
+        virtual void OnClusterChanged(EndpointId endpointId, ClusterId clusterId){};
 
         /*
          * Called anytime an endpoint was added to the cache
          */
-        virtual void OnEndpointAdded(EndpointId endpointId) {};
+        virtual void OnEndpointAdded(EndpointId endpointId){};
     };
 
     AttributeCache(Callback & callback) : mCallback(callback) {}
@@ -86,7 +87,7 @@ public:
      *
      */
     template <typename AttributeObjectTypeT>
-    CHIP_ERROR Get(ConcreteAttributePath &path, AttributeObjectTypeT &value);
+    CHIP_ERROR Get(ConcreteAttributePath & path, AttributeObjectTypeT & value);
 
     /*
      * Retrieve the value of an entire cluster instance from the cache (if present) given a path
@@ -100,7 +101,7 @@ public:
      *
      */
     template <typename ClusterObjectTypeT>
-    CHIP_ERROR Get(EndpointId endpointId, ClusterId clusterId, ClusterObjectTypeT &value);
+    CHIP_ERROR Get(EndpointId endpointId, ClusterId clusterId, ClusterObjectTypeT & value);
 
     /*
      * Retrieve the value of an attribute by updating a in-out TLVReader to be positioned
@@ -109,7 +110,7 @@ public:
      * If it isn't present, CHIP_ERROR_INVALID_ARGUMENT is returned.
      *
      */
-    CHIP_ERROR Get(ConcreteAttributePath &path, TLV::TLVReader &reader);
+    CHIP_ERROR Get(ConcreteAttributePath & path, TLV::TLVReader & reader);
 
     size_t GetNumEndpoints();
     size_t GetNumClusters(EndpointId endpointId);
@@ -153,14 +154,14 @@ public:
 
 private:
     using AttributeState = Variant<System::PacketBufferHandle, StatusIB>;
-    using ClusterState = std::map<AttributeId, AttributeState>;
-    using EndpointState = std::map<ClusterId, ClusterState>;
+    using ClusterState   = std::map<AttributeId, AttributeState>;
+    using EndpointState  = std::map<ClusterId, ClusterState>;
 
     //
     // ReadClient::Callback
     //
-    void OnReportBegin(const ReadClient *apReadClient) override;
-    void OnReportEnd(const ReadClient *apReadClient) override;
+    void OnReportBegin(const ReadClient * apReadClient) override;
+    void OnReportEnd(const ReadClient * apReadClient) override;
     void OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, TLV::TLVReader * apData,
                          const StatusIB & aStatus) override;
     void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override { return mCallback.OnError(apReadClient, aError); }
