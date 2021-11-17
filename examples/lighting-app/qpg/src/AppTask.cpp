@@ -27,6 +27,7 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/server/Mdns.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -73,6 +74,10 @@ StaticTask_t appTaskStruct;
 
 AppTask AppTask::sAppTask;
 
+namespace {
+constexpr int extDiscTimeoutSecs = 20;
+}
+
 CHIP_ERROR AppTask::StartAppTask()
 {
     sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
@@ -108,6 +113,10 @@ CHIP_ERROR AppTask::Init()
 
     // Subscribe with our button callback to the qvCHIP button handler.
     qvCHIP_SetBtnCallback(ButtonEventHandler);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    chip::app::MdnsServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
+#endif
 
     // Init ZCL Data Model
     chip::Server::GetInstance().Init();

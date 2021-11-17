@@ -46,6 +46,10 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
+namespace {
+constexpr int extDiscTimeoutSecs = 20;
+}
+
 /*****************************************************************************
  *                    Macro Definitions
  *****************************************************************************/
@@ -121,6 +125,10 @@ CHIP_ERROR CHIP_Init(void)
         goto exit;
     }
 #endif // CHIP_ENABLE_OPENTHREAD
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    chip::app::MdnsServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
+#endif
 
     ChipLogProgress(NotSpecified, "Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
