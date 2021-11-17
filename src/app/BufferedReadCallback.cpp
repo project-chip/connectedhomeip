@@ -28,15 +28,20 @@
 namespace chip {
 namespace app {
 
-void BufferedReadCallback::OnReportBegin()
+void BufferedReadCallback::OnReportBegin(const ReadClient * apReadClient)
 {
-    mCallback.OnReportBegin();
+    mCallback.OnReportBegin(apReadClient);
 }
 
-void BufferedReadCallback::OnReportEnd()
+void BufferedReadCallback::OnReportEnd(const ReadClient * apReadClient)
 {
-    DispatchBufferedData(nullptr, mBufferedPath, StatusIB(), true);
-    mCallback.OnReportEnd();
+    CHIP_ERROR err = DispatchBufferedData(nullptr, mBufferedPath, StatusIB(), true);
+    if (err != CHIP_NO_ERROR)
+    {
+        mCallback.OnError(apReadClient, err);
+    }
+
+    mCallback.OnReportEnd(apReadClient);
 }
 
 CHIP_ERROR BufferedReadCallback::GenerateListTLV(System::PacketBufferTLVReader & aReader)
@@ -73,7 +78,6 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(System::PacketBufferTLVReader &
 
 CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteAttributePath & aPath, TLV::TLVReader * apData)
 {
-    CHIP_ERROR err;
 
     if (aPath.mListOp == ConcreteAttributePath::ListOperation::ReplaceAll)
     {
@@ -83,6 +87,8 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteAttributePath & aPath,
         mBufferedList.clear();
 
         ReturnErrorOnFailure(apData->EnterContainer(outerContainer));
+
+        CHIP_ERROR err;
 
         while ((err = apData->Next()) == CHIP_NO_ERROR)
         {
@@ -102,6 +108,12 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteAttributePath & aPath,
             mBufferedList.push_back(std::move(handle));
         }
 
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+
+        ReturnErrorOnFailure(err);
         ReturnErrorOnFailure(apData->ExitContainer(outerContainer));
     }
     else if (aPath.mListOp == ConcreteAttributePath::ListOperation::AppendItem)
@@ -171,7 +183,7 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ReadClient * apReadC
     //
     // Advance the reader forward to the list itself
     //
-    reader.Next();
+    ReturnErrorOnFailure(reader.Next());
 
     mCallback.OnAttributeData(apReadClient, mBufferedPath, &reader, statusIB);
 
@@ -186,17 +198,21 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ReadClient * apReadC
 void BufferedReadCallback::OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath,
                                            TLV::TLVReader * apData, const StatusIB & aStatus)
 {
+    CHIP_ERROR err;
+
     //
     // First, let's dispatch to our registered callback any buffered up list data from previous calls.
     //
-    DispatchBufferedData(apReadClient, aPath, aStatus);
+    err = DispatchBufferedData(apReadClient, aPath, aStatus);
+    SuccessOrExit(err);
 
     //
     // We buffer up list data (only if the status was successful)
     //
     if (aPath.IsListOperation() && aStatus.mStatus == Protocols::InteractionModel::Status::Success)
     {
-        ReturnOnFailure(BufferData(aPath, apData));
+        err = BufferData(aPath, apData);
+        SuccessOrExit(err);
     }
     else
     {
@@ -207,6 +223,12 @@ void BufferedReadCallback::OnAttributeData(const ReadClient * apReadClient, cons
     // Update our latched buffered path.
     //
     mBufferedPath = aPath;
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        mCallback.OnError(apReadClient, err);
+    }
 }
 
 } // namespace app

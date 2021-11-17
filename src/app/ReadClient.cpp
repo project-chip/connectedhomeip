@@ -384,12 +384,12 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         TLV::TLVReader attributeReportIBsReader;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
 
-        mpCallback->OnReportBegin();
+        mpCallback->OnReportBegin(this);
 
         err = ProcessAttributeReportIBs(attributeReportIBsReader);
         SuccessOrExit(err);
 
-        mpCallback->OnReportEnd();
+        mpCallback->OnReportEnd(this);
     }
 
     if (!suppressResponse)

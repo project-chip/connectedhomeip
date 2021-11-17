@@ -60,8 +60,8 @@ private:
     //
     // ReadClient::Callback
     //
-    void OnReportBegin() override;
-    void OnReportEnd() override;
+    void OnReportBegin(const ReadClient * apReadClient) override;
+    void OnReportEnd(const ReadClient * apReadClient) override;
     void OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, TLV::TLVReader * apData,
                          const StatusIB & aStatus) override;
     void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override { return mCallback.OnError(apReadClient, aError); }

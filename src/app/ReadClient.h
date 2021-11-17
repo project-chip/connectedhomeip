@@ -64,12 +64,12 @@ public:
         /**
          * Used to signal the commencement of processing of the first attribute report received in a given exchange.
          */
-        virtual void OnReportBegin() {}
+        virtual void OnReportBegin(const ReadClient * apReadClient) {}
 
         /**
          * Used to signal the completion of processing of the last attribute report in a given exchange.
          */
-        virtual void OnReportEnd() {}
+        virtual void OnReportEnd(const ReadClient * apReadClient) {}
 
         /**
          * Notification that a list of events is received on the given read client.

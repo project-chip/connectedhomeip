@@ -78,8 +78,8 @@ public:
     // BufferedReadCallback::Callback
     //
 
-    void OnReportBegin() override;
-    void OnReportEnd() override;
+    void OnReportBegin(const ReadClient * apReadClient) override;
+    void OnReportEnd(const ReadClient * apReadClient) override;
     void OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, TLV::TLVReader * apData,
                          const StatusIB & aStatus) override;
     void OnDone(ReadClient * apClient) override {}
@@ -88,12 +88,12 @@ public:
     uint32_t mCurrentInstruction = 0;
 };
 
-void DataSeriesValidator::OnReportBegin()
+void DataSeriesValidator::OnReportBegin(const ReadClient * apReadClient)
 {
     mCurrentInstruction = 0;
 }
 
-void DataSeriesValidator::OnReportEnd() {}
+void DataSeriesValidator::OnReportEnd(const ReadClient * apReadClient) {}
 
 void DataSeriesValidator::OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath,
                                           TLV::TLVReader * apData, const StatusIB & aStatus)
@@ -283,7 +283,7 @@ void DataSeriesGenerator::Generate()
     StatusIB status;
     bool hasData;
 
-    callback->OnReportBegin();
+    callback->OnReportBegin(nullptr);
 
     uint8_t index = 0;
     for (auto & instruction : mInstructionList)
@@ -530,7 +530,7 @@ void DataSeriesGenerator::Generate()
         index++;
     }
 
-    callback->OnReportEnd();
+    callback->OnReportEnd(nullptr);
 }
 
 void RunAndValidateSequence(std::vector<ValidationInstruction> instructionList)
