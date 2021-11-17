@@ -1,24 +1,40 @@
 {{#if isOptional}}
-chip::JniReferences::GetInstance().GetOptionalValue({{label}}, {{label}});
+chip::JniReferences::GetInstance().GetOptionalValue({{source}}, {{source}});
 {{/if}}
 {{#if isNullable}}
   {{#if_chip_enum type}}
-    decltype(request.{{label}}) {{label}}Primitive;
-    if ({{label}} != nullptr) {
-      {{label}}Primitive = static_cast<decltype(request.{{label}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{label}}));
+    decltype({{target}}) {{source}}Value;
+    if ({{source}} != nullptr) {
+      {{source}}Value = static_cast<decltype({{target}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}}));
     }
   {{else}}
-  {{#if_is_bitmap type}}
-    decltype(request.{{label}}) {{label}}Primitive;
-    if ({{label}} != nullptr) {
-      {{label}}Primitive = static_cast<decltype(request.{{label}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{label}}));
+  {{#if isArray}}
+  {{! TODO: Support array types. }}
+  {{else if isStruct}}
+  {{! TODO: Support struct types. }}
+  {{else if (isOctetString type)}}
+    chip::ByteSpan {{source}}Value;
+    if ({{source}} != nullptr) {
+      {{source}}Value = chip::JniByteArray(env, static_cast<jbyteArray>({{source}})).byteSpan();
+    }
+  {{else if (isCharString type)}}
+    chip::CharSpan {{source}}Value;
+    if ({{source}} != nullptr) {
+      {{source}}Value = chip::JniUtfString(env, static_cast<jstring>({{source}})).charSpan();
     }
   {{else}}
-    {{chipType}} {{label}}Primitive;
-    if ({{label}} != nullptr) {
-      {{label}}Primitive = chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{label}});
-    }
-  {{/if_is_bitmap}}
+    {{#if_is_bitmap type}}
+      decltype({{target}}) {{source}}Value;
+      if ({{source}} != nullptr) {
+        {{source}}Value = static_cast<decltype({{target}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}}));
+      }
+    {{else}}
+      {{chipType}} {{source}}Value;
+      if ({{source}} != nullptr) {
+        {{source}}Value = chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}});
+      }
+    {{/if_is_bitmap}}
+  {{/if}}
   {{/if_chip_enum}}
 {{/if}}
 {{#*inline "value"}}
@@ -28,27 +44,27 @@ chip::JniReferences::GetInstance().GetOptionalValue({{label}}, {{label}});
 {{else if isStruct}}
 {{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}()
 {{else if (isOctetString type)}}
-chip::JniByteArray(env, static_cast<jbyteArray>({{label}})).byteSpan()
+chip::JniByteArray(env, static_cast<jbyteArray>({{source}})).byteSpan()
 {{else if (isCharString type)}}
-chip::JniUtfString(env, static_cast<jstring>({{label}})).charSpan()
+chip::JniUtfString(env, static_cast<jstring>({{source}})).charSpan()
 {{else}}
   {{#if_chip_enum type}}
-    static_cast<decltype(request.{{label}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{label}}))
+    static_cast<decltype({{target}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}}))
   {{else}}
     {{#if_is_bitmap type}}
-      static_cast<decltype(request.{{label}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{label}}))
+      static_cast<decltype({{target}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}}))
     {{else}}
-      static_cast<decltype(request.{{label}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{label}}))
+      static_cast<decltype({{target}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}}))
     {{/if_is_bitmap}}
   {{/if_chip_enum}}
 {{/if}}
 {{/inline}}
-request.{{label}} =
+{{target}} =
 {{#if isOptional}}
 {{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}(
 {{/if}}
 {{#if isNullable}}
-  {{label}} == nullptr ? chip::app::DataModel::Nullable<{{chipType}}>() : chip::app::DataModel::Nullable<{{chipType}}>({{label}}Primitive)
+  {{source}} == nullptr ? chip::app::DataModel::Nullable<{{chipType}}>() : chip::app::DataModel::Nullable<{{chipType}}>({{source}}Value)
   {{else}}
 {{! TODO If the inline partial is indented, generation fails with "result.split is not a function". }}
 {{>value}}

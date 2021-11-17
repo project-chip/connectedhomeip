@@ -9287,13 +9287,13 @@ JNI_METHOD(void, TestClusterCluster, testNullableOptionalRequest)
     chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
 
     chip::JniReferences::GetInstance().GetOptionalValue(arg1, arg1);
-    uint8_t arg1Primitive;
+    uint8_t arg1Value;
     if (arg1 != nullptr)
     {
-        arg1Primitive = chip::JniReferences::GetInstance().IntegerToPrimitive(arg1);
+        arg1Value = chip::JniReferences::GetInstance().IntegerToPrimitive(arg1);
     }
     request.arg1 = chip::Optional<chip::app::DataModel::Nullable<uint8_t>>(
-        arg1 == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(arg1Primitive));
+        arg1 == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(arg1Value));
 
     std::unique_ptr<CHIPTestClusterClusterTestNullableOptionalResponseCallback,
                     void (*)(CHIPTestClusterClusterTestNullableOptionalResponseCallback *)>

@@ -12,6 +12,8 @@ if (dataResponse.{{asLowerCamelCase label}}.Value().IsNull()) {
 {{~#*inline "item"}}dataResponse.{{asLowerCamelCase name}}{{#if isOptional}}.Value(){{/if}}{{#if isNullable}}.Value(){{/if}}{{/inline}}
 {{#if isArray}}
 {{asSymbol label}} = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+{{else if isStruct}}
+{{asSymbol label}} = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
 {{else if (isOctetString type)}}
 {{asSymbol label}} = chip::ByteArray(env, {{>item}}).jniValue();
 {{else if (isCharString type)}}
