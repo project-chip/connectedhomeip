@@ -209,7 +209,7 @@ private:
     NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
     FabricIndex mFabricIndex                                 = 0;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
-    bool mIsFabricFiltered   = false;
+    bool mIsFabricFiltered                                   = false;
 };
 } // namespace app
 } // namespace chip
