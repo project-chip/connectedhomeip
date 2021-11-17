@@ -357,7 +357,7 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
 void DeviceController::OnPIDReadResponse(void * context, uint16_t value)
 {
     ChipLogProgress(Controller, "Received PID for the device. Value %d", value);
-    DeviceController * controller       = reinterpret_cast<DeviceController *>(context);
+    DeviceController * controller       = static_cast<DeviceController *>(context);
     controller->mSetupPayload.productID = value;
 
     if (controller->OpenCommissioningWindowInternal() != CHIP_NO_ERROR)
@@ -370,7 +370,7 @@ void DeviceController::OnVIDReadResponse(void * context, uint16_t value)
 {
     ChipLogProgress(Controller, "Received VID for the device. Value %d", value);
 
-    DeviceController * controller = reinterpret_cast<DeviceController *>(context);
+    DeviceController * controller = static_cast<DeviceController *>(context);
 
     controller->mSetupPayload.vendorID = value;
 
@@ -396,7 +396,7 @@ void DeviceController::OnVIDPIDReadFailureResponse(void * context, uint8_t statu
 void DeviceController::OnOpenPairingWindowSuccessResponse(void * context)
 {
     ChipLogProgress(Controller, "Successfully opened pairing window on the device");
-    DeviceController * controller = reinterpret_cast<DeviceController *>(context);
+    DeviceController * controller = static_cast<DeviceController *>(context);
     if (controller->mCommissioningWindowCallback != nullptr)
     {
         controller->mCommissioningWindowCallback->mCall(controller->mCommissioningWindowCallback->mContext,
@@ -408,7 +408,7 @@ void DeviceController::OnOpenPairingWindowSuccessResponse(void * context)
 void DeviceController::OnOpenPairingWindowFailureResponse(void * context, uint8_t status)
 {
     ChipLogError(Controller, "Failed to open pairing window on the device. Status %d", status);
-    DeviceController * controller = reinterpret_cast<DeviceController *>(context);
+    DeviceController * controller = static_cast<DeviceController *>(context);
     if (controller->mCommissioningWindowCallback != nullptr)
     {
         CHIP_ERROR error = CHIP_ERROR_INVALID_PASE_PARAMETER;
@@ -488,7 +488,7 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
 
     std::string QRCode;
     std::string manualPairingCode;
-    ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
+    ByteSpan salt(Uint8::from_const_char(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
 
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
