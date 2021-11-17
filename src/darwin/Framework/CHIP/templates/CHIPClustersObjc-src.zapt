@@ -33,7 +33,7 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
     {{#chip_cluster_command_arguments}}
-    {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "payload." (asUpperCamelCase label)) cluster=parent.parent.name errorCode="return;" depth=0}}
+    {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "payload." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return;" depth=0}}
     {{/chip_cluster_command_arguments}}
 
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
