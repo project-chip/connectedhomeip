@@ -312,19 +312,22 @@ void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, 
 
     VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
 
-    char * tokens  = strdup(type);
-    char * regtype = strtok(tokens, ".");
-    free(tokens);
-
     DnssdService service = {};
     service.mInterface   = interfaceId;
     service.mProtocol    = context->protocol;
 
-    strncpy(service.mName, name, sizeof(service.mName));
-    service.mName[Common::kInstanceNameMaxLength] = 0;
+    CopyString(service.mName, name);
+    CopyString(service.mType, type);
 
-    strncpy(service.mType, regtype, sizeof(service.mType));
-    service.mType[kDnssdTypeMaxSize] = 0;
+    // only the first token after '.' should be included in the type
+    for (char * p = service.mType; *p != '\0'; p++)
+    {
+        if (*p == '.')
+        {
+            *p = '\0';
+            break;
+        }
+    }
 
     context->services.push_back(service);
 }
