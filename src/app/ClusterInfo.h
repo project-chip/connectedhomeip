@@ -58,7 +58,7 @@ public:
         return true;
     }
 
-    bool IsPathIncluded(const ConcreteAttributePath & other) const
+    bool IsAttributePathSupersetOf(const ConcreteAttributePath & other) const
     {
         VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
         VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);

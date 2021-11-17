@@ -112,7 +112,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 // TODO: Optimize this implementation by making the iterator only emit intersected paths.
                 for (auto dirtyPath = mpGlobalDirtySet; dirtyPath != nullptr; dirtyPath = dirtyPath->mpNext)
                 {
-                    if (dirtyPath->IsPathIncluded(readPath))
+                    if (dirtyPath->IsAttributePathSupersetOf(readPath))
                     {
                         concretePathDirty = true;
                         break;
@@ -297,7 +297,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     // Always limit the size of the generated packet to fit within kMaxSecureSduLengthBytes regardless of the available buffer
     // capacity.
-    reportDataWriter.ReserveBuffer(reservedSize);
+    // Also, we need to reserve some extra space for the MIC field.
+    reportDataWriter.ReserveBuffer(static_cast<uint32_t>(reservedSize + chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
     // Create a report data.
     err = reportDataBuilder.Init(&reportDataWriter);
@@ -433,7 +434,10 @@ CHIP_ERROR Engine::SetDirty(ClusterInfo & aClusterInfo)
 {
     for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
     {
-        if (handler.IsSubscriptionType() && (handler.IsGeneratingReports() || handler.IsAwaitingReportResponse()))
+        // We call SetDirty for both read interactions and subscribe interactions, since we may sent inconsistent attribute data
+        // between two chunks. SetDirty will be ignored automatically by read handlers which is waiting for response to last message
+        // chunk for read interactions.
+        if (handler.IsGeneratingReports() || handler.IsAwaitingReportResponse())
         {
             handler.SetDirty();
         }

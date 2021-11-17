@@ -128,6 +128,7 @@ public:
 
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() { return mInteractionType == InteractionType::Subscribe; }
+    bool IsChunkedReport() { return mIsChunkedReport; }
     bool IsInitialReport() { return mInitialReport; }
     bool IsActiveSubscription() const { return mActiveSubscription; }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
@@ -136,7 +137,8 @@ public:
     void SetDirty()
     {
         mDirty = true;
-        // The interested path in this report is changed, make the path iterator ready to emit paths by reset it.
+        // If the contents of the global dirty set have changed, we need to reset the iterator since the paths
+        // we've sent up till now are no longer valid and need to be invalidated.
         mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
     }
     void ClearDirty() { mDirty = false; }
@@ -148,12 +150,11 @@ private:
     friend class TestReadInteraction;
     enum class HandlerState
     {
-        Uninitialized = 0, ///< The handler has not been initialized
-        Initialized,       ///< The handler has been initialized and is ready
-        GeneratingReports, ///< The handler has received either a Read or Subscribe request and is the process of generating a
-                           ///< report.
-        AwaitingChunkingResponse, ///< The handler just sent a report chunked report and is awaiting a status response.
-        AwaitingReportResponse,   ///< The handler has sent the last chunked report to the client and is awaiting a status response.
+        Uninitialized = 0,      ///< The handler has not been initialized
+        Initialized,            ///< The handler has been initialized and is ready
+        GeneratingReports,      ///< The handler has received either a Read or Subscribe request and is the process of generating a
+                                ///< report.
+        AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
     };
 
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
@@ -198,9 +199,12 @@ private:
     uint16_t mMinIntervalFloorSeconds          = 0;
     uint16_t mMaxIntervalCeilingSeconds        = 0;
     Optional<SessionHandle> mSessionHandle;
-    bool mHoldReport                                         = false;
-    bool mDirty                                              = false;
-    bool mActiveSubscription                                 = false;
+    bool mHoldReport         = false;
+    bool mDirty              = false;
+    bool mActiveSubscription = false;
+    // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during sending
+    // last chunked message.
+    bool mIsChunkedReport                                    = false;
     NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
     FabricIndex mFabricIndex                                 = 0;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);

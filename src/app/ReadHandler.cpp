@@ -54,6 +54,7 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mHoldReport         = false;
     mDirty              = false;
     mActiveSubscription = false;
+    mIsChunkedReport    = false;
     mInteractionType    = aInteractionType;
     mInitiatorNodeId    = apExchangeContext->GetSessionHandle().GetPeerNodeId();
     mFabricIndex        = apExchangeContext->GetSessionHandle().GetFabricIndex();
@@ -107,6 +108,7 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     mHoldReport                = false;
     mDirty                     = false;
     mActiveSubscription        = false;
+    mIsChunkedReport           = false;
     mInitiatorNodeId           = kUndefinedNodeId;
 }
 
@@ -139,18 +141,19 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
     SuccessOrExit(err);
     switch (mState)
     {
-    case HandlerState::AwaitingChunkingResponse:
-        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
-        MoveToState(HandlerState::GeneratingReports);
-        if (mpExchangeCtx)
-        {
-            mpExchangeCtx->WillSendMessage();
-        }
-        // Trigger ReportingEngine run for sending next chunk of data.
-        SuccessOrExit(err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
-        break;
     case HandlerState::AwaitingReportResponse:
-        if (IsSubscriptionType())
+        if (IsChunkedReport())
+        {
+            InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+            MoveToState(HandlerState::GeneratingReports);
+            if (mpExchangeCtx)
+            {
+                mpExchangeCtx->WillSendMessage();
+            }
+            // Trigger ReportingEngine run for sending next chunk of data.
+            SuccessOrExit(err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
+        }
+        else if (IsSubscriptionType())
         {
             InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
             if (IsInitialReport())
@@ -189,7 +192,7 @@ exit:
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks)
 {
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
-    if (IsInitialReport())
+    if (IsInitialReport() || IsChunkedReport())
     {
         mSessionHandle.SetValue(mpExchangeCtx->GetSessionHandle());
     }
@@ -200,7 +203,8 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    MoveToState(aMoreChunks ? HandlerState::AwaitingChunkingResponse : HandlerState::AwaitingReportResponse);
+    mIsChunkedReport = aMoreChunks;
+    MoveToState(HandlerState::AwaitingReportResponse);
     CHIP_ERROR err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                                 Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     if (err == CHIP_NO_ERROR)
@@ -332,19 +336,27 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
         AttributePathIB::Parser path;
         err = path.Init(reader);
         SuccessOrExit(err);
-        // TODO: Support wildcard paths here
         // TODO: MEIs (ClusterId and AttributeId) have a invalid pattern instead of a single invalid value, need to add separate
         // functions for checking if we have received valid values.
+        // TODO: Wildcard cluster id with non-global attributes or wildcard attribute paths should be rejected.
         err = path.GetEndpoint(&(clusterInfo.mEndpointId));
         if (err == CHIP_NO_ERROR)
         {
             VerifyOrExit(!clusterInfo.HasWildcardEndpointId(), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+        }
+        else if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
         }
         SuccessOrExit(err);
         err = path.GetCluster(&(clusterInfo.mClusterId));
         if (err == CHIP_NO_ERROR)
         {
             VerifyOrExit(!clusterInfo.HasWildcardClusterId(), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+        }
+        else if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
         }
 
         SuccessOrExit(err);
@@ -438,9 +450,6 @@ const char * ReadHandler::GetStateStr() const
 
     case HandlerState::GeneratingReports:
         return "GeneratingReports";
-
-    case HandlerState::AwaitingChunkingResponse:
-        return "AwaitingChunkingResponse";
 
     case HandlerState::AwaitingReportResponse:
         return "AwaitingReportResponse";
