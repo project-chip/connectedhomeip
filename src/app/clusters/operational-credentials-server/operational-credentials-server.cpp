@@ -36,6 +36,7 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/FabricTable.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
@@ -44,7 +45,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <string.h>
-#include <transport/FabricTable.h>
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;

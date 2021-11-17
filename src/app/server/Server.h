@@ -20,6 +20,7 @@
 #include <app/OperationalDeviceProxy.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
+#include <credentials/FabricTable.h>
 #include <inet/InetConfig.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
@@ -28,7 +29,6 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
-#include <transport/FabricTable.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/TransportMgrBase.h>
