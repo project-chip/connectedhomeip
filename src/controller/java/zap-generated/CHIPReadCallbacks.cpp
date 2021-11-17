@@ -762,7 +762,7 @@ void CHIPAudioOutputAudioOutputListAttributeCallback::CallbackFn(
         bool outputTypeNull     = false;
         bool outputTypeHasValue = true;
 
-        uint8_t outputTypeValue = entry.outputType;
+        chip::app::Clusters::AudioOutput::AudioOutputType outputTypeValue = entry.outputType;
 
         jobject outputType = nullptr;
         if (!outputTypeNull && outputTypeHasValue)
@@ -908,7 +908,7 @@ void CHIPBridgedActionsActionListAttributeCallback::CallbackFn(
         bool typeNull     = false;
         bool typeHasValue = true;
 
-        uint8_t typeValue = entry.type;
+        chip::app::Clusters::BridgedActions::ActionTypeEnum typeValue = entry.type;
 
         jobject type = nullptr;
         if (!typeNull && typeHasValue)
@@ -953,7 +953,7 @@ void CHIPBridgedActionsActionListAttributeCallback::CallbackFn(
         bool statusNull     = false;
         bool statusHasValue = true;
 
-        uint8_t statusValue = entry.status;
+        chip::app::Clusters::BridgedActions::ActionStatusEnum statusValue = entry.status;
 
         jobject status = nullptr;
         if (!statusNull && statusHasValue)
@@ -1089,7 +1089,7 @@ void CHIPBridgedActionsEndpointListAttributeCallback::CallbackFn(
         bool typeNull     = false;
         bool typeHasValue = true;
 
-        uint8_t typeValue = entry.type;
+        chip::app::Clusters::BridgedActions::EndpointListTypeEnum typeValue = entry.type;
 
         jobject type = nullptr;
         if (!typeNull && typeHasValue)
@@ -1267,9 +1267,9 @@ void CHIPContentLauncherSupportedStreamingTypesAttributeCallback::CallbackFn(
     auto iter = list.begin();
     while (iter.Next())
     {
-        auto & entry       = iter.GetValue();
-        bool entryNull     = false;
-        uint8_t entryValue = entry;
+        auto & entry                                                                = iter.GetValue();
+        bool entryNull                                                              = false;
+        chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType entryValue = entry;
 
         jobject entryObject = nullptr;
         if (!entryNull)
@@ -2058,7 +2058,7 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
         bool typeNull     = false;
         bool typeHasValue = true;
 
-        uint8_t typeValue = entry.type;
+        chip::app::Clusters::GeneralDiagnostics::InterfaceType typeValue = entry.type;
 
         jobject type = nullptr;
         if (!typeNull && typeHasValue)
@@ -2631,7 +2631,7 @@ void CHIPGroupKeyManagementGroupKeysAttributeCallback::CallbackFn(
         bool groupKeySecurityPolicyNull     = false;
         bool groupKeySecurityPolicyHasValue = true;
 
-        uint8_t groupKeySecurityPolicyValue = entry.groupKeySecurityPolicy;
+        chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy groupKeySecurityPolicyValue = entry.groupKeySecurityPolicy;
 
         jobject groupKeySecurityPolicy = nullptr;
         if (!groupKeySecurityPolicyNull && groupKeySecurityPolicyHasValue)
@@ -2997,7 +2997,7 @@ void CHIPMediaInputMediaInputListAttributeCallback::CallbackFn(
         bool inputTypeNull     = false;
         bool inputTypeHasValue = true;
 
-        uint8_t inputTypeValue = entry.inputType;
+        chip::app::Clusters::MediaInput::MediaInputType inputTypeValue = entry.inputType;
 
         jobject inputType = nullptr;
         if (!inputTypeNull && inputTypeHasValue)
@@ -6694,9 +6694,9 @@ void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::Callb
     auto iter = list.begin();
     while (iter.Next())
     {
-        auto & entry       = iter.GetValue();
-        bool entryNull     = false;
-        uint8_t entryValue = entry;
+        auto & entry                                                           = iter.GetValue();
+        bool entryNull                                                         = false;
+        chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault entryValue = entry;
 
         jobject entryObject = nullptr;
         if (!entryNull)
