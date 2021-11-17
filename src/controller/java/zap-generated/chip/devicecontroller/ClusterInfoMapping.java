@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ClusterInfoMapping {
 
@@ -208,7 +209,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status, String data) {
+    public void onSuccess(Integer status, String data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -343,7 +344,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(String data, int contentLaunchStatus) {
+    public void onSuccess(String data, Integer contentLaunchStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "String");
       responseValues.put(dataResponseValue, data);
@@ -370,7 +371,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(String data, int contentLaunchStatus) {
+    public void onSuccess(String data, Integer contentLaunchStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "String");
       responseValues.put(dataResponseValue, data);
@@ -552,7 +553,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status, byte[] content, long timeStamp, long timeSinceBoot) {
+    public void onSuccess(Integer status, byte[] content, Long timeStamp, Long timeSinceBoot) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -583,7 +584,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -607,7 +608,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -631,7 +632,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -654,7 +655,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -677,7 +678,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -701,7 +702,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -725,7 +726,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -750,11 +751,11 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        int scheduleId,
-        int status,
-        long localStartTime,
-        long localEndTime,
-        int operatingModeDuringHoliday) {
+        Integer scheduleId,
+        Integer status,
+        Long localStartTime,
+        Long localEndTime,
+        Integer operatingModeDuringHoliday) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo scheduleIdResponseValue = new CommandResponseInfo("scheduleId", "int");
       responseValues.put(scheduleIdResponseValue, scheduleId);
@@ -790,12 +791,12 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        int logEntryId,
-        long timestamp,
-        int eventType,
-        int source,
-        int eventIdOrAlarmCode,
-        int userId,
+        Integer logEntryId,
+        Long timestamp,
+        Integer eventType,
+        Integer source,
+        Integer eventIdOrAlarmCode,
+        Integer userId,
         byte[] pin) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo logEntryIdResponseValue = new CommandResponseInfo("logEntryId", "int");
@@ -832,7 +833,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int userId, int userStatus, int userType, byte[] pin) {
+    public void onSuccess(Integer userId, Integer userStatus, Integer userType, byte[] pin) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo userIdResponseValue = new CommandResponseInfo("userId", "int");
       responseValues.put(userIdResponseValue, userId);
@@ -861,7 +862,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int userId, int userStatus, int userType, byte[] rfid) {
+    public void onSuccess(Integer userId, Integer userStatus, Integer userType, byte[] rfid) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo userIdResponseValue = new CommandResponseInfo("userId", "int");
       responseValues.put(userIdResponseValue, userId);
@@ -891,7 +892,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int userId, int userType) {
+    public void onSuccess(Integer userId, Integer userType) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo userIdResponseValue = new CommandResponseInfo("userId", "int");
       responseValues.put(userIdResponseValue, userId);
@@ -918,14 +919,14 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        int scheduleId,
-        int userId,
-        int status,
-        int daysMask,
-        int startHour,
-        int startMinute,
-        int endHour,
-        int endMinute) {
+        Integer scheduleId,
+        Integer userId,
+        Integer status,
+        Integer daysMask,
+        Integer startHour,
+        Integer startMinute,
+        Integer endHour,
+        Integer endMinute) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo scheduleIdResponseValue = new CommandResponseInfo("scheduleId", "int");
       responseValues.put(scheduleIdResponseValue, scheduleId);
@@ -964,7 +965,11 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        int scheduleId, int userId, int status, long localStartTime, long localEndTime) {
+        Integer scheduleId,
+        Integer userId,
+        Integer status,
+        Long localStartTime,
+        Long localEndTime) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo scheduleIdResponseValue = new CommandResponseInfo("scheduleId", "int");
       responseValues.put(scheduleIdResponseValue, scheduleId);
@@ -997,7 +1002,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1021,7 +1026,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1044,7 +1049,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1067,7 +1072,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1091,7 +1096,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1115,7 +1120,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1139,7 +1144,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1162,7 +1167,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1186,7 +1191,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1237,7 +1242,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int errorCode, String debugText) {
+    public void onSuccess(Integer errorCode, String debugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
       responseValues.put(errorCodeResponseValue, errorCode);
@@ -1263,7 +1268,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int errorCode, String debugText) {
+    public void onSuccess(Integer errorCode, String debugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
       responseValues.put(errorCodeResponseValue, errorCode);
@@ -1289,7 +1294,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int errorCode, String debugText) {
+    public void onSuccess(Integer errorCode, String debugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
       responseValues.put(errorCodeResponseValue, errorCode);
@@ -1507,7 +1512,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status, int groupId) {
+    public void onSuccess(Integer status, Integer groupId) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1533,7 +1538,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int capacity, int groupCount
+    public void onSuccess(Integer capacity, Integer groupCount
         // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Java is not properly implemented yet
         ) {
@@ -1563,7 +1568,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status, int groupId) {
+    public void onSuccess(Integer status, Integer groupId) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1588,7 +1593,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status, int groupId, String groupName) {
+    public void onSuccess(Integer status, Integer groupId, String groupName) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1616,7 +1621,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int timeout) {
+    public void onSuccess(Integer timeout) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo timeoutResponseValue = new CommandResponseInfo("timeout", "int");
       responseValues.put(timeoutResponseValue, timeout);
@@ -1639,7 +1644,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status) {
+    public void onSuccess(Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -1690,7 +1695,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int mediaPlaybackStatus) {
+    public void onSuccess(Integer mediaPlaybackStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo mediaPlaybackStatusResponseValue =
           new CommandResponseInfo("mediaPlaybackStatus", "int");
@@ -1715,7 +1720,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int mediaPlaybackStatus) {
+    public void onSuccess(Integer mediaPlaybackStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo mediaPlaybackStatusResponseValue =
           new CommandResponseInfo("mediaPlaybackStatus", "int");
@@ -1740,7 +1745,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int mediaPlaybackStatus) {
+    public void onSuccess(Integer mediaPlaybackStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo mediaPlaybackStatusResponseValue =
           new CommandResponseInfo("mediaPlaybackStatus", "int");
@@ -1765,7 +1770,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int mediaPlaybackStatus) {
+    public void onSuccess(Integer mediaPlaybackStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo mediaPlaybackStatusResponseValue =
           new CommandResponseInfo("mediaPlaybackStatus", "int");
@@ -1790,7 +1795,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int mediaPlaybackStatus) {
+    public void onSuccess(Integer mediaPlaybackStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo mediaPlaybackStatusResponseValue =
           new CommandResponseInfo("mediaPlaybackStatus", "int");
@@ -1815,7 +1820,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int mediaPlaybackStatus) {
+    public void onSuccess(Integer mediaPlaybackStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo mediaPlaybackStatusResponseValue =
           new CommandResponseInfo("mediaPlaybackStatus", "int");
@@ -1840,7 +1845,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int mediaPlaybackStatus) {
+    public void onSuccess(Integer mediaPlaybackStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo mediaPlaybackStatusResponseValue =
           new CommandResponseInfo("mediaPlaybackStatus", "int");
@@ -1865,7 +1870,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int mediaPlaybackStatus) {
+    public void onSuccess(Integer mediaPlaybackStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo mediaPlaybackStatusResponseValue =
           new CommandResponseInfo("mediaPlaybackStatus", "int");
@@ -1890,7 +1895,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int mediaPlaybackStatus) {
+    public void onSuccess(Integer mediaPlaybackStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo mediaPlaybackStatusResponseValue =
           new CommandResponseInfo("mediaPlaybackStatus", "int");
@@ -1915,7 +1920,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int mediaPlaybackStatus) {
+    public void onSuccess(Integer mediaPlaybackStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo mediaPlaybackStatusResponseValue =
           new CommandResponseInfo("mediaPlaybackStatus", "int");
@@ -1940,7 +1945,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int mediaPlaybackStatus) {
+    public void onSuccess(Integer mediaPlaybackStatus) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo mediaPlaybackStatusResponseValue =
           new CommandResponseInfo("mediaPlaybackStatus", "int");
@@ -1992,7 +1997,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int errorCode, String debugText) {
+    public void onSuccess(Integer errorCode, String debugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
       responseValues.put(errorCodeResponseValue, errorCode);
@@ -2018,7 +2023,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int errorCode, String debugText) {
+    public void onSuccess(Integer errorCode, String debugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
       responseValues.put(errorCodeResponseValue, errorCode);
@@ -2044,7 +2049,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int errorCode, String debugText) {
+    public void onSuccess(Integer errorCode, String debugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
       responseValues.put(errorCodeResponseValue, errorCode);
@@ -2070,7 +2075,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int errorCode, String debugText) {
+    public void onSuccess(Integer errorCode, String debugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
       responseValues.put(errorCodeResponseValue, errorCode);
@@ -2096,7 +2101,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int errorCode, String debugText) {
+    public void onSuccess(Integer errorCode, String debugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
       responseValues.put(errorCodeResponseValue, errorCode);
@@ -2122,7 +2127,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int errorCode, String debugText
+    public void onSuccess(Integer errorCode, String debugText
         // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Java is not properly implemented yet
         // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
@@ -2157,7 +2162,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int errorCode, String debugText) {
+    public void onSuccess(Integer errorCode, String debugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
       responseValues.put(errorCodeResponseValue, errorCode);
@@ -2183,7 +2188,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int errorCode, String debugText) {
+    public void onSuccess(Integer errorCode, String debugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
       responseValues.put(errorCodeResponseValue, errorCode);
@@ -2209,7 +2214,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int action, long delayedActionTime) {
+    public void onSuccess(Integer action, Long delayedActionTime) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo actionResponseValue = new CommandResponseInfo("action", "int");
       responseValues.put(actionResponseValue, action);
@@ -2237,14 +2242,14 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        int status,
-        long delayedActionTime,
-        String imageURI,
-        long softwareVersion,
-        String softwareVersionString,
-        byte[] updateToken,
-        boolean userConsentNeeded,
-        byte[] metadataForRequestor) {
+        Integer status,
+        Optional<Long> delayedActionTime,
+        Optional<String> imageURI,
+        Optional<Long> softwareVersion,
+        Optional<String> softwareVersionString,
+        Optional<byte[]> updateToken,
+        Optional<Boolean> userConsentNeeded,
+        Optional<byte[]> metadataForRequestor) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -2340,7 +2345,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int StatusCode, int FabricIndex, String DebugText) {
+    public void onSuccess(Integer StatusCode, Integer FabricIndex, String DebugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo StatusCodeResponseValue = new CommandResponseInfo("StatusCode", "int");
       responseValues.put(StatusCodeResponseValue, StatusCode);
@@ -2476,7 +2481,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status, int groupId, int sceneId) {
+    public void onSuccess(Integer status, Integer groupId, Integer sceneId) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -2504,7 +2509,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status, int capacity, int groupId, int sceneCount
+    public void onSuccess(Integer status, Integer capacity, Integer groupId, Integer sceneCount
         // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Java is not properly implemented yet
         ) {
@@ -2539,7 +2544,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status, int groupId) {
+    public void onSuccess(Integer status, Integer groupId) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -2564,7 +2569,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status, int groupId, int sceneId) {
+    public void onSuccess(Integer status, Integer groupId, Integer sceneId) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -2591,7 +2596,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status, int groupId, int sceneId) {
+    public void onSuccess(Integer status, Integer groupId, Integer sceneId) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -2618,7 +2623,8 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status, int groupId, int sceneId, int transitionTime, String sceneName
+    public void onSuccess(
+        Integer status, Integer groupId, Integer sceneId, Integer transitionTime, String sceneName
         // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Java is not properly implemented yet
         ) {
@@ -2684,10 +2690,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(
-        // ChannelMatch: /* TYPE WARNING: array array defaults to */ uint8_t *
+    public void onSuccess( // ChannelMatch: /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Java is not properly implemented yet
-        int ErrorType) {
+        Integer ErrorType) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       // ChannelMatch: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
@@ -2740,7 +2745,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int status, String data) {
+    public void onSuccess(Integer status, String data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
@@ -2794,7 +2799,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(boolean value) {
+    public void onSuccess(Boolean value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo valueResponseValue = new CommandResponseInfo("value", "boolean");
       responseValues.put(valueResponseValue, value);
@@ -2818,7 +2823,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int returnValue) {
+    public void onSuccess(Integer returnValue) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo returnValueResponseValue = new CommandResponseInfo("returnValue", "int");
       responseValues.put(returnValueResponseValue, returnValue);
@@ -2842,7 +2847,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int arg1, int arg2) {
+    public void onSuccess(Integer arg1, Integer arg2) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo arg1ResponseValue = new CommandResponseInfo("arg1", "int");
       responseValues.put(arg1ResponseValue, arg1);
@@ -2868,8 +2873,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(
-        // arg1: /* TYPE WARNING: array array defaults to */ uint8_t *
+    public void onSuccess( // arg1: /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Java is not properly implemented yet
         ) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
@@ -2895,7 +2899,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(boolean wasPresent, boolean wasNull, int value, int originalValue) {
+    public void onSuccess(
+        Boolean wasPresent,
+        Optional<Boolean> wasNull,
+        Optional<Integer> value,
+        Optional<Integer> originalValue) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo wasPresentResponseValue =
           new CommandResponseInfo("wasPresent", "boolean");
@@ -2927,7 +2935,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(int returnValue) {
+    public void onSuccess(Integer returnValue) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo returnValueResponseValue = new CommandResponseInfo("returnValue", "int");
       responseValues.put(returnValueResponseValue, returnValue);
@@ -3577,6 +3585,7 @@ public class ClusterInfoMapping {
     destination.get("windowCovering").combineCommands(source.get("windowCovering"));
   }
 
+  @SuppressWarnings("unchecked")
   public Map<String, Map<String, InteractionInfo>> getCommandMap() {
     Map<String, Map<String, InteractionInfo>> commandMap = new HashMap<>();
     Map<String, InteractionInfo> accountLoginClusterInteractionInfoMap = new LinkedHashMap<>();
@@ -3973,7 +3982,7 @@ public class ClusterInfoMapping {
                   .disableAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
-                      (Long) commandArguments.get("invokeID"));
+                      (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             bridgedActionsdisableActionCommandParams);
@@ -4004,7 +4013,7 @@ public class ClusterInfoMapping {
                   .disableActionWithDuration(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
-                      (Long) commandArguments.get("invokeID"),
+                      (Optional<Long>) commandArguments.get("invokeID"),
                       (Long) commandArguments.get("duration"));
             },
             () -> new DelegatedDefaultClusterCallback(),
@@ -4031,7 +4040,7 @@ public class ClusterInfoMapping {
                   .enableAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
-                      (Long) commandArguments.get("invokeID"));
+                      (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             bridgedActionsenableActionCommandParams);
@@ -4062,7 +4071,7 @@ public class ClusterInfoMapping {
                   .enableActionWithDuration(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
-                      (Long) commandArguments.get("invokeID"),
+                      (Optional<Long>) commandArguments.get("invokeID"),
                       (Long) commandArguments.get("duration"));
             },
             () -> new DelegatedDefaultClusterCallback(),
@@ -4089,7 +4098,7 @@ public class ClusterInfoMapping {
                   .instantAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
-                      (Long) commandArguments.get("invokeID"));
+                      (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             bridgedActionsinstantActionCommandParams);
@@ -4122,7 +4131,7 @@ public class ClusterInfoMapping {
                   .instantActionWithTransition(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
-                      (Long) commandArguments.get("invokeID"),
+                      (Optional<Long>) commandArguments.get("invokeID"),
                       (Integer) commandArguments.get("transitionTime"));
             },
             () -> new DelegatedDefaultClusterCallback(),
@@ -4149,7 +4158,7 @@ public class ClusterInfoMapping {
                   .pauseAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
-                      (Long) commandArguments.get("invokeID"));
+                      (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             bridgedActionspauseActionCommandParams);
@@ -4180,7 +4189,7 @@ public class ClusterInfoMapping {
                   .pauseActionWithDuration(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
-                      (Long) commandArguments.get("invokeID"),
+                      (Optional<Long>) commandArguments.get("invokeID"),
                       (Long) commandArguments.get("duration"));
             },
             () -> new DelegatedDefaultClusterCallback(),
@@ -4207,7 +4216,7 @@ public class ClusterInfoMapping {
                   .resumeAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
-                      (Long) commandArguments.get("invokeID"));
+                      (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             bridgedActionsresumeActionCommandParams);
@@ -4233,7 +4242,7 @@ public class ClusterInfoMapping {
                   .startAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
-                      (Long) commandArguments.get("invokeID"));
+                      (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             bridgedActionsstartActionCommandParams);
@@ -4264,7 +4273,7 @@ public class ClusterInfoMapping {
                   .startActionWithDuration(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
-                      (Long) commandArguments.get("invokeID"),
+                      (Optional<Long>) commandArguments.get("invokeID"),
                       (Long) commandArguments.get("duration"));
             },
             () -> new DelegatedDefaultClusterCallback(),
@@ -4291,7 +4300,7 @@ public class ClusterInfoMapping {
                   .stopAction(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("actionID"),
-                      (Long) commandArguments.get("invokeID"));
+                      (Optional<Long>) commandArguments.get("invokeID"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             bridgedActionsstopActionCommandParams);
@@ -7018,10 +7027,10 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("productId"),
                       (Long) commandArguments.get("softwareVersion"),
                       (Integer) commandArguments.get("protocolsSupported"),
-                      (Integer) commandArguments.get("hardwareVersion"),
-                      (String) commandArguments.get("location"),
-                      (Boolean) commandArguments.get("requestorCanConsent"),
-                      (byte[]) commandArguments.get("metadataForProvider"));
+                      (Optional<Integer>) commandArguments.get("hardwareVersion"),
+                      (Optional<String>) commandArguments.get("location"),
+                      (Optional<Boolean>) commandArguments.get("requestorCanConsent"),
+                      (Optional<byte[]>) commandArguments.get("metadataForProvider"));
             },
             () -> new DelegatedQueryImageResponseCallback(),
             otaSoftwareUpdateProviderqueryImageCommandParams);
@@ -7068,7 +7077,7 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("providerLocation"),
                       (Integer) commandArguments.get("vendorId"),
                       (Integer) commandArguments.get("announcementReason"),
-                      (byte[]) commandArguments.get("metadataForNode"));
+                      (Optional<byte[]>) commandArguments.get("metadataForNode"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             otaSoftwareUpdateRequestorannounceOtaProviderCommandParams);
@@ -7220,7 +7229,7 @@ public class ClusterInfoMapping {
                   .addNOC(
                       (ChipClusters.OperationalCredentialsCluster.NOCResponseCallback) callback,
                       (byte[]) commandArguments.get("NOCValue"),
-                      (byte[]) commandArguments.get("ICACValue"),
+                      (Optional<byte[]>) commandArguments.get("ICACValue"),
                       (byte[]) commandArguments.get("IPKValue"),
                       (Long) commandArguments.get("caseAdminNode"),
                       (Integer) commandArguments.get("adminVendorId"));
@@ -7402,7 +7411,7 @@ public class ClusterInfoMapping {
                   .updateNOC(
                       (ChipClusters.OperationalCredentialsCluster.NOCResponseCallback) callback,
                       (byte[]) commandArguments.get("NOCValue"),
-                      (byte[]) commandArguments.get("ICACValue"));
+                      (Optional<byte[]>) commandArguments.get("ICACValue"));
             },
             () -> new DelegatedNOCResponseCallback(),
             operationalCredentialsupdateNOCCommandParams);
@@ -7906,7 +7915,7 @@ public class ClusterInfoMapping {
                   .testNullableOptionalRequest(
                       (ChipClusters.TestClusterCluster.TestNullableOptionalResponseCallback)
                           callback,
-                      (Integer) commandArguments.get("arg1"));
+                      (Optional<Integer>) commandArguments.get("arg1"));
             },
             () -> new DelegatedTestNullableOptionalResponseCallback(),
             testClustertestNullableOptionalRequestCommandParams);

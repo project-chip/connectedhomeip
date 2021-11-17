@@ -4,10 +4,11 @@
 package chip.devicecontroller;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.List;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import chip.clusterinfo.ClusterInfo;
 import chip.clusterinfo.InteractionInfo;
 import chip.clusterinfo.CommandParameterInfo;
@@ -162,20 +163,7 @@ public class ClusterInfoMapping {
         }
 
         @Override
-        public void onSuccess(
-        {{#chip_cluster_response_arguments}}
-        {{#if isArray}}
-           // {{asSymbol label}}: {{asUnderlyingZclType type}}
-           // Conversion from this type to Java is not properly implemented yet
-           {{else if (isOctetString type)}}
-              {{omitCommaForFirstNonStatusCommand parent.id index}}byte[] {{asSymbol label}}
-           {{else if (isShortString type)}}
-              {{omitCommaForFirstNonStatusCommand parent.id index}}String {{asSymbol label}}
-           {{else}}
-              {{omitCommaForFirstNonStatusCommand parent.id index}}{{asJavaBasicTypeForZclType type false}} {{asSymbol label}}
-           {{/if}}
-        {{/chip_cluster_response_arguments}}
-        ) {
+        public void onSuccess({{>command_callback_responses parent=..}}) {
            Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
            {{#chip_cluster_response_arguments}}
              {{#if isArray}}
@@ -209,24 +197,7 @@ public class ClusterInfoMapping {
           this.callback = callback;
         }
         @Override
-        public void onSuccess(List<
-        {{#if isStruct}}
-        ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Attribute
-        {{else}}
-          {{#if (isOctetString type)}}
-          byte[]
-          {{else if (isCharString type)}}
-          // Add String field here after ByteSpan is properly emitted in C++ layer
-          {{else}}
-          {{! NOTE: asJavaBasicTypeForZclType does not handle isArray well, so
-              add an inline partial to force isArray to false when we want the
-              types of list entries. }}
-          {{~#*inline "asBoxedJavaBasicType"}}{{asJavaBasicTypeForZclType type true}}{{/inline~}}
-          {{~#*inline "asBoxedJavaBasicTypeForEntry"}}{{> asBoxedJavaBasicType isArray=false}}{{/inline~}}
-          {{> asBoxedJavaBasicTypeForEntry}}
-          {{/if}}
-        {{/if}}
-        > valueList) {
+        public void onSuccess(List<{{#>list_attribute_callback_type}}ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{/list_attribute_callback_type}}> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           {{#if isStruct}}
             CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Attribute>");
@@ -285,6 +256,7 @@ public class ClusterInfoMapping {
     {{/chip_client_clusters}}
  }
 
+ @SuppressWarnings("unchecked")
  public Map<String, Map<String, InteractionInfo>> getCommandMap() {
      Map<String, Map<String, InteractionInfo>> commandMap = new HashMap<>();
      {{#chip_client_clusters}}
@@ -307,7 +279,7 @@ public class ClusterInfoMapping {
            ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
            .{{asLowerCamelCase name}}((ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback) callback
            {{#chip_cluster_command_arguments_with_structs_expanded}},
-           ({{asJavaBoxedType type}})
+           ({{#if isOptional}}Optional<{{/if}}{{asJavaBoxedType type}}{{#if isOptional}}>{{/if}})
            commandArguments.get("{{asLowerCamelCase label}}")
            {{/chip_cluster_command_arguments_with_structs_expanded}}
            );
@@ -321,7 +293,7 @@ public class ClusterInfoMapping {
            ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
            .{{asLowerCamelCase name}}((DefaultClusterCallback) callback
            {{#chip_cluster_command_arguments_with_structs_expanded}},
-           ({{asJavaBoxedType type}})
+           ({{#if isOptional}}Optional<{{/if}}{{asJavaBoxedType type}}{{#if isOptional}}>{{/if}})
            commandArguments.get("{{asLowerCamelCase label}}")
            {{/chip_cluster_command_arguments_with_structs_expanded}}
            );
