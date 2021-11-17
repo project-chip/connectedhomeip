@@ -434,8 +434,9 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
             // Truncation, but nothing better we can do
             valueLen = sizeof(value) - 1;
         }
-        if (valueLen > 1) {
-          memcpy(value, valuePtr, valueLen - 1);
+        if (valueLen > 1)
+        {
+            memcpy(value, valuePtr, valueLen - 1);
         }
         value[valueLen] = 0;
 
