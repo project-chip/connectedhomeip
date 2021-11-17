@@ -146,7 +146,7 @@ jobs:
                       esac
 
                       scripts/build/gn_gen.sh --args="$GN_ARGS"
-                      ninja -C ./out/$BUILD_TYPE
+                      ninja -C ./out
                       scripts/tests/gn_tests.sh
                   done
             - name: Build using build_examples.py
