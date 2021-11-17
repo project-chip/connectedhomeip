@@ -64,7 +64,7 @@ subcommand="$1"
 shift
 
 case $subcommand in
-*)
-    happytest_"$subcommand" "$@"
-    ;;
+    *)
+        happytest_"$subcommand" "$@"
+        ;;
 esac
