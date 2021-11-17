@@ -46,7 +46,7 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     auto & salt                 = commandData.salt;
     auto & passcodeID           = commandData.passcodeID;
 
-    Optional<StatusCode> status;
+    Optional<StatusCode> status = Optional<StatusCode>::Missing();
     PASEVerifier verifier;
     const uint8_t * verifierData = pakeVerifier.data();
 
@@ -90,7 +90,7 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
 {
     auto & commissioningTimeout = commandData.commissioningTimeout;
 
-    Optional<StatusCode> status;
+    Optional<StatusCode> status = Optional<StatusCode>::Missing();
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
     VerifyOrExit(!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen(),
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
