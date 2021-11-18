@@ -376,7 +376,7 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
 
     for (auto & readClient : mReadClients)
     {
-        if (!readClient.IsSubscriptionTypeIdle())
+        if (!readClient.IsSubscriptionIdle())
         {
             continue;
         }

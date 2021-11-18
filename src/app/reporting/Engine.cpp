@@ -324,6 +324,10 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     {
         reportDataBuilder.MoreChunkedMessages(hasMoreChunks);
     }
+    else if (apReadHandler->IsReadType())
+    {
+        reportDataBuilder.SuppressResponse(true);
+    }
 
     reportDataBuilder.EndOfReportDataMessage();
     SuccessOrExit(err = reportDataBuilder.GetError());
@@ -360,6 +364,10 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         apReadHandler->Shutdown(ReadHandler::ShutdownOptions::AbortCurrentExchange);
+    }
+    else if (apReadHandler->IsReadType() && !hasMoreChunks)
+    {
+        apReadHandler->Shutdown();
     }
     return err;
 }

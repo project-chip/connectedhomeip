@@ -279,11 +279,11 @@ public:
 
 private:
     static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                   bool aNeedInvalidReport = false);
+                                   bool aNeedInvalidReport, bool aSuppressResponse);
 };
 
 void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                             bool aNeedInvalidReport)
+                                             bool aNeedInvalidReport, bool aSuppressResponse)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
@@ -293,6 +293,9 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
 
     err = reportDataMessageBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    reportDataMessageBuilder.SuppressResponse(aSuppressResponse);
+    NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
 
     AttributeReportIBs::Builder attributeReportIBsBuilder = reportDataMessageBuilder.CreateAttributeReportIBs();
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
@@ -346,9 +349,6 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     attributeReportIBsBuilder.EndOfAttributeReportIBs();
     NL_TEST_ASSERT(apSuite, attributeReportIBsBuilder.GetError() == CHIP_NO_ERROR);
 
-    reportDataMessageBuilder.SuppressResponse(true);
-    NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
-
     reportDataMessageBuilder.MoreChunkedMessages(false);
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
 
@@ -372,8 +372,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     err = readClient.SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    GenerateReportData(apSuite, apContext, buf);
-
+    GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
     err = readClient.ProcessReportData(std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -397,7 +396,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr);
     readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
 
-    GenerateReportData(apSuite, apContext, reportDatabuf);
+    GenerateReportData(apSuite, apContext, reportDatabuf, false /*aNeedInvalidReport*/, false /* aSuppressResponse*/);
     err = readHandler.SendReportData(std::move(reportDatabuf), false);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
@@ -500,7 +499,7 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     err = readClient.SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/);
+    GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
 
     err = readClient.ProcessReportData(std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
@@ -526,7 +525,7 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr);
     readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
 
-    GenerateReportData(apSuite, apContext, reportDatabuf);
+    GenerateReportData(apSuite, apContext, reportDatabuf, false /*aNeedInvalidReport*/, false /* aSuppressResponse*/);
     err = readHandler.SendReportData(std::move(reportDatabuf), false);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
