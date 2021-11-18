@@ -206,7 +206,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     VerifyOrExit(mpCallback->CommandExists(ConcreteCommandPath(requestPath.endpoint, requestPath.cluster, commandId)),
                  err = CHIP_ERROR_INVALID_PROFILE_ID);
 
-    err = GetAccessControl().Check(subjectDescriptor, requestPath, privilege); 
+    err = GetAccessControl().Check(subjectDescriptor, requestPath, privilege);
     SuccessOrExit(err);
 
     err = aCommandElement.GetData(&commandDataReader);

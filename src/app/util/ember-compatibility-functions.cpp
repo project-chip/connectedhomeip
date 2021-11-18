@@ -141,7 +141,7 @@ CHIP_ERROR CheckAccessControl(const SubjectDescriptor & aSubjectDescriptor, Endp
     RequestPath requestPath = { .cluster = aCluster, .endpoint = aEndpoint };
     // TODO: get required privilege using ember APIs, as it could be custom
     Privilege privilege = aWrite ? Privilege::kOperate : Privilege::kView;
-    return GetAccessControl().Check(aSubjectDescriptor, requestPath, privilege); 
+    return GetAccessControl().Check(aSubjectDescriptor, requestPath, privilege);
 }
 
 } // namespace
