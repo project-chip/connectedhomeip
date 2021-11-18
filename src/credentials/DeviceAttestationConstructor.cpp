@@ -67,6 +67,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
 {
     bool certificationDeclarationExists = false;
     bool attestationNonceExists         = false;
+    bool timestampExists                = false;
     bool gotFirstContextTag             = false;
     uint32_t lastContextTagId           = 0;
 
@@ -117,6 +118,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
             break;
         case kTimestampTagId:
             ReturnErrorOnFailure(tlvReader.Get(timestamp));
+            timestampExists = true;
             break;
         case kFirmwareInfoTagId:
             ReturnErrorOnFailure(tlvReader.GetByteView(firmwareInfo));
@@ -130,7 +132,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
 
     VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_END_OF_TLV, error);
 
-    const bool allTagsNeededPresent = certificationDeclarationExists && attestationNonceExists;
+    const bool allTagsNeededPresent = certificationDeclarationExists && attestationNonceExists && timestampExists;
     VerifyOrReturnError(allTagsNeededPresent, CHIP_ERROR_MISSING_TLV_ELEMENT);
 
     size_t count = 0;
