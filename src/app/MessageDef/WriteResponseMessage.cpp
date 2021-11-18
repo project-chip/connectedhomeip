@@ -71,11 +71,14 @@ CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
         {
             err = CHIP_NO_ERROR;
         }
+        else
+        {
+            err = CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE;
+        }
     }
 
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
@@ -83,8 +86,7 @@ CHIP_ERROR WriteResponseMessage::Parser::GetWriteResponses(AttributeStatuses::Pa
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kWriteResponses)), reader));
-    ReturnErrorOnFailure(apWriteResponses->Init(reader));
-    return CHIP_NO_ERROR;
+    return apWriteResponses->Init(reader);
 }
 
 AttributeStatuses::Builder & WriteResponseMessage::Builder::CreateWriteResponses()

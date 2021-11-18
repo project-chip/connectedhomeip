@@ -30,11 +30,12 @@ from __future__ import print_function
 import asyncio
 from ctypes import *
 from .ChipStack import *
-from .interaction_model import delegate as im
+from .interaction_model import InteractionModelError, delegate as im
 from .exceptions import *
 from .clusters import Command as ClusterCommand
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
+from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import *
 import enum
 import threading
@@ -376,7 +377,7 @@ class ChipDeviceController(object):
             future.set_exception(self._ChipStack.ErrorToException(res))
         return await future
 
-    def WriteAttribute(self, nodeid: int, attributes):
+    async def WriteAttribute(self, nodeid: int, attributes):
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
@@ -387,9 +388,9 @@ class ChipDeviceController(object):
         )
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
-        return future
+        return await future
 
-    def ReadAttribute(self, nodeid: int, attributes: typing.List[typing.Union[
+    async def ReadAttribute(self, nodeid: int, attributes: typing.List[typing.Union[
         None,  # Empty tuple, all wildcard
         typing.Tuple[int],  # Endpoint
         # Wildcard endpoint, Cluster id present
@@ -437,18 +438,21 @@ class ChipDeviceController(object):
             lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, attrs))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
-        return future
+        return await future
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
-        device = self.GetConnectedDeviceSync(nodeid)
-
-        im.ClearCommandStatus(im.PLACEHOLDER_COMMAND_HANDLE)
-        self._Cluster.SendCommand(
-            device, cluster, command, endpoint, groupid, args, True)
-        if blocking:
-            # We only send 1 command by this function, so index is always 0
-            return im.WaitCommandIndexStatus(im.PLACEHOLDER_COMMAND_HANDLE, 1)
-        return (0, None)
+        req = None
+        try:
+            req = eval(
+                f"GeneratedObjects.{cluster}.Commands.{command}")(**args)
+        except:
+            raise UnknownCommand(cluster, command)
+        try:
+            res = asyncio.run(self.SendCommand(nodeid, endpoint, req))
+            print(f"CommandResponse {res}")
+            return (0, res)
+        except InteractionModelError as ex:
+            return (int(ex.state), None)
 
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
         device = self.GetConnectedDeviceSync(nodeid)
@@ -460,13 +464,14 @@ class ChipDeviceController(object):
             return im.GetAttributeReadResponse(im.DEFAULT_ATTRIBUTEREAD_APPID)
 
     def ZCLWriteAttribute(self, cluster, attribute, nodeid, endpoint, groupid, value, blocking=True):
-        device = self.GetConnectedDeviceSync(nodeid)
+        req = None
+        try:
+            req = ClusterAttribute.AttributeWriteRequest(EndpointId=endpoint, Attribute=eval(
+                f"GeneratedObjects.{cluster}.Attributes.{attribute}"), Data=value)
+        except:
+            raise UnknownAttribute(cluster, attribute)
 
-        # We are not using IM for Attributes.
-        self._Cluster.WriteAttribute(
-            device, cluster, attribute, endpoint, groupid, value, False)
-        if blocking:
-            return im.GetAttributeWriteResponse(im.DEFAULT_ATTRIBUTEWRITE_APPID)
+        return asyncio.run(self.WriteAttribute(nodeid, [req]))
 
     def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True):
         device = self.GetConnectedDeviceSync(nodeid)

@@ -115,22 +115,6 @@ class ChipClusters:
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
-    # Cluster commands
-
-{{#chip_client_clusters}}
-{{#chip_cluster_commands}}
-    def Cluster{{asUpperCamelCase clusterName}}_Command{{asUpperCamelCase name}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int{{#chip_cluster_command_arguments_with_structs_expanded}}, {{asLowerCamelCase label}}: {{asPythonType chipType}}{{/chip_cluster_command_arguments_with_structs_expanded}}):
-{{#chip_cluster_command_arguments_with_structs_expanded}}
-{{#if (isCharString type)}}
-        {{asLowerCamelCase label}} = {{asLowerCamelCase label}}.encode("utf-8") + b'\x00'
-{{/if}}
-{{/chip_cluster_command_arguments_with_structs_expanded}}
-        return self._chipLib.chip_ime_AppendCommand_{{asUpperCamelCase clusterName}}_{{asUpperCamelCase name}}(
-                device, ZCLendpoint, ZCLgroupid{{#chip_cluster_command_arguments_with_structs_expanded}}, {{asLowerCamelCase label}}{{#if (isString type)}}, len({{asLowerCamelCase label}}){{/if}}{{/chip_cluster_command_arguments_with_structs_expanded}}
-        )
-{{/chip_cluster_commands}}
-{{/chip_client_clusters}}
-
     # Cluster attributes
 
 {{#chip_client_clusters}}
@@ -140,13 +124,6 @@ class ChipClusters:
 {{#if isReportableAttribute}}
     def Cluster{{asUpperCamelCase parent.name}}_SubscribeAttribute{{asUpperCamelCase name}}(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(device, ZCLendpoint, minInterval, maxInterval)
-{{/if}}
-{{#if isWritableAttribute}}
-    def Cluster{{asUpperCamelCase parent.name}}_WriteAttribute{{asUpperCamelCase name}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: {{ asPythonType chipType }}):
-{{#if (isCharString type)}}
-        value = value.encode("utf-8")
-{{/if}}
-        return self._chipLib.chip_ime_WriteAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(device, ZCLendpoint, ZCLgroupid, value{{#if (isString type)}}, len(value){{/if}})
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
@@ -162,11 +139,6 @@ class ChipClusters:
         self._chipLib.chip_ime_SetFailureResponseDelegate.res = None
 {{#chip_client_clusters}}
         # Cluster {{asUpperCamelCase name}}
-{{#chip_cluster_commands}}
-        # Cluster {{asUpperCamelCase clusterName}} Command {{asUpperCamelCase name}}
-        self._chipLib.chip_ime_AppendCommand_{{asUpperCamelCase clusterName}}_{{asUpperCamelCase name}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16{{#chip_cluster_command_arguments_with_structs_expanded}}{{#if (isString type)}}, ctypes.c_char_p, ctypes.c_uint32{{else}}, ctypes.{{asPythonCType chipType}}{{/if}}{{/chip_cluster_command_arguments_with_structs_expanded}}]
-        self._chipLib.chip_ime_AppendCommand_{{asUpperCamelCase clusterName}}_{{asUpperCamelCase name}}.restype = ctypes.c_uint32
-{{/chip_cluster_commands}}
 {{#chip_server_cluster_attributes}}
         # Cluster {{asUpperCamelCase parent.name}} ReadAttribute {{asUpperCamelCase name}}
         self._chipLib.chip_ime_ReadAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -175,11 +147,6 @@ class ChipClusters:
         # Cluster {{asUpperCamelCase parent.name}} SubscribeAttribute {{asUpperCamelCase name}}
         self._chipLib.chip_ime_SubscribeAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.restype = ctypes.c_uint32
-{{/if}}
-{{#if isWritableAttribute}}
-        # Cluster {{asUpperCamelCase parent.name}} WriteAttribute {{asUpperCamelCase name}}
-        self._chipLib.chip_ime_WriteAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, {{#if (isString type)}}ctypes.c_char_p, ctypes.c_uint32{{else}}ctypes.{{asPythonCType chipType}}{{/if}}]
-        self._chipLib.chip_ime_WriteAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.restype = ctypes.c_uint32
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}

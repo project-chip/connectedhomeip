@@ -8,8 +8,10 @@
 {{#zcl_clusters}}
 {{#zcl_structs}}
 @interface CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}} : NSObject
+{{! Override the getter name because some of our properties start with things
+    like "new" or "init" }}
 {{#zcl_struct_items}}
-@property (strong) {{asObjectiveCType type parent.parent.name}} {{asUpperCamelCase label}};
+@property (strong, nonatomic{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}};
 {{/zcl_struct_items}}
 @end
 
