@@ -46,7 +46,7 @@ def AllTests(root: str):
         else:
             continue
 
-        yield TestDefinition(yaml_file=path, run_name = path.stem, name=name, target=target)
+        yield TestDefinition(yaml_file=path, run_name=path.stem, name=name, target=target)
 
 
 __all__ = ['TestTarget', 'TestDefinition', 'AllTests', 'ApplicationPaths']

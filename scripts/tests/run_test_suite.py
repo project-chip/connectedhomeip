@@ -33,6 +33,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
 
+
 def FindBinaryPath(name: str):
     for path in Path(DEFAULT_CHIP_ROOT).rglob(name):
         if not path.is_file():
@@ -40,7 +41,7 @@ def FindBinaryPath(name: str):
         if path.name != name:
             continue
         return str(path)
-    
+
     return 'NOT_FOUND_IN_OUTPUT_' + name
 
 
@@ -103,8 +104,9 @@ def main(context, log_level, target, no_log_timestamps, root, internal_inside_un
         target = set([name.lower() for name in target])
         tests = [test for test in tests if test.name in target]
     tests.sort(key=lambda x: x.name)
-    
-    context.obj = RunContext(root=root, tests=tests, in_unshare=internal_inside_unshare)
+
+    context.obj = RunContext(root=root, tests=tests,
+                             in_unshare=internal_inside_unshare)
 
 
 @main.command(
@@ -139,22 +141,23 @@ def cmd_run(context, iterations, chip_tool, all_clusters_app, tv_app):
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
-        chip_tool = [chip_tool],
-        all_clusters_app = [all_clusters_app],
-        tv_app = [tv_app]
+        chip_tool=[chip_tool],
+        all_clusters_app=[all_clusters_app],
+        tv_app=[tv_app]
     )
 
     if sys.platform == 'linux':
-        chiptest.linux.PrepareNamespacesForTestExecution(context.obj.in_unshare)
+        chiptest.linux.PrepareNamespacesForTestExecution(
+            context.obj.in_unshare)
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
 
     # Testing prerequisites: tv app requires a config. Copy it just in case
     shutil.copyfile(
-        os.path.join(context.obj.root, 'examples/tv-app/linux/include/endpoint-configuration/chip_tv_config.ini'),
+        os.path.join(
+            context.obj.root, 'examples/tv-app/linux/include/endpoint-configuration/chip_tv_config.ini'),
         '/tmp/chip_tv_config.ini'
     )
-   
-        
+
     logging.info("Each test will be executed %d times" % iterations)
 
     for i in range(iterations):

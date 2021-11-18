@@ -17,13 +17,14 @@ import os
 import subprocess
 import sys
 import threading
-import time 
+import time
 
 from dataclasses import dataclass
 
+
 class LogPipe(threading.Thread):
 
-    def __init__(self, level, capture_delegate = None, name = None):
+    def __init__(self, level, capture_delegate=None, name=None):
         """Setup the object with a logger and a loglevel
 
             and start the thread
@@ -38,7 +39,7 @@ class LogPipe(threading.Thread):
         self.capture_delegate = capture_delegate
         self.name = name
 
-    def CapturedLogContains(self, txt:str):
+    def CapturedLogContains(self, txt: str):
         for l in self.captured_logs:
             if txt in l:
                 return True
@@ -64,13 +65,14 @@ class LogPipe(threading.Thread):
 
 
 class Runner:
-    def __init__(self, capture_delegate = None):
-        self.capture_delegate =  capture_delegate
-
+    def __init__(self, capture_delegate=None):
+        self.capture_delegate = capture_delegate
 
     def RunSubprocess(self, cmd, name, wait=True):
-        outpipe = LogPipe(logging.DEBUG, capture_delegate=self.capture_delegate, name = name + 'STDOUT')
-        errpipe = LogPipe(logging.INFO, capture_delegate=self.capture_delegate, name = name + 'STDERR')
+        outpipe = LogPipe(
+            logging.DEBUG, capture_delegate=self.capture_delegate, name=name + 'STDOUT')
+        errpipe = LogPipe(
+            logging.INFO, capture_delegate=self.capture_delegate, name=name + 'STDERR')
 
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'Executing %r' % cmd)
@@ -80,7 +82,7 @@ class Runner:
         errpipe.close()
 
         if not wait:
-           return s, outpipe, errpipe
+            return s, outpipe, errpipe
 
         code = s.wait()
         if code != 0:
