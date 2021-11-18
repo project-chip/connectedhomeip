@@ -34,7 +34,9 @@ public:
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_attributes}}
     {{#if isWritableAttribute}}
+    {{#unless isList}}
     CHIP_ERROR WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value);
+    {{/unless}}
     {{/if}}
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_attributes}}
