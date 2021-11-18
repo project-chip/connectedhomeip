@@ -33,6 +33,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Defer.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -144,21 +145,31 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
 {
     // Create a UnauthenticatedSession for CASE pairing.
     // Don't use mSecureSession here, because mSecureSession is for encrypted communication.
+    VerifyOrReturnError(mCASESession == nullptr, CHIP_ERROR_INCORRECT_STATE);
     Optional<SessionHandle> session = mInitParams.sessionManager->CreateUnauthenticatedSession(mDeviceAddress);
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
 
     session.Value().GetUnauthenticatedSession()->SetMRPIntervals(mMrpIdleInterval, mMrpActiveInterval);
 
-    Messaging::ExchangeContext * exchange = mInitParams.exchangeMgr->NewContext(session.Value(), &mCASESession);
+    mCASESession = chip::Platform::New<CASESession>();
+    VerifyOrReturnError(mCASESession != nullptr, CHIP_ERROR_NO_MEMORY);
+    auto deferred = MakeDefer([&]() {
+        if (mState != State::Connecting)
+        {
+            FreeCASESession();
+        }
+    });
+
+    Messaging::ExchangeContext * exchange = mInitParams.exchangeMgr->NewContext(session.Value(), mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
-    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mInitParams.sessionManager));
+    ReturnErrorOnFailure(mCASESession->MessageDispatch().Init(mInitParams.sessionManager));
 
     uint16_t keyID = 0;
     ReturnErrorOnFailure(mInitParams.idAllocator->Allocate(keyID));
 
     ReturnErrorOnFailure(
-        mCASESession.EstablishSession(mDeviceAddress, mInitParams.fabricInfo, mPeerId.GetNodeId(), keyID, exchange, this));
+        mCASESession->EstablishSession(mDeviceAddress, mInitParams.fabricInfo, mPeerId.GetNodeId(), keyID, exchange, this));
 
     mState = State::Connecting;
 
@@ -218,7 +229,7 @@ void OperationalDeviceProxy::OnSessionEstablishmentError(CHIP_ERROR error)
                    ChipLogError(Controller, "OnSessionEstablishmentError was called while the device was not initialized"));
 
     mState = State::Initialized;
-    mInitParams.idAllocator->Free(mCASESession.GetLocalSessionId());
+    mInitParams.idAllocator->Free(mCASESession->GetLocalSessionId());
 
     DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
     DequeueConnectionFailureCallbacks(error, /* executeCallback */ true);
@@ -231,7 +242,7 @@ void OperationalDeviceProxy::OnSessionEstablished()
 
     // TODO Update the MRP params based on the MRP params extracted from CASE, when this is available.
     CHIP_ERROR err = mInitParams.sessionManager->NewPairing(
-        Optional<Transport::PeerAddress>::Value(mDeviceAddress), mPeerId.GetNodeId(), &mCASESession,
+        Optional<Transport::PeerAddress>::Value(mDeviceAddress), mPeerId.GetNodeId(), mCASESession,
         CryptoContext::SessionRole::kInitiator, mInitParams.fabricInfo->GetFabricIndex());
     if (err != CHIP_NO_ERROR)
     {
@@ -239,7 +250,7 @@ void OperationalDeviceProxy::OnSessionEstablished()
         OnSessionEstablishmentError(err);
         return;
     }
-    mSecureSession.SetValue(SessionHandle(mPeerId.GetNodeId(), mCASESession.GetLocalSessionId(), mCASESession.GetPeerSessionId(),
+    mSecureSession.SetValue(SessionHandle(mPeerId.GetNodeId(), mCASESession->GetLocalSessionId(), mCASESession->GetPeerSessionId(),
                                           mInitParams.fabricInfo->GetFabricIndex()));
 
     mState = State::SecureConnected;
@@ -256,13 +267,15 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
         mInitParams.sessionManager->ExpirePairing(mSecureSession.Value());
     }
     mState = State::Initialized;
-    mCASESession.Clear();
+    mCASESession->Clear();
+    FreeCASESession();
     return CHIP_NO_ERROR;
 }
 
 void OperationalDeviceProxy::Clear()
 {
-    mCASESession.Clear();
+    mCASESession->Clear();
+    FreeCASESession();
 
     mState      = State::Uninitialized;
     mInitParams = DeviceProxyInitParams();
@@ -282,6 +295,9 @@ CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
                                                                              GetDeviceId());
 }
 
-OperationalDeviceProxy::~OperationalDeviceProxy() {}
+OperationalDeviceProxy::~OperationalDeviceProxy()
+{
+    FreeCASESession();
+}
 
 } // namespace chip

@@ -155,8 +155,6 @@ public:
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 
-    CASESession & GetCASESession() { return mCASESession; }
-
     Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mInitParams.imDelegate; }
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
@@ -196,7 +194,7 @@ private:
 
     DeviceProxyInitParams mInitParams;
 
-    CASESession mCASESession;
+    CASESession * mCASESession;
 
     PeerId mPeerId;
 
@@ -220,6 +218,15 @@ private:
 
     void DequeueConnectionSuccessCallbacks(bool executeCallback);
     void DequeueConnectionFailureCallbacks(CHIP_ERROR error, bool executeCallback);
+
+    void FreeCASESession()
+    {
+        if (mCASESession)
+        {
+            chip::Platform::Delete(mCASESession);
+            mCASESession = nullptr;
+        }
+    }
 };
 
 } // namespace chip
