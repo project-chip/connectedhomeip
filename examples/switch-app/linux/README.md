@@ -2,8 +2,8 @@
 
 An example showing the use of CHIP binding on Linux.
 
-After binding, all the changes on the On/Off cluster will be reflected on the bound
-device.
+After binding, all the changes on the On/Off cluster will be reflected on the
+bound device.
 
 ## Building
 
@@ -24,33 +24,38 @@ device.
           $ cd ~/connectedhomeip/examples/lighting-app/linux
           $ rm -rf out/
 
-
 ## Running the example
 
-We will use the controller to bind the switch to another device with On/Off cluster support. The peer device can be [all-cluster-app](../../all-cluster-app) or [lighting-app](../../lighting-app).
+We will use the controller to bind the switch to another device with On/Off
+cluster support. The peer device can be [all-cluster-app](../../all-cluster-app)
+or [lighting-app](../../lighting-app).
 
-* Pair the peer device with command:
+-   Pair the peer device with command:
 
 ```
 chip-tool pairing ble-wifi 1234 $SSID $PSK 0 $PAIRING_CODE $DISCRIMINATOR
 ```
 
-* Run the switch app:
+-   Run the switch app:
+
 ```
 ./out/debug/chip-switch-app
 ```
 
-* Pair the switch app:
+-   Pair the switch app:
+
 ```
 chip-tool pairing ethernet 1235 20202021 3840 127.0.0.1 5540
 ```
 
-* Setup the binding:
+-   Setup the binding:
+
 ```
 chip-tool binding bind 1234 0 1 6 1235 1
 ```
 
-* Toggle the On/Off cluster on the switch:
+-   Toggle the On/Off cluster on the switch:
+
 ```
 chip-tool onoff toggle 1235 1
 ```
