@@ -44,6 +44,9 @@ __LOG_LEVELS__ = {
 @dataclass
 class RunContext:
     tests: typing.List[chiptest.TestDefinition]
+    in_unshare: bool
+
+
 
 @click.group(chain=True)
 @click.option(
@@ -66,8 +69,15 @@ class RunContext:
     '--root',
     default=DEFAULT_CHIP_ROOT,
     help='Default directory path for CHIP. Used to determine what tests exist')
+@click.option(
+    '--internal-inside-unshare',
+    hidden = True,
+    is_flag = True,
+    default = False,
+    help='Internal flag for running inside a unshared environment'
+)
 @click.pass_context
-def main(context, log_level, target, no_log_timestamps, root):
+def main(context, log_level, target, no_log_timestamps, root, internal_inside_unshare):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -80,7 +90,7 @@ def main(context, log_level, target, no_log_timestamps, root):
         tests = [test for test in tests if test.name.upper() in target]
     tests.sort(key=lambda x: x.name)
     
-    context.obj = RunContext(tests=tests)
+    context.obj = RunContext(tests=tests, in_unshare=internal_inside_unshare)
 
 @main.command(
     'list', help='List available test suites')
@@ -90,14 +100,26 @@ def cmd_generate(context):
         print(test.name)
 
 @main.command(
-    'run', help='List available test suites')
+    'run', help='Execute the tests')
 @click.option(
     '--iterations',
     default=1,
     help='Number of iterations to run')
 @click.pass_context
 def cmd_run(context, iterations):
-    print("should run %d times" % iterations)
+    if sys.platform == 'linux':
+        chiptest.linux.PrepareNamespacesForTestExecution(context.obj.in_unshare)
+
+    logging.info("Each test will be executed %d times" % iterations)
+
+# On linux, allow an execution shell to be prepared
+if sys.platform == 'linux':
+    @main.command(
+        'shell', help='Execute a bash shell in the environment (useful to test network namespaces)')
+    @click.pass_context
+    def cmd_run(context):
+        chiptest.linux.PrepareNamespacesForTestExecution(context.obj.in_unshare)
+        os.execvpe("bash", ["bash"], os.environ.copy())
 
 
 if __name__ == '__main__':

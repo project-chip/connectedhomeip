@@ -18,6 +18,8 @@ from pathlib import Path
 import os
 import logging
 
+import chiptest.linux
+
 from .test_definition import TestTarget, TestDefinition
 
 def AllTests(root: str):
@@ -43,4 +45,4 @@ def AllTests(root: str):
 
 
 
-__all__ = [ 'TestTarget', 'TestDefinition', 'AllTests' ]
+__all__ = [ 'TestTarget', 'TestDefinition', 'AllTests', 'linux' ]
