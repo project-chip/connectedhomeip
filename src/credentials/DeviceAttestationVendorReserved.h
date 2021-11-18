@@ -60,7 +60,7 @@ public:
             if (!TLV::IsContextTag(tag))
                 break;
         }
-        // positioned to first context tag (vendor reserved data)
+        // positioned to first non-context tag (vendor reserved data)
         mIsInitialized  = true;
         mIsAtFirstToken = true;
         return CHIP_NO_ERROR;
