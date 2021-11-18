@@ -86,6 +86,19 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     EntryIterator iterator;
     ReturnErrorOnFailure(Entries(iterator, &subjectDescriptor.fabricIndex));
 
+#if 1
+    ChipLogDetail(DataManagement, "ACCESS CONTROL vvvvvvvvvvvvvvv");
+    ChipLogDetail(DataManagement, "  fabric = %u", subjectDescriptor.fabricIndex);
+    ChipLogDetail(DataManagement, "  authmode = %d", int(subjectDescriptor.authMode));
+    ChipLogDetail(DataManagement, "  subject = %u", unsigned(subjectDescriptor.subjects[0]));
+    ChipLogDetail(DataManagement, "  cluster = %u", requestPath.cluster);
+    ChipLogDetail(DataManagement, "  endpoint = %u", requestPath.endpoint);
+    // TEMP: hardcode allow/deny
+    bool allow = requestPath.cluster != 0x33;
+    ChipLogDetail(DataManagement, "^^^^^^^^^^^^^^^ --> %s", allow ? "ALLOW" : "DENY");
+    return allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_DENIED;
+#endif
+
     Entry entry;
     while (iterator.Next(entry) == CHIP_NO_ERROR)
     {

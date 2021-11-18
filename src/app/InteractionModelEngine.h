@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -54,6 +55,8 @@
 
 namespace chip {
 namespace app {
+
+using chip::Access::SubjectDescriptor;
 
 static constexpr size_t kMaxSecureSduLengthBytes = 1024;
 
@@ -283,18 +286,19 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *  This function is implemented by CHIP as a part of cluster data storage & management.
  * The apWriter and apDataExists can be nullptr.
  *
- *  @param[in]    aAccessingFabricIndex The accessing fabric index for the read.
- *  @param[in]    aPath             The concrete path of the data being read.
- *  @param[in]    aAttributeReport  The TLV Builder for Cluter attribute builder.
+ *  @param[in]    aSubjectDescriptor    The subject descriptor for the read.
+ *  @param[in]    aPath                 The concrete path of the data being read.
+ *  @param[in]    aAttributeReport      The TLV Builder for Cluter attribute builder.
  *
  *  @retval  CHIP_NO_ERROR on success
  */
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath,
                                  AttributeReportIB::Builder & aAttributeReport);
 
 /**
  * TODO: Document.
  */
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
+CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
 } // namespace app
 } // namespace chip

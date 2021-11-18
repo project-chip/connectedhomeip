@@ -1096,15 +1096,22 @@ EntryStorage EntryStorage::pool[];
 EntryDelegate EntryDelegate::pool[];
 EntryIteratorDelegate EntryIteratorDelegate::pool[];
 
+AccessControlDelegate accessControlDelegate;
+AccessControl accessControl(accessControlDelegate);
+
 } // namespace
 
 namespace chip {
 namespace Access {
 namespace Examples {
 
+AccessControl & GetAccessControl()
+{
+    return accessControl;
+}
+
 AccessControl::Delegate & GetAccessControlDelegate()
 {
-    static AccessControlDelegate accessControlDelegate;
     return accessControlDelegate;
 }
 

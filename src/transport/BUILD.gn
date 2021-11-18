@@ -43,6 +43,7 @@ static_library("transport") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/access",
     "${chip_root}/src/credentials",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
 #include <app/util/basic-types.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
@@ -30,6 +31,8 @@ class SessionManager;
 class SessionHandle
 {
 public:
+    using SubjectDescriptor = Access::SubjectDescriptor;
+
     SessionHandle(NodeId peerNodeId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric) {}
 
     SessionHandle(Transport::UnauthenticatedSessionHandle session) :
@@ -54,6 +57,8 @@ public:
     FabricIndex GetFabricIndex() const { return mFabric; }
     void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
     void SetGroupId(GroupId groupId) { mGroupId.SetValue(groupId); }
+
+    SubjectDescriptor GetSubjectDescriptor() const;
 
     bool operator==(const SessionHandle & that) const
     {

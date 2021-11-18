@@ -22,6 +22,10 @@ namespace chip {
 namespace Access {
 namespace Examples {
 
+// Returns an example access control using an example delegate.
+AccessControl & GetAccessControl();
+
+// Returns an example access control delegate.
 AccessControl::Delegate & GetAccessControlDelegate();
 
 } // namespace Examples

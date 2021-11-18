@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
 #include <app/ClusterInfo.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelDelegate.h>
@@ -50,6 +51,8 @@ namespace app {
 class ReadHandler : public Messaging::ExchangeDelegate
 {
 public:
+    using SubjectDescriptor = Access::SubjectDescriptor;
+
     enum class ShutdownOptions
     {
         KeepCurrentExchange,
@@ -134,7 +137,7 @@ public:
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
-    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+    const SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 
 private:
     friend class TestReadInteraction;
@@ -193,7 +196,7 @@ private:
     bool mDirty              = false;
     bool mActiveSubscription = false;
     NodeId mInitiatorNodeId  = kUndefinedNodeId;
-    FabricIndex mFabricIndex = 0;
+    SubjectDescriptor mSubjectDescriptor;
 };
 } // namespace app
 } // namespace chip

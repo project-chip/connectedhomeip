@@ -21,6 +21,7 @@
  *          when calling ember callbacks.
  */
 
+#include <access/AccessControl.h>
 #include <app/ClusterInfo.h>
 #include <app/Command.h>
 #include <app/ConcreteAttributePath.h>
@@ -49,6 +50,7 @@
 #include <limits>
 
 using namespace chip;
+using namespace chip::Access;
 using namespace chip::app;
 using namespace chip::app::Compatibility;
 
@@ -134,6 +136,14 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     }
 }
 
+CHIP_ERROR CheckAccessControl(const SubjectDescriptor & aSubjectDescriptor, EndpointId aEndpoint, ClusterId aCluster, bool aWrite)
+{
+    RequestPath requestPath = { .cluster = aCluster, .endpoint = aEndpoint };
+    // TODO: get required privilege using ember APIs, as it could be custom
+    Privilege privilege = aWrite ? Privilege::kOperate : Privilege::kView;
+    return GetAccessControl().Check(aSubjectDescriptor, requestPath, privilege); 
+}
+
 } // namespace
 
 void SetupEmberAfObjects(Command * command, const ConcreteCommandPath & commandPath)
@@ -210,7 +220,7 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath,
                                  AttributeReportIB::Builder & aAttributeReport)
 {
     ChipLogDetail(DataManagement,
@@ -231,6 +241,8 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         .EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePathIBBuilder.GetError());
 
+    CHIP_ERROR accessControlStatus = CheckAccessControl(aSubjectDescriptor, aPath.mEndpointId, aPath.mClusterId, false);
+
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
     if (attrOverride != nullptr)
     {
@@ -238,8 +250,12 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         // into status responses, unless our caller already does that.
         writer = attributeDataIBBuilder.GetWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
-        AttributeValueEncoder valueEncoder(writer, aAccessingFabricIndex);
+        AttributeValueEncoder valueEncoder(writer, aSubjectDescriptor.fabricIndex);
         ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
+
+        ChipLogDetail(DataManagement, "################# attribute access override #################");
+
+        ReturnErrorOnFailure(accessControlStatus);
 
         if (valueEncoder.TriedEncode())
         {
@@ -259,6 +275,11 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     record.manufacturerCode   = EMBER_AF_NULL_MANUFACTURER_CODE;
     EmberAfStatus emberStatus = emAfReadOrWriteAttribute(&record, &metadata, attributeData, sizeof(attributeData),
                                                          /* write = */ false);
+
+    if (emberStatus == EMBER_ZCL_STATUS_SUCCESS && accessControlStatus != CHIP_NO_ERROR)
+    {
+        emberStatus = (accessControlStatus == CHIP_ERROR_ACCESS_DENIED) ? EMBER_ZCL_STATUS_NOT_AUTHORIZED : EMBER_ZCL_STATUS_SOFTWARE_FAILURE;
+    }
 
     if (emberStatus == EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -542,44 +563,15 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * metadata, TLV::TLVR
 }
 } // namespace
 
-static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader,
-                                                                          WriteHandler * apWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    // Passing nullptr as buf to emberAfReadAttribute means we only need attribute type here, and ember will not do data read &
-    // copy in this case.
-    const EmberAfAttributeMetadata * attributeMetadata = emberAfLocateAttributeMetadata(
-        aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0);
-
-    if (attributeMetadata == nullptr)
-    {
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
-
-    CHIP_ERROR preparationError = CHIP_NO_ERROR;
-    uint16_t dataLen            = 0;
-    if ((preparationError = prepareWriteData(attributeMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(preparationError));
-        return Protocols::InteractionModel::Status::InvalidValue;
-    }
-
-    if (dataLen > attributeMetadata->size)
-    {
-        ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
-        return Protocols::InteractionModel::Status::InvalidValue;
-    }
-
-    return ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
-                                                                  aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0, attributeData,
-                                                                  attributeMetadata->attributeType));
-}
-
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
-{
+    Protocols::InteractionModel::Status imStatus = Protocols::InteractionModel::Status::Failure;
     AttributePathParams attributePathParams;
     attributePathParams.mEndpointId  = aClusterInfo.mEndpointId;
     attributePathParams.mClusterId   = aClusterInfo.mClusterId;
     attributePathParams.mAttributeId = aClusterInfo.mAttributeId;
+
+    CHIP_ERROR accessControlStatus = CheckAccessControl(aSubjectDescriptor, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, true);
 
     // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
     // as the input argument.
@@ -590,14 +582,51 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
         AttributeValueDecoder valueDecoder(aReader);
         ReturnErrorOnFailure(attrOverride->Write(path, valueDecoder));
 
+        ChipLogDetail(DataManagement, "################# attribute access override #################");
+
+        ReturnErrorOnFailure(accessControlStatus);
+
         if (valueDecoder.TriedDecode())
         {
             return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
         }
     }
 
-    auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
-    return apWriteHandler->AddStatus(attributePathParams, imCode);
+    // Passing nullptr as buf to emberAfReadAttribute means we only need attribute type here,
+    // and ember will not do data read & copy in this case.
+    const EmberAfAttributeMetadata * attributeMetadata = emberAfLocateAttributeMetadata(
+        aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0);
+    CHIP_ERROR preparationError = CHIP_NO_ERROR;
+    uint16_t dataLen            = 0;
+
+    if (attributeMetadata == nullptr)
+    {
+        imStatus = Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
+    else if (accessControlStatus != CHIP_NO_ERROR)
+    {
+        imStatus = (accessControlStatus == CHIP_ERROR_ACCESS_DENIED)
+                ? Protocols::InteractionModel::Status::UnsupportedAccess
+                : Protocols::InteractionModel::Status::Failure;
+    }
+    else if ((preparationError = prepareWriteData(attributeMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(preparationError));
+        imStatus = Protocols::InteractionModel::Status::InvalidValue;
+    }
+    else if (dataLen > attributeMetadata->size)
+    {
+        ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
+        imStatus = Protocols::InteractionModel::Status::InvalidValue;
+    }
+    else
+    {
+        imStatus = ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
+                                                                          aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0, attributeData,
+                                                                          attributeMetadata->attributeType));
+    }
+
+    return apWriteHandler->AddStatus(attributePathParams, imStatus);
 }
 
 } // namespace app

@@ -21,7 +21,24 @@
 
 namespace chip {
 
+using namespace Access;
 using namespace Transport;
+
+SubjectDescriptor SessionHandle::GetSubjectDescriptor() const
+{
+    SubjectDescriptor subjectDescriptor = { .fabricIndex = mFabric };
+    if (IsSecure())
+    {
+        subjectDescriptor.authMode = AuthMode::kCase;
+        subjectDescriptor.subjects[0] = mPeerNodeId;
+        // TODO: handle CATs
+    }
+    else
+    {
+        // TODO: handle PASE, Group
+    }
+    return subjectDescriptor;
+}
 
 const PeerAddress * SessionHandle::GetPeerAddress(SessionManager * sessionManager) const
 {

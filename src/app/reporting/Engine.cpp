@@ -63,7 +63,7 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 }
 
 CHIP_ERROR
-Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
+Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, AttributeReportIBs::Builder & aAttributeReportIBs,
                             ClusterInfo & aClusterInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -75,7 +75,7 @@ Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIB
                   aClusterInfo.mAttributeId);
 
     MatterPreAttributeReadCallback(path);
-    err = ReadSingleClusterData(aAccessingFabricIndex, path, attributeReport);
+    err = ReadSingleClusterData(aSubjectDescriptor, path, attributeReport);
     MatterPostAttributeReadCallback(path);
     SuccessOrExit(err);
     attributeReport.EndOfAttributeReportIB();
@@ -106,7 +106,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         if (apReadHandler->IsInitialReport())
         {
             // Retrieve data for this cluster instance and clear its dirty flag.
-            err = RetrieveClusterData(apReadHandler->GetFabricIndex(), AttributeReportIBs, *clusterInfo);
+            err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), AttributeReportIBs, *clusterInfo);
             VerifyOrExit(err == CHIP_NO_ERROR,
                          ChipLogError(DataManagement, "<RE:Run> Error retrieving data from cluster, aborting"));
             attributeClean = false;
@@ -121,11 +121,11 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     // need to inject nodeId from subscribed path here.
                     ClusterInfo dirtyPath = *path;
                     dirtyPath.mNodeId     = clusterInfo->mNodeId;
-                    err                   = RetrieveClusterData(apReadHandler->GetFabricIndex(), AttributeReportIBs, dirtyPath);
+                    err                   = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), AttributeReportIBs, dirtyPath);
                 }
                 else if (path->IsAttributePathSupersetOf(*clusterInfo))
                 {
-                    err = RetrieveClusterData(apReadHandler->GetFabricIndex(), AttributeReportIBs, *clusterInfo);
+                    err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), AttributeReportIBs, *clusterInfo);
                 }
                 else
                 {

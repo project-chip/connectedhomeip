@@ -21,6 +21,7 @@ source_set("device_callbacks_manager") {
   ]
 
   public_deps = [
+    "${chip_root}/src/access",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
