@@ -15,7 +15,6 @@ import chip.platform.PreferencesKeyValueStoreManager;
 import chip.setuppayload.DiscoveryCapability;
 import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
-
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
 import com.tcl.chip.tvapp.TvApp;
 import java.util.HashSet;

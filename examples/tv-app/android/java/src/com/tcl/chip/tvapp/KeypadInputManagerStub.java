@@ -19,16 +19,14 @@ package com.tcl.chip.tvapp;
 
 import android.util.Log;
 
-/**
- * Stub implement of KeypadInputManager, TV manufacture should have there own implements
- */
+/** Stub implement of KeypadInputManager, TV manufacture should have there own implements */
 public class KeypadInputManagerStub implements KeypadInputManager {
 
-    private final String TAG = KeypadInputManagerStub.class.getSimpleName();
+  private final String TAG = KeypadInputManagerStub.class.getSimpleName();
 
-    @Override
-    public int sendKey(int keyCode) {
-        Log.d(TAG, "sendKey:" + keyCode);
-        return KEY_STATUS_SUCCESS;
-    }
+  @Override
+  public int sendKey(int keyCode) {
+    Log.d(TAG, "sendKey:" + keyCode);
+    return KEY_STATUS_SUCCESS;
+  }
 }
