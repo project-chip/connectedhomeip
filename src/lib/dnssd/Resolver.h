@@ -56,15 +56,11 @@ struct ResolvedNodeData
 
     ReliableMessageProtocolConfig GetMRPConfig() const
     {
-        return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().ValueOr(gDefaultMRPConfig.mIdleRetransTimeoutTick
-                                                                               << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT) >>
-                                                 CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
-                                             GetMrpRetryIntervalActive().ValueOr(gDefaultMRPConfig.mActiveRetransTimeoutTick
-                                                                                 << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT) >>
-                                                 CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT);
+        return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().ValueOr(gDefaultMRPConfig.mIdleRetransTimeout),
+                                             GetMrpRetryIntervalActive().ValueOr(gDefaultMRPConfig.mActiveRetransTimeout));
     }
-    Optional<uint32_t> GetMrpRetryIntervalIdle() const { return mMrpRetryIntervalIdle; }
-    Optional<uint32_t> GetMrpRetryIntervalActive() const { return mMrpRetryIntervalActive; }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mMrpRetryIntervalIdle; }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mMrpRetryIntervalActive; }
 
     PeerId mPeerId;
     size_t mNumIPs = 0;
@@ -73,8 +69,8 @@ struct ResolvedNodeData
     uint16_t mPort                         = 0;
     char mHostName[kHostNameMaxLength + 1] = {};
     bool mSupportsTcp                      = false;
-    Optional<uint32_t> mMrpRetryIntervalIdle;
-    Optional<uint32_t> mMrpRetryIntervalActive;
+    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalIdle;
+    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalActive;
     System::Clock::Timestamp mExpiryTime;
 };
 
@@ -100,8 +96,8 @@ struct DiscoveredNodeData
     uint16_t pairingHint;
     char pairingInstruction[kMaxPairingInstructionLen + 1];
     bool supportsTcp;
-    Optional<uint32_t> mrpRetryIntervalIdle;
-    Optional<uint32_t> mrpRetryIntervalActive;
+    Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
+    Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
     uint16_t port;
     int numIPs;
     Inet::InterfaceId interfaceId[kMaxIPAddresses];
@@ -135,8 +131,8 @@ struct DiscoveredNodeData
     bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
     bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
-    Optional<uint32_t> GetMrpRetryIntervalIdle() const { return mrpRetryIntervalIdle; }
-    Optional<uint32_t> GetMrpRetryIntervalActive() const { return mrpRetryIntervalActive; }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mrpRetryIntervalIdle; }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mrpRetryIntervalActive; }
 
     void LogDetail() const
     {

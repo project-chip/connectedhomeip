@@ -134,7 +134,6 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
 
     Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
     secureSession->SetPeerAddress(addr);
-    secureSession->SetMRPConfig(config);
 
     return CHIP_NO_ERROR;
 }

@@ -132,7 +132,7 @@
  * This interval is used by the device to periodically wake up and poll the data in the idle mode.
  */
 #ifndef CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL
-#define CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL 5000
+#define CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL 5000_ms32
 #endif
 
 /**
@@ -142,7 +142,7 @@
  * This interval is used by the device to periodically wake up and poll the data in the active mode.
  */
 #ifndef CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL
-#define CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL 200
+#define CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL 200_ms32
 #endif
 
 // -------------------- Device Identification Configuration --------------------
