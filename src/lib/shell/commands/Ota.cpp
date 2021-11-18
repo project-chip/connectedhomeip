@@ -25,6 +25,7 @@
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeMgr.h>
@@ -33,7 +34,7 @@
 
 // TODO: Use common software update layer to store the image
 #if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
-#include "BDXDownloader_nrfconnect.h"
+#include "DFUManager_nrfconnect.h"
 #endif
 
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
@@ -49,15 +50,39 @@ namespace chip {
 namespace Shell {
 namespace {
 
-constexpr EndpointId kProviderEndpointId                   = 0;
 constexpr const char kRequestorLocation[]                  = { 'U', 'S' };
 constexpr EmberAfOTADownloadProtocol kRequestorProtocols[] = { EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS };
 constexpr bool kRequestorCanConsent                        = false;
+constexpr uint16_t kBlockSize                              = 1024;
+constexpr uint8_t kMaxUpdateTokenLen                       = 32;
 
-BdxDownloader sBdxDownloader;
-Controller::DeviceControllerInteractionModelDelegate sIMDelegate;
-Transport::PeerAddress sProviderAddress;
+struct OTAContext
+{
+    OperationalDeviceProxy * deviceProxy    = nullptr;
+    Transport::PeerAddress providerAddress  = {};
+    EndpointId providerEndpointId           = 0;
+    uint8_t updateToken[kMaxUpdateTokenLen] = {};
+    uint8_t updateTokenLen                  = 0;
+    uint32_t updateVersion                  = 0;
+
+    void Clear();
+};
+
 Shell::Engine sSubShell;
+Controller::DeviceControllerInteractionModelDelegate sIMDelegate;
+DFUManager sDfuManager;
+OTAContext sOtaContext;
+
+inline void OTAContext::Clear()
+{
+    if (deviceProxy != nullptr)
+    {
+        deviceProxy->Disconnect();
+        delete deviceProxy;
+    }
+
+    *this = {};
+}
 
 CharSpan ExtractResourceName(CharSpan imageURI)
 {
@@ -83,14 +108,27 @@ CharSpan ExtractResourceName(CharSpan imageURI)
 
 void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response)
 {
-    ChipLogProgress(SoftwareUpdate, "Received QueryImage response: %" PRIu16, static_cast<uint16_t>(response.status));
-
     CharSpan imageURI     = response.imageURI.ValueOr({});
+    ByteSpan updateToken  = response.updateToken.ValueOr({});
     CharSpan resourceName = ExtractResourceName(imageURI);
+    uint32_t version      = response.softwareVersion.ValueOr(0u);
+
+    ChipLogProgress(SoftwareUpdate, "Received QueryImage response: %" PRIu16, static_cast<uint16_t>(response.status));
     ChipLogProgress(SoftwareUpdate, "  Image URI: %.*s", static_cast<int>(imageURI.size()), imageURI.data());
     ChipLogProgress(SoftwareUpdate, "  Resource: %.*s", static_cast<int>(resourceName.size()), resourceName.data());
+    ChipLogProgress(SoftwareUpdate, "  Version: %" PRIu32, version);
 
-    OperationalDeviceProxy * deviceProxy = Server::GetInstance().GetOperationalDeviceProxy();
+    if (updateToken.size() > kMaxUpdateTokenLen)
+    {
+        ChipLogError(SoftwareUpdate, "Update token too long");
+        return;
+    }
+
+    memcpy(sOtaContext.updateToken, updateToken.data(), updateToken.size());
+    sOtaContext.updateTokenLen = static_cast<uint8_t>(updateToken.size());
+    sOtaContext.updateVersion  = version;
+
+    OperationalDeviceProxy * deviceProxy = sOtaContext.deviceProxy;
     VerifyOrReturn(deviceProxy != nullptr);
 
     Messaging::ExchangeManager * exchangeMgr = deviceProxy->GetExchangeManager();
@@ -99,7 +137,7 @@ void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableTyp
 
     if (exchangeMgr != nullptr && session.HasValue())
     {
-        exchangeCtx = exchangeMgr->NewContext(session.Value(), &sBdxDownloader);
+        exchangeCtx = exchangeMgr->NewContext(session.Value(), &sDfuManager);
     }
 
     if (exchangeCtx == nullptr)
@@ -110,13 +148,13 @@ void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableTyp
 
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = TransferControlFlags::kReceiverDrive;
-    initOptions.MaxBlockSize     = 1024;
+    initOptions.MaxBlockSize     = kBlockSize;
     initOptions.FileDesLength    = resourceName.size();
     initOptions.FileDesignator   = reinterpret_cast<const uint8_t *>(resourceName.data());
 
-    sBdxDownloader.SetInitialExchange(exchangeCtx);
-    CHIP_ERROR error = sBdxDownloader.InitiateTransfer(&DeviceLayer::SystemLayer(), TransferRole::kReceiver, initOptions,
-                                                       System::Clock::Seconds16(20));
+    sDfuManager.SetInitialExchange(exchangeCtx);
+    CHIP_ERROR error = sDfuManager.InitiateTransfer(&DeviceLayer::SystemLayer(), TransferRole::kReceiver, initOptions,
+                                                    System::Clock::Seconds16(20));
 
     if (error != CHIP_NO_ERROR)
     {
@@ -133,11 +171,11 @@ void OnQueryImageConnection(void * /* context */, DeviceProxy * deviceProxy)
 {
     // Initialize cluster object
     Controller::OtaSoftwareUpdateProviderCluster cluster;
-    CHIP_ERROR error = cluster.Associate(deviceProxy, kProviderEndpointId);
+    CHIP_ERROR error = cluster.Associate(deviceProxy, sOtaContext.providerEndpointId);
 
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Associate() failed: %" CHIP_ERROR_FORMAT, error.Format());
+        ChipLogError(SoftwareUpdate, "Associate failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
 
@@ -164,7 +202,74 @@ void OnQueryImageConnection(void * /* context */, DeviceProxy * deviceProxy)
 
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "QueryImage() failed: %" CHIP_ERROR_FORMAT, error.Format());
+        ChipLogError(SoftwareUpdate, "QueryImage failed: %" CHIP_ERROR_FORMAT, error.Format());
+    }
+}
+
+void OnApplyUpdateResponse(void * context, const ApplyUpdateResponse::DecodableType & response)
+{
+    ChipLogProgress(SoftwareUpdate, "Received ApplyUpdate response: %" PRIu16, static_cast<uint16_t>(response.action));
+
+    switch (response.action)
+    {
+    case EMBER_ZCL_OTA_APPLY_UPDATE_ACTION_PROCEED: {
+        CHIP_ERROR error = sDfuManager.ApplyUpdate();
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(SoftwareUpdate, "Failed to apply update: %" CHIP_ERROR_FORMAT, error.Format());
+        }
+        break;
+    }
+    case EMBER_ZCL_OTA_APPLY_UPDATE_ACTION_DISCONTINUE: {
+        CHIP_ERROR error = sDfuManager.DiscardUpdate();
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(SoftwareUpdate, "Failed to discard update: %" CHIP_ERROR_FORMAT, error.Format());
+        }
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void OnApplyUpdateFailure(void * /* context */, EmberAfStatus status)
+{
+    ChipLogError(SoftwareUpdate, "ApplyUpdate failed: %" PRIu16, static_cast<uint16_t>(status));
+}
+
+void OnApplyUpdateConnection(void * /* context */, DeviceProxy * deviceProxy)
+{
+    // Initialize cluster object
+    Controller::OtaSoftwareUpdateProviderCluster cluster;
+    CHIP_ERROR error = cluster.Associate(deviceProxy, sOtaContext.providerEndpointId);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Associate failed: %" CHIP_ERROR_FORMAT, error.Format());
+        return;
+    }
+
+    // Send QueryImage command
+    uint16_t vendorId        = 0;
+    uint16_t productId       = 0;
+    uint16_t hardwareVersion = 0;
+    uint16_t softwareVersion = 0;
+
+    DeviceLayer::ConfigurationMgr().GetVendorId(vendorId);
+    DeviceLayer::ConfigurationMgr().GetProductId(productId);
+    DeviceLayer::ConfigurationMgr().GetProductRevision(hardwareVersion);
+    DeviceLayer::ConfigurationMgr().GetFirmwareRevision(softwareVersion);
+
+    ApplyUpdateRequest::Type request;
+    request.updateToken = ByteSpan(sOtaContext.updateToken, sOtaContext.updateTokenLen);
+    request.newVersion  = sOtaContext.updateVersion;
+
+    error = cluster.InvokeCommand(request, /* context */ nullptr, OnApplyUpdateResponse, OnApplyUpdateFailure);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "ApplyUpdate failed: %" CHIP_ERROR_FORMAT, error.Format());
     }
 }
 
@@ -173,60 +278,103 @@ void OnConnectionFailure(void * /* context */, NodeId nodeId, CHIP_ERROR error)
     ChipLogError(SoftwareUpdate, "Connection failed: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
-void QueryImageAsyncHandler(intptr_t)
+template <OnDeviceConnected OnConnected>
+void ConnectDeviceAsync(intptr_t)
 {
-    static Callback::Callback<OnDeviceConnected> successCallback(OnQueryImageConnection, nullptr);
+    static Callback::Callback<OnDeviceConnected> successCallback(OnConnected, nullptr);
     static Callback::Callback<OnDeviceConnectionFailure> failureCallback(OnConnectionFailure, nullptr);
 
-    OperationalDeviceProxy * deviceProxy = Server::GetInstance().GetOperationalDeviceProxy();
+    OperationalDeviceProxy * deviceProxy = sOtaContext.deviceProxy;
     VerifyOrReturn(deviceProxy != nullptr);
 
-    deviceProxy->UpdateDeviceData(sProviderAddress, deviceProxy->GetMRPIdleInterval(), deviceProxy->GetMRPActiveInterval());
+    deviceProxy->UpdateDeviceData(sOtaContext.providerAddress, deviceProxy->GetMRPIdleInterval(),
+                                  deviceProxy->GetMRPActiveInterval());
     deviceProxy->Connect(&successCallback, &failureCallback);
 }
 
-CHIP_ERROR QueryImageHandler(int argc, char ** argv)
+template <OnDeviceConnected OnConnected>
+CHIP_ERROR ConnectProvider(FabricIndex fabricIndex, NodeId nodeId, const Transport::PeerAddress & address)
 {
-    VerifyOrReturnError(argc == 4, CHIP_ERROR_INVALID_ARGUMENT);
-
-    const FabricIndex providerFabricIndex = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
-    const NodeId providerNodeId           = static_cast<NodeId>(strtoull(argv[1], nullptr, 10));
-    const char * ipAddressStr             = argv[2];
-    const uint16_t udpPort                = static_cast<uint16_t>(strtoul(argv[3], nullptr, 10));
-
-    Inet::IPAddress ipAddress;
-    VerifyOrReturnError(Inet::IPAddress::FromString(ipAddressStr, ipAddress), CHIP_ERROR_INVALID_ARGUMENT);
-
-    FabricInfo * fabric = Server::GetInstance().GetFabricTable().FindFabricWithIndex(providerFabricIndex);
+    // Allocate new device proxy
+    FabricInfo * fabric = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
     VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Disconnect old device proxy if exists
-    OperationalDeviceProxy * deviceProxy = Server::GetInstance().GetOperationalDeviceProxy();
-    if (deviceProxy != nullptr)
-    {
-        deviceProxy->Disconnect();
-        delete deviceProxy;
-        Server::GetInstance().SetOperationalDeviceProxy(nullptr);
-    }
-
-    // Allocate new device proxy
     DeviceProxyInitParams initParams = { .sessionManager = &Server::GetInstance().GetSecureSessionManager(),
                                          .exchangeMgr    = &Server::GetInstance().GetExchangeManager(),
                                          .idAllocator    = &Server::GetInstance().GetSessionIDAllocator(),
                                          .fabricInfo     = fabric,
                                          .imDelegate     = &sIMDelegate };
 
-    deviceProxy = Platform::New<OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(providerNodeId));
+    auto deviceProxy = Platform::New<OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(nodeId));
     VerifyOrReturnError(deviceProxy != nullptr, CHIP_ERROR_NO_MEMORY);
-    Server::GetInstance().SetOperationalDeviceProxy(deviceProxy);
 
     // Initiate the connection and send QueryImage command using CHIP thread
-    streamer_printf(streamer_get(), "Querying image from %s:%" PRIu16 "... \r\n", ipAddressStr, udpPort);
+    streamer_printf(streamer_get(), "Connecting...\r\n");
 
-    sProviderAddress = Transport::PeerAddress::UDP(ipAddress, udpPort);
-    DeviceLayer::PlatformMgr().ScheduleWork(QueryImageAsyncHandler);
-
+    sOtaContext.deviceProxy     = deviceProxy;
+    sOtaContext.providerAddress = address;
+    DeviceLayer::PlatformMgr().ScheduleWork(ConnectDeviceAsync<OnConnected>);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR QueryImageHandler(int argc, char ** argv)
+{
+    VerifyOrReturnError(argc == 5, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const FabricIndex fabricIndex       = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
+    const NodeId providerNodeId         = static_cast<NodeId>(strtoull(argv[1], nullptr, 10));
+    const EndpointId providerEndpointId = static_cast<EndpointId>(strtoul(argv[2], nullptr, 10));
+    const char * ipAddressStr           = argv[3];
+    const uint16_t udpPort              = static_cast<uint16_t>(strtoul(argv[4], nullptr, 10));
+
+    Inet::IPAddress ipAddress;
+    VerifyOrReturnError(Inet::IPAddress::FromString(ipAddressStr, ipAddress), CHIP_ERROR_INVALID_ARGUMENT);
+
+    sOtaContext.Clear();
+    sOtaContext.providerEndpointId = providerEndpointId;
+
+    return ConnectProvider<OnQueryImageConnection>(fabricIndex, providerNodeId, Transport::PeerAddress::UDP(ipAddress, udpPort));
+}
+
+CHIP_ERROR ShowUpdateHandler(int argc, char ** argv)
+{
+    VerifyOrReturnError(argc == 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    char token[kMaxUpdateTokenLen * 2 + 1];
+    ReturnErrorOnFailure(
+        Encoding::BytesToUppercaseHexString(sOtaContext.updateToken, sOtaContext.updateTokenLen, token, sizeof(token)));
+
+    streamer_printf(streamer_get(), "Token: %s\r\n", token);
+    streamer_printf(streamer_get(), "Version: %" PRIu32 "\r\n", sOtaContext.updateVersion);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ApplyImageHandler(int argc, char ** argv)
+{
+    VerifyOrReturnError(argc == 7, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const FabricIndex fabricIndex       = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
+    const NodeId providerNodeId         = static_cast<NodeId>(strtoull(argv[1], nullptr, 10));
+    const EndpointId providerEndpointId = static_cast<EndpointId>(strtoul(argv[2], nullptr, 10));
+    const char * ipAddressStr           = argv[3];
+    const uint16_t udpPort              = static_cast<uint16_t>(strtoul(argv[4], nullptr, 10));
+    const char * updateTokenStr         = argv[5];
+    const uint32_t updateVersion        = static_cast<uint32_t>(strtoul(argv[6], nullptr, 10));
+
+    Inet::IPAddress ipAddress;
+    VerifyOrReturnError(Inet::IPAddress::FromString(ipAddressStr, ipAddress), CHIP_ERROR_INVALID_ARGUMENT);
+
+    uint8_t updateToken[kMaxUpdateTokenLen];
+    size_t updateTokenLen = Encoding::HexToBytes(updateTokenStr, strlen(updateTokenStr), updateToken, sizeof(updateToken));
+    VerifyOrReturnError(updateTokenLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    sOtaContext.Clear();
+    sOtaContext.providerEndpointId = providerEndpointId;
+    sOtaContext.updateTokenLen     = updateTokenLen;
+    sOtaContext.updateVersion      = updateVersion;
+    memcpy(sOtaContext.updateToken, updateToken, updateTokenLen);
+
+    return ConnectProvider<OnApplyUpdateConnection>(fabricIndex, providerNodeId, Transport::PeerAddress::UDP(ipAddress, udpPort));
 }
 
 CHIP_ERROR OtaHandler(int argc, char ** argv)
@@ -253,7 +401,11 @@ void RegisterOtaCommands()
     // Register subcommands of the `ota` commands.
     static const shell_command_t subCommands[] = {
         { &QueryImageHandler, "query",
-          "Query for new image. Usage: ota query <ota-provider-fabric-index> <ota-provider-node-id> <ip-address> <udp-port>" },
+          "Query for a new image. Usage: ota query <fabric-index> <provider-node-id> <endpoint-id> <ip-address> <port>" },
+        { &ShowUpdateHandler, "show-update", "Print the current update information" },
+        { &ApplyImageHandler, "apply",
+          "Apply the current update. Usage ota apply <fabric-index> <provider-node-id> <endpoint-id> <ip-address> <port> "
+          "<update-token> <version>" },
     };
 
     sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));

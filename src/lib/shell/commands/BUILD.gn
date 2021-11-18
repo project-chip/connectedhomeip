@@ -56,7 +56,7 @@ source_set("commands") {
     configs += [ "${chip_root}/src/controller:config" ]
 
     if (chip_device_platform == "nrfconnect") {
-      sources += [ "BDXDownloader_nrfconnect.h" ]
+      sources += [ "DFUManager_nrfconnect.h" ]
     }
   }
 
