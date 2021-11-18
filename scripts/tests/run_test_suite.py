@@ -21,11 +21,13 @@ import os
 import sys
 import typing
 
-from pathlib import Path
-from enum import Enum, auto
 from dataclasses import dataclass
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
+import chiptest
+
+
 
 DEFAULT_CHIP_ROOT=os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
@@ -39,41 +41,9 @@ __LOG_LEVELS__ = {
     'fatal': logging.FATAL,
 }
 
-class TestTarget(Enum):
-    ALL_CLUSTERS = auto()
-    TV = auto()
-
-@dataclass
-class TestDefinition:
-    yaml_file: str
-    name: str
-    target: TestTarget
-
 @dataclass
 class RunContext:
-    tests: typing.List[TestDefinition]
-
-def AllTests(root: str):
-    """Gets all the tests that can be found in the ROOT directory based on
-       yaml file names.
-    """
-    for path in Path(os.path.join(root, 'src', 'app',  'tests', 'suites')).rglob("*.yaml"):
-        logging.debug('Found YAML: %s' % path)
-
-        # grab the name without the extension
-        name = path.stem.lower()
-
-        if name.startswith('tv_'):
-            target = TestTarget.ALL_CLUSTERS
-            name = 'tv-'  + name[3:]
-        elif name.startswith('test_'):
-            target = TestTarget.TV
-            name = 'app-'  + name[5:]
-        else:
-            continue
-        
-        yield TestDefinition(yaml_file=path, name=name,target=target)
-
+    tests: typing.List[chiptest.TestDefinition]
 
 @click.group(chain=True)
 @click.option(
@@ -105,7 +75,7 @@ def main(context, log_level, target, no_log_timestamps, root):
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     # Figures out selected test that match the given name(s)
-    tests = [test for test in AllTests(root)]
+    tests = [test for test in chiptest.AllTests(root)]
     if 'all' not in target:
         tests = [test for test in tests if test.name.upper() in target]
     tests.sort(key=lambda x: x.name)
@@ -118,6 +88,16 @@ def main(context, log_level, target, no_log_timestamps, root):
 def cmd_generate(context):
     for test in context.obj.tests:
         print(test.name)
+
+@main.command(
+    'run', help='List available test suites')
+@click.option(
+    '--iterations',
+    default=1,
+    help='Number of iterations to run')
+@click.pass_context
+def cmd_run(context, iterations):
+    print("should run %d times" % iterations)
 
 
 if __name__ == '__main__':
