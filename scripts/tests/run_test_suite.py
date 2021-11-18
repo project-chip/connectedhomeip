@@ -163,7 +163,6 @@ def cmd_run(context, iterations, chip_tool, all_clusters_app, tv_app):
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
         for test in context.obj.tests:
-            # TODO: - make log captures possible so that failure info is provided
             test_start = time.time()
             try:
                 test.Run(runner, paths)
