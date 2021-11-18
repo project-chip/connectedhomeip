@@ -46,6 +46,15 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint16_t value);
+    CHIP_ERROR SubscribeAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeIdentifyTime(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeIdentifyType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeIdentifyType(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
 
 private:
 };

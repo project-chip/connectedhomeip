@@ -111,7 +111,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
 {{/unless}}
 {{/if}}
 {{#if isReportableAttribute}}
-
+{{#unless isList}}
 JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, subscribe{{asCamelCased name false}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
@@ -135,7 +135,7 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, subscribe{{asCamelCased 
 JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, report{{asCamelCased name false}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIP{{chipCallback.name}}AttributeCallback, void (*)(CHIP{{chipCallback.name}}AttributeCallback *)> onReport(Platform::New<CHIP{{chipCallback.name}}AttributeCallback>(callback{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}, true), Platform::Delete<CHIP{{chipCallback.name}}AttributeCallback>);
+    std::unique_ptr<CHIP{{chipCallback.name}}AttributeCallback, void (*)(CHIP{{chipCallback.name}}AttributeCallback *)> onReport(Platform::New<CHIP{{chipCallback.name}}AttributeCallback>(callback, true), Platform::Delete<CHIP{{chipCallback.name}}AttributeCallback>);
     VerifyOrReturn(onReport.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native report callback", CHIP_ERROR_NO_MEMORY));
     
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -147,6 +147,7 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, report{{asCamelCased nam
 
     onReport.release();
 }
+{{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}

@@ -95,6 +95,7 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::WriteAttribute{{asUpperCamel
 {{/unless}}
 {{/if}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
 CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::SubscribeAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
 {
     chip::app::AttributePathParams attributePath;
@@ -109,6 +110,7 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReportAttribute{{asUpperCame
     return RequestAttributeReporting({{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id, onReportCallback, BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>);
 }
 
+{{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 

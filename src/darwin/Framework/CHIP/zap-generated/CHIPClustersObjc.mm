@@ -76,6 +76,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
+}
+
 @end
 
 @implementation CHIPAdministratorCommissioning
@@ -138,6 +157,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
+}
+
 @end
 
 @implementation CHIPApplicationBasic
@@ -168,11 +206,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeVendorNameWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeVendorName(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeVendorName(success);
+        },
+        true);
+}
+
 - (void)readAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeVendorId(success, failure);
     });
+}
+
+- (void)subscribeAttributeVendorIdWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeVendorId(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeVendorId(success);
+        },
+        true);
 }
 
 - (void)readAttributeApplicationNameWithResponseHandler:(ResponseHandler)responseHandler
@@ -182,11 +258,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeApplicationNameWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeApplicationName(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeApplicationNameWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeApplicationName(success);
+        },
+        true);
+}
+
 - (void)readAttributeProductIdWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeProductId(success, failure);
     });
+}
+
+- (void)subscribeAttributeProductIdWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeProductId(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeProductIdWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeProductId(success);
+        },
+        true);
 }
 
 - (void)readAttributeApplicationIdWithResponseHandler:(ResponseHandler)responseHandler
@@ -196,11 +310,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeApplicationIdWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeApplicationId(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeApplicationIdWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeApplicationId(success);
+        },
+        true);
+}
+
 - (void)readAttributeCatalogVendorIdWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeCatalogVendorId(success, failure);
     });
+}
+
+- (void)subscribeAttributeCatalogVendorIdWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCatalogVendorId(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCatalogVendorIdWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCatalogVendorId(success);
+        },
+        true);
 }
 
 - (void)readAttributeApplicationStatusWithResponseHandler:(ResponseHandler)responseHandler
@@ -210,11 +362,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeApplicationStatusWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeApplicationStatus(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeApplicationStatusWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeApplicationStatus(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -258,6 +448,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeCatalogVendorIdWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCatalogVendorId(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCatalogVendorIdWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCatalogVendorId(success);
+        },
+        true);
+}
+
 - (void)readAttributeApplicationIdWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -265,11 +474,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeApplicationIdWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeApplicationId(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeApplicationIdWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeApplicationId(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -323,11 +570,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeCurrentAudioOutputWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                            responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentAudioOutput(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentAudioOutputWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentAudioOutput(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -373,11 +658,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeBarrierMovingStateWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                            responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBarrierMovingState(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBarrierMovingStateWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBarrierMovingState(success);
+        },
+        true);
+}
+
 - (void)readAttributeBarrierSafetyStatusWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeBarrierSafetyStatus(success, failure);
     });
+}
+
+- (void)subscribeAttributeBarrierSafetyStatusWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBarrierSafetyStatus(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBarrierSafetyStatusWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBarrierSafetyStatus(success);
+        },
+        true);
 }
 
 - (void)readAttributeBarrierCapabilitiesWithResponseHandler:(ResponseHandler)responseHandler
@@ -387,6 +710,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeBarrierCapabilitiesWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBarrierCapabilities(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBarrierCapabilitiesWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBarrierCapabilities(success);
+        },
+        true);
+}
+
 - (void)readAttributeBarrierPositionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -394,11 +736,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeBarrierPositionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBarrierPosition(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBarrierPositionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBarrierPosition(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -429,11 +809,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeInteractionModelVersionWithMinInterval:(uint16_t)minInterval
+                                                     maxInterval:(uint16_t)maxInterval
+                                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInteractionModelVersion(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInteractionModelVersionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInteractionModelVersion(success);
+        },
+        true);
+}
+
 - (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeVendorName(success, failure);
     });
+}
+
+- (void)subscribeAttributeVendorNameWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeVendorName(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeVendorName(success);
+        },
+        true);
 }
 
 - (void)readAttributeVendorIDWithResponseHandler:(ResponseHandler)responseHandler
@@ -443,6 +861,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeVendorIDWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeVendorID(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeVendorIDWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeVendorID(success);
+        },
+        true);
+}
+
 - (void)readAttributeProductNameWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -450,11 +887,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeProductNameWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeProductName(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeProductNameWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeProductName(success);
+        },
+        true);
+}
+
 - (void)readAttributeProductIDWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeProductID(success, failure);
     });
+}
+
+- (void)subscribeAttributeProductIDWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeProductID(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeProductIDWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeProductID(success);
+        },
+        true);
 }
 
 - (void)readAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler
@@ -477,6 +952,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeUserLabelWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeUserLabel(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeUserLabel(success);
+        },
+        true);
+}
+
 - (void)readAttributeLocationWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -497,11 +991,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeLocationWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeLocation(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeLocationWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeLocation(success);
+        },
+        true);
+}
+
 - (void)readAttributeHardwareVersionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeHardwareVersion(success, failure);
     });
+}
+
+- (void)subscribeAttributeHardwareVersionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeHardwareVersion(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeHardwareVersionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeHardwareVersion(success);
+        },
+        true);
 }
 
 - (void)readAttributeHardwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler
@@ -511,11 +1043,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeHardwareVersionStringWithMinInterval:(uint16_t)minInterval
+                                                   maxInterval:(uint16_t)maxInterval
+                                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeHardwareVersionString(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeHardwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeHardwareVersionString(success);
+        },
+        true);
+}
+
 - (void)readAttributeSoftwareVersionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeSoftwareVersion(success, failure);
     });
+}
+
+- (void)subscribeAttributeSoftwareVersionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSoftwareVersion(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSoftwareVersionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSoftwareVersion(success);
+        },
+        true);
 }
 
 - (void)readAttributeSoftwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler
@@ -525,11 +1095,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeSoftwareVersionStringWithMinInterval:(uint16_t)minInterval
+                                                   maxInterval:(uint16_t)maxInterval
+                                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSoftwareVersionString(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSoftwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSoftwareVersionString(success);
+        },
+        true);
+}
+
 - (void)readAttributeManufacturingDateWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeManufacturingDate(success, failure);
     });
+}
+
+- (void)subscribeAttributeManufacturingDateWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeManufacturingDate(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeManufacturingDateWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeManufacturingDate(success);
+        },
+        true);
 }
 
 - (void)readAttributePartNumberWithResponseHandler:(ResponseHandler)responseHandler
@@ -539,11 +1147,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePartNumberWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePartNumber(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePartNumberWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePartNumber(success);
+        },
+        true);
+}
+
 - (void)readAttributeProductURLWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeProductURL(success, failure);
     });
+}
+
+- (void)subscribeAttributeProductURLWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeProductURL(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeProductURLWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeProductURL(success);
+        },
+        true);
 }
 
 - (void)readAttributeProductLabelWithResponseHandler:(ResponseHandler)responseHandler
@@ -553,11 +1199,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeProductLabelWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeProductLabel(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeProductLabelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeProductLabel(success);
+        },
+        true);
+}
+
 - (void)readAttributeSerialNumberWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeSerialNumber(success, failure);
     });
+}
+
+- (void)subscribeAttributeSerialNumberWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSerialNumber(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSerialNumberWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSerialNumber(success);
+        },
+        true);
 }
 
 - (void)readAttributeLocalConfigDisabledWithResponseHandler:(ResponseHandler)responseHandler
@@ -580,6 +1264,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeLocalConfigDisabledWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeLocalConfigDisabled(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeLocalConfigDisabledWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeLocalConfigDisabled(success);
+        },
+        true);
+}
+
 - (void)readAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -587,11 +1290,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeReachableWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeReachable(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeReachable(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -621,6 +1362,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeOutOfServiceWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOutOfService(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOutOfServiceWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOutOfService(success);
+        },
+        true);
 }
 
 - (void)readAttributePresentValueWithResponseHandler:(ResponseHandler)responseHandler
@@ -695,6 +1455,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
+}
+
 @end
 
 @implementation CHIPBinding
@@ -743,6 +1522,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
+}
+
 @end
 
 @implementation CHIPBooleanState
@@ -783,6 +1581,25 @@ using namespace chip::app::Clusters;
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -1035,11 +1852,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeSetupUrlWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSetupUrl(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSetupUrlWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSetupUrl(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -1056,6 +1911,25 @@ using namespace chip::app::Clusters;
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -1457,6 +2331,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRemainingTimeWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRemainingTime(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRemainingTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRemainingTime(success);
+        },
+        true);
+}
+
 - (void)readAttributeCurrentXWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1516,11 +2409,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeDriftCompensationWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeDriftCompensation(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeDriftCompensationWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeDriftCompensation(success);
+        },
+        true);
+}
+
 - (void)readAttributeCompensationTextWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeCompensationText(success, failure);
     });
+}
+
+- (void)subscribeAttributeCompensationTextWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCompensationText(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCompensationTextWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCompensationText(success);
+        },
+        true);
 }
 
 - (void)readAttributeColorTemperatureWithResponseHandler:(ResponseHandler)responseHandler
@@ -1556,6 +2487,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeColorModeWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorMode(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorMode(success);
+        },
+        true);
+}
+
 - (void)readAttributeColorControlOptionsWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1576,11 +2526,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeColorControlOptionsWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorControlOptions(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorControlOptionsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorControlOptions(success);
+        },
+        true);
+}
+
 - (void)readAttributeNumberOfPrimariesWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeNumberOfPrimaries(success, failure);
     });
+}
+
+- (void)subscribeAttributeNumberOfPrimariesWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNumberOfPrimaries(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNumberOfPrimariesWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNumberOfPrimaries(success);
+        },
+        true);
 }
 
 - (void)readAttributePrimary1XWithResponseHandler:(ResponseHandler)responseHandler
@@ -1590,11 +2578,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePrimary1XWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary1X(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary1XWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary1X(success);
+        },
+        true);
+}
+
 - (void)readAttributePrimary1YWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePrimary1Y(success, failure);
     });
+}
+
+- (void)subscribeAttributePrimary1YWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary1Y(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary1YWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary1Y(success);
+        },
+        true);
 }
 
 - (void)readAttributePrimary1IntensityWithResponseHandler:(ResponseHandler)responseHandler
@@ -1604,11 +2630,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePrimary1IntensityWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary1Intensity(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary1IntensityWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary1Intensity(success);
+        },
+        true);
+}
+
 - (void)readAttributePrimary2XWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePrimary2X(success, failure);
     });
+}
+
+- (void)subscribeAttributePrimary2XWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary2X(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary2XWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary2X(success);
+        },
+        true);
 }
 
 - (void)readAttributePrimary2YWithResponseHandler:(ResponseHandler)responseHandler
@@ -1618,11 +2682,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePrimary2YWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary2Y(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary2YWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary2Y(success);
+        },
+        true);
+}
+
 - (void)readAttributePrimary2IntensityWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePrimary2Intensity(success, failure);
     });
+}
+
+- (void)subscribeAttributePrimary2IntensityWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary2Intensity(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary2IntensityWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary2Intensity(success);
+        },
+        true);
 }
 
 - (void)readAttributePrimary3XWithResponseHandler:(ResponseHandler)responseHandler
@@ -1632,11 +2734,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePrimary3XWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary3X(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary3XWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary3X(success);
+        },
+        true);
+}
+
 - (void)readAttributePrimary3YWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePrimary3Y(success, failure);
     });
+}
+
+- (void)subscribeAttributePrimary3YWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary3Y(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary3YWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary3Y(success);
+        },
+        true);
 }
 
 - (void)readAttributePrimary3IntensityWithResponseHandler:(ResponseHandler)responseHandler
@@ -1646,11 +2786,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePrimary3IntensityWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary3Intensity(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary3IntensityWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary3Intensity(success);
+        },
+        true);
+}
+
 - (void)readAttributePrimary4XWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePrimary4X(success, failure);
     });
+}
+
+- (void)subscribeAttributePrimary4XWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary4X(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary4XWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary4X(success);
+        },
+        true);
 }
 
 - (void)readAttributePrimary4YWithResponseHandler:(ResponseHandler)responseHandler
@@ -1660,11 +2838,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePrimary4YWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary4Y(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary4YWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary4Y(success);
+        },
+        true);
+}
+
 - (void)readAttributePrimary4IntensityWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePrimary4Intensity(success, failure);
     });
+}
+
+- (void)subscribeAttributePrimary4IntensityWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary4Intensity(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary4IntensityWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary4Intensity(success);
+        },
+        true);
 }
 
 - (void)readAttributePrimary5XWithResponseHandler:(ResponseHandler)responseHandler
@@ -1674,11 +2890,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePrimary5XWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary5X(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary5XWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary5X(success);
+        },
+        true);
+}
+
 - (void)readAttributePrimary5YWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePrimary5Y(success, failure);
     });
+}
+
+- (void)subscribeAttributePrimary5YWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary5Y(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary5YWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary5Y(success);
+        },
+        true);
 }
 
 - (void)readAttributePrimary5IntensityWithResponseHandler:(ResponseHandler)responseHandler
@@ -1688,11 +2942,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePrimary5IntensityWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary5Intensity(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary5IntensityWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary5Intensity(success);
+        },
+        true);
+}
+
 - (void)readAttributePrimary6XWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePrimary6X(success, failure);
     });
+}
+
+- (void)subscribeAttributePrimary6XWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary6X(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary6XWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary6X(success);
+        },
+        true);
 }
 
 - (void)readAttributePrimary6YWithResponseHandler:(ResponseHandler)responseHandler
@@ -1702,11 +2994,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePrimary6YWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary6Y(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary6YWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary6Y(success);
+        },
+        true);
+}
+
 - (void)readAttributePrimary6IntensityWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePrimary6Intensity(success, failure);
     });
+}
+
+- (void)subscribeAttributePrimary6IntensityWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePrimary6Intensity(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePrimary6IntensityWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePrimary6Intensity(success);
+        },
+        true);
 }
 
 - (void)readAttributeWhitePointXWithResponseHandler:(ResponseHandler)responseHandler
@@ -1729,6 +3059,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeWhitePointXWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeWhitePointX(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeWhitePointXWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeWhitePointX(success);
+        },
+        true);
+}
+
 - (void)readAttributeWhitePointYWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1747,6 +3096,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeWhitePointYWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeWhitePointY(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeWhitePointYWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeWhitePointY(success);
+        },
+        true);
 }
 
 - (void)readAttributeColorPointRXWithResponseHandler:(ResponseHandler)responseHandler
@@ -1769,6 +3137,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeColorPointRXWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorPointRX(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorPointRXWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorPointRX(success);
+        },
+        true);
+}
+
 - (void)readAttributeColorPointRYWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1787,6 +3174,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeColorPointRYWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorPointRY(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorPointRYWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorPointRY(success);
+        },
+        true);
 }
 
 - (void)readAttributeColorPointRIntensityWithResponseHandler:(ResponseHandler)responseHandler
@@ -1809,6 +3215,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeColorPointRIntensityWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorPointRIntensity(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorPointRIntensityWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorPointRIntensity(success);
+        },
+        true);
+}
+
 - (void)readAttributeColorPointGXWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1827,6 +3252,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeColorPointGXWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorPointGX(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorPointGXWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorPointGX(success);
+        },
+        true);
 }
 
 - (void)readAttributeColorPointGYWithResponseHandler:(ResponseHandler)responseHandler
@@ -1849,6 +3293,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeColorPointGYWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorPointGY(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorPointGYWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorPointGY(success);
+        },
+        true);
+}
+
 - (void)readAttributeColorPointGIntensityWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1867,6 +3330,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeColorPointGIntensityWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorPointGIntensity(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorPointGIntensityWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorPointGIntensity(success);
+        },
+        true);
 }
 
 - (void)readAttributeColorPointBXWithResponseHandler:(ResponseHandler)responseHandler
@@ -1889,6 +3371,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeColorPointBXWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorPointBX(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorPointBXWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorPointBX(success);
+        },
+        true);
+}
+
 - (void)readAttributeColorPointBYWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1907,6 +3408,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeColorPointBYWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorPointBY(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorPointBYWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorPointBY(success);
+        },
+        true);
 }
 
 - (void)readAttributeColorPointBIntensityWithResponseHandler:(ResponseHandler)responseHandler
@@ -1929,11 +3449,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeColorPointBIntensityWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorPointBIntensity(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorPointBIntensityWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorPointBIntensity(success);
+        },
+        true);
+}
+
 - (void)readAttributeEnhancedCurrentHueWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeEnhancedCurrentHue(success, failure);
     });
+}
+
+- (void)subscribeAttributeEnhancedCurrentHueWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                            responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeEnhancedCurrentHue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeEnhancedCurrentHueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeEnhancedCurrentHue(success);
+        },
+        true);
 }
 
 - (void)readAttributeEnhancedColorModeWithResponseHandler:(ResponseHandler)responseHandler
@@ -1943,11 +3501,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeEnhancedColorModeWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeEnhancedColorMode(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeEnhancedColorModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeEnhancedColorMode(success);
+        },
+        true);
+}
+
 - (void)readAttributeColorLoopActiveWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeColorLoopActive(success, failure);
     });
+}
+
+- (void)subscribeAttributeColorLoopActiveWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorLoopActive(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorLoopActiveWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorLoopActive(success);
+        },
+        true);
 }
 
 - (void)readAttributeColorLoopDirectionWithResponseHandler:(ResponseHandler)responseHandler
@@ -1957,11 +3553,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeColorLoopDirectionWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                            responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorLoopDirection(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorLoopDirectionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorLoopDirection(success);
+        },
+        true);
+}
+
 - (void)readAttributeColorLoopTimeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeColorLoopTime(success, failure);
     });
+}
+
+- (void)subscribeAttributeColorLoopTimeWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorLoopTime(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorLoopTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorLoopTime(success);
+        },
+        true);
 }
 
 - (void)readAttributeColorLoopStartEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler
@@ -1971,11 +3605,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeColorLoopStartEnhancedHueWithMinInterval:(uint16_t)minInterval
+                                                       maxInterval:(uint16_t)maxInterval
+                                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorLoopStartEnhancedHue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorLoopStartEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorLoopStartEnhancedHue(success);
+        },
+        true);
+}
+
 - (void)readAttributeColorLoopStoredEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeColorLoopStoredEnhancedHue(success, failure);
     });
+}
+
+- (void)subscribeAttributeColorLoopStoredEnhancedHueWithMinInterval:(uint16_t)minInterval
+                                                        maxInterval:(uint16_t)maxInterval
+                                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorLoopStoredEnhancedHue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorLoopStoredEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorLoopStoredEnhancedHue(success);
+        },
+        true);
 }
 
 - (void)readAttributeColorCapabilitiesWithResponseHandler:(ResponseHandler)responseHandler
@@ -1985,11 +3657,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeColorCapabilitiesWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorCapabilities(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorCapabilitiesWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorCapabilities(success);
+        },
+        true);
+}
+
 - (void)readAttributeColorTempPhysicalMinWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeColorTempPhysicalMin(success, failure);
     });
+}
+
+- (void)subscribeAttributeColorTempPhysicalMinWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorTempPhysicalMin(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorTempPhysicalMinWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorTempPhysicalMin(success);
+        },
+        true);
 }
 
 - (void)readAttributeColorTempPhysicalMaxWithResponseHandler:(ResponseHandler)responseHandler
@@ -1999,11 +3709,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeColorTempPhysicalMaxWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeColorTempPhysicalMax(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeColorTempPhysicalMaxWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeColorTempPhysicalMax(success);
+        },
+        true);
+}
+
 - (void)readAttributeCoupleColorTempToLevelMinMiredsWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeCoupleColorTempToLevelMinMireds(success, failure);
     });
+}
+
+- (void)subscribeAttributeCoupleColorTempToLevelMinMiredsWithMinInterval:(uint16_t)minInterval
+                                                             maxInterval:(uint16_t)maxInterval
+                                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCoupleColorTempToLevelMinMireds(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCoupleColorTempToLevelMinMiredsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCoupleColorTempToLevelMinMireds(success);
+        },
+        true);
 }
 
 - (void)readAttributeStartUpColorTemperatureMiredsWithResponseHandler:(ResponseHandler)responseHandler
@@ -2027,11 +3775,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeStartUpColorTemperatureMiredsWithMinInterval:(uint16_t)minInterval
+                                                           maxInterval:(uint16_t)maxInterval
+                                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeStartUpColorTemperatureMireds(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeStartUpColorTemperatureMiredsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeStartUpColorTemperatureMireds(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -2097,6 +3883,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
+}
+
 @end
 
 @implementation CHIPDescriptor
@@ -2143,6 +3948,25 @@ using namespace chip::app::Clusters;
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -2568,6 +4392,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeLockTypeWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeLockType(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeLockTypeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeLockType(success);
+        },
+        true);
+}
+
 - (void)readAttributeActuatorEnabledWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2575,11 +4418,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeActuatorEnabledWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeActuatorEnabled(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeActuatorEnabledWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeActuatorEnabled(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -2598,11 +4479,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMeasurementTypeWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMeasurementType(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMeasurementTypeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMeasurementType(success);
+        },
+        true);
+}
+
 - (void)readAttributeTotalActivePowerWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeTotalActivePower(success, failure);
     });
+}
+
+- (void)subscribeAttributeTotalActivePowerWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTotalActivePower(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTotalActivePowerWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTotalActivePower(success);
+        },
+        true);
 }
 
 - (void)readAttributeRmsVoltageWithResponseHandler:(ResponseHandler)responseHandler
@@ -2612,11 +4531,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRmsVoltageWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRmsVoltage(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRmsVoltageWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRmsVoltage(success);
+        },
+        true);
+}
+
 - (void)readAttributeRmsVoltageMinWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRmsVoltageMin(success, failure);
     });
+}
+
+- (void)subscribeAttributeRmsVoltageMinWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRmsVoltageMin(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRmsVoltageMinWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRmsVoltageMin(success);
+        },
+        true);
 }
 
 - (void)readAttributeRmsVoltageMaxWithResponseHandler:(ResponseHandler)responseHandler
@@ -2626,11 +4583,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRmsVoltageMaxWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRmsVoltageMax(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRmsVoltageMaxWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRmsVoltageMax(success);
+        },
+        true);
+}
+
 - (void)readAttributeRmsCurrentWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRmsCurrent(success, failure);
     });
+}
+
+- (void)subscribeAttributeRmsCurrentWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRmsCurrent(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRmsCurrentWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRmsCurrent(success);
+        },
+        true);
 }
 
 - (void)readAttributeRmsCurrentMinWithResponseHandler:(ResponseHandler)responseHandler
@@ -2640,11 +4635,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRmsCurrentMinWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRmsCurrentMin(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRmsCurrentMinWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRmsCurrentMin(success);
+        },
+        true);
+}
+
 - (void)readAttributeRmsCurrentMaxWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRmsCurrentMax(success, failure);
     });
+}
+
+- (void)subscribeAttributeRmsCurrentMaxWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRmsCurrentMax(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRmsCurrentMaxWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRmsCurrentMax(success);
+        },
+        true);
 }
 
 - (void)readAttributeActivePowerWithResponseHandler:(ResponseHandler)responseHandler
@@ -2654,11 +4687,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeActivePowerWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeActivePower(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeActivePowerWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeActivePower(success);
+        },
+        true);
+}
+
 - (void)readAttributeActivePowerMinWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeActivePowerMin(success, failure);
     });
+}
+
+- (void)subscribeAttributeActivePowerMinWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeActivePowerMin(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeActivePowerMinWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeActivePowerMin(success);
+        },
+        true);
 }
 
 - (void)readAttributeActivePowerMaxWithResponseHandler:(ResponseHandler)responseHandler
@@ -2668,11 +4739,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeActivePowerMaxWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeActivePowerMax(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeActivePowerMaxWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeActivePowerMax(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -2704,11 +4813,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePHYRateWithMinInterval:(uint16_t)minInterval
+                                     maxInterval:(uint16_t)maxInterval
+                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePHYRate(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePHYRateWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePHYRate(success);
+        },
+        true);
+}
+
 - (void)readAttributeFullDuplexWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeFullDuplex(success, failure);
     });
+}
+
+- (void)subscribeAttributeFullDuplexWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeFullDuplex(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeFullDuplexWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeFullDuplex(success);
+        },
+        true);
 }
 
 - (void)readAttributePacketRxCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -2718,11 +4865,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePacketRxCountWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePacketRxCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePacketRxCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePacketRxCount(success);
+        },
+        true);
+}
+
 - (void)readAttributePacketTxCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePacketTxCount(success, failure);
     });
+}
+
+- (void)subscribeAttributePacketTxCountWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePacketTxCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePacketTxCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePacketTxCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeTxErrCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -2732,11 +4917,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTxErrCountWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxErrCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxErrCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxErrCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeCollisionCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeCollisionCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeCollisionCountWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCollisionCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCollisionCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCollisionCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -2746,11 +4969,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeOverrunCountWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOverrunCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOverrunCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeCarrierDetectWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeCarrierDetect(success, failure);
     });
+}
+
+- (void)subscribeAttributeCarrierDetectWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCarrierDetect(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCarrierDetectWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCarrierDetect(success);
+        },
+        true);
 }
 
 - (void)readAttributeTimeSinceResetWithResponseHandler:(ResponseHandler)responseHandler
@@ -2760,11 +5021,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTimeSinceResetWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTimeSinceReset(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTimeSinceResetWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTimeSinceReset(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -2791,6 +5090,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
+}
+
 @end
 
 @implementation CHIPFlowMeasurement
@@ -2807,11 +5125,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMeasuredValue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMeasuredValue(success);
+        },
+        true);
+}
+
 - (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeMinMeasuredValue(success, failure);
     });
+}
+
+- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinMeasuredValue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinMeasuredValue(success);
+        },
+        true);
 }
 
 - (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
@@ -2821,6 +5177,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxMeasuredValue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxMeasuredValue(success);
+        },
+        true);
+}
+
 - (void)readAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2828,11 +5203,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeToleranceWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTolerance(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTolerance(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -2915,6 +5328,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeBreadcrumbWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBreadcrumb(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBreadcrumbWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBreadcrumb(success);
+        },
+        true);
+}
+
 - (void)readAttributeBasicCommissioningInfoListWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBridge(
@@ -2928,6 +5360,25 @@ using namespace chip::app::Clusters;
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -2954,11 +5405,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRebootCountWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRebootCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRebootCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRebootCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeUpTimeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeUpTime(success, failure);
     });
+}
+
+- (void)subscribeAttributeUpTimeWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeUpTime(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeUpTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeUpTime(success);
+        },
+        true);
 }
 
 - (void)readAttributeTotalOperationalHoursWithResponseHandler:(ResponseHandler)responseHandler
@@ -2968,11 +5457,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTotalOperationalHoursWithMinInterval:(uint16_t)minInterval
+                                                   maxInterval:(uint16_t)maxInterval
+                                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTotalOperationalHours(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTotalOperationalHoursWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTotalOperationalHours(success);
+        },
+        true);
+}
+
 - (void)readAttributeBootReasonsWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeBootReasons(success, failure);
     });
+}
+
+- (void)subscribeAttributeBootReasonsWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBootReasons(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBootReasonsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBootReasons(success);
+        },
+        true);
 }
 
 - (void)readAttributeActiveHardwareFaultsWithResponseHandler:(ResponseHandler)responseHandler
@@ -3006,6 +5533,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
+}
+
 @end
 
 @implementation CHIPGroupKeyManagement
@@ -3036,6 +5582,25 @@ using namespace chip::app::Clusters;
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -3160,11 +5725,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNameSupportWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNameSupport(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNameSupportWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNameSupport(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -3238,6 +5841,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeIdentifyTimeWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeIdentifyTime(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeIdentifyTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeIdentifyTime(success);
+        },
+        true);
+}
+
 - (void)readAttributeIdentifyTypeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3245,11 +5867,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeIdentifyTypeWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeIdentifyType(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeIdentifyTypeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeIdentifyType(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -3294,11 +5954,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinMeasuredValue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinMeasuredValue(success);
+        },
+        true);
+}
+
 - (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeMaxMeasuredValue(success, failure);
     });
+}
+
+- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxMeasuredValue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxMeasuredValue(success);
+        },
+        true);
 }
 
 - (void)readAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler
@@ -3308,6 +6006,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeToleranceWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTolerance(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTolerance(success);
+        },
+        true);
+}
+
 - (void)readAttributeLightSensorTypeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3315,11 +6032,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeLightSensorTypeWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeLightSensorType(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeLightSensorTypeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeLightSensorType(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -3350,6 +6105,25 @@ using namespace chip::app::Clusters;
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -3516,11 +6290,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRemainingTimeWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRemainingTime(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRemainingTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRemainingTime(success);
+        },
+        true);
+}
+
 - (void)readAttributeMinLevelWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeMinLevel(success, failure);
     });
+}
+
+- (void)subscribeAttributeMinLevelWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinLevel(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinLevelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinLevel(success);
+        },
+        true);
 }
 
 - (void)readAttributeMaxLevelWithResponseHandler:(ResponseHandler)responseHandler
@@ -3530,11 +6342,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMaxLevelWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxLevel(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxLevelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxLevel(success);
+        },
+        true);
+}
+
 - (void)readAttributeCurrentFrequencyWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeCurrentFrequency(success, failure);
     });
+}
+
+- (void)subscribeAttributeCurrentFrequencyWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentFrequency(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentFrequencyWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentFrequency(success);
+        },
+        true);
 }
 
 - (void)readAttributeMinFrequencyWithResponseHandler:(ResponseHandler)responseHandler
@@ -3544,11 +6394,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMinFrequencyWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinFrequency(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinFrequencyWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinFrequency(success);
+        },
+        true);
+}
+
 - (void)readAttributeMaxFrequencyWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeMaxFrequency(success, failure);
     });
+}
+
+- (void)subscribeAttributeMaxFrequencyWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxFrequency(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxFrequencyWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxFrequency(success);
+        },
+        true);
 }
 
 - (void)readAttributeOptionsWithResponseHandler:(ResponseHandler)responseHandler
@@ -3571,6 +6459,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeOptionsWithMinInterval:(uint16_t)minInterval
+                                     maxInterval:(uint16_t)maxInterval
+                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOptions(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOptionsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOptions(success);
+        },
+        true);
+}
+
 - (void)readAttributeOnOffTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3589,6 +6496,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeOnOffTransitionTimeWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOnOffTransitionTime(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOnOffTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOnOffTransitionTime(success);
+        },
+        true);
 }
 
 - (void)readAttributeOnLevelWithResponseHandler:(ResponseHandler)responseHandler
@@ -3611,6 +6537,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeOnLevelWithMinInterval:(uint16_t)minInterval
+                                     maxInterval:(uint16_t)maxInterval
+                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOnLevel(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOnLevelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOnLevel(success);
+        },
+        true);
+}
+
 - (void)readAttributeOnTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3629,6 +6574,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeOnTransitionTimeWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOnTransitionTime(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOnTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOnTransitionTime(success);
+        },
+        true);
 }
 
 - (void)readAttributeOffTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler
@@ -3651,6 +6615,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeOffTransitionTimeWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOffTransitionTime(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOffTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOffTransitionTime(success);
+        },
+        true);
+}
+
 - (void)readAttributeDefaultMoveRateWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3669,6 +6652,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeDefaultMoveRateWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeDefaultMoveRate(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeDefaultMoveRateWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeDefaultMoveRate(success);
+        },
+        true);
 }
 
 - (void)readAttributeStartUpCurrentLevelWithResponseHandler:(ResponseHandler)responseHandler
@@ -3691,11 +6693,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeStartUpCurrentLevelWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeStartUpCurrentLevel(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeStartUpCurrentLevelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeStartUpCurrentLevel(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -3724,6 +6764,25 @@ using namespace chip::app::Clusters;
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -3803,11 +6862,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeCurrentMediaInputWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentMediaInput(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentMediaInputWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentMediaInput(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -3977,11 +7074,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePlaybackStateWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePlaybackState(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePlaybackStateWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePlaybackState(success);
+        },
+        true);
+}
+
 - (void)readAttributeStartTimeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeStartTime(success, failure);
     });
+}
+
+- (void)subscribeAttributeStartTimeWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeStartTime(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeStartTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeStartTime(success);
+        },
+        true);
 }
 
 - (void)readAttributeDurationWithResponseHandler:(ResponseHandler)responseHandler
@@ -3991,11 +7126,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeDurationWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeDuration(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeDurationWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeDuration(success);
+        },
+        true);
+}
+
 - (void)readAttributePositionUpdatedAtWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePositionUpdatedAt(success, failure);
     });
+}
+
+- (void)subscribeAttributePositionUpdatedAtWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePositionUpdatedAt(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePositionUpdatedAtWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePositionUpdatedAt(success);
+        },
+        true);
 }
 
 - (void)readAttributePositionWithResponseHandler:(ResponseHandler)responseHandler
@@ -4005,11 +7178,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePositionWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePosition(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePositionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePosition(success);
+        },
+        true);
+}
+
 - (void)readAttributePlaybackSpeedWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePlaybackSpeed(success, failure);
     });
+}
+
+- (void)subscribeAttributePlaybackSpeedWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePlaybackSpeed(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePlaybackSpeedWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePlaybackSpeed(success);
+        },
+        true);
 }
 
 - (void)readAttributeSeekRangeEndWithResponseHandler:(ResponseHandler)responseHandler
@@ -4019,6 +7230,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeSeekRangeEndWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSeekRangeEnd(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSeekRangeEndWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSeekRangeEnd(success);
+        },
+        true);
+}
+
 - (void)readAttributeSeekRangeStartWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4026,11 +7256,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeSeekRangeStartWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSeekRangeStart(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSeekRangeStartWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSeekRangeStart(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -4109,11 +7377,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeOnModeWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOnMode(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOnModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOnMode(success);
+        },
+        true);
+}
+
 - (void)readAttributeStartUpModeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeStartUpMode(success, failure);
     });
+}
+
+- (void)subscribeAttributeStartUpModeWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeStartUpMode(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeStartUpModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeStartUpMode(success);
+        },
+        true);
 }
 
 - (void)readAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler
@@ -4123,11 +7429,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeDescriptionWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeDescription(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeDescription(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -4286,11 +7630,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeFeatureMap(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeFeatureMap(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -4396,6 +7778,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
+}
+
 @end
 
 @implementation CHIPOtaSoftwareUpdateRequestor
@@ -4446,6 +7847,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeDefaultOtaProviderWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                            responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeDefaultOtaProvider(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeDefaultOtaProviderWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeDefaultOtaProvider(success);
+        },
+        true);
+}
+
 - (void)readAttributeUpdatePossibleWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4453,11 +7873,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeUpdatePossibleWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeUpdatePossible(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeUpdatePossibleWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeUpdatePossible(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -4502,6 +7960,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeOccupancySensorTypeWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOccupancySensorType(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOccupancySensorTypeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOccupancySensorType(success);
+        },
+        true);
+}
+
 - (void)readAttributeOccupancySensorTypeBitmapWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4509,11 +7986,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeOccupancySensorTypeBitmapWithMinInterval:(uint16_t)minInterval
+                                                       maxInterval:(uint16_t)maxInterval
+                                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOccupancySensorTypeBitmap(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOccupancySensorTypeBitmapWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOccupancySensorTypeBitmap(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -4638,6 +8153,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeGlobalSceneControlWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                            responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeGlobalSceneControl(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeGlobalSceneControlWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeGlobalSceneControl(success);
+        },
+        true);
+}
+
 - (void)readAttributeOnTimeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4656,6 +8190,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeOnTimeWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOnTime(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOnTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOnTime(success);
+        },
+        true);
 }
 
 - (void)readAttributeOffWaitTimeWithResponseHandler:(ResponseHandler)responseHandler
@@ -4678,6 +8231,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeOffWaitTimeWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOffWaitTime(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOffWaitTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOffWaitTime(success);
+        },
+        true);
+}
+
 - (void)readAttributeStartUpOnOffWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4698,6 +8270,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeStartUpOnOffWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeStartUpOnOff(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeStartUpOnOffWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeStartUpOnOff(success);
+        },
+        true);
+}
+
 - (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4705,11 +8296,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeFeatureMap(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeFeatureMap(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -4726,6 +8355,25 @@ using namespace chip::app::Clusters;
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeSwitchType(success, failure);
     });
+}
+
+- (void)subscribeAttributeSwitchTypeWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSwitchType(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSwitchTypeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSwitchType(success);
+        },
+        true);
 }
 
 - (void)readAttributeSwitchActionsWithResponseHandler:(ResponseHandler)responseHandler
@@ -4748,11 +8396,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeSwitchActionsWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSwitchActions(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSwitchActionsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSwitchActions(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -4923,11 +8609,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeSupportedFabricsWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSupportedFabrics(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSupportedFabricsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSupportedFabrics(success);
+        },
+        true);
+}
+
 - (void)readAttributeCommissionedFabricsWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeCommissionedFabrics(success, failure);
     });
+}
+
+- (void)subscribeAttributeCommissionedFabricsWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCommissionedFabrics(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCommissionedFabricsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCommissionedFabrics(success);
+        },
+        true);
 }
 
 - (void)readAttributeTrustedRootCertificatesWithResponseHandler:(ResponseHandler)responseHandler
@@ -4945,11 +8669,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeCurrentFabricIndexWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                            responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentFabricIndex(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentFabricIndexWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentFabricIndex(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -4968,11 +8730,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeStatusWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeStatus(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeStatusWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeStatus(success);
+        },
+        true);
+}
+
 - (void)readAttributeOrderWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeOrder(success, failure);
     });
+}
+
+- (void)subscribeAttributeOrderWithMinInterval:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOrder(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOrderWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOrder(success);
+        },
+        true);
 }
 
 - (void)readAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler
@@ -4982,11 +8782,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeDescriptionWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeDescription(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeDescription(success);
+        },
+        true);
+}
+
 - (void)readAttributeBatteryVoltageWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeBatteryVoltage(success, failure);
     });
+}
+
+- (void)subscribeAttributeBatteryVoltageWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBatteryVoltage(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBatteryVoltageWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBatteryVoltage(success);
+        },
+        true);
 }
 
 - (void)readAttributeBatteryPercentRemainingWithResponseHandler:(ResponseHandler)responseHandler
@@ -4996,6 +8834,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeBatteryPercentRemainingWithMinInterval:(uint16_t)minInterval
+                                                     maxInterval:(uint16_t)maxInterval
+                                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBatteryPercentRemaining(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBatteryPercentRemainingWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBatteryPercentRemaining(success);
+        },
+        true);
+}
+
 - (void)readAttributeBatteryTimeRemainingWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5003,11 +8860,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeBatteryTimeRemainingWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBatteryTimeRemaining(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBatteryTimeRemainingWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBatteryTimeRemaining(success);
+        },
+        true);
+}
+
 - (void)readAttributeBatteryChargeLevelWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeBatteryChargeLevel(success, failure);
     });
+}
+
+- (void)subscribeAttributeBatteryChargeLevelWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                            responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBatteryChargeLevel(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBatteryChargeLevelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBatteryChargeLevel(success);
+        },
+        true);
 }
 
 - (void)readAttributeActiveBatteryFaultsWithResponseHandler:(ResponseHandler)responseHandler
@@ -5025,6 +8920,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeBatteryChargeStateWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                            responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBatteryChargeState(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBatteryChargeStateWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBatteryChargeState(success);
+        },
+        true);
+}
+
 - (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5032,11 +8946,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeFeatureMap(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeFeatureMap(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -5081,6 +9033,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinMeasuredValue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinMeasuredValue(success);
+        },
+        true);
+}
+
 - (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5088,11 +9059,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxMeasuredValue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxMeasuredValue(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -5111,11 +9120,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMaxPressureWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxPressure(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxPressureWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxPressure(success);
+        },
+        true);
+}
+
 - (void)readAttributeMaxSpeedWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeMaxSpeed(success, failure);
     });
+}
+
+- (void)subscribeAttributeMaxSpeedWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxSpeed(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxSpeedWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxSpeed(success);
+        },
+        true);
 }
 
 - (void)readAttributeMaxFlowWithResponseHandler:(ResponseHandler)responseHandler
@@ -5125,11 +9172,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMaxFlowWithMinInterval:(uint16_t)minInterval
+                                     maxInterval:(uint16_t)maxInterval
+                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxFlow(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxFlowWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxFlow(success);
+        },
+        true);
+}
+
 - (void)readAttributeMinConstPressureWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeMinConstPressure(success, failure);
     });
+}
+
+- (void)subscribeAttributeMinConstPressureWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinConstPressure(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinConstPressureWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinConstPressure(success);
+        },
+        true);
 }
 
 - (void)readAttributeMaxConstPressureWithResponseHandler:(ResponseHandler)responseHandler
@@ -5139,11 +9224,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMaxConstPressureWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxConstPressure(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxConstPressureWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxConstPressure(success);
+        },
+        true);
+}
+
 - (void)readAttributeMinCompPressureWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeMinCompPressure(success, failure);
     });
+}
+
+- (void)subscribeAttributeMinCompPressureWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinCompPressure(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinCompPressureWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinCompPressure(success);
+        },
+        true);
 }
 
 - (void)readAttributeMaxCompPressureWithResponseHandler:(ResponseHandler)responseHandler
@@ -5153,11 +9276,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMaxCompPressureWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxCompPressure(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxCompPressureWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxCompPressure(success);
+        },
+        true);
+}
+
 - (void)readAttributeMinConstSpeedWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeMinConstSpeed(success, failure);
     });
+}
+
+- (void)subscribeAttributeMinConstSpeedWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinConstSpeed(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinConstSpeedWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinConstSpeed(success);
+        },
+        true);
 }
 
 - (void)readAttributeMaxConstSpeedWithResponseHandler:(ResponseHandler)responseHandler
@@ -5167,11 +9328,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMaxConstSpeedWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxConstSpeed(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxConstSpeedWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxConstSpeed(success);
+        },
+        true);
+}
+
 - (void)readAttributeMinConstFlowWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeMinConstFlow(success, failure);
     });
+}
+
+- (void)subscribeAttributeMinConstFlowWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinConstFlow(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinConstFlowWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinConstFlow(success);
+        },
+        true);
 }
 
 - (void)readAttributeMaxConstFlowWithResponseHandler:(ResponseHandler)responseHandler
@@ -5181,6 +9380,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMaxConstFlowWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxConstFlow(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxConstFlowWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxConstFlow(success);
+        },
+        true);
+}
+
 - (void)readAttributeMinConstTempWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5188,11 +9406,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMinConstTempWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinConstTemp(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinConstTempWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinConstTemp(success);
+        },
+        true);
+}
+
 - (void)readAttributeMaxConstTempWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeMaxConstTemp(success, failure);
     });
+}
+
+- (void)subscribeAttributeMaxConstTempWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxConstTemp(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxConstTempWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxConstTemp(success);
+        },
+        true);
 }
 
 - (void)readAttributePumpStatusWithResponseHandler:(ResponseHandler)responseHandler
@@ -5228,11 +9484,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeEffectiveOperationModeWithMinInterval:(uint16_t)minInterval
+                                                    maxInterval:(uint16_t)maxInterval
+                                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeEffectiveOperationMode(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeEffectiveOperationModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeEffectiveOperationMode(success);
+        },
+        true);
+}
+
 - (void)readAttributeEffectiveControlModeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeEffectiveControlMode(success, failure);
     });
+}
+
+- (void)subscribeAttributeEffectiveControlModeWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeEffectiveControlMode(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeEffectiveControlModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeEffectiveControlMode(success);
+        },
+        true);
 }
 
 - (void)readAttributeCapacityWithResponseHandler:(ResponseHandler)responseHandler
@@ -5268,11 +9562,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeSpeedWithMinInterval:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSpeed(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSpeedWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSpeed(success);
+        },
+        true);
+}
+
 - (void)readAttributeLifetimeEnergyConsumedWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeLifetimeEnergyConsumed(success, failure);
     });
+}
+
+- (void)subscribeAttributeLifetimeEnergyConsumedWithMinInterval:(uint16_t)minInterval
+                                                    maxInterval:(uint16_t)maxInterval
+                                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeLifetimeEnergyConsumed(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeLifetimeEnergyConsumedWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeLifetimeEnergyConsumed(success);
+        },
+        true);
 }
 
 - (void)readAttributeOperationModeWithResponseHandler:(ResponseHandler)responseHandler
@@ -5295,6 +9627,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeOperationModeWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOperationMode(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOperationModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOperationMode(success);
+        },
+        true);
+}
+
 - (void)readAttributeControlModeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5315,11 +9666,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeControlModeWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeControlMode(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeControlModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeControlMode(success);
+        },
+        true);
+}
+
 - (void)readAttributeAlarmMaskWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeAlarmMask(success, failure);
     });
+}
+
+- (void)subscribeAttributeAlarmMaskWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeAlarmMask(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeAlarmMaskWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeAlarmMask(success);
+        },
+        true);
 }
 
 - (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
@@ -5329,11 +9718,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeFeatureMap(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeFeatureMap(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -5378,11 +9805,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinMeasuredValue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinMeasuredValue(success);
+        },
+        true);
+}
+
 - (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeMaxMeasuredValue(success, failure);
     });
+}
+
+- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxMeasuredValue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxMeasuredValue(success);
+        },
+        true);
 }
 
 - (void)readAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler
@@ -5416,6 +9881,25 @@ using namespace chip::app::Clusters;
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -5564,11 +10048,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeSceneCountWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSceneCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSceneCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSceneCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeCurrentSceneWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeCurrentScene(success, failure);
     });
+}
+
+- (void)subscribeAttributeCurrentSceneWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentScene(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentSceneWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentScene(success);
+        },
+        true);
 }
 
 - (void)readAttributeCurrentGroupWithResponseHandler:(ResponseHandler)responseHandler
@@ -5578,11 +10100,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeCurrentGroupWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentGroup(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentGroupWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentGroup(success);
+        },
+        true);
+}
+
 - (void)readAttributeSceneValidWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeSceneValid(success, failure);
     });
+}
+
+- (void)subscribeAttributeSceneValidWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSceneValid(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSceneValidWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSceneValid(success);
+        },
+        true);
 }
 
 - (void)readAttributeNameSupportWithResponseHandler:(ResponseHandler)responseHandler
@@ -5592,11 +10152,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNameSupportWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNameSupport(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNameSupportWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNameSupport(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -5636,11 +10234,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeCurrentHeapFreeWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentHeapFree(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentHeapFreeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentHeapFree(success);
+        },
+        true);
+}
+
 - (void)readAttributeCurrentHeapUsedWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeCurrentHeapUsed(success, failure);
     });
+}
+
+- (void)subscribeAttributeCurrentHeapUsedWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentHeapUsed(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentHeapUsedWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentHeapUsed(success);
+        },
+        true);
 }
 
 - (void)readAttributeCurrentHeapHighWatermarkWithResponseHandler:(ResponseHandler)responseHandler
@@ -5650,11 +10286,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeCurrentHeapHighWatermarkWithMinInterval:(uint16_t)minInterval
+                                                      maxInterval:(uint16_t)maxInterval
+                                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentHeapHighWatermark(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentHeapHighWatermarkWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentHeapHighWatermark(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -5671,6 +10345,25 @@ using namespace chip::app::Clusters;
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeNumberOfPositions(success, failure);
     });
+}
+
+- (void)subscribeAttributeNumberOfPositionsWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNumberOfPositions(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNumberOfPositionsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNumberOfPositions(success);
+        },
+        true);
 }
 
 - (void)readAttributeCurrentPositionWithResponseHandler:(ResponseHandler)responseHandler
@@ -5706,6 +10399,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMultiPressMaxWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMultiPressMax(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMultiPressMaxWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMultiPressMax(success);
+        },
+        true);
+}
+
 - (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5713,11 +10425,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeFeatureMap(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeFeatureMap(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -5786,6 +10536,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTvChannelLineupWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTvChannelLineup(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTvChannelLineupWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTvChannelLineup(success);
+        },
+        true);
+}
+
 - (void)readAttributeCurrentTvChannelWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5793,11 +10562,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeCurrentTvChannelWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentTvChannel(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentTvChannelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentTvChannel(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -5838,6 +10645,25 @@ using namespace chip::app::Clusters;
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -5882,11 +10708,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinMeasuredValue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinMeasuredValue(success);
+        },
+        true);
+}
+
 - (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeMaxMeasuredValue(success, failure);
     });
+}
+
+- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxMeasuredValue(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxMeasuredValue(success);
+        },
+        true);
 }
 
 - (void)readAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler
@@ -5920,6 +10784,25 @@ using namespace chip::app::Clusters;
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -6192,6 +11075,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeBooleanWithMinInterval:(uint16_t)minInterval
+                                     maxInterval:(uint16_t)maxInterval
+                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBoolean(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBooleanWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBoolean(success);
+        },
+        true);
+}
+
 - (void)readAttributeBitmap8WithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6210,6 +11112,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeBitmap8WithMinInterval:(uint16_t)minInterval
+                                     maxInterval:(uint16_t)maxInterval
+                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBitmap8(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBitmap8WithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBitmap8(success);
+        },
+        true);
 }
 
 - (void)readAttributeBitmap16WithResponseHandler:(ResponseHandler)responseHandler
@@ -6232,6 +11153,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeBitmap16WithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBitmap16(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBitmap16WithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBitmap16(success);
+        },
+        true);
+}
+
 - (void)readAttributeBitmap32WithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6250,6 +11190,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeBitmap32WithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBitmap32(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBitmap32WithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBitmap32(success);
+        },
+        true);
 }
 
 - (void)readAttributeBitmap64WithResponseHandler:(ResponseHandler)responseHandler
@@ -6272,6 +11231,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeBitmap64WithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBitmap64(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBitmap64WithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBitmap64(success);
+        },
+        true);
+}
+
 - (void)readAttributeInt8uWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6290,6 +11268,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeInt8uWithMinInterval:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInt8u(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInt8uWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInt8u(success);
+        },
+        true);
 }
 
 - (void)readAttributeInt16uWithResponseHandler:(ResponseHandler)responseHandler
@@ -6312,6 +11309,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeInt16uWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInt16u(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInt16uWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInt16u(success);
+        },
+        true);
+}
+
 - (void)readAttributeInt32uWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6330,6 +11346,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeInt32uWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInt32u(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInt32uWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInt32u(success);
+        },
+        true);
 }
 
 - (void)readAttributeInt64uWithResponseHandler:(ResponseHandler)responseHandler
@@ -6352,6 +11387,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeInt64uWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInt64u(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInt64uWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInt64u(success);
+        },
+        true);
+}
+
 - (void)readAttributeInt8sWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6370,6 +11424,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeInt8sWithMinInterval:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInt8s(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInt8sWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInt8s(success);
+        },
+        true);
 }
 
 - (void)readAttributeInt16sWithResponseHandler:(ResponseHandler)responseHandler
@@ -6392,6 +11465,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeInt16sWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInt16s(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInt16sWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInt16s(success);
+        },
+        true);
+}
+
 - (void)readAttributeInt32sWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6410,6 +11502,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeInt32sWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInt32s(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInt32sWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInt32s(success);
+        },
+        true);
 }
 
 - (void)readAttributeInt64sWithResponseHandler:(ResponseHandler)responseHandler
@@ -6432,6 +11543,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeInt64sWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInt64s(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInt64sWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInt64s(success);
+        },
+        true);
+}
+
 - (void)readAttributeEnum8WithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6450,6 +11580,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeEnum8WithMinInterval:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeEnum8(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeEnum8WithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeEnum8(success);
+        },
+        true);
 }
 
 - (void)readAttributeEnum16WithResponseHandler:(ResponseHandler)responseHandler
@@ -6472,6 +11621,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeEnum16WithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeEnum16(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeEnum16WithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeEnum16(success);
+        },
+        true);
+}
+
 - (void)readAttributeOctetStringWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6490,6 +11658,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeOctetStringWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOctetString(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOctetStringWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOctetString(success);
+        },
+        true);
 }
 
 - (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler
@@ -6639,6 +11826,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeLongOctetStringWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeLongOctetString(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeLongOctetStringWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeLongOctetString(success);
+        },
+        true);
+}
+
 - (void)readAttributeCharStringWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6657,6 +11863,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeCharStringWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCharString(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCharStringWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCharString(success);
+        },
+        true);
 }
 
 - (void)readAttributeLongCharStringWithResponseHandler:(ResponseHandler)responseHandler
@@ -6679,6 +11904,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeLongCharStringWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeLongCharString(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeLongCharStringWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeLongCharString(success);
+        },
+        true);
+}
+
 - (void)readAttributeEpochUsWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6697,6 +11941,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeEpochUsWithMinInterval:(uint16_t)minInterval
+                                     maxInterval:(uint16_t)maxInterval
+                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeEpochUs(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeEpochUsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeEpochUs(success);
+        },
+        true);
 }
 
 - (void)readAttributeEpochSWithResponseHandler:(ResponseHandler)responseHandler
@@ -6719,6 +11982,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeEpochSWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeEpochS(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeEpochSWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeEpochS(success);
+        },
+        true);
+}
+
 - (void)readAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6737,6 +12019,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeVendorIdWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeVendorId(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeVendorId(success);
+        },
+        true);
 }
 
 - (void)readAttributeListNullablesAndOptionalsStructWithResponseHandler:(ResponseHandler)responseHandler
@@ -6767,6 +12068,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeUnsupportedWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeUnsupported(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeUnsupported(success);
+        },
+        true);
+}
+
 - (void)readAttributeNullableBooleanWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6790,6 +12110,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeNullableBooleanWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableBoolean(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableBooleanWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableBoolean(success);
+        },
+        true);
 }
 
 - (void)readAttributeNullableBitmap8WithResponseHandler:(ResponseHandler)responseHandler
@@ -6817,6 +12156,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNullableBitmap8WithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableBitmap8(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableBitmap8WithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableBitmap8(success);
+        },
+        true);
+}
+
 - (void)readAttributeNullableBitmap16WithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6840,6 +12198,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeNullableBitmap16WithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableBitmap16(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableBitmap16WithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableBitmap16(success);
+        },
+        true);
 }
 
 - (void)readAttributeNullableBitmap32WithResponseHandler:(ResponseHandler)responseHandler
@@ -6867,6 +12244,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNullableBitmap32WithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableBitmap32(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableBitmap32WithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableBitmap32(success);
+        },
+        true);
+}
+
 - (void)readAttributeNullableBitmap64WithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6890,6 +12286,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeNullableBitmap64WithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableBitmap64(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableBitmap64WithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableBitmap64(success);
+        },
+        true);
 }
 
 - (void)readAttributeNullableInt8uWithResponseHandler:(ResponseHandler)responseHandler
@@ -6917,6 +12332,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNullableInt8uWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableInt8u(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableInt8uWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableInt8u(success);
+        },
+        true);
+}
+
 - (void)readAttributeNullableInt16uWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6940,6 +12374,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeNullableInt16uWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableInt16u(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableInt16uWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableInt16u(success);
+        },
+        true);
 }
 
 - (void)readAttributeNullableInt32uWithResponseHandler:(ResponseHandler)responseHandler
@@ -6967,6 +12420,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNullableInt32uWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableInt32u(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableInt32uWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableInt32u(success);
+        },
+        true);
+}
+
 - (void)readAttributeNullableInt64uWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -6990,6 +12462,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeNullableInt64uWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableInt64u(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableInt64uWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableInt64u(success);
+        },
+        true);
 }
 
 - (void)readAttributeNullableInt8sWithResponseHandler:(ResponseHandler)responseHandler
@@ -7017,6 +12508,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNullableInt8sWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableInt8s(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableInt8sWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableInt8s(success);
+        },
+        true);
+}
+
 - (void)readAttributeNullableInt16sWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7040,6 +12550,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeNullableInt16sWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableInt16s(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableInt16sWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableInt16s(success);
+        },
+        true);
 }
 
 - (void)readAttributeNullableInt32sWithResponseHandler:(ResponseHandler)responseHandler
@@ -7067,6 +12596,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNullableInt32sWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableInt32s(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableInt32sWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableInt32s(success);
+        },
+        true);
+}
+
 - (void)readAttributeNullableInt64sWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7090,6 +12638,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeNullableInt64sWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableInt64s(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableInt64sWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableInt64s(success);
+        },
+        true);
 }
 
 - (void)readAttributeNullableEnum8WithResponseHandler:(ResponseHandler)responseHandler
@@ -7117,6 +12684,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNullableEnum8WithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableEnum8(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableEnum8WithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableEnum8(success);
+        },
+        true);
+}
+
 - (void)readAttributeNullableEnum16WithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7140,6 +12726,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeNullableEnum16WithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableEnum16(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableEnum16WithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableEnum16(success);
+        },
+        true);
 }
 
 - (void)readAttributeNullableOctetStringWithResponseHandler:(ResponseHandler)responseHandler
@@ -7167,6 +12772,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNullableOctetStringWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableOctetString(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableOctetStringWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableOctetString(success);
+        },
+        true);
+}
+
 - (void)readAttributeNullableCharStringWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7192,11 +12816,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNullableCharStringWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                            responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNullableCharString(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNullableCharStringWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableCharString(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -7339,11 +13001,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeAbsMinHeatSetpointLimitWithMinInterval:(uint16_t)minInterval
+                                                     maxInterval:(uint16_t)maxInterval
+                                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeAbsMinHeatSetpointLimit(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeAbsMinHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeAbsMinHeatSetpointLimit(success);
+        },
+        true);
+}
+
 - (void)readAttributeAbsMaxHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeAbsMaxHeatSetpointLimit(success, failure);
     });
+}
+
+- (void)subscribeAttributeAbsMaxHeatSetpointLimitWithMinInterval:(uint16_t)minInterval
+                                                     maxInterval:(uint16_t)maxInterval
+                                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeAbsMaxHeatSetpointLimit(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeAbsMaxHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeAbsMaxHeatSetpointLimit(success);
+        },
+        true);
 }
 
 - (void)readAttributeAbsMinCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
@@ -7353,11 +13053,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeAbsMinCoolSetpointLimitWithMinInterval:(uint16_t)minInterval
+                                                     maxInterval:(uint16_t)maxInterval
+                                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeAbsMinCoolSetpointLimit(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeAbsMinCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeAbsMinCoolSetpointLimit(success);
+        },
+        true);
+}
+
 - (void)readAttributeAbsMaxCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeAbsMaxCoolSetpointLimit(success, failure);
     });
+}
+
+- (void)subscribeAttributeAbsMaxCoolSetpointLimitWithMinInterval:(uint16_t)minInterval
+                                                     maxInterval:(uint16_t)maxInterval
+                                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeAbsMaxCoolSetpointLimit(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeAbsMaxCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeAbsMaxCoolSetpointLimit(success);
+        },
+        true);
 }
 
 - (void)readAttributeOccupiedCoolingSetpointWithResponseHandler:(ResponseHandler)responseHandler
@@ -7380,6 +13118,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeOccupiedCoolingSetpointWithMinInterval:(uint16_t)minInterval
+                                                     maxInterval:(uint16_t)maxInterval
+                                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOccupiedCoolingSetpoint(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOccupiedCoolingSetpointWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOccupiedCoolingSetpoint(success);
+        },
+        true);
+}
+
 - (void)readAttributeOccupiedHeatingSetpointWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7398,6 +13155,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeOccupiedHeatingSetpointWithMinInterval:(uint16_t)minInterval
+                                                     maxInterval:(uint16_t)maxInterval
+                                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOccupiedHeatingSetpoint(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOccupiedHeatingSetpointWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOccupiedHeatingSetpoint(success);
+        },
+        true);
 }
 
 - (void)readAttributeMinHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
@@ -7420,6 +13196,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMinHeatSetpointLimitWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinHeatSetpointLimit(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinHeatSetpointLimit(success);
+        },
+        true);
+}
+
 - (void)readAttributeMaxHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7438,6 +13233,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeMaxHeatSetpointLimitWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxHeatSetpointLimit(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxHeatSetpointLimit(success);
+        },
+        true);
 }
 
 - (void)readAttributeMinCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
@@ -7460,6 +13274,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMinCoolSetpointLimitWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinCoolSetpointLimit(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinCoolSetpointLimit(success);
+        },
+        true);
+}
+
 - (void)readAttributeMaxCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7480,6 +13313,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMaxCoolSetpointLimitWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMaxCoolSetpointLimit(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMaxCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMaxCoolSetpointLimit(success);
+        },
+        true);
+}
+
 - (void)readAttributeMinSetpointDeadBandWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7498,6 +13350,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeMinSetpointDeadBandWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMinSetpointDeadBand(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMinSetpointDeadBandWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMinSetpointDeadBand(success);
+        },
+        true);
 }
 
 - (void)readAttributeControlSequenceOfOperationWithResponseHandler:(ResponseHandler)responseHandler
@@ -7521,6 +13392,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeControlSequenceOfOperationWithMinInterval:(uint16_t)minInterval
+                                                        maxInterval:(uint16_t)maxInterval
+                                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeControlSequenceOfOperation(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeControlSequenceOfOperationWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeControlSequenceOfOperation(success);
+        },
+        true);
+}
+
 - (void)readAttributeSystemModeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7541,11 +13431,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeSystemModeWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSystemMode(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSystemModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSystemMode(success);
+        },
+        true);
+}
+
 - (void)readAttributeStartOfWeekWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeStartOfWeek(success, failure);
     });
+}
+
+- (void)subscribeAttributeStartOfWeekWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeStartOfWeek(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeStartOfWeekWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeStartOfWeek(success);
+        },
+        true);
 }
 
 - (void)readAttributeNumberOfWeeklyTransitionsWithResponseHandler:(ResponseHandler)responseHandler
@@ -7555,11 +13483,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNumberOfWeeklyTransitionsWithMinInterval:(uint16_t)minInterval
+                                                       maxInterval:(uint16_t)maxInterval
+                                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNumberOfWeeklyTransitions(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNumberOfWeeklyTransitionsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNumberOfWeeklyTransitions(success);
+        },
+        true);
+}
+
 - (void)readAttributeNumberOfDailyTransitionsWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeNumberOfDailyTransitions(success, failure);
     });
+}
+
+- (void)subscribeAttributeNumberOfDailyTransitionsWithMinInterval:(uint16_t)minInterval
+                                                      maxInterval:(uint16_t)maxInterval
+                                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNumberOfDailyTransitions(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNumberOfDailyTransitionsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNumberOfDailyTransitions(success);
+        },
+        true);
 }
 
 - (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
@@ -7569,11 +13535,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeFeatureMap(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeFeatureMap(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -7605,6 +13609,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTemperatureDisplayModeWithMinInterval:(uint16_t)minInterval
+                                                    maxInterval:(uint16_t)maxInterval
+                                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTemperatureDisplayMode(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTemperatureDisplayModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTemperatureDisplayMode(success);
+        },
+        true);
+}
+
 - (void)readAttributeKeypadLockoutWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7623,6 +13646,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeKeypadLockoutWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeKeypadLockout(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeKeypadLockoutWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeKeypadLockout(success);
+        },
+        true);
 }
 
 - (void)readAttributeScheduleProgrammingVisibilityWithResponseHandler:(ResponseHandler)responseHandler
@@ -7646,11 +13688,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeScheduleProgrammingVisibilityWithMinInterval:(uint16_t)minInterval
+                                                           maxInterval:(uint16_t)maxInterval
+                                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeScheduleProgrammingVisibility(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeScheduleProgrammingVisibilityWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeScheduleProgrammingVisibility(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -7682,11 +13762,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeChannelWithMinInterval:(uint16_t)minInterval
+                                     maxInterval:(uint16_t)maxInterval
+                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeChannel(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeChannelWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeChannel(success);
+        },
+        true);
+}
+
 - (void)readAttributeRoutingRoleWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRoutingRole(success, failure);
     });
+}
+
+- (void)subscribeAttributeRoutingRoleWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRoutingRole(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRoutingRoleWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRoutingRole(success);
+        },
+        true);
 }
 
 - (void)readAttributeNetworkNameWithResponseHandler:(ResponseHandler)responseHandler
@@ -7696,11 +13814,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeNetworkNameWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeNetworkName(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeNetworkNameWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNetworkName(success);
+        },
+        true);
+}
+
 - (void)readAttributePanIdWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePanId(success, failure);
     });
+}
+
+- (void)subscribeAttributePanIdWithMinInterval:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePanId(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePanIdWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePanId(success);
+        },
+        true);
 }
 
 - (void)readAttributeExtendedPanIdWithResponseHandler:(ResponseHandler)responseHandler
@@ -7710,6 +13866,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeExtendedPanIdWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeExtendedPanId(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeExtendedPanIdWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeExtendedPanId(success);
+        },
+        true);
+}
+
 - (void)readAttributeMeshLocalPrefixWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -7717,11 +13892,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeMeshLocalPrefixWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMeshLocalPrefix(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeMeshLocalPrefixWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMeshLocalPrefix(success);
+        },
+        true);
+}
+
 - (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeOverrunCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeOverrunCountWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOverrunCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOverrunCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeNeighborTableListWithResponseHandler:(ResponseHandler)responseHandler
@@ -7747,11 +13960,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePartitionIdWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePartitionId(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePartitionIdWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePartitionId(success);
+        },
+        true);
+}
+
 - (void)readAttributeWeightingWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeWeighting(success, failure);
     });
+}
+
+- (void)subscribeAttributeWeightingWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeWeighting(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeWeightingWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeWeighting(success);
+        },
+        true);
 }
 
 - (void)readAttributeDataVersionWithResponseHandler:(ResponseHandler)responseHandler
@@ -7761,11 +14012,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeDataVersionWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeDataVersion(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeDataVersionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeDataVersion(success);
+        },
+        true);
+}
+
 - (void)readAttributeStableDataVersionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeStableDataVersion(success, failure);
     });
+}
+
+- (void)subscribeAttributeStableDataVersionWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeStableDataVersion(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeStableDataVersionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeStableDataVersion(success);
+        },
+        true);
 }
 
 - (void)readAttributeLeaderRouterIdWithResponseHandler:(ResponseHandler)responseHandler
@@ -7775,11 +14064,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeLeaderRouterIdWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeLeaderRouterId(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeLeaderRouterIdWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeLeaderRouterId(success);
+        },
+        true);
+}
+
 - (void)readAttributeDetachedRoleCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeDetachedRoleCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeDetachedRoleCountWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeDetachedRoleCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeDetachedRoleCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeDetachedRoleCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeChildRoleCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7789,11 +14116,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeChildRoleCountWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeChildRoleCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeChildRoleCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeChildRoleCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeRouterRoleCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRouterRoleCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeRouterRoleCountWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRouterRoleCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRouterRoleCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRouterRoleCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeLeaderRoleCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7803,11 +14168,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeLeaderRoleCountWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeLeaderRoleCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeLeaderRoleCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeLeaderRoleCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeAttachAttemptCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeAttachAttemptCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeAttachAttemptCountWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                            responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeAttachAttemptCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeAttachAttemptCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeAttachAttemptCount(success);
+        },
+        true);
 }
 
 - (void)readAttributePartitionIdChangeCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7817,11 +14220,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePartitionIdChangeCountWithMinInterval:(uint16_t)minInterval
+                                                    maxInterval:(uint16_t)maxInterval
+                                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePartitionIdChangeCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePartitionIdChangeCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePartitionIdChangeCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeBetterPartitionAttachAttemptCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeBetterPartitionAttachAttemptCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeBetterPartitionAttachAttemptCountWithMinInterval:(uint16_t)minInterval
+                                                               maxInterval:(uint16_t)maxInterval
+                                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBetterPartitionAttachAttemptCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBetterPartitionAttachAttemptCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBetterPartitionAttachAttemptCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeParentChangeCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7831,11 +14272,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeParentChangeCountWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeParentChangeCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeParentChangeCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeParentChangeCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeTxTotalCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeTxTotalCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeTxTotalCountWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxTotalCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxTotalCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxTotalCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeTxUnicastCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7845,11 +14324,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTxUnicastCountWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxUnicastCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxUnicastCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxUnicastCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeTxBroadcastCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeTxBroadcastCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeTxBroadcastCountWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxBroadcastCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxBroadcastCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxBroadcastCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeTxAckRequestedCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7859,11 +14376,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTxAckRequestedCountWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxAckRequestedCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxAckRequestedCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxAckRequestedCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeTxAckedCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeTxAckedCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeTxAckedCountWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxAckedCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxAckedCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxAckedCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeTxNoAckRequestedCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7873,11 +14428,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTxNoAckRequestedCountWithMinInterval:(uint16_t)minInterval
+                                                   maxInterval:(uint16_t)maxInterval
+                                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxNoAckRequestedCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxNoAckRequestedCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxNoAckRequestedCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeTxDataCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeTxDataCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeTxDataCountWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxDataCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxDataCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxDataCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeTxDataPollCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7887,11 +14480,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTxDataPollCountWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxDataPollCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxDataPollCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxDataPollCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeTxBeaconCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeTxBeaconCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeTxBeaconCountWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxBeaconCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxBeaconCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxBeaconCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeTxBeaconRequestCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7901,11 +14532,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTxBeaconRequestCountWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxBeaconRequestCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxBeaconRequestCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxBeaconRequestCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeTxOtherCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeTxOtherCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeTxOtherCountWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxOtherCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxOtherCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxOtherCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeTxRetryCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7915,11 +14584,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTxRetryCountWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxRetryCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxRetryCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxRetryCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeTxDirectMaxRetryExpiryCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeTxDirectMaxRetryExpiryCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeTxDirectMaxRetryExpiryCountWithMinInterval:(uint16_t)minInterval
+                                                         maxInterval:(uint16_t)maxInterval
+                                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxDirectMaxRetryExpiryCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxDirectMaxRetryExpiryCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxDirectMaxRetryExpiryCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeTxIndirectMaxRetryExpiryCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7929,11 +14636,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTxIndirectMaxRetryExpiryCountWithMinInterval:(uint16_t)minInterval
+                                                           maxInterval:(uint16_t)maxInterval
+                                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxIndirectMaxRetryExpiryCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxIndirectMaxRetryExpiryCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxIndirectMaxRetryExpiryCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeTxErrCcaCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeTxErrCcaCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeTxErrCcaCountWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxErrCcaCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxErrCcaCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxErrCcaCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeTxErrAbortCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7943,11 +14688,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTxErrAbortCountWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxErrAbortCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxErrAbortCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxErrAbortCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeTxErrBusyChannelCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeTxErrBusyChannelCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeTxErrBusyChannelCountWithMinInterval:(uint16_t)minInterval
+                                                   maxInterval:(uint16_t)maxInterval
+                                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeTxErrBusyChannelCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTxErrBusyChannelCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeTxErrBusyChannelCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeRxTotalCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7957,11 +14740,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRxTotalCountWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxTotalCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxTotalCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxTotalCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeRxUnicastCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRxUnicastCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeRxUnicastCountWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxUnicastCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxUnicastCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxUnicastCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeRxBroadcastCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7971,11 +14792,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRxBroadcastCountWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxBroadcastCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxBroadcastCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxBroadcastCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeRxDataCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRxDataCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeRxDataCountWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxDataCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxDataCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxDataCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeRxDataPollCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7985,11 +14844,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRxDataPollCountWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxDataPollCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxDataPollCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxDataPollCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeRxBeaconCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRxBeaconCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeRxBeaconCountWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxBeaconCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxBeaconCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxBeaconCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeRxBeaconRequestCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -7999,11 +14896,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRxBeaconRequestCountWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxBeaconRequestCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxBeaconRequestCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxBeaconRequestCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeRxOtherCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRxOtherCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeRxOtherCountWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxOtherCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxOtherCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxOtherCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeRxAddressFilteredCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -8013,11 +14948,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRxAddressFilteredCountWithMinInterval:(uint16_t)minInterval
+                                                    maxInterval:(uint16_t)maxInterval
+                                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxAddressFilteredCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxAddressFilteredCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxAddressFilteredCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeRxDestAddrFilteredCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRxDestAddrFilteredCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeRxDestAddrFilteredCountWithMinInterval:(uint16_t)minInterval
+                                                     maxInterval:(uint16_t)maxInterval
+                                                 responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxDestAddrFilteredCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxDestAddrFilteredCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxDestAddrFilteredCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeRxDuplicatedCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -8027,11 +15000,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRxDuplicatedCountWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxDuplicatedCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxDuplicatedCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxDuplicatedCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeRxErrNoFrameCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRxErrNoFrameCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeRxErrNoFrameCountWithMinInterval:(uint16_t)minInterval
+                                               maxInterval:(uint16_t)maxInterval
+                                           responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxErrNoFrameCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxErrNoFrameCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxErrNoFrameCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeRxErrUnknownNeighborCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -8041,11 +15052,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRxErrUnknownNeighborCountWithMinInterval:(uint16_t)minInterval
+                                                       maxInterval:(uint16_t)maxInterval
+                                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxErrUnknownNeighborCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxErrUnknownNeighborCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxErrUnknownNeighborCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeRxErrInvalidSrcAddrCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRxErrInvalidSrcAddrCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeRxErrInvalidSrcAddrCountWithMinInterval:(uint16_t)minInterval
+                                                      maxInterval:(uint16_t)maxInterval
+                                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxErrInvalidSrcAddrCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxErrInvalidSrcAddrCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxErrInvalidSrcAddrCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeRxErrSecCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -8055,11 +15104,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRxErrSecCountWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxErrSecCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxErrSecCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxErrSecCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeRxErrFcsCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeRxErrFcsCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeRxErrFcsCountWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxErrFcsCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxErrFcsCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxErrFcsCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeRxErrOtherCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -8069,11 +15156,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRxErrOtherCountWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRxErrOtherCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRxErrOtherCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRxErrOtherCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeActiveTimestampWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeActiveTimestamp(success, failure);
     });
+}
+
+- (void)subscribeAttributeActiveTimestampWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeActiveTimestamp(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeActiveTimestampWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeActiveTimestamp(success);
+        },
+        true);
 }
 
 - (void)readAttributePendingTimestampWithResponseHandler:(ResponseHandler)responseHandler
@@ -8083,11 +15208,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePendingTimestampWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePendingTimestamp(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePendingTimestampWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePendingTimestamp(success);
+        },
+        true);
+}
+
 - (void)readAttributeDelayWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeDelay(success, failure);
     });
+}
+
+- (void)subscribeAttributeDelayWithMinInterval:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeDelay(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeDelayWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeDelay(success);
+        },
+        true);
 }
 
 - (void)readAttributeSecurityPolicyWithResponseHandler:(ResponseHandler)responseHandler
@@ -8103,6 +15266,25 @@ using namespace chip::app::Clusters;
     new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeChannelMask(success, failure);
     });
+}
+
+- (void)subscribeAttributeChannelMaskWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeChannelMask(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeChannelMaskWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeChannelMask(success);
+        },
+        true);
 }
 
 - (void)readAttributeOperationalDatasetComponentsWithResponseHandler:(ResponseHandler)responseHandler
@@ -8128,6 +15310,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
+}
+
 @end
 
 @implementation CHIPWakeOnLan
@@ -8144,11 +15345,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeWakeOnLanMacAddressWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeWakeOnLanMacAddress(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeWakeOnLanMacAddressWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeWakeOnLanMacAddress(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -8180,11 +15419,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeBssidWithMinInterval:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                               responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBssid(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBssidWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBssid(success);
+        },
+        true);
+}
+
 - (void)readAttributeSecurityTypeWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeSecurityType(success, failure);
     });
+}
+
+- (void)subscribeAttributeSecurityTypeWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeSecurityType(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeSecurityTypeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeSecurityType(success);
+        },
+        true);
 }
 
 - (void)readAttributeWiFiVersionWithResponseHandler:(ResponseHandler)responseHandler
@@ -8194,11 +15471,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeWiFiVersionWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeWiFiVersion(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeWiFiVersionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeWiFiVersion(success);
+        },
+        true);
+}
+
 - (void)readAttributeChannelNumberWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeChannelNumber(success, failure);
     });
+}
+
+- (void)subscribeAttributeChannelNumberWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeChannelNumber(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeChannelNumberWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeChannelNumber(success);
+        },
+        true);
 }
 
 - (void)readAttributeRssiWithResponseHandler:(ResponseHandler)responseHandler
@@ -8208,11 +15523,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeRssiWithMinInterval:(uint16_t)minInterval
+                                  maxInterval:(uint16_t)maxInterval
+                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeRssi(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeRssiWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeRssi(success);
+        },
+        true);
+}
+
 - (void)readAttributeBeaconLostCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeBeaconLostCount(success, failure);
     });
+}
+
+- (void)subscribeAttributeBeaconLostCountWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBeaconLostCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBeaconLostCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBeaconLostCount(success);
+        },
+        true);
 }
 
 - (void)readAttributeBeaconRxCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -8222,11 +15575,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeBeaconRxCountWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeBeaconRxCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeBeaconRxCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeBeaconRxCount(success);
+        },
+        true);
+}
+
 - (void)readAttributePacketMulticastRxCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePacketMulticastRxCount(success, failure);
     });
+}
+
+- (void)subscribeAttributePacketMulticastRxCountWithMinInterval:(uint16_t)minInterval
+                                                    maxInterval:(uint16_t)maxInterval
+                                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePacketMulticastRxCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePacketMulticastRxCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePacketMulticastRxCount(success);
+        },
+        true);
 }
 
 - (void)readAttributePacketMulticastTxCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -8236,11 +15627,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePacketMulticastTxCountWithMinInterval:(uint16_t)minInterval
+                                                    maxInterval:(uint16_t)maxInterval
+                                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePacketMulticastTxCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePacketMulticastTxCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePacketMulticastTxCount(success);
+        },
+        true);
+}
+
 - (void)readAttributePacketUnicastRxCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributePacketUnicastRxCount(success, failure);
     });
+}
+
+- (void)subscribeAttributePacketUnicastRxCountWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePacketUnicastRxCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePacketUnicastRxCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePacketUnicastRxCount(success);
+        },
+        true);
 }
 
 - (void)readAttributePacketUnicastTxCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -8250,11 +15679,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributePacketUnicastTxCountWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributePacketUnicastTxCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributePacketUnicastTxCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributePacketUnicastTxCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeCurrentMaxRateWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeCurrentMaxRate(success, failure);
     });
+}
+
+- (void)subscribeAttributeCurrentMaxRateWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentMaxRate(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentMaxRateWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentMaxRate(success);
+        },
+        true);
 }
 
 - (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler
@@ -8264,11 +15731,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeOverrunCountWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeOverrunCount(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeOverrunCount(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
@@ -8381,11 +15886,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeTypeWithMinInterval:(uint16_t)minInterval
+                                  maxInterval:(uint16_t)maxInterval
+                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeType(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeTypeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeType(success);
+        },
+        true);
+}
+
 - (void)readAttributeCurrentPositionLiftWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeCurrentPositionLift(success, failure);
     });
+}
+
+- (void)subscribeAttributeCurrentPositionLiftWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentPositionLift(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentPositionLiftWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentPositionLift(success);
+        },
+        true);
 }
 
 - (void)readAttributeCurrentPositionTiltWithResponseHandler:(ResponseHandler)responseHandler
@@ -8395,11 +15938,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeCurrentPositionTiltWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeCurrentPositionTilt(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeCurrentPositionTiltWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeCurrentPositionTilt(success);
+        },
+        true);
+}
+
 - (void)readAttributeConfigStatusWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeConfigStatus(success, failure);
     });
+}
+
+- (void)subscribeAttributeConfigStatusWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeConfigStatus(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeConfigStatusWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeConfigStatus(success);
+        },
+        true);
 }
 
 - (void)readAttributeCurrentPositionLiftPercentageWithResponseHandler:(ResponseHandler)responseHandler
@@ -8539,6 +16120,25 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeEndProductTypeWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeEndProductType(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeEndProductTypeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeEndProductType(success);
+        },
+        true);
+}
+
 - (void)readAttributeCurrentPositionLiftPercent100thsWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -8598,11 +16198,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeInstalledOpenLimitLiftWithMinInterval:(uint16_t)minInterval
+                                                    maxInterval:(uint16_t)maxInterval
+                                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInstalledOpenLimitLift(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInstalledOpenLimitLiftWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInstalledOpenLimitLift(success);
+        },
+        true);
+}
+
 - (void)readAttributeInstalledClosedLimitLiftWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeInstalledClosedLimitLift(success, failure);
     });
+}
+
+- (void)subscribeAttributeInstalledClosedLimitLiftWithMinInterval:(uint16_t)minInterval
+                                                      maxInterval:(uint16_t)maxInterval
+                                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInstalledClosedLimitLift(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInstalledClosedLimitLiftWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInstalledClosedLimitLift(success);
+        },
+        true);
 }
 
 - (void)readAttributeInstalledOpenLimitTiltWithResponseHandler:(ResponseHandler)responseHandler
@@ -8612,11 +16250,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeInstalledOpenLimitTiltWithMinInterval:(uint16_t)minInterval
+                                                    maxInterval:(uint16_t)maxInterval
+                                                responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInstalledOpenLimitTilt(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInstalledOpenLimitTiltWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInstalledOpenLimitTilt(success);
+        },
+        true);
+}
+
 - (void)readAttributeInstalledClosedLimitTiltWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeInstalledClosedLimitTilt(success, failure);
     });
+}
+
+- (void)subscribeAttributeInstalledClosedLimitTiltWithMinInterval:(uint16_t)minInterval
+                                                      maxInterval:(uint16_t)maxInterval
+                                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeInstalledClosedLimitTilt(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeInstalledClosedLimitTiltWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeInstalledClosedLimitTilt(success);
+        },
+        true);
 }
 
 - (void)readAttributeModeWithResponseHandler:(ResponseHandler)responseHandler
@@ -8637,6 +16313,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeModeWithMinInterval:(uint16_t)minInterval
+                                  maxInterval:(uint16_t)maxInterval
+                              responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeMode(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeModeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeMode(success);
+        },
+        true);
 }
 
 - (void)readAttributeSafetyStatusWithResponseHandler:(ResponseHandler)responseHandler
@@ -8672,11 +16367,49 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                                    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeFeatureMap(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeFeatureMap(success);
+        },
+        true);
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeClusterRevision(success, failure);
     });
+}
+
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                         responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeClusterRevision(success);
+        },
+        true);
 }
 
 @end
