@@ -25,7 +25,16 @@
 namespace chip {
 namespace app {
 
-template <typename T>
+template <typename T,
+          bool IsBigEndian =
+// BIGENDIAN_CPU to match how the attribute store works, because that's
+// what where our data buffer is eventually ending up or coming from.
+#if BIGENDIAN_CPU
+              true
+#else  // BIGENDIAN_CPU
+              false
+#endif // BIGENDIAN_CPU
+          >
 struct NumericAttributeTraits
 {
     // StorageType is the type used to represent this C++ type in the attribute
