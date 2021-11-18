@@ -3728,6 +3728,15 @@ namespace Events {
 } // namespace Events
 
 } // namespace Descriptor
+namespace Acl {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace Acl
 namespace PollControl {
 
 namespace Commands {
@@ -5061,6 +5070,33 @@ namespace Events {
 } // namespace Events
 
 } // namespace OtaSoftwareUpdateRequestor
+namespace LocalizationConfiguration {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace LocalizationConfiguration
+namespace BridgedDeviceBasicInformation {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace BridgedDeviceBasicInformation
+namespace PowerSourceConfiguration {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace PowerSourceConfiguration
 namespace PowerSource {
 
 namespace Commands {
@@ -7141,6 +7177,33 @@ namespace Events {
 } // namespace Events
 
 } // namespace EthernetNetworkDiagnostics
+namespace LocalizationTimeFormat {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace LocalizationTimeFormat
+namespace TimeSynchronization {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace TimeSynchronization
+namespace LocalizationUnit {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace LocalizationUnit
 namespace BridgedDeviceBasic {
 
 namespace Commands {
