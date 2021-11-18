@@ -386,8 +386,8 @@ void DeviceController::OnVIDReadResponse(void * context, uint16_t value)
     chip::Controller::BasicCluster cluster;
     cluster.Associate(device, kBasicClusterEndpoint);
 
-    if (cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductID::TypeInfo>(
-            context, OnPIDReadResponse, OnVIDPIDReadFailureResponse) != CHIP_NO_ERROR)
+    if (cluster.ReadAttribute<app::Clusters::Basic::Attributes::ProductID::TypeInfo>(context, OnPIDReadResponse,
+                                                                                     OnVIDPIDReadFailureResponse) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Could not read PID for opening commissioning window");
         OnOpenPairingWindowFailureResponse(context, 0);
@@ -468,7 +468,7 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (callback != nullptr && option != 0)
+    if (callback != nullptr && mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
         OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(mDeviceWithCommissioningWindowOpen);
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -477,8 +477,8 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, kBasicClusterEndpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, OnVIDReadResponse,
-                                                                                                 OnVIDPIDReadFailureResponse);
+        return cluster.ReadAttribute<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, OnVIDReadResponse,
+                                                                                           OnVIDPIDReadFailureResponse);
     }
 
     return OpenCommissioningWindowInternal();
@@ -492,10 +492,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
     OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(mDeviceWithCommissioningWindowOpen);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    std::string QRCode;
-    std::string manualPairingCode;
-    ByteSpan salt(Uint8::from_const_char(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
-
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
     chip::Controller::AdministratorCommissioningCluster cluster;
@@ -506,6 +502,7 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
 
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
+        ByteSpan salt(Uint8::from_const_char(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
         bool randomSetupPIN = (mCommissioningWindowOption == CommissioningWindowOption::kTokenWithRandomPIN);
         PASEVerifier verifier;
 
@@ -522,11 +519,15 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
             successCallback, failureCallback, mCommissioningWindowTimeout, ByteSpan(serializedVerifier, sizeof(serializedVerifier)),
             mSetupPayload.discriminator, mCommissioningWindowIteration, salt, mPAKEVerifierID++));
 
-        ReturnErrorOnFailure(ManualSetupPayloadGenerator(mSetupPayload).payloadDecimalStringRepresentation(manualPairingCode));
-        ChipLogProgress(Controller, "Manual pairing code: [%s]", manualPairingCode.c_str());
+        char payloadBuffer[QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength];
 
-        ReturnErrorOnFailure(QRCodeSetupPayloadGenerator(mSetupPayload).payloadBase38Representation(QRCode));
-        ChipLogProgress(Controller, "SetupQRCode: [%s]", QRCode.c_str());
+        MutableCharSpan manualCode(payloadBuffer);
+        ReturnErrorOnFailure(ManualSetupPayloadGenerator(mSetupPayload).payloadDecimalStringRepresentation(manualCode));
+        ChipLogProgress(Controller, "Manual pairing code: [%s]", payloadBuffer);
+
+        MutableCharSpan QRCode(payloadBuffer);
+        ReturnErrorOnFailure(QRCodeBasicSetupPayloadGenerator(mSetupPayload).payloadBase38Representation(QRCode));
+        ChipLogProgress(Controller, "SetupQRCode: [%s]", payloadBuffer);
     }
     else
     {
