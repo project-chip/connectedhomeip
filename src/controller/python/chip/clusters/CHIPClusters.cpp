@@ -2557,162 +2557,19 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedActions_ClusterRevisi
 }
 
 // End of Cluster BridgedActions
-// Cluster BridgedDeviceBasic
+// Cluster BridgedDeviceBasicInformation
 
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName(chip::DeviceProxy * device,
-                                                                                  chip::EndpointId ZCLendpointId,
-                                                                                  chip::GroupId /* ZCLgroupId */)
+chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasicInformation_ClusterRevision(chip::DeviceProxy * device,
+                                                                                                  chip::EndpointId ZCLendpointId,
+                                                                                                  chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeVendorName(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_VendorID(chip::DeviceProxy * device,
-                                                                                chip::EndpointId ZCLendpointId,
-                                                                                chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeVendorID(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_ProductName(chip::DeviceProxy * device,
-                                                                                   chip::EndpointId ZCLendpointId,
-                                                                                   chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeProductName(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_UserLabel(chip::DeviceProxy * device,
-                                                                                 chip::EndpointId ZCLendpointId,
-                                                                                 chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeUserLabel(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersion(chip::DeviceProxy * device,
-                                                                                       chip::EndpointId ZCLendpointId,
-                                                                                       chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeHardwareVersion(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersionString(chip::DeviceProxy * device,
-                                                                                             chip::EndpointId ZCLendpointId,
-                                                                                             chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeHardwareVersionString(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
-        .AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_SoftwareVersion(chip::DeviceProxy * device,
-                                                                                       chip::EndpointId ZCLendpointId,
-                                                                                       chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeSoftwareVersion(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_SoftwareVersionString(chip::DeviceProxy * device,
-                                                                                             chip::EndpointId ZCLendpointId,
-                                                                                             chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeSoftwareVersionString(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
-        .AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_ManufacturingDate(chip::DeviceProxy * device,
-                                                                                         chip::EndpointId ZCLendpointId,
-                                                                                         chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeManufacturingDate(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
-        .AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_PartNumber(chip::DeviceProxy * device,
-                                                                                  chip::EndpointId ZCLendpointId,
-                                                                                  chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributePartNumber(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_ProductURL(chip::DeviceProxy * device,
-                                                                                  chip::EndpointId ZCLendpointId,
-                                                                                  chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeProductURL(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_ProductLabel(chip::DeviceProxy * device,
-                                                                                    chip::EndpointId ZCLendpointId,
-                                                                                    chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeProductLabel(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_SerialNumber(chip::DeviceProxy * device,
-                                                                                    chip::EndpointId ZCLendpointId,
-                                                                                    chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeSerialNumber(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_Reachable(chip::DeviceProxy * device,
-                                                                                 chip::EndpointId ZCLendpointId,
-                                                                                 chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeReachable(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
-}
-
-chip::ChipError::StorageType chip_ime_ReadAttribute_BridgedDeviceBasic_ClusterRevision(chip::DeviceProxy * device,
-                                                                                       chip::EndpointId ZCLendpointId,
-                                                                                       chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::BridgedDeviceBasicCluster cluster;
+    chip::Controller::BridgedDeviceBasicInformationCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-// End of Cluster BridgedDeviceBasic
+// End of Cluster BridgedDeviceBasicInformation
 // Cluster ColorControl
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_ColorControl_CurrentHue(chip::DeviceProxy * device,
