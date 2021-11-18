@@ -460,18 +460,6 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
     }
     else
     {
-        // -1 is the local only interface. In this case, we can use localhost ::1
-        /*
-        // This fails to compile because sdRef is uninitialised. Initialising it to nullptr causes Add to fail.
-        CHIP_ERROR chip_err = MdnsContexts::GetInstance().Add(sdCtx, sdRef);
-        if (chip_err != CHIP_NO_ERROR)
-        {
-            // TODO: Above doesn't check the error return, but it does seem like we want to trigger the callback if this fails.
-            CheckForSuccess(sdCtx, __func__, kDNSServiceErr_Unknown, true);
-            return chip_err;
-        }
-        */
-
         sockaddr_in6 sockaddr;
         memset(&sockaddr, 0, sizeof(sockaddr));
         sockaddr.sin6_len    = sizeof(sockaddr);
@@ -480,8 +468,17 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
         sockaddr.sin6_port   = htons((unsigned short) port);
         uint32_t ttl         = 120; // default TTL for records with hostnames is 120 seconds
         uint32_t interface   = 0;   // Set interface to ANY (0) - network stack can decide how to route this.
-        OnGetAddrInfo(sdRef, 0 /* flags */, interface, kDNSServiceErr_NoError, hostname, reinterpret_cast<struct sockaddr *>(&sockaddr),
+        OnGetAddrInfo(nullptr, 0 /* flags */, interface, kDNSServiceErr_NoError, hostname, reinterpret_cast<struct sockaddr *>(&sockaddr),
                       ttl, sdCtx);
+
+        // Don't leak memory.
+        std::vector<TextEntry>::iterator textEntry;
+        for (textEntry = sdCtx->textEntries.begin(); textEntry != sdCtx->textEntries.end(); textEntry++)
+        {
+            free(const_cast<char *>(textEntry->mKey));
+            free(const_cast<uint8_t *>(textEntry->mData));
+        }
+
         return CHIP_NO_ERROR;
     }
 }
