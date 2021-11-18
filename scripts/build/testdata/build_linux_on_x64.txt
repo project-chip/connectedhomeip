@@ -68,6 +68,12 @@ gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux {ou
 # Generating linux-x64-thermostat-ipv6only
 gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-thermostat-ipv6only
 
+# Generating linux-x64-tv-app
+gn gen --check --fail-on-unused-args --root={root}/examples/tv-app/linux {out}/linux-x64-tv-app
+
+# Generating linux-x64-tv-app-ipv6only
+gn gen --check --fail-on-unused-args --root={root}/examples/tv-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-tv-app-ipv6only
+
 # Building linux-arm64-all-clusters
 ninja -C {out}/linux-arm64-all-clusters
 
@@ -118,3 +124,9 @@ ninja -C {out}/linux-x64-thermostat
 
 # Building linux-x64-thermostat-ipv6only
 ninja -C {out}/linux-x64-thermostat-ipv6only
+
+# Building linux-x64-tv-app
+ninja -C {out}/linux-x64-tv-app
+
+# Building linux-x64-tv-app-ipv6only
+ninja -C {out}/linux-x64-tv-app-ipv6only
