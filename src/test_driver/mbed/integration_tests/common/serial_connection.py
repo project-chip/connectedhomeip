@@ -46,7 +46,6 @@ class SerialConnection:
         :return: Bytes from serial stream
         """
         if not self.ser.is_open:
-            log.warning('Serial port is not open')
             return None
         try:
             output = self.ser.read(size)
@@ -61,7 +60,6 @@ class SerialConnection:
         :return: One line from serial stream
         """
         if not self.ser.is_open:
-            log.warning('Serial port is not open')
             return None
         try:
             output = self.ser.readline()
@@ -76,7 +74,6 @@ class SerialConnection:
         :param data: Data to send
         """
         if not self.ser.is_open:
-            log.warning('Serial port is not open')
             return
         try:
             if self.inter_byte_delay:
@@ -94,7 +91,6 @@ class SerialConnection:
         :param duration: Break duration
         """
         if not self.ser.is_open:
-            log.warning('Serial port is not open')
             return None
         try:
             self.ser.send_break(duration)
