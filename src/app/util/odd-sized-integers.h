@@ -158,7 +158,7 @@ struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>, IsBigEndian> 
             }
             for (int i = highIndex + lowerIndex; i != pastLowIndex; i += lowerIndex)
             {
-                if (value[i] != 0xFF)
+                if (value[i] != 0x00)
                 {
                     return false;
                 }
@@ -182,14 +182,17 @@ struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>, IsBigEndian> 
         if (IsSigned)
         {
             value[highIndex] = 0x80;
+            for (int i = highIndex + lowerIndex; i != pastLowIndex; i += lowerIndex)
+            {
+                value[i] = 0x00;
+            }
         }
         else
         {
-            value[highIndex] = 0xFF;
-        }
-        for (int i = highIndex + lowerIndex; i != pastLowIndex; i += lowerIndex)
-        {
-            value[i] = 0xFF;
+            for (int i = highIndex; i != pastLowIndex; i += lowerIndex)
+            {
+                value[i] = 0xFF;
+            }
         }
     }
 
