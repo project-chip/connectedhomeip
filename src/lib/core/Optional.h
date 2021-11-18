@@ -157,10 +157,22 @@ public:
     }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
+    T & Value()
+    {
+        VerifyOrDie(HasValue());
+        return mValue.mData;
+    }
+
     const T & Value() const
     {
         VerifyOrDie(HasValue());
         return mValue.mData;
+    }
+
+    void Reset()
+    {
+        mValue.mData.~T();
+        mHasValue = false;
     }
 
     /** Gets the current value of the optional if the optional has a value;
@@ -195,6 +207,12 @@ private:
         T mData;
     } mValue;
 };
+
+template <class T>
+constexpr Optional<std::decay_t<T>> MakeOptional(T && value)
+{
+    return Optional<std::decay_t<T>>(InPlace, std::forward<T>(value));
+}
 
 template <class T, class... Args>
 constexpr Optional<T> MakeOptional(Args &&... args)

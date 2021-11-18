@@ -302,10 +302,7 @@ void ConnectToProvider(const char * ipAddress, uint32_t nodeId)
         IPAddress ipAddr;
         IPAddress::FromString(ipAddress, ipAddr);
         PeerAddress addr = PeerAddress::UDP(ipAddr, CHIP_PORT);
-        uint32_t idleInterval;
-        uint32_t activeInterval;
-        operationalDeviceProxy->GetMRPIntervals(idleInterval, activeInterval);
-        operationalDeviceProxy->UpdateDeviceData(addr, idleInterval, activeInterval);
+        operationalDeviceProxy->UpdateDeviceData(addr, operationalDeviceProxy->GetMRPConfig());
     }
 
     CHIP_ERROR err = operationalDeviceProxy->Connect(&onConnectedCallback, &onConnectionFailureCallback);

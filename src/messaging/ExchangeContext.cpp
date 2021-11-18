@@ -199,7 +199,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     // needs to clear the MRP retransmission table immediately.
     if (clearRetransTable)
     {
-        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(static_cast<ReliableMessageContext *>(this));
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
     }
 
     // Cancel the response timer.
@@ -499,6 +499,11 @@ void ExchangeContext::MessageHandled()
     }
 
     Close();
+}
+
+ReliableMessageProtocolConfig ExchangeContext::GetMRPConfig() const
+{
+    return GetSessionHandle().GetMRPConfig(GetExchangeMgr()->GetSessionManager());
 }
 
 } // namespace Messaging

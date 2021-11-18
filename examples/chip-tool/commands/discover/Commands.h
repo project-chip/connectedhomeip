@@ -54,12 +54,12 @@ public:
         auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
 
         if (retryInterval.HasValue())
-            ChipLogProgress(chipTool, "   MRP retry interval (idle): %" PRIu32 "ms", retryInterval.Value());
+            ChipLogProgress(chipTool, "   MRP retry interval (idle): %" PRIu32 "ms", retryInterval.Value().count());
 
         retryInterval = nodeData.GetMrpRetryIntervalActive();
 
         if (retryInterval.HasValue())
-            ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms", retryInterval.Value());
+            ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms", retryInterval.Value().count());
 
         ChipLogProgress(chipTool, "   Supports TCP: %s", nodeData.mSupportsTcp ? "yes" : "no");
         SetCommandExitStatus(CHIP_NO_ERROR);

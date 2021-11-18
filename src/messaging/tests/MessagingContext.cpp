@@ -72,12 +72,12 @@ SessionHandle MessagingContext::GetSessionBobToFriends()
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
-    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mAliceAddress).Value(), delegate);
+    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mAliceAddress, gMRPConfig).Value(), delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate)
 {
-    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mBobAddress).Value(), delegate);
+    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mBobAddress, gMRPConfig).Value(), delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate)

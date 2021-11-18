@@ -258,15 +258,13 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
             MutableByteSpan mac(macBuffer);
             chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
 
-            const auto advertiseParameters =
-                chip::Dnssd::OperationalAdvertisingParameters()
-                    .SetPeerId(fabricInfo.GetPeerId())
-                    .SetMac(mac)
-                    .SetPort(GetSecuredPort())
-                    .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL),
-                                          Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
-                    .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
-                    .EnableIpV4(true);
+            const auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
+                                                 .SetPeerId(fabricInfo.GetPeerId())
+                                                 .SetMac(mac)
+                                                 .SetPort(GetSecuredPort())
+                                                 .SetMRPConfig(gMRPConfig)
+                                                 .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
+                                                 .EnableIpV4(true);
 
             auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
@@ -343,10 +341,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
 
-    advertiseParameters
-        .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL),
-                              Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
-        .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
+    advertiseParameters.SetMRPConfig(gMRPConfig).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
 
     if (mode != chip::Dnssd::CommissioningMode::kEnabledEnhanced)
     {

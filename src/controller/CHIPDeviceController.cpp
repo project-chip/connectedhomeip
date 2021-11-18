@@ -694,7 +694,6 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     CommissioneeDeviceProxy * device   = nullptr;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
-    uint32_t mrpIdleInterval, mrpActiveInterval;
 
     Messaging::ExchangeContext * exchangeCtxt = nullptr;
     Optional<SessionHandle> session;
@@ -789,12 +788,10 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         }
     }
 #endif
-    session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress());
-    VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
-
     // TODO: In some cases like PASE over IP, CRA and CRI values from commissionable node service should be used
-    device->GetMRPIntervals(mrpIdleInterval, mrpActiveInterval);
-    session.Value().GetUnauthenticatedSession()->SetMRPIntervals(mrpIdleInterval, mrpActiveInterval);
+    session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(),
+                                                                       device->GetMRPConfig().ValueOr(gMRPConfig));
+    VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);

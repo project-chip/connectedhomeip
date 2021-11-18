@@ -281,9 +281,8 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
 {
 
     if (node.longDiscriminator != 0 || node.vendorId != 0 || node.productId != 0 || node.commissioningMode != 0 ||
-        node.deviceType != 0 || node.rotatingIdLen != 0 || node.pairingHint != 0 ||
-        node.mrpRetryIntervalIdle != kUndefinedRetryInterval || node.mrpRetryIntervalActive != kUndefinedRetryInterval ||
-        node.supportsTcp)
+        node.deviceType != 0 || node.rotatingIdLen != 0 || node.pairingHint != 0 || node.mrpRetryIntervalIdle.HasValue() ||
+        node.mrpRetryIntervalActive.HasValue() || node.supportsTcp)
     {
         return false;
     }
@@ -381,28 +380,27 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
 bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
 {
     return nodeData.mPeerId == PeerId{} && nodeData.mNumIPs == 0 && nodeData.mPort == 0 &&
-        nodeData.mMrpRetryIntervalIdle == kUndefinedRetryInterval && nodeData.mMrpRetryIntervalActive == kUndefinedRetryInterval &&
-        !nodeData.mSupportsTcp;
+        !nodeData.mMrpRetryIntervalIdle.HasValue() && !nodeData.mMrpRetryIntervalActive.HasValue() && !nodeData.mSupportsTcp;
 }
 
 void ResetRetryIntervalIdle(DiscoveredNodeData & nodeData)
 {
-    nodeData.mrpRetryIntervalIdle = kUndefinedRetryInterval;
+    nodeData.mrpRetryIntervalIdle.Reset();
 }
 
 void ResetRetryIntervalIdle(ResolvedNodeData & nodeData)
 {
-    nodeData.mMrpRetryIntervalIdle = kUndefinedRetryInterval;
+    nodeData.mMrpRetryIntervalIdle.Reset();
 }
 
 void ResetRetryIntervalActive(DiscoveredNodeData & nodeData)
 {
-    nodeData.mrpRetryIntervalActive = kUndefinedRetryInterval;
+    nodeData.mrpRetryIntervalActive.Reset();
 }
 
 void ResetRetryIntervalActive(ResolvedNodeData & nodeData)
 {
-    nodeData.mMrpRetryIntervalActive = kUndefinedRetryInterval;
+    nodeData.mMrpRetryIntervalActive.Reset();
 }
 
 // Test CRI
@@ -418,14 +416,14 @@ void TxtFieldMrpRetryIntervalIdle(nlTestSuite * inSuite, void * inContext)
     sprintf(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 1);
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 1_ms32);
 
     // Maximum
     sprintf(key, "CRI");
     sprintf(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 3600000);
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 3600000_ms32);
 
     // Test no other fields were populated
     ResetRetryIntervalIdle(nodeData);
@@ -481,14 +479,14 @@ void TxtFieldMrpRetryIntervalActive(nlTestSuite * inSuite, void * inContext)
     sprintf(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 1);
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 1_ms32);
 
     // Maximum
     sprintf(key, "CRA");
     sprintf(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 3600000);
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 3600000_ms32);
 
     // Test no other fields were populated
     ResetRetryIntervalActive(nodeData);

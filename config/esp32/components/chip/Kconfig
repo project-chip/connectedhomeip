@@ -67,17 +67,6 @@ menu "CHIP Core"
                 message handlers with the CHIP message layer to direct incoming messages to
                 their code.
 
-        config RMP_TIMER_DEFAULT_PERIOD_SHIFT
-            int "Default WRMP Timer Tick Interval Shift (ms)"
-            range 0 16
-            default 6
-            help
-                The default interval shift, in milliseconds (e.g. 6 bits shift
-                = 64ms), at which items in the WRMP pending message list are
-                processed for the purpose of retransmission or timeout.
-
-                This value can be overridden by the application at runtime.
-
         config ENABLE_PW_RPC
             bool "Enable Pigweed RPC library"
             default n

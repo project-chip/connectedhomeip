@@ -31,6 +31,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/Constants.h>
 #include <transport/CryptoContext.h>
 #include <transport/MessageCounterManagerInterface.h>
@@ -248,9 +249,11 @@ public:
      */
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
 
-    Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress)
+    Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress,
+                                                         ReliableMessageProtocolConfig config)
     {
-        Optional<Transport::UnauthenticatedSessionHandle> session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
+        Optional<Transport::UnauthenticatedSessionHandle> session =
+            mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, config);
         return session.HasValue() ? MakeOptional<SessionHandle>(session.Value()) : NullOptional;
     }
 

@@ -86,7 +86,7 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
     sessionManager->RegisterReleaseDelegate(*this);
     sessionManager->SetMessageDelegate(this);
 
-    mReliableMessageMgr.Init(sessionManager->SystemLayer(), sessionManager);
+    mReliableMessageMgr.Init(sessionManager->SystemLayer());
     ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionManager));
 
     mState = State::kState_Initialized;
@@ -118,19 +118,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
 ExchangeContext * ExchangeManager::NewContext(SessionHandle session, ExchangeDelegate * delegate)
 {
-    ExchangeContext * context = mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
-
-    uint32_t mrpIdleInterval   = CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL;
-    uint32_t mrpActiveInterval = CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL;
-
-    session.GetMRPIntervals(GetSessionManager(), mrpIdleInterval, mrpActiveInterval);
-
-    ReliableMessageProtocolConfig mrpConfig;
-    mrpConfig.mIdleRetransTimeoutTick   = mrpIdleInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
-    mrpConfig.mActiveRetransTimeoutTick = mrpActiveInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
-    context->GetReliableMessageContext()->SetConfig(mrpConfig);
-
-    return context;
+    return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)

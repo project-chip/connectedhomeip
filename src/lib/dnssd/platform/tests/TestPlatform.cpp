@@ -51,7 +51,7 @@ OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingPara
                                                           .SetMac(ByteSpan(kMac))
                                                           .SetPort(CHIP_PORT)
                                                           .EnableIpV4(true)
-                                                          .SetMRPRetryIntervals(Optional<uint32_t>(32), Optional<uint32_t>(33))
+                                                          .SetMRPConfig({ 32_ms32, 33_ms32 })
                                                           .SetTcpSupported(Optional<bool>(true));
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
@@ -94,9 +94,8 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetProductId(chip::Optional<uint16_t>(897))
         .SetRotatingId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
-        .SetMRPRetryIntervals(
-            chip::Optional<uint32_t>(3600000),
-            chip::Optional<uint32_t>(3600005)); // 3600005 is over the max, so this should be adjusted by the platform
+        // 3600005 is over the max, so this should be adjusted by the platform
+        .SetMRPConfig({ 3600000_ms32, 3600005_ms32 });
 
 test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)

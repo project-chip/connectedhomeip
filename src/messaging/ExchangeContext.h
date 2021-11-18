@@ -151,7 +151,7 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    SessionHandle GetSessionHandle() { return mSession.Value(); }
+    SessionHandle GetSessionHandle() const { return mSession.Value(); }
     bool HasSessionHandle() const { return mSession.HasValue(); }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
@@ -165,6 +165,9 @@ public:
     void Abort();
 
     void SetResponseTimeout(Timeout timeout);
+
+    // Helper function for easily accessing MRP config
+    ReliableMessageProtocolConfig GetMRPConfig() const;
 
 private:
     Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.

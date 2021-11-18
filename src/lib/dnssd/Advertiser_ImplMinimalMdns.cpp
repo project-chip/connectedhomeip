@@ -157,8 +157,7 @@ private:
     CHIP_ERROR AddCommonTxtEntries(const BaseAdvertisingParams<Derived> & params, CommonTxtEntryStorage & storage,
                                    char ** txtFields, size_t & numTxtFields)
     {
-        Optional<uint32_t> mrpRetryIntervalIdle, mrpRetryIntervalActive;
-        params.GetMRPRetryIntervals(mrpRetryIntervalIdle, mrpRetryIntervalActive);
+        Optional<ReliableMessageProtocolConfig> optionalMrp = params.GetMRPConfig();
         // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value change or device type change.
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
         chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
@@ -166,40 +165,36 @@ private:
         ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
         // Increment default MRP retry intervals by SED poll period to be on the safe side
         // and avoid unnecessary retransmissions.
-        if (mrpRetryIntervalIdle.HasValue())
+        if (optionalMrp.HasValue())
         {
-            mrpRetryIntervalIdle.SetValue(mrpRetryIntervalIdle.Value() + sedPollingConfig.SlowPollingIntervalMS);
-        }
-        if (mrpRetryIntervalActive.HasValue())
-        {
-            mrpRetryIntervalActive.SetValue(mrpRetryIntervalActive.Value() + sedPollingConfig.FastPollingIntervalMS);
+            auto mrp = optionalMrp.Value() optionalMrp.SetValue(
+                ReliableMessageProtocolConfig{ mrp.mIdleRetransTimeoutTick + sedPollingConfig.SlowPollingIntervalMS,
+                                               mrp.mActiveRetransTimeoutTick + sedPollingConfig.FastPollingIntervalMS });
         }
 #endif
-        if (mrpRetryIntervalIdle.HasValue())
+        if (optionalMrp.HasValue())
         {
-            if (mrpRetryIntervalIdle.Value() > kMaxRetryInterval)
+            auto mrp = optionalMrp.Value();
+            if (mrp.mIdleRetransTimeoutTick > kMaxRetryInterval)
             {
                 ChipLogProgress(Discovery,
                                 "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
-                mrpRetryIntervalIdle.SetValue(kMaxRetryInterval);
+                mrp.mIdleRetransTimeoutTick = kMaxRetryInterval;
             }
             size_t writtenCharactersNumber = snprintf(storage.mrpRetryIntervalIdleBuf, sizeof(storage.mrpRetryIntervalIdleBuf),
-                                                      "CRI=%" PRIu32, mrpRetryIntervalIdle.Value());
+                                                      "CRI=%" PRIu32, mrp.mIdleRetransTimeoutTick.count());
             VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                     (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalIdleBuf)),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.mrpRetryIntervalIdleBuf;
-        }
-        if (mrpRetryIntervalActive.HasValue())
-        {
-            if (mrpRetryIntervalActive.Value() > kMaxRetryInterval)
+            if (mrp.mActiveRetransTimeoutTick > kMaxRetryInterval)
             {
                 ChipLogProgress(Discovery,
                                 "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
-                mrpRetryIntervalActive.SetValue(kMaxRetryInterval);
+                mrp.mActiveRetransTimeoutTick = kMaxRetryInterval;
             }
-            size_t writtenCharactersNumber = snprintf(storage.mrpRetryIntervalActiveBuf, sizeof(storage.mrpRetryIntervalActiveBuf),
-                                                      "CRA=%" PRIu32, mrpRetryIntervalActive.Value());
+            writtenCharactersNumber = snprintf(storage.mrpRetryIntervalActiveBuf, sizeof(storage.mrpRetryIntervalActiveBuf),
+                                               "CRA=%" PRIu32, mrp.mActiveRetransTimeoutTick.count());
             VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                     (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalActiveBuf)),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);

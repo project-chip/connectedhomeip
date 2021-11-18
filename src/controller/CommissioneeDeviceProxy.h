@@ -194,7 +194,7 @@ public:
      *
      * @return CHIP_NO_ERROR if the data has been updated, an error code otherwise.
      */
-    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, uint32_t mrpIdleInterval, uint32_t mrpActiveInterval);
+    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, ReliableMessageProtocolConfig config);
     /**
      * @brief
      *   Return whether the current device object is actively associated with a paired CHIP

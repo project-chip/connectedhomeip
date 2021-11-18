@@ -29,11 +29,10 @@
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Constants.h>
 #include <lib/support/BytesToHex.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 
 namespace chip {
 namespace Dnssd {
-
-constexpr uint32_t kUndefinedRetryInterval = std::numeric_limits<uint32_t>::max();
 
 struct ResolvedNodeData
 {
@@ -55,27 +54,25 @@ struct ResolvedNodeData
 #endif // CHIP_PROGRESS_LOGGING
     }
 
-    Optional<uint32_t> GetMrpRetryIntervalIdle() const
+    ReliableMessageProtocolConfig GetMRPConfig() const
     {
-        return mMrpRetryIntervalIdle != kUndefinedRetryInterval ? Optional<uint32_t>{ mMrpRetryIntervalIdle }
-                                                                : Optional<uint32_t>{};
+        return ReliableMessageProtocolConfig{
+            GetMrpRetryIntervalIdle().ValueOr(gMRPConfig.mIdleRetransTimeoutTick),
+            GetMrpRetryIntervalActive().ValueOr(gMRPConfig.mActiveRetransTimeoutTick),
+        };
     }
-
-    Optional<uint32_t> GetMrpRetryIntervalActive() const
-    {
-        return mMrpRetryIntervalActive != kUndefinedRetryInterval ? Optional<uint32_t>{ mMrpRetryIntervalActive }
-                                                                  : Optional<uint32_t>{};
-    }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mMrpRetryIntervalIdle; }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mMrpRetryIntervalActive; }
 
     PeerId mPeerId;
     size_t mNumIPs = 0;
     Inet::InterfaceId mInterfaceId;
     Inet::IPAddress mAddress[kMaxIPAddresses];
-    uint16_t mPort                         = 0;
-    char mHostName[kHostNameMaxLength + 1] = {};
-    bool mSupportsTcp                      = false;
-    uint32_t mMrpRetryIntervalIdle         = kUndefinedRetryInterval;
-    uint32_t mMrpRetryIntervalActive       = kUndefinedRetryInterval;
+    uint16_t mPort                                                  = 0;
+    char mHostName[kHostNameMaxLength + 1]                          = {};
+    bool mSupportsTcp                                               = false;
+    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalIdle   = NullOptional;
+    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalActive = NullOptional;
     System::Clock::Timestamp mExpiryTime;
 };
 
@@ -101,8 +98,8 @@ struct DiscoveredNodeData
     uint16_t pairingHint;
     char pairingInstruction[kMaxPairingInstructionLen + 1];
     bool supportsTcp;
-    uint32_t mrpRetryIntervalIdle;
-    uint32_t mrpRetryIntervalActive;
+    Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
+    Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
     uint16_t port;
     int numIPs;
     Inet::InterfaceId interfaceId[kMaxIPAddresses];
@@ -123,8 +120,8 @@ struct DiscoveredNodeData
         memset(pairingInstruction, 0, sizeof(pairingInstruction));
         pairingHint            = 0;
         supportsTcp            = false;
-        mrpRetryIntervalIdle   = kUndefinedRetryInterval;
-        mrpRetryIntervalActive = kUndefinedRetryInterval;
+        mrpRetryIntervalIdle   = NullOptional;
+        mrpRetryIntervalActive = NullOptional;
         numIPs                 = 0;
         port                   = 0;
         for (int i = 0; i < kMaxIPAddresses; ++i)
@@ -136,17 +133,8 @@ struct DiscoveredNodeData
     bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
     bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
-
-    Optional<uint32_t> GetMrpRetryIntervalIdle() const
-    {
-        return mrpRetryIntervalIdle != kUndefinedRetryInterval ? Optional<uint32_t>{ mrpRetryIntervalIdle } : Optional<uint32_t>{};
-    }
-
-    Optional<uint32_t> GetMrpRetryIntervalActive() const
-    {
-        return mrpRetryIntervalActive != kUndefinedRetryInterval ? Optional<uint32_t>{ mrpRetryIntervalActive }
-                                                                 : Optional<uint32_t>{};
-    }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mrpRetryIntervalIdle; }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mrpRetryIntervalActive; }
 
     void LogDetail() const
     {

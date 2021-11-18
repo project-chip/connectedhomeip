@@ -22,6 +22,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <transport/CryptoContext.h>
 #include <transport/SessionMessageCounter.h>
 #include <transport/raw/Base.h>
@@ -50,9 +51,9 @@ class SecureSession
 {
 public:
     SecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric,
-                  System::Clock::Timestamp currentTime) :
+                  ReliableMessageProtocolConfig config, System::Clock::Timestamp currentTime) :
         mPeerNodeId(peerNodeId),
-        mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mFabric(fabric)
+        mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mFabric(fabric), mMRPConfig(config)
     {
         SetLastActivityTime(currentTime);
     }
@@ -68,17 +69,9 @@ public:
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
 
-    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval)
-    {
-        idleInterval   = mMRPIdleInterval;
-        activeInterval = mMRPActiveInterval;
-    }
+    void SetMRPConfig(ReliableMessageProtocolConfig config) { mMRPConfig = config; }
 
-    void SetMRPIntervals(uint32_t idleInterval, uint32_t activeInterval)
-    {
-        mMRPIdleInterval   = idleInterval;
-        mMRPActiveInterval = activeInterval;
-    }
+    ReliableMessageProtocolConfig GetMRPConfig() const { return mMRPConfig; }
 
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
@@ -110,9 +103,8 @@ private:
     const FabricIndex mFabric;
 
     PeerAddress mPeerAddress;
-    System::Clock::Timestamp mLastActivityTime = System::Clock::kZero;
-    uint32_t mMRPIdleInterval                  = 0;
-    uint32_t mMRPActiveInterval                = 0;
+    System::Clock::Timestamp mLastActivityTime;
+    ReliableMessageProtocolConfig mMRPConfig;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
 };
