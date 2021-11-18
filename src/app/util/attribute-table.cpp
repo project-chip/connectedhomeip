@@ -48,6 +48,7 @@
 // for pulling in defines dealing with EITHER server or client
 #include "app/util/common.h"
 #include <app-common/zap-generated/callback.h>
+#include <app/binding/BindingTable.h>
 #include <app/util/af-main.h>
 #include <app/util/error-mapping.h>
 
@@ -614,6 +615,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         // Post write attribute callback for all attributes changes, regardless
         // of cluster.
         MatterPostAttributeChangeCallback(attributePath, mask, dataType, emberAfAttributeSize(metadata), data);
+        chip::app::MatterBindingAttributeChangeCallback(attributePath, mask, dataType, emberAfAttributeSize(metadata), data);
 
         // Post-write attribute callback specific
         // to the cluster that the attribute lives in.
