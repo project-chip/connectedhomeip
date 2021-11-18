@@ -16,11 +16,6 @@
  *
  */
 
-/**
- *    @file
- *      Implementation of JNI bridge for Tv App on Android.
- *
- */
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
