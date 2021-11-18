@@ -28,7 +28,7 @@ if(${IDF_TARGET} STREQUAL "esp32")
                                      "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/spidriver"
                                      "${CMAKE_CURRENT_LIST_DIR}/../../common/screen-framework")
 elseif(${IDF_TARGET} STREQUAL "esp32c3")
-    list(APPEND EXTRA_COMPONENT_DIRS "$ENV{IDF_PATH}/examples/peripherals/rmt/led_strip/components")
+    list(APPEND EXTRA_COMPONENT_DIRS "$ENV{IDF_PATH}/examples/common_components/led_strip")
 endif()
 
 project(chip-all-clusters-app)
