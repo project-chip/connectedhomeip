@@ -36,16 +36,19 @@ class ApplicationPaths:
     all_clusters_app: typing.List[str]
     tv_app: typing.List[str]
 
+
 @dataclass
 class CaptureLine:
     when: datetime
     source: str
     line: str
 
+
 class ExecutionCapture:
     """
     Keeps track of output lines in a process, to help debug failures.
     """
+
     def __init__(self):
         self.captures = []
 
@@ -59,13 +62,13 @@ class ExecutionCapture:
     def LogContents(self):
         for entry in self.captures:
             logging.error('%02d:%02d:%02d.%03d - %-10s: %s',
-            entry.when.hour,
-            entry.when.minute,
-            entry.when.second,
-            entry.when.microsecond/1000,
-            entry.source,
-            entry.line
-            )
+                          entry.when.hour,
+                          entry.when.minute,
+                          entry.when.second,
+                          entry.when.microsecond/1000,
+                          entry.source,
+                          entry.line
+                          )
         pass
 
 
