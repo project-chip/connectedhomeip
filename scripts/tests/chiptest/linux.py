@@ -18,9 +18,11 @@
 Handles linux-specific functionality for running test cases
 """
 
-import os
-import sys
 import logging
+import os
+import subprocess
+import sys
+import time
 
 test_environ = os.environ.copy()
 
@@ -39,11 +41,13 @@ def EnsurePrivateState():
     logging.debug("Making / private")
     if os.system("mount --make-private /") != 0:
         logging.error("Failed to make / private")
+        logging.error("Are you using --privileged if running in docker?")
         sys.exit(1)
     
     logging.debug("Remounting /run")
     if os.system("mount -t tmpfs tmpfs /run") != 0:
         logging.error("Failed to mount /run as a temporary filesystem")
+        logging.error("Are you using --privileged if running in docker?")
         sys.exit(1)
 
 def CreateNamespacesForAppTest():
@@ -91,8 +95,25 @@ def CreateNamespacesForAppTest():
         logging.debug("Executing '%s'" % command)
         if os.system(command) != 0:
             logging.error("Failed to execute '%s'" % command)
-            logging.error("Are you running on a host or a VM with --privileged?")
+            logging.error("Are you using --privileged if running in docker?")
             sys.exit(1)
+
+    # IPv6 does Duplicate Address  Detection even though
+    # we know ULAs provided are isolated. Wait for 'tenative' address to be gone
+
+    logging.info('Waiting for IPv6 DaD to complete (no tentative addresses)')
+    for i in range(100): # wait at most 10 seconds
+       output = subprocess.check_output(['ip', 'addr'])
+       if b'tentative' not in output:
+           break
+       time.sleep(0.1)
+
+    if b'tentative' in output:
+        logging.warn("Some addresses look to still be tentative")
+    else:
+        logging.info('No more tentative addresses')
+    
+    
     
 def PrepareNamespacesForTestExecution(in_unshare: bool):
     if not in_unshare:

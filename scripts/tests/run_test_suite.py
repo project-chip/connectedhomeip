@@ -79,7 +79,7 @@ class RunContext:
 @click.pass_context
 def main(context, log_level, target, no_log_timestamps, root, internal_inside_unshare):
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
         log_fmt = '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
