@@ -75,9 +75,15 @@ public:
 
     void OnEventData(const app::ReadClient * apReadClient, TLV::TLVReader & aEventList) override {}
 
-    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath, TLV::TLVReader * apData,
-                         const app::StatusIB & aStatus) override
+    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteDataAttributePath & aPath,
+                         TLV::TLVReader * apData, const app::StatusIB & aStatus) override
     {
+        //
+        // We shouldn't be getting list item operations in the provided path since that should be handled by the buffered read
+        // callback. If we do, that's a bug.
+        //
+        VerifyOrDie(!aPath.IsListItemOperation());
+
         IMReadReportAttributesResponseCallback(apReadClient, &aPath, apData, aStatus.mStatus);
     }
 

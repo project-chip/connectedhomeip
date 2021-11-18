@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "lib/core/CHIPTLV.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
 #include <app/AttributePathParams.h>
@@ -43,10 +44,17 @@ private:
     /*
      * Generates the reconsistuted TLV array from the stored individual list elements
      */
-    CHIP_ERROR GenerateListTLV(System::PacketBufferTLVReader & reader);
+    CHIP_ERROR GenerateListTLV(TLV::ScopedBufferTLVReader & reader);
 
     /*
-     * Dispatch any buffered list data if we need to
+     * Dispatch any buffered list data if we need to. Buffered data will only be dispatched if:
+     *  1. The path provided in aPath is different from the buffered path being tracked internally AND the type of data
+     *     in the buffer is list data
+     *
+     *     OR
+     *
+     *  2. The path provided in aPath is similar to what is buffered but we've hit the end of the report.
+     *
      */
     CHIP_ERROR DispatchBufferedData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, const StatusIB & aStatus,
                                     bool endOfReport = false);
@@ -54,7 +62,7 @@ private:
     /*
      * Buffer up list data as they arrive.
      */
-    CHIP_ERROR BufferData(const ConcreteAttributePath & aPath, TLV::TLVReader * apReader);
+    CHIP_ERROR BufferData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apReader);
 
 private:
     //
@@ -62,7 +70,7 @@ private:
     //
     void OnReportBegin(const ReadClient * apReadClient) override;
     void OnReportEnd(const ReadClient * apReadClient) override;
-    void OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, TLV::TLVReader * apData,
+    void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const StatusIB & aStatus) override;
     void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override { return mCallback.OnError(apReadClient, aError); }
     void OnEventData(const ReadClient * apReadClient, TLV::TLVReader & aEventReports) override
@@ -72,7 +80,14 @@ private:
     void OnDone(ReadClient * apReadClient) override { return mCallback.OnDone(apReadClient); }
     void OnSubscriptionEstablished(const ReadClient * apReadClient) override { mCallback.OnSubscriptionEstablished(apReadClient); }
 
-    ConcreteAttributePath mBufferedPath;
+private:
+    /*
+     * Allocate a packet buffer, copy the element where the reader is positioned into that buffer and
+     * return the buffer back to the caller.
+     */
+    CHIP_ERROR AllocAndCopyElement(TLV::TLVReader & reader, System::PacketBufferHandle & handle);
+
+    ConcreteDataAttributePath mBufferedPath;
     std::vector<System::PacketBufferHandle> mBufferedList;
     Callback & mCallback;
 };

@@ -145,7 +145,7 @@ public:
      *             This may involve reading from the attribute store or external
      *             attribute callbacks.
      */
-    virtual CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) = 0;
+    virtual CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) = 0;
 
     /**
      * Callback for writing attributes.
@@ -159,7 +159,7 @@ public:
      *             This may involve writing to the attribute store or external
      *             attribute callbacks.
      */
-    virtual CHIP_ERROR Write(const ConcreteAttributePath & aPath, AttributeValueDecoder & aDecoder) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) { return CHIP_NO_ERROR; }
 
     /**
      * Mechanism for keeping track of a chain of AttributeAccessInterfaces.

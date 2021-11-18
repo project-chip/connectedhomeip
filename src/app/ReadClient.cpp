@@ -484,7 +484,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
             mpCallback->OnAttributeData(
-                this, ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId), nullptr,
+                this, ConcreteDataAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId), nullptr,
                 statusIB);
         }
         else if (CHIP_END_OF_TLV == err)
@@ -494,11 +494,11 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(ProcessAttributePath(path, clusterInfo));
             ReturnErrorOnFailure(data.GetData(&dataReader));
 
-            ConcreteAttributePath attributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
+            ConcreteDataAttributePath attributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
 
             if (dataReader.GetType() == TLV::kTLVType_Array)
             {
-                attributePath.mListOp = ConcreteAttributePath::ListOperation::ReplaceAll;
+                attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             }
 
             mpCallback->OnAttributeData(this, attributePath, &dataReader, statusIB);

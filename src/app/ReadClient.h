@@ -99,8 +99,8 @@ public:
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
-        virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, TLV::TLVReader * apData,
-                                     const StatusIB & aStatus)
+        virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath,
+                                     TLV::TLVReader * apData, const StatusIB & aStatus)
         {}
 
         /**

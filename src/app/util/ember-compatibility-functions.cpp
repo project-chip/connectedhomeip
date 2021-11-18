@@ -234,12 +234,14 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
     if (attrOverride != nullptr)
     {
+        ConcreteReadAttributePath readPath(aPath);
+
         // TODO: We should probably clone the writer and convert failures here
         // into status responses, unless our caller already does that.
         writer = attributeDataIBBuilder.GetWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
         AttributeValueEncoder valueEncoder(writer, aAccessingFabricIndex);
-        ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
+        ReturnErrorOnFailure(attrOverride->Read(readPath, valueEncoder));
 
         if (valueEncoder.TriedEncode())
         {
@@ -586,7 +588,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
     if (attrOverride != nullptr)
     {
-        ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
+        ConcreteDataAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
         AttributeValueDecoder valueDecoder(aReader);
         ReturnErrorOnFailure(attrOverride->Write(path, valueDecoder));
 

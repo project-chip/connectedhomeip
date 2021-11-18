@@ -19,12 +19,13 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {
 
 /**
- * A representation of a concrete attribute path.
+ * A representation of a concrete attribute path. This does not convey any list index specifiers.
  */
 struct ConcreteAttributePath
 {
@@ -39,6 +40,44 @@ struct ConcreteAttributePath
         return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mAttributeId == other.mAttributeId;
     }
 
+    EndpointId mEndpointId   = 0;
+    ClusterId mClusterId     = 0;
+    AttributeId mAttributeId = 0;
+};
+
+/**
+ * A representation of a concrete path as it appears in a Read or Subscribe
+ * request after path expansion. This contains support for expressing an
+ * optional list index.
+ */
+struct ConcreteReadAttributePath : public ConcreteAttributePath
+{
+    ConcreteReadAttributePath() {}
+
+    ConcreteReadAttributePath(const ConcreteAttributePath & path) :
+        ConcreteReadAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId)
+    {}
+
+    ConcreteReadAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
+        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
+    {}
+
+    ConcreteReadAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, uint16_t aListIndex) :
+        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
+    {
+        mListIndex.SetValue(aListIndex);
+    }
+
+    Optional<uint16_t> mListIndex;
+};
+
+/**
+ * A representation of a concrete path as it appears in a Report or Write
+ * request after path expansion. This contains support for expressing list and list item-specific operations
+ * like replace, update, delete and append.
+ */
+struct ConcreteDataAttributePath : public ConcreteAttributePath
+{
     enum class ListOperation
     {
         NotList,
@@ -48,13 +87,26 @@ struct ConcreteAttributePath
         AppendItem
     };
 
-    bool IsListOperation() const { return mListOp != ListOperation::NotList; }
+    ConcreteDataAttributePath() {}
 
-    EndpointId mEndpointId   = 0;
-    ClusterId mClusterId     = 0;
-    AttributeId mAttributeId = 0;
-    uint16_t mListIndex      = 0;
-    ListOperation mListOp    = ListOperation::NotList;
+    ConcreteDataAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
+        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
+    {}
+
+    ConcreteDataAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListOperation aListOp,
+                              uint16_t aListIndex) :
+        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
+    {
+        mListOp    = aListOp;
+        mListIndex = aListIndex;
+    }
+
+    bool IsListOperation() const { return mListOp != ListOperation::NotList; }
+    bool IsListItemOperation() const { return ((mListOp != ListOperation::NotList) && (mListOp != ListOperation::ReplaceAll)); }
+
+    uint16_t mListIndex   = 0;
+    ListOperation mListOp = ListOperation::NotList;
 };
+
 } // namespace app
 } // namespace chip

@@ -55,11 +55,17 @@ public:
     app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
 
 private:
-    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath, TLV::TLVReader * apData,
-                         const app::StatusIB & status) override
+    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteDataAttributePath & aPath,
+                         TLV::TLVReader * apData, const app::StatusIB & status) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableAttributeType value;
+
+        //
+        // We shouldn't be getting list item operations in the provided path since that should be handled by the buffered read
+        // callback. If we do, that's a bug.
+        //
+        VerifyOrDie(!aPath.IsListItemOperation());
 
         VerifyOrExit(status.mStatus == Protocols::InteractionModel::Status::Success, err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
         VerifyOrExit(aPath.mClusterId == mClusterId && aPath.mAttributeId == mAttributeId, err = CHIP_ERROR_SCHEMA_MISMATCH);
