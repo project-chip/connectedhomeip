@@ -425,7 +425,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
         ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->pairingHint);
         if (dnsSdInfo->GetMrpRetryIntervalIdle().HasValue())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", dnsSdInfo->GetMrpRetryIntervalIdle().Value());
+            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", dnsSdInfo->GetMrpRetryIntervalIdle().Value().count());
         }
         else
         {
@@ -433,7 +433,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
         }
         if (dnsSdInfo->GetMrpRetryIntervalActive().HasValue())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", dnsSdInfo->GetMrpRetryIntervalActive().Value());
+            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", dnsSdInfo->GetMrpRetryIntervalActive().Value().count());
         }
         else
         {

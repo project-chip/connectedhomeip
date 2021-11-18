@@ -120,7 +120,6 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
         if (secureSession != nullptr)
         {
             secureSession->SetPeerAddress(addr);
-            secureSession->SetMRPConfig(mMRPConfig);
         }
     }
 

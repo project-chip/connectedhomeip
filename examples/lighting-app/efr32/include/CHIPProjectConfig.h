@@ -128,4 +128,4 @@
  *  needs (e.g. sleeping period) using Service Discovery TXT record CRA key.
  *
  */
-#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (2000)
+#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (2000_ms32)

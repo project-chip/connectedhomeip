@@ -161,33 +161,28 @@ private:
         // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value change or device type change.
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
         chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
-        sedPollingConfig.Clear();
         ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
         // Increment default MRP retry intervals by SED poll period to be on the safe side
         // and avoid unnecessary retransmissions.
         if (optionalMrp.HasValue())
         {
             auto mrp = optionalMrp.Value();
-            optionalMrp.SetValue(ReliableMessageProtocolConfig(
-                mrp.mIdleRetransTimeoutTick +
-                    (sedPollingConfig.SlowPollingIntervalMS >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT),
-                mrp.mActiveRetransTimeoutTick +
-                    (sedPollingConfig.FastPollingIntervalMS >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)));
+            optionalMrp.SetValue(ReliableMessageProtocolConfig(mrp.mIdleRetransTimeout + sedPollingConfig.SlowPollingIntervalMS,
+                                                               mrp.mActiveRetransTimeout + sedPollingConfig.FastPollingIntervalMS));
         }
 #endif
         if (optionalMrp.HasValue())
         {
             auto mrp = optionalMrp.Value();
             {
-                if ((mrp.mIdleRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT) > kMaxRetryInterval)
+                if (mrp.mIdleRetransTimeout > kMaxRetryInterval)
                 {
                     ChipLogProgress(Discovery,
                                     "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
-                    mrp.mIdleRetransTimeoutTick = kMaxRetryInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
+                    mrp.mIdleRetransTimeout = kMaxRetryInterval;
                 }
-                size_t writtenCharactersNumber =
-                    snprintf(storage.mrpRetryIntervalIdleBuf, sizeof(storage.mrpRetryIntervalIdleBuf), "CRI=%" PRIu32,
-                             mrp.mIdleRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT);
+                size_t writtenCharactersNumber = snprintf(storage.mrpRetryIntervalIdleBuf, sizeof(storage.mrpRetryIntervalIdleBuf),
+                                                          "CRI=%" PRIu32, mrp.mIdleRetransTimeout.count());
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                         (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalIdleBuf)),
                                     CHIP_ERROR_INVALID_STRING_LENGTH);
@@ -196,15 +191,15 @@ private:
             }
 
             {
-                if ((mrp.mActiveRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT) > kMaxRetryInterval)
+                if (mrp.mActiveRetransTimeout > kMaxRetryInterval)
                 {
                     ChipLogProgress(Discovery,
                                     "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
-                    mrp.mActiveRetransTimeoutTick = kMaxRetryInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
+                    mrp.mActiveRetransTimeout = kMaxRetryInterval;
                 }
                 size_t writtenCharactersNumber =
                     snprintf(storage.mrpRetryIntervalActiveBuf, sizeof(storage.mrpRetryIntervalActiveBuf), "CRA=%" PRIu32,
-                             mrp.mActiveRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT);
+                             mrp.mActiveRetransTimeout.count());
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                         (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalActiveBuf)),
                                     CHIP_ERROR_INVALID_STRING_LENGTH);
