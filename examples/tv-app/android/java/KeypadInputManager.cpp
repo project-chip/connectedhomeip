@@ -53,7 +53,7 @@ exit:
     {
         return EMBER_ZCL_KEYPAD_INPUT_STATUS_SUCCESS;
     }
-    
+
     return static_cast<EmberAfKeypadInputStatus>(ret);
 }
 
