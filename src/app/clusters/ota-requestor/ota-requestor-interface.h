@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 
+#include <app/util/util.h>
 #pragma once
 
 // Interface class to connect the OTA Software Update Requestor cluster command processing
@@ -32,7 +33,7 @@ class OTARequestorInterface
 {
 public:
     // Handler for the AnnounceOTAProvider command
-    virtual bool HandleAnnounceOTAProvider(
+    virtual EmberAfStatus HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) = 0;
 

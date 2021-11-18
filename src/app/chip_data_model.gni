@@ -76,6 +76,7 @@ template("chip_data_model") {
 
     sources += [
       "${_app_root}/clusters/ota-requestor/OTARequestor.cpp",
+      "${_app_root}/clusters/ota-requestor/cluster-interface.cpp",
       "${_app_root}/clusters/barrier-control-server/barrier-control-server.h",
       "${_app_root}/clusters/basic/basic.h",
       "${_app_root}/clusters/color-control-server/color-control-server.h",

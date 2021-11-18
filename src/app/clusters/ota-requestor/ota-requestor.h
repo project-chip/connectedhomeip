@@ -42,9 +42,9 @@ public:
 
     // Virtual functions from OTARequestorInterface start
     // Handler for the AnnounceOTAProvider command
-    bool HandleAnnounceOTAProvider(
+    EmberAfStatus HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) {return true;}
+        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) {return EMBER_ZCL_STATUS_SUCCESS;}
 
     // TBD: This probably doesn't need to be a method OTARequestorInterface as the response handler is
     // explicitly supplied at command invocation

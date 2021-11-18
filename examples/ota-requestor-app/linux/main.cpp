@@ -222,7 +222,7 @@ int main(int argc, char * argv[])
     requestorCore->setOtaRequestorDriver(requestorUser);
 
     OTADownloader *downloaderCore = new OTADownloader;
-    SetDownloaderInstance(downloaderCore);
+    // TODO: enable    SetDownloaderInstance(downloaderCore);
 
     LinuxOTAImageProcessor *downloaderUser = new LinuxOTAImageProcessor;
 

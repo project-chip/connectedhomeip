@@ -35,10 +35,10 @@ public:
     // API declarations start
 
     // Application calls this method to direct OTADownloader to begin the download
-    void virtual BeginDownload();
+    void virtual BeginDownload() {};
 
     // Platform calls this method upon the completion of PrepareDownload() processing
-    void virtual OnPreparedForDownload();
+    void virtual OnPreparedForDownload() {};
 
     // Action parameter type for the OnBlockProcessed()
     enum blockActionType
@@ -48,7 +48,7 @@ public:
     };
 
     // Platform calls this method upon the completion of ProcessBlock() processing
-    void virtual OnBlockProcessed(blockActionType action);
+    void virtual OnBlockProcessed(blockActionType action) {};
 
     // A setter for the delegate class pointer
     void setImageProcessorDelegate(OTAImageProcessor * delegate);
