@@ -22,7 +22,7 @@
 #include <protocols/secure_channel/CASESession.h>
 
 namespace chip {
-    
+
 using ResumptionID = FixedByteSpan<kCASEResumptionIDSize>;
 
 class CASESessionCache

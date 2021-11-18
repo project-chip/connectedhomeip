@@ -80,7 +80,7 @@ CHIP_ERROR CASESessionCache::Get(ResumptionID resumptionID, CASESession & outSes
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool found     = false;
-    mCachePool.ForEachActiveObject([&](auto * ec) {       
+    mCachePool.ForEachActiveObject([&](auto * ec) {
         if (resumptionID.data_equal(ResumptionID(ec->mResumptionId)))
         {
             found = true;
