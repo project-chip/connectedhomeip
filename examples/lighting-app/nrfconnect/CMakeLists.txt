@@ -37,6 +37,7 @@ endif()
 
 option(BUILD_WITH_DFU "Build target with Device Firmware Upgrade support" OFF)
 if(BUILD_WITH_DFU)
+    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-ota_requestor.conf)
     if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
         list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-multi_image_dfu_support.conf)
         set(mcuboot_OVERLAY_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/configuration/mcuboot_multi_image_dfu.conf CACHE INTERNAL "")
