@@ -37,6 +37,12 @@ namespace DeviceLayer {
 class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
                                        private Internal::K32WConfig
 {
+public:
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount);
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount);
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
+
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
