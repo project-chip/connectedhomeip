@@ -1,0 +1,678 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 42.2.2. [TC-TSTAT-2.2] Setpoint Test Cases with server as DUT
+
+config:
+    cluster: "Thermostat"
+    endpoint: 1
+
+tests:
+    - label:
+          "Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies
+          that the value is within range"
+      command: "readAttribute"
+      attribute: "occupied cooling setpoint"
+      response:
+          value: 2600
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 2600
+
+    - label:
+          "Writes a value back that is different but valid for
+          OccupiedCoolingSetpoint attribute"
+      command: "writeAttribute"
+      attribute: "occupied cooling setpoint"
+      arguments:
+          value: 2000
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          OccupiedCoolingSetpoint attribute"
+      command: "readAttribute"
+      attribute: "occupied cooling setpoint"
+      response:
+          value: 2000
+
+    #issue #11718 Write command above max and below min value returns Sucess Response
+    - label:
+          "Writes OccupiedCoolingSetpoint to value below the
+          MinCoolSetpointLimit"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "occupied cooling setpoint"
+      arguments:
+          value: 30
+
+    #issue  #11718 Write command above max and below min value returns Sucess Response
+    - label:
+          "Writes OccupiedCoolingSetpoint to value above the
+          MaxCoolSetpointLimit"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "occupied cooling setpoint"
+      arguments:
+          value: 4000
+
+    - label:
+          "Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint
+          attribute"
+      command: "writeAttribute"
+      attribute: "occupied cooling setpoint"
+      arguments:
+          value: 1600
+
+    - label:
+          "Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint
+          attribute"
+      command: "writeAttribute"
+      attribute: "occupied cooling setpoint"
+      arguments:
+          value: 2600
+
+    - label:
+          "Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies
+          that the value is within range"
+      command: "readAttribute"
+      attribute: "occupied heating setpoint"
+      response:
+          value: 2000
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Writes a value back that is different but valid for
+          OccupiedHeatingSetpoint attribute"
+      command: "writeAttribute"
+      attribute: "occupied heating setpoint"
+      arguments:
+          value: 2100
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          OccupiedHeatingSetpoint attribute"
+      command: "readAttribute"
+      attribute: "occupied heating setpoint"
+      response:
+          value: 2100
+
+    #issue  #11718 Write command above max and below min value returns Sucess Response
+    - label:
+          "Writes OccupiedHeatingSetpoint to value below the
+          MinHeatSetpointLimit"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "occupied heating setpoint"
+      arguments:
+          value: 1002
+
+    #issue  #11718 Write command above max and below min value returns Sucess Response
+    - label:
+          "Writes OccupiedHeatingSetpoint to value above the
+          MaxHeatSetpointLimit"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "occupied heating setpoint"
+      arguments:
+          value: 4010
+
+    - label:
+          "Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint
+          attribute"
+      command: "writeAttribute"
+      attribute: "occupied heating setpoint"
+      arguments:
+          value: 700
+
+    - label:
+          "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint
+          attribute"
+      command: "writeAttribute"
+      attribute: "occupied heating setpoint"
+      arguments:
+          value: 3000
+
+    - label:
+          "Reads MinHeatSetpointLimit attribute from Server DUT and verifies
+          that the value is within range"
+      command: "readAttribute"
+      attribute: "min heat setpoint limit"
+      response:
+          value: 700
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Writes a value back that is different but valid for
+          MinHeatSetpointLimit attribute"
+      command: "writeAttribute"
+      attribute: "min heat setpoint limit"
+      arguments:
+          value: 2000
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          MinHeatSetpointLimit attribute"
+      command: "readAttribute"
+      attribute: "min heat setpoint limit"
+      response:
+          value: 2000
+
+    #issue  #11718 Write command above max and below min value returns Sucess Response
+    - label:
+          "Writes MinHeatSetpointLimit to value below the
+          AbsMinHeatSetpointLimit "
+      disabled: true
+      command: "writeAttribute"
+      attribute: "min heat setpoint limit"
+      arguments:
+          value: 650
+
+    #issue  #11718 Write command above max and below min value returns Sucess Response
+    - label:
+          "Writes MinHeatSetpointLimit to value above the
+          AbsMaxHeatSetpointLimit "
+      disabled: true
+      command: "writeAttribute"
+      attribute: "min heat setpoint limit"
+      arguments:
+          value: 4050
+
+    - label:
+          "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit
+          attribute"
+      command: "writeAttribute"
+      attribute: "min heat setpoint limit"
+      arguments:
+          value: 700
+
+    - label:
+          "Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit
+          attribute"
+      command: "writeAttribute"
+      attribute: "min heat setpoint limit"
+      arguments:
+          value: 3000
+
+    - label:
+          "Reads MaxHeatSetpointLimit attribute from Server DUT and verifies
+          that the value is within range"
+      command: "readAttribute"
+      attribute: "max heat setpoint limit"
+      response:
+          value: 3000
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Writes a value back that is different but valid for
+          MaxHeatSetpointLimit attribute"
+      command: "writeAttribute"
+      attribute: "max heat setpoint limit"
+      arguments:
+          value: 2000
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          MaxHeatSetpointLimit attribute"
+      command: "readAttribute"
+      attribute: "max heat setpoint limit"
+      response:
+          value: 2000
+
+    #issue  #11718 Write command above max and below min value returns Sucess Response
+    - label:
+          "Writes MaxHeatSetpointLimit to value below the
+          AbsMinHeatSetpointLimit "
+      disabled: true
+      command: "writeAttribute"
+      attribute: "max heat setpoint limit"
+      arguments:
+          value: 500
+
+    #issue  #11718 Write command above max and below min value returns Sucess Response
+    - label:
+          "Writes MaxHeatSetpointLimit to value above the
+          AbsMaxHeatSetpointLimit "
+      disabled: true
+      command: "writeAttribute"
+      attribute: "max heat setpoint limit"
+      arguments:
+          value: 4000
+
+    - label:
+          "Writes the limit of AbsMinHeatSetpointLimit to MaxHeatSetpointLimit
+          attribute"
+      command: "writeAttribute"
+      attribute: "max heat setpoint limit"
+      arguments:
+          value: 700
+
+    - label:
+          "Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit
+          attribute"
+      command: "writeAttribute"
+      attribute: "max heat setpoint limit"
+      arguments:
+          value: 3000
+
+    - label:
+          "Reads MinCoolSetpointLimit attribute from Server DUT and verifies
+          that the value is within range"
+      command: "readAttribute"
+      attribute: "min cool setpoint limit"
+      response:
+          value: 1600
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    - label:
+          "Writes a value back that is different but valid for
+          MinCoolSetpointLimit attribute"
+      command: "writeAttribute"
+      attribute: "min cool setpoint limit"
+      arguments:
+          value: 2000
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          MinCoolSetpointLimit attribute"
+      command: "readAttribute"
+      attribute: "min cool setpoint limit"
+      response:
+          value: 2000
+
+    #issue #11718 Write command above max and below min value returns Sucess Response
+    - label:
+          "Writes MinCoolSetpointLimit to value below the
+          AbsMinCoolSetpointLimit "
+      disabled: true
+      command: "writeAttribute"
+      attribute: "min cool setpoint limit"
+      arguments:
+          value: 1000
+
+    #issue #11718 Write command above max and below min value returns Sucess Response
+    - label:
+          "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit "
+      disabled: true
+      command: "writeAttribute"
+      attribute: "min cool setpoint limit"
+      arguments:
+          value: 4000
+
+    - label:
+          "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit
+          attribute"
+      command: "writeAttribute"
+      attribute: "min cool setpoint limit"
+      arguments:
+          value: 1600
+
+    - label:
+          "Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit
+          attribute"
+      command: "writeAttribute"
+      attribute: "min cool setpoint limit"
+      arguments:
+          value: 3200
+
+    - label:
+          "Reads MaxCoolSetpointLimit attribute from Server DUT and verifies
+          that the value is within range"
+      command: "readAttribute"
+      attribute: "max cool setpoint limit"
+      response:
+          value: 3200
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    - label:
+          "Writes a value back that is different but valid for
+          MaxCoolSetpointLimit attribute"
+      command: "writeAttribute"
+      attribute: "max cool setpoint limit"
+      arguments:
+          value: 2000
+
+    - label:
+          "Reads it back again to confirm the successful write of
+          MaxCoolSetpointLimit attribute"
+      command: "readAttribute"
+      attribute: "max cool setpoint limit"
+      response:
+          value: 2000
+
+    #issue  #11718 Write command above max and below min value returns Sucess Response
+    - label:
+          "Writes MaxCoolSetpointLimit to value below the
+          AbsMinCoolSetpointLimit "
+      disabled: true
+      command: "writeAttribute"
+      attribute: "max cool setpoint limit"
+      arguments:
+          value: 1000
+
+    #issue  #11718 Write command above max and below min value returns Sucess Response
+    - label:
+          "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit "
+      disabled: true
+      command: "writeAttribute"
+      attribute: "max cool setpoint limit"
+      arguments:
+          value: 4000
+
+    - label:
+          "Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit
+          attribute"
+      command: "writeAttribute"
+      attribute: "max cool setpoint limit"
+      arguments:
+          value: 1600
+
+    - label:
+          "Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit
+          attribute"
+      command: "writeAttribute"
+      attribute: "max cool setpoint limit"
+      arguments:
+          value: 3200
+
+    - label:
+          "Writes (sets back) the limit of MinHeatSetpointLimit to
+          MinHeatSetpointLimit attribute"
+      command: "writeAttribute"
+      attribute: "min heat setpoint limit"
+      arguments:
+          value: 700
+
+    - label:
+          "Writes (sets back) the limit of MaxHeatSetpointLimit to
+          MinHeatSetpointLimit attribute"
+      command: "writeAttribute"
+      attribute: "min heat setpoint limit"
+      arguments:
+          value: 3000
+
+    - label:
+          "Writes (sets back) the limit of MinHeatSetpointLimit to
+          MaxHeatSetpointLimit attribute"
+      command: "writeAttribute"
+      attribute: "max heat setpoint limit"
+      arguments:
+          value: 700
+
+    - label:
+          "Writes (sets back) the limit of MaxHeatSetpointLimit to
+          MaxHeatSetpointLimit attribute"
+      command: "writeAttribute"
+      attribute: "max heat setpoint limit"
+      arguments:
+          value: 3000
+
+    - label:
+          "Writes (sets back) the limit of MinCoolSetpointLimit to
+          MinCoolSetpointLimit attribute"
+      command: "writeAttribute"
+      attribute: "min cool setpoint limit"
+      arguments:
+          value: 1600
+
+    - label:
+          "Writes (sets back) the limit of MaxCoolSetpointLimit to
+          MinCoolSetpointLimit attribute"
+      command: "writeAttribute"
+      attribute: "min cool setpoint limit"
+      arguments:
+          value: 3200
+
+    - label:
+          "Writes (sets back) the limit of MinCoolSetpointLimit to
+          MaxCoolSetpointLimit attribute"
+      command: "writeAttribute"
+      attribute: "max cool setpoint limit"
+      arguments:
+          value: 1600
+
+    - label:
+          "Writes (sets back) the limit of MaxCoolSetpointLimit to
+          MaxCoolSetpointLimit attribute"
+      command: "writeAttribute"
+      attribute: "max cool setpoint limit"
+      arguments:
+          value: 3200
+
+    - label:
+          "Reads ControlSequenceOfOperation from Server DUT and verifies that
+          the value is valid"
+      command: "readAttribute"
+      attribute: "control sequence of operation"
+      response:
+          value: 4
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 5
+
+    - label:
+          "Write Attribute command for ControlSequenceOfOperation with a new
+          valid value"
+      command: "writeAttribute"
+      attribute: "control sequence of operation"
+      arguments:
+          value: 2
+
+    - label: "Read it back again to confirm the successful write"
+      command: "readAttribute"
+      attribute: "control sequence of operation"
+      response:
+          value: 2
+
+    - label: "Sets OccupiedHeatingSetpoint to default value"
+      command: "writeAttribute"
+      attribute: "occupied heating setpoint"
+      arguments:
+          value: 2000
+
+    #issue #11714 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      disabled: true
+      command: "SetpointRaiseLower"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 0
+              - name: "Amount"
+                value: -30
+
+    - label:
+          "Reads back OccupiedHeatingSetpoint to confirm the success of the
+          write"
+      disabled: true
+      command: "readAttribute"
+      attribute: "occupied heating setpoint"
+      response:
+          value: -30
+
+    - label: "Sets OccupiedHeatingSetpoint to default value"
+      command: "writeAttribute"
+      attribute: "occupied heating setpoint"
+      arguments:
+          value: 2000
+
+    #issue #11714 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      disabled: true
+      command: "SetpointRaiseLower"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 0
+              - name: "Amount"
+                value: 30
+
+    - label:
+          "Reads back OccupiedHeatingSetpoint to confirm the success of the
+          write"
+      disabled: true
+      command: "readAttribute"
+      attribute: "occupied heating setpoint"
+      response:
+          value: 30
+
+    - label: "Sets OccupiedCoolingSetpoint to default value"
+      command: "writeAttribute"
+      attribute: "occupied cooling setpoint"
+      arguments:
+          value: 2600
+
+    #issue #11714 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      disabled: true
+      command: "SetpointRaiseLower"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 1
+              - name: "Amount"
+                value: -30
+
+    - label:
+          "Reads back OccupiedCoolingSetpoint to confirm the success of the
+          write"
+      disabled: true
+      command: "readAttribute"
+      attribute: "occupied cooling setpoint"
+      response:
+          value: -30
+
+    - label: "Sets OccupiedCoolingSetpoint to default value"
+      command: "writeAttribute"
+      attribute: "occupied cooling setpoint"
+      arguments:
+          value: 2600
+
+    #issue #11714 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      disabled: true
+      command: "SetpointRaiseLower"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 1
+              - name: "Amount"
+                value: 30
+
+    - label:
+          "Reads back OccupiedCoolingSetpoint to confirm the success of the
+          write"
+      disabled: true
+      command: "readAttribute"
+      attribute: "occupied cooling setpoint"
+      response:
+          value: 30
+
+    - label: "Sets OccupiedCoolingSetpoint to default value"
+      command: "writeAttribute"
+      attribute: "occupied cooling setpoint"
+      arguments:
+          value: 2600
+
+    - label: "Sets OccupiedHeatingSetpoint to default value"
+      command: "writeAttribute"
+      attribute: "occupied heating setpoint"
+      arguments:
+          value: 2000
+
+    #issue #11714 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      disabled: true
+      command: "SetpointRaiseLower"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 2
+              - name: "Amount"
+                value: -30
+
+    - label:
+          "Reads back OccupiedCoolingSetpoint to confirm the success of the
+          write"
+      disabled: true
+      command: "readAttribute"
+      attribute: "occupied cooling setpoint"
+      response:
+          value: -30
+
+    - label:
+          "Reads back OccupiedHeatingSetpoint to confirm the success of the
+          write"
+      disabled: true
+      command: "readAttribute"
+      attribute: "occupied heating setpoint"
+      response:
+          value: -30
+
+    - label: "Sets OccupiedCoolingSetpoint to default value"
+      command: "writeAttribute"
+      attribute: "occupied cooling setpoint"
+      arguments:
+          value: 2600
+
+    - label: "Sets OccupiedHeatingSetpoint to default value"
+      command: "writeAttribute"
+      attribute: "occupied heating setpoint"
+      arguments:
+          value: 2000
+
+    #issue #11714 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      disabled: true
+      command: "SetpointRaiseLower"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 2
+              - name: "Amount"
+                value: 30
+
+    - label:
+          "Reads back OccupiedCoolingSetpoint to confirm the success of the
+          write"
+      disabled: true
+      command: "readAttribute"
+      attribute: "occupied cooling setpoint"
+      response:
+          value: 30
+
+    - label:
+          "Reads back OccupiedHeatingSetpoint to confirm the success of the
+          write"
+      disabled: true
+      command: "readAttribute"
+      attribute: "occupied heating setpoint"
+      response:
+          value: 30
