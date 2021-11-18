@@ -1121,8 +1121,8 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
-  public static class BridgedDeviceBasicCluster extends BaseChipCluster {
-    public BridgedDeviceBasicCluster(long devicePtr, int endpointId) {
+  public static class BridgedDeviceBasicInformationCluster extends BaseChipCluster {
+    public BridgedDeviceBasicInformationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -1133,114 +1133,9 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void readVendorNameAttribute(CharStringAttributeCallback callback) {
-      readVendorNameAttribute(chipClusterPtr, callback);
-    }
-
-    public void readVendorIDAttribute(IntegerAttributeCallback callback) {
-      readVendorIDAttribute(chipClusterPtr, callback);
-    }
-
-    public void readProductNameAttribute(CharStringAttributeCallback callback) {
-      readProductNameAttribute(chipClusterPtr, callback);
-    }
-
-    public void readUserLabelAttribute(CharStringAttributeCallback callback) {
-      readUserLabelAttribute(chipClusterPtr, callback);
-    }
-
-    public void writeUserLabelAttribute(DefaultClusterCallback callback, String value) {
-      writeUserLabelAttribute(chipClusterPtr, callback, value);
-    }
-
-    public void readHardwareVersionAttribute(IntegerAttributeCallback callback) {
-      readHardwareVersionAttribute(chipClusterPtr, callback);
-    }
-
-    public void readHardwareVersionStringAttribute(CharStringAttributeCallback callback) {
-      readHardwareVersionStringAttribute(chipClusterPtr, callback);
-    }
-
-    public void readSoftwareVersionAttribute(LongAttributeCallback callback) {
-      readSoftwareVersionAttribute(chipClusterPtr, callback);
-    }
-
-    public void readSoftwareVersionStringAttribute(CharStringAttributeCallback callback) {
-      readSoftwareVersionStringAttribute(chipClusterPtr, callback);
-    }
-
-    public void readManufacturingDateAttribute(CharStringAttributeCallback callback) {
-      readManufacturingDateAttribute(chipClusterPtr, callback);
-    }
-
-    public void readPartNumberAttribute(CharStringAttributeCallback callback) {
-      readPartNumberAttribute(chipClusterPtr, callback);
-    }
-
-    public void readProductURLAttribute(CharStringAttributeCallback callback) {
-      readProductURLAttribute(chipClusterPtr, callback);
-    }
-
-    public void readProductLabelAttribute(CharStringAttributeCallback callback) {
-      readProductLabelAttribute(chipClusterPtr, callback);
-    }
-
-    public void readSerialNumberAttribute(CharStringAttributeCallback callback) {
-      readSerialNumberAttribute(chipClusterPtr, callback);
-    }
-
-    public void readReachableAttribute(BooleanAttributeCallback callback) {
-      readReachableAttribute(chipClusterPtr, callback);
-    }
-
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-
-    private native void readVendorNameAttribute(
-        long chipClusterPtr, CharStringAttributeCallback callback);
-
-    private native void readVendorIDAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void readProductNameAttribute(
-        long chipClusterPtr, CharStringAttributeCallback callback);
-
-    private native void readUserLabelAttribute(
-        long chipClusterPtr, CharStringAttributeCallback callback);
-
-    private native void writeUserLabelAttribute(
-        long chipClusterPtr, DefaultClusterCallback callback, String value);
-
-    private native void readHardwareVersionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void readHardwareVersionStringAttribute(
-        long chipClusterPtr, CharStringAttributeCallback callback);
-
-    private native void readSoftwareVersionAttribute(
-        long chipClusterPtr, LongAttributeCallback callback);
-
-    private native void readSoftwareVersionStringAttribute(
-        long chipClusterPtr, CharStringAttributeCallback callback);
-
-    private native void readManufacturingDateAttribute(
-        long chipClusterPtr, CharStringAttributeCallback callback);
-
-    private native void readPartNumberAttribute(
-        long chipClusterPtr, CharStringAttributeCallback callback);
-
-    private native void readProductURLAttribute(
-        long chipClusterPtr, CharStringAttributeCallback callback);
-
-    private native void readProductLabelAttribute(
-        long chipClusterPtr, CharStringAttributeCallback callback);
-
-    private native void readSerialNumberAttribute(
-        long chipClusterPtr, CharStringAttributeCallback callback);
-
-    private native void readReachableAttribute(
-        long chipClusterPtr, BooleanAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

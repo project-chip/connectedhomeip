@@ -242,6 +242,12 @@
 #define ZCL_CLIENT_LIST_ATTRIBUTE_ID (0x0002)
 #define ZCL_PARTS_LIST_ATTRIBUTE_ID (0x0003)
 
+// Attribute ids for cluster: ACL
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Poll Control
 
 // Client attributes
@@ -301,6 +307,24 @@
 // Server attributes
 #define ZCL_DEFAULT_OTA_PROVIDER_ATTRIBUTE_ID (0x0001)
 #define ZCL_UPDATE_POSSIBLE_ATTRIBUTE_ID (0x0002)
+
+// Attribute ids for cluster: Localization Configuration
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Localization Time Format
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Power Source Configuration
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Power Source
 
@@ -487,6 +511,24 @@
 #define ZCL_ETHERNET_OVERRUN_COUNT_ATTRIBUTE_ID (0x0006)
 #define ZCL_CARRIER_DETECT_ATTRIBUTE_ID (0x0007)
 #define ZCL_TIME_SINCE_RESET_ATTRIBUTE_ID (0x0008)
+
+// Attribute ids for cluster: Localization Unit
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Time Synchronization
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Bridged Device Basic Information
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Bridged Device Basic
 

@@ -47,6 +47,8 @@ void __attribute__((weak)) MatterApplianceControlPluginClientInitCallback() {}
 void MatterApplianceControlPluginServerInitCallback();
 void __attribute__((weak)) MatterDescriptorPluginClientInitCallback() {}
 void MatterDescriptorPluginServerInitCallback();
+void __attribute__((weak)) MatterAclPluginClientInitCallback() {}
+void MatterAclPluginServerInitCallback();
 void __attribute__((weak)) MatterPollControlPluginClientInitCallback() {}
 void MatterPollControlPluginServerInitCallback();
 void __attribute__((weak)) MatterBridgedActionsPluginClientInitCallback() {}
@@ -57,6 +59,12 @@ void __attribute__((weak)) MatterOtaSoftwareUpdateProviderPluginClientInitCallba
 void MatterOtaSoftwareUpdateProviderPluginServerInitCallback();
 void __attribute__((weak)) MatterOtaSoftwareUpdateRequestorPluginClientInitCallback() {}
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
+void __attribute__((weak)) MatterLocalizationConfigurationPluginClientInitCallback() {}
+void MatterLocalizationConfigurationPluginServerInitCallback();
+void __attribute__((weak)) MatterLocalizationTimeFormatPluginClientInitCallback() {}
+void MatterLocalizationTimeFormatPluginServerInitCallback();
+void __attribute__((weak)) MatterPowerSourceConfigurationPluginClientInitCallback() {}
+void MatterPowerSourceConfigurationPluginServerInitCallback();
 void __attribute__((weak)) MatterPowerSourcePluginClientInitCallback() {}
 void MatterPowerSourcePluginServerInitCallback();
 void __attribute__((weak)) MatterGeneralCommissioningPluginClientInitCallback() {}
@@ -75,6 +83,12 @@ void __attribute__((weak)) MatterWiFiNetworkDiagnosticsPluginClientInitCallback(
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
 void __attribute__((weak)) MatterEthernetNetworkDiagnosticsPluginClientInitCallback() {}
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback();
+void __attribute__((weak)) MatterLocalizationUnitPluginClientInitCallback() {}
+void MatterLocalizationUnitPluginServerInitCallback();
+void __attribute__((weak)) MatterTimeSynchronizationPluginClientInitCallback() {}
+void MatterTimeSynchronizationPluginServerInitCallback();
+void __attribute__((weak)) MatterBridgedDeviceBasicInformationPluginClientInitCallback() {}
+void MatterBridgedDeviceBasicInformationPluginServerInitCallback();
 void __attribute__((weak)) MatterBridgedDeviceBasicPluginClientInitCallback() {}
 void MatterBridgedDeviceBasicPluginServerInitCallback();
 void __attribute__((weak)) MatterSwitchPluginClientInitCallback() {}

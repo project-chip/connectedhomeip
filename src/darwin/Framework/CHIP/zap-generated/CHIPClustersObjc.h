@@ -292,39 +292,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Bridged Device Basic
+ * Cluster Bridged Device Basic Information
  *
  */
-@interface CHIPBridgedDeviceBasic : CHIPCluster
-
-- (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeVendorIDWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeProductNameWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeUserLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeHardwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeHardwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeSoftwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeSoftwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeManufacturingDateWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributePartNumberWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeProductURLWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeProductLabelWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeSerialNumberWithResponseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler;
+@interface CHIPBridgedDeviceBasicInformation : CHIPCluster
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
