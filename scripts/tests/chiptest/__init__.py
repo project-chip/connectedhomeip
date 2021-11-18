@@ -19,6 +19,7 @@ import os
 import logging
 
 import chiptest.linux
+import chiptest.runner
 
 from .test_definition import TestTarget, TestDefinition
 
@@ -45,4 +46,4 @@ def AllTests(root: str):
         yield TestDefinition(yaml_file=path, name=name, target=target)
 
 
-__all__ = ['TestTarget', 'TestDefinition', 'AllTests', 'linux']
+__all__ = ['TestTarget', 'TestDefinition', 'AllTests']

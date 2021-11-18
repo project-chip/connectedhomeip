@@ -50,7 +50,7 @@ class RunContext:
 @click.group(chain=True)
 @click.option(
     '--log-level',
-    default='WARN',
+    default='info',
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.option(
@@ -108,11 +108,31 @@ def cmd_generate(context):
     help='Number of iterations to run')
 @click.pass_context
 def cmd_run(context, iterations):
+    runner = chiptest.runner.Runner()
+
     if sys.platform == 'linux':
         chiptest.linux.PrepareNamespacesForTestExecution(
             context.obj.in_unshare)
 
     logging.info("Each test will be executed %d times" % iterations)
+
+    for i in range(iterations):
+        logging.info("Starting iteration %d" % (i+1))
+        for test in context.obj.tests:
+            # TODO: - make it run in namespaces  on linux
+            # TODO: - make log captures possible so that failure info is provided
+
+            test_start = time.time()
+            try:
+                test.Run(runner)
+                test_end = time.time()
+                logging.info('%s - Completed in %0.2f seconds' %
+                             (test.name, (test_end - test_start)))
+            except:
+                test_end = time.time()
+                logging.exception('%s - FAILED in %0.2f seconds' %
+                                  (test.name, (test_end - test_start)))
+                sys.exit(2)
 
 
 # On linux, allow an execution shell to be prepared
