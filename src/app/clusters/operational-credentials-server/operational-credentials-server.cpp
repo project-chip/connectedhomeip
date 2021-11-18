@@ -175,14 +175,9 @@ void fabricListChanged()
                                            OperationalCredentials::Attributes::CommissionedFabrics::Id);
 }
 
-static FabricInfo * retrieveCurrentFabric()
+static FabricInfo * retrieveCurrentFabric(CommandHandler * aCommandHandler)
 {
-    if (emberAfCurrentCommand()->source == nullptr)
-    {
-        return nullptr;
-    }
-
-    FabricIndex index = emberAfCurrentCommand()->source->GetSessionHandle().GetFabricIndex();
+    FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
@@ -278,7 +273,7 @@ exit:
     if (err == CHIP_NO_ERROR)
     {
         chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
-        FabricIndex currentFabricIndex        = ec->GetSessionHandle().GetFabricIndex();
+        FabricIndex currentFabricIndex        = commandObj->GetAccessingFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
         {
             // If the current fabric is being removed, expiring all the secure sessions causes crashes as
@@ -309,7 +304,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
     CHIP_ERROR err;
 
     // Fetch current fabric
-    FabricInfo * fabric = retrieveCurrentFabric();
+    FabricInfo * fabric = retrieveCurrentFabric(commandObj);
     VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
     // Set Label on fabric
@@ -442,7 +437,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: an administrator has updated the Op Cert");
 
     // Fetch current fabric
-    FabricInfo * fabric = retrieveCurrentFabric();
+    FabricInfo * fabric = retrieveCurrentFabric(commandObj);
     VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_ID));
 
     err = fabric->SetNOCCert(NOCValue);
