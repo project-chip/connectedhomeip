@@ -64,8 +64,35 @@ struct OddSizedInteger
     using StorageType = uint8_t[ByteSize];
 };
 
-template <int ByteSize, bool IsSigned>
-struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>>
+namespace detail {
+template <int ByteSize, bool IsBigEndian>
+struct IntegerByteIndexing;
+
+template <int ByteSize>
+struct IntegerByteIndexing<ByteSize, true>
+{
+    static constexpr int highIndex     = 0;
+    static constexpr int lowIndex      = ByteSize - 1;
+    static constexpr int lowerIndex    = 1;
+    static constexpr int raiseIndex    = -1;
+    static constexpr int pastLowIndex  = ByteSize;
+    static constexpr int pastHighIndex = -1;
+};
+
+template <int ByteSize>
+struct IntegerByteIndexing<ByteSize, false>
+{
+    static constexpr int highIndex     = ByteSize - 1;
+    static constexpr int lowIndex      = 0;
+    static constexpr int lowerIndex    = -1;
+    static constexpr int raiseIndex    = 1;
+    static constexpr int pastLowIndex  = -1;
+    static constexpr int pastHighIndex = ByteSize;
+};
+} // namespace detail
+
+template <int ByteSize, bool IsSigned, bool IsBigEndian>
+struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>, IsBigEndian> : detail::IntegerByteIndexing<ByteSize, IsBigEndian>
 {
     using IntType = OddSizedInteger<ByteSize, IsSigned>;
     // StorageType is the type "at rest" in the attribute store.  It's a
@@ -75,23 +102,13 @@ struct NumericAttributeTraits<OddSizedInteger<ByteSize, IsSigned>>
     // integer that we can do arithmetic, greater/less-than compares, etc on.
     using WorkingType = typename IntType::WorkingType;
 
-    // BIGENDIAN_CPU to match how the attribute store works, because that's
-    // what where our data buffer is eventually ending up or coming from.
-#if BIGENDIAN_CPU
-    static constexpr int highIndex     = 0;
-    static constexpr int lowIndex      = ByteSize - 1;
-    static constexpr int lowerIndex    = 1;
-    static constexpr int raiseIndex    = -1;
-    static constexpr int pastLowIndex  = ByteSize;
-    static constexpr int pastHighIndex = -1;
-#else  // BIGENDIAN_CPU
-    static constexpr int highIndex     = ByteSize - 1;
-    static constexpr int lowIndex      = 0;
-    static constexpr int lowerIndex    = -1;
-    static constexpr int raiseIndex    = 1;
-    static constexpr int pastLowIndex  = -1;
-    static constexpr int pastHighIndex = ByteSize;
-#endif // BIGENDIAN_CPU
+    using Indexing = detail::IntegerByteIndexing<ByteSize, IsBigEndian>;
+    using Indexing::highIndex;
+    using Indexing::lowerIndex;
+    using Indexing::lowIndex;
+    using Indexing::pastHighIndex;
+    using Indexing::pastLowIndex;
+    using Indexing::raiseIndex;
 
     static constexpr WorkingType StorageToWorking(StorageType storageValue)
     {
