@@ -196,4 +196,61 @@ CHIP_ERROR JniReferences::CreateOptional(jobject objectToWrap, jobject & outOpti
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR JniReferences::GetOptionalValue(jobject optionalObj, jobject & optionalValue)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass optionalCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/util/Optional", optionalCls);
+    VerifyOrReturnError(optionalCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    chip::JniClass jniClass(optionalCls);
+
+    jmethodID isPresentMethod = env->GetMethodID(optionalCls, "isPresent", "()Z");
+    VerifyOrReturnError(isPresentMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    jboolean isPresent = env->CallBooleanMethod(optionalObj, isPresentMethod);
+
+    if (!isPresent)
+    {
+        optionalValue = nullptr;
+        return CHIP_NO_ERROR;
+    }
+
+    jmethodID getMethod = env->GetMethodID(optionalCls, "get", "()Ljava/lang/Object;");
+    VerifyOrReturnError(getMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    optionalValue = env->CallObjectMethod(optionalObj, getMethod);
+    return CHIP_NO_ERROR;
+}
+
+jint JniReferences::IntegerToPrimitive(jobject boxedInteger)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass boxedTypeCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", boxedTypeCls);
+    chip::JniClass jniClass(boxedTypeCls);
+
+    jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "intValue", "()I");
+    return env->CallIntMethod(boxedInteger, valueMethod);
+}
+
+jlong JniReferences::LongToPrimitive(jobject boxedLong)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass boxedTypeCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", boxedTypeCls);
+    chip::JniClass jniClass(boxedTypeCls);
+
+    jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "longValue", "()J");
+    return env->CallLongMethod(boxedLong, valueMethod);
+}
+
+jboolean JniReferences::BooleanToPrimitive(jobject boxedBoolean)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass boxedTypeCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", boxedTypeCls);
+    chip::JniClass jniClass(boxedTypeCls);
+
+    jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "booleanValue", "()Z");
+    return env->CallBooleanMethod(boxedBoolean, valueMethod);
+}
+
 } // namespace chip

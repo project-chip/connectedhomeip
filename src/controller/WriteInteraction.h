@@ -99,19 +99,26 @@ CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpoint
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, callback.get()));
     if (sessionHandle.IsGroupSession())
     {
-        // TODO : Issue #11604
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-        // ReturnErrorOnFailure(
-        // handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));
+        ReturnErrorOnFailure(
+            handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));
     }
     else
     {
         ReturnErrorOnFailure(
             handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
     }
+
     ReturnErrorOnFailure(handle.SendWriteRequest(sessionHandle));
 
     callback.release();
+
+    if (sessionHandle.IsGroupSession())
+    {
+        // Manually call success callback since OnReponse won't be called in WriteClient for group
+        app::ConcreteAttributePath aPath;
+        onSuccessCb(aPath);
+    }
+
     return CHIP_NO_ERROR;
 }
 

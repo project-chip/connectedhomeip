@@ -46,7 +46,7 @@
 {{else}}
   {{#if_is_struct type}}
     {{#zcl_struct_items_by_struct_name type}}
-     {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "." (asUpperCamelCase label)) cluster=../cluster errorCode=../errorCode depth=(incrementDepth ../depth)}}
+     {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "." (asStructPropertyName label)) cluster=../cluster errorCode=../errorCode depth=(incrementDepth ../depth)}}
     {{/zcl_struct_items_by_struct_name}}
   {{else}}
     {{#if_chip_enum type}}

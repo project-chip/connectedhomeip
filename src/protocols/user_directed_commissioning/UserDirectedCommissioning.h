@@ -183,7 +183,7 @@ public:
      * Get the cache of UDC Clients
      *
      */
-    UDCClients<kMaxUDCClients> GetUDCClients() { return mUdcClients; }
+    UDCClients<kMaxUDCClients> & GetUDCClients() { return mUdcClients; }
 
     /**
      * Print the cache of UDC Clients

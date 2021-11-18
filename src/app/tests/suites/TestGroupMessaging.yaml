@@ -26,7 +26,6 @@ tests:
     - label: "Group Write Attribute"
       command: "writeAttribute"
       attribute: "location"
-      disabled: true
       groupId: "1234"
       arguments:
           value: "us"

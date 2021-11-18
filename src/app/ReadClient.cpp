@@ -140,28 +140,34 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
         if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
         {
-            EventPaths::Builder & eventPathListBuilder = request.CreateEventPathsBuilder();
+            EventPaths::Builder & eventPathListBuilder = request.CreateEventRequests();
             SuccessOrExit(err = eventPathListBuilder.GetError());
             err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
                                      aReadPrepareParams.mEventPathParamsListSize);
             SuccessOrExit(err);
             if (aReadPrepareParams.mEventNumber != 0)
             {
-                // EventNumber is optional
-                request.EventNumber(aReadPrepareParams.mEventNumber);
+                // EventFilter is optional
+                EventFilters::Builder eventFilters = request.CreateEventFilters();
+                SuccessOrExit(err = request.GetError());
+                EventFilterIB::Builder eventFilter = eventFilters.CreateEventFilter();
+                eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB();
+                SuccessOrExit(err = eventFilter.GetError());
+                eventFilters.EndOfEventFilters();
+                SuccessOrExit(err = eventFilters.GetError());
             }
         }
 
         if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
         {
-            AttributePathIBs::Builder attributePathListBuilder = request.CreateAttributePathListBuilder();
+            AttributePathIBs::Builder attributePathListBuilder = request.CreateAttributeRequests();
             SuccessOrExit(err = attributePathListBuilder.GetError());
             err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
                                             aReadPrepareParams.mAttributePathParamsListSize);
             SuccessOrExit(err);
         }
 
-        request.EndOfReadRequestMessage();
+        request.IsFabricFiltered(false).EndOfReadRequestMessage();
         SuccessOrExit(err = request.GetError());
 
         err = writer.Finalize(&msgBuf);
@@ -369,7 +375,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     {
         chip::TLV::TLVReader EventReportsReader;
         EventReports.GetReader(&EventReportsReader);
-        mpCallback->OnEventData(this, EventReportsReader);
+        err = ProcessEventReportIBs(EventReportsReader);
+        SuccessOrExit(err);
     }
 
     err                         = report.GetAttributeReportIBs(&attributeReportIBs);
@@ -512,6 +519,37 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
     return err;
 }
 
+CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while (CHIP_NO_ERROR == (err = aEventReportIBsReader.Next()))
+    {
+        TLV::TLVReader dataReader;
+        EventReportIB::Parser report;
+        EventDataIB::Parser data;
+        EventHeader header;
+
+        TLV::TLVReader reader = aEventReportIBsReader;
+        ReturnErrorOnFailure(report.Init(reader));
+
+        ReturnErrorOnFailure(report.GetEventData(&data));
+
+        header.mTimestamp = mEventTimestamp;
+        ReturnErrorOnFailure(data.DecodeEventHeader(header));
+        mEventTimestamp = header.mTimestamp;
+
+        ReturnErrorOnFailure(data.GetData(&dataReader));
+
+        mpCallback->OnEventData(this, header, &dataReader, nullptr);
+    }
+
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
 CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 {
     CancelLivenessCheckTimer();
@@ -597,7 +635,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
     {
-        EventPaths::Builder & eventPathListBuilder = request.CreateEventPathsBuilder();
+        EventPaths::Builder & eventPathListBuilder = request.CreateEventRequests();
         SuccessOrExit(err = eventPathListBuilder.GetError());
         err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
                                  aReadPrepareParams.mEventPathParamsListSize);
@@ -606,13 +644,19 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         if (aReadPrepareParams.mEventNumber != 0)
         {
             // EventNumber is optional
-            request.EventNumber(aReadPrepareParams.mEventNumber);
+            EventFilters::Builder eventFilters = request.CreateEventFilters();
+            SuccessOrExit(err = request.GetError());
+            EventFilterIB::Builder eventFilter = eventFilters.CreateEventFilter();
+            eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB();
+            SuccessOrExit(err = eventFilter.GetError());
+            eventFilters.EndOfEventFilters();
+            SuccessOrExit(err = eventFilters.GetError());
         }
     }
 
     if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
     {
-        AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
+        AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
         SuccessOrExit(err = attributePathListBuilder.GetError());
         err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
                                         aReadPrepareParams.mAttributePathParamsListSize);
@@ -621,9 +665,10 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     VerifyOrExit(aReadPrepareParams.mMinIntervalFloorSeconds < aReadPrepareParams.mMaxIntervalCeilingSeconds,
                  err = CHIP_ERROR_INVALID_ARGUMENT);
-    request.MinIntervalSeconds(aReadPrepareParams.mMinIntervalFloorSeconds)
-        .MaxIntervalSeconds(aReadPrepareParams.mMaxIntervalCeilingSeconds)
+    request.MinIntervalFloorSeconds(aReadPrepareParams.mMinIntervalFloorSeconds)
+        .MaxIntervalCeilingSeconds(aReadPrepareParams.mMaxIntervalCeilingSeconds)
         .KeepSubscriptions(aReadPrepareParams.mKeepSubscriptions)
+        .IsFabricFiltered(false)
         .EndOfSubscribeRequestMessage();
     SuccessOrExit(err = request.GetError());
 

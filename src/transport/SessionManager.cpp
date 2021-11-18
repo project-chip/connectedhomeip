@@ -117,18 +117,39 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHe
 #endif // CHIP_PROGRESS_LOGGING
     if (sessionHandle.IsSecure())
     {
-        SecureSession * session = GetSecureSession(sessionHandle);
-        if (session == nullptr)
+        if (sessionHandle.IsGroupSession())
         {
-            return CHIP_ERROR_NOT_CONNECTED;
-        }
+            // TODO : #11911
+            // For now, just set the packetHeader with the correct data.
+            packetHeader.SetDestinationGroupId(sessionHandle.GetGroupId());
+            packetHeader.SetFlags(Header::SecFlagValues::kPrivacyFlag);
+            packetHeader.SetSessionType(Header::SessionType::kGroupSession);
+            // TODO : Replace the PeerNodeId with Our nodeId
+            packetHeader.SetSourceNodeId(sessionHandle.GetPeerNodeId());
 
-        MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *session);
-        ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session, payloadHeader, packetHeader, message, counter));
+            if (!packetHeader.IsValidGroupMsg())
+            {
+                return CHIP_ERROR_INTERNAL;
+            }
 
 #if CHIP_PROGRESS_LOGGING
-        destination = session->GetPeerNodeId();
+            destination = sessionHandle.GetPeerNodeId();
 #endif // CHIP_PROGRESS_LOGGING
+        }
+        else
+        {
+            SecureSession * session = GetSecureSession(sessionHandle);
+            if (session == nullptr)
+            {
+                return CHIP_ERROR_NOT_CONNECTED;
+            }
+            MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *session);
+            ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session, payloadHeader, packetHeader, message, counter));
+
+#if CHIP_PROGRESS_LOGGING
+            destination = session->GetPeerNodeId();
+#endif // CHIP_PROGRESS_LOGGING
+        }
     }
     else
     {

@@ -26,7 +26,7 @@
 
 #include <lib/core/CHIPCore.h>
 
-#include <transport/FabricTable.h>
+#include <credentials/FabricTable.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>

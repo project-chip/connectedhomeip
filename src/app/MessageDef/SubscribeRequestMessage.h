@@ -19,6 +19,7 @@
 
 #include "AttributeDataVersionList.h"
 #include "AttributePathIBs.h"
+#include "EventFilters.h"
 #include "EventPaths.h"
 #include "StructBuilder.h"
 #include "StructParser.h"
@@ -32,16 +33,17 @@
 namespace chip {
 namespace app {
 namespace SubscribeRequestMessage {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_AttributePathList        = 0,
-    kCsTag_EventPaths               = 1,
-    kCsTag_AttributeDataVersionList = 2,
-    kCsTag_EventNumber              = 3,
-    kCsTag_MinIntervalSeconds       = 4,
-    kCsTag_MaxIntervalSeconds       = 5,
-    kCsTag_KeepSubscriptions        = 6,
-    kCsTag_IsProxy                  = 7,
+    kKeepSubscriptions         = 0,
+    kMinIntervalFloorSeconds   = 1,
+    kMaxIntervalCeilingSeconds = 2,
+    kAttributeRequests         = 3,
+    kDataVersionFilters        = 4,
+    kEventRequests             = 5,
+    kEventFilters              = 6,
+    kIsProxy                   = 7,
+    kIsFabricFiltered          = 8,
 };
 
 class Parser : public StructParser
@@ -63,12 +65,34 @@ public:
 #endif
 
     /**
+     *  @brief Check if subscription is kept.
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetKeepSubscriptions(bool * const apKeepExistingSubscription) const;
+
+    /**
+     *  @brief Get MinIntervalFloorSeconds. Next() must be called before accessing them.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetMinIntervalFloorSeconds(uint16_t * const apMinIntervalFloorSeconds) const;
+
+    /**
+     *  @brief Get MaxIntervalCeilingSeconds. Next() must be called before accessing them.
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetMaxIntervalCeilingSeconds(uint16_t * const apMaxIntervalCeilingSeconds) const;
+
+    /**
      *  @brief Get a TLVReader for the AttributePathIBs. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetPathList(AttributePathIBs::Parser * const apAttributePathList) const;
+    CHIP_ERROR GetAttributeRequests(AttributePathIBs::Parser * const apAttributeRequests) const;
 
     /**
      *  @brief Get a TLVReader for the EventPaths. Next() must be called before accessing them.
@@ -76,84 +100,47 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventPaths(EventPaths::Parser * const apEventPaths) const;
+    CHIP_ERROR GetEventRequests(EventPaths::Parser * const apEventRequests) const;
 
     /**
-     *  @brief Get a parser for the AttributeDataVersionList. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the EventFilters. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const;
+    CHIP_ERROR GetEventFilters(EventFilters::Parser * const apEventFilters) const;
 
     /**
-     *  @brief Get Event Number. Next() must be called before accessing them.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetEventNumber(uint64_t * const apEventNumber) const;
-
-    /**
-     *  @brief Get MinIntervalSeconds. Next() must be called before accessing them.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetMinIntervalSeconds(uint16_t * const apMinIntervalSeconds) const;
-
-    /**
-     *  @brief Get MaxIntervalSeconds. Next() must be called before accessing them.
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetMaxIntervalSeconds(uint16_t * const apMaxIntervalSeconds) const;
-
-    /**
-     *  @brief Check if subscription is kept. Next() must be called before accessing them.
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetKeepSubscriptions(bool * const apKeepExistingSubscription) const;
-
-    /**
-     *  @brief Check if subscription is kept. Next() must be called before accessing them.
+     *  @brief Get GetIsProxy boolean .
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetIsProxy(bool * const apIsProxy) const;
+
+    /**
+     *  @brief Get IsFabricFiltered boolean
+     *
+     *  @param [in] apIsFabricFiltered    A pointer to apIsFabricFiltered
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetIsFabricFiltered(bool * const apIsFabricFiltered) const;
 };
 
 class Builder : public StructBuilder
 {
 public:
-    AttributePathIBs::Builder & CreateAttributePathListBuilder();
-
-    /**
-     *  @brief Initialize a EventPaths::Builder for writing into the TLV stream
-     */
-    EventPaths::Builder & CreateEventPathsBuilder();
-
-    /**
-     *  @brief Initialize a AttributeDataVersionList::Builder for writing into the TLV stream
-     */
-    AttributeDataVersionList::Builder & CreateAttributeDataVersionListBuilder();
-
-    /**
-     *  @brief An initiator can optionally specify an EventNumber it has already to limit the
-     *  set of retrieved events on the server for optimization purposes.
-     */
-    SubscribeRequestMessage::Builder & EventNumber(const uint64_t aEventNumber);
-
-    SubscribeRequestMessage::Builder & MinIntervalSeconds(const uint16_t aMinIntervalSeconds);
-
-    SubscribeRequestMessage::Builder & MaxIntervalSeconds(const uint16_t aMinIntervalSeconds);
-
     /**
      *  @brief This is set to 'true' by the subscriber to indicate preservation of previous subscriptions. If omitted, it implies
      * 'false' as a value.
      */
     SubscribeRequestMessage::Builder & KeepSubscriptions(const bool aKeepSubscriptions);
+    SubscribeRequestMessage::Builder & MinIntervalFloorSeconds(const uint16_t aMinIntervalFloorSeconds);
+    SubscribeRequestMessage::Builder & MaxIntervalCeilingSeconds(const uint16_t aMinIntervalFloorSeconds);
+    AttributePathIBs::Builder & CreateAttributeRequests();
+    EventPaths::Builder & CreateEventRequests();
+    EventFilters::Builder & CreateEventFilters();
 
     /**
      *  @brief This is set to true by the subscriber if it is a proxy-type device proxying for another client. This
@@ -163,14 +150,20 @@ public:
     SubscribeRequestMessage::Builder & IsProxy(const bool aIsProxy);
 
     /**
+     *  @brief  limits the data written within fabric-scoped lists to the accessing fabric
+     *  @return A reference to *this
+     */
+    SubscribeRequestMessage::Builder & IsFabricFiltered(const bool aIsFabricFiltered);
+
+    /**
      *  @brief Mark the end of this SubscribeRequestMessage
      */
     SubscribeRequestMessage::Builder & EndOfSubscribeRequestMessage();
 
 private:
-    AttributePathIBs::Builder mAttributePathListBuilder;
-    EventPaths::Builder mEventPathsBuilder;
-    AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
+    AttributePathIBs::Builder mAttributeRequests;
+    EventPaths::Builder mEventRequests;
+    EventFilters::Builder mEventFilters;
 };
 } // namespace SubscribeRequestMessage
 } // namespace app

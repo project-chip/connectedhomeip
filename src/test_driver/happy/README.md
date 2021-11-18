@@ -35,7 +35,7 @@
 
             $ scripts/build/gn_bootstrap.sh
             $ scripts/build/gn_gen.sh --args="chip_enable_happy_tests=true"
-            $ scripts/build/gn_build.sh
+            $ ninja -C ./out
 
 -   Run Tests
 

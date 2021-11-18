@@ -22,8 +22,6 @@ static_library("transport") {
   sources = [
     "CryptoContext.cpp",
     "CryptoContext.h",
-    "FabricTable.cpp",
-    "FabricTable.h",
     "MessageCounter.cpp",
     "MessageCounter.h",
     "MessageCounterManagerInterface.h",

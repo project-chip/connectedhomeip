@@ -30,8 +30,8 @@
 #pragma once
 
 #include <app/DeviceControllerInteractionModelDelegate.h>
+#include <credentials/FabricTable.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
-#include <transport/FabricTable.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 #if CONFIG_DEVICE_LAYER

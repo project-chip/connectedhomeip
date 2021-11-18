@@ -158,34 +158,22 @@ void GenerateSubscribeResponse(nlTestSuite * apSuite, void * apContext, chip::Sy
 class MockInteractionModelApp : public chip::app::ReadClient::Callback, public chip::app::InteractionModelDelegate
 {
 public:
-    void OnEventData(const chip::app::ReadClient * apReadClient, chip::TLV::TLVReader & apEventReportsReader) override
+    void OnEventData(const chip::app::ReadClient * apReadClient, const chip::app::EventHeader & aEventHeader,
+                     chip::TLV::TLVReader * apData, const chip::app::StatusIB * apStatus) override
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        chip::TLV::TLVReader reader;
-        int numDataElementIndex = 0;
-        reader.Init(apEventReportsReader);
-        while (CHIP_NO_ERROR == (err = reader.Next()))
+        static int numDataElementIndex = 0;
+
+        if (numDataElementIndex == 0)
         {
-            uint8_t priorityLevel = 0;
-            chip::app::EventReportIB::Parser eventReport;
-            chip::app::EventDataIB::Parser eventData;
-            VerifyOrReturn(eventReport.Init(reader) == CHIP_NO_ERROR);
-            VerifyOrReturn(eventReport.GetEventData(&eventData) == CHIP_NO_ERROR);
-            VerifyOrReturn(eventData.GetPriority(&priorityLevel) == CHIP_NO_ERROR);
-            if (numDataElementIndex == 0)
-            {
-                VerifyOrReturn(priorityLevel == chip::to_underlying(chip::app::PriorityLevel::Critical));
-            }
-            else if (numDataElementIndex == 1)
-            {
-                VerifyOrReturn(priorityLevel == chip::to_underlying(chip::app::PriorityLevel::Info));
-            }
-            ++numDataElementIndex;
+            VerifyOrReturn(aEventHeader.mPriorityLevel == chip::app::PriorityLevel::Critical);
         }
-        if (CHIP_END_OF_TLV == err)
+        else if (numDataElementIndex == 1)
         {
-            mGotEventResponse = true;
+            VerifyOrReturn(aEventHeader.mPriorityLevel == chip::app::PriorityLevel::Info);
         }
+
+        ++numDataElementIndex;
+        mGotEventResponse = true;
     }
 
     void OnAttributeData(const chip::app::ReadClient * apReadClient, const chip::app::ConcreteDataAttributePath & aPath,
@@ -417,7 +405,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathIBs::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
+    AttributePathIBs::Builder attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
     AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePath();
@@ -432,7 +420,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    readRequestBuilder.EndOfReadRequestMessage();
+    readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -466,7 +454,7 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
     attributePathParams[0].mAttributeId                  = 0;
     attributePathParams[1].mAttributeId                  = 0;
     attributePathParams[1].mListIndex                    = 0;
-    AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
+    AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
     err = readClient.GenerateAttributePathList(attributePathListBuilder, attributePathParams, 2 /*aAttributePathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
@@ -492,7 +480,7 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
     AttributePathParams attributePathParams[2];
     attributePathParams[0].mAttributeId                  = 0;
     attributePathParams[1].mListIndex                    = 0;
-    AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
+    AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
     err = readClient.GenerateAttributePathList(attributePathListBuilder, attributePathParams, 2 /*aAttributePathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 }
@@ -546,7 +534,7 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathIBs::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
+    AttributePathIBs::Builder attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
     AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePath();
@@ -556,8 +544,9 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    readRequestBuilder.EndOfReadRequestMessage();
+    attributePathListBuilder.EndOfAttributePathIBs();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -593,11 +582,11 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSu
     eventPathParams[0].mClusterId  = 3;
     eventPathParams[0].mEventId    = 4;
 
-    EventPaths::Builder & eventPathListBuilder = request.CreateEventPathsBuilder();
+    EventPaths::Builder & eventPathListBuilder = request.CreateEventRequests();
     err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 1 /*aEventPathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    request.EndOfReadRequestMessage();
+    request.IsFabricFiltered(false).EndOfReadRequestMessage();
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == request.GetError());
 
     err = writer.Finalize(&msgBuf);
@@ -647,11 +636,11 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSu
     eventPathParams[1].mClusterId  = 3;
     eventPathParams[1].mEventId    = 5;
 
-    EventPaths::Builder & eventPathListBuilder = request.CreateEventPathsBuilder();
+    EventPaths::Builder & eventPathListBuilder = request.CreateEventRequests();
     err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 2 /*aEventPathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    request.EndOfReadRequestMessage();
+    request.IsFabricFiltered(false).EndOfReadRequestMessage();
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == request.GetError());
 
     err = writer.Finalize(&msgBuf);
@@ -948,7 +937,7 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     err = subscribeRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathIBs::Builder attributePathListBuilder = subscribeRequestBuilder.CreateAttributePathListBuilder();
+    AttributePathIBs::Builder attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
     AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePath();
@@ -962,10 +951,10 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     err = attributePathListBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.MinIntervalSeconds(2);
+    subscribeRequestBuilder.MinIntervalFloorSeconds(2);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.MaxIntervalSeconds(3);
+    subscribeRequestBuilder.MaxIntervalCeilingSeconds(3);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     subscribeRequestBuilder.KeepSubscriptions(true);
@@ -974,7 +963,7 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     subscribeRequestBuilder.IsProxy(true);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.EndOfSubscribeRequestMessage();
+    subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
