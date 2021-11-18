@@ -228,9 +228,9 @@ class ClusterDetailFragment : Fragment() {
       callbackList.addView(emptyCallback)
     } else {
       response.forEachIndexed { index, it ->
-        val AttributeCallbackItem =
+        val attributeCallbackItem =
           inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
-        AttributeCallbackItem.clusterCallbackNameTv.text = variableNameType.name + "[$index]"
+        attributeCallbackItem.clusterCallbackNameTv.text = variableNameType.name + "[$index]"
         val objectString = if (it!!.javaClass == ByteArray::class.java) {
           (it as ByteArray).contentToString()
         } else {
@@ -241,16 +241,16 @@ class ClusterDetailFragment : Fragment() {
         } else {
           it!!.javaClass.toString().split('$').last()
         }
-        AttributeCallbackItem.clusterCallbackDataTv.text = callbackClassName
-        AttributeCallbackItem.clusterCallbackDataTv.setOnClickListener {
+        attributeCallbackItem.clusterCallbackDataTv.text = callbackClassName
+        attributeCallbackItem.clusterCallbackDataTv.setOnClickListener {
           AlertDialog.Builder(requireContext())
             .setTitle(callbackClassName)
             .setMessage(objectString)
             .create()
             .show()
         }
-        AttributeCallbackItem.clusterCallbackTypeTv.text = "List<$callbackClassName>"
-        callbackList.addView(AttributeCallbackItem)
+        attributeCallbackItem.clusterCallbackTypeTv.text = "List<$callbackClassName>"
+        callbackList.addView(attributeCallbackItem)
       }
     }
   }
