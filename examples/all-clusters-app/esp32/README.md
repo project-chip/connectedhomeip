@@ -40,8 +40,8 @@ the riscv-esp32-elf toolchain for ESP32C3 modules.
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout
-    branch [release/v4.4](https://github.com/espressif/esp-idf/tree/release/v4.4)
+-   Clone the Espressif ESP-IDF and checkout branch
+    [release/v4.4](https://github.com/espressif/esp-idf/tree/release/v4.4)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
