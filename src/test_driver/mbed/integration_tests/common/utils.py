@@ -19,7 +19,9 @@ import os
 import platform
 import random
 import shlex
+import re
 
+from chip.setup_payload import SetupPayload
 from chip import exceptions
 
 if platform.system() == 'Darwin':
@@ -37,6 +39,25 @@ class ParsingError(exceptions.ChipStackException):
     def __str__(self):
         return self.msg
 
+def get_device_details(device):
+    """
+    Get device details from logs
+    :param device: serial device instance
+    :return: device details dictionary or None
+    """
+    ret = device.wait_for_output("SetupQRCode")
+    if ret == None or len(ret) < 2:
+        return None
+
+    qr_code = re.sub(r"[\[\]]", "", ret[-1].partition("SetupQRCode:")[2]).strip()
+    try:
+        device_details = dict(SetupPayload().ParseQrCode("VP:vendorpayload%{}".format(qr_code)).attributes)
+    except exceptions.ChipStackError as ex:
+        log.error(ex.msg)
+        return None
+
+    return device_details
+
 def ParseEncodedString(value):
     if value.find(":") < 0:
         raise ParsingError(
@@ -47,7 +68,6 @@ def ParseEncodedString(value):
     elif enc == "hex":
         return bytes.fromhex(encValue)
     raise ParsingError("Only str and hex encoding is supported")
-
 
 def ParseValueWithType(value, type):
     if type == 'int':
@@ -113,7 +133,7 @@ def send_zcl_command(devCtrl, line):
 
     return (err, res)
 
-def scan_chip_ble_devices(devCtrl, name):
+def scan_chip_ble_devices(devCtrl):
     """
     BLE scan CHIP device
     BLE scanning for 10 seconds and collect the results 
@@ -125,14 +145,39 @@ def scan_chip_ble_devices(devCtrl, name):
     bleMgr.scan("-t 10")
 
     for device in bleMgr.peripheral_list:
-        if device.Name != name:
-            continue
         devIdInfo = bleMgr.get_peripheral_devIdInfo(device)
         if devIdInfo:
-            devices.append(devIdInfo)
+            devInfo = devIdInfo.__dict__
+            devInfo["name"] = device.Name
+            devices.append(devInfo)
 
     return devices
 
+def check_chip_ble_devices_advertising(devCtrl, name, deviceDetails):
+    """
+    Check if CHIP device advertise
+    BLE scanning for 10 seconds and compare with device details
+    :param devCtrl: device controller instance
+    :param name: device advertising name
+    :param name: device details
+    :return: True if device advertise else False
+    """
+    ble_chip_device = scan_chip_ble_devices(devCtrl)
+    if ble_chip_device == None or len(ble_chip_device) == 0:
+        log.error("No BLE CHIP device found")
+        return False
+
+    chip_device_found = False
+
+    for ble_device in ble_chip_device:
+        if (ble_device["name"] == name and
+            int(ble_device["discriminator"]) == int(deviceDetails["Discriminator"]) and
+            int(ble_device["vendorId"]) == int(deviceDetails["VendorID"]) and
+            int(ble_device["productId"]) == int(deviceDetails["ProductID"])):
+            chip_device_found = True
+            break
+
+    return chip_device_found
 
 def connect_device_over_ble(devCtrl, discriminator, pinCode, nodeId=None):
     """
@@ -153,6 +198,20 @@ def connect_device_over_ble(devCtrl, discriminator, pinCode, nodeId=None):
         return None
 
     return nodeId
+
+def close_connection(devCtrl, nodeId):
+    """
+    Close the BLE connection
+    :param devCtrl: device controller instance
+    :return: true if successful, otherwise false
+    """
+    try:
+        devCtrl.CloseSession(nodeId)
+    except exceptions.ChipStackException as ex:
+        log.error("Close session failed: {}".format(str(ex)))
+        return False
+
+    return True
 
 def close_ble(devCtrl):
     """
