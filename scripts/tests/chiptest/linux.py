@@ -24,6 +24,8 @@ import subprocess
 import sys
 import time
 
+from .test_definition import ApplicationPaths
+
 test_environ = os.environ.copy()
 
 
@@ -124,3 +126,15 @@ def PrepareNamespacesForTestExecution(in_unshare: bool):
         EnsurePrivateState()
 
     CreateNamespacesForAppTest()
+
+
+def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
+    """
+    Returns a copy of paths with updated command arrays to invoke the 
+    commands in an appropriate network namespace.
+    """
+    return ApplicationPaths(
+        chip_tool='ip netns exec tool'.split() + paths.chip_tool,
+        all_clusters_app='ip netns exec app'.split() + paths.all_clusters_app,
+        tv_app='ip netns exec app'.split() + paths.tv_app,
+    )

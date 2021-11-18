@@ -21,7 +21,7 @@ import logging
 import chiptest.linux
 import chiptest.runner
 
-from .test_definition import TestTarget, TestDefinition
+from .test_definition import TestTarget, TestDefinition, ApplicationPaths
 
 
 def AllTests(root: str):
@@ -35,15 +35,15 @@ def AllTests(root: str):
         name = path.stem.lower()
 
         if name.startswith('tv_'):
-            target = TestTarget.ALL_CLUSTERS
+            target = TestTarget.TV
             name = 'tv-' + name[3:]
         elif name.startswith('test_'):
-            target = TestTarget.TV
+            target = TestTarget.ALL_CLUSTERS
             name = 'app-' + name[5:]
         else:
             continue
 
-        yield TestDefinition(yaml_file=path, name=name, target=target)
+        yield TestDefinition(yaml_file=path, run_name = path.stem, name=name, target=target)
 
 
-__all__ = ['TestTarget', 'TestDefinition', 'AllTests']
+__all__ = ['TestTarget', 'TestDefinition', 'AllTests', 'ApplicationPaths']

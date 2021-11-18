@@ -21,7 +21,9 @@ import logging
 import os
 import sys
 import typing
+import time
 
+from pathlib import Path
 from dataclasses import dataclass
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
@@ -29,6 +31,16 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
+
+def FindBinaryPath(name: str):
+    for path in Path(DEFAULT_CHIP_ROOT).rglob(name):
+        if not path.is_file():
+            continue
+        if path.name != name:
+            continue
+        return str(path)
+    
+    return 'NOT_FOUND_IN_OUTPUT_' + name
 
 
 # Supported log levels, mapping string values required for argument
@@ -86,9 +98,10 @@ def main(context, log_level, target, no_log_timestamps, root, internal_inside_un
     # Figures out selected test that match the given name(s)
     tests = [test for test in chiptest.AllTests(root)]
     if 'all' not in target:
-        tests = [test for test in tests if test.name.upper() in target]
+        target = set([name.lower() for name in target])
+        tests = [test for test in tests if test.name in target]
     tests.sort(key=lambda x: x.name)
-
+    
     context.obj = RunContext(tests=tests, in_unshare=internal_inside_unshare)
 
 
@@ -106,25 +119,42 @@ def cmd_generate(context):
     '--iterations',
     default=1,
     help='Number of iterations to run')
+@click.option(
+    '--chip-tool',
+    default=FindBinaryPath('chip-tool'),
+    help='What chip tool app to use to run the test')
+@click.option(
+    '--all-clusters-app',
+    default=FindBinaryPath('chip-all-clusters-app'),
+    help='what all clusters app to use')
+@click.option(
+    '--tv-app',
+    default=FindBinaryPath('chip-tv-app'),
+    help='what tv app to use')
 @click.pass_context
-def cmd_run(context, iterations):
+def cmd_run(context, iterations, chip_tool, all_clusters_app, tv_app):
     runner = chiptest.runner.Runner()
 
-    if sys.platform == 'linux':
-        chiptest.linux.PrepareNamespacesForTestExecution(
-            context.obj.in_unshare)
+    # Command execution requires an array
+    paths = chiptest.ApplicationPaths(
+        chip_tool = [chip_tool],
+        all_clusters_app = [all_clusters_app],
+        tv_app = [tv_app]
+    )
 
+    if sys.platform == 'linux':
+        chiptest.linux.PrepareNamespacesForTestExecution(context.obj.in_unshare)
+        paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
+        
     logging.info("Each test will be executed %d times" % iterations)
 
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
         for test in context.obj.tests:
-            # TODO: - make it run in namespaces  on linux
             # TODO: - make log captures possible so that failure info is provided
-
             test_start = time.time()
             try:
-                test.Run(runner)
+                test.Run(runner, paths)
                 test_end = time.time()
                 logging.info('%s - Completed in %0.2f seconds' %
                              (test.name, (test_end - test_start)))
