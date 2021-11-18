@@ -19,6 +19,7 @@ import coloredlogs
 import click
 import logging
 import os
+import shutil
 import sys
 import typing
 import time
@@ -55,6 +56,7 @@ __LOG_LEVELS__ = {
 
 @dataclass
 class RunContext:
+    root: str
     tests: typing.List[chiptest.TestDefinition]
     in_unshare: bool
 
@@ -102,7 +104,7 @@ def main(context, log_level, target, no_log_timestamps, root, internal_inside_un
         tests = [test for test in tests if test.name in target]
     tests.sort(key=lambda x: x.name)
     
-    context.obj = RunContext(tests=tests, in_unshare=internal_inside_unshare)
+    context.obj = RunContext(root=root, tests=tests, in_unshare=internal_inside_unshare)
 
 
 @main.command(
@@ -145,6 +147,13 @@ def cmd_run(context, iterations, chip_tool, all_clusters_app, tv_app):
     if sys.platform == 'linux':
         chiptest.linux.PrepareNamespacesForTestExecution(context.obj.in_unshare)
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
+
+    # Testing prerequisites: tv app requires a config. Copy it just in case
+    shutil.copyfile(
+        os.path.join(context.obj.root, 'examples/tv-app/linux/include/endpoint-configuration/chip_tv_config.ini'),
+        '/tmp/chip_tv_config.ini'
+    )
+   
         
     logging.info("Each test will be executed %d times" % iterations)
 
@@ -156,7 +165,7 @@ def cmd_run(context, iterations, chip_tool, all_clusters_app, tv_app):
             try:
                 test.Run(runner, paths)
                 test_end = time.time()
-                logging.info('%s - Completed in %0.2f seconds' %
+                logging.info('%-20s - Completed in %0.2f seconds' %
                              (test.name, (test_end - test_start)))
             except:
                 test_end = time.time()

@@ -13,9 +13,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import typing
-import time
 import logging
+import os
+import time
+import typing
 
 from enum import Enum, auto
 from dataclasses import dataclass
@@ -52,15 +53,12 @@ class TestDefinition:
               raise Exception("Unknown test target - don't know which application to run")
    
           tool_cmd = paths.chip_tool
+          if os.path.exists('/tmp/chip_tool_config.ini'):
+              os.unlink('/tmp/chip_tool_config.ini')
    
-          # PREREQUISITES
-          #   TV: cp examples/tv-app/linux/include/endpoint-configuration/chip_tv_config.ini /tmp/chip_tv_config.ini
-          #   rm -rf /tmp/chip_tool_config.ini
-   
-   
+          logging.debug('Executing application under test.')
           app_process, outpipe, errpipe = runner.RunSubprocess(app_cmd, name = 'APP', wait = False)
    
-
           logging.debug('Waiting for server to listen.')
           start_time = time.time()
           server_is_listening = outpipe.CapturedLogContains("Server Listening")

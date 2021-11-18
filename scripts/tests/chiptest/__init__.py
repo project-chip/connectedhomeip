@@ -34,6 +34,9 @@ def AllTests(root: str):
         # grab the name without the extension
         name = path.stem.lower()
 
+        if 'simulated' in name:
+            continue
+
         if name.startswith('tv_'):
             target = TestTarget.TV
             name = 'tv-' + name[3:]
