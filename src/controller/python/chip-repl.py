@@ -18,15 +18,7 @@
 #
 
 import IPython
-import chip
-import chip.logging
-import coloredlogs
-import logging
 from traitlets.config import Config
-from rich import print
-from rich import pretty
-from rich import inspect
-import builtins
 import argparse
 import sys
 
