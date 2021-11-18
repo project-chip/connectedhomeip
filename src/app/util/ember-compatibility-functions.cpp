@@ -278,7 +278,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
 
     if (emberStatus == EMBER_ZCL_STATUS_SUCCESS && accessControlStatus != CHIP_NO_ERROR)
     {
-        emberStatus = (accessControlStatus == CHIP_ERROR_ACCESS_DENIED) ? EMBER_ZCL_STATUS_NOT_AUTHORIZED : EMBER_ZCL_STATUS_SOFTWARE_FAILURE;
+        emberStatus =
+            (accessControlStatus == CHIP_ERROR_ACCESS_DENIED) ? EMBER_ZCL_STATUS_NOT_AUTHORIZED : EMBER_ZCL_STATUS_SOFTWARE_FAILURE;
     }
 
     if (emberStatus == EMBER_ZCL_STATUS_SUCCESS)
@@ -563,7 +564,8 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * metadata, TLV::TLVR
 }
 } // namespace
 
-CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     Protocols::InteractionModel::Status imStatus = Protocols::InteractionModel::Status::Failure;
     AttributePathParams attributePathParams;
@@ -571,7 +573,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     attributePathParams.mClusterId   = aClusterInfo.mClusterId;
     attributePathParams.mAttributeId = aClusterInfo.mAttributeId;
 
-    CHIP_ERROR accessControlStatus = CheckAccessControl(aSubjectDescriptor, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, true);
+    CHIP_ERROR accessControlStatus =
+        CheckAccessControl(aSubjectDescriptor, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, true);
 
     // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
     // as the input argument.
@@ -605,9 +608,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     }
     else if (accessControlStatus != CHIP_NO_ERROR)
     {
-        imStatus = (accessControlStatus == CHIP_ERROR_ACCESS_DENIED)
-                ? Protocols::InteractionModel::Status::UnsupportedAccess
-                : Protocols::InteractionModel::Status::Failure;
+        imStatus = (accessControlStatus == CHIP_ERROR_ACCESS_DENIED) ? Protocols::InteractionModel::Status::UnsupportedAccess
+                                                                     : Protocols::InteractionModel::Status::Failure;
     }
     else if ((preparationError = prepareWriteData(attributeMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
     {
@@ -622,8 +624,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     else
     {
         imStatus = ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
-                                                                          aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0, attributeData,
-                                                                          attributeMetadata->attributeType));
+                                                                          aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0,
+                                                                          attributeData, attributeMetadata->attributeType));
     }
 
     return apWriteHandler->AddStatus(attributePathParams, imStatus);

@@ -183,7 +183,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
 
 CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
     SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle().GetSubjectDescriptor();
     CommandPathIB::Parser commandPath;
     TLV::TLVReader commandDataReader;
@@ -225,7 +225,8 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
                       requestPath.endpoint, ChipLogValueMEI(requestPath.cluster), ChipLogValueMEI(commandId));
         const ConcreteCommandPath concretePath(requestPath.endpoint, requestPath.cluster, commandId);
         SuccessOrExit(MatterPreCommandReceivedCallback(concretePath));
-        mpCallback->DispatchCommand(*this, ConcreteCommandPath(requestPath.endpoint, requestPath.cluster, commandId), commandDataReader);
+        mpCallback->DispatchCommand(*this, ConcreteCommandPath(requestPath.endpoint, requestPath.cluster, commandId),
+                                    commandDataReader);
         MatterPostCommandReceivedCallback(concretePath);
     }
 
@@ -240,8 +241,8 @@ exit:
         // TODO: The error code should be updated after #7072 added error codes required by IM.
         if (err == CHIP_ERROR_INVALID_PROFILE_ID)
         {
-            ChipLogDetail(DataManagement, "No Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16, ChipLogValueMEI(requestPath.cluster),
-                          requestPath.endpoint);
+            ChipLogDetail(DataManagement, "No Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
+                          ChipLogValueMEI(requestPath.cluster), requestPath.endpoint);
         }
 
         // TODO:in particular different reasons for ServerClusterCommandExists to test false should result in different errors here
