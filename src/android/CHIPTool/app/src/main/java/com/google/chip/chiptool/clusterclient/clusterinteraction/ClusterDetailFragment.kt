@@ -24,6 +24,9 @@ import chip.devicecontroller.ClusterInfoMapping
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets.UTF_16
+import java.nio.charset.StandardCharsets.UTF_8
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackDataTv
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackNameTv
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackTypeTv
@@ -96,7 +99,7 @@ class ClusterDetailFragment : Fragment() {
       Int::class.java -> data.toInt()
       Boolean::class.java -> data.toBoolean()
       ByteArray::class.java -> data.encodeToByteArray()
-      Long::class.java -> data.toLong()
+        Long ::class.java -> data.toLong()
       else -> data
     }
   }
@@ -228,9 +231,9 @@ class ClusterDetailFragment : Fragment() {
       callbackList.addView(emptyCallback)
     } else {
       response.forEachIndexed { index, it ->
-        val attributeCallbackItem =
+        val AttributeCallbackItem =
           inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
-        attributeCallbackItem.clusterCallbackNameTv.text = variableNameType.name + "[$index]"
+        AttributeCallbackItem.clusterCallbackNameTv.text = variableNameType.name + "[$index]"
         val objectString = if (it!!.javaClass == ByteArray::class.java) {
           (it as ByteArray).contentToString()
         } else {
@@ -241,16 +244,16 @@ class ClusterDetailFragment : Fragment() {
         } else {
           it!!.javaClass.toString().split('$').last()
         }
-        attributeCallbackItem.clusterCallbackDataTv.text = callbackClassName
-        attributeCallbackItem.clusterCallbackDataTv.setOnClickListener {
+        AttributeCallbackItem.clusterCallbackDataTv.text = callbackClassName
+        AttributeCallbackItem.clusterCallbackDataTv.setOnClickListener {
           AlertDialog.Builder(requireContext())
             .setTitle(callbackClassName)
             .setMessage(objectString)
             .create()
             .show()
         }
-        attributeCallbackItem.clusterCallbackTypeTv.text = "List<$callbackClassName>"
-        callbackList.addView(attributeCallbackItem)
+        AttributeCallbackItem.clusterCallbackTypeTv.text = "List<$callbackClassName>"
+        callbackList.addView(AttributeCallbackItem)
       }
     }
   }
