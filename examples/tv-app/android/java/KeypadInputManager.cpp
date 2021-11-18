@@ -16,30 +16,30 @@
  *    limitations under the License.
  */
 
-
+#include "KeypadInputManager.h"
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <cstddef>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
-#include "KeypadInputManager.h"
 
 using namespace chip;
 
 KeypadInputManager KeypadInputManager::sInstance;
 
-EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode) {
+EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode)
+{
     return KeypadInputMgr().SendKey(keyCode);
 }
 
 EmberAfKeypadInputStatus KeypadInputManager::SendKey(EmberAfKeypadInputCecKeyCode keyCode)
 {
-    jint ret = -1;
+    jint ret       = -1;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogProgress(Zcl, "Received keypadInputClusterSendKey: %d",keyCode);
+    ChipLogProgress(Zcl, "Received keypadInputClusterSendKey: %d", keyCode);
     VerifyOrExit(mKeypadInputManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mSendKeyMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
@@ -56,7 +56,6 @@ exit:
 
     return static_cast<EmberAfKeypadInputStatus>(ret);
 }
-
 
 void KeypadInputManager::InitializeWithObjects(jobject managerObject)
 {
