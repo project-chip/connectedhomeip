@@ -15,7 +15,7 @@
  *   limitations under the License.
  *
  */
-package com.tcl.tvapp;
+package com.tcl.chip.tvapp;
 
 public class TvApp {
   public TvApp() {}
