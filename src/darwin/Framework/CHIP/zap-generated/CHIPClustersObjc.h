@@ -25,7 +25,11 @@
 #include <CHIP/CHIPCluster.h>
 #include <CHIP/CHIPCommandPayloadsObjc.h>
 
+/* We need to sort out our handlers, but for now just define both
+   ResponseHandler and CompletionHandler to look the same way.  Eventually we
+   will want different completion handlers for different return types. */
 typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
+typedef void (^CompletionHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -35,8 +39,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPAccountLogin : CHIPCluster
 
-- (void)getSetupPIN:(CHIPAccountLoginClusterGetSetupPINPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)login:(CHIPAccountLoginClusterLoginPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)getSetupPINWithParams:(CHIPAccountLoginClusterGetSetupPINParams *)params
+            completionHandler:(CompletionHandler)completionHandler;
+- (void)loginWithParams:(CHIPAccountLoginClusterLoginParams *)params completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -52,12 +57,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPAdministratorCommissioning : CHIPCluster
 
-- (void)openBasicCommissioningWindow:(CHIPAdministratorCommissioningClusterOpenBasicCommissioningWindowPayload * _Nonnull)payload
-                     responseHandler:(ResponseHandler)responseHandler;
-- (void)openCommissioningWindow:(CHIPAdministratorCommissioningClusterOpenCommissioningWindowPayload * _Nonnull)payload
-                responseHandler:(ResponseHandler)responseHandler;
-- (void)revokeCommissioning:(CHIPAdministratorCommissioningClusterRevokeCommissioningPayload * _Nonnull)payload
-            responseHandler:(ResponseHandler)responseHandler;
+- (void)openBasicCommissioningWindowWithParams:(CHIPAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *)params
+                             completionHandler:(CompletionHandler)completionHandler;
+- (void)openCommissioningWindowWithParams:(CHIPAdministratorCommissioningClusterOpenCommissioningWindowParams *)params
+                        completionHandler:(CompletionHandler)completionHandler;
+- (void)revokeCommissioningWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -73,8 +77,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPApplicationBasic : CHIPCluster
 
-- (void)changeStatus:(CHIPApplicationBasicClusterChangeStatusPayload * _Nonnull)payload
-     responseHandler:(ResponseHandler)responseHandler;
+- (void)changeStatusWithParams:(CHIPApplicationBasicClusterChangeStatusParams *)params
+             completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeVendorNameWithMinInterval:(uint16_t)minInterval
@@ -132,8 +136,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPApplicationLauncher : CHIPCluster
 
-- (void)launchApp:(CHIPApplicationLauncherClusterLaunchAppPayload * _Nonnull)payload
-    responseHandler:(ResponseHandler)responseHandler;
+- (void)launchAppWithParams:(CHIPApplicationLauncherClusterLaunchAppParams *)params
+          completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeApplicationLauncherListWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -163,8 +167,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPAudioOutput : CHIPCluster
 
-- (void)renameOutput:(CHIPAudioOutputClusterRenameOutputPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)selectOutput:(CHIPAudioOutputClusterSelectOutputPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)renameOutputWithParams:(CHIPAudioOutputClusterRenameOutputParams *)params
+             completionHandler:(CompletionHandler)completionHandler;
+- (void)selectOutputWithParams:(CHIPAudioOutputClusterSelectOutputParams *)params
+             completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeAudioOutputListWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -188,10 +194,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBarrierControl : CHIPCluster
 
-- (void)barrierControlGoToPercent:(CHIPBarrierControlClusterBarrierControlGoToPercentPayload * _Nonnull)payload
-                  responseHandler:(ResponseHandler)responseHandler;
-- (void)barrierControlStop:(CHIPBarrierControlClusterBarrierControlStopPayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
+- (void)barrierControlGoToPercentWithParams:(CHIPBarrierControlClusterBarrierControlGoToPercentParams *)params
+                          completionHandler:(CompletionHandler)completionHandler;
+- (void)barrierControlStopWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeBarrierMovingStateWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeBarrierMovingStateWithMinInterval:(uint16_t)minInterval
@@ -231,7 +236,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBasic : CHIPCluster
 
-- (void)mfgSpecificPing:(CHIPBasicClusterMfgSpecificPingPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)mfgSpecificPingWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeInteractionModelVersionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeInteractionModelVersionWithMinInterval:(uint16_t)minInterval
@@ -392,8 +397,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBinding : CHIPCluster
 
-- (void)bind:(CHIPBindingClusterBindPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)unbind:(CHIPBindingClusterUnbindPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)bindWithParams:(CHIPBindingClusterBindParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)unbindWithParams:(CHIPBindingClusterUnbindParams *)params completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -429,29 +434,30 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBridgedActions : CHIPCluster
 
-- (void)disableAction:(CHIPBridgedActionsClusterDisableActionPayload * _Nonnull)payload
-      responseHandler:(ResponseHandler)responseHandler;
-- (void)disableActionWithDuration:(CHIPBridgedActionsClusterDisableActionWithDurationPayload * _Nonnull)payload
-                  responseHandler:(ResponseHandler)responseHandler;
-- (void)enableAction:(CHIPBridgedActionsClusterEnableActionPayload * _Nonnull)payload
-     responseHandler:(ResponseHandler)responseHandler;
-- (void)enableActionWithDuration:(CHIPBridgedActionsClusterEnableActionWithDurationPayload * _Nonnull)payload
-                 responseHandler:(ResponseHandler)responseHandler;
-- (void)instantAction:(CHIPBridgedActionsClusterInstantActionPayload * _Nonnull)payload
-      responseHandler:(ResponseHandler)responseHandler;
-- (void)instantActionWithTransition:(CHIPBridgedActionsClusterInstantActionWithTransitionPayload * _Nonnull)payload
-                    responseHandler:(ResponseHandler)responseHandler;
-- (void)pauseAction:(CHIPBridgedActionsClusterPauseActionPayload * _Nonnull)payload
-    responseHandler:(ResponseHandler)responseHandler;
-- (void)pauseActionWithDuration:(CHIPBridgedActionsClusterPauseActionWithDurationPayload * _Nonnull)payload
-                responseHandler:(ResponseHandler)responseHandler;
-- (void)resumeAction:(CHIPBridgedActionsClusterResumeActionPayload * _Nonnull)payload
-     responseHandler:(ResponseHandler)responseHandler;
-- (void)startAction:(CHIPBridgedActionsClusterStartActionPayload * _Nonnull)payload
-    responseHandler:(ResponseHandler)responseHandler;
-- (void)startActionWithDuration:(CHIPBridgedActionsClusterStartActionWithDurationPayload * _Nonnull)payload
-                responseHandler:(ResponseHandler)responseHandler;
-- (void)stopAction:(CHIPBridgedActionsClusterStopActionPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)disableActionWithParams:(CHIPBridgedActionsClusterDisableActionParams *)params
+              completionHandler:(CompletionHandler)completionHandler;
+- (void)disableActionWithDurationWithParams:(CHIPBridgedActionsClusterDisableActionWithDurationParams *)params
+                          completionHandler:(CompletionHandler)completionHandler;
+- (void)enableActionWithParams:(CHIPBridgedActionsClusterEnableActionParams *)params
+             completionHandler:(CompletionHandler)completionHandler;
+- (void)enableActionWithDurationWithParams:(CHIPBridgedActionsClusterEnableActionWithDurationParams *)params
+                         completionHandler:(CompletionHandler)completionHandler;
+- (void)instantActionWithParams:(CHIPBridgedActionsClusterInstantActionParams *)params
+              completionHandler:(CompletionHandler)completionHandler;
+- (void)instantActionWithTransitionWithParams:(CHIPBridgedActionsClusterInstantActionWithTransitionParams *)params
+                            completionHandler:(CompletionHandler)completionHandler;
+- (void)pauseActionWithParams:(CHIPBridgedActionsClusterPauseActionParams *)params
+            completionHandler:(CompletionHandler)completionHandler;
+- (void)pauseActionWithDurationWithParams:(CHIPBridgedActionsClusterPauseActionWithDurationParams *)params
+                        completionHandler:(CompletionHandler)completionHandler;
+- (void)resumeActionWithParams:(CHIPBridgedActionsClusterResumeActionParams *)params
+             completionHandler:(CompletionHandler)completionHandler;
+- (void)startActionWithParams:(CHIPBridgedActionsClusterStartActionParams *)params
+            completionHandler:(CompletionHandler)completionHandler;
+- (void)startActionWithDurationWithParams:(CHIPBridgedActionsClusterStartActionWithDurationParams *)params
+                        completionHandler:(CompletionHandler)completionHandler;
+- (void)stopActionWithParams:(CHIPBridgedActionsClusterStopActionParams *)params
+           completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeActionListWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -491,38 +497,39 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPColorControl : CHIPCluster
 
-- (void)colorLoopSet:(CHIPColorControlClusterColorLoopSetPayload * _Nonnull)payload
-     responseHandler:(ResponseHandler)responseHandler;
-- (void)enhancedMoveHue:(CHIPColorControlClusterEnhancedMoveHuePayload * _Nonnull)payload
-        responseHandler:(ResponseHandler)responseHandler;
-- (void)enhancedMoveToHue:(CHIPColorControlClusterEnhancedMoveToHuePayload * _Nonnull)payload
-          responseHandler:(ResponseHandler)responseHandler;
-- (void)enhancedMoveToHueAndSaturation:(CHIPColorControlClusterEnhancedMoveToHueAndSaturationPayload * _Nonnull)payload
-                       responseHandler:(ResponseHandler)responseHandler;
-- (void)enhancedStepHue:(CHIPColorControlClusterEnhancedStepHuePayload * _Nonnull)payload
-        responseHandler:(ResponseHandler)responseHandler;
-- (void)moveColor:(CHIPColorControlClusterMoveColorPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)moveColorTemperature:(CHIPColorControlClusterMoveColorTemperaturePayload * _Nonnull)payload
-             responseHandler:(ResponseHandler)responseHandler;
-- (void)moveHue:(CHIPColorControlClusterMoveHuePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)moveSaturation:(CHIPColorControlClusterMoveSaturationPayload * _Nonnull)payload
-       responseHandler:(ResponseHandler)responseHandler;
-- (void)moveToColor:(CHIPColorControlClusterMoveToColorPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)moveToColorTemperature:(CHIPColorControlClusterMoveToColorTemperaturePayload * _Nonnull)payload
-               responseHandler:(ResponseHandler)responseHandler;
-- (void)moveToHue:(CHIPColorControlClusterMoveToHuePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)moveToHueAndSaturation:(CHIPColorControlClusterMoveToHueAndSaturationPayload * _Nonnull)payload
-               responseHandler:(ResponseHandler)responseHandler;
-- (void)moveToSaturation:(CHIPColorControlClusterMoveToSaturationPayload * _Nonnull)payload
-         responseHandler:(ResponseHandler)responseHandler;
-- (void)stepColor:(CHIPColorControlClusterStepColorPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)stepColorTemperature:(CHIPColorControlClusterStepColorTemperaturePayload * _Nonnull)payload
-             responseHandler:(ResponseHandler)responseHandler;
-- (void)stepHue:(CHIPColorControlClusterStepHuePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)stepSaturation:(CHIPColorControlClusterStepSaturationPayload * _Nonnull)payload
-       responseHandler:(ResponseHandler)responseHandler;
-- (void)stopMoveStep:(CHIPColorControlClusterStopMoveStepPayload * _Nonnull)payload
-     responseHandler:(ResponseHandler)responseHandler;
+- (void)colorLoopSetWithParams:(CHIPColorControlClusterColorLoopSetParams *)params
+             completionHandler:(CompletionHandler)completionHandler;
+- (void)enhancedMoveHueWithParams:(CHIPColorControlClusterEnhancedMoveHueParams *)params
+                completionHandler:(CompletionHandler)completionHandler;
+- (void)enhancedMoveToHueWithParams:(CHIPColorControlClusterEnhancedMoveToHueParams *)params
+                  completionHandler:(CompletionHandler)completionHandler;
+- (void)enhancedMoveToHueAndSaturationWithParams:(CHIPColorControlClusterEnhancedMoveToHueAndSaturationParams *)params
+                               completionHandler:(CompletionHandler)completionHandler;
+- (void)enhancedStepHueWithParams:(CHIPColorControlClusterEnhancedStepHueParams *)params
+                completionHandler:(CompletionHandler)completionHandler;
+- (void)moveColorWithParams:(CHIPColorControlClusterMoveColorParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)moveColorTemperatureWithParams:(CHIPColorControlClusterMoveColorTemperatureParams *)params
+                     completionHandler:(CompletionHandler)completionHandler;
+- (void)moveHueWithParams:(CHIPColorControlClusterMoveHueParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)moveSaturationWithParams:(CHIPColorControlClusterMoveSaturationParams *)params
+               completionHandler:(CompletionHandler)completionHandler;
+- (void)moveToColorWithParams:(CHIPColorControlClusterMoveToColorParams *)params
+            completionHandler:(CompletionHandler)completionHandler;
+- (void)moveToColorTemperatureWithParams:(CHIPColorControlClusterMoveToColorTemperatureParams *)params
+                       completionHandler:(CompletionHandler)completionHandler;
+- (void)moveToHueWithParams:(CHIPColorControlClusterMoveToHueParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)moveToHueAndSaturationWithParams:(CHIPColorControlClusterMoveToHueAndSaturationParams *)params
+                       completionHandler:(CompletionHandler)completionHandler;
+- (void)moveToSaturationWithParams:(CHIPColorControlClusterMoveToSaturationParams *)params
+                 completionHandler:(CompletionHandler)completionHandler;
+- (void)stepColorWithParams:(CHIPColorControlClusterStepColorParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)stepColorTemperatureWithParams:(CHIPColorControlClusterStepColorTemperatureParams *)params
+                     completionHandler:(CompletionHandler)completionHandler;
+- (void)stepHueWithParams:(CHIPColorControlClusterStepHueParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)stepSaturationWithParams:(CHIPColorControlClusterStepSaturationParams *)params
+               completionHandler:(CompletionHandler)completionHandler;
+- (void)stopMoveStepWithParams:(CHIPColorControlClusterStopMoveStepParams *)params
+             completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeCurrentHueWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeCurrentHueWithMinInterval:(uint16_t)minInterval
@@ -864,9 +871,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPContentLauncher : CHIPCluster
 
-- (void)launchContent:(CHIPContentLauncherClusterLaunchContentPayload * _Nonnull)payload
-      responseHandler:(ResponseHandler)responseHandler;
-- (void)launchURL:(CHIPContentLauncherClusterLaunchURLPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)launchContentWithParams:(CHIPContentLauncherClusterLaunchContentParams *)params
+              completionHandler:(CompletionHandler)completionHandler;
+- (void)launchURLWithParams:(CHIPContentLauncherClusterLaunchURLParams *)params
+          completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeAcceptsHeaderListWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -908,8 +916,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPDiagnosticLogs : CHIPCluster
 
-- (void)retrieveLogsRequest:(CHIPDiagnosticLogsClusterRetrieveLogsRequestPayload * _Nonnull)payload
-            responseHandler:(ResponseHandler)responseHandler;
+- (void)retrieveLogsRequestWithParams:(CHIPDiagnosticLogsClusterRetrieveLogsRequestParams *)params
+                    completionHandler:(CompletionHandler)completionHandler;
 
 @end
 
@@ -919,39 +927,40 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPDoorLock : CHIPCluster
 
-- (void)clearAllPins:(CHIPDoorLockClusterClearAllPinsPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)clearAllRfids:(CHIPDoorLockClusterClearAllRfidsPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)clearHolidaySchedule:(CHIPDoorLockClusterClearHolidaySchedulePayload * _Nonnull)payload
-             responseHandler:(ResponseHandler)responseHandler;
-- (void)clearPin:(CHIPDoorLockClusterClearPinPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)clearRfid:(CHIPDoorLockClusterClearRfidPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)clearWeekdaySchedule:(CHIPDoorLockClusterClearWeekdaySchedulePayload * _Nonnull)payload
-             responseHandler:(ResponseHandler)responseHandler;
-- (void)clearYeardaySchedule:(CHIPDoorLockClusterClearYeardaySchedulePayload * _Nonnull)payload
-             responseHandler:(ResponseHandler)responseHandler;
-- (void)getHolidaySchedule:(CHIPDoorLockClusterGetHolidaySchedulePayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
-- (void)getLogRecord:(CHIPDoorLockClusterGetLogRecordPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)getPin:(CHIPDoorLockClusterGetPinPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)getRfid:(CHIPDoorLockClusterGetRfidPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)getUserType:(CHIPDoorLockClusterGetUserTypePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)getWeekdaySchedule:(CHIPDoorLockClusterGetWeekdaySchedulePayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
-- (void)getYeardaySchedule:(CHIPDoorLockClusterGetYeardaySchedulePayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
-- (void)lockDoor:(CHIPDoorLockClusterLockDoorPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)setHolidaySchedule:(CHIPDoorLockClusterSetHolidaySchedulePayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
-- (void)setPin:(CHIPDoorLockClusterSetPinPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)setRfid:(CHIPDoorLockClusterSetRfidPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)setUserType:(CHIPDoorLockClusterSetUserTypePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)setWeekdaySchedule:(CHIPDoorLockClusterSetWeekdaySchedulePayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
-- (void)setYeardaySchedule:(CHIPDoorLockClusterSetYeardaySchedulePayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
-- (void)unlockDoor:(CHIPDoorLockClusterUnlockDoorPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)unlockWithTimeout:(CHIPDoorLockClusterUnlockWithTimeoutPayload * _Nonnull)payload
-          responseHandler:(ResponseHandler)responseHandler;
+- (void)clearAllPinsWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)clearAllRfidsWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)clearHolidayScheduleWithParams:(CHIPDoorLockClusterClearHolidayScheduleParams *)params
+                     completionHandler:(CompletionHandler)completionHandler;
+- (void)clearPinWithParams:(CHIPDoorLockClusterClearPinParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)clearRfidWithParams:(CHIPDoorLockClusterClearRfidParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)clearWeekdayScheduleWithParams:(CHIPDoorLockClusterClearWeekdayScheduleParams *)params
+                     completionHandler:(CompletionHandler)completionHandler;
+- (void)clearYeardayScheduleWithParams:(CHIPDoorLockClusterClearYeardayScheduleParams *)params
+                     completionHandler:(CompletionHandler)completionHandler;
+- (void)getHolidayScheduleWithParams:(CHIPDoorLockClusterGetHolidayScheduleParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
+- (void)getLogRecordWithParams:(CHIPDoorLockClusterGetLogRecordParams *)params
+             completionHandler:(CompletionHandler)completionHandler;
+- (void)getPinWithParams:(CHIPDoorLockClusterGetPinParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)getRfidWithParams:(CHIPDoorLockClusterGetRfidParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)getUserTypeWithParams:(CHIPDoorLockClusterGetUserTypeParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)getWeekdayScheduleWithParams:(CHIPDoorLockClusterGetWeekdayScheduleParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
+- (void)getYeardayScheduleWithParams:(CHIPDoorLockClusterGetYeardayScheduleParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
+- (void)lockDoorWithParams:(CHIPDoorLockClusterLockDoorParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)setHolidayScheduleWithParams:(CHIPDoorLockClusterSetHolidayScheduleParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
+- (void)setPinWithParams:(CHIPDoorLockClusterSetPinParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)setRfidWithParams:(CHIPDoorLockClusterSetRfidParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)setUserTypeWithParams:(CHIPDoorLockClusterSetUserTypeParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)setWeekdayScheduleWithParams:(CHIPDoorLockClusterSetWeekdayScheduleParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
+- (void)setYeardayScheduleWithParams:(CHIPDoorLockClusterSetYeardayScheduleParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
+- (void)unlockDoorWithParams:(CHIPDoorLockClusterUnlockDoorParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)unlockWithTimeoutWithParams:(CHIPDoorLockClusterUnlockWithTimeoutParams *)params
+                  completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeLockStateWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeLockStateWithMinInterval:(uint16_t)minInterval
@@ -1065,8 +1074,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPEthernetNetworkDiagnostics : CHIPCluster
 
-- (void)resetCounts:(CHIPEthernetNetworkDiagnosticsClusterResetCountsPayload * _Nonnull)payload
-    responseHandler:(ResponseHandler)responseHandler;
+- (void)resetCountsWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributePHYRateWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributePHYRateWithMinInterval:(uint16_t)minInterval
@@ -1190,12 +1198,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGeneralCommissioning : CHIPCluster
 
-- (void)armFailSafe:(CHIPGeneralCommissioningClusterArmFailSafePayload * _Nonnull)payload
-    responseHandler:(ResponseHandler)responseHandler;
-- (void)commissioningComplete:(CHIPGeneralCommissioningClusterCommissioningCompletePayload * _Nonnull)payload
-              responseHandler:(ResponseHandler)responseHandler;
-- (void)setRegulatoryConfig:(CHIPGeneralCommissioningClusterSetRegulatoryConfigPayload * _Nonnull)payload
-            responseHandler:(ResponseHandler)responseHandler;
+- (void)armFailSafeWithParams:(CHIPGeneralCommissioningClusterArmFailSafeParams *)params
+            completionHandler:(CompletionHandler)completionHandler;
+- (void)commissioningCompleteWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)setRegulatoryConfigWithParams:(CHIPGeneralCommissioningClusterSetRegulatoryConfigParams *)params
+                    completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeBreadcrumbWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBreadcrumbWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
@@ -1284,15 +1291,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGroups : CHIPCluster
 
-- (void)addGroup:(CHIPGroupsClusterAddGroupPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)addGroupIfIdentifying:(CHIPGroupsClusterAddGroupIfIdentifyingPayload * _Nonnull)payload
-              responseHandler:(ResponseHandler)responseHandler;
-- (void)getGroupMembership:(CHIPGroupsClusterGetGroupMembershipPayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
-- (void)removeAllGroups:(CHIPGroupsClusterRemoveAllGroupsPayload * _Nonnull)payload
-        responseHandler:(ResponseHandler)responseHandler;
-- (void)removeGroup:(CHIPGroupsClusterRemoveGroupPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)viewGroup:(CHIPGroupsClusterViewGroupPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)addGroupWithParams:(CHIPGroupsClusterAddGroupParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)addGroupIfIdentifyingWithParams:(CHIPGroupsClusterAddGroupIfIdentifyingParams *)params
+                      completionHandler:(CompletionHandler)completionHandler;
+- (void)getGroupMembershipWithParams:(CHIPGroupsClusterGetGroupMembershipParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
+- (void)removeAllGroupsWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)removeGroupWithParams:(CHIPGroupsClusterRemoveGroupParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)viewGroupWithParams:(CHIPGroupsClusterViewGroupParams *)params completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeNameSupportWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeNameSupportWithMinInterval:(uint16_t)minInterval
@@ -1314,9 +1320,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPIdentify : CHIPCluster
 
-- (void)identify:(CHIPIdentifyClusterIdentifyPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)identifyQuery:(CHIPIdentifyClusterIdentifyQueryPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)triggerEffect:(CHIPIdentifyClusterTriggerEffectPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)identifyWithParams:(CHIPIdentifyClusterIdentifyParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)identifyQueryWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)triggerEffectWithParams:(CHIPIdentifyClusterTriggerEffectParams *)params
+              completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeIdentifyTimeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeIdentifyTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
@@ -1389,7 +1396,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPKeypadInput : CHIPCluster
 
-- (void)sendKey:(CHIPKeypadInputClusterSendKeyPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)sendKeyWithParams:(CHIPKeypadInputClusterSendKeyParams *)params completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -1405,18 +1412,18 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPLevelControl : CHIPCluster
 
-- (void)move:(CHIPLevelControlClusterMovePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)moveToLevel:(CHIPLevelControlClusterMoveToLevelPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)moveToLevelWithOnOff:(CHIPLevelControlClusterMoveToLevelWithOnOffPayload * _Nonnull)payload
-             responseHandler:(ResponseHandler)responseHandler;
-- (void)moveWithOnOff:(CHIPLevelControlClusterMoveWithOnOffPayload * _Nonnull)payload
-      responseHandler:(ResponseHandler)responseHandler;
-- (void)step:(CHIPLevelControlClusterStepPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)stepWithOnOff:(CHIPLevelControlClusterStepWithOnOffPayload * _Nonnull)payload
-      responseHandler:(ResponseHandler)responseHandler;
-- (void)stop:(CHIPLevelControlClusterStopPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)stopWithOnOff:(CHIPLevelControlClusterStopWithOnOffPayload * _Nonnull)payload
-      responseHandler:(ResponseHandler)responseHandler;
+- (void)moveWithParams:(CHIPLevelControlClusterMoveParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)moveToLevelWithParams:(CHIPLevelControlClusterMoveToLevelParams *)params
+            completionHandler:(CompletionHandler)completionHandler;
+- (void)moveToLevelWithOnOffWithParams:(CHIPLevelControlClusterMoveToLevelWithOnOffParams *)params
+                     completionHandler:(CompletionHandler)completionHandler;
+- (void)moveWithOnOffWithParams:(CHIPLevelControlClusterMoveWithOnOffParams *)params
+              completionHandler:(CompletionHandler)completionHandler;
+- (void)stepWithParams:(CHIPLevelControlClusterStepParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)stepWithOnOffWithParams:(CHIPLevelControlClusterStepWithOnOffParams *)params
+              completionHandler:(CompletionHandler)completionHandler;
+- (void)stopWithParams:(CHIPLevelControlClusterStopParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)stopWithOnOffWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeCurrentLevelWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeCurrentLevelWithMinInterval:(uint16_t)minInterval
@@ -1523,7 +1530,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPLowPower : CHIPCluster
 
-- (void)sleep:(CHIPLowPowerClusterSleepPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)sleepWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -1539,12 +1546,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPMediaInput : CHIPCluster
 
-- (void)hideInputStatus:(CHIPMediaInputClusterHideInputStatusPayload * _Nonnull)payload
-        responseHandler:(ResponseHandler)responseHandler;
-- (void)renameInput:(CHIPMediaInputClusterRenameInputPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)selectInput:(CHIPMediaInputClusterSelectInputPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)showInputStatus:(CHIPMediaInputClusterShowInputStatusPayload * _Nonnull)payload
-        responseHandler:(ResponseHandler)responseHandler;
+- (void)hideInputStatusWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)renameInputWithParams:(CHIPMediaInputClusterRenameInputParams *)params
+            completionHandler:(CompletionHandler)completionHandler;
+- (void)selectInputWithParams:(CHIPMediaInputClusterSelectInputParams *)params
+            completionHandler:(CompletionHandler)completionHandler;
+- (void)showInputStatusWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeMediaInputListWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -1568,22 +1575,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPMediaPlayback : CHIPCluster
 
-- (void)mediaFastForward:(CHIPMediaPlaybackClusterMediaFastForwardPayload * _Nonnull)payload
-         responseHandler:(ResponseHandler)responseHandler;
-- (void)mediaNext:(CHIPMediaPlaybackClusterMediaNextPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)mediaPause:(CHIPMediaPlaybackClusterMediaPausePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)mediaPlay:(CHIPMediaPlaybackClusterMediaPlayPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)mediaPrevious:(CHIPMediaPlaybackClusterMediaPreviousPayload * _Nonnull)payload
-      responseHandler:(ResponseHandler)responseHandler;
-- (void)mediaRewind:(CHIPMediaPlaybackClusterMediaRewindPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)mediaSeek:(CHIPMediaPlaybackClusterMediaSeekPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)mediaSkipBackward:(CHIPMediaPlaybackClusterMediaSkipBackwardPayload * _Nonnull)payload
-          responseHandler:(ResponseHandler)responseHandler;
-- (void)mediaSkipForward:(CHIPMediaPlaybackClusterMediaSkipForwardPayload * _Nonnull)payload
-         responseHandler:(ResponseHandler)responseHandler;
-- (void)mediaStartOver:(CHIPMediaPlaybackClusterMediaStartOverPayload * _Nonnull)payload
-       responseHandler:(ResponseHandler)responseHandler;
-- (void)mediaStop:(CHIPMediaPlaybackClusterMediaStopPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)mediaFastForwardWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)mediaNextWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)mediaPauseWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)mediaPlayWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)mediaPreviousWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)mediaRewindWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)mediaSeekWithParams:(CHIPMediaPlaybackClusterMediaSeekParams *)params
+          completionHandler:(CompletionHandler)completionHandler;
+- (void)mediaSkipBackwardWithParams:(CHIPMediaPlaybackClusterMediaSkipBackwardParams *)params
+                  completionHandler:(CompletionHandler)completionHandler;
+- (void)mediaSkipForwardWithParams:(CHIPMediaPlaybackClusterMediaSkipForwardParams *)params
+                 completionHandler:(CompletionHandler)completionHandler;
+- (void)mediaStartOverWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)mediaStopWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributePlaybackStateWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributePlaybackStateWithMinInterval:(uint16_t)minInterval
@@ -1647,7 +1652,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPModeSelect : CHIPCluster
 
-- (void)changeToMode:(CHIPModeSelectClusterChangeToModePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)changeToModeWithParams:(CHIPModeSelectClusterChangeToModeParams *)params
+             completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeCurrentModeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeCurrentModeWithMinInterval:(uint16_t)minInterval
@@ -1690,22 +1696,22 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPNetworkCommissioning : CHIPCluster
 
-- (void)addThreadNetwork:(CHIPNetworkCommissioningClusterAddThreadNetworkPayload * _Nonnull)payload
-         responseHandler:(ResponseHandler)responseHandler;
-- (void)addWiFiNetwork:(CHIPNetworkCommissioningClusterAddWiFiNetworkPayload * _Nonnull)payload
-       responseHandler:(ResponseHandler)responseHandler;
-- (void)disableNetwork:(CHIPNetworkCommissioningClusterDisableNetworkPayload * _Nonnull)payload
-       responseHandler:(ResponseHandler)responseHandler;
-- (void)enableNetwork:(CHIPNetworkCommissioningClusterEnableNetworkPayload * _Nonnull)payload
-      responseHandler:(ResponseHandler)responseHandler;
-- (void)removeNetwork:(CHIPNetworkCommissioningClusterRemoveNetworkPayload * _Nonnull)payload
-      responseHandler:(ResponseHandler)responseHandler;
-- (void)scanNetworks:(CHIPNetworkCommissioningClusterScanNetworksPayload * _Nonnull)payload
-     responseHandler:(ResponseHandler)responseHandler;
-- (void)updateThreadNetwork:(CHIPNetworkCommissioningClusterUpdateThreadNetworkPayload * _Nonnull)payload
-            responseHandler:(ResponseHandler)responseHandler;
-- (void)updateWiFiNetwork:(CHIPNetworkCommissioningClusterUpdateWiFiNetworkPayload * _Nonnull)payload
-          responseHandler:(ResponseHandler)responseHandler;
+- (void)addThreadNetworkWithParams:(CHIPNetworkCommissioningClusterAddThreadNetworkParams *)params
+                 completionHandler:(CompletionHandler)completionHandler;
+- (void)addWiFiNetworkWithParams:(CHIPNetworkCommissioningClusterAddWiFiNetworkParams *)params
+               completionHandler:(CompletionHandler)completionHandler;
+- (void)disableNetworkWithParams:(CHIPNetworkCommissioningClusterDisableNetworkParams *)params
+               completionHandler:(CompletionHandler)completionHandler;
+- (void)enableNetworkWithParams:(CHIPNetworkCommissioningClusterEnableNetworkParams *)params
+              completionHandler:(CompletionHandler)completionHandler;
+- (void)removeNetworkWithParams:(CHIPNetworkCommissioningClusterRemoveNetworkParams *)params
+              completionHandler:(CompletionHandler)completionHandler;
+- (void)scanNetworksWithParams:(CHIPNetworkCommissioningClusterScanNetworksParams *)params
+             completionHandler:(CompletionHandler)completionHandler;
+- (void)updateThreadNetworkWithParams:(CHIPNetworkCommissioningClusterUpdateThreadNetworkParams *)params
+                    completionHandler:(CompletionHandler)completionHandler;
+- (void)updateWiFiNetworkWithParams:(CHIPNetworkCommissioningClusterUpdateWiFiNetworkParams *)params
+                  completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
@@ -1727,12 +1733,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOtaSoftwareUpdateProvider : CHIPCluster
 
-- (void)applyUpdateRequest:(CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestPayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
-- (void)notifyUpdateApplied:(CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedPayload * _Nonnull)payload
-            responseHandler:(ResponseHandler)responseHandler;
-- (void)queryImage:(CHIPOtaSoftwareUpdateProviderClusterQueryImagePayload * _Nonnull)payload
-    responseHandler:(ResponseHandler)responseHandler;
+- (void)applyUpdateRequestWithParams:(CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
+- (void)notifyUpdateAppliedWithParams:(CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                    completionHandler:(CompletionHandler)completionHandler;
+- (void)queryImageWithParams:(CHIPOtaSoftwareUpdateProviderClusterQueryImageParams *)params
+           completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -1748,8 +1754,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOtaSoftwareUpdateRequestor : CHIPCluster
 
-- (void)announceOtaProvider:(CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderPayload * _Nonnull)payload
-            responseHandler:(ResponseHandler)responseHandler;
+- (void)announceOtaProviderWithParams:(CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
+                    completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeDefaultOtaProviderWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeDefaultOtaProviderWithValue:(NSData * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
@@ -1810,13 +1816,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOnOff : CHIPCluster
 
-- (void)off:(CHIPOnOffClusterOffPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)offWithEffect:(CHIPOnOffClusterOffWithEffectPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)on:(CHIPOnOffClusterOnPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)onWithRecallGlobalScene:(CHIPOnOffClusterOnWithRecallGlobalScenePayload * _Nonnull)payload
-                responseHandler:(ResponseHandler)responseHandler;
-- (void)onWithTimedOff:(CHIPOnOffClusterOnWithTimedOffPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)toggle:(CHIPOnOffClusterTogglePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)offWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)offWithEffectWithParams:(CHIPOnOffClusterOffWithEffectParams *)params
+              completionHandler:(CompletionHandler)completionHandler;
+- (void)onWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)onWithRecallGlobalSceneWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)onWithTimedOffWithParams:(CHIPOnOffClusterOnWithTimedOffParams *)params
+               completionHandler:(CompletionHandler)completionHandler;
+- (void)toggleWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeOnOffWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeOnOffWithMinInterval:(uint16_t)minInterval
@@ -1898,23 +1905,24 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOperationalCredentials : CHIPCluster
 
-- (void)addNOC:(CHIPOperationalCredentialsClusterAddNOCPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)addTrustedRootCertificate:(CHIPOperationalCredentialsClusterAddTrustedRootCertificatePayload * _Nonnull)payload
-                  responseHandler:(ResponseHandler)responseHandler;
-- (void)attestationRequest:(CHIPOperationalCredentialsClusterAttestationRequestPayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
-- (void)certificateChainRequest:(CHIPOperationalCredentialsClusterCertificateChainRequestPayload * _Nonnull)payload
-                responseHandler:(ResponseHandler)responseHandler;
-- (void)opCSRRequest:(CHIPOperationalCredentialsClusterOpCSRRequestPayload * _Nonnull)payload
-     responseHandler:(ResponseHandler)responseHandler;
-- (void)removeFabric:(CHIPOperationalCredentialsClusterRemoveFabricPayload * _Nonnull)payload
-     responseHandler:(ResponseHandler)responseHandler;
-- (void)removeTrustedRootCertificate:(CHIPOperationalCredentialsClusterRemoveTrustedRootCertificatePayload * _Nonnull)payload
-                     responseHandler:(ResponseHandler)responseHandler;
-- (void)updateFabricLabel:(CHIPOperationalCredentialsClusterUpdateFabricLabelPayload * _Nonnull)payload
-          responseHandler:(ResponseHandler)responseHandler;
-- (void)updateNOC:(CHIPOperationalCredentialsClusterUpdateNOCPayload * _Nonnull)payload
-    responseHandler:(ResponseHandler)responseHandler;
+- (void)addNOCWithParams:(CHIPOperationalCredentialsClusterAddNOCParams *)params
+       completionHandler:(CompletionHandler)completionHandler;
+- (void)addTrustedRootCertificateWithParams:(CHIPOperationalCredentialsClusterAddTrustedRootCertificateParams *)params
+                          completionHandler:(CompletionHandler)completionHandler;
+- (void)attestationRequestWithParams:(CHIPOperationalCredentialsClusterAttestationRequestParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
+- (void)certificateChainRequestWithParams:(CHIPOperationalCredentialsClusterCertificateChainRequestParams *)params
+                        completionHandler:(CompletionHandler)completionHandler;
+- (void)opCSRRequestWithParams:(CHIPOperationalCredentialsClusterOpCSRRequestParams *)params
+             completionHandler:(CompletionHandler)completionHandler;
+- (void)removeFabricWithParams:(CHIPOperationalCredentialsClusterRemoveFabricParams *)params
+             completionHandler:(CompletionHandler)completionHandler;
+- (void)removeTrustedRootCertificateWithParams:(CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams *)params
+                             completionHandler:(CompletionHandler)completionHandler;
+- (void)updateFabricLabelWithParams:(CHIPOperationalCredentialsClusterUpdateFabricLabelParams *)params
+                  completionHandler:(CompletionHandler)completionHandler;
+- (void)updateNOCWithParams:(CHIPOperationalCredentialsClusterUpdateNOCParams *)params
+          completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeFabricsListWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -2246,15 +2254,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPScenes : CHIPCluster
 
-- (void)addScene:(CHIPScenesClusterAddScenePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)getSceneMembership:(CHIPScenesClusterGetSceneMembershipPayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
-- (void)recallScene:(CHIPScenesClusterRecallScenePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)removeAllScenes:(CHIPScenesClusterRemoveAllScenesPayload * _Nonnull)payload
-        responseHandler:(ResponseHandler)responseHandler;
-- (void)removeScene:(CHIPScenesClusterRemoveScenePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)storeScene:(CHIPScenesClusterStoreScenePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)viewScene:(CHIPScenesClusterViewScenePayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)addSceneWithParams:(CHIPScenesClusterAddSceneParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)getSceneMembershipWithParams:(CHIPScenesClusterGetSceneMembershipParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
+- (void)recallSceneWithParams:(CHIPScenesClusterRecallSceneParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)removeAllScenesWithParams:(CHIPScenesClusterRemoveAllScenesParams *)params
+                completionHandler:(CompletionHandler)completionHandler;
+- (void)removeSceneWithParams:(CHIPScenesClusterRemoveSceneParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)storeSceneWithParams:(CHIPScenesClusterStoreSceneParams *)params completionHandler:(CompletionHandler)completionHandler;
+- (void)viewSceneWithParams:(CHIPScenesClusterViewSceneParams *)params completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeSceneCountWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeSceneCountWithMinInterval:(uint16_t)minInterval
@@ -2300,8 +2308,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPSoftwareDiagnostics : CHIPCluster
 
-- (void)resetWatermarks:(CHIPSoftwareDiagnosticsClusterResetWatermarksPayload * _Nonnull)payload
-        responseHandler:(ResponseHandler)responseHandler;
+- (void)resetWatermarksWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeThreadMetricsWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -2375,10 +2382,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTvChannel : CHIPCluster
 
-- (void)changeChannel:(CHIPTvChannelClusterChangeChannelPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)changeChannelByNumber:(CHIPTvChannelClusterChangeChannelByNumberPayload * _Nonnull)payload
-              responseHandler:(ResponseHandler)responseHandler;
-- (void)skipChannel:(CHIPTvChannelClusterSkipChannelPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)changeChannelWithParams:(CHIPTvChannelClusterChangeChannelParams *)params
+              completionHandler:(CompletionHandler)completionHandler;
+- (void)changeChannelByNumberWithParams:(CHIPTvChannelClusterChangeChannelByNumberParams *)params
+                      completionHandler:(CompletionHandler)completionHandler;
+- (void)skipChannelWithParams:(CHIPTvChannelClusterSkipChannelParams *)params
+            completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeTvChannelListWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -2408,8 +2417,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTargetNavigator : CHIPCluster
 
-- (void)navigateTarget:(CHIPTargetNavigatorClusterNavigateTargetPayload * _Nonnull)payload
-       responseHandler:(ResponseHandler)responseHandler;
+- (void)navigateTargetWithParams:(CHIPTargetNavigatorClusterNavigateTargetParams *)params
+               completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeTargetNavigatorListWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -2465,26 +2474,24 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestCluster : CHIPCluster
 
-- (void)test:(CHIPTestClusterClusterTestPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)testAddArguments:(CHIPTestClusterClusterTestAddArgumentsPayload * _Nonnull)payload
-         responseHandler:(ResponseHandler)responseHandler;
-- (void)testEnumsRequest:(CHIPTestClusterClusterTestEnumsRequestPayload * _Nonnull)payload
-         responseHandler:(ResponseHandler)responseHandler;
-- (void)testListInt8UArgumentRequest:(CHIPTestClusterClusterTestListInt8UArgumentRequestPayload * _Nonnull)payload
-                     responseHandler:(ResponseHandler)responseHandler;
-- (void)testListInt8UReverseRequest:(CHIPTestClusterClusterTestListInt8UReverseRequestPayload * _Nonnull)payload
-                    responseHandler:(ResponseHandler)responseHandler;
-- (void)testListStructArgumentRequest:(CHIPTestClusterClusterTestListStructArgumentRequestPayload * _Nonnull)payload
-                      responseHandler:(ResponseHandler)responseHandler;
-- (void)testNotHandled:(CHIPTestClusterClusterTestNotHandledPayload * _Nonnull)payload
-       responseHandler:(ResponseHandler)responseHandler;
-- (void)testNullableOptionalRequest:(CHIPTestClusterClusterTestNullableOptionalRequestPayload * _Nonnull)payload
-                    responseHandler:(ResponseHandler)responseHandler;
-- (void)testSpecific:(CHIPTestClusterClusterTestSpecificPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)testStructArgumentRequest:(CHIPTestClusterClusterTestStructArgumentRequestPayload * _Nonnull)payload
-                  responseHandler:(ResponseHandler)responseHandler;
-- (void)testUnknownCommand:(CHIPTestClusterClusterTestUnknownCommandPayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
+- (void)testWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)testAddArgumentsWithParams:(CHIPTestClusterClusterTestAddArgumentsParams *)params
+                 completionHandler:(CompletionHandler)completionHandler;
+- (void)testEnumsRequestWithParams:(CHIPTestClusterClusterTestEnumsRequestParams *)params
+                 completionHandler:(CompletionHandler)completionHandler;
+- (void)testListInt8UArgumentRequestWithParams:(CHIPTestClusterClusterTestListInt8UArgumentRequestParams *)params
+                             completionHandler:(CompletionHandler)completionHandler;
+- (void)testListInt8UReverseRequestWithParams:(CHIPTestClusterClusterTestListInt8UReverseRequestParams *)params
+                            completionHandler:(CompletionHandler)completionHandler;
+- (void)testListStructArgumentRequestWithParams:(CHIPTestClusterClusterTestListStructArgumentRequestParams *)params
+                              completionHandler:(CompletionHandler)completionHandler;
+- (void)testNotHandledWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)testNullableOptionalRequestWithParams:(CHIPTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
+                            completionHandler:(CompletionHandler)completionHandler;
+- (void)testSpecificWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)testStructArgumentRequestWithParams:(CHIPTestClusterClusterTestStructArgumentRequestParams *)params
+                          completionHandler:(CompletionHandler)completionHandler;
+- (void)testUnknownCommandWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeBooleanWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBooleanWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
@@ -2791,16 +2798,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPThermostat : CHIPCluster
 
-- (void)clearWeeklySchedule:(CHIPThermostatClusterClearWeeklySchedulePayload * _Nonnull)payload
-            responseHandler:(ResponseHandler)responseHandler;
-- (void)getRelayStatusLog:(CHIPThermostatClusterGetRelayStatusLogPayload * _Nonnull)payload
-          responseHandler:(ResponseHandler)responseHandler;
-- (void)getWeeklySchedule:(CHIPThermostatClusterGetWeeklySchedulePayload * _Nonnull)payload
-          responseHandler:(ResponseHandler)responseHandler;
-- (void)setWeeklySchedule:(CHIPThermostatClusterSetWeeklySchedulePayload * _Nonnull)payload
-          responseHandler:(ResponseHandler)responseHandler;
-- (void)setpointRaiseLower:(CHIPThermostatClusterSetpointRaiseLowerPayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
+- (void)clearWeeklyScheduleWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)getRelayStatusLogWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)getWeeklyScheduleWithParams:(CHIPThermostatClusterGetWeeklyScheduleParams *)params
+                  completionHandler:(CompletionHandler)completionHandler;
+- (void)setWeeklyScheduleWithParams:(CHIPThermostatClusterSetWeeklyScheduleParams *)params
+                  completionHandler:(CompletionHandler)completionHandler;
+- (void)setpointRaiseLowerWithParams:(CHIPThermostatClusterSetpointRaiseLowerParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeLocalTemperatureWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeLocalTemperatureWithMinInterval:(uint16_t)minInterval
@@ -2970,8 +2975,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPThreadNetworkDiagnostics : CHIPCluster
 
-- (void)resetCounts:(CHIPThreadNetworkDiagnosticsClusterResetCountsPayload * _Nonnull)payload
-    responseHandler:(ResponseHandler)responseHandler;
+- (void)resetCountsWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeChannelWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeChannelWithMinInterval:(uint16_t)minInterval
@@ -3365,8 +3369,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPWiFiNetworkDiagnostics : CHIPCluster
 
-- (void)resetCounts:(CHIPWiFiNetworkDiagnosticsClusterResetCountsPayload * _Nonnull)payload
-    responseHandler:(ResponseHandler)responseHandler;
+- (void)resetCountsWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeBssidWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeBssidWithMinInterval:(uint16_t)minInterval
@@ -3460,18 +3463,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPWindowCovering : CHIPCluster
 
-- (void)downOrClose:(CHIPWindowCoveringClusterDownOrClosePayload * _Nonnull)payload
-    responseHandler:(ResponseHandler)responseHandler;
-- (void)goToLiftPercentage:(CHIPWindowCoveringClusterGoToLiftPercentagePayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
-- (void)goToLiftValue:(CHIPWindowCoveringClusterGoToLiftValuePayload * _Nonnull)payload
-      responseHandler:(ResponseHandler)responseHandler;
-- (void)goToTiltPercentage:(CHIPWindowCoveringClusterGoToTiltPercentagePayload * _Nonnull)payload
-           responseHandler:(ResponseHandler)responseHandler;
-- (void)goToTiltValue:(CHIPWindowCoveringClusterGoToTiltValuePayload * _Nonnull)payload
-      responseHandler:(ResponseHandler)responseHandler;
-- (void)stopMotion:(CHIPWindowCoveringClusterStopMotionPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
-- (void)upOrOpen:(CHIPWindowCoveringClusterUpOrOpenPayload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+- (void)downOrCloseWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)goToLiftPercentageWithParams:(CHIPWindowCoveringClusterGoToLiftPercentageParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
+- (void)goToLiftValueWithParams:(CHIPWindowCoveringClusterGoToLiftValueParams *)params
+              completionHandler:(CompletionHandler)completionHandler;
+- (void)goToTiltPercentageWithParams:(CHIPWindowCoveringClusterGoToTiltPercentageParams *)params
+                   completionHandler:(CompletionHandler)completionHandler;
+- (void)goToTiltValueWithParams:(CHIPWindowCoveringClusterGoToTiltValueParams *)params
+              completionHandler:(CompletionHandler)completionHandler;
+- (void)stopMotionWithCompletionHandler:(CompletionHandler)completionHandler;
+- (void)upOrOpenWithCompletionHandler:(CompletionHandler)completionHandler;
 
 - (void)readAttributeTypeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeTypeWithMinInterval:(uint16_t)minInterval

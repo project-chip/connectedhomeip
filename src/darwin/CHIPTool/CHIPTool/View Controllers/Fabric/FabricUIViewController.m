@@ -348,35 +348,37 @@
                 CHIPOperationalCredentials * cluster =
                     [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"updateFabricLabel command sent."] isError:NO];
-                __auto_type * payload = [[CHIPOperationalCredentialsClusterUpdateFabricLabelPayload alloc] init];
-                payload.Label = label;
+                __auto_type * params = [[CHIPOperationalCredentialsClusterUpdateFabricLabelParams alloc] init];
+                params.label = label;
 
                 [cluster
-                    updateFabricLabel:payload
-                      responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                          dispatch_async(dispatch_get_main_queue(), ^{
-                              if (error) {
-                                  NSLog(@"Got back error trying to updateFabricLabel %@", error);
+                    updateFabricLabelWithParams:params
+                              completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
                                   dispatch_async(dispatch_get_main_queue(), ^{
-                                      self->_updateFabricLabelTextField.text = @"";
-                                      [self
-                                          updateResult:[NSString stringWithFormat:@"Command updateFabricLabel failed with error %@",
-                                                                 error]
-                                               isError:YES];
-                                  });
-                              } else {
-                                  NSLog(@"Successfully updated the label: %@", values);
-                                  dispatch_async(dispatch_get_main_queue(), ^{
-                                      self->_updateFabricLabelTextField.text = @"";
-                                      [self updateResult:[NSString stringWithFormat:
+                                      if (error) {
+                                          NSLog(@"Got back error trying to updateFabricLabel %@", error);
+                                          dispatch_async(dispatch_get_main_queue(), ^{
+                                              self->_updateFabricLabelTextField.text = @"";
+                                              [self updateResult:[NSString
+                                                                     stringWithFormat:
+                                                                         @"Command updateFabricLabel failed with error %@", error]
+                                                         isError:YES];
+                                          });
+                                      } else {
+                                          NSLog(@"Successfully updated the label: %@", values);
+                                          dispatch_async(dispatch_get_main_queue(), ^{
+                                              self->_updateFabricLabelTextField.text = @"";
+                                              [self
+                                                  updateResult:[NSString
+                                                                   stringWithFormat:
                                                                        @"Command updateFabricLabel succeeded to update label to %@",
                                                                    label]
-                                                 isError:NO];
-                                      [self fetchFabricsList];
+                                                       isError:NO];
+                                              [self fetchFabricsList];
+                                          });
+                                      }
                                   });
-                              }
-                          });
-                      }];
+                              }];
             } else {
                 [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"] isError:YES];
             }
