@@ -112,6 +112,10 @@ ChipError::StorageType pychip_DeviceController_ConnectBLE(chip::Controller::Devi
 ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                                          uint32_t setupPINCode, chip::NodeId nodeid);
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
+ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                      const char * peerAddrStr, uint32_t setupPINCode,
+                                                                      chip::NodeId nodeid);
+ChipError::StorageType pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 
 ChipError::StorageType
 pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
@@ -341,6 +345,23 @@ void CloseSessionCallback(DeviceProxy * device, ChipError::StorageType err)
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
     return pychip_GetConnectedDeviceByNodeId(devCtrl, nodeid, CloseSessionCallback);
+}
+ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                      const char * peerAddrStr, uint32_t setupPINCode,
+                                                                      chip::NodeId nodeid)
+{
+    chip::Inet::IPAddress peerAddr;
+    chip::Transport::PeerAddress addr;
+    RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
+    VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
+    params.SetPeerAddress(addr).SetDiscriminator(0);
+    return devCtrl->EstablishPASEConnection(nodeid, params).AsInteger();
+}
+ChipError::StorageType pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
+{
+    CommissioningParameters params;
+    return devCtrl->Commission(nodeid, params).AsInteger();
 }
 
 ChipError::StorageType pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl)

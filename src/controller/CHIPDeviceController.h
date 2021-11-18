@@ -48,6 +48,7 @@
 #include <lib/support/Pool.h>
 #include <lib/support/SerializableIntegerSet.h>
 #include <lib/support/Span.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
@@ -468,9 +469,15 @@ public:
      *         in the Init() call.
      *
      * @param[in] remoteDeviceId        The remote device Id.
-     * @param[in] params                The Rendezvous connection parameters
+     * @param[in] rendezvousParams      The Rendezvous connection parameters
+     * @param[in] commssioningParams    The commissioning parameters (uses defualt if not supplied)
      */
-    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & params);
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams);
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams,
+                          CommissioningParameters & commissioningParams);
+
+    CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params);
+    CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
@@ -606,6 +613,7 @@ private:
     bool mPairedDevicesUpdated;
 
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
+    bool mRunCommissioningAfterConnection  = false;
 
     BitMapObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
 
