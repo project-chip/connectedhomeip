@@ -73,10 +73,12 @@ private:
     void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const StatusIB & aStatus) override;
     void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override { return mCallback.OnError(apReadClient, aError); }
-    void OnEventData(const ReadClient * apReadClient, TLV::TLVReader & aEventReports) override
+    void OnEventData(const ReadClient * apReadClient, const EventHeader & aEventHeader, TLV::TLVReader * apData,
+                     const StatusIB * apStatus) override
     {
-        return mCallback.OnEventData(apReadClient, aEventReports);
+        return mCallback.OnEventData(apReadClient, aEventHeader, apData, apStatus);
     }
+
     void OnDone(ReadClient * apReadClient) override { return mCallback.OnDone(apReadClient); }
     void OnSubscriptionEstablished(const ReadClient * apReadClient) override { mCallback.OnSubscriptionEstablished(apReadClient); }
 
