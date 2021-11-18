@@ -25,6 +25,9 @@
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
+#include "KeypadInputManager.h"
+
+#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_tcl_chip_tvapp_TvApp_##METHOD_NAME
 
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
@@ -34,4 +37,9 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 void JNI_OnUnload(JavaVM * jvm, void * reserved)
 {
     return AndroidAppServerJNI_OnUnload(jvm, reserved);
+}
+
+JNI_METHOD(void, setKeypadInputManager)(JNIEnv *, jobject, jobject manager)
+{
+    KeypadInputMgr().InitializeWithObjects(manager);
 }

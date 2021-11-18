@@ -16,33 +16,27 @@
  *    limitations under the License.
  */
 
-#include "KeypadInputManager.h"
+#pragma once
 
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
+#include <app-common/zap-generated/af-structs.h>
+#include <jni.h>
+#include <lib/core/CHIPError.h>
 
-#include <map>
-#include <string>
-
-using namespace std;
-
-CHIP_ERROR KeypadInputManager::Init()
+class KeypadInputManager
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+public:
+    void  InitializeWithObjects(jobject managerObject);
+    EmberAfKeypadInputStatus SendKey(EmberAfKeypadInputCecKeyCode keyCode);
 
-    // TODO: Store feature map once it is supported
-    map<string, bool> featureMap;
-    featureMap["NV"] = true;
-    featureMap["LK"] = true;
-    featureMap["NK"] = true;
+private:
+    friend KeypadInputManager & KeypadInputMgr();
 
-    SuccessOrExit(err);
-exit:
-    return err;
-}
+    static KeypadInputManager sInstance;
+    jobject mKeypadInputManagerObject = nullptr;
+    jmethodID mSendKeyMethod    = nullptr;
+};
 
-EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode)
+inline KeypadInputManager & KeypadInputMgr()
 {
-    // TODO: Insert code here
-    return EMBER_ZCL_KEYPAD_INPUT_STATUS_SUCCESS;
+    return KeypadInputManager::sInstance;
 }
