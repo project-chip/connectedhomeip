@@ -481,8 +481,8 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
         sockaddr.sin6_port   = htons((unsigned short) port);
         uint32_t ttl         = 120; // default TTL for records with hostnames is 120 seconds
         uint32_t interface   = 0;   // Set interface to ANY (0) - network stack can decide how to route this.
-        OnGetAddrInfo(nullptr, 0 /* flags */, interface, kDNSServiceErr_NoError, hostname, reinterpret_cast<struct sockaddr *>(&sockaddr),
-                      ttl, sdCtx);
+        OnGetAddrInfo(nullptr, 0 /* flags */, interface, kDNSServiceErr_NoError, hostname,
+                      reinterpret_cast<struct sockaddr *>(&sockaddr), ttl, sdCtx);
 
         // Don't leak memory.
         std::vector<TextEntry>::iterator textEntry;
