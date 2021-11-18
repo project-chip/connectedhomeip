@@ -31,6 +31,28 @@ buildconfig_header("app_buildconfig") {
   defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}" ]
 }
 
+source_set("operational_device") {
+  sources = [
+    "DeviceProxy.cpp",
+    "DeviceProxy.h",
+    "OperationalDeviceProxy.cpp",
+    "OperationalDeviceProxy.h",
+  ]
+
+  public_deps = [
+    ":app_buildconfig",
+    "${chip_root}/src/app/util:device_callbacks_manager",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/secure_channel",
+    "${chip_root}/src/system",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
 static_library("app") {
   output_name = "libCHIPDataModel"
 
@@ -45,8 +67,6 @@ static_library("app") {
     "Command.h",
     "CommandHandler.cpp",
     "CommandSender.cpp",
-    "DeviceProxy.cpp",
-    "DeviceProxy.h",
     "EventManagement.cpp",
     "InteractionModelEngine.cpp",
     "MessageDef/ArrayBuilder.cpp",
@@ -113,14 +133,14 @@ static_library("app") {
     "MessageDef/TimedRequestMessage.cpp",
     "MessageDef/WriteRequestMessage.cpp",
     "MessageDef/WriteResponseMessage.cpp",
-    "OperationalDeviceProxy.cpp",
-    "OperationalDeviceProxy.h",
     "ReadClient.cpp",
     "ReadHandler.cpp",
     "StatusResponse.cpp",
     "StatusResponse.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
+    "binding/BindingTable.cpp",
+    "binding/BindingTable.h",
     "decoder.cpp",
     "encoder-common.cpp",
     "reporting/Engine.cpp",
@@ -129,6 +149,8 @@ static_library("app") {
 
   public_deps = [
     ":app_buildconfig",
+    ":operational_device",
+    "${chip_root}/src/app/server",
     "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",

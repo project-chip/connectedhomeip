@@ -25,133 +25,63 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/binding/BindingTable.h>
 #include <app/util/binding-table.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::Binding;
+using chip::app::BindingTable;
 
-EmberStatus prepareBinding(EmberBindingTableEntry & binding, NodeId nodeId, GroupId groupId, EndpointId endpointId,
-                           ClusterId clusterId)
+namespace {
+// TODO: Add peer fabric index to command path
+constexpr FabricIndex kPeerFabricIndex = 1;
+
+EmberAfStatus MapBindingErrorToStatus(CHIP_ERROR error)
 {
-    if (groupId && nodeId)
+    if (error == CHIP_ERROR_NO_MEMORY)
     {
-        return EMBER_BAD_ARGUMENT;
+        return EMBER_ZCL_STATUS_LIMIT_REACHED;
     }
-
-    binding.clusterId    = clusterId;
-    binding.local        = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
-    binding.networkIndex = 0;
-
-    if (groupId)
+    if (error == CHIP_NO_ERROR)
     {
-        binding.type    = EMBER_MULTICAST_BINDING;
-        binding.groupId = groupId;
-        binding.remote  = 0;
+        return EMBER_ZCL_STATUS_SUCCESS;
     }
-    else
+    if (error == CHIP_ERROR_KEY_NOT_FOUND)
     {
-        binding.type   = EMBER_UNICAST_BINDING;
-        binding.nodeId = nodeId;
-        binding.remote = endpointId;
+        return EMBER_ZCL_STATUS_NOT_FOUND;
     }
-
-    return EMBER_SUCCESS;
+    return EMBER_ZCL_STATUS_FAILURE;
 }
 
-EmberStatus getBindingIndex(EmberBindingTableEntry & newEntry, uint8_t * bindingIndex)
-{
-    EmberBindingTableEntry currentEntry;
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
-    {
-        emberGetBinding(i, &currentEntry);
-        if (currentEntry.type != EMBER_UNUSED_BINDING && currentEntry == newEntry)
-        {
-            *bindingIndex = i;
-            return EMBER_SUCCESS;
-        }
-    }
-
-    return EMBER_NOT_FOUND;
-}
-
-EmberStatus getUnusedBindingIndex(uint8_t * bindingIndex)
-{
-    EmberBindingTableEntry currentEntry;
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
-    {
-        emberGetBinding(i, &currentEntry);
-        if (currentEntry.type == EMBER_UNUSED_BINDING)
-        {
-            *bindingIndex = i;
-            return EMBER_SUCCESS;
-        }
-    }
-
-    return EMBER_NOT_FOUND;
-}
+} // namespace
 
 bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                        const Commands::Bind::DecodableType & commandData)
 {
-    auto & nodeId     = commandData.nodeId;
-    auto & groupId    = commandData.groupId;
-    auto & endpointId = commandData.endpointId;
-    auto & clusterId  = commandData.clusterId;
+    auto & nodeId             = commandData.nodeId;
+    auto & endpointId         = commandData.endpointId;
+    auto & clusterId          = commandData.clusterId;
+    EndpointId selfEndpointId = commandPath.mEndpointId;
 
-    ChipLogDetail(Zcl, "RX: BindCallback");
-
-    EmberBindingTableEntry bindingEntry;
-    if (prepareBinding(bindingEntry, nodeId, groupId, endpointId, clusterId) != EMBER_SUCCESS)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
-        return true;
-    }
-
-    uint8_t bindingIndex;
-    if (getBindingIndex(bindingEntry, &bindingIndex) != EMBER_NOT_FOUND)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_DUPLICATE_EXISTS);
-        return true;
-    }
-
-    if (getUnusedBindingIndex(&bindingIndex) != EMBER_SUCCESS)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INSUFFICIENT_SPACE);
-        return true;
-    }
-
-    emberSetBinding(bindingIndex, &bindingEntry);
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    ChipLogProgress(Zcl, "RX: BindCallback to node %" PRIu64 "\n", nodeId);
+    CHIP_ERROR error = BindingTable::GetInstance().Add(selfEndpointId, nodeId, endpointId, kPeerFabricIndex, clusterId);
+    emberAfSendImmediateDefaultResponse(MapBindingErrorToStatus(error));
     return true;
 }
 
 bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                          const Commands::Unbind::DecodableType & commandData)
 {
-    auto & nodeId     = commandData.nodeId;
-    auto & groupId    = commandData.groupId;
-    auto & endpointId = commandData.endpointId;
-    auto & clusterId  = commandData.clusterId;
+    auto & nodeId             = commandData.nodeId;
+    auto & endpointId         = commandData.endpointId;
+    auto & clusterId          = commandData.clusterId;
+    EndpointId selfEndpointId = commandPath.mEndpointId;
 
-    ChipLogDetail(Zcl, "RX: UnbindCallback");
+    ChipLogProgress(Zcl, "RX: UnbindCallback to node %" PRIu64 "\n", nodeId);
+    CHIP_ERROR error = BindingTable::GetInstance().Remove(selfEndpointId, nodeId, endpointId, kPeerFabricIndex, clusterId);
+    emberAfSendImmediateDefaultResponse(MapBindingErrorToStatus(error));
 
-    EmberBindingTableEntry bindingEntry;
-    if (prepareBinding(bindingEntry, nodeId, groupId, endpointId, clusterId) != EMBER_SUCCESS)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
-        return true;
-    }
-
-    uint8_t bindingIndex;
-    if (getBindingIndex(bindingEntry, &bindingIndex) != EMBER_SUCCESS)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
-        return true;
-    }
-
-    emberDeleteBinding(bindingIndex);
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
