@@ -167,7 +167,7 @@ inline uint32_t ProfileIdFromTag(Tag tag)
  */
 inline uint16_t ProfileNumFromTag(Tag tag)
 {
-    return static_cast<uint16_t>((tag & kProfileNumMask) >> kProfileIdShift);
+    return static_cast<uint16_t>((tag & kProfileNumMask) >> kProfileNumShift);
 }
 
 /**
