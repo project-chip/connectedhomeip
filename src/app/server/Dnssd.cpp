@@ -420,6 +420,11 @@ void DnssdServer::StartServer(chip::Dnssd::CommissioningMode mode)
     {
         ChipLogError(Discovery, "Failed to initialize advertiser: %s", chip::ErrorStr(err));
     }
+    err = Dnssd::Resolver::Instance().Init(&chip::DeviceLayer::InetLayer());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to initialize resolver: %s", chip::ErrorStr(err));
+    }
 
     err = Dnssd::ServiceAdvertiser::Instance().RemoveServices();
     if (err != CHIP_NO_ERROR)
