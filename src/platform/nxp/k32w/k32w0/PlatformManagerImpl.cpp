@@ -25,6 +25,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <app-common/zap-generated/enums.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
@@ -32,6 +33,8 @@
 #include <lwip/tcpip.h>
 
 #include <openthread/platform/entropy.h>
+
+#include "fsl_power.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -55,6 +58,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
 
+    mStartTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
+
     // Initialize the configuration system.
     err = Internal::K32WConfig::Init();
     SuccessOrExit(err);
@@ -72,6 +77,108 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
+}
+
+CHIP_ERROR PlatformManagerImpl::_Shutdown()
+{
+    uint64_t upTime = 0;
+
+    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalOperationalHours = 0;
+
+        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        {
+            ConfigurationMgrImpl().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
+    }
+
+    return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
+{
+    uint32_t count = 0;
+
+    CHIP_ERROR err = ConfigurationMgrImpl().GetRebootCount(count);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        rebootCount = static_cast<uint16_t>(count);
+    }
+
+    return err;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
+{
+    uint64_t currentTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
+
+    if (currentTimeMilliseconds >= mStartTimeMilliseconds)
+    {
+        upTime = (currentTimeMilliseconds - mStartTimeMilliseconds) / 1000;
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_INVALID_TIME;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    uint64_t upTime = 0;
+
+    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalHours = 0;
+        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_INVALID_TIME;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReason)
+{
+    bootReason = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+    uint8_t reason;
+    reason = POWER_GetResetCause();
+
+    if (reason == RESET_UNDEFINED)
+    {
+        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+    }
+    else if ((reason == RESET_POR) || (reason == RESET_EXT_PIN))
+    {
+        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT;
+    }
+    else if (reason == RESET_BOR)
+    {
+        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET;
+    }
+    else if (reason == RESET_SW_REQ)
+    {
+        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET;
+    }
+    else if (reason == RESET_WDT)
+    {
+        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET;
+        /* Reboot can be due to hardware or software watchdog*/
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
