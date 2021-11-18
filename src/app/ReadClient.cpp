@@ -545,8 +545,8 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     if (mpExchangeCtx != nullptr && mpExchangeCtx->IsUDPTransport())
     {
         auto margin = System::Clock::Milliseconds32((CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1) *
-                                                                      mpExchangeCtx->GetIdleRetransmitTimeoutTick());
-        timeout                       = timeout + margin;
+                                                    mpExchangeCtx->GetIdleRetransmitTimeoutTick());
+        timeout     = timeout + margin;
     }
 
     ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %d seconds", mMaxIntervalCeilingSeconds);
