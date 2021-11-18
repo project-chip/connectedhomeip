@@ -25,7 +25,7 @@
 class KeypadInputManager
 {
 public:
-    void  InitializeWithObjects(jobject managerObject);
+    void InitializeWithObjects(jobject managerObject);
     EmberAfKeypadInputStatus SendKey(EmberAfKeypadInputCecKeyCode keyCode);
 
 private:
@@ -33,7 +33,7 @@ private:
 
     static KeypadInputManager sInstance;
     jobject mKeypadInputManagerObject = nullptr;
-    jmethodID mSendKeyMethod    = nullptr;
+    jmethodID mSendKeyMethod          = nullptr;
 };
 
 inline KeypadInputManager & KeypadInputMgr()
