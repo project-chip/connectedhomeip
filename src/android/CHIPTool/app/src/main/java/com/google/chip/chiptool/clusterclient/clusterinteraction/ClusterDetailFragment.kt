@@ -24,6 +24,9 @@ import chip.devicecontroller.ClusterInfoMapping
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets.UTF_16
+import java.nio.charset.StandardCharsets.UTF_8
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackDataTv
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackNameTv
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackTypeTv
@@ -95,6 +98,8 @@ class ClusterDetailFragment : Fragment() {
     return when (type) {
       Int::class.java -> data.toInt()
       Boolean::class.java -> data.toBoolean()
+      ByteArray::class.java -> data.toByteArray()
+      Long::class.java -> data.toLong()
       else -> data
     }
   }
@@ -169,7 +174,14 @@ class ClusterDetailFragment : Fragment() {
     selectedInteractionInfo.commandParameters.forEach { (paramName, paramInfo) ->
       val param = inflater.inflate(R.layout.cluster_parameter_item, null, false) as ConstraintLayout
       param.clusterParameterNameTv.text = "${paramName}"
-      param.clusterParameterTypeTv.text = "${paramInfo.type}"
+      // byte[].class will be output as class [B, which is not readable, so dynamically change it
+      // to Byte[]. If more custom logic is required, should add a className field in
+      // commandParameterInfo
+      if (paramInfo.type == ByteArray::class.java) {
+        param.clusterParameterTypeTv.text = "Byte[]"
+      } else {
+        param.clusterParameterTypeTv.text = "${paramInfo.type}"
+      }
       parameterList.addView(param)
     }
   }
@@ -181,14 +193,14 @@ class ClusterDetailFragment : Fragment() {
   ) {
     responseValues.forEach { (variableNameType, response) ->
       if (response is List<*>) {
-        createListReadAttributeView(response, inflater, callbackList, variableNameType)
+        createListResponseView(response, inflater, callbackList, variableNameType)
       } else {
-        createBasicReadAttributeView(response, inflater, callbackList, variableNameType)
+        createBasicResponseView(response, inflater, callbackList, variableNameType)
       }
     }
   }
 
-  private fun createBasicReadAttributeView(
+  private fun createBasicResponseView(
     response: Any,
     inflater: LayoutInflater,
     callbackList: LinearLayout,
@@ -197,12 +209,16 @@ class ClusterDetailFragment : Fragment() {
     val callbackItem =
       inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
     callbackItem.clusterCallbackNameTv.text = variableNameType.name
-    callbackItem.clusterCallbackDataTv.text = response.toString()
+    callbackItem.clusterCallbackDataTv.text = if (response.javaClass == ByteArray::class.java) {
+      (response as ByteArray).contentToString()
+    } else {
+      response.toString()
+    }
     callbackItem.clusterCallbackTypeTv.text = variableNameType.type
     callbackList.addView(callbackItem)
   }
 
-  private fun createListReadAttributeView(
+  private fun createListResponseView(
     response: List<*>,
     inflater: LayoutInflater,
     callbackList: LinearLayout,
@@ -215,21 +231,29 @@ class ClusterDetailFragment : Fragment() {
       callbackList.addView(emptyCallback)
     } else {
       response.forEachIndexed { index, it ->
-        val readAttributeCallbackItem =
+        val AttributeCallbackItem =
           inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
-        readAttributeCallbackItem.clusterCallbackNameTv.text = variableNameType.name + "[$index]"
-        val objectString = it.toString()
-        val callbackClassName = it!!.javaClass.toString().split('$').last()
-        readAttributeCallbackItem.clusterCallbackDataTv.text = callbackClassName
-        readAttributeCallbackItem.clusterCallbackDataTv.setOnClickListener {
+        AttributeCallbackItem.clusterCallbackNameTv.text = variableNameType.name + "[$index]"
+        val objectString = if (it!!.javaClass == ByteArray::class.java) {
+          (it as ByteArray).contentToString()
+        } else {
+          it.toString()
+        }
+        var callbackClassName = if (it!!.javaClass == ByteArray::class.java) {
+          "Byte[]"
+        } else {
+          it!!.javaClass.toString().split('$').last()
+        }
+        AttributeCallbackItem.clusterCallbackDataTv.text = callbackClassName
+        AttributeCallbackItem.clusterCallbackDataTv.setOnClickListener {
           AlertDialog.Builder(requireContext())
             .setTitle(callbackClassName)
             .setMessage(objectString)
             .create()
             .show()
         }
-        readAttributeCallbackItem.clusterCallbackTypeTv.text = "List<$callbackClassName>"
-        callbackList.addView(readAttributeCallbackItem)
+        AttributeCallbackItem.clusterCallbackTypeTv.text = "List<$callbackClassName>"
+        callbackList.addView(AttributeCallbackItem)
       }
     }
   }
