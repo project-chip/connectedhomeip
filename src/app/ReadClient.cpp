@@ -541,8 +541,7 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
 CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 {
     CancelLivenessCheckTimer();
-    System::Clock::Timeout timeout =
-        std::chrono::duration_cast<std::chrono::milliseconds>(System::Clock::Seconds16(mMaxIntervalCeilingSeconds));
+    System::Clock::Timeout timeout = System::Clock::Seconds16(mMaxIntervalCeilingSeconds);
     if (mpExchangeCtx != nullptr && mpExchangeCtx->IsUDPTransport())
     {
         System::Clock::Timeout margin = System::Clock::Milliseconds32((CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1) *
