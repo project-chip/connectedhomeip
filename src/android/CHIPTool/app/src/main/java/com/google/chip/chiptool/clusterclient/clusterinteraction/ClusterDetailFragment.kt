@@ -24,9 +24,6 @@ import chip.devicecontroller.ClusterInfoMapping
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
-import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets.UTF_16
-import java.nio.charset.StandardCharsets.UTF_8
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackDataTv
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackNameTv
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackTypeTv
@@ -99,7 +96,7 @@ class ClusterDetailFragment : Fragment() {
       Int::class.java -> data.toInt()
       Boolean::class.java -> data.toBoolean()
       ByteArray::class.java -> data.encodeToByteArray()
-        Long ::class.java -> data.toLong()
+      Long::class.java -> data.toLong()
       else -> data
     }
   }
