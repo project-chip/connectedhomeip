@@ -105,7 +105,7 @@ using namespace chip::Encoding;
 using namespace chip::Protocols::UserDirectedCommissioning;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondsPerSecond;
+constexpr uint32_t kSessionEstablishmentTimeout = 40 * kMillisecondsPerSecond;
 
 DeviceController::DeviceController() :
     mOpenPairingSuccessCallback(OnOpenPairingWindowSuccessResponse, this),
