@@ -90,13 +90,16 @@ public:
     {
         return (serializable.mVersion == mCASESessionSerializableArray[index].mVersion) &&
             (serializable.mSharedSecretLen == mCASESessionSerializableArray[index].mSharedSecretLen) &&
-            ((ResumptionID(serializable.mSharedSecret)).data_equal(ResumptionID(mCASESessionSerializableArray[index].mSharedSecret))) &&
+            ((ResumptionID(serializable.mSharedSecret))
+                 .data_equal(ResumptionID(mCASESessionSerializableArray[index].mSharedSecret))) &&
             (serializable.mMessageDigestLen == mCASESessionSerializableArray[index].mMessageDigestLen) &&
-            ((ResumptionID(serializable.mMessageDigest)).data_equal(ResumptionID(mCASESessionSerializableArray[index].mMessageDigest))) &&
+            ((ResumptionID(serializable.mMessageDigest))
+                 .data_equal(ResumptionID(mCASESessionSerializableArray[index].mMessageDigest))) &&
             (serializable.mPeerNodeId == mCASESessionSerializableArray[index].mPeerNodeId) &&
             (serializable.mLocalSessionId == mCASESessionSerializableArray[index].mLocalSessionId) &&
             (serializable.mPeerSessionId == mCASESessionSerializableArray[index].mPeerSessionId) &&
-            ((ResumptionID(serializable.mResumptionId)).data_equal(ResumptionID(mCASESessionSerializableArray[index].mResumptionId))) &&
+            ((ResumptionID(serializable.mResumptionId))
+                 .data_equal(ResumptionID(mCASESessionSerializableArray[index].mResumptionId))) &&
             (serializable.mLocalFabricIndex == mCASESessionSerializableArray[index].mLocalFabricIndex) &&
             (serializable.mSessionSetupTimeStamp == mCASESessionSerializableArray[index].mSessionSetupTimeStamp);
     }
@@ -185,7 +188,8 @@ static void CASESessionCache_Remove_Test(nlTestSuite * inSuite, void * inContext
     CHIP_ERROR err = CHIP_NO_ERROR;
     for (uint8_t i = 1; i < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE + 1; i++)
     {
-        err = mCASESessionTest.mCASESessionCache.Remove(ResumptionID(mCASESessionTest.mCASESessionSerializableArray[i].mResumptionId));
+        err = mCASESessionTest.mCASESessionCache.Remove(
+            ResumptionID(mCASESessionTest.mCASESessionSerializableArray[i].mResumptionId));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         CASESession outSession;

@@ -84,7 +84,7 @@ CHIP_ERROR CASESessionCache::Get(ResumptionID resumptionID, CASESession & outSes
         if (resumptionID.data_equal(ResumptionID(ec->mResumptionId)))
         {
             found = true;
-            err = outSession.FromSerializable(*ec);
+            err   = outSession.FromSerializable(*ec);
             return false;
         }
         return true;
