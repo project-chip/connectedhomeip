@@ -210,6 +210,28 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 }
 
+namespace {
+CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIB::Builder & aAttributeReport,
+                             Protocols::InteractionModel::Status aStatus, const TLV::TLVWriter & aReportCheckpoint)
+{
+    aAttributeReport.Rollback(aReportCheckpoint);
+    AttributeStatusIB::Builder attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
+    AttributePathIB::Builder attributePathIBBuilder     = attributeStatusIBBuilder.CreatePath();
+    attributePathIBBuilder.Endpoint(aPath.mEndpointId)
+        .Cluster(aPath.mClusterId)
+        .Attribute(aPath.mAttributeId)
+        .EndOfAttributePathIB();
+    ReturnErrorOnFailure(attributePathIBBuilder.GetError());
+    StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
+    statusIBBuilder.EncodeStatusIB(StatusIB(aStatus));
+    ReturnErrorOnFailure(statusIBBuilder.GetError());
+    attributeStatusIBBuilder.EndOfAttributeStatusIB();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
+    return CHIP_NO_ERROR;
+}
+
+} // anonymous namespace
+
 CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIB::Builder & aAttributeReport)
 {
@@ -234,6 +256,16 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
     if (attrOverride != nullptr)
     {
+        const EmberAfAttributeMetadata * attributeMetadata =
+            emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
+
+        if (attributeMetadata == nullptr)
+        {
+            // This attribute (or even this cluster) is not actually supported
+            // on this endpoint.
+            return SendFailureStatus(aPath, aAttributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, backup);
+        }
+
         // TODO: We should probably clone the writer and convert failures here
         // into status responses, unless our caller already does that.
         writer = attributeDataIBBuilder.GetWriter();
@@ -433,19 +465,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     }
     else
     {
-        aAttributeReport.Rollback(backup);
-        attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
-        attributePathIBBuilder   = attributeStatusIBBuilder.CreatePath();
-        attributePathIBBuilder.Endpoint(aPath.mEndpointId)
-            .Cluster(aPath.mClusterId)
-            .Attribute(aPath.mAttributeId)
-            .EndOfAttributePathIB();
-        ReturnErrorOnFailure(attributePathIBBuilder.GetError());
-        StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
-        statusIBBuilder.EncodeStatusIB(StatusIB(imStatus));
-        ReturnErrorOnFailure(statusIBBuilder.GetError());
-        attributeStatusIBBuilder.EndOfAttributeStatusIB();
-        ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
+        ReturnErrorOnFailure(SendFailureStatus(aPath, aAttributeReport, imStatus, backup));
     }
     return CHIP_NO_ERROR;
 }

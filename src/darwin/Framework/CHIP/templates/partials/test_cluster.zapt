@@ -71,7 +71,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         }
         {{/if}}
 
-        XCTAssertEqual(err.code, {{response.error}});
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], {{response.error}});
         {{#unless (isStrEqual "0" response.error)}}
         [expectation fulfill];
         {{else}}

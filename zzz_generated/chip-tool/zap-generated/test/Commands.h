@@ -31199,6 +31199,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 242 : Read attribute NULLABLE_CHAR_STRING\n");
             err = TestReadAttributeNullableCharString_242();
             break;
+        case 243:
+            ChipLogProgress(chipTool, " ***** Test Step 243 : Read nonexistent attribute.\n");
+            err = TestReadNonexistentAttribute_243();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -31210,7 +31214,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 243;
+    const uint16_t mTestCount = 244;
 
     static void OnFailureCallback_5(void * context, EmberAfStatus status)
     {
@@ -33158,6 +33162,16 @@ private:
     static void OnSuccessCallback_242(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_242(nullableCharString);
+    }
+
+    static void OnFailureCallback_243(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_243(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_243(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_243(listInt8u);
     }
 
     //
@@ -37845,6 +37859,20 @@ private:
         VerifyOrReturn(CheckValueAsString("nullableCharString.Value()", nullableCharString.Value(), chip::CharSpan("", 0)));
         NextTest();
     }
+
+    CHIP_ERROR TestReadNonexistentAttribute_243()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 200;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_243,
+                                                                                                        OnFailureCallback_243);
+    }
+
+    void OnFailureResponse_243(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_243(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u) { ThrowSuccessResponse(); }
 };
 
 class TestClusterComplexTypes : public TestCommand

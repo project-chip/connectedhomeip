@@ -24,6 +24,8 @@
 #import <CHIP/CHIP.h>
 #import <CHIP/CHIPTestClustersObjc.h>
 
+#import "CHIPErrorTestUtils.h"
+
 // system dependencies
 #import <XCTest/XCTest.h>
 
@@ -190,7 +192,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -219,7 +221,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -237,7 +239,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -262,7 +264,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOutOfServiceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read mandatory non-global attribute: OutOfService Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -287,7 +289,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOutOfServiceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read mandatory non-global attribute constraints: OutOfService Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -311,7 +313,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Write the default values to mandatory non-global attribute: OutOfService Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -331,7 +333,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOutOfServiceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back the mandatory non-global attribute: OutOfService Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -356,7 +358,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePresentValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read mandatory non-global attribute constraints: PresentValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -380,7 +382,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Write the default values to mandatory non-global attribute: PresentValue Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -400,7 +402,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePresentValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back the mandatory non-global attribute: PresentValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -424,7 +426,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStatusFlagsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read mandatory non-global attribute: StatusFlags Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -449,7 +451,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStatusFlagsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read mandatory non-global attribute constraints: StatusFlags Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -477,7 +479,7 @@ CHIPDevice * GetConnectedDevice()
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write the default values to mandatory non-global attribute: StatusFlags Error: %@", err);
 
-                                  XCTAssertEqual(err.code, 1);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                   [expectation fulfill];
                               }];
 
@@ -496,7 +498,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStatusFlagsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back the mandatory non-global attribute: StatusFlags Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -521,7 +523,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePresentValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads PresentValue attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -545,7 +547,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOutOfServiceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OutOfService attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -569,7 +571,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStatusFlagsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads StatusFlags attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -593,7 +595,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePresentValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads PresentValue attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -617,7 +619,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOutOfServiceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OutOfService attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -641,7 +643,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStatusFlagsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads StatusFlags attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -665,7 +667,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStatusFlagsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads StatusFlags attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -689,7 +691,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStatusFlagsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads StatusFlags attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -714,7 +716,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -743,7 +745,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -761,7 +763,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -786,7 +788,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStateValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read mandatory non-global attribute: StateValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -811,7 +813,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStateValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read mandatory non-global attribute constraints: StateValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -834,7 +836,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"Write the default value to mandatory non-global attribute: StateValue Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -853,7 +855,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStateValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back the mandatory non-global attribute: StateValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -883,7 +885,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -902,7 +904,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attribute: CurrentHue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -926,7 +928,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: current hue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -954,7 +956,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"Write the default value to mandatory attribute: CurrentHue Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -972,7 +974,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: CurrentHue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -996,7 +998,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attribute: CurrentSaturation Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1020,7 +1022,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: CurrentSaturation Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1048,7 +1050,7 @@ CHIPDevice * GetConnectedDevice()
                                     completionHandler:^(NSError * _Nullable err) {
                                         NSLog(@"Write the default value to mandatory attribute: CurrentSaturation Error: %@", err);
 
-                                        XCTAssertEqual(err.code, 1);
+                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                         [expectation fulfill];
                                     }];
 
@@ -1066,7 +1068,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: CurrentSaturation Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1090,7 +1092,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: CurrentX Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1114,7 +1116,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: CurrentX Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1141,7 +1143,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write the default value to mandatory attribute: CurrentX Error: %@", err);
 
-                               XCTAssertEqual(err.code, 1);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                [expectation fulfill];
                            }];
 
@@ -1159,7 +1161,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: CurrentX Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1183,7 +1185,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: CurrentY Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1207,7 +1209,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: CurrentY Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1235,7 +1237,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write the default values to mandatory attribute: CurrentY Error: %@", err);
 
-                               XCTAssertEqual(err.code, 1);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                [expectation fulfill];
                            }];
 
@@ -1253,7 +1255,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: CurrentY Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1278,7 +1280,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: ColorTemperatureMireds Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1302,7 +1304,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: ColorMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1326,7 +1328,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorControlOptionsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Options Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1350,7 +1352,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorControlOptionsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: Options Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -1372,7 +1374,7 @@ CHIPDevice * GetConnectedDevice()
                                       completionHandler:^(NSError * _Nullable err) {
                                           NSLog(@"Write the default values to mandatory attribute: Options Error: %@", err);
 
-                                          XCTAssertEqual(err.code, 0);
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                           [expectation fulfill];
                                       }];
@@ -1391,7 +1393,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorControlOptionsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: Options Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1415,7 +1417,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: EnhancedCurrentHue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1439,7 +1441,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: EnhancedCurrentHue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -1463,7 +1465,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write the default values to mandatory attribute: EnhancedCurrentHue Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 1);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                     [expectation fulfill];
                                 }];
 
@@ -1481,7 +1483,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: EnhancedCurrentHue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1505,7 +1507,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEnhancedColorModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: EnhancedColorMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -1524,7 +1526,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: ColorLoopActive Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1548,7 +1550,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: ColorLoopActive Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -1571,7 +1573,7 @@ CHIPDevice * GetConnectedDevice()
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write the default values to mandatory attribute: ColorLoopActive Error: %@", err);
 
-                                      XCTAssertEqual(err.code, 1);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                       [expectation fulfill];
                                   }];
 
@@ -1589,7 +1591,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: ColorLoopActive Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1613,7 +1615,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: ColorLoopDirection Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1637,7 +1639,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: ColorLoopDirection Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -1661,7 +1663,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write the default values to mandatory attribute: ColorLoopDirection Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 1);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                     [expectation fulfill];
                                 }];
 
@@ -1679,7 +1681,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: ColorLoopDirection Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1703,7 +1705,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: ColorLoopTime Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1727,7 +1729,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: ColorLoopTime Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -1750,7 +1752,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write the default values to mandatory attribute: ColorLoopTime Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 1);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                     [expectation fulfill];
                                 }];
 
@@ -1768,7 +1770,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: ColorLoopTime Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1792,7 +1794,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopStartEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: ColorLoopStartEnhancedHue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1817,7 +1819,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopStartEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: ColorLoopStartEnhancedHue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -1842,7 +1844,7 @@ CHIPDevice * GetConnectedDevice()
                                                       @"Error: %@",
                                                     err);
 
-                                                XCTAssertEqual(err.code, 1);
+                                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                 [expectation fulfill];
                                             }];
 
@@ -1861,7 +1863,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopStartEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: ColorLoopStartEnhancedHue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1885,7 +1887,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: ColorLoopStoredEnhancedHue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1910,7 +1912,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: ColorLoopStoredEnhancedHue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -1935,7 +1937,7 @@ CHIPDevice * GetConnectedDevice()
                                                        @"ColorLoopStoredEnhancedHue Error: %@",
                                                      err);
 
-                                                 XCTAssertEqual(err.code, 1);
+                                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                  [expectation fulfill];
                                              }];
 
@@ -1954,7 +1956,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: ColorLoopStoredEnhancedHue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -1978,7 +1980,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorCapabilitiesWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: ColorCapabilities Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2002,7 +2004,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorCapabilitiesWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: ColorCapabilities Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2030,7 +2032,7 @@ CHIPDevice * GetConnectedDevice()
                                     completionHandler:^(NSError * _Nullable err) {
                                         NSLog(@"Write the default values to mandatory attribute: ColorCapabilities Error: %@", err);
 
-                                        XCTAssertEqual(err.code, 1);
+                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                         [expectation fulfill];
                                     }];
 
@@ -2048,7 +2050,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorCapabilitiesWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: ColorCapabilities Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2072,7 +2074,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorTempPhysicalMinWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: ColorTempPhysicalMinMireds Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2097,7 +2099,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorTempPhysicalMinWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: ColorTempPhysicalMinMireds Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2128,7 +2130,7 @@ CHIPDevice * GetConnectedDevice()
                                           @"Write the default values to mandatory  attribute: ColorTempPhysicalMinMireds Error: %@",
                                           err);
 
-                                      XCTAssertEqual(err.code, 1);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                       [expectation fulfill];
                                   }];
 
@@ -2147,7 +2149,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorTempPhysicalMinWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: ColorTempPhysicalMinMireds Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2171,7 +2173,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorTempPhysicalMaxWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: ColorTempPhysicalMaxMireds Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2196,7 +2198,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorTempPhysicalMaxWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: ColorTempPhysicalMaxMireds Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2227,7 +2229,7 @@ CHIPDevice * GetConnectedDevice()
                                           @"Write the default values to mandatory attribute: ColorTempPhysicalMaxMireds Error: %@",
                                           err);
 
-                                      XCTAssertEqual(err.code, 1);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                       [expectation fulfill];
                                   }];
 
@@ -2246,7 +2248,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorTempPhysicalMaxWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: ColorTempPhysicalMaxMireds Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2272,7 +2274,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeCoupleColorTempToLevelMinMiredsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Read the optional attribute: CoupleColorTempToLevelMinMireds Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             [expectation fulfill];
         }];
@@ -2297,7 +2299,7 @@ CHIPDevice * GetConnectedDevice()
                                                             @"CoupleColorTempToLevelMinMireds Error: %@",
                                                           err);
 
-                                                      XCTAssertEqual(err.code, 1);
+                                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                       [expectation fulfill];
                                                   }];
 
@@ -2317,7 +2319,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeCoupleColorTempToLevelMinMiredsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Reads back optional attribute: CoupleColorTempToLevelMinMireds Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -2343,7 +2345,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeStartUpColorTemperatureMiredsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Read the optional attribute: StartUpColorTemperatureMireds Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -2373,7 +2375,7 @@ CHIPDevice * GetConnectedDevice()
                                                           @"StartUpColorTemperatureMireds Error: %@",
                                                         err);
 
-                                                    XCTAssertEqual(err.code, 0);
+                                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                                     [expectation fulfill];
                                                 }];
@@ -2394,7 +2396,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeStartUpColorTemperatureMiredsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Reads back optional attribute: StartUpColorTemperatureMireds Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -2418,7 +2420,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeRemainingTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the Optional attribute: RemainingTime Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2442,7 +2444,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeRemainingTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: RemainingTime Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2470,7 +2472,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write the default values to optional attribute: RemainingTime Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 1);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                     [expectation fulfill];
                                 }];
 
@@ -2488,7 +2490,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeRemainingTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back optional attribute: RemainingTime Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2512,7 +2514,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeDriftCompensationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: DriftCompensation Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2540,7 +2542,7 @@ CHIPDevice * GetConnectedDevice()
                                     completionHandler:^(NSError * _Nullable err) {
                                         NSLog(@"Write the default values to optional attribute: DriftCompensation Error: %@", err);
 
-                                        XCTAssertEqual(err.code, 1);
+                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                         [expectation fulfill];
                                     }];
 
@@ -2558,7 +2560,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeDriftCompensationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back optional attribute: DriftCompensation Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2582,7 +2584,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCompensationTextWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: CompensationText Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2606,7 +2608,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNumberOfPrimariesWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: NumberOfPrimaries Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2633,7 +2635,7 @@ CHIPDevice * GetConnectedDevice()
                                     completionHandler:^(NSError * _Nullable err) {
                                         NSLog(@"Write the default mandatory attribute: NumberOfPrimaries Error: %@", err);
 
-                                        XCTAssertEqual(err.code, 1);
+                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                         [expectation fulfill];
                                     }];
 
@@ -2651,7 +2653,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNumberOfPrimariesWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: NumberOfPrimaries Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2675,7 +2677,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary1XWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary1X Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2702,7 +2704,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary1X Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -2720,7 +2722,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary1XWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: Primary1X Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2744,7 +2746,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary1YWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary1Y Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2771,7 +2773,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary1Y Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -2789,7 +2791,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary1YWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: Primary1Y Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2813,7 +2815,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary1IntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary1Intensity Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -2832,7 +2834,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary2XWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary2X Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2859,7 +2861,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary2X Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -2877,7 +2879,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary2XWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: Primary2X Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2901,7 +2903,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary2YWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary2Y Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2928,7 +2930,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary2Y Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -2946,7 +2948,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary2YWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: Primary2Y Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -2970,7 +2972,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary2IntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: Primary2Intensity Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -2989,7 +2991,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary3XWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary3X Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3016,7 +3018,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary3X Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -3034,7 +3036,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary3XWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: Primary3X Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3058,7 +3060,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary3YWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary3Y Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3085,7 +3087,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary3Y Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -3103,7 +3105,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary3YWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: Primary3Y Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3127,7 +3129,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary3IntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary3Intensity Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -3146,7 +3148,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary4XWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary4X Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3173,7 +3175,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary4X Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -3191,7 +3193,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary4XWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: Primary4X Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3215,7 +3217,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary4YWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary4Y Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3242,7 +3244,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary4Y Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -3260,7 +3262,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary4YWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: Primary4Y Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3284,7 +3286,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary4IntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary4Intensity Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -3303,7 +3305,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary5XWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary5X Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3330,7 +3332,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary5X Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -3348,7 +3350,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary5XWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: Primary5X Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3372,7 +3374,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary5YWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary5Y Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3399,7 +3401,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary5Y Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -3417,7 +3419,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary5YWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: Primary5Y Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3441,7 +3443,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary5IntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary5Intensity Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -3460,7 +3462,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary6XWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary6X Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3487,7 +3489,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary6X Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -3505,7 +3507,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary6XWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: Primary6X Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3529,7 +3531,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary6YWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary6Y Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3556,7 +3558,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary6Y Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -3574,7 +3576,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary6YWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the mandatory attribute: Primary6Y Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3598,7 +3600,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePrimary6IntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: Primary6Intensity Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -3617,7 +3619,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeWhitePointXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: WhitePointX Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3644,7 +3646,7 @@ CHIPDevice * GetConnectedDevice()
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write the default optional attribute: WhitePointX Error: %@", err);
 
-                                  XCTAssertEqual(err.code, 0);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                   [expectation fulfill];
                               }];
@@ -3663,7 +3665,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeWhitePointXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: WhitePointX Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3687,7 +3689,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeWhitePointYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: WhitePointY Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3714,7 +3716,7 @@ CHIPDevice * GetConnectedDevice()
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write the default optional attribute: WhitePointY Error: %@", err);
 
-                                  XCTAssertEqual(err.code, 0);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                   [expectation fulfill];
                               }];
@@ -3733,7 +3735,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeWhitePointYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: WhitePointY Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3757,7 +3759,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointRXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointRX Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3784,7 +3786,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointRX Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 0);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                    [expectation fulfill];
                                }];
@@ -3803,7 +3805,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointRXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointRX Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3827,7 +3829,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointRYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointRY Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3854,7 +3856,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointRY Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 0);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                    [expectation fulfill];
                                }];
@@ -3873,7 +3875,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointRYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointRY Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3897,7 +3899,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointRIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointRIntensity Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -3916,7 +3918,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointGXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointGX Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3943,7 +3945,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointGX Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 0);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                    [expectation fulfill];
                                }];
@@ -3962,7 +3964,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointGXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointGX Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -3986,7 +3988,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointGYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointGY Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4013,7 +4015,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointGY Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 0);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                    [expectation fulfill];
                                }];
@@ -4032,7 +4034,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointGYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointGY Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4056,7 +4058,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointGIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointGIntensity Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -4075,7 +4077,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointBXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointBX Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4102,7 +4104,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointBX Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 0);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                    [expectation fulfill];
                                }];
@@ -4121,7 +4123,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointBXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointBX Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4145,7 +4147,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointBYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointBY Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4172,7 +4174,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointBY Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 0);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                    [expectation fulfill];
                                }];
@@ -4191,7 +4193,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointBYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointBY Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4215,7 +4217,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorPointBIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointBIntensity Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -4235,7 +4237,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -4254,7 +4256,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4285,7 +4287,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(NSError * _Nullable err) {
                    NSLog(@"Move to hue shortest distance command Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    [expectation fulfill];
                }];
@@ -4311,7 +4313,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(NSError * _Nullable err) {
                    NSLog(@"Move to hue longest distance command Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    [expectation fulfill];
                }];
@@ -4337,7 +4339,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(NSError * _Nullable err) {
                    NSLog(@"Move to hue up command Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    [expectation fulfill];
                }];
@@ -4363,7 +4365,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(NSError * _Nullable err) {
                    NSLog(@"Move to hue down command Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    [expectation fulfill];
                }];
@@ -4382,7 +4384,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -4401,7 +4403,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4426,7 +4428,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -4445,7 +4447,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4475,7 +4477,7 @@ CHIPDevice * GetConnectedDevice()
              completionHandler:^(NSError * _Nullable err) {
                  NSLog(@"Move hue up command Error: %@", err);
 
-                 XCTAssertEqual(err.code, 0);
+                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                  [expectation fulfill];
              }];
@@ -4500,7 +4502,7 @@ CHIPDevice * GetConnectedDevice()
              completionHandler:^(NSError * _Nullable err) {
                  NSLog(@"Move hue stop command Error: %@", err);
 
-                 XCTAssertEqual(err.code, 0);
+                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                  [expectation fulfill];
              }];
@@ -4525,7 +4527,7 @@ CHIPDevice * GetConnectedDevice()
              completionHandler:^(NSError * _Nullable err) {
                  NSLog(@"Move hue down command Error: %@", err);
 
-                 XCTAssertEqual(err.code, 0);
+                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                  [expectation fulfill];
              }];
@@ -4550,7 +4552,7 @@ CHIPDevice * GetConnectedDevice()
              completionHandler:^(NSError * _Nullable err) {
                  NSLog(@"Move hue stop command Error: %@", err);
 
-                 XCTAssertEqual(err.code, 0);
+                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                  [expectation fulfill];
              }];
@@ -4569,7 +4571,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -4588,7 +4590,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4613,7 +4615,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -4632,7 +4634,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4663,7 +4665,7 @@ CHIPDevice * GetConnectedDevice()
              completionHandler:^(NSError * _Nullable err) {
                  NSLog(@"Step hue up command Error: %@", err);
 
-                 XCTAssertEqual(err.code, 0);
+                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                  [expectation fulfill];
              }];
@@ -4689,7 +4691,7 @@ CHIPDevice * GetConnectedDevice()
              completionHandler:^(NSError * _Nullable err) {
                  NSLog(@"Step hue down command Error: %@", err);
 
-                 XCTAssertEqual(err.code, 0);
+                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                  [expectation fulfill];
              }];
@@ -4708,7 +4710,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -4727,7 +4729,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4752,7 +4754,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -4771,7 +4773,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4801,7 +4803,7 @@ CHIPDevice * GetConnectedDevice()
                       completionHandler:^(NSError * _Nullable err) {
                           NSLog(@"Move to saturation command Error: %@", err);
 
-                          XCTAssertEqual(err.code, 0);
+                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                           [expectation fulfill];
                       }];
@@ -4820,7 +4822,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -4839,7 +4841,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4864,7 +4866,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -4883,7 +4885,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -4913,7 +4915,7 @@ CHIPDevice * GetConnectedDevice()
                     completionHandler:^(NSError * _Nullable err) {
                         NSLog(@"Move saturation up command Error: %@", err);
 
-                        XCTAssertEqual(err.code, 0);
+                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                         [expectation fulfill];
                     }];
@@ -4938,7 +4940,7 @@ CHIPDevice * GetConnectedDevice()
                     completionHandler:^(NSError * _Nullable err) {
                         NSLog(@"Move saturation down command Error: %@", err);
 
-                        XCTAssertEqual(err.code, 0);
+                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                         [expectation fulfill];
                     }];
@@ -4957,7 +4959,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -4976,7 +4978,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5001,7 +5003,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5020,7 +5022,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5051,7 +5053,7 @@ CHIPDevice * GetConnectedDevice()
                     completionHandler:^(NSError * _Nullable err) {
                         NSLog(@"Step saturation up command Error: %@", err);
 
-                        XCTAssertEqual(err.code, 0);
+                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                         [expectation fulfill];
                     }];
@@ -5077,7 +5079,7 @@ CHIPDevice * GetConnectedDevice()
                     completionHandler:^(NSError * _Nullable err) {
                         NSLog(@"Step saturation down command Error: %@", err);
 
-                        XCTAssertEqual(err.code, 0);
+                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                         [expectation fulfill];
                     }];
@@ -5096,7 +5098,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5115,7 +5117,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5140,7 +5142,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5159,7 +5161,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5190,7 +5192,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Move To current hue and saturation command Error: %@", err);
 
-                                XCTAssertEqual(err.code, 0);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                 [expectation fulfill];
                             }];
@@ -5209,7 +5211,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5228,7 +5230,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5253,7 +5255,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5272,7 +5274,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5303,7 +5305,7 @@ CHIPDevice * GetConnectedDevice()
                  completionHandler:^(NSError * _Nullable err) {
                      NSLog(@"Move to Color command Error: %@", err);
 
-                     XCTAssertEqual(err.code, 0);
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                      [expectation fulfill];
                  }];
@@ -5322,7 +5324,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5341,7 +5343,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5366,7 +5368,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5385,7 +5387,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5415,7 +5417,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(NSError * _Nullable err) {
                    NSLog(@"Move Color command Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    [expectation fulfill];
                }];
@@ -5438,7 +5440,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Stop Move Step command Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -5457,7 +5459,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5476,7 +5478,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5501,7 +5503,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5520,7 +5522,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5551,7 +5553,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(NSError * _Nullable err) {
                    NSLog(@"Step Color command Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    [expectation fulfill];
                }];
@@ -5570,7 +5572,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5589,7 +5591,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5614,7 +5616,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5633,7 +5635,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5663,7 +5665,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Move To Color Temperature command Error: %@", err);
 
-                                XCTAssertEqual(err.code, 0);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                 [expectation fulfill];
                             }];
@@ -5682,7 +5684,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5701,7 +5703,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5726,7 +5728,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5745,7 +5747,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5777,7 +5779,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Move up color temperature command Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -5804,7 +5806,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Stop Color Temperature command Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -5831,7 +5833,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Move down color temperature command Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -5850,7 +5852,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5869,7 +5871,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5894,7 +5896,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -5913,7 +5915,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -5946,7 +5948,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Step up color temperature command Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -5974,7 +5976,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Step down color temperature command Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -5993,7 +5995,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -6012,7 +6014,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6037,7 +6039,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -6056,7 +6058,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6087,7 +6089,7 @@ CHIPDevice * GetConnectedDevice()
                        completionHandler:^(NSError * _Nullable err) {
                            NSLog(@"Enhanced Move To Hue command Error: %@", err);
 
-                           XCTAssertEqual(err.code, 0);
+                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                            [expectation fulfill];
                        }];
@@ -6107,7 +6109,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeRemainingTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check Remaining time attribute value matched the value sent by the last command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6131,7 +6133,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -6150,7 +6152,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6175,7 +6177,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -6194,7 +6196,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6224,7 +6226,7 @@ CHIPDevice * GetConnectedDevice()
                      completionHandler:^(NSError * _Nullable err) {
                          NSLog(@"Enhanced Move Hue Down command  Error: %@", err);
 
-                         XCTAssertEqual(err.code, 0);
+                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                          [expectation fulfill];
                      }];
@@ -6249,7 +6251,7 @@ CHIPDevice * GetConnectedDevice()
                      completionHandler:^(NSError * _Nullable err) {
                          NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
 
-                         XCTAssertEqual(err.code, 0);
+                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                          [expectation fulfill];
                      }];
@@ -6274,7 +6276,7 @@ CHIPDevice * GetConnectedDevice()
                      completionHandler:^(NSError * _Nullable err) {
                          NSLog(@"Enhanced Move Hue Up command Error: %@", err);
 
-                         XCTAssertEqual(err.code, 0);
+                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                          [expectation fulfill];
                      }];
@@ -6299,7 +6301,7 @@ CHIPDevice * GetConnectedDevice()
                      completionHandler:^(NSError * _Nullable err) {
                          NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
 
-                         XCTAssertEqual(err.code, 0);
+                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                          [expectation fulfill];
                      }];
@@ -6318,7 +6320,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -6337,7 +6339,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6362,7 +6364,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -6381,7 +6383,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6412,7 +6414,7 @@ CHIPDevice * GetConnectedDevice()
                      completionHandler:^(NSError * _Nullable err) {
                          NSLog(@"Enhanced Step Hue Up command Error: %@", err);
 
-                         XCTAssertEqual(err.code, 0);
+                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                          [expectation fulfill];
                      }];
@@ -6438,7 +6440,7 @@ CHIPDevice * GetConnectedDevice()
                      completionHandler:^(NSError * _Nullable err) {
                          NSLog(@"Enhanced Step Hue Down command Error: %@", err);
 
-                         XCTAssertEqual(err.code, 0);
+                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                          [expectation fulfill];
                      }];
@@ -6457,7 +6459,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -6476,7 +6478,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6501,7 +6503,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -6520,7 +6522,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6551,7 +6553,7 @@ CHIPDevice * GetConnectedDevice()
                                     completionHandler:^(NSError * _Nullable err) {
                                         NSLog(@"Enhanced move to hue and saturation command Error: %@", err);
 
-                                        XCTAssertEqual(err.code, 0);
+                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                         [expectation fulfill];
                                     }];
@@ -6570,7 +6572,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -6589,7 +6591,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6614,7 +6616,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -6633,7 +6635,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6666,7 +6668,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Set all Attributs Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -6685,7 +6687,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check ColorLoopDirection Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6709,7 +6711,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check ColorLoopTime Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6733,7 +6735,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopStartEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check ColorLoopStartEnhancedHue Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6757,7 +6759,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check ColorLoopActive Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6790,7 +6792,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -6809,7 +6811,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check ColorLoopActive Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6843,7 +6845,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Set direction and time while running Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -6862,7 +6864,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check ColorLoopDirection Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6886,7 +6888,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check ColorLoopTime Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6919,7 +6921,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Set direction while running Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -6938,7 +6940,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check ColorLoopDirection Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -6962,7 +6964,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -6981,7 +6983,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7006,7 +7008,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Precondition : Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -7025,7 +7027,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7058,7 +7060,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7077,7 +7079,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7110,7 +7112,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7129,7 +7131,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopDirection attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7162,7 +7164,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7181,7 +7183,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7214,7 +7216,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7233,7 +7235,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopStartEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopStartEnhancedHue attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7266,7 +7268,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7285,7 +7287,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7318,7 +7320,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7337,7 +7339,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7370,7 +7372,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7389,7 +7391,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopDirection attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7422,7 +7424,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7441,7 +7443,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7474,7 +7476,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7493,7 +7495,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7524,7 +7526,7 @@ CHIPDevice * GetConnectedDevice()
                        completionHandler:^(NSError * _Nullable err) {
                            NSLog(@"Enhanced Move To Hue command 10 Error: %@", err);
 
-                           XCTAssertEqual(err.code, 0);
+                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                            [expectation fulfill];
                        }];
@@ -7551,7 +7553,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read EnhancedCurrentHue attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7584,7 +7586,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7603,7 +7605,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopDirection attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7636,7 +7638,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7655,7 +7657,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7688,7 +7690,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7707,7 +7709,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7740,7 +7742,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7759,7 +7761,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopDirection attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7792,7 +7794,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7811,7 +7813,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7844,7 +7846,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7863,7 +7865,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7887,7 +7889,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn Off light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -7907,7 +7909,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Precondition: Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -7927,7 +7929,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Precondition: Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -7960,7 +7962,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -7979,7 +7981,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8003,7 +8005,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopDirection attribute from DUT. Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8027,7 +8029,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopTime attribute from DUT. Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8051,7 +8053,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopStartEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopStartEnhancedHue attribute from DUT. Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8084,7 +8086,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -8103,7 +8105,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT. Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8136,7 +8138,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -8155,7 +8157,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopDirection attribute from DUT. Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8188,7 +8190,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -8207,7 +8209,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8231,7 +8233,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -8251,7 +8253,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Precondition: Turn on light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -8271,7 +8273,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Precondition: Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8304,7 +8306,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -8323,7 +8325,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8347,7 +8349,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopDirection attribute from DUT. Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8371,7 +8373,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopTime attribute from DUT. Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8395,7 +8397,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopStartEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopStartEnhancedHue attribute from DUT. Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8428,7 +8430,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Set all Attributes Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -8447,7 +8449,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT. Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8480,7 +8482,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -8499,7 +8501,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopTime attribute from DUT. Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8532,7 +8534,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -8551,7 +8553,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8575,7 +8577,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light for color control tests Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -8595,7 +8597,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInteractionModelVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query Interaction Model Version Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -8614,7 +8616,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeVendorNameWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query Vendor Name Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8638,7 +8640,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeVendorIDWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query VendorID Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -8657,7 +8659,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeProductNameWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query Product Name Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8681,7 +8683,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeProductIDWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query ProductID Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -8700,7 +8702,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNodeLabelWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query Node Label Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8724,7 +8726,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeLocationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query User Location Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8748,7 +8750,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeHardwareVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query HardwareVersion Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -8767,7 +8769,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeHardwareVersionStringWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query HardwareVersionString Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8795,7 +8797,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeSoftwareVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query SoftwareVersion Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -8814,7 +8816,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeSoftwareVersionStringWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query SoftwareVersionString Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8847,7 +8849,7 @@ CHIPDevice * GetConnectedDevice()
             return;
         }
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8880,7 +8882,7 @@ CHIPDevice * GetConnectedDevice()
             return;
         }
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8909,7 +8911,7 @@ CHIPDevice * GetConnectedDevice()
             return;
         }
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8938,7 +8940,7 @@ CHIPDevice * GetConnectedDevice()
             return;
         }
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8967,7 +8969,7 @@ CHIPDevice * GetConnectedDevice()
             return;
         }
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -8996,7 +8998,7 @@ CHIPDevice * GetConnectedDevice()
             return;
         }
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -9020,7 +9022,7 @@ CHIPDevice * GetConnectedDevice()
             return;
         }
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -9044,7 +9046,7 @@ CHIPDevice * GetConnectedDevice()
             return;
         }
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9069,7 +9071,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9098,7 +9100,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -9116,7 +9118,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9146,7 +9148,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -9165,7 +9167,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: MeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -9184,7 +9186,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: MinMeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -9203,7 +9205,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: MaxMeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -9226,7 +9228,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"write the default value to optional attribute: MinMeasuredValue Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 1);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                        [expectation fulfill];
                                    }];
 
@@ -9248,7 +9250,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"write the default value to optional attribute: MaxMeasuredValue Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 1);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                        [expectation fulfill];
                                    }];
 
@@ -9266,7 +9268,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: MeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -9285,7 +9287,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: MinMeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -9304,7 +9306,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: MaxMeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -9324,7 +9326,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: MeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -9343,7 +9345,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: MeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -9365,7 +9367,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9396,7 +9398,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -9416,7 +9418,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9446,7 +9448,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -9465,7 +9467,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads current Level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9495,7 +9497,7 @@ CHIPDevice * GetConnectedDevice()
                  completionHandler:^(NSError * _Nullable err) {
                      NSLog(@"sends a Move to level command Error: %@", err);
 
-                     XCTAssertEqual(err.code, 0);
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                      [expectation fulfill];
                  }];
@@ -9522,7 +9524,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads current Level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9552,7 +9554,7 @@ CHIPDevice * GetConnectedDevice()
                  completionHandler:^(NSError * _Nullable err) {
                      NSLog(@"sends a Move to level command Error: %@", err);
 
-                     XCTAssertEqual(err.code, 0);
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                      [expectation fulfill];
                  }];
@@ -9579,7 +9581,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads current Level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9603,7 +9605,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffTransitionTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads On Off Transition Time attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9633,7 +9635,7 @@ CHIPDevice * GetConnectedDevice()
                  completionHandler:^(NSError * _Nullable err) {
                      NSLog(@"sends a Move to level command Error: %@", err);
 
-                     XCTAssertEqual(err.code, 0);
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                      [expectation fulfill];
                  }];
@@ -9660,7 +9662,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads current Level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9690,7 +9692,7 @@ CHIPDevice * GetConnectedDevice()
                  completionHandler:^(NSError * _Nullable err) {
                      NSLog(@"Reset level to 0 Error: %@", err);
 
-                     XCTAssertEqual(err.code, 0);
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                      [expectation fulfill];
                  }];
@@ -9718,7 +9720,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads current level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9742,7 +9744,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads max level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9772,7 +9774,7 @@ CHIPDevice * GetConnectedDevice()
           completionHandler:^(NSError * _Nullable err) {
               NSLog(@"sends a Move up command Error: %@", err);
 
-              XCTAssertEqual(err.code, 0);
+              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
               [expectation fulfill];
           }];
@@ -9799,7 +9801,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads current level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9823,7 +9825,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads min level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9853,7 +9855,7 @@ CHIPDevice * GetConnectedDevice()
           completionHandler:^(NSError * _Nullable err) {
               NSLog(@"sends a Move down command Error: %@", err);
 
-              XCTAssertEqual(err.code, 0);
+              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
               [expectation fulfill];
           }];
@@ -9880,7 +9882,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads current level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9907,7 +9909,7 @@ CHIPDevice * GetConnectedDevice()
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write default move rate attribute from DUT Error: %@", err);
 
-                                      XCTAssertEqual(err.code, 0);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       [expectation fulfill];
                                   }];
@@ -9926,7 +9928,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeDefaultMoveRateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads default move rate attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -9956,7 +9958,7 @@ CHIPDevice * GetConnectedDevice()
           completionHandler:^(NSError * _Nullable err) {
               NSLog(@"sends a Move up command at default move rate Error: %@", err);
 
-              XCTAssertEqual(err.code, 0);
+              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
               [expectation fulfill];
           }];
@@ -9983,7 +9985,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads current level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10008,7 +10010,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Sending on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -10034,7 +10036,7 @@ CHIPDevice * GetConnectedDevice()
           completionHandler:^(NSError * _Nullable err) {
               NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
 
-              XCTAssertEqual(err.code, 0);
+              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
               [expectation fulfill];
           }];
@@ -10061,7 +10063,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads current level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10092,7 +10094,7 @@ CHIPDevice * GetConnectedDevice()
           completionHandler:^(NSError * _Nullable err) {
               NSLog(@"Sends step down command to DUT Error: %@", err);
 
-              XCTAssertEqual(err.code, 0);
+              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
               [expectation fulfill];
           }];
@@ -10119,7 +10121,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads current level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10150,7 +10152,7 @@ CHIPDevice * GetConnectedDevice()
           completionHandler:^(NSError * _Nullable err) {
               NSLog(@"Sends a Step up command Error: %@", err);
 
-              XCTAssertEqual(err.code, 0);
+              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
               [expectation fulfill];
           }];
@@ -10177,7 +10179,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads current level attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10201,7 +10203,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Sending off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -10221,7 +10223,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Sending on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -10247,7 +10249,7 @@ CHIPDevice * GetConnectedDevice()
           completionHandler:^(NSError * _Nullable err) {
               NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
 
-              XCTAssertEqual(err.code, 0);
+              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
               [expectation fulfill];
           }];
@@ -10280,7 +10282,7 @@ CHIPDevice * GetConnectedDevice()
           completionHandler:^(NSError * _Nullable err) {
               NSLog(@"Sends a move up command to DUT Error: %@", err);
 
-              XCTAssertEqual(err.code, 0);
+              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
               [expectation fulfill];
           }];
@@ -10311,7 +10313,7 @@ CHIPDevice * GetConnectedDevice()
           completionHandler:^(NSError * _Nullable err) {
               NSLog(@"Sends stop command to DUT Error: %@", err);
 
-              XCTAssertEqual(err.code, 0);
+              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
               [expectation fulfill];
           }];
@@ -10330,7 +10332,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Sending off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -10357,7 +10359,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -10376,7 +10378,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster sleepWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Put the device into low power mode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -10396,7 +10398,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10425,7 +10427,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -10444,7 +10446,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupancyWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attribute constrains: Occupancy Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10472,7 +10474,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Writes the respective default value to mandatory attribute: Occupancy Error: %@", err);
 
-                                XCTAssertEqual(err.code, 1);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                 [expectation fulfill];
                             }];
 
@@ -10490,7 +10492,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupancyWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: Occupancy Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10515,7 +10517,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupancySensorTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attribute constrains: OccupancySensorType Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10545,7 +10547,7 @@ CHIPDevice * GetConnectedDevice()
                                                 @"Error: %@",
                                               err);
 
-                                          XCTAssertEqual(err.code, 1);
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                           [expectation fulfill];
                                       }];
 
@@ -10563,7 +10565,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupancySensorTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: OccupancySensorType Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10588,7 +10590,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupancySensorTypeBitmapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attribute constrains: OccupancySensorTypeBitmap Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10622,7 +10624,7 @@ CHIPDevice * GetConnectedDevice()
                                                       @"OccupancySensorTypeBitmap Error: %@",
                                                     err);
 
-                                                XCTAssertEqual(err.code, 1);
+                                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                 [expectation fulfill];
                                             }];
 
@@ -10641,7 +10643,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupancySensorTypeBitmapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: OccupancySensorTypeBitmap Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10666,7 +10668,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupancyWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads Occupancy attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -10685,7 +10687,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupancyWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads Occupancy attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -10705,7 +10707,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10734,7 +10736,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -10752,7 +10754,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10776,7 +10778,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional global attribute: FeatureMap Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10804,7 +10806,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to optional global attribute: FeatureMap Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -10822,7 +10824,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads back optional global attribute: FeatureMap Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10847,7 +10849,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: OnOff Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10871,7 +10873,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads back mandatory attribute: OnOff Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10895,7 +10897,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeGlobalSceneControlWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read LT attribute: GlobalSceneControl Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10919,7 +10921,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read LT attribute: OnTime Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10943,7 +10945,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOffWaitTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read LT attribute: OffWaitTime Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10967,7 +10969,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStartUpOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read LT attribute: StartUpOnOff Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -10994,7 +10996,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"write the default value to LT attribute: OnTime Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -11016,7 +11018,7 @@ CHIPDevice * GetConnectedDevice()
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"write the default value to LT attribute: OffWaitTime Error: %@", err);
 
-                                  XCTAssertEqual(err.code, 0);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                   [expectation fulfill];
                               }];
@@ -11038,7 +11040,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"write the default value to LT attribute: StartUpOnOff Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 0);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                    [expectation fulfill];
                                }];
@@ -11057,7 +11059,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads back LT attribute: OnTime Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11081,7 +11083,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOffWaitTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads back LT attribute: OffWaitTime Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11105,7 +11107,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStartUpOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads back LT attribute: StartUpOnOff Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11130,7 +11132,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11149,7 +11151,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11173,7 +11175,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11192,7 +11194,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11216,7 +11218,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11235,7 +11237,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11259,7 +11261,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster toggleWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Toggle Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11279,7 +11281,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after toggle command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11303,7 +11305,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster toggleWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Toggle Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11323,7 +11325,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after toggle command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11347,7 +11349,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11366,7 +11368,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11390,7 +11392,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11409,7 +11411,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11434,7 +11436,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11461,7 +11463,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnOff attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11485,7 +11487,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeGlobalSceneControlWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads GlobalSceneControl attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11509,7 +11511,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11536,7 +11538,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnOff attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11560,7 +11562,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeGlobalSceneControlWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads GlobalSceneControl attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11584,7 +11586,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11611,7 +11613,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnOff attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11635,7 +11637,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeGlobalSceneControlWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads GlobalSceneControl attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11659,7 +11661,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11683,7 +11685,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOffWaitTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OffWaitTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11707,7 +11709,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11726,7 +11728,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnOff attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11750,7 +11752,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11774,7 +11776,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOffWaitTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OffWaitTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11798,7 +11800,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11817,7 +11819,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnOff attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11841,7 +11843,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11865,7 +11867,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnOff attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11889,7 +11891,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11913,7 +11915,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOffWaitTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OffWaitTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11937,7 +11939,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -11956,7 +11958,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -11980,7 +11982,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOffWaitTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OffWaitTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12004,7 +12006,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12023,7 +12025,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnOff attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12047,7 +12049,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12071,7 +12073,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnOff attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12095,7 +12097,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12119,7 +12121,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12138,7 +12140,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnOff attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12162,7 +12164,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12186,7 +12188,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOffWaitTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OffWaitTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12210,7 +12212,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12229,7 +12231,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnOff attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12253,7 +12255,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12277,7 +12279,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnOff attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12301,7 +12303,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12325,7 +12327,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOffWaitTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OffWaitTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12349,7 +12351,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnOff attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12373,7 +12375,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OnTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12397,7 +12399,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOffWaitTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads OffWaitTime attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12421,7 +12423,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12441,7 +12443,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12465,7 +12467,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12489,7 +12491,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -12507,7 +12509,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12532,7 +12534,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute constraints: MeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12555,7 +12557,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write the default values to mandatory attribute: MeasuredValue Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 1);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                     [expectation fulfill];
                                 }];
 
@@ -12573,7 +12575,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: MeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12598,7 +12600,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute constraints: MinMeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12621,7 +12623,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"Write the default values to mandatory attribute: MinMeasuredValue Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 1);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                        [expectation fulfill];
                                    }];
 
@@ -12639,7 +12641,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: MinMeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12664,7 +12666,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute constraints: MaxMeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12687,7 +12689,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"Write the default values to mandatory attribute: MaxMeasuredValue Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 1);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                        [expectation fulfill];
                                    }];
 
@@ -12705,7 +12707,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back mandatory attribute: MaxMeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -12737,7 +12739,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -12758,7 +12760,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: MaxPressure Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12779,7 +12781,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEffectiveOperationModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: EffectiveOperationMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12800,7 +12802,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEffectiveControlModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: EffectiveControlMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12821,7 +12823,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCapacityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: Capacity Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12842,7 +12844,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: MaxPressure Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12863,7 +12865,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEffectiveOperationModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: EffectiveOperationMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12884,7 +12886,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEffectiveControlModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: EffectiveControlMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12905,7 +12907,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCapacityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: Capacity Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -12931,7 +12933,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write 1 to the OperationMode attribute to DUT: OperationMode Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -12956,7 +12958,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write 2 to the OperationMode attribute to DUT: OperationMode Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -12981,7 +12983,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write 3 to the OperationMode attribute to DUT: OperationMode Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -13006,7 +13008,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write 0 to the OperationMode attribute to DUT Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -13027,7 +13029,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEffectiveOperationModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the attribute: EffectiveOperationMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13059,7 +13061,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -13080,7 +13082,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of attribute: MeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -13101,7 +13103,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of attribute: MinMeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13128,7 +13130,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads MeasuredValue attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -13149,7 +13151,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: MeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -13171,7 +13173,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13202,7 +13204,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -13222,7 +13224,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13249,7 +13251,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: MeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -13271,7 +13273,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads MeasuredValue attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -13292,7 +13294,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the mandatory attribute: MeasuredValue Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -13317,7 +13319,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -13337,7 +13339,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeLocalTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: LocalTemperature Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -13357,7 +13359,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeAbsMinHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attributes from DUT: AbsMinHeatSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13382,7 +13384,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeAbsMinHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: AbsMinHeatSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13416,7 +13418,7 @@ CHIPDevice * GetConnectedDevice()
                                                     @"AbsMinHeatSetpointLimit Error: %@",
                                                   err);
 
-                                              XCTAssertEqual(err.code, 1);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                               [expectation fulfill];
                                           }];
 
@@ -13435,7 +13437,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeAbsMinHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back mandatory attributes from DUT: AbsMinHeatSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13460,7 +13462,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeAbsMaxHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attributes from DUT: AbsMaxHeatSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13485,7 +13487,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeAbsMaxHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: AbsMaxHeatSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13519,7 +13521,7 @@ CHIPDevice * GetConnectedDevice()
                                                     @"AbsMaxHeatSetpointLimit Error: %@",
                                                   err);
 
-                                              XCTAssertEqual(err.code, 1);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                               [expectation fulfill];
                                           }];
 
@@ -13538,7 +13540,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeAbsMaxHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back mandatory attributes from DUT: AbsMaxHeatSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13563,7 +13565,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeAbsMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attributes from DUT: AbsMinCoolSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13588,7 +13590,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeAbsMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: AbsMinCoolSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13622,7 +13624,7 @@ CHIPDevice * GetConnectedDevice()
                                                     @"AbsMinCoolSetpointLimit Error: %@",
                                                   err);
 
-                                              XCTAssertEqual(err.code, 1);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                               [expectation fulfill];
                                           }];
 
@@ -13641,7 +13643,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeAbsMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back mandatory attributes from DUT: AbsMinCoolSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13666,7 +13668,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeAbsMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attributes from DUT: AbsMaxCoolSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13691,7 +13693,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeAbsMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: AbsMaxCoolSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13725,7 +13727,7 @@ CHIPDevice * GetConnectedDevice()
                                                     @"AbsMaxCoolSetpointLimit Error: %@",
                                                   err);
 
-                                              XCTAssertEqual(err.code, 1);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                               [expectation fulfill];
                                           }];
 
@@ -13744,7 +13746,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeAbsMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back mandatory attributes from DUT: AbsMaxCoolSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13769,7 +13771,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupiedCoolingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attributes from DUT: OccupiedCoolingSetpoint Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13794,7 +13796,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupiedCoolingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: OccupiedCoolingSetpoint Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13828,7 +13830,7 @@ CHIPDevice * GetConnectedDevice()
                                                     @"OccupiedCoolingSetpoint Error: %@",
                                                   err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -13848,7 +13850,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupiedCoolingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back mandatory attributes from DUT: OccupiedCoolingSetpoint Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13873,7 +13875,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupiedHeatingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attributes from DUT: OccupiedHeatingSetpoint Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13898,7 +13900,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupiedHeatingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: OccupiedHeatingSetpoint Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13932,7 +13934,7 @@ CHIPDevice * GetConnectedDevice()
                                                     @"OccupiedHeatingSetpoint Error: %@",
                                                   err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -13952,7 +13954,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupiedHeatingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back mandatory attributes from DUT: OccupiedHeatingSetpoint Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -13977,7 +13979,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attributes from DUT: MinHeatSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14002,7 +14004,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: MinHeatSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14036,7 +14038,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"MinHeatSetpointLimit Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -14056,7 +14058,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back mandatory attributes from DUT: MinHeatSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14081,7 +14083,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attributes from DUT: MaxHeatSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14106,7 +14108,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: MaxHeatSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14140,7 +14142,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"MaxHeatSetpointLimit Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -14160,7 +14162,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back mandatory attributes from DUT: MaxHeatSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14185,7 +14187,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attributes from DUT: MinCoolSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14210,7 +14212,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: MinCoolSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14244,7 +14246,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"MinCoolSetpointLimit Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -14264,7 +14266,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back mandatory attributes from DUT: MinCoolSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14289,7 +14291,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attributes from DUT: MaxCoolSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14314,7 +14316,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: MaxCoolSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14348,7 +14350,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"MaxCoolSetpointLimit Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -14368,7 +14370,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back mandatory attributes from DUT: MaxCoolSetpointLimit Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14393,7 +14395,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeControlSequenceOfOperationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attributes from DUT: ControlSequenceOfOperation Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14418,7 +14420,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeControlSequenceOfOperationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: ControlSequenceOfOperation Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14449,7 +14451,7 @@ CHIPDevice * GetConnectedDevice()
                                                        @"ControlSequenceOfOperation Error: %@",
                                                      err);
 
-                                                 XCTAssertEqual(err.code, 0);
+                                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                                  [expectation fulfill];
                                              }];
@@ -14469,7 +14471,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeControlSequenceOfOperationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back mandatory attributes from DUT: ControlSequenceOfOperation Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14493,7 +14495,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeSystemModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads mandatory attributes from DUT: SystemMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14518,7 +14520,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeSystemModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of mandatory attributes from DUT: SystemMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14547,7 +14549,7 @@ CHIPDevice * GetConnectedDevice()
                         completionHandler:^(NSError * _Nullable err) {
                             NSLog(@"Writes the respective default value to mandatory attributes to DUT: SystemMode Error: %@", err);
 
-                            XCTAssertEqual(err.code, 0);
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                             [expectation fulfill];
                         }];
@@ -14566,7 +14568,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeSystemModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back mandatory attributes from DUT: SystemMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14590,7 +14592,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinSetpointDeadBandWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads optional attributes from DUT: MinSetpointDeadBand Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14615,7 +14617,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinSetpointDeadBandWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of optional attributes from DUT: MinSetpointDeadBand Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14645,7 +14647,7 @@ CHIPDevice * GetConnectedDevice()
                                                 @"MinSetpointDeadBand Error: %@",
                                               err);
 
-                                          XCTAssertEqual(err.code, 0);
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                           [expectation fulfill];
                                       }];
@@ -14665,7 +14667,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinSetpointDeadBandWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back optional attributes from DUT: MinSetpointDeadBand Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14690,7 +14692,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStartOfWeekWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of optional attributes from DUT: StartOfWeek Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14719,7 +14721,7 @@ CHIPDevice * GetConnectedDevice()
                                   NSLog(@"Writes the respective default value to optional attributes to DUT: StartOfWeek Error: %@",
                                       err);
 
-                                  XCTAssertEqual(err.code, 1);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                   [expectation fulfill];
                               }];
 
@@ -14737,7 +14739,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStartOfWeekWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back optional attributes from DUT: StartOfWeek Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14762,7 +14764,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNumberOfWeeklyTransitionsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of optional attributes from DUT: NumberOfWeeklyTransitions Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -14787,7 +14789,7 @@ CHIPDevice * GetConnectedDevice()
                                                       @"NumberOfWeeklyTransitions Error: %@",
                                                     err);
 
-                                                XCTAssertEqual(err.code, 1);
+                                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                 [expectation fulfill];
                                             }];
 
@@ -14806,7 +14808,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNumberOfDailyTransitionsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of optional attributes from DUT: NumberOfDailyTransitions Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -14831,7 +14833,7 @@ CHIPDevice * GetConnectedDevice()
                                                      @"NumberOfDailyTransitions Error: %@",
                                                    err);
 
-                                               XCTAssertEqual(err.code, 1);
+                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                [expectation fulfill];
                                            }];
 
@@ -14853,7 +14855,7 @@ CHIPDevice * GetConnectedDevice()
         NSLog(
             @"Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies that the value is within range Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14883,7 +14885,7 @@ CHIPDevice * GetConnectedDevice()
                                                     @"attribute Error: %@",
                                                   err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -14903,7 +14905,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupiedCoolingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads it back again to confirm the successful write of OccupiedCoolingSetpoint attribute Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -14933,7 +14935,7 @@ CHIPDevice * GetConnectedDevice()
                                                     @"attribute Error: %@",
                                                   err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -14958,7 +14960,7 @@ CHIPDevice * GetConnectedDevice()
                                                     @"attribute Error: %@",
                                                   err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -14980,7 +14982,7 @@ CHIPDevice * GetConnectedDevice()
         NSLog(
             @"Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies that the value is within range Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -15010,7 +15012,7 @@ CHIPDevice * GetConnectedDevice()
                                                     @"attribute Error: %@",
                                                   err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -15030,7 +15032,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOccupiedHeatingSetpointWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads it back again to confirm the successful write of OccupiedHeatingSetpoint attribute Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -15060,7 +15062,7 @@ CHIPDevice * GetConnectedDevice()
                                                     @"attribute Error: %@",
                                                   err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -15085,7 +15087,7 @@ CHIPDevice * GetConnectedDevice()
                                                     @"attribute Error: %@",
                                                   err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -15106,7 +15108,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads MinHeatSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -15136,7 +15138,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"attribute Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15156,7 +15158,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads it back again to confirm the successful write of MinHeatSetpointLimit attribute Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -15186,7 +15188,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15211,7 +15213,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15232,7 +15234,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads MaxHeatSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -15262,7 +15264,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"attribute Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15282,7 +15284,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxHeatSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads it back again to confirm the successful write of MaxHeatSetpointLimit attribute Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -15312,7 +15314,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15337,7 +15339,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15358,7 +15360,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads MinCoolSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -15388,7 +15390,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"attribute Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15408,7 +15410,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMinCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads it back again to confirm the successful write of MinCoolSetpointLimit attribute Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -15438,7 +15440,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15463,7 +15465,7 @@ CHIPDevice * GetConnectedDevice()
                                       NSLog(@"Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute Error: %@",
                                           err);
 
-                                      XCTAssertEqual(err.code, 0);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       [expectation fulfill];
                                   }];
@@ -15484,7 +15486,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads MaxCoolSetpointLimit attribute from Server DUT and verifies that the value is within range Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -15514,7 +15516,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"attribute Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15534,7 +15536,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeMaxCoolSetpointLimitWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads it back again to confirm the successful write of MaxCoolSetpointLimit attribute Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -15564,7 +15566,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15589,7 +15591,7 @@ CHIPDevice * GetConnectedDevice()
                                       NSLog(@"Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute Error: %@",
                                           err);
 
-                                      XCTAssertEqual(err.code, 0);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       [expectation fulfill];
                                   }];
@@ -15614,7 +15616,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"attribute Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15639,7 +15641,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"attribute Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15664,7 +15666,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"attribute Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15689,7 +15691,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"attribute Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15714,7 +15716,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"attribute Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15739,7 +15741,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"attribute Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15764,7 +15766,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"attribute Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15789,7 +15791,7 @@ CHIPDevice * GetConnectedDevice()
                                                  @"attribute Error: %@",
                                                err);
 
-                                           XCTAssertEqual(err.code, 0);
+                                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                            [expectation fulfill];
                                        }];
@@ -15809,7 +15811,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeControlSequenceOfOperationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads ControlSequenceOfOperation from Server DUT and verifies that the value is valid Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -15839,7 +15841,7 @@ CHIPDevice * GetConnectedDevice()
                                                        @"value Error: %@",
                                                      err);
 
-                                                 XCTAssertEqual(err.code, 0);
+                                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                                  [expectation fulfill];
                                              }];
@@ -15858,7 +15860,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeControlSequenceOfOperationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read it back again to confirm the successful write Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -15885,7 +15887,7 @@ CHIPDevice * GetConnectedDevice()
                                           completionHandler:^(NSError * _Nullable err) {
                                               NSLog(@"Sets OccupiedHeatingSetpoint to default value Error: %@", err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -15907,7 +15909,7 @@ CHIPDevice * GetConnectedDevice()
                                           completionHandler:^(NSError * _Nullable err) {
                                               NSLog(@"Sets OccupiedHeatingSetpoint to default value Error: %@", err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -15929,7 +15931,7 @@ CHIPDevice * GetConnectedDevice()
                                           completionHandler:^(NSError * _Nullable err) {
                                               NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -15951,7 +15953,7 @@ CHIPDevice * GetConnectedDevice()
                                           completionHandler:^(NSError * _Nullable err) {
                                               NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -15973,7 +15975,7 @@ CHIPDevice * GetConnectedDevice()
                                           completionHandler:^(NSError * _Nullable err) {
                                               NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -15995,7 +15997,7 @@ CHIPDevice * GetConnectedDevice()
                                           completionHandler:^(NSError * _Nullable err) {
                                               NSLog(@"Sets OccupiedHeatingSetpoint to default value Error: %@", err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -16017,7 +16019,7 @@ CHIPDevice * GetConnectedDevice()
                                           completionHandler:^(NSError * _Nullable err) {
                                               NSLog(@"Sets OccupiedCoolingSetpoint to default value Error: %@", err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -16039,7 +16041,7 @@ CHIPDevice * GetConnectedDevice()
                                           completionHandler:^(NSError * _Nullable err) {
                                               NSLog(@"Sets OccupiedHeatingSetpoint to default value Error: %@", err);
 
-                                              XCTAssertEqual(err.code, 0);
+                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                               [expectation fulfill];
                                           }];
@@ -16065,7 +16067,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -16085,7 +16087,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeTemperatureDisplayModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: TemperatureDisplayMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16110,7 +16112,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeTemperatureDisplayModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: TemperatureDisplayMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -16133,7 +16135,7 @@ CHIPDevice * GetConnectedDevice()
                                          completionHandler:^(NSError * _Nullable err) {
                                              NSLog(@"write to the mandatory attribute: TemperatureDisplayMode Error: %@", err);
 
-                                             XCTAssertEqual(err.code, 0);
+                                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                              [expectation fulfill];
                                          }];
@@ -16153,7 +16155,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeTemperatureDisplayModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: TemperatureDisplayMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16178,7 +16180,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeTemperatureDisplayModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: TemperatureDisplayMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -16198,7 +16200,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeKeypadLockoutWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: KeypadLockout Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16223,7 +16225,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeKeypadLockoutWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: KeypadLockout Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -16246,7 +16248,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"write to the mandatory attribute: KeypadLockout Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -16266,7 +16268,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeKeypadLockoutWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: KeypadLockout Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16291,7 +16293,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeKeypadLockoutWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the mandatory attribute: KeypadLockout Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -16313,7 +16315,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeScheduleProgrammingVisibilityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"read the optional attribute: ScheduleProgrammingVisibility Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -16340,7 +16342,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeScheduleProgrammingVisibilityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"read the optional attribute: ScheduleProgrammingVisibility Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             [expectation fulfill];
         }];
@@ -16366,7 +16368,7 @@ CHIPDevice * GetConnectedDevice()
                                                NSLog(@"write to the mandatory attribute: ScheduleProgrammingVisibility Error: %@",
                                                    err);
 
-                                               XCTAssertEqual(err.code, 0);
+                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                                [expectation fulfill];
                                            }];
@@ -16388,7 +16390,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeScheduleProgrammingVisibilityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"read the optional attribute: ScheduleProgrammingVisibility Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -16415,7 +16417,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeScheduleProgrammingVisibilityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"read the optional attribute: ScheduleProgrammingVisibility Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             [expectation fulfill];
         }];
@@ -16441,7 +16443,7 @@ CHIPDevice * GetConnectedDevice()
                                     completionHandler:^(NSError * _Nullable err) {
                                         NSLog(@"Writes a value of 0 to TemperatureDisplayMode attribute of DUT Error: %@", err);
 
-                                        XCTAssertEqual(err.code, 0);
+                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                         [expectation fulfill];
                                     }];
@@ -16466,7 +16468,7 @@ CHIPDevice * GetConnectedDevice()
                                     completionHandler:^(NSError * _Nullable err) {
                                         NSLog(@"Writes a value of 1 to TemperatureDisplayMode attribute of DUT Error: %@", err);
 
-                                        XCTAssertEqual(err.code, 0);
+                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                         [expectation fulfill];
                                     }];
@@ -16489,7 +16491,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Writes a value of 0 to KeypadLockout attribute of DUT Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -16512,7 +16514,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Writes a value of 1 to KeypadLockout attribute of DUT Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -16535,7 +16537,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Writes a value of 2 to KeypadLockout attribute of DUT Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -16558,7 +16560,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Writes a value of 3 to KeypadLockout attribute of DUT Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -16581,7 +16583,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Writes a value of 4 to KeypadLockout attribute of DUT Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -16604,7 +16606,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Writes a value of 5 to KeypadLockout attribute of DUT Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -16630,7 +16632,7 @@ CHIPDevice * GetConnectedDevice()
                                                           @"Error: %@",
                                                         err);
 
-                                                    XCTAssertEqual(err.code, 0);
+                                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                                     [expectation fulfill];
                                                 }];
@@ -16656,7 +16658,7 @@ CHIPDevice * GetConnectedDevice()
                                                           @"Error: %@",
                                                         err);
 
-                                                    XCTAssertEqual(err.code, 0);
+                                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                                     [expectation fulfill];
                                                 }];
@@ -16678,7 +16680,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16709,7 +16711,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -16729,7 +16731,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16754,7 +16756,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"2: read the global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16787,7 +16789,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"3a: write a value into the RO mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -16805,7 +16807,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3b: reads back global attribute: ClusterRevision Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16829,7 +16831,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"2: read the global attribute: FeatureMap Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16857,7 +16859,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"3a: write the default value to optional global attribute: FeatureMap Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 1);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                  [expectation fulfill];
                              }];
 
@@ -16875,7 +16877,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3b: reads back global attribute: FeatureMap Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16900,7 +16902,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"2: read the RO mandatory attribute default: Type Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16927,7 +16929,7 @@ CHIPDevice * GetConnectedDevice()
                        completionHandler:^(NSError * _Nullable err) {
                            NSLog(@"3a: write a value into the RO mandatory attribute: Type Error: %@", err);
 
-                           XCTAssertEqual(err.code, 1);
+                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                            [expectation fulfill];
                        }];
 
@@ -16945,7 +16947,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3b: reads back the RO mandatory attribute: Type Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16969,7 +16971,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"2: read the RO mandatory attribute default: ConfigStatus Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -16997,7 +16999,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"3a: write a value into the RO mandatory attribute: ConfigStatus Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 1);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                    [expectation fulfill];
                                }];
 
@@ -17015,7 +17017,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3b: reads back the RO mandatory attribute: ConfigStatus Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17040,7 +17042,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"2: read the RO mandatory attribute default: OperationalStatus Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17069,7 +17071,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"3a: write a value into the RO mandatory attribute: OperationalStatus Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 1);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                    [expectation fulfill];
                                }];
 
@@ -17088,7 +17090,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3b: reads back the RO mandatory attribute: OperationalStatus Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17113,7 +17115,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEndProductTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"2: read the RO mandatory attribute default: EndProductType Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17141,7 +17143,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"3a: write a value into the RO mandatory attribute: EndProductType Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 1);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                      [expectation fulfill];
                                  }];
 
@@ -17160,7 +17162,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEndProductTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3b: reads back the RO mandatory attribute: EndProductType Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17184,7 +17186,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"2: read the RW mandatory attribute default: Mode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17211,7 +17213,7 @@ CHIPDevice * GetConnectedDevice()
                        completionHandler:^(NSError * _Nullable err) {
                            NSLog(@"3a: write a value into the RW mandatory attribute:: Mode Error: %@", err);
 
-                           XCTAssertEqual(err.code, 0);
+                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                            [expectation fulfill];
                        }];
@@ -17230,7 +17232,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3b: reads back the RW mandatory attribute: Mode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17256,7 +17258,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"2: read the RO optional attribute default: TargetPositionLiftPercent100ths Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -17286,7 +17288,7 @@ CHIPDevice * GetConnectedDevice()
                                                             @"TargetPositionLiftPercent100ths Error: %@",
                                                           err);
 
-                                                      XCTAssertEqual(err.code, 1);
+                                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                       [expectation fulfill];
                                                   }];
 
@@ -17306,7 +17308,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"3b: reads back the RO optional attribute: TargetPositionLiftPercent100ths Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -17332,7 +17334,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeTargetPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"2: read the RO optional attribute default: TargetPositionTiltPercent100ths Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -17362,7 +17364,7 @@ CHIPDevice * GetConnectedDevice()
                                                             @"TargetPositionTiltPercent100ths Error: %@",
                                                           err);
 
-                                                      XCTAssertEqual(err.code, 1);
+                                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                       [expectation fulfill];
                                                   }];
 
@@ -17382,7 +17384,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeTargetPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"3b: reads back the RO optional attribute: TargetPositionTiltPercent100ths Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -17408,7 +17410,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"2: read the RO optional attribute default: CurrentPositionLiftPercent100ths Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -17438,7 +17440,7 @@ CHIPDevice * GetConnectedDevice()
                                                              @"CurrentPositionLiftPercent100ths Error: %@",
                                                            err);
 
-                                                       XCTAssertEqual(err.code, 1);
+                                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                        [expectation fulfill];
                                                    }];
 
@@ -17458,7 +17460,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"3b: reads back the RO optional attribute: CurrentPositionLiftPercent100ths Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -17484,7 +17486,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"2: read the RO optional attribute default: CurrentPositionTiltPercent100ths Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -17514,7 +17516,7 @@ CHIPDevice * GetConnectedDevice()
                                                              @"CurrentPositionTiltPercent100ths Error: %@",
                                                            err);
 
-                                                       XCTAssertEqual(err.code, 1);
+                                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                        [expectation fulfill];
                                                    }];
 
@@ -17534,7 +17536,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"3b: reads back the RO optional attribute: CurrentPositionTiltPercent100ths Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -17559,7 +17561,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInstalledOpenLimitLiftWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"2: read the RO optional attribute default: InstalledOpenLimitLift Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17589,7 +17591,7 @@ CHIPDevice * GetConnectedDevice()
                                         NSLog(@"3a: write a value into the RO optional attribute: InstalledOpenLimitLift Error: %@",
                                             err);
 
-                                        XCTAssertEqual(err.code, 1);
+                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                         [expectation fulfill];
                                     }];
 
@@ -17608,7 +17610,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInstalledOpenLimitLiftWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3b: reads back the RO optional attribute: InstalledOpenLimitLift Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17633,7 +17635,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInstalledClosedLimitLiftWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"2: read the RO optional attribute default: InstalledClosedLimitLift Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17663,7 +17665,7 @@ CHIPDevice * GetConnectedDevice()
                                                      @"Error: %@",
                                                    err);
 
-                                               XCTAssertEqual(err.code, 1);
+                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                [expectation fulfill];
                                            }];
 
@@ -17682,7 +17684,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInstalledClosedLimitLiftWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3b: reads back the RO optional attribute: InstalledClosedLimitLift Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17707,7 +17709,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInstalledOpenLimitTiltWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"2: read the RO optional attribute default: InstalledOpenLimitTilt Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17737,7 +17739,7 @@ CHIPDevice * GetConnectedDevice()
                                         NSLog(@"3a: write a value into the RO optional attribute: InstalledOpenLimitTilt Error: %@",
                                             err);
 
-                                        XCTAssertEqual(err.code, 1);
+                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                         [expectation fulfill];
                                     }];
 
@@ -17756,7 +17758,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInstalledOpenLimitTiltWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3b: reads back the RO optional attribute: InstalledOpenLimitTilt Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17781,7 +17783,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInstalledClosedLimitTiltWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"2: read the RO optional attribute default: InstalledClosedLimitTilt Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17811,7 +17813,7 @@ CHIPDevice * GetConnectedDevice()
                                                      @"Error: %@",
                                                    err);
 
-                                               XCTAssertEqual(err.code, 1);
+                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                [expectation fulfill];
                                            }];
 
@@ -17830,7 +17832,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInstalledClosedLimitTiltWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3b: reads back the RO optional attribute: InstalledClosedLimitTilt Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17854,7 +17856,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeSafetyStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"4: read the RO mandatory attribute default: SafetyStatus Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17882,7 +17884,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"5a: write a value into the RO mandatory attribute: SafetyStatus Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 1);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                    [expectation fulfill];
                                }];
 
@@ -17900,7 +17902,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeSafetyStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"5b: reads back the RO mandatory attribute: SafetyStatus Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17925,7 +17927,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentPositionLiftWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"4: read the RO optional attribute default: CurrentPositionLift Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17954,7 +17956,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"5a: write a value into the RO optional attribute: CurrentPositionLift Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 1);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                      [expectation fulfill];
                                  }];
 
@@ -17973,7 +17975,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentPositionLiftWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"5b: reads back the RO optional attribute: CurrentPositionLift Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -17998,7 +18000,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentPositionTiltWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"4: read the RO optional attribute default: CurrentPositionTilt Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18027,7 +18029,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"5a: write a value into the RO optional attribute: CurrentPositionTilt Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 1);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                      [expectation fulfill];
                                  }];
 
@@ -18046,7 +18048,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentPositionTiltWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"5b: reads back the RO optional attribute: CurrentPositionTilt Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18072,7 +18074,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeCurrentPositionLiftPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"4: read the RO optional attribute default: CurrentPositionLiftPercentage Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -18102,7 +18104,7 @@ CHIPDevice * GetConnectedDevice()
                                                           @"CurrentPositionLiftPercentage Error: %@",
                                                         err);
 
-                                                    XCTAssertEqual(err.code, 1);
+                                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                     [expectation fulfill];
                                                 }];
 
@@ -18122,7 +18124,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeCurrentPositionLiftPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"5b: reads back the RO optional attribute: CurrentPositionLiftPercentage Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -18148,7 +18150,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeCurrentPositionTiltPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"4: read the RO optional attribute default: CurrentPositionTiltPercentage Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -18178,7 +18180,7 @@ CHIPDevice * GetConnectedDevice()
                                                           @"CurrentPositionTiltPercentage Error: %@",
                                                         err);
 
-                                                    XCTAssertEqual(err.code, 1);
+                                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                                     [expectation fulfill];
                                                 }];
 
@@ -18198,7 +18200,7 @@ CHIPDevice * GetConnectedDevice()
         readAttributeCurrentPositionTiltPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"5b: reads back the RO optional attribute: CurrentPositionTiltPercentage Error: %@", err);
 
-            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
@@ -18223,7 +18225,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads Type attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18247,7 +18249,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads Type attribute constraints Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18272,7 +18274,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEndProductTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads EndProductType attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18296,7 +18298,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEndProductTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads EndProductType attribute constraints from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18321,7 +18323,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"1a: TH adjusts the the DUT to a non-open position Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -18340,7 +18342,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster upOrOpenWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"2a: TH sends UpOrOpen command to DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -18359,7 +18361,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3a: TH reads OperationalStatus attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18384,7 +18386,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster upOrOpenWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"1a: TH adjusts the the DUT to a non-closed position Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -18403,7 +18405,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"2a: TH sends DownOrClose command to DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -18422,7 +18424,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"3a: TH reads OperationalStatus attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18447,7 +18449,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster upOrOpenWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"1a: TH adjusts the the DUT to a non-open position Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -18466,7 +18468,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster stopMotionWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"2a: TH sends StopMotion command to DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -18485,7 +18487,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"2b: TH reads OperationalStatus attribute from DUT Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18510,7 +18512,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster testWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Test Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -18529,7 +18531,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster testNotHandledWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Test Not Handled Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 1);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
         [expectation fulfill];
     }];
 
@@ -18548,7 +18550,7 @@ CHIPDevice * GetConnectedDevice()
         CHIPTestClusterClusterTestSpecificResponseParams * _Nullable values, NSError * _Nullable err) {
         NSLog(@"Send Test Specific Command Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = values.returnValue;
@@ -18577,7 +18579,7 @@ CHIPDevice * GetConnectedDevice()
                           CHIPTestClusterClusterTestAddArgumentsResponseParams * _Nullable values, NSError * _Nullable err) {
                           NSLog(@"Send Test Add Arguments Command Error: %@", err);
 
-                          XCTAssertEqual(err.code, 0);
+                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                           {
                               id actualValue = values.returnValue;
@@ -18606,7 +18608,7 @@ CHIPDevice * GetConnectedDevice()
                           CHIPTestClusterClusterTestAddArgumentsResponseParams * _Nullable values, NSError * _Nullable err) {
                           NSLog(@"Send failing Test Add Arguments Command Error: %@", err);
 
-                          XCTAssertEqual(err.code, 1);
+                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                           [expectation fulfill];
                       }];
 
@@ -18624,7 +18626,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBooleanWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BOOLEAN Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18651,7 +18653,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Write attribute BOOLEAN True Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -18670,7 +18672,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBooleanWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BOOLEAN True Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18697,7 +18699,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Write attribute BOOLEAN False Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -18716,7 +18718,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBooleanWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BOOLEAN False Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18740,7 +18742,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBitmap8WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BITMAP8 Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18767,7 +18769,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Write attribute BITMAP8 Max Value Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -18786,7 +18788,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBitmap8WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BITMAP8 Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18813,7 +18815,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Write attribute BITMAP8 Min Value Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -18832,7 +18834,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBitmap8WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BITMAP8 Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18856,7 +18858,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBitmap16WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BITMAP16 Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18883,7 +18885,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write attribute BITMAP16 Max Value Error: %@", err);
 
-                               XCTAssertEqual(err.code, 0);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                [expectation fulfill];
                            }];
@@ -18902,7 +18904,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBitmap16WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BITMAP16 Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18929,7 +18931,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write attribute BITMAP16 Min Value Error: %@", err);
 
-                               XCTAssertEqual(err.code, 0);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                [expectation fulfill];
                            }];
@@ -18948,7 +18950,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBitmap16WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BITMAP16 Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18972,7 +18974,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBitmap32WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BITMAP32 Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -18999,7 +19001,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write attribute BITMAP32 Max Value Error: %@", err);
 
-                               XCTAssertEqual(err.code, 0);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                [expectation fulfill];
                            }];
@@ -19018,7 +19020,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBitmap32WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BITMAP32 Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19045,7 +19047,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write attribute BITMAP32 Min Value Error: %@", err);
 
-                               XCTAssertEqual(err.code, 0);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                [expectation fulfill];
                            }];
@@ -19064,7 +19066,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBitmap32WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BITMAP32 Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19088,7 +19090,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBitmap64WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BITMAP64 Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19115,7 +19117,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write attribute BITMAP64 Max Value Error: %@", err);
 
-                               XCTAssertEqual(err.code, 0);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                [expectation fulfill];
                            }];
@@ -19134,7 +19136,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBitmap64WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BITMAP64 Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19161,7 +19163,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write attribute BITMAP64 Min Value Error: %@", err);
 
-                               XCTAssertEqual(err.code, 0);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                [expectation fulfill];
                            }];
@@ -19180,7 +19182,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeBitmap64WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute BITMAP64 Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19204,7 +19206,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt8uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT8U Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19231,7 +19233,7 @@ CHIPDevice * GetConnectedDevice()
                         completionHandler:^(NSError * _Nullable err) {
                             NSLog(@"Write attribute INT8U Max Value Error: %@", err);
 
-                            XCTAssertEqual(err.code, 0);
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                             [expectation fulfill];
                         }];
@@ -19250,7 +19252,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt8uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT8U Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19277,7 +19279,7 @@ CHIPDevice * GetConnectedDevice()
                         completionHandler:^(NSError * _Nullable err) {
                             NSLog(@"Write attribute INT8U Min Value Error: %@", err);
 
-                            XCTAssertEqual(err.code, 0);
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                             [expectation fulfill];
                         }];
@@ -19296,7 +19298,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt8uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT8U Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19320,7 +19322,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt16uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT16U Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19347,7 +19349,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT16U Max Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -19366,7 +19368,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt16uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT16U Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19393,7 +19395,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT16U Min Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -19412,7 +19414,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt16uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT16U Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19436,7 +19438,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt32uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT32U Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19463,7 +19465,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT32U Max Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -19482,7 +19484,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt32uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT32U Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19509,7 +19511,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT32U Min Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -19528,7 +19530,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt32uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT32U Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19552,7 +19554,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt64uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT64U Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19579,7 +19581,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT64U Max Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -19598,7 +19600,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt64uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT64U Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19625,7 +19627,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT64U Min Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -19644,7 +19646,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt64uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT64U Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19668,7 +19670,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt8sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT8S Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19695,7 +19697,7 @@ CHIPDevice * GetConnectedDevice()
                         completionHandler:^(NSError * _Nullable err) {
                             NSLog(@"Write attribute INT8S Max Value Error: %@", err);
 
-                            XCTAssertEqual(err.code, 0);
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                             [expectation fulfill];
                         }];
@@ -19714,7 +19716,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt8sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT8S Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19741,7 +19743,7 @@ CHIPDevice * GetConnectedDevice()
                         completionHandler:^(NSError * _Nullable err) {
                             NSLog(@"Write attribute INT8S Min Value Error: %@", err);
 
-                            XCTAssertEqual(err.code, 0);
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                             [expectation fulfill];
                         }];
@@ -19760,7 +19762,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt8sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT8S Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19787,7 +19789,7 @@ CHIPDevice * GetConnectedDevice()
                         completionHandler:^(NSError * _Nullable err) {
                             NSLog(@"Write attribute INT8S Default Value Error: %@", err);
 
-                            XCTAssertEqual(err.code, 0);
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                             [expectation fulfill];
                         }];
@@ -19806,7 +19808,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt8sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT8S Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19830,7 +19832,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt16sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT16S Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19857,7 +19859,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT16S Max Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -19876,7 +19878,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt16sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT16S Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19903,7 +19905,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT16S Min Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -19922,7 +19924,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt16sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT16S Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19949,7 +19951,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT16S Default Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -19968,7 +19970,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt16sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT16S Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -19992,7 +19994,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt32sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT32S Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20019,7 +20021,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT32S Max Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -20038,7 +20040,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt32sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT32S Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20065,7 +20067,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT32S Min Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -20084,7 +20086,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt32sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT32S Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20111,7 +20113,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT32S Default Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -20130,7 +20132,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt32sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT32S Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20154,7 +20156,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt64sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT64S Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20181,7 +20183,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT64S Max Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -20200,7 +20202,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt64sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT64S Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20227,7 +20229,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT64S Min Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -20246,7 +20248,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt64sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT64S Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20273,7 +20275,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT64S Default Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -20292,7 +20294,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt64sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT64S Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20316,7 +20318,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEnum8WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute ENUM8 Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20343,7 +20345,7 @@ CHIPDevice * GetConnectedDevice()
                         completionHandler:^(NSError * _Nullable err) {
                             NSLog(@"Write attribute ENUM8 Max Value Error: %@", err);
 
-                            XCTAssertEqual(err.code, 0);
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                             [expectation fulfill];
                         }];
@@ -20362,7 +20364,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEnum8WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute ENUM8 Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20389,7 +20391,7 @@ CHIPDevice * GetConnectedDevice()
                         completionHandler:^(NSError * _Nullable err) {
                             NSLog(@"Write attribute ENUM8 Min Value Error: %@", err);
 
-                            XCTAssertEqual(err.code, 0);
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                             [expectation fulfill];
                         }];
@@ -20408,7 +20410,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEnum8WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute ENUM8 Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20432,7 +20434,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEnum16WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute ENUM16 Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20459,7 +20461,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute ENUM16 Max Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -20478,7 +20480,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEnum16WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute ENUM16 Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20505,7 +20507,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute ENUM16 Min Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -20524,7 +20526,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEnum16WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute ENUM16 Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20548,7 +20550,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOctetStringWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute OCTET_STRING Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20575,7 +20577,7 @@ CHIPDevice * GetConnectedDevice()
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write attribute OCTET_STRING with embedded null Error: %@", err);
 
-                                  XCTAssertEqual(err.code, 0);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                   [expectation fulfill];
                               }];
@@ -20594,7 +20596,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOctetStringWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute OCTET_STRING with embedded null Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20621,7 +20623,7 @@ CHIPDevice * GetConnectedDevice()
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write attribute OCTET_STRING Error: %@", err);
 
-                                  XCTAssertEqual(err.code, 0);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                   [expectation fulfill];
                               }];
@@ -20640,7 +20642,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOctetStringWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute OCTET_STRING Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20667,7 +20669,7 @@ CHIPDevice * GetConnectedDevice()
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write attribute OCTET_STRING Error: %@", err);
 
-                                  XCTAssertEqual(err.code, true);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], true);
                                   [expectation fulfill];
                               }];
 
@@ -20685,7 +20687,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOctetStringWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute OCTET_STRING Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20712,7 +20714,7 @@ CHIPDevice * GetConnectedDevice()
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write attribute OCTET_STRING Error: %@", err);
 
-                                  XCTAssertEqual(err.code, 0);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                   [expectation fulfill];
                               }];
@@ -20731,7 +20733,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeLongOctetStringWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute LONG_OCTET_STRING Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20762,7 +20764,7 @@ CHIPDevice * GetConnectedDevice()
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write attribute LONG_OCTET_STRING Error: %@", err);
 
-                                      XCTAssertEqual(err.code, 0);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       [expectation fulfill];
                                   }];
@@ -20781,7 +20783,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeLongOctetStringWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute LONG_OCTET_STRING Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20814,7 +20816,7 @@ CHIPDevice * GetConnectedDevice()
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write attribute LONG_OCTET_STRING Error: %@", err);
 
-                                      XCTAssertEqual(err.code, 0);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       [expectation fulfill];
                                   }];
@@ -20833,7 +20835,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCharStringWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute CHAR_STRING Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20860,7 +20862,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"Write attribute CHAR_STRING Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 0);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                  [expectation fulfill];
                              }];
@@ -20882,7 +20884,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"Write attribute CHAR_STRING - Value too long Error: %@", err);
 
-                                 XCTAssertEqual(err.code, true);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], true);
                                  [expectation fulfill];
                              }];
 
@@ -20903,7 +20905,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"Write attribute CHAR_STRING - Empty Error: %@", err);
 
-                                 XCTAssertEqual(err.code, 0);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                  [expectation fulfill];
                              }];
@@ -20922,7 +20924,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeLongCharStringWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute LONG_CHAR_STRING Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -20952,7 +20954,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute LONG_CHAR_STRING Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -20971,7 +20973,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeLongCharStringWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute LONG_CHAR_STRING Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -21002,7 +21004,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute LONG_CHAR_STRING Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -21021,7 +21023,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEpochUsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute EPOCH_US Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -21048,7 +21050,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Write attribute EPOCH_US Max Value Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -21067,7 +21069,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEpochUsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute EPOCH_US Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -21094,7 +21096,7 @@ CHIPDevice * GetConnectedDevice()
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Write attribute EPOCH_US Min Value Error: %@", err);
 
-                              XCTAssertEqual(err.code, 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                               [expectation fulfill];
                           }];
@@ -21113,7 +21115,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEpochUsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute EPOCH_US Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -21137,7 +21139,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEpochSWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute EPOCH_S Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -21164,7 +21166,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute EPOCH_S Max Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -21183,7 +21185,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEpochSWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute EPOCH_S Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -21210,7 +21212,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute EPOCH_S Min Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -21229,7 +21231,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeEpochSWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute EPOCH_S Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -21258,7 +21260,7 @@ CHIPDevice * GetConnectedDevice()
             return;
         }
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -21290,7 +21292,7 @@ CHIPDevice * GetConnectedDevice()
                                       return;
                                   }
 
-                                  XCTAssertEqual(err.code, 0);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                   [expectation fulfill];
                               }];
@@ -21309,7 +21311,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster testWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Test Command to unsupported endpoint Error: %@", err);
 
-        XCTAssertEqual(err.code, 1);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
         [expectation fulfill];
     }];
 
@@ -21327,7 +21329,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeVendorIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute vendor_id Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -21354,7 +21356,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write attribute vendor_id Error: %@", err);
 
-                               XCTAssertEqual(err.code, 0);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                [expectation fulfill];
                            }];
@@ -21373,7 +21375,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeVendorIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute vendor_id Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -21400,7 +21402,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Restore attribute vendor_id Error: %@", err);
 
-                               XCTAssertEqual(err.code, 0);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                [expectation fulfill];
                            }];
@@ -21424,7 +21426,7 @@ CHIPDevice * GetConnectedDevice()
                  completionHandler:^(CHIPTestClusterClusterTestEnumsResponseParams * _Nullable values, NSError * _Nullable err) {
                      NSLog(@"Send a command with a vendor_id and enum Error: %@", err);
 
-                     XCTAssertEqual(err.code, 0);
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                      {
                          id actualValue = values.arg1;
@@ -21464,7 +21466,7 @@ CHIPDevice * GetConnectedDevice()
                                    CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
                                    NSLog(@"Send Test Command With Struct Argument and arg1.b is true Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 0);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                    {
                                        id actualValue = values.value;
@@ -21500,7 +21502,7 @@ CHIPDevice * GetConnectedDevice()
                                    CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
                                    NSLog(@"Send Test Command With Struct Argument and arg1.b is false Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 0);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                    {
                                        id actualValue = values.value;
@@ -21541,7 +21543,7 @@ CHIPDevice * GetConnectedDevice()
                                       CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
                                       NSLog(@"Send Test Command With List of INT8U and none of them is set to 0 Error: %@", err);
 
-                                      XCTAssertEqual(err.code, 0);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       {
                                           id actualValue = values.value;
@@ -21583,7 +21585,7 @@ CHIPDevice * GetConnectedDevice()
                                       CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
                                       NSLog(@"Send Test Command With List of INT8U and one of them is set to 0 Error: %@", err);
 
-                                      XCTAssertEqual(err.code, 0);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       {
                                           id actualValue = values.value;
@@ -21623,7 +21625,7 @@ CHIPDevice * GetConnectedDevice()
                                      NSError * _Nullable err) {
                                      NSLog(@"Send Test Command With List of INT8U and get it reversed Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      {
                                          id actualValue = values.arg1;
@@ -21664,7 +21666,7 @@ CHIPDevice * GetConnectedDevice()
                                      NSError * _Nullable err) {
                                      NSLog(@"Send Test Command With empty List of INT8U and get an empty list back Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      {
                                          id actualValue = values.arg1;
@@ -21715,7 +21717,7 @@ CHIPDevice * GetConnectedDevice()
                                       @"Send Test Command With List of Struct Argument and arg1.b of first item is true Error: %@",
                                       err);
 
-                                  XCTAssertEqual(err.code, 0);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                   {
                                       id actualValue = values.value;
@@ -21766,7 +21768,7 @@ CHIPDevice * GetConnectedDevice()
                                       @"Send Test Command With List of Struct Argument and arg1.b of first item is false Error: %@",
                                       err);
 
-                                  XCTAssertEqual(err.code, 0);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                   {
                                       id actualValue = values.value;
@@ -21801,7 +21803,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write attribute LIST With List of INT8U and none of them is set to 0 Error: %@", err);
 
-                                XCTAssertEqual(err.code, 0);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                 [expectation fulfill];
                             }];
@@ -21820,7 +21822,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeListInt8uWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute LIST With List of INT8U Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -21858,7 +21860,7 @@ CHIPDevice * GetConnectedDevice()
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write attribute LIST With List of OCTET_STRING Error: %@", err);
 
-                                      XCTAssertEqual(err.code, 0);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       [expectation fulfill];
                                   }];
@@ -21877,7 +21879,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeListOctetStringWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute LIST With List of OCTET_STRING Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -21928,7 +21930,7 @@ CHIPDevice * GetConnectedDevice()
                                         completionHandler:^(NSError * _Nullable err) {
                                             NSLog(@"Write attribute LIST With List of LIST_STRUCT_OCTET_STRING Error: %@", err);
 
-                                            XCTAssertEqual(err.code, 0);
+                                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                             [expectation fulfill];
                                         }];
@@ -21948,7 +21950,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeListStructOctetStringWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute LIST With List of LIST_STRUCT_OCTET_STRING Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22024,7 +22026,7 @@ CHIPDevice * GetConnectedDevice()
                                      NSError * _Nullable err) {
                                      NSLog(@"Send Test Command with optional arg set. Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      {
                                          id actualValue = values.wasPresent;
@@ -22064,7 +22066,7 @@ CHIPDevice * GetConnectedDevice()
                                      NSError * _Nullable err) {
                                      NSLog(@"Send Test Command without its optional arg. Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      {
                                          id actualValue = values.wasPresent;
@@ -22091,7 +22093,7 @@ CHIPDevice * GetConnectedDevice()
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write attribute NULLABLE_BOOLEAN null Error: %@", err);
 
-                                      XCTAssertEqual(err.code, 0);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       [expectation fulfill];
                                   }];
@@ -22110,7 +22112,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBooleanWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BOOLEAN null Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22137,7 +22139,7 @@ CHIPDevice * GetConnectedDevice()
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write attribute NULLABLE_BOOLEAN True Error: %@", err);
 
-                                      XCTAssertEqual(err.code, 0);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       [expectation fulfill];
                                   }];
@@ -22156,7 +22158,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBooleanWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BOOLEAN True Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22184,7 +22186,7 @@ CHIPDevice * GetConnectedDevice()
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write attribute NULLABLE_BITMAP8 Max Value Error: %@", err);
 
-                                      XCTAssertEqual(err.code, 0);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       [expectation fulfill];
                                   }];
@@ -22203,7 +22205,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBitmap8WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BITMAP8 Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22231,7 +22233,7 @@ CHIPDevice * GetConnectedDevice()
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write attribute NULLABLE_BITMAP8 Invalid Value Error: %@", err);
 
-                                      XCTAssertEqual(err.code, 1);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                       [expectation fulfill];
                                   }];
 
@@ -22249,7 +22251,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBitmap8WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BITMAP8 unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22277,7 +22279,7 @@ CHIPDevice * GetConnectedDevice()
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"Write attribute NULLABLE_BITMAP8 null Value Error: %@", err);
 
-                                      XCTAssertEqual(err.code, 0);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                       [expectation fulfill];
                                   }];
@@ -22296,7 +22298,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBitmap8WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BITMAP8 null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22323,7 +22325,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"Write attribute NULLABLE_BITMAP16 Max Value Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 0);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                        [expectation fulfill];
                                    }];
@@ -22342,7 +22344,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBitmap16WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BITMAP16 Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22370,7 +22372,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"Write attribute NULLABLE_BITMAP16 Invalid Value Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 1);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                        [expectation fulfill];
                                    }];
 
@@ -22388,7 +22390,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBitmap16WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BITMAP16 unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22416,7 +22418,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"Write attribute NULLABLE_BITMAP16 null Value Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 0);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                        [expectation fulfill];
                                    }];
@@ -22435,7 +22437,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBitmap16WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BITMAP16 null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22462,7 +22464,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"Write attribute NULLABLE_BITMAP32 Max Value Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 0);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                        [expectation fulfill];
                                    }];
@@ -22481,7 +22483,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBitmap32WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BITMAP32 Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22509,7 +22511,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"Write attribute NULLABLE_BITMAP32 Invalid Value Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 1);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                        [expectation fulfill];
                                    }];
 
@@ -22527,7 +22529,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBitmap32WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BITMAP32 unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22555,7 +22557,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"Write attribute NULLABLE_BITMAP32 null Value Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 0);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                        [expectation fulfill];
                                    }];
@@ -22574,7 +22576,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBitmap32WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BITMAP32 null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22601,7 +22603,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"Write attribute NULLABLE_BITMAP64 Max Value Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 0);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                        [expectation fulfill];
                                    }];
@@ -22620,7 +22622,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBitmap64WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BITMAP64 Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22648,7 +22650,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"Write attribute NULLABLE_BITMAP64 Invalid Value Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 1);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                        [expectation fulfill];
                                    }];
 
@@ -22666,7 +22668,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBitmap64WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BITMAP64 unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22694,7 +22696,7 @@ CHIPDevice * GetConnectedDevice()
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"Write attribute NULLABLE_BITMAP64 null Value Error: %@", err);
 
-                                       XCTAssertEqual(err.code, 0);
+                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                        [expectation fulfill];
                                    }];
@@ -22713,7 +22715,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableBitmap64WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_BITMAP64 null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22740,7 +22742,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write attribute NULLABLE_INT8U Max Value Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -22759,7 +22761,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt8uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT8U Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22787,7 +22789,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write attribute NULLABLE_INT8U Invalid Value Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 1);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                     [expectation fulfill];
                                 }];
 
@@ -22805,7 +22807,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt8uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT8U unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22833,7 +22835,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write attribute NULLABLE_INT8U null Value Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -22852,7 +22854,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt8uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT8U null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22879,7 +22881,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT16U Max Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -22898,7 +22900,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt16uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT16U Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22926,7 +22928,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT16U Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 1);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                      [expectation fulfill];
                                  }];
 
@@ -22944,7 +22946,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt16uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT16U unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -22972,7 +22974,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT16U null Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -22991,7 +22993,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt16uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT16U null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23018,7 +23020,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT32U Max Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -23037,7 +23039,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt32uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT32U Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23065,7 +23067,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT32U Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 1);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                      [expectation fulfill];
                                  }];
 
@@ -23083,7 +23085,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt32uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT32U unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23111,7 +23113,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT32U null Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -23130,7 +23132,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt32uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT32U null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23157,7 +23159,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT64U Max Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -23176,7 +23178,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt64uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT64U Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23204,7 +23206,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT64U Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 1);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                      [expectation fulfill];
                                  }];
 
@@ -23222,7 +23224,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt64uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT64U unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23250,7 +23252,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT64U null Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -23269,7 +23271,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt64uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT64U null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23296,7 +23298,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write attribute NULLABLE_INT8S Min Value Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -23315,7 +23317,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt8sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT8S Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23343,7 +23345,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write attribute NULLABLE_INT8S Invalid Value Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 1);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                     [expectation fulfill];
                                 }];
 
@@ -23361,7 +23363,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt8sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT8S unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23389,7 +23391,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write attribute NULLABLE_INT8S null Value Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -23408,7 +23410,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt8sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT8S null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23435,7 +23437,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT16S Min Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -23454,7 +23456,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt16sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT16S Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23482,7 +23484,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT16S Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 1);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                      [expectation fulfill];
                                  }];
 
@@ -23500,7 +23502,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt16sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT16S unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23528,7 +23530,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT16S null Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -23547,7 +23549,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt16sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT16S null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23574,7 +23576,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT32S Min Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -23593,7 +23595,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt32sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT32S Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23621,7 +23623,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT32S Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 1);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                      [expectation fulfill];
                                  }];
 
@@ -23639,7 +23641,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt32sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT32S unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23667,7 +23669,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT32S null Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -23686,7 +23688,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt32sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT32S null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23713,7 +23715,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT64S Min Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -23732,7 +23734,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt64sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT64S Min Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23760,7 +23762,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT64S Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 1);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                      [expectation fulfill];
                                  }];
 
@@ -23778,7 +23780,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt64sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT64S unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23806,7 +23808,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_INT64S null Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -23825,7 +23827,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableInt64sWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_INT64S null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23852,7 +23854,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write attribute NULLABLE_ENUM8 Max Value Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -23871,7 +23873,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableEnum8WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_ENUM8 Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23899,7 +23901,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write attribute NULLABLE_ENUM8 Invalid Value Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 1);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                     [expectation fulfill];
                                 }];
 
@@ -23917,7 +23919,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableEnum8WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_ENUM8 unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23945,7 +23947,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write attribute NULLABLE_ENUM8 null Value Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                     [expectation fulfill];
                                 }];
@@ -23964,7 +23966,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableEnum8WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_ENUM8 null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -23991,7 +23993,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_ENUM16 Max Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -24010,7 +24012,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableEnum16WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_ENUM16 Max Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24038,7 +24040,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_ENUM16 Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 1);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                                      [expectation fulfill];
                                  }];
 
@@ -24056,7 +24058,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableEnum16WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_ENUM16 unchanged Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24084,7 +24086,7 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"Write attribute NULLABLE_ENUM16 null Value Error: %@", err);
 
-                                     XCTAssertEqual(err.code, 0);
+                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                      [expectation fulfill];
                                  }];
@@ -24103,7 +24105,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableEnum16WithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_ENUM16 null Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24127,7 +24129,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableOctetStringWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_OCTET_STRING Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24155,7 +24157,7 @@ CHIPDevice * GetConnectedDevice()
                                       completionHandler:^(NSError * _Nullable err) {
                                           NSLog(@"Write attribute NULLABLE_OCTET_STRING Error: %@", err);
 
-                                          XCTAssertEqual(err.code, 0);
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                           [expectation fulfill];
                                       }];
@@ -24174,7 +24176,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableOctetStringWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_OCTET_STRING Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24202,7 +24204,7 @@ CHIPDevice * GetConnectedDevice()
                                       completionHandler:^(NSError * _Nullable err) {
                                           NSLog(@"Write attribute NULLABLE_OCTET_STRING Error: %@", err);
 
-                                          XCTAssertEqual(err.code, 0);
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                           [expectation fulfill];
                                       }];
@@ -24221,7 +24223,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableOctetStringWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_OCTET_STRING Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24248,7 +24250,7 @@ CHIPDevice * GetConnectedDevice()
                                       completionHandler:^(NSError * _Nullable err) {
                                           NSLog(@"Write attribute NULLABLE_OCTET_STRING Error: %@", err);
 
-                                          XCTAssertEqual(err.code, 0);
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                           [expectation fulfill];
                                       }];
@@ -24267,7 +24269,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableOctetStringWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_OCTET_STRING Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24292,7 +24294,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableCharStringWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_CHAR_STRING Default Value Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24320,7 +24322,7 @@ CHIPDevice * GetConnectedDevice()
                                      completionHandler:^(NSError * _Nullable err) {
                                          NSLog(@"Write attribute NULLABLE_CHAR_STRING Error: %@", err);
 
-                                         XCTAssertEqual(err.code, 0);
+                                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                          [expectation fulfill];
                                      }];
@@ -24342,7 +24344,7 @@ CHIPDevice * GetConnectedDevice()
                                      completionHandler:^(NSError * _Nullable err) {
                                          NSLog(@"Write attribute NULLABLE_CHAR_STRING - Value too long Error: %@", err);
 
-                                         XCTAssertEqual(err.code, 0);
+                                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                          [expectation fulfill];
                                      }];
@@ -24361,7 +24363,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableCharStringWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_CHAR_STRING Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24388,7 +24390,7 @@ CHIPDevice * GetConnectedDevice()
                                      completionHandler:^(NSError * _Nullable err) {
                                          NSLog(@"Write attribute NULLABLE_CHAR_STRING - Empty Error: %@", err);
 
-                                         XCTAssertEqual(err.code, 0);
+                                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                          [expectation fulfill];
                                      }];
@@ -24407,7 +24409,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeNullableCharStringWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute NULLABLE_CHAR_STRING Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24415,6 +24417,24 @@ CHIPDevice * GetConnectedDevice()
             XCTAssertTrue([actualValue isEqualToString:@""]);
         }
 
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000243_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read nonexistent attribute."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:200 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeListInt8uWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read nonexistent attribute. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 134);
         [expectation fulfill];
     }];
 
@@ -24436,7 +24456,7 @@ CHIPDevice * GetConnectedDevice()
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT32U Value Error: %@", err);
 
-                             XCTAssertEqual(err.code, 0);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                              [expectation fulfill];
                          }];
@@ -24455,7 +24475,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt32uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT32U Value MinValue Constraints Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24479,7 +24499,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt32uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT32U Value MaxValue Constraints Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24503,7 +24523,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeInt32uWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute INT32U Value NotValue Constraints Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24537,7 +24557,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeDeviceListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute Device list Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24571,7 +24591,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeServerListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute Server list Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24613,7 +24633,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeClientListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute Client list Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24637,7 +24657,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributePartsListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute Parts list Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24664,7 +24684,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeLocationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read location Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24691,7 +24711,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write location Error: %@", err);
 
-                               XCTAssertEqual(err.code, 0);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                [expectation fulfill];
                            }];
@@ -24710,7 +24730,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeLocationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back location Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -24737,7 +24757,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Restore initial location value Error: %@", err);
 
-                               XCTAssertEqual(err.code, 0);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                [expectation fulfill];
                            }];
@@ -24760,7 +24780,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 0 (invalid) Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    {
                        id actualValue = values.status;
@@ -24791,7 +24811,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 1 (not found) Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    {
                        id actualValue = values.status;
@@ -24823,7 +24843,7 @@ CHIPDevice * GetConnectedDevice()
               completionHandler:^(CHIPGroupsClusterAddGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                   NSLog(@"Add Group 1 (new) Error: %@", err);
 
-                  XCTAssertEqual(err.code, 0);
+                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                   {
                       id actualValue = values.status;
@@ -24854,7 +24874,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 1 (new) Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    {
                        id actualValue = values.status;
@@ -24889,7 +24909,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 2 (not found) Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    {
                        id actualValue = values.status;
@@ -24920,7 +24940,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 3 (not found) Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    {
                        id actualValue = values.status;
@@ -24951,7 +24971,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 1 (existing) Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    {
                        id actualValue = values.status;
@@ -24986,7 +25006,7 @@ CHIPDevice * GetConnectedDevice()
                  completionHandler:^(CHIPGroupsClusterRemoveGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                      NSLog(@"Remove Group 0 (invalid) Error: %@", err);
 
-                     XCTAssertEqual(err.code, 0);
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                      {
                          id actualValue = values.status;
@@ -25017,7 +25037,7 @@ CHIPDevice * GetConnectedDevice()
                  completionHandler:^(CHIPGroupsClusterRemoveGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                      NSLog(@"Remove Group 4 (not found) Error: %@", err);
 
-                     XCTAssertEqual(err.code, 0);
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                      {
                          id actualValue = values.status;
@@ -25048,7 +25068,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 1 (not removed) Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    {
                        id actualValue = values.status;
@@ -25083,7 +25103,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 2 (removed) Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    {
                        id actualValue = values.status;
@@ -25111,7 +25131,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster removeAllGroupsWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Remove All Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -25133,7 +25153,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 1 (removed) Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    {
                        id actualValue = values.status;
@@ -25164,7 +25184,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 2 (still removed) Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    {
                        id actualValue = values.status;
@@ -25195,7 +25215,7 @@ CHIPDevice * GetConnectedDevice()
                completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 3 (removed) Error: %@", err);
 
-                   XCTAssertEqual(err.code, 0);
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                    {
                        id actualValue = values.status;
@@ -25227,7 +25247,7 @@ CHIPDevice * GetConnectedDevice()
               completionHandler:^(NSError * _Nullable err) {
                   NSLog(@"Send Identify command and expect success response Error: %@", err);
 
-                  XCTAssertEqual(err.code, 0);
+                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                   [expectation fulfill];
               }];
@@ -25249,7 +25269,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeSupportedFabricsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read number of supported fabrics Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25275,7 +25295,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCommissionedFabricsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read number of commissioned fabrics Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25301,7 +25321,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read current fabric index Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25326,7 +25346,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read CurrentMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25350,7 +25370,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeOnModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read OnMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25374,7 +25394,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read StartUpMode Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25398,7 +25418,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeDescriptionWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read Description Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25422,7 +25442,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeSupportedModesWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read SupportedModes Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25494,7 +25514,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Change to Supported Mode Error: %@", err);
 
-                      XCTAssertEqual(err.code, 0);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                       [expectation fulfill];
                   }];
@@ -25513,7 +25533,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeCurrentModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Verify Current Mode Change Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25540,7 +25560,7 @@ CHIPDevice * GetConnectedDevice()
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Change to Unsupported Mode Error: %@", err);
 
-                      XCTAssertEqual(err.code, 1);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
                       [expectation fulfill];
                   }];
 
@@ -25562,7 +25582,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Group Write Attribute Error: %@", err);
 
-                               XCTAssertEqual(err.code, 0);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                [expectation fulfill];
                            }];
@@ -25581,7 +25601,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeLocationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back Attribute Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25608,7 +25628,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Restore initial location value Error: %@", err);
 
-                               XCTAssertEqual(err.code, 0);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
                                [expectation fulfill];
                            }];
@@ -25627,7 +25647,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster readAttributeLocationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back Attribute Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25658,7 +25678,7 @@ CHIPDevice * GetConnectedDevice()
             return;
         }
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -25683,7 +25703,7 @@ CHIPDevice * GetConnectedDevice()
             return;
         }
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -25708,7 +25728,7 @@ CHIPDevice * GetConnectedDevice()
             return;
         }
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -25728,7 +25748,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Set OnOff Attribute to false Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -25747,7 +25767,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [cluster reportAttributeOnOffWithResponseHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Report: Subscribe OnOff Attribute Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25773,7 +25793,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
                                     responseHandler:^(NSError * err, NSDictionary * values) {
                                         NSLog(@"Subscribe OnOff Attribute Error: %@", err);
 
-                                        XCTAssertEqual(err.code, 0);
+                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
                                         XCTAssertEqual(testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled, true);
                                         [expectation fulfill];
                                     }];
@@ -25792,7 +25812,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn On the light to see attribute change Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -25811,7 +25831,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [cluster reportAttributeOnOffWithResponseHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check for attribute report Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
@@ -25835,7 +25855,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn Off the light to see attribute change Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         [expectation fulfill];
     }];
@@ -25854,7 +25874,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [cluster reportAttributeOnOffWithResponseHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check for attribute report Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;

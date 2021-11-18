@@ -2033,3 +2033,10 @@ tests:
       attribute: "nullable_char_string"
       response:
           value: ""
+
+    - label: "Read nonexistent attribute."
+      endpoint: 200
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          error: 0x86 # UNSUPPORTED_ATTRIBUTE
