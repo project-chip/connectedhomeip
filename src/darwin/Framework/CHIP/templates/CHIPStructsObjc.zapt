@@ -5,6 +5,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 {{#zcl_clusters}}
 {{#zcl_structs}}
 @interface CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}} : NSObject
@@ -13,9 +15,12 @@
 {{#zcl_struct_items}}
 @property (strong, nonatomic{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}};
 {{/zcl_struct_items}}
+- (instancetype)init;
 @end
 
 {{/zcl_structs}}
 {{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END
 
 #endif /* CHIP_STRUCTS_H */
