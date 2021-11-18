@@ -55,7 +55,7 @@ class LogPipe(threading.Thread):
             logging.log(self.level, line.strip('\n'))
             self.captured_logs.append(line)
             if self.capture_delegate:
-                self.capture_delegate.Log(name, line)
+                self.capture_delegate.Log(self.name, line)
 
         self.pipeReader.close()
 
@@ -70,12 +70,12 @@ class Runner:
 
     def RunSubprocess(self, cmd, name, wait=True):
         outpipe = LogPipe(
-            logging.DEBUG, capture_delegate=self.capture_delegate, name=name + 'STDOUT')
+            logging.DEBUG, capture_delegate=self.capture_delegate, name=name + ' OUT')
         errpipe = LogPipe(
-            logging.INFO, capture_delegate=self.capture_delegate, name=name + 'STDERR')
+            logging.INFO, capture_delegate=self.capture_delegate, name=name + ' ERR')
 
         if self.capture_delegate:
-            self.capture_delegate.Log(name, 'Executing %r' % cmd)
+            self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)
 
         s = subprocess.Popen(cmd, stdout=outpipe, stderr=errpipe)
         outpipe.close()

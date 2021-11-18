@@ -16,6 +16,7 @@
 import logging
 import os
 import time
+from datetime import datetime
 import typing
 
 from enum import Enum, auto
@@ -35,6 +36,38 @@ class ApplicationPaths:
     all_clusters_app: typing.List[str]
     tv_app: typing.List[str]
 
+@dataclass
+class CaptureLine:
+    when: datetime
+    source: str
+    line: str
+
+class ExecutionCapture:
+    """
+    Keeps track of output lines in a process, to help debug failures.
+    """
+    def __init__(self):
+        self.captures = []
+
+    def Log(self, source, line):
+        self.captures.append(CaptureLine(
+            when=datetime.now(),
+            source=source,
+            line=line.strip('\n')
+        ))
+
+    def LogContents(self):
+        for entry in self.captures:
+            logging.error('%02d:%02d:%02d.%03d - %-10s: %s',
+            entry.when.hour,
+            entry.when.minute,
+            entry.when.second,
+            entry.when.microsecond/1000,
+            entry.source,
+            entry.line
+            )
+        pass
+
 
 @dataclass
 class TestDefinition:
@@ -46,6 +79,7 @@ class TestDefinition:
     def Run(self, runner, paths: ApplicationPaths):
         """Executes the given test case using the provided runner for execution."""
         app_process = None
+        runner.capture_delegate = ExecutionCapture()
 
         try:
             if self.target == TestTarget.ALL_CLUSTERS:
@@ -62,7 +96,7 @@ class TestDefinition:
 
             logging.debug('Executing application under test.')
             app_process, outpipe, errpipe = runner.RunSubprocess(
-                app_cmd, name='APP', wait=False)
+                app_cmd, name='APP ', wait=False)
 
             logging.debug('Waiting for server to listen.')
             start_time = time.time()
@@ -81,6 +115,10 @@ class TestDefinition:
 
             runner.RunSubprocess(tool_cmd + ['tests', self.run_name, TEST_NODE_ID],
                                  name='PAIR')
+        except:
+            logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
+            runner.capture_delegate.LogContents()
+            raise
         finally:
             if app_process:
                 app_process.kill()
