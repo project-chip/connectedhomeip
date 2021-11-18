@@ -80,6 +80,7 @@ public:
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsGroupSession() const { return mGroupId.HasValue(); }
+    const Optional<GroupId> & GetGroupId() const { return mGroupId; }
     const Optional<uint16_t> & GetPeerSessionId() const { return mPeerSessionId; }
     const Optional<uint16_t> & GetLocalSessionId() const { return mLocalSessionId; }
 

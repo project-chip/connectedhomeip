@@ -1091,6 +1091,34 @@ public:
     CHIP_ERROR Finalize();
 
     /**
+     * Reserve some buffer for encoding future fields.
+     *
+     * @retval #CHIP_NO_ERROR        Successfully reserved required buffer size.
+     * @retval #CHIP_ERROR_NO_MEMORY The reserved buffer size cannot fits into the remaining buffer size.
+     */
+    CHIP_ERROR ReserveBuffer(uint32_t aBufferSize)
+    {
+        VerifyOrReturnError(mRemainingLen >= aBufferSize, CHIP_ERROR_NO_MEMORY);
+        mReservedSize += aBufferSize;
+        mRemainingLen -= aBufferSize;
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Release previously reserved buffer.
+     *
+     * @retval #CHIP_NO_ERROR        Successfully released reserved buffer size.
+     * @retval #CHIP_ERROR_NO_MEMORY The released buffer is larger than previously reserved buffer size.
+     */
+    CHIP_ERROR UnreserveBuffer(uint32_t aBufferSize)
+    {
+        VerifyOrReturnError(mReservedSize >= aBufferSize, CHIP_ERROR_NO_MEMORY);
+        mReservedSize -= aBufferSize;
+        mRemainingLen += aBufferSize;
+        return CHIP_NO_ERROR;
+    }
+
+    /**
      * Encodes a TLV signed integer value.
      *
      * @param[in]   tag             The TLV tag to be encoded with the value, or @p AnonymousTag if the
@@ -2120,6 +2148,7 @@ protected:
     uint32_t mRemainingLen;
     uint32_t mLenWritten;
     uint32_t mMaxLen;
+    uint32_t mReservedSize;
     TLVType mContainerType;
 
 private:

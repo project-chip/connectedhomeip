@@ -15,20 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines ReadRequestMessage parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
 
-#include "AttributeDataVersionList.h"
 #include "AttributePathIBs.h"
-#include "Builder.h"
+#include "EventFilters.h"
 #include "EventPaths.h"
-
-#include "Parser.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -40,12 +32,13 @@
 namespace chip {
 namespace app {
 namespace ReadRequestMessage {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_AttributePathList        = 0,
-    kCsTag_AttributeDataVersionList = 1,
-    kCsTag_EventPaths               = 2,
-    kCsTag_EventNumber              = 3,
+    kAttributeRequests  = 0,
+    kEventRequests      = 1,
+    kDataVersionFilters = 2,
+    kEventFilters       = 3,
+    kIsFabricFiltered   = 4,
 };
 
 class Parser : public StructParser
@@ -71,42 +64,40 @@ public:
     /**
      *  @brief Get a TLVReader for the AttributePathIBs. Next() must be called before accessing them.
      *
-     *  @param [in] apAttributePathList    A pointer to an attribute path list parser.
+     *  @param [in] apAttributeRequests    A pointer to an attribute path list parser.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetPathList(AttributePathIBs::Parser * const apAttributePathList) const;
+    CHIP_ERROR GetAttributeRequests(AttributePathIBs::Parser * const apAttributeRequests) const;
 
     /**
-     *  @brief Get a TLVReader for the EventPaths. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the EventRequests. Next() must be called before accessing them.
      *
      *  @param [in] apEventPaths    A pointer to apEventPaths
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventPaths(EventPaths::Parser * const apEventPaths) const;
+    CHIP_ERROR GetEventRequests(EventPaths::Parser * const apEventRequests) const;
 
     /**
-     *  @brief Get a parser for the AttributeDataVersionList. Next() must be called before accessing them.
-     *
-     *  @param [in] apAttributeDataVersionList    A pointer to apAttributeDataVersionList
+     *  @brief Get a TLVReader for the EventFilters. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const;
+    CHIP_ERROR GetEventFilters(EventFilters::Parser * const apEventFilters) const;
 
     /**
-     *  @brief Get Event Number. Next() must be called before accessing them.
+     *  @brief Get IsFabricFiltered boolean
      *
-     *  @param [in] apEventNumber    A pointer to apEventNumber
+     *  @param [in] apIsFabricFiltered    A pointer to apIsFabricFiltered
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventNumber(uint64_t * const apEventNumber) const;
+    CHIP_ERROR GetIsFabricFiltered(bool * const apIsFabricFiltered) const;
 };
 
 class Builder : public StructBuilder
@@ -117,29 +108,28 @@ public:
      *
      *  @return A reference to AttributePathIBs::Builder
      */
-    AttributePathIBs::Builder & CreateAttributePathListBuilder();
+    AttributePathIBs::Builder & CreateAttributeRequests();
 
     /**
      *  @brief Initialize a EventPaths::Builder for writing into the TLV stream
      *
      *  @return A reference to EventPaths::Builder
      */
-    EventPaths::Builder & CreateEventPathsBuilder();
+    EventPaths::Builder & CreateEventRequests();
 
     /**
-     *  @brief Initialize a AttributeDataVersionList::Builder for writing into the TLV stream
+     *  @brief Initialize a EventFilters::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataVersionList::Builder
+     *  @return A reference to EventFilters::Builder
      */
-    AttributeDataVersionList::Builder & CreateAttributeDataVersionListBuilder();
+    EventFilters::Builder & CreateEventFilters();
 
     /**
-     *  @brief An initiator can optionally specify an EventNumber it has already to limit the
-     *  set of retrieved events on the server for optimization purposes.
-     *  @param [in] aEventNumber The event number
+     *  @brief  limits the data written within fabric-scoped lists to the accessing fabric
      *  @return A reference to *this
      */
-    ReadRequestMessage::Builder & EventNumber(const uint64_t aEventNumber);
+    ReadRequestMessage::Builder & IsFabricFiltered(const bool aIsFabricFiltered);
+
     /**
      *  @brief Mark the end of this ReadRequestMessage
      *
@@ -148,10 +138,10 @@ public:
     ReadRequestMessage::Builder & EndOfReadRequestMessage();
 
 private:
-    AttributePathIBs::Builder mAttributePathListBuilder;
-    EventPaths::Builder mEventPathsBuilder;
-    AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
+    AttributePathIBs::Builder mAttributeRequests;
+    EventPaths::Builder mEventRequests;
+    EventFilters::Builder mEventFilters;
 };
-}; // namespace ReadRequestMessage
-}; // namespace app
-}; // namespace chip
+} // namespace ReadRequestMessage
+} // namespace app
+} // namespace chip

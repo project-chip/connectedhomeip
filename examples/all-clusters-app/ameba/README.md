@@ -10,7 +10,6 @@ control.
     -   [Building the Example Application](#building-the-example-application)
     -   [Commissioning and cluster control](#commissioning-and-cluster-control)
         -   [Commissioning](#commissioning)
-            -   [Bypass mode](#bypass-mode)
             -   [BLE mode](#ble-mode)
             -   [IP mode](#ip-mode)
         -   [Cluster control](#cluster-control)
@@ -59,26 +58,7 @@ The CHIP demo application is supported on
 
 ## Commissioning
 
-There are three commissioning modes supported by Ameba platform:
-
-### Bypass mode
-
-1. In "connectedhomeip/config/ameba/args.gni"
-
-    - set `chip_bypass_rendezvous = true`
-    - Set `chip_config_network_layer_ble = false`
-
-2. In "connectedhomeip/src/platform/Ameba/CHIPDevicePlatformConfig.h"
-
-    - Set `#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0`
-
-3. Build and Flash
-4. Use ATS\$ command to run all-cluster example.
-5. Connect to AP using `ATW0, ATW1, ATWC` commands
-6. Test with
-   [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
-   or
-   [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md).
+There are two commissioning modes supported by Ameba platform:
 
 ### BLE mode
 

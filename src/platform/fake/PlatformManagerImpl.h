@@ -113,6 +113,10 @@ private:
     CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
     CHIP_ERROR _GetBootReasons(uint8_t & bootReasons);
 
+    CHIP_ERROR _GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults);
+    CHIP_ERROR _GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults);
+    CHIP_ERROR _GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults);
+
     // ===== Members for internal use by the following friends.
 
     friend PlatformManager & PlatformMgr();

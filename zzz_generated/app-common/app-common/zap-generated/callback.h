@@ -14446,8 +14446,6 @@ bool emberAfSampleMfgSpecificCluster2ClusterCommandTwoCallback(
  * application behaves with regard to sleeping and polling.  Until the
  * outstanding task is completed, the device may poll more frequently and sleep
  * less often.
- *
- * @param tasks   Ver.: always
  */
 void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks);
 
@@ -14460,8 +14458,6 @@ void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks);
  * from the list of outstanding tasks may allow the device to sleep longer and
  * poll less frequently.  If there are other outstanding tasks the system may
  * still have to stay away and poll more often.
- *
- * @param tasks   Ver.: always
  */
 void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks);
 
@@ -14489,14 +14485,6 @@ void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks);
  * is unlikely to be a problem for writing read-only attributes, but it may be a
  * problem for attributes that are writeable according to the specification but
  * restricted by the application implementing this callback.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param value   Ver.: always
- * @param type   Ver.: always
  */
 EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                           chip::AttributeId attributeId, uint8_t mask,
@@ -14506,11 +14494,6 @@ EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::
  *
  * This function is called whenever the Application Framework needs to check
  * access permission for an attribute read.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param attributeId   Ver.: always
  */
 bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
                                         chip::AttributeId attributeId);
@@ -14519,11 +14502,6 @@ bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::Cluster
  *
  * This function is called whenever the Application Framework needs to check
  * access permission for an attribute write.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param attributeId   Ver.: always
  */
 bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
                                          chip::AttributeId attributeId);
@@ -14534,11 +14512,10 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
  * command is received from an external device.  The application should return
  * true if the message was processed or false if it was not.
  *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param commandId The command identifier to which this is a response.  Ver.:
- * always
+ * @param clusterId The cluster identifier of this response.
+ * @param commandId The command identifier to which this is a response.
  * @param status Specifies either SUCCESS or the nature of the error that was
- * detected in the received command.  Ver.: always
+ * detected in the received command.
  */
 bool emberAfDefaultResponseCallback(chip::ClusterId clusterId, chip::CommandId commandId, EmberAfStatus status);
 
@@ -14557,9 +14534,9 @@ bool emberAfDefaultResponseCallback(chip::ClusterId clusterId, chip::CommandId c
  * the mesasge and the framework will continue to process accordingly.
  *
  * @param messageStruct The structure containing the parameters of the APS
- * message to be sent.  Ver.: always
+ * message to be sent.
  * @param status A pointer to the status code value that will be returned to the
- * caller.  Ver.: always
+ * caller.
  */
 bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberStatus * status);
 
@@ -14573,12 +14550,6 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
  * callback should return a bool value of true or false. A value of true
  * indicates that the message sent notification has been handled and should not
  * be handled by the application framework.
- *
- * @param destination   Ver.: always
- * @param apsFrame   Ver.: always
- * @param msgLen   Ver.: always
- * @param message   Ver.: always
- * @param status   Ver.: always
  */
 bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
                                 uint8_t * message, EmberStatus status);
@@ -14611,14 +14582,6 @@ bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination
  * of a buffer overflow throw an appropriate error such as
  * EMBER_ZCL_STATUS_INSUFFICIENT_SPACE. Any other return value indicates the
  * application was not able to read the attribute.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeMetadata   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param buffer   Ver.: always
- * @param maxReadLength   Ver.: always
- * @param index   Ver.: always
  */
 EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
@@ -14663,13 +14626,6 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
  * write the attribute, it returns a value of EMBER_ZCL_STATUS_SUCCESS. Any
  * other return value indicates the application was not able to write the
  * attribute.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeMetadata   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param buffer   Ver.: always
- * @param index   Ver.: always
  */
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                     EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
@@ -14741,12 +14697,6 @@ bool emberAfStartMoveCallback();
  * the attribute is to be set by the framework.  The application should return
  * chip::Protocols::InteractionModel::Status::Success to permit the change or
  * any other code to reject it.
- *
- * @param attributePath
- * @param mask
- * @param type
- * @param size
- * @param value
  */
 chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                                            uint8_t mask, uint8_t type, uint16_t size,
@@ -14757,12 +14707,6 @@ chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const
  * This function is called by the application framework after it changes an
  * attribute value. The value passed into this callback is the value to which
  * the attribute was set by the framework.
- *
- * @param attributePath
- * @param mask
- * @param type
- * @param size
- * @param value
  */
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
                                        uint16_t size, uint8_t * value);

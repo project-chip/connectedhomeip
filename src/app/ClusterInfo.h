@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
 #include <assert.h>
 #include <lib/core/Optional.h>
@@ -37,6 +38,7 @@ struct ClusterInfo
 private:
     // Allow AttributePathParams access these constants.
     friend struct AttributePathParams;
+    friend struct ConcreteEventPath;
 
     // The ClusterId, AttributeId and EventId are MEIs,
     // 0xFFFF is not a valid manufacturer code, thus 0xFFFF'FFFF is not a valid MEI
@@ -53,6 +55,15 @@ public:
         VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
         VerifyOrReturnError(HasWildcardAttributeId() || mAttributeId == other.mAttributeId, false);
         VerifyOrReturnError(HasWildcardListIndex() || mListIndex == other.mListIndex, false);
+
+        return true;
+    }
+
+    bool IsAttributePathSupersetOf(const ConcreteAttributePath & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+        VerifyOrReturnError(HasWildcardAttributeId() || mAttributeId == other.mAttributeId, false);
 
         return true;
     }

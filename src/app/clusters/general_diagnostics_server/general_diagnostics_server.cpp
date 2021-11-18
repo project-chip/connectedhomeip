@@ -29,6 +29,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
+using namespace chip::DeviceLayer;
 using chip::DeviceLayer::ConnectivityMgr;
 using chip::DeviceLayer::PlatformManager;
 using chip::DeviceLayer::PlatformMgr;
@@ -46,6 +47,10 @@ public:
 private:
     template <typename T>
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &), AttributeValueEncoder & aEncoder);
+
+    template <typename T>
+    CHIP_ERROR ReadListIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &), AttributeValueEncoder & aEncoder);
+
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 };
 
@@ -65,6 +70,32 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMana
     }
 
     return aEncoder.Encode(data);
+}
+
+template <typename T>
+CHIP_ERROR GeneralDiagosticsAttrAccess::ReadListIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &),
+                                                            AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    T faultList;
+
+    if ((PlatformMgr().*getter)(faultList) == CHIP_NO_ERROR)
+    {
+        err = aEncoder.EncodeList([&faultList](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+            for (auto fault : faultList)
+            {
+                ReturnErrorOnFailure(encoder.Encode(fault));
+            }
+
+            return CHIP_NO_ERROR;
+        });
+    }
+    else
+    {
+        err = aEncoder.Encode(DataModel::List<uint8_t>());
+    }
+
+    return err;
 }
 
 CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)
@@ -107,6 +138,15 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath
     {
     case NetworkInterfaces::Id: {
         return ReadNetworkInterfaces(aEncoder);
+    }
+    case ActiveHardwareFaults::Id: {
+        return ReadListIfSupported(&PlatformManager::GetActiveHardwareFaults, aEncoder);
+    }
+    case ActiveRadioFaults::Id: {
+        return ReadListIfSupported(&PlatformManager::GetActiveRadioFaults, aEncoder);
+    }
+    case ActiveNetworkFaults::Id: {
+        return ReadListIfSupported(&PlatformManager::GetActiveNetworkFaults, aEncoder);
     }
     case RebootCount::Id: {
         return ReadIfSupported(&PlatformManager::GetRebootCount, aEncoder);

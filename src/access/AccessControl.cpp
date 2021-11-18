@@ -95,7 +95,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     ChipLogDetail(DataManagement, "  endpoint = %u", requestPath.endpoint);
     // TEMP: hardcode allow/deny
     bool allow = requestPath.cluster != 0x33;
-    ChipLogDetail(DataManagement, "^^^^^^^^^^^^^^^ --> %s", allow ? "ALLOW" : "DENY");
+    ChipLogDetail(DataManagement, "^^^^^^^^^^^^^^^^^^^^^^^^^ --> %s", allow ? "ALLOW" : "DENY");
     return allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_DENIED;
 #endif
 

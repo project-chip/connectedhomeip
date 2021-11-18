@@ -40,6 +40,8 @@
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
 
+#include <lib/dnssd/Resolver.h>
+
 namespace chip {
 
 struct DeviceProxyInitParams
@@ -50,6 +52,16 @@ struct DeviceProxyInitParams
     FabricInfo * fabricInfo                  = nullptr;
 
     Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
+
+    CHIP_ERROR Validate()
+    {
+        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(idAllocator == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        return CHIP_NO_ERROR;
+    }
 };
 
 class OperationalDeviceProxy;
@@ -57,20 +69,24 @@ class OperationalDeviceProxy;
 typedef void (*OnDeviceConnected)(void * context, DeviceProxy * device);
 typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
 
-class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, public SessionEstablishmentDelegate
+class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, SessionReleaseDelegate, public SessionEstablishmentDelegate
 {
 public:
     virtual ~OperationalDeviceProxy();
-    OperationalDeviceProxy(DeviceProxyInitParams params, PeerId peerId)
+    OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId)
     {
-        VerifyOrReturn(params.sessionManager != nullptr);
-        VerifyOrReturn(params.exchangeMgr != nullptr);
-        VerifyOrReturn(params.idAllocator != nullptr);
-        VerifyOrReturn(params.fabricInfo != nullptr);
+        VerifyOrReturn(params.Validate() == CHIP_NO_ERROR);
 
         mInitParams = params;
         mPeerId     = peerId;
-        mState      = State::NeedsAddress;
+
+        mState = State::NeedsAddress;
+    }
+
+    OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId, const Dnssd::ResolvedNodeData & nodeResolutionData) :
+        OperationalDeviceProxy(params, peerId)
+    {
+        OnNodeIdResolved(nodeResolutionData);
     }
 
     void Clear();
@@ -97,7 +113,20 @@ public:
      *   Called when a connection is closing.
      *   The object releases all resources associated with the connection.
      */
-    void OnConnectionExpired(SessionHandle session) override;
+    void OnSessionReleased(SessionHandle session) override;
+
+    void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeResolutionData)
+    {
+        mDeviceAddress = ToPeerAddress(nodeResolutionData);
+
+        mMrpIdleInterval   = nodeResolutionData.GetMrpRetryIntervalIdle().ValueOr(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL);
+        mMrpActiveInterval = nodeResolutionData.GetMrpRetryIntervalActive().ValueOr(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
+
+        if (mState == State::NeedsAddress)
+        {
+            mState = State::Initialized;
+        }
+    }
 
     /**
      *  Mark any open session with the device as expired.
@@ -105,27 +134,6 @@ public:
     CHIP_ERROR Disconnect() override;
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
-    /*
-        // ----- Messaging -----
-        CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
-                                            Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter) override;
-
-        CHIP_ERROR SendSubscribeAttributeRequest(app::AttributePathParams aPath, uint16_t mMinIntervalFloorSeconds,
-                                                 uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
-                                                 Callback::Cancelable * onFailureCallback) override;
-
-        CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
-                                             Callback::Cancelable * onFailureCallback) override;
-
-        CHIP_ERROR SendCommands(app::CommandSender * commandObj) override;
-
-        void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable *
-       onReportCallback, app::TLVDataFilter tlvDataFilter) override;
-
-        void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback, Callback::Cancelable *
-       onFailureCallback, app::TLVDataFilter tlvDataFilter = nullptr) override; void CancelIMResponseHandler(void * commandObj)
-       override;
-    */
 
     /**
      *   Update data of the device.
@@ -156,6 +164,25 @@ public:
     chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession; }
 
     bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const override;
+
+    Transport::PeerAddress GetPeerAddress() const { return mDeviceAddress; }
+
+    static Transport::PeerAddress ToPeerAddress(const Dnssd::ResolvedNodeData & nodeData)
+    {
+        Inet::InterfaceId interfaceId = Inet::InterfaceId::Null();
+
+        // TODO - Revisit usage of InterfaceID only for addresses that are IPv6 LLA
+        // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
+        // For all other addresses, we should rely on the device's routing table to route messages sent.
+        // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
+        // mDNS advertisements are not usually received on the same interface the peer is reachable on.
+        if (nodeData.mAddress[0].IsIPv6LinkLocal())
+        {
+            interfaceId = nodeData.mInterfaceId;
+        }
+
+        return Transport::PeerAddress::UDP(nodeData.mAddress[0], nodeData.mPort, interfaceId);
+    }
 
 private:
     enum class State

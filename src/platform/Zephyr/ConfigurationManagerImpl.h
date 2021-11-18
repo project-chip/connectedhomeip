@@ -33,15 +33,8 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Zephyr platform.
  */
-class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-                                 private Internal::ZephyrConfig
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::ZephyrConfig>
 {
-    // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
-    // defined on this class.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
-#endif
-
 public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
@@ -58,6 +51,20 @@ private:
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
+    // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
+    CHIP_ERROR ReadConfigValue(Key key, bool & val) override;
+    CHIP_ERROR ReadConfigValue(Key key, uint32_t & val) override;
+    CHIP_ERROR ReadConfigValue(Key key, uint64_t & val) override;
+    CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen) override;
+    CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen) override;
+    CHIP_ERROR WriteConfigValue(Key key, bool val) override;
+    CHIP_ERROR WriteConfigValue(Key key, uint32_t val) override;
+    CHIP_ERROR WriteConfigValue(Key key, uint64_t val) override;
+    CHIP_ERROR WriteConfigValueStr(Key key, const char * str) override;
+    CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen) override;
+    CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
+    void RunConfigUnitTest(void) override;
+
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
@@ -70,12 +77,12 @@ inline bool ConfigurationManagerImpl::CanFactoryReset()
 
 inline CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    return ReadConfigValueCounter(key, value);
+    return Internal::ZephyrConfig::ReadConfigValueCounter(key, value);
 }
 
 inline CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    return WriteConfigValueCounter(key, value);
+    return Internal::ZephyrConfig::WriteConfigValueCounter(key, value);
 }
 
 inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * /* buf */)

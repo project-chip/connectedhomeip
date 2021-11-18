@@ -27,6 +27,7 @@
 #include "StructBuilder.h"
 #include "StructParser.h"
 #include <app/AppBuildConfig.h>
+#include <app/EventHeader.h>
 #include <app/EventLoggingTypes.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -156,9 +157,14 @@ public:
      */
     CHIP_ERROR GetData(TLV::TLVReader * const apReader) const;
 
+    CHIP_ERROR DecodeEventHeader(EventHeader & aEventHeader);
+
 protected:
     // A recursively callable function to parse a data element and pretty-print it.
     CHIP_ERROR ParseData(TLV::TLVReader & aReader, int aDepth) const;
+
+    CHIP_ERROR ProcessEventPath(EventPathIB::Parser & aEventPath, ConcreteEventPath & aConcreteEventPath);
+    CHIP_ERROR ProcessEventTimestamp(EventHeader & aEventHeader);
 };
 
 class Builder : public StructBuilder

@@ -22,22 +22,25 @@ static_library("transport") {
   sources = [
     "CryptoContext.cpp",
     "CryptoContext.h",
-    "FabricTable.cpp",
-    "FabricTable.h",
     "MessageCounter.cpp",
     "MessageCounter.h",
+    "MessageCounterManagerInterface.h",
     "PeerMessageCounter.h",
     "SecureMessageCodec.cpp",
     "SecureMessageCodec.h",
     "SecureSession.h",
     "SecureSessionTable.h",
+    "SessionDelegate.h",
     "SessionHandle.cpp",
     "SessionHandle.h",
     "SessionManager.cpp",
     "SessionManager.h",
+    "SessionMessageCounter.h",
+    "SessionMessageDelegate.h",
     "TransportMgr.h",
     "TransportMgrBase.cpp",
     "TransportMgrBase.h",
+    "UnauthenticatedSessionTable.h",
   ]
 
   cflags = [ "-Wconversion" ]

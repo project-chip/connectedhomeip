@@ -22,6 +22,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <access/AccessControl.h>
+#include <access/examples/ExampleAccessControlDelegate.h>
+
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <lib/core/CHIPError.h>
@@ -57,6 +60,7 @@
 #include "Options.h"
 
 using namespace chip;
+using namespace chip::Access;
 using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 using namespace chip::Inet;
@@ -122,6 +126,10 @@ int ChipLinuxAppInit(int argc, char ** argv)
     SuccessOrExit(err);
 
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
+    SuccessOrExit(err);
+
+    SetAccessControl(Access::Examples::GetAccessControl());
+    err = GetAccessControl().Init();
     SuccessOrExit(err);
 
     err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
@@ -234,7 +242,7 @@ CHIP_ERROR InitCommissioner()
     ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort));
 
     // Initialize device attestation verifier
-    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
+    SetDeviceAttestationVerifier(Credentials::Examples::GetExampleDACVerifier());
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
@@ -300,7 +308,7 @@ void ChipLinuxAppMainLoop()
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
     // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     InitCommissioner();

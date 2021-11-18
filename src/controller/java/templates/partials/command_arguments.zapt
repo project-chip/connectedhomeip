@@ -1,0 +1,13 @@
+{{#chip_cluster_command_arguments_with_structs_expanded}}
+,
+{{#if isOptional}}
+Optional<
+{{else if isNullable}}
+@Nullable
+{{/if}}
+{{asJavaBoxedType type}}
+{{#if isOptional}}
+>
+{{/if}}
+{{asLowerCamelCase label}}
+{{/chip_cluster_command_arguments_with_structs_expanded}}

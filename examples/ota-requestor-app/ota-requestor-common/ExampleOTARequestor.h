@@ -21,7 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/util/af-enums.h>
-#include <transport/FabricTable.h>
+#include <credentials/FabricTable.h>
 
 // An example implementation for how an application might handle receiving an AnnounceOTAProvider command. In this case, the
 // AnnounceOTAProvider command will be used as a trigger to send a QueryImage command and begin the OTA process. This class also

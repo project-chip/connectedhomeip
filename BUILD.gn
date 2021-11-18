@@ -315,7 +315,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_fake_tests) {
     chip_build("fake_platform") {
-      toolchain = "${build_root}/toolchain/host:fake_${host_cpu}_gcc"
+      toolchain = "${build_root}/toolchain/fake:fake_${host_cpu}_gcc"
     }
   }
 
