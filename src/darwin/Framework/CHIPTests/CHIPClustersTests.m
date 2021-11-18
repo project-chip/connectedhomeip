@@ -4173,11 +4173,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveToHuePayload alloc] init];
-    payload.Hue = [NSNumber numberWithUnsignedChar:150];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:100U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.hue = [NSNumber numberWithUnsignedChar:150];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:100U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move to hue shortest distance command Error: %@", err);
@@ -4199,11 +4199,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveToHuePayload alloc] init];
-    payload.Hue = [NSNumber numberWithUnsignedChar:200];
-    payload.Direction = [NSNumber numberWithUnsignedChar:1];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:100U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.hue = [NSNumber numberWithUnsignedChar:200];
+    payload.direction = [NSNumber numberWithUnsignedChar:1];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:100U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move to hue longest distance command Error: %@", err);
@@ -4225,11 +4225,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveToHuePayload alloc] init];
-    payload.Hue = [NSNumber numberWithUnsignedChar:250];
-    payload.Direction = [NSNumber numberWithUnsignedChar:2];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:100U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.hue = [NSNumber numberWithUnsignedChar:250];
+    payload.direction = [NSNumber numberWithUnsignedChar:2];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:100U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move to hue up command Error: %@", err);
@@ -4251,11 +4251,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveToHuePayload alloc] init];
-    payload.Hue = [NSNumber numberWithUnsignedChar:225];
-    payload.Direction = [NSNumber numberWithUnsignedChar:3];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:100U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.hue = [NSNumber numberWithUnsignedChar:225];
+    payload.direction = [NSNumber numberWithUnsignedChar:3];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:100U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move to hue down command Error: %@", err);
@@ -4368,10 +4368,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveHuePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
-    payload.Rate = [NSNumber numberWithUnsignedChar:50];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.rate = [NSNumber numberWithUnsignedChar:50];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move hue up command Error: %@", err);
@@ -4393,10 +4393,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveHuePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
-    payload.Rate = [NSNumber numberWithUnsignedChar:50];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.rate = [NSNumber numberWithUnsignedChar:50];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move hue stop command Error: %@", err);
@@ -4418,10 +4418,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveHuePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:3];
-    payload.Rate = [NSNumber numberWithUnsignedChar:50];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:3];
+    payload.rate = [NSNumber numberWithUnsignedChar:50];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move hue down command Error: %@", err);
@@ -4443,10 +4443,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveHuePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
-    payload.Rate = [NSNumber numberWithUnsignedChar:50];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.rate = [NSNumber numberWithUnsignedChar:50];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move hue stop command Error: %@", err);
@@ -4559,11 +4559,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterStepHuePayload alloc] init];
-    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
-    payload.StepSize = [NSNumber numberWithUnsignedChar:5];
-    payload.TransitionTime = [NSNumber numberWithUnsignedChar:25];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.stepSize = [NSNumber numberWithUnsignedChar:5];
+    payload.transitionTime = [NSNumber numberWithUnsignedChar:25];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Step hue up command Error: %@", err);
@@ -4585,11 +4585,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterStepHuePayload alloc] init];
-    payload.StepMode = [NSNumber numberWithUnsignedChar:3];
-    payload.StepSize = [NSNumber numberWithUnsignedChar:5];
-    payload.TransitionTime = [NSNumber numberWithUnsignedChar:25];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepMode = [NSNumber numberWithUnsignedChar:3];
+    payload.stepSize = [NSNumber numberWithUnsignedChar:5];
+    payload.transitionTime = [NSNumber numberWithUnsignedChar:25];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepHue:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Step hue down command Error: %@", err);
@@ -4702,10 +4702,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveToSaturationPayload alloc] init];
-    payload.Saturation = [NSNumber numberWithUnsignedChar:90];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:10U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.saturation = [NSNumber numberWithUnsignedChar:90];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:10U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToSaturation:payload
               responseHandler:^(NSError * err, NSDictionary * values) {
                   NSLog(@"Move to saturation command Error: %@", err);
@@ -4818,10 +4818,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveSaturationPayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
-    payload.Rate = [NSNumber numberWithUnsignedChar:5];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.rate = [NSNumber numberWithUnsignedChar:5];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveSaturation:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 NSLog(@"Move saturation up command Error: %@", err);
@@ -4843,10 +4843,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveSaturationPayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:3];
-    payload.Rate = [NSNumber numberWithUnsignedChar:5];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:3];
+    payload.rate = [NSNumber numberWithUnsignedChar:5];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveSaturation:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 NSLog(@"Move saturation down command Error: %@", err);
@@ -4959,11 +4959,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterStepSaturationPayload alloc] init];
-    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
-    payload.StepSize = [NSNumber numberWithUnsignedChar:15];
-    payload.TransitionTime = [NSNumber numberWithUnsignedChar:10];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.stepSize = [NSNumber numberWithUnsignedChar:15];
+    payload.transitionTime = [NSNumber numberWithUnsignedChar:10];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepSaturation:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 NSLog(@"Step saturation up command Error: %@", err);
@@ -4985,11 +4985,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterStepSaturationPayload alloc] init];
-    payload.StepMode = [NSNumber numberWithUnsignedChar:3];
-    payload.StepSize = [NSNumber numberWithUnsignedChar:20];
-    payload.TransitionTime = [NSNumber numberWithUnsignedChar:10];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepMode = [NSNumber numberWithUnsignedChar:3];
+    payload.stepSize = [NSNumber numberWithUnsignedChar:20];
+    payload.transitionTime = [NSNumber numberWithUnsignedChar:10];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepSaturation:payload
             responseHandler:^(NSError * err, NSDictionary * values) {
                 NSLog(@"Step saturation down command Error: %@", err);
@@ -5102,11 +5102,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveToHueAndSaturationPayload alloc] init];
-    payload.Hue = [NSNumber numberWithUnsignedChar:40];
-    payload.Saturation = [NSNumber numberWithUnsignedChar:160];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:10U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.hue = [NSNumber numberWithUnsignedChar:40];
+    payload.saturation = [NSNumber numberWithUnsignedChar:160];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:10U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHueAndSaturation:payload
                     responseHandler:^(NSError * err, NSDictionary * values) {
                         NSLog(@"Move To current hue and saturation command Error: %@", err);
@@ -5219,11 +5219,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveToColorPayload alloc] init];
-    payload.ColorX = [NSNumber numberWithUnsignedShort:200U];
-    payload.ColorY = [NSNumber numberWithUnsignedShort:300U];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.colorX = [NSNumber numberWithUnsignedShort:200U];
+    payload.colorY = [NSNumber numberWithUnsignedShort:300U];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:20U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToColor:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"Move to Color command Error: %@", err);
@@ -5336,10 +5336,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveColorPayload alloc] init];
-    payload.RateX = [NSNumber numberWithShort:15];
-    payload.RateY = [NSNumber numberWithShort:20];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.rateX = [NSNumber numberWithShort:15];
+    payload.rateY = [NSNumber numberWithShort:20];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveColor:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Move Color command Error: %@", err);
@@ -5361,8 +5361,8 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterStopMoveStepPayload alloc] init];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stopMoveStep:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Stop Move Step command Error: %@", err);
@@ -5475,11 +5475,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterStepColorPayload alloc] init];
-    payload.StepX = [NSNumber numberWithShort:15];
-    payload.StepY = [NSNumber numberWithShort:20];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:50U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepX = [NSNumber numberWithShort:15];
+    payload.stepY = [NSNumber numberWithShort:20];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:50U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepColor:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Step Color command Error: %@", err);
@@ -5592,10 +5592,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveToColorTemperaturePayload alloc] init];
-    payload.ColorTemperature = [NSNumber numberWithUnsignedShort:100U];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:10U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.colorTemperature = [NSNumber numberWithUnsignedShort:100U];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:10U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToColorTemperature:payload
                     responseHandler:^(NSError * err, NSDictionary * values) {
                         NSLog(@"Move To Color Temperature command Error: %@", err);
@@ -5708,12 +5708,12 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveColorTemperaturePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
-    payload.Rate = [NSNumber numberWithUnsignedShort:10U];
-    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
-    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.rate = [NSNumber numberWithUnsignedShort:10U];
+    payload.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
+    payload.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Move up color temperature command Error: %@", err);
@@ -5735,12 +5735,12 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveColorTemperaturePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
-    payload.Rate = [NSNumber numberWithUnsignedShort:10U];
-    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
-    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.rate = [NSNumber numberWithUnsignedShort:10U];
+    payload.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
+    payload.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Stop Color Temperature command Error: %@", err);
@@ -5762,12 +5762,12 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterMoveColorTemperaturePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:3];
-    payload.Rate = [NSNumber numberWithUnsignedShort:20U];
-    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
-    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:3];
+    payload.rate = [NSNumber numberWithUnsignedShort:20U];
+    payload.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
+    payload.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Move down color temperature command Error: %@", err);
@@ -5880,13 +5880,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterStepColorTemperaturePayload alloc] init];
-    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
-    payload.StepSize = [NSNumber numberWithUnsignedShort:5U];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:50U];
-    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:5U];
-    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:100U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.stepSize = [NSNumber numberWithUnsignedShort:5U];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:50U];
+    payload.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:5U];
+    payload.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:100U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Step up color temperature command Error: %@", err);
@@ -5908,13 +5908,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterStepColorTemperaturePayload alloc] init];
-    payload.StepMode = [NSNumber numberWithUnsignedChar:3];
-    payload.StepSize = [NSNumber numberWithUnsignedShort:5U];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:50U];
-    payload.ColorTemperatureMinimum = [NSNumber numberWithUnsignedShort:5U];
-    payload.ColorTemperatureMaximum = [NSNumber numberWithUnsignedShort:100U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepMode = [NSNumber numberWithUnsignedChar:3];
+    payload.stepSize = [NSNumber numberWithUnsignedShort:5U];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:50U];
+    payload.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:5U];
+    payload.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:100U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepColorTemperature:payload
                   responseHandler:^(NSError * err, NSDictionary * values) {
                       NSLog(@"Step down color temperature command Error: %@", err);
@@ -6027,11 +6027,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveToHuePayload alloc] init];
-    payload.EnhancedHue = [NSNumber numberWithUnsignedShort:1025U];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:1U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.enhancedHue = [NSNumber numberWithUnsignedShort:1025U];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:1U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveToHue:payload
                responseHandler:^(NSError * err, NSDictionary * values) {
                    NSLog(@"Enhanced Move To Hue command Error: %@", err);
@@ -6169,10 +6169,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveHuePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:3];
-    payload.Rate = [NSNumber numberWithUnsignedShort:5U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:3];
+    payload.rate = [NSNumber numberWithUnsignedShort:5U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Move Hue Down command  Error: %@", err);
@@ -6194,10 +6194,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveHuePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
-    payload.Rate = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.rate = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
@@ -6219,10 +6219,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveHuePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
-    payload.Rate = [NSNumber numberWithUnsignedShort:50U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.rate = [NSNumber numberWithUnsignedShort:50U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Move Hue Up command Error: %@", err);
@@ -6244,10 +6244,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveHuePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
-    payload.Rate = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.rate = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
@@ -6360,11 +6360,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterEnhancedStepHuePayload alloc] init];
-    payload.StepMode = [NSNumber numberWithUnsignedChar:0];
-    payload.StepSize = [NSNumber numberWithUnsignedShort:50U];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:1U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepMode = [NSNumber numberWithUnsignedChar:0];
+    payload.stepSize = [NSNumber numberWithUnsignedShort:50U];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:1U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedStepHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Step Hue Up command Error: %@", err);
@@ -6386,11 +6386,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterEnhancedStepHuePayload alloc] init];
-    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
-    payload.StepSize = [NSNumber numberWithUnsignedShort:75U];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:1U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.stepSize = [NSNumber numberWithUnsignedShort:75U];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:1U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedStepHue:payload
              responseHandler:^(NSError * err, NSDictionary * values) {
                  NSLog(@"Enhanced Step Hue Down command Error: %@", err);
@@ -6503,11 +6503,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveToHueAndSaturationPayload alloc] init];
-    payload.EnhancedHue = [NSNumber numberWithUnsignedShort:1200U];
-    payload.Saturation = [NSNumber numberWithUnsignedChar:90];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:10U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.enhancedHue = [NSNumber numberWithUnsignedShort:1200U];
+    payload.saturation = [NSNumber numberWithUnsignedChar:90];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:10U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveToHueAndSaturation:payload
                             responseHandler:^(NSError * err, NSDictionary * values) {
                                 NSLog(@"Enhanced move to hue and saturation command Error: %@", err);
@@ -6620,13 +6620,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:14];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:1];
-    payload.Time = [NSNumber numberWithUnsignedShort:100U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:500U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:14];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:1];
+    payload.time = [NSNumber numberWithUnsignedShort:100U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:500U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set all Attributs Error: %@", err);
@@ -6744,13 +6744,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:1];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:1];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
@@ -6797,13 +6797,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:6];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:3500U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:6];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:3500U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set direction and time while running Error: %@", err);
@@ -6873,13 +6873,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:1];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:1];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set direction while running Error: %@", err);
@@ -7016,13 +7016,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7068,13 +7068,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7120,13 +7120,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:4];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:30U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:4];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:30U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7172,13 +7172,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:8];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:160U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:8];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:160U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7224,13 +7224,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:1];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:1];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7276,13 +7276,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7328,13 +7328,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:1];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:1];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7380,13 +7380,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:1];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:1];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7432,13 +7432,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7484,11 +7484,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterEnhancedMoveToHuePayload alloc] init];
-    payload.EnhancedHue = [NSNumber numberWithUnsignedShort:40960U];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.enhancedHue = [NSNumber numberWithUnsignedShort:40960U];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveToHue:payload
                responseHandler:^(NSError * err, NSDictionary * values) {
                    NSLog(@"Enhanced Move To Hue command 10 Error: %@", err);
@@ -7542,13 +7542,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7594,13 +7594,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:2];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:2];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7646,13 +7646,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7698,13 +7698,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:1];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:1];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7750,13 +7750,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:2];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:2];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7802,13 +7802,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -7922,13 +7922,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:15];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:30U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:160U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:15];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:30U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:160U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -8046,13 +8046,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:1];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:1];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set all Attributes Error: %@", err);
@@ -8098,13 +8098,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:2];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:1];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:2];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:1];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
@@ -8150,13 +8150,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
@@ -8270,13 +8270,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:15];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:30U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:160U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:15];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:30U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:160U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
@@ -8394,13 +8394,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:1];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:1];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Set all Attributes Error: %@", err);
@@ -8446,13 +8446,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:4];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:60U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:4];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:60U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
@@ -8498,13 +8498,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPColorControlClusterColorLoopSetPayload alloc] init];
-    payload.UpdateFlags = [NSNumber numberWithUnsignedChar:1];
-    payload.Action = [NSNumber numberWithUnsignedChar:0];
-    payload.Direction = [NSNumber numberWithUnsignedChar:0];
-    payload.Time = [NSNumber numberWithUnsignedShort:0U];
-    payload.StartHue = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionsMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionsOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    payload.action = [NSNumber numberWithUnsignedChar:0];
+    payload.direction = [NSNumber numberWithUnsignedChar:0];
+    payload.time = [NSNumber numberWithUnsignedShort:0U];
+    payload.startHue = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSet:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
@@ -9395,10 +9395,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterMoveToLevelPayload alloc] init];
-    payload.Level = [NSNumber numberWithUnsignedChar:64];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    payload.level = [NSNumber numberWithUnsignedChar:64];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveToLevel:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"sends a Move to level command Error: %@", err);
@@ -9452,10 +9452,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterMoveToLevelPayload alloc] init];
-    payload.Level = [NSNumber numberWithUnsignedChar:128];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:1U];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    payload.level = [NSNumber numberWithUnsignedChar:128];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:1U];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveToLevel:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"sends a Move to level command Error: %@", err);
@@ -9533,10 +9533,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterMoveToLevelPayload alloc] init];
-    payload.Level = [NSNumber numberWithUnsignedChar:254];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:65535U];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    payload.level = [NSNumber numberWithUnsignedChar:254];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:65535U];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveToLevel:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"sends a Move to level command Error: %@", err);
@@ -9590,10 +9590,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterMoveToLevelPayload alloc] init];
-    payload.Level = [NSNumber numberWithUnsignedChar:0];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:0U];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    payload.level = [NSNumber numberWithUnsignedChar:0];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:0U];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveToLevel:payload
          responseHandler:^(NSError * err, NSDictionary * values) {
              NSLog(@"Reset level to 0 Error: %@", err);
@@ -9672,10 +9672,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterMovePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
-    payload.Rate = [NSNumber numberWithUnsignedChar:200];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.rate = [NSNumber numberWithUnsignedChar:200];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster move:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"sends a Move up command Error: %@", err);
@@ -9753,10 +9753,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterMovePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
-    payload.Rate = [NSNumber numberWithUnsignedChar:250];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.rate = [NSNumber numberWithUnsignedChar:250];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster move:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"sends a Move down command Error: %@", err);
@@ -9856,10 +9856,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterMovePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:1];
-    payload.Rate = [NSNumber numberWithUnsignedChar:255];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:1];
+    payload.rate = [NSNumber numberWithUnsignedChar:255];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster move:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"sends a Move up command at default move rate Error: %@", err);
@@ -9932,11 +9932,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterStepPayload alloc] init];
-    payload.StepMode = [NSNumber numberWithUnsignedChar:0];
-    payload.StepSize = [NSNumber numberWithUnsignedChar:128];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20U];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepMode = [NSNumber numberWithUnsignedChar:0];
+    payload.stepSize = [NSNumber numberWithUnsignedChar:128];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:20U];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster step:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
@@ -9990,11 +9990,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterStepPayload alloc] init];
-    payload.StepMode = [NSNumber numberWithUnsignedChar:1];
-    payload.StepSize = [NSNumber numberWithUnsignedChar:64];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20U];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepMode = [NSNumber numberWithUnsignedChar:1];
+    payload.stepSize = [NSNumber numberWithUnsignedChar:64];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:20U];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster step:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Sends step down command to DUT Error: %@", err);
@@ -10048,11 +10048,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterStepPayload alloc] init];
-    payload.StepMode = [NSNumber numberWithUnsignedChar:0];
-    payload.StepSize = [NSNumber numberWithUnsignedChar:64];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20U];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepMode = [NSNumber numberWithUnsignedChar:0];
+    payload.stepSize = [NSNumber numberWithUnsignedChar:64];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:20U];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster step:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Sends a Step up command Error: %@", err);
@@ -10149,11 +10149,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterStepPayload alloc] init];
-    payload.StepMode = [NSNumber numberWithUnsignedChar:0];
-    payload.StepSize = [NSNumber numberWithUnsignedChar:128];
-    payload.TransitionTime = [NSNumber numberWithUnsignedShort:20U];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.stepMode = [NSNumber numberWithUnsignedChar:0];
+    payload.stepSize = [NSNumber numberWithUnsignedChar:128];
+    payload.transitionTime = [NSNumber numberWithUnsignedShort:20U];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster step:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
@@ -10183,10 +10183,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterMovePayload alloc] init];
-    payload.MoveMode = [NSNumber numberWithUnsignedChar:0];
-    payload.Rate = [NSNumber numberWithUnsignedChar:1];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:1];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:1];
+    payload.moveMode = [NSNumber numberWithUnsignedChar:0];
+    payload.rate = [NSNumber numberWithUnsignedChar:1];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:1];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster move:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Sends a move up command to DUT Error: %@", err);
@@ -10216,8 +10216,8 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPLevelControlClusterStopPayload alloc] init];
-    payload.OptionMask = [NSNumber numberWithUnsignedChar:0];
-    payload.OptionOverride = [NSNumber numberWithUnsignedChar:0];
+    payload.optionMask = [NSNumber numberWithUnsignedChar:0];
+    payload.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stop:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Sends stop command to DUT Error: %@", err);
@@ -16082,7 +16082,7 @@ CHIPDevice * GetConnectedDevice()
               XCTAssertEqual(err.code, 0);
 
               {
-                  id actualValue = values[@"ReturnValue"];
+                  id actualValue = values[@"returnValue"];
                   XCTAssertEqual([actualValue unsignedCharValue], 7);
               }
 
@@ -16101,8 +16101,8 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPTestClusterClusterTestAddArgumentsPayload alloc] init];
-    payload.Arg1 = [NSNumber numberWithUnsignedChar:3];
-    payload.Arg2 = [NSNumber numberWithUnsignedChar:17];
+    payload.arg1 = [NSNumber numberWithUnsignedChar:3];
+    payload.arg2 = [NSNumber numberWithUnsignedChar:17];
     [cluster testAddArguments:payload
               responseHandler:^(NSError * err, NSDictionary * values) {
                   NSLog(@"Send Test Add Arguments Command Error: %@", err);
@@ -16110,7 +16110,7 @@ CHIPDevice * GetConnectedDevice()
                   XCTAssertEqual(err.code, 0);
 
                   {
-                      id actualValue = values[@"ReturnValue"];
+                      id actualValue = values[@"returnValue"];
                       XCTAssertEqual([actualValue unsignedCharValue], 20);
                   }
 
@@ -16129,8 +16129,8 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPTestClusterClusterTestAddArgumentsPayload alloc] init];
-    payload.Arg1 = [NSNumber numberWithUnsignedChar:250];
-    payload.Arg2 = [NSNumber numberWithUnsignedChar:6];
+    payload.arg1 = [NSNumber numberWithUnsignedChar:250];
+    payload.arg2 = [NSNumber numberWithUnsignedChar:6];
     [cluster testAddArguments:payload
               responseHandler:^(NSError * err, NSDictionary * values) {
                   NSLog(@"Send failing Test Add Arguments Command Error: %@", err);
@@ -18948,8 +18948,8 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPTestClusterClusterTestEnumsRequestPayload alloc] init];
-    payload.Arg1 = [NSNumber numberWithUnsignedShort:20003U];
-    payload.Arg2 = [NSNumber numberWithUnsignedChar:101];
+    payload.arg1 = [NSNumber numberWithUnsignedShort:20003U];
+    payload.arg2 = [NSNumber numberWithUnsignedChar:101];
     [cluster testEnumsRequest:payload
               responseHandler:^(NSError * err, NSDictionary * values) {
                   NSLog(@"Send a command with a vendor_id and enum Error: %@", err);
@@ -18957,11 +18957,11 @@ CHIPDevice * GetConnectedDevice()
                   XCTAssertEqual(err.code, 0);
 
                   {
-                      id actualValue = values[@"Arg1"];
+                      id actualValue = values[@"arg1"];
                       XCTAssertEqual([actualValue unsignedShortValue], 20003U);
                   }
                   {
-                      id actualValue = values[@"Arg2"];
+                      id actualValue = values[@"arg2"];
                       XCTAssertEqual([actualValue unsignedCharValue], 101);
                   }
 
@@ -18981,13 +18981,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPTestClusterClusterTestStructArgumentRequestPayload alloc] init];
-    payload.Arg1 = [[CHIPTestClusterClusterSimpleStruct alloc] init];
-    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).A = [NSNumber numberWithUnsignedChar:0];
-    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).B = [NSNumber numberWithBool:true];
-    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).C = [NSNumber numberWithUnsignedChar:2];
-    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).D = [[NSData alloc] initWithBytes:"octet_string" length:12];
-    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).E = @"char_string";
-    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).F = [NSNumber numberWithUnsignedChar:1];
+    payload.arg1 = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.arg1).a = [NSNumber numberWithUnsignedChar:0];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.arg1).b = [NSNumber numberWithBool:true];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.arg1).c = [NSNumber numberWithUnsignedChar:2];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.arg1).d = [[NSData alloc] initWithBytes:"octet_string" length:12];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.arg1).e = @"char_string";
+    ((CHIPTestClusterClusterSimpleStruct *) payload.arg1).f = [NSNumber numberWithUnsignedChar:1];
 
     [cluster testStructArgumentRequest:payload
                        responseHandler:^(NSError * err, NSDictionary * values) {
@@ -18996,7 +18996,7 @@ CHIPDevice * GetConnectedDevice()
                            XCTAssertEqual(err.code, 0);
 
                            {
-                               id actualValue = values[@"Value"];
+                               id actualValue = values[@"value"];
                                XCTAssertEqual([actualValue boolValue], true);
                            }
 
@@ -19016,13 +19016,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPTestClusterClusterTestStructArgumentRequestPayload alloc] init];
-    payload.Arg1 = [[CHIPTestClusterClusterSimpleStruct alloc] init];
-    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).A = [NSNumber numberWithUnsignedChar:0];
-    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).B = [NSNumber numberWithBool:false];
-    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).C = [NSNumber numberWithUnsignedChar:2];
-    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).D = [[NSData alloc] initWithBytes:"octet_string" length:12];
-    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).E = @"char_string";
-    ((CHIPTestClusterClusterSimpleStruct *) payload.Arg1).F = [NSNumber numberWithUnsignedChar:1];
+    payload.arg1 = [[CHIPTestClusterClusterSimpleStruct alloc] init];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.arg1).a = [NSNumber numberWithUnsignedChar:0];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.arg1).b = [NSNumber numberWithBool:false];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.arg1).c = [NSNumber numberWithUnsignedChar:2];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.arg1).d = [[NSData alloc] initWithBytes:"octet_string" length:12];
+    ((CHIPTestClusterClusterSimpleStruct *) payload.arg1).e = @"char_string";
+    ((CHIPTestClusterClusterSimpleStruct *) payload.arg1).f = [NSNumber numberWithUnsignedChar:1];
 
     [cluster testStructArgumentRequest:payload
                        responseHandler:^(NSError * err, NSDictionary * values) {
@@ -19031,7 +19031,7 @@ CHIPDevice * GetConnectedDevice()
                            XCTAssertEqual(err.code, 0);
 
                            {
-                               id actualValue = values[@"Value"];
+                               id actualValue = values[@"value"];
                                XCTAssertEqual([actualValue boolValue], false);
                            }
 
@@ -19062,7 +19062,7 @@ CHIPDevice * GetConnectedDevice()
         temp[6] = [NSNumber numberWithUnsignedChar:7];
         temp[7] = [NSNumber numberWithUnsignedChar:8];
         temp[8] = [NSNumber numberWithUnsignedChar:9];
-        payload.Arg1 = temp;
+        payload.arg1 = temp;
     }
     [cluster testListInt8UArgumentRequest:payload
                           responseHandler:^(NSError * err, NSDictionary * values) {
@@ -19071,7 +19071,7 @@ CHIPDevice * GetConnectedDevice()
                               XCTAssertEqual(err.code, 0);
 
                               {
-                                  id actualValue = values[@"Value"];
+                                  id actualValue = values[@"value"];
                                   XCTAssertEqual([actualValue boolValue], true);
                               }
 
@@ -19103,7 +19103,7 @@ CHIPDevice * GetConnectedDevice()
         temp[7] = [NSNumber numberWithUnsignedChar:8];
         temp[8] = [NSNumber numberWithUnsignedChar:9];
         temp[9] = [NSNumber numberWithUnsignedChar:0];
-        payload.Arg1 = temp;
+        payload.arg1 = temp;
     }
     [cluster testListInt8UArgumentRequest:payload
                           responseHandler:^(NSError * err, NSDictionary * values) {
@@ -19112,7 +19112,7 @@ CHIPDevice * GetConnectedDevice()
                               XCTAssertEqual(err.code, 0);
 
                               {
-                                  id actualValue = values[@"Value"];
+                                  id actualValue = values[@"value"];
                                   XCTAssertEqual([actualValue boolValue], false);
                               }
 
@@ -19142,7 +19142,7 @@ CHIPDevice * GetConnectedDevice()
         temp[6] = [NSNumber numberWithUnsignedChar:7];
         temp[7] = [NSNumber numberWithUnsignedChar:8];
         temp[8] = [NSNumber numberWithUnsignedChar:9];
-        payload.Arg1 = temp;
+        payload.arg1 = temp;
     }
     [cluster testListInt8UReverseRequest:payload
                          responseHandler:^(NSError * err, NSDictionary * values) {
@@ -19151,7 +19151,7 @@ CHIPDevice * GetConnectedDevice()
                              XCTAssertEqual(err.code, 0);
 
                              {
-                                 id actualValue = values[@"Arg1"];
+                                 id actualValue = values[@"arg1"];
                                  XCTAssertEqual([actualValue count], 9);
                                  XCTAssertEqual([actualValue[0] unsignedCharValue], 9);
                                  XCTAssertEqual([actualValue[1] unsignedCharValue], 8);
@@ -19182,7 +19182,7 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * payload = [[CHIPTestClusterClusterTestListInt8UReverseRequestPayload alloc] init];
     {
         NSMutableArray * temp = [[NSMutableArray alloc] init];
-        payload.Arg1 = temp;
+        payload.arg1 = temp;
     }
     [cluster testListInt8UReverseRequest:payload
                          responseHandler:^(NSError * err, NSDictionary * values) {
@@ -19191,7 +19191,7 @@ CHIPDevice * GetConnectedDevice()
                              XCTAssertEqual(err.code, 0);
 
                              {
-                                 id actualValue = values[@"Arg1"];
+                                 id actualValue = values[@"arg1"];
                                  XCTAssertEqual([actualValue count], 0);
                              }
 
@@ -19214,22 +19214,22 @@ CHIPDevice * GetConnectedDevice()
     {
         NSMutableArray * temp = [[NSMutableArray alloc] init];
         temp[0] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).A = [NSNumber numberWithUnsignedChar:0];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).B = [NSNumber numberWithBool:true];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).C = [NSNumber numberWithUnsignedChar:2];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).D = [[NSData alloc] initWithBytes:"first_octet_string" length:18];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).E = @"first_char_string";
-        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).F = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).a = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).b = [NSNumber numberWithBool:true];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).c = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).d = [[NSData alloc] initWithBytes:"first_octet_string" length:18];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).e = @"first_char_string";
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).f = [NSNumber numberWithUnsignedChar:1];
 
         temp[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).A = [NSNumber numberWithUnsignedChar:1];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).B = [NSNumber numberWithBool:true];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).C = [NSNumber numberWithUnsignedChar:3];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).D = [[NSData alloc] initWithBytes:"second_octet_string" length:19];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).E = @"second_char_string";
-        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).F = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).a = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).b = [NSNumber numberWithBool:true];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).c = [NSNumber numberWithUnsignedChar:3];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).d = [[NSData alloc] initWithBytes:"second_octet_string" length:19];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).e = @"second_char_string";
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).f = [NSNumber numberWithUnsignedChar:1];
 
-        payload.Arg1 = temp;
+        payload.arg1 = temp;
     }
     [cluster
         testListStructArgumentRequest:payload
@@ -19239,7 +19239,7 @@ CHIPDevice * GetConnectedDevice()
                           XCTAssertEqual(err.code, 0);
 
                           {
-                              id actualValue = values[@"Value"];
+                              id actualValue = values[@"value"];
                               XCTAssertEqual([actualValue boolValue], true);
                           }
 
@@ -19262,22 +19262,22 @@ CHIPDevice * GetConnectedDevice()
     {
         NSMutableArray * temp = [[NSMutableArray alloc] init];
         temp[0] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).A = [NSNumber numberWithUnsignedChar:1];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).B = [NSNumber numberWithBool:true];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).C = [NSNumber numberWithUnsignedChar:3];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).D = [[NSData alloc] initWithBytes:"second_octet_string" length:19];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).E = @"second_char_string";
-        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).F = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).a = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).b = [NSNumber numberWithBool:true];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).c = [NSNumber numberWithUnsignedChar:3];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).d = [[NSData alloc] initWithBytes:"second_octet_string" length:19];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).e = @"second_char_string";
+        ((CHIPTestClusterClusterSimpleStruct *) temp[0]).f = [NSNumber numberWithUnsignedChar:1];
 
         temp[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).A = [NSNumber numberWithUnsignedChar:0];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).B = [NSNumber numberWithBool:false];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).C = [NSNumber numberWithUnsignedChar:2];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).D = [[NSData alloc] initWithBytes:"first_octet_string" length:18];
-        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).E = @"first_char_string";
-        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).F = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).a = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).b = [NSNumber numberWithBool:false];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).c = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).d = [[NSData alloc] initWithBytes:"first_octet_string" length:18];
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).e = @"first_char_string";
+        ((CHIPTestClusterClusterSimpleStruct *) temp[1]).f = [NSNumber numberWithUnsignedChar:1];
 
-        payload.Arg1 = temp;
+        payload.arg1 = temp;
     }
     [cluster
         testListStructArgumentRequest:payload
@@ -19287,7 +19287,7 @@ CHIPDevice * GetConnectedDevice()
                           XCTAssertEqual(err.code, 0);
 
                           {
-                              id actualValue = values[@"Value"];
+                              id actualValue = values[@"value"];
                               XCTAssertEqual([actualValue boolValue], false);
                           }
 
@@ -19306,7 +19306,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPTestClusterClusterTestNullableOptionalRequestPayload alloc] init];
-    payload.Arg1 = [NSNumber numberWithUnsignedChar:5];
+    payload.arg1 = [NSNumber numberWithUnsignedChar:5];
     [cluster testNullableOptionalRequest:payload
                          responseHandler:^(NSError * err, NSDictionary * values) {
                              NSLog(@"Send Test Command with optional arg set. Error: %@", err);
@@ -19314,19 +19314,19 @@ CHIPDevice * GetConnectedDevice()
                              XCTAssertEqual(err.code, 0);
 
                              {
-                                 id actualValue = values[@"WasPresent"];
+                                 id actualValue = values[@"wasPresent"];
                                  XCTAssertEqual([actualValue boolValue], true);
                              }
                              {
-                                 id actualValue = values[@"WasNull"];
+                                 id actualValue = values[@"wasNull"];
                                  XCTAssertEqual([actualValue boolValue], false);
                              }
                              {
-                                 id actualValue = values[@"Value"];
+                                 id actualValue = values[@"value"];
                                  XCTAssertEqual([actualValue unsignedCharValue], 5);
                              }
                              {
-                                 id actualValue = values[@"OriginalValue"];
+                                 id actualValue = values[@"originalValue"];
                                  XCTAssertFalse([actualValue isKindOfClass:[NSNull class]]);
                                  XCTAssertEqual([actualValue unsignedCharValue], 5);
                              }
@@ -19353,7 +19353,7 @@ CHIPDevice * GetConnectedDevice()
                              XCTAssertEqual(err.code, 0);
 
                              {
-                                 id actualValue = values[@"WasPresent"];
+                                 id actualValue = values[@"wasPresent"];
                                  XCTAssertEqual([actualValue boolValue], false);
                              }
 
@@ -19476,14 +19476,14 @@ CHIPDevice * GetConnectedDevice()
             id actualValue = values[@"value"];
             XCTAssertEqual([actualValue count], 1);
             if ([actualValue[0] isKindOfClass:[NSDictionary class]]) {
-                XCTAssertEqual([actualValue[0][@"Type"] unsignedIntValue], 0UL);
+                XCTAssertEqual([actualValue[0][@"type"] unsignedIntValue], 0UL);
             } else {
-                XCTAssertEqual([[actualValue[0] Type] unsignedIntValue], 0UL);
+                XCTAssertEqual([((CHIPDescriptorClusterDeviceType *) actualValue[0]).type unsignedIntValue], 0UL);
             }
             if ([actualValue[0] isKindOfClass:[NSDictionary class]]) {
-                XCTAssertEqual([actualValue[0][@"Revision"] unsignedShortValue], 1U);
+                XCTAssertEqual([actualValue[0][@"revision"] unsignedShortValue], 1U);
             } else {
-                XCTAssertEqual([[actualValue[0] Revision] unsignedShortValue], 1U);
+                XCTAssertEqual([((CHIPDescriptorClusterDeviceType *) actualValue[0]).revision unsignedShortValue], 1U);
             }
         }
 
@@ -19688,7 +19688,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPIdentifyClusterIdentifyPayload alloc] init];
-    payload.IdentifyTime = [NSNumber numberWithUnsignedShort:0U];
+    payload.identifyTime = [NSNumber numberWithUnsignedShort:0U];
     [cluster identify:payload
         responseHandler:^(NSError * err, NSDictionary * values) {
             NSLog(@"Send Identify command and expect success response Error: %@", err);
@@ -19885,49 +19885,49 @@ CHIPDevice * GetConnectedDevice()
             id actualValue = values[@"value"];
             XCTAssertEqual([actualValue count], 3);
             if ([actualValue[0] isKindOfClass:[NSDictionary class]]) {
-                XCTAssertTrue([actualValue[0][@"Label"] isEqualToString:@"Black"]);
+                XCTAssertTrue([actualValue[0][@"label"] isEqualToString:@"Black"]);
             } else {
-                XCTAssertTrue([[actualValue[0] Label] isEqualToString:@"Black"]);
+                XCTAssertTrue([((CHIPModeSelectClusterModeOptionStruct *) actualValue[0]).label isEqualToString:@"Black"]);
             }
             if ([actualValue[0] isKindOfClass:[NSDictionary class]]) {
-                XCTAssertEqual([actualValue[0][@"Mode"] unsignedCharValue], 0);
+                XCTAssertEqual([actualValue[0][@"mode"] unsignedCharValue], 0);
             } else {
-                XCTAssertEqual([[actualValue[0] Mode] unsignedCharValue], 0);
+                XCTAssertEqual([((CHIPModeSelectClusterModeOptionStruct *) actualValue[0]).mode unsignedCharValue], 0);
             }
             if ([actualValue[0] isKindOfClass:[NSDictionary class]]) {
-                XCTAssertEqual([actualValue[0][@"SemanticTag"] unsignedIntValue], 0UL);
+                XCTAssertEqual([actualValue[0][@"semanticTag"] unsignedIntValue], 0UL);
             } else {
-                XCTAssertEqual([[actualValue[0] SemanticTag] unsignedIntValue], 0UL);
+                XCTAssertEqual([((CHIPModeSelectClusterModeOptionStruct *) actualValue[0]).semanticTag unsignedIntValue], 0UL);
             }
             if ([actualValue[1] isKindOfClass:[NSDictionary class]]) {
-                XCTAssertTrue([actualValue[1][@"Label"] isEqualToString:@"Cappuccino"]);
+                XCTAssertTrue([actualValue[1][@"label"] isEqualToString:@"Cappuccino"]);
             } else {
-                XCTAssertTrue([[actualValue[1] Label] isEqualToString:@"Cappuccino"]);
+                XCTAssertTrue([((CHIPModeSelectClusterModeOptionStruct *) actualValue[1]).label isEqualToString:@"Cappuccino"]);
             }
             if ([actualValue[1] isKindOfClass:[NSDictionary class]]) {
-                XCTAssertEqual([actualValue[1][@"Mode"] unsignedCharValue], 4);
+                XCTAssertEqual([actualValue[1][@"mode"] unsignedCharValue], 4);
             } else {
-                XCTAssertEqual([[actualValue[1] Mode] unsignedCharValue], 4);
+                XCTAssertEqual([((CHIPModeSelectClusterModeOptionStruct *) actualValue[1]).mode unsignedCharValue], 4);
             }
             if ([actualValue[1] isKindOfClass:[NSDictionary class]]) {
-                XCTAssertEqual([actualValue[1][@"SemanticTag"] unsignedIntValue], 0UL);
+                XCTAssertEqual([actualValue[1][@"semanticTag"] unsignedIntValue], 0UL);
             } else {
-                XCTAssertEqual([[actualValue[1] SemanticTag] unsignedIntValue], 0UL);
+                XCTAssertEqual([((CHIPModeSelectClusterModeOptionStruct *) actualValue[1]).semanticTag unsignedIntValue], 0UL);
             }
             if ([actualValue[2] isKindOfClass:[NSDictionary class]]) {
-                XCTAssertTrue([actualValue[2][@"Label"] isEqualToString:@"Espresso"]);
+                XCTAssertTrue([actualValue[2][@"label"] isEqualToString:@"Espresso"]);
             } else {
-                XCTAssertTrue([[actualValue[2] Label] isEqualToString:@"Espresso"]);
+                XCTAssertTrue([((CHIPModeSelectClusterModeOptionStruct *) actualValue[2]).label isEqualToString:@"Espresso"]);
             }
             if ([actualValue[2] isKindOfClass:[NSDictionary class]]) {
-                XCTAssertEqual([actualValue[2][@"Mode"] unsignedCharValue], 7);
+                XCTAssertEqual([actualValue[2][@"mode"] unsignedCharValue], 7);
             } else {
-                XCTAssertEqual([[actualValue[2] Mode] unsignedCharValue], 7);
+                XCTAssertEqual([((CHIPModeSelectClusterModeOptionStruct *) actualValue[2]).mode unsignedCharValue], 7);
             }
             if ([actualValue[2] isKindOfClass:[NSDictionary class]]) {
-                XCTAssertEqual([actualValue[2][@"SemanticTag"] unsignedIntValue], 0UL);
+                XCTAssertEqual([actualValue[2][@"semanticTag"] unsignedIntValue], 0UL);
             } else {
-                XCTAssertEqual([[actualValue[2] SemanticTag] unsignedIntValue], 0UL);
+                XCTAssertEqual([((CHIPModeSelectClusterModeOptionStruct *) actualValue[2]).semanticTag unsignedIntValue], 0UL);
             }
         }
 
@@ -19946,7 +19946,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPModeSelectClusterChangeToModePayload alloc] init];
-    payload.NewMode = [NSNumber numberWithUnsignedChar:4];
+    payload.newMode = [NSNumber numberWithUnsignedChar:4];
     [cluster changeToMode:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Change to Supported Mode Error: %@", err);
@@ -19992,7 +19992,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     __auto_type * payload = [[CHIPModeSelectClusterChangeToModePayload alloc] init];
-    payload.NewMode = [NSNumber numberWithUnsignedChar:2];
+    payload.newMode = [NSNumber numberWithUnsignedChar:2];
     [cluster changeToMode:payload
           responseHandler:^(NSError * err, NSDictionary * values) {
               NSLog(@"Change to Unsupported Mode Error: %@", err);
@@ -20000,6 +20000,29 @@ CHIPDevice * GetConnectedDevice()
               XCTAssertEqual(err.code, 1);
               [expectation fulfill];
           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTestGroupMessaging_000000_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Group Write Attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id locationArgument;
+    locationArgument = @"us";
+    [cluster writeAttributeLocationWithValue:locationArgument
+                             responseHandler:^(NSError * err, NSDictionary * values) {
+                                 NSLog(@"Group Write Attribute Error: %@", err);
+
+                                 XCTAssertEqual(err.code, 0);
+
+                                 [expectation fulfill];
+                             }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }

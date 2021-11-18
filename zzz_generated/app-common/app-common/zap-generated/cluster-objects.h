@@ -11508,9 +11508,9 @@ namespace AdministratorCommissioning {
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
-    kSuccess      = 0x00,
-    kBusy         = 0x01,
-    kGeneralError = 0x02,
+    kBusy               = 0x01,
+    kPAKEParameterError = 0x02,
+    kWindowNotOpen      = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using StatusCode                           = EmberAfStatusCode;

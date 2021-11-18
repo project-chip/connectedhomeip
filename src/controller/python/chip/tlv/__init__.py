@@ -384,12 +384,14 @@ class TLVWriter(object):
                     controlByte |= TLV_TAG_CONTROL_COMMON_PROFILE_4Bytes
                     return struct.pack("<BL", controlByte, tagNum)
             else:
+                vendorId = (profile >> 16) & 0xFFFF
+                profileNum = (profile >> 0) & 0xFFFF
                 if tagNum <= UINT16_MAX:
                     controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_6Bytes
-                    return struct.pack("<BLH", controlByte, profile, tagNum)
+                    return struct.pack("<BHHH", controlByte, vendorId, profileNum, tagNum)
                 else:
                     controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_8Bytes
-                    return struct.pack("<BLL", controlByte, profile, tagNum)
+                    return struct.pack("<BHHL", controlByte, vendorId, profileNum, profile, tagNum)
         raise ValueError("Invalid object given for TLV tag")
 
     @staticmethod
@@ -490,16 +492,18 @@ class TLVReader(object):
             decoding["tagLen"] = 4
             self._bytesRead += 4
         elif decoding["tagControl"] == "Fully Qualified 6-byte":
-            (profile,) = struct.unpack(
-                "<L", tlv[self._bytesRead: self._bytesRead + 4])
+            (vendorId, profileNum) = struct.unpack(
+                "<HH", tlv[self._bytesRead: self._bytesRead + 4])
+            profile = (vendorId << 16) | profileNum
             (tag,) = struct.unpack(
                 "<H", tlv[self._bytesRead + 4: self._bytesRead + 6])
             decoding["profileTag"] = (profile, tag)
             decoding["tagLen"] = 2
             self._bytesRead += 6
         elif decoding["tagControl"] == "Fully Qualified 8-byte":
-            (profile,) = struct.unpack(
-                "<L", tlv[self._bytesRead: self._bytesRead + 4])
+            (vendorId, profileNum) = struct.unpack(
+                "<HH", tlv[self._bytesRead: self._bytesRead + 4])
+            profile = (vendorId << 16) | profileNum
             (tag,) = struct.unpack(
                 "<L", tlv[self._bytesRead + 4: self._bytesRead + 8])
             decoding["profileTag"] = (profile, tag)

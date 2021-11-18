@@ -27,6 +27,9 @@ struct EventPathParams
     EventPathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId, bool aIsUrgent) :
         mNodeId(aNodeId), mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mIsUrgent(aIsUrgent)
     {}
+    EventPathParams(EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId) :
+        EventPathParams(0, aEndpointId, aClusterId, aEventId, false)
+    {}
     EventPathParams() {}
     bool IsSamePath(const EventPathParams & other) const
     {

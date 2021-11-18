@@ -4,8 +4,8 @@
 package chip.devicecontroller;
 
 import androidx.annotation.Nullable;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class ChipClusters {
@@ -78,30 +78,17 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
   {{#chip_cluster_commands}}
 
-    public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{asJavaBasicType type}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}}) {
+    public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback{{>command_arguments}}) {
       {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}});
     }
 
   {{/chip_cluster_commands}}
   {{#chip_cluster_commands}}
-    private native void {{asLowerCamelCase name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{asJavaBasicType type}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}});
+    private native void {{asLowerCamelCase name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback{{>command_arguments}});
   {{/chip_cluster_commands}}
   {{#chip_cluster_responses}}
     public interface {{asUpperCamelCase name}}Callback {
-      void onSuccess(
-{{#chip_cluster_response_arguments}}
-{{#if isArray}}
-      // {{asSymbol label}}: {{asUnderlyingZclType type}}
-      // Conversion from this type to Java is not properly implemented yet
-{{else if (isOctetString type)}}
-      {{omitCommaForFirstNonStatusCommand parent.id index}}byte[] {{asSymbol label}}
-{{else if (isShortString type)}}
-      {{omitCommaForFirstNonStatusCommand parent.id index}}String {{asSymbol label}}
-{{else}}
-      {{omitCommaForFirstNonStatusCommand parent.id index}}{{asJavaBasicTypeForZclType type false}} {{asSymbol label}}
-{{/if}}
-{{/chip_cluster_response_arguments}}
-      );
+      void onSuccess({{>command_callback_responses parent=..}});
       
       void onError(Exception error);
     }
@@ -200,44 +187,7 @@ public class ChipClusters {
 {{/if}}
 
     public interface {{asUpperCamelCase name}}AttributeCallback {
-      void onSuccess(List<
-      {{#if isStruct}}
-      {{asUpperCamelCase name}}Attribute
-      {{else}}
-        {{#if isNullable}}
-        {{#unless isArray}}
-        {{#unless isStruct}}
-        @Nullable
-        {{/unless}}
-        {{/unless}}
-        {{/if}}
-        {{#if isOptional}}
-        {{#unless isArray}}
-        {{#unless isStruct}}
-        Optional<
-        {{/unless}}
-        {{/unless}}
-        {{/if}}
-        {{#if (isOctetString type)}}
-        byte[]
-        {{else if (isCharString type)}}
-        // Add String field here after ByteSpan is properly emitted in C++ layer
-        {{else}}
-        {{! NOTE: asJavaBasicTypeForZclType ends up sniffing for isArray on the
-            context.  Since we want the type of our _entry_, force isArray to
-            false. }}
-        {{~#*inline "asJavaBasicTypeForEntry"}}{{asJavaBasicTypeForZclType type true}}{{/inline~}}
-        {{> asJavaBasicTypeForEntry isArray=false}}
-        {{/if}}
-        {{#if isOptional}}
-        {{#unless isArray}}
-        {{#unless isStruct}}
-        >
-        {{/unless}}
-        {{/unless}}
-        {{/if}}
-      {{/if}}
-      > valueList);
+      void onSuccess(List<{{#>list_attribute_callback_type}}{{/list_attribute_callback_type}}> valueList);
       void onError(Exception ex);
     }
   {{/if}}

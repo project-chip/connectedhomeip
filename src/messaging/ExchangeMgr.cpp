@@ -59,7 +59,7 @@ namespace Messaging {
  *    prior to use.
  *
  */
-ExchangeManager::ExchangeManager() : mDelegate(nullptr), mReliableMessageMgr(mContextPool)
+ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
 {
     mState = State::kState_NotInitialized;
 }
@@ -83,7 +83,8 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
         handler.Reset();
     }
 
-    sessionManager->SetDelegate(this);
+    sessionManager->RegisterReleaseDelegate(*this);
+    sessionManager->SetMessageDelegate(this);
 
     mReliableMessageMgr.Init(sessionManager->SystemLayer(), sessionManager);
     ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionManager));
@@ -105,7 +106,8 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
     if (mSessionManager != nullptr)
     {
-        mSessionManager->SetDelegate(nullptr);
+        mSessionManager->SetMessageDelegate(nullptr);
+        mSessionManager->UnregisterReleaseDelegate(*this);
         mSessionManager = nullptr;
     }
 
@@ -150,16 +152,6 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(Proto
 CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType)
 {
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
-}
-
-void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source)
-{
-#if CHIP_ERROR_LOGGING
-    char srcAddressStr[Transport::PeerAddress::kMaxToStringSize];
-    source.ToString(srcAddressStr);
-
-    ChipLogError(ExchangeManager, "Error receiving message from %s: %s", srcAddressStr, ErrorStr(error));
-#endif // CHIP_ERROR_LOGGING
 }
 
 CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate)
@@ -326,21 +318,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
 }
 
-void ExchangeManager::OnNewConnection(SessionHandle session)
+void ExchangeManager::OnSessionReleased(SessionHandle session)
 {
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnNewConnection(session, this);
-    }
+    ExpireExchangesForSession(session);
 }
 
-void ExchangeManager::OnConnectionExpired(SessionHandle session)
+void ExchangeManager::ExpireExchangesForSession(SessionHandle session)
 {
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnConnectionExpired(session, this);
-    }
-
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->mSession.HasValue() && ec->mSession.Value() == session)
         {

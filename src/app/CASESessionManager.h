@@ -23,7 +23,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/dnssd/DnssdCache.h>
 #include <lib/support/Pool.h>
-#include <messaging/ExchangeMgrDelegate.h>
+#include <transport/SessionDelegate.h>
 
 #include <lib/dnssd/Resolver.h>
 
@@ -43,7 +43,7 @@ struct CASESessionManagerConfig
  * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
  * successful)
  */
-class CASESessionManager : public Messaging::ExchangeMgrDelegate, public Dnssd::ResolverDelegate
+class CASESessionManager : public SessionReleaseDelegate, public Dnssd::ResolverDelegate
 {
 public:
     CASESessionManager() = delete;
@@ -91,9 +91,8 @@ public:
      */
     CHIP_ERROR GetPeerAddress(NodeId nodeId, Transport::PeerAddress & addr);
 
-    //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
-    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    //////////// SessionReleaseDelegate Implementation ///////////////
+    void OnSessionReleased(SessionHandle session) override;
 
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData) override;

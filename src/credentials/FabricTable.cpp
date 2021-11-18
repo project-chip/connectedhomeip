@@ -19,11 +19,12 @@
  * @brief Defines a table of fabrics that have provisioned the device.
  */
 
+#include "FabricTable.h"
+
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeInt.h>
-#include <transport/FabricTable.h>
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
