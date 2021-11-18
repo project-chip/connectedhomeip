@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import chiptest
 import coloredlogs
 import click
 import logging
@@ -25,11 +26,9 @@ from dataclasses import dataclass
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-import chiptest
 
-
-
-DEFAULT_CHIP_ROOT=os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+DEFAULT_CHIP_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '..', '..'))
 
 
 # Supported log levels, mapping string values required for argument
@@ -41,11 +40,11 @@ __LOG_LEVELS__ = {
     'fatal': logging.FATAL,
 }
 
+
 @dataclass
 class RunContext:
     tests: typing.List[chiptest.TestDefinition]
     in_unshare: bool
-
 
 
 @click.group(chain=True)
@@ -71,9 +70,9 @@ class RunContext:
     help='Default directory path for CHIP. Used to determine what tests exist')
 @click.option(
     '--internal-inside-unshare',
-    hidden = True,
-    is_flag = True,
-    default = False,
+    hidden=True,
+    is_flag=True,
+    default=False,
     help='Internal flag for running inside a unshared environment'
 )
 @click.pass_context
@@ -89,8 +88,9 @@ def main(context, log_level, target, no_log_timestamps, root, internal_inside_un
     if 'all' not in target:
         tests = [test for test in tests if test.name.upper() in target]
     tests.sort(key=lambda x: x.name)
-    
+
     context.obj = RunContext(tests=tests, in_unshare=internal_inside_unshare)
+
 
 @main.command(
     'list', help='List available test suites')
@@ -98,6 +98,7 @@ def main(context, log_level, target, no_log_timestamps, root, internal_inside_un
 def cmd_generate(context):
     for test in context.obj.tests:
         print(test.name)
+
 
 @main.command(
     'run', help='Execute the tests')
@@ -108,9 +109,11 @@ def cmd_generate(context):
 @click.pass_context
 def cmd_run(context, iterations):
     if sys.platform == 'linux':
-        chiptest.linux.PrepareNamespacesForTestExecution(context.obj.in_unshare)
+        chiptest.linux.PrepareNamespacesForTestExecution(
+            context.obj.in_unshare)
 
     logging.info("Each test will be executed %d times" % iterations)
+
 
 # On linux, allow an execution shell to be prepared
 if sys.platform == 'linux':
@@ -118,7 +121,8 @@ if sys.platform == 'linux':
         'shell', help='Execute a bash shell in the environment (useful to test network namespaces)')
     @click.pass_context
     def cmd_run(context):
-        chiptest.linux.PrepareNamespacesForTestExecution(context.obj.in_unshare)
+        chiptest.linux.PrepareNamespacesForTestExecution(
+            context.obj.in_unshare)
         os.execvpe("bash", ["bash"], os.environ.copy())
 
 

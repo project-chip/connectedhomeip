@@ -16,9 +16,11 @@
 from enum import Enum, auto
 from dataclasses import dataclass
 
+
 class TestTarget(Enum):
     ALL_CLUSTERS = auto()
     TV = auto()
+
 
 @dataclass
 class TestDefinition:

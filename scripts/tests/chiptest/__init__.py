@@ -22,6 +22,7 @@ import chiptest.linux
 
 from .test_definition import TestTarget, TestDefinition
 
+
 def AllTests(root: str):
     """Gets all the tests that can be found in the ROOT directory based on
        yaml file names.
@@ -34,15 +35,14 @@ def AllTests(root: str):
 
         if name.startswith('tv_'):
             target = TestTarget.ALL_CLUSTERS
-            name = 'tv-'  + name[3:]
+            name = 'tv-' + name[3:]
         elif name.startswith('test_'):
             target = TestTarget.TV
-            name = 'app-'  + name[5:]
+            name = 'app-' + name[5:]
         else:
             continue
-        
-        yield TestDefinition(yaml_file=path, name=name,target=target)
+
+        yield TestDefinition(yaml_file=path, name=name, target=target)
 
 
-
-__all__ = [ 'TestTarget', 'TestDefinition', 'AllTests', 'linux' ]
+__all__ = ['TestTarget', 'TestDefinition', 'AllTests', 'linux']
