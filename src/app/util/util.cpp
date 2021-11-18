@@ -308,6 +308,7 @@ void MatterWakeOnLanPluginServerInitCallback() {}
 void MatterOnOffSwitchConfigurationPluginServerInitCallback() {}
 void MatterPowerSourcePluginServerInitCallback() {}
 void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}
+void MatterBridgedDeviceBasicInformationPluginServerInitCallback() {}
 
 // ****************************************
 // This function is called by the application when the stack goes down,
