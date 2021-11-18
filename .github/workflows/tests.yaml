@@ -92,10 +92,6 @@ jobs:
                      --all-clusters-app ./out/debug/standalone/chip-all-clusters-app \
                      --tv-app ./out/debug/standalone/chip-tv-app \
                   "
-            - name: Run TV Tests
-              timeout-minutes: 10
-              run: |
-                  scripts/tests/test_suites.sh -n -a tv
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
