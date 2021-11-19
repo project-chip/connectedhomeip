@@ -27,11 +27,14 @@ log = logging.getLogger(__name__)
 
 BLE_DEVICE_NAME = "MBED-shell"
 
-SHELL_COMMAND_NAME = ["echo", "log", "rand", "ping", "send", "base64", "version", "ble", "wifi", "config", "device", "onboardingcodes", "dns", "help", "exit"]
+SHELL_COMMAND_NAME = ["echo", "log", "rand", "ping", "send", "base64", "version",
+                      "ble", "wifi", "config", "device", "onboardingcodes", "dns", "help", "exit"]
 WIFI_MODE_NAME = ["disable", "ap", "sta"]
+
 
 def get_shell_command(response):
     return [line.split()[0].strip() for line in response]
+
 
 def parse_config_response(response):
     config = {}
@@ -50,11 +53,13 @@ def parse_config_response(response):
         config[param_name] = value
     return config
 
+
 def parse_boarding_codes_response(response):
     codes = {}
     for param in response:
         codes[param.split(":")[0].lower()] = param.split()[1].strip()
     return codes
+
 
 @pytest.mark.smoketest
 def test_smoke_test(device):
@@ -70,7 +75,7 @@ def test_help_check(device):
     assert ret != None and len(ret) > 1
     shell_commands = get_shell_command(ret[1:-1])
     assert set(SHELL_COMMAND_NAME) == set(shell_commands)
-    
+
 
 def test_echo_check(device):
     ret = device.send(command="echo Hello", expected_output="Done")
@@ -92,10 +97,12 @@ def test_rand_check(device):
 
 def test_base64_encode_decode(device):
     hex_string = "1234"
-    ret = device.send(command="base64 encode {}".format(hex_string), expected_output="Done")
+    ret = device.send(command="base64 encode {}".format(
+        hex_string), expected_output="Done")
     assert ret != None and len(ret) > 1
     base64code = ret[-2]
-    ret = device.send(command="base64 decode {}".format(base64code), expected_output="Done")
+    ret = device.send(command="base64 decode {}".format(
+        base64code), expected_output="Done")
     assert ret != None and len(ret) > 1
     assert ret[-2].rstrip() == hex_string
 
@@ -139,7 +146,8 @@ def test_device_config_check(device):
     config = parse_config_response(ret[1:-1])
 
     for param_name, value in config.items():
-        ret = device.send(command="config {}".format(param_name), expected_output="Done")
+        ret = device.send(command="config {}".format(
+            param_name), expected_output="Done")
         assert ret != None and len(ret) > 1
         if "discriminator" in param_name:
             assert int(ret[-2].split()[0], 16) == value
@@ -147,7 +155,8 @@ def test_device_config_check(device):
             assert int(ret[-2].split()[0]) == value
 
     new_value = int(config['discriminator']) + 1
-    ret = device.send(command="config discriminator {}".format(new_value), expected_output="Done")
+    ret = device.send(command="config discriminator {}".format(
+        new_value), expected_output="Done")
     assert ret != None and len(ret) > 1
     assert "Setup discriminator set to: {}".format(new_value) in ret[-2]
 
@@ -163,19 +172,22 @@ def test_on_boarding_codes(device):
     boarding_codes = parse_boarding_codes_response(ret[1:-1])
 
     for param, value in boarding_codes.items():
-        ret = device.send(command="onboardingcodes {}".format(param), expected_output="Done")
+        ret = device.send(command="onboardingcodes {}".format(
+            param), expected_output="Done")
         assert ret != None and len(ret) > 1
         assert value == ret[-2].strip()
 
     try:
-        device_details = dict(SetupPayload().ParseQrCode("VP:vendorpayload%{}".format(boarding_codes['qrcode'])).attributes)
+        device_details = dict(SetupPayload().ParseQrCode(
+            "VP:vendorpayload%{}".format(boarding_codes['qrcode'])).attributes)
     except exceptions.ChipStackError as ex:
         log.error(ex.msg)
         assert False
     assert device_details != None and len(device_details) != 0
 
     try:
-        device_details = dict(SetupPayload().ParseManualPairingCode(boarding_codes['manualpairingcode']).attributes)
+        device_details = dict(SetupPayload().ParseManualPairingCode(
+            boarding_codes['manualpairingcode']).attributes)
     except exceptions.ChipStackError as ex:
         log.error(ex.msg)
         assert False
@@ -190,7 +202,8 @@ def test_wifi_mode(device):
 
     for mode in [n for n in WIFI_MODE_NAME if n != current_mode]:
         print(mode)
-        ret = device.send(command="wifi mode {}".format(mode), expected_output="Done")
+        ret = device.send(command="wifi mode {}".format(
+            mode), expected_output="Done")
         assert ret != None and len(ret) > 0
 
         ret = device.send(command="wifi mode", expected_output="Done")
@@ -202,7 +215,8 @@ def test_wifi_connect(device, network):
     network_ssid = network[0]
     network_pass = network[1]
 
-    ret = device.send(command="wifi connect {} {}".format(network_ssid, network_pass), expected_output="Done")
+    ret = device.send(command="wifi connect {} {}".format(
+        network_ssid, network_pass), expected_output="Done")
     assert ret != None and len(ret) > 0
 
     ret = device.wait_for_output("StationConnected", 30)

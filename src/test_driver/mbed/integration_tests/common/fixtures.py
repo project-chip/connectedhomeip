@@ -39,6 +39,7 @@ def platforms(request):
             'CY8CPROTO_062_4343W'
         ]
 
+
 @pytest.fixture(scope="session")
 def serial_inter_byte_delay(request):
     if request.config.getoption('serial_inter_byte_delay'):
@@ -51,6 +52,7 @@ def serial_baudrate(request):
     if request.config.getoption('serial_baudrate'):
         return int(request.config.getoption('serial_baudrate'))
     return 115200
+
 
 @pytest.fixture(scope="session")
 def network(request):
@@ -66,10 +68,12 @@ class BoardAllocation:
         self.description = description
         self.device = None
 
+
 class BoardAllocator:
     def __init__(self, platforms_supported: List[str], serial_inter_byte_delay: float, baudrate: int):
         mbed_ls = mbed_lstools.create(list_unmounted=True)
-        boards = mbed_ls.list_mbeds(filter_function=lambda m: m['platform_name'] in platforms_supported)
+        boards = mbed_ls.list_mbeds(
+            filter_function=lambda m: m['platform_name'] in platforms_supported)
         self.board_description = boards
         self.allocation = []
         self.serial_inter_byte_delay = serial_inter_byte_delay
@@ -115,7 +119,8 @@ class BoardAllocator:
                 # Cleanup
                 alloc.device = None
 
-                log.info('Release {} board'.format(alloc.description['platform_name']))
+                log.info('Release {} board'.format(
+                    alloc.description['platform_name']))
 
 
 @pytest.fixture(scope="session")
@@ -132,16 +137,3 @@ def device(board_allocator):
     device = board_allocator.allocate(name='DUT')
     yield device
     board_allocator.release(device)
-
-
-@pytest.fixture(scope="function")
-def ap(network):
-    if network is not None:
-        ap = AccessPoint(ssid=network[0], password=network[1])
-    else:
-        ap = AccessPoint()
-    ap.start()
-    sleep(5)
-    yield ap
-    ap.stop()
-    sleep(5)

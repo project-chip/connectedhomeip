@@ -45,7 +45,8 @@ class Device:
         :param assert_output: Assert the fail situations to end the test run
         :return: If there's expected output then the response line is returned
         """
-        log.debug('{}: Sending command to client: "{}"'.format(self.name, command))
+        log.debug('{}: Sending command to client: "{}"'.format(
+            self.name, command))
         self.flush(0)
         self._write(command)
         if expected_output is not None:
@@ -84,7 +85,8 @@ class Device:
         lines = []
         start = time()
         now = 0
-        timeout_error_msg = '{}: Didn\'t find {} in {} s'.format(self.name, search, timeout)
+        timeout_error_msg = '{}: Didn\'t find {} in {} s'.format(
+            self.name, search, timeout)
 
         while time() - start <= timeout:
             try:

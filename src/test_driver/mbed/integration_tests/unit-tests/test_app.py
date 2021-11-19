@@ -16,6 +16,7 @@
 import pytest
 import re
 
+
 def test_unit_tests(device):
     device.reset(duration=1)
     # smoke test

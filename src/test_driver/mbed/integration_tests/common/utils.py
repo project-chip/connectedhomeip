@@ -32,12 +32,14 @@ elif sys.platform.startswith('linux'):
 import logging
 log = logging.getLogger(__name__)
 
+
 class ParsingError(exceptions.ChipStackException):
     def __init__(self, msg=None):
         self.msg = "Parsing Error: " + msg
 
     def __str__(self):
         return self.msg
+
 
 def get_device_details(device):
     """
@@ -49,14 +51,17 @@ def get_device_details(device):
     if ret == None or len(ret) < 2:
         return None
 
-    qr_code = re.sub(r"[\[\]]", "", ret[-1].partition("SetupQRCode:")[2]).strip()
+    qr_code = re.sub(
+        r"[\[\]]", "", ret[-1].partition("SetupQRCode:")[2]).strip()
     try:
-        device_details = dict(SetupPayload().ParseQrCode("VP:vendorpayload%{}".format(qr_code)).attributes)
+        device_details = dict(SetupPayload().ParseQrCode(
+            "VP:vendorpayload%{}".format(qr_code)).attributes)
     except exceptions.ChipStackError as ex:
         log.error(ex.msg)
         return None
 
     return device_details
+
 
 def ParseEncodedString(value):
     if value.find(":") < 0:
@@ -68,6 +73,7 @@ def ParseEncodedString(value):
     elif enc == "hex":
         return bytes.fromhex(encValue)
     raise ParsingError("Only str and hex encoding is supported")
+
 
 def ParseValueWithType(value, type):
     if type == 'int':
@@ -81,6 +87,7 @@ def ParseValueWithType(value, type):
     else:
         raise ParsingError('Cannot recognize type: {}'.format(type))
 
+
 def FormatZCLArguments(args, command):
     commandArgs = {}
     for kvPair in args:
@@ -90,6 +97,7 @@ def FormatZCLArguments(args, command):
         valueType = command.get(key, None)
         commandArgs[key] = ParseValueWithType(value, valueType)
     return commandArgs
+
 
 def send_zcl_command(devCtrl, line):
     """
@@ -133,6 +141,7 @@ def send_zcl_command(devCtrl, line):
 
     return (err, res)
 
+
 def scan_chip_ble_devices(devCtrl):
     """
     BLE scan CHIP device
@@ -152,6 +161,7 @@ def scan_chip_ble_devices(devCtrl):
             devices.append(devInfo)
 
     return devices
+
 
 def check_chip_ble_devices_advertising(devCtrl, name, deviceDetails=None):
     """
@@ -174,7 +184,7 @@ def check_chip_ble_devices_advertising(devCtrl, name, deviceDetails=None):
             if (ble_device["name"] == name and
                 int(ble_device["discriminator"]) == int(deviceDetails["Discriminator"]) and
                 int(ble_device["vendorId"]) == int(deviceDetails["VendorID"]) and
-                int(ble_device["productId"]) == int(deviceDetails["ProductID"])):
+                    int(ble_device["productId"]) == int(deviceDetails["ProductID"])):
                 chip_device_found = True
                 break
         else:
@@ -183,6 +193,7 @@ def check_chip_ble_devices_advertising(devCtrl, name, deviceDetails=None):
                 break
 
     return chip_device_found
+
 
 def connect_device_over_ble(devCtrl, discriminator, pinCode, nodeId=None):
     """
@@ -204,6 +215,7 @@ def connect_device_over_ble(devCtrl, discriminator, pinCode, nodeId=None):
 
     return nodeId
 
+
 def close_connection(devCtrl, nodeId):
     """
     Close the BLE connection
@@ -217,6 +229,7 @@ def close_connection(devCtrl, nodeId):
         return False
 
     return True
+
 
 def close_ble(devCtrl):
     """
@@ -232,6 +245,7 @@ def close_ble(devCtrl):
 
     return True
 
+
 def commissioning_wifi(devCtrl, ssid, password, nodeId):
     """
     Commissioning a Wi-Fi device 
@@ -243,13 +257,15 @@ def commissioning_wifi(devCtrl, ssid, password, nodeId):
     """
 
     # Inject the credentials to the device
-    err, res = send_zcl_command(devCtrl, "NetworkCommissioning AddWiFiNetwork {} 0 0 ssid=str:{} credentials=str:{} breadcrumb=0 timeoutMs=1000".format(nodeId, ssid, password))
+    err, res = send_zcl_command(
+        devCtrl, "NetworkCommissioning AddWiFiNetwork {} 0 0 ssid=str:{} credentials=str:{} breadcrumb=0 timeoutMs=1000".format(nodeId, ssid, password))
     if err != 0 and res["Status"] != 0:
         log.error("Set Wi-Fi credentials failed [{}]".format(err))
         return err
-    
+
     # Enable the Wi-Fi interface
-    err, res = send_zcl_command(devCtrl, "NetworkCommissioning EnableNetwork {} 0 0 networkID=str:{} breadcrumb=0 timeoutMs=1000".format(nodeId, ssid))
+    err, res = send_zcl_command(
+        devCtrl, "NetworkCommissioning EnableNetwork {} 0 0 networkID=str:{} breadcrumb=0 timeoutMs=1000".format(nodeId, ssid))
     if err != 0 and res["Status"] != 0:
         log.error("Enable Wi-Fi failed [{}]".format(err))
         return err
