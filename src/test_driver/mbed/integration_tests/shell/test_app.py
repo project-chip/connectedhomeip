@@ -21,7 +21,7 @@ from time import sleep
 from chip.setup_payload import SetupPayload
 from chip import exceptions
 from chip import ChipDeviceCtrl
-from common.utils import scan_chip_ble_devices
+from common.utils import *
 import logging
 log = logging.getLogger(__name__)
 

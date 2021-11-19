@@ -14,11 +14,8 @@
 # limitations under the License.
 
 import pytest
-import re
 from time import sleep
 
-from chip.setup_payload import SetupPayload
-from chip import exceptions
 from chip import ChipDeviceCtrl
 
 from common.utils import *
