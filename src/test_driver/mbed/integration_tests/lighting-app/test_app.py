@@ -14,14 +14,11 @@
 # limitations under the License.
 
 import pytest
-import re
 from time import sleep
 
-from chip.setup_payload import SetupPayload
-from chip import exceptions
 from chip import ChipDeviceCtrl
 
-from common.utils import scan_chip_ble_devices, connect_device_over_ble, commissioning_wifi
+from common.utils import *
 
 from common.pigweed_client import PigweedClient
 from device_service import device_service_pb2
@@ -35,7 +32,6 @@ log = logging.getLogger(__name__)
 BLE_DEVICE_NAME = "MBED-lighting"
 DEVICE_NODE_ID = 1234
 RPC_PROTOS = [device_service_pb2, button_service_pb2, lighting_service_pb2]
-DEVICE_TEST_SERIAL_NUMBER = "TEST_SN"
 
 @pytest.mark.smoketest
 def test_smoke_test(device):
@@ -51,31 +47,11 @@ def test_wifi_provisioning(device, network):
     network_pass = network[1]
 
     devCtrl = ChipDeviceCtrl.ChipDeviceController()
-    
-    ret = device.wait_for_output("SetupQRCode")
-    assert ret != None and len(ret) > 1
 
-    qr_code = re.sub(r"[\[\]]", "", ret[-1].partition("SetupQRCode:")[2]).strip()
-    try:
-        device_details = dict(SetupPayload().ParseQrCode("VP:vendorpayload%{}".format(qr_code)).attributes)
-    except exceptions.ChipStackError as ex:
-        log.error(ex.msg)
-        assert False
+    device_details = get_device_details(device)
     assert device_details != None and len(device_details) != 0
 
-    ble_chip_device = scan_chip_ble_devices(devCtrl, BLE_DEVICE_NAME)
-    assert ble_chip_device != None and len(ble_chip_device) != 0
-
-    chip_device_found = False
-
-    for ble_device in ble_chip_device:
-        if (int(ble_device.discriminator) == int(device_details["Discriminator"]) and
-            int(ble_device.vendorId) == int(device_details["VendorID"]) and
-            int(ble_device.productId) == int(device_details["ProductID"])):
-            chip_device_found = True
-            break
-
-    assert chip_device_found
+    assert check_chip_ble_devices_advertising(devCtrl, BLE_DEVICE_NAME, device_details)
 
     ret = connect_device_over_ble(devCtrl, int(device_details["Discriminator"]), int(device_details["SetUpPINCode"]), DEVICE_NODE_ID)
     assert ret != None and ret == DEVICE_NODE_ID
@@ -86,9 +62,46 @@ def test_wifi_provisioning(device, network):
     ret = commissioning_wifi(devCtrl, network_ssid, network_pass, DEVICE_NODE_ID)
     assert ret == 0
 
-    ret = device.wait_for_output("Event - StationConnected")
+    ret = device.wait_for_output("StationConnected")
     assert ret != None and len(ret) > 0
 
+    assert close_connection(devCtrl, DEVICE_NODE_ID)
+    assert close_ble(devCtrl)
+
+
+def test_lock_ctrl(device):
+    devCtrl = ChipDeviceCtrl.ChipDeviceController()
+    
+    device_details = get_device_details(device)
+    assert device_details != None and len(device_details) != 0
+
+    assert check_chip_ble_devices_advertising(devCtrl, BLE_DEVICE_NAME, device_details)
+
+    ret = connect_device_over_ble(devCtrl, int(device_details["Discriminator"]), int(device_details["SetUpPINCode"]), DEVICE_NODE_ID)
+    assert ret != None and ret == DEVICE_NODE_ID
+
+    ret = device.wait_for_output("Device completed Rendezvous process")
+    assert ret != None and len(ret) > 0
+
+    err, res = send_zcl_command(devCtrl, "OnOff Off {} 1 0".format(DEVICE_NODE_ID))
+    assert err == 0 and res["Status"] == 0
+
+    ret = device.wait_for_output("Unlock Action has been completed", 20)
+    assert ret != None and len(ret) > 0
+
+    err, res = send_zcl_command(devCtrl, "OnOff On {} 1 0".format(DEVICE_NODE_ID))
+    assert err == 0 and res["Status"] == 0
+
+    ret = device.wait_for_output("Lock Action has been completed", 20)
+    assert ret != None and len(ret) > 0
+
+    err, res = send_zcl_command(devCtrl, "OnOff Toggle {} 1 0".format(DEVICE_NODE_ID))
+    assert err == 0 and res["Status"] == 0
+
+    ret = device.wait_for_output("Unlock Action has been completed", 20)
+    assert ret != None and len(ret) > 0
+
+    assert close_connection(devCtrl, DEVICE_NODE_ID)
     assert close_ble(devCtrl)
 
 def test_device_info_rpc(device):
@@ -97,35 +110,32 @@ def test_device_info_rpc(device):
     assert status.ok() == True
     assert payload.vendor_id != None and payload.product_id != None and payload.serial_number != None
 
-    ret = device.wait_for_output("SetupQRCode")
-    assert ret != None and len(ret) > 1
-
-    qr_code = re.sub(r"[\[\]]", "", ret[-1].partition("SetupQRCode:")[2]).strip()
-    try:
-        device_details = dict(SetupPayload().ParseQrCode("VP:vendorpayload%{}".format(qr_code)).attributes)
-    except exceptions.ChipStackError as ex:
-        log.error(ex.msg)
-        assert False
+    device_details = get_device_details(device)
     assert device_details != None and len(device_details) != 0
 
     assert int(device_details["VendorID"]) == payload.vendor_id
     assert int(device_details["ProductID"]) == payload.product_id
-    assert DEVICE_TEST_SERIAL_NUMBER == payload.serial_number
+    assert int(device_details["Discriminator"]) == payload.pairing_info.discriminator
+    assert int(device_details["SetUpPINCode"]) == payload.pairing_info.code
+
 
 def test_device_factory_reset_rpc(device):
     pw_client = PigweedClient(device, RPC_PROTOS)
     status, payload = pw_client.rpcs.chip.rpc.Device.FactoryReset()
     assert status.ok() == True
 
+
 def test_device_reboot_rpc(device):
     pw_client = PigweedClient(device, RPC_PROTOS)
     status, payload = pw_client.rpcs.chip.rpc.Device.Reboot()
     assert status == Status.UNIMPLEMENTED
 
+
 def test_device_ota_rpc(device):
     pw_client = PigweedClient(device, RPC_PROTOS)
     status, payload = pw_client.rpcs.chip.rpc.Device.TriggerOta()
     assert status == Status.UNIMPLEMENTED
+
 
 def test_ligth_ctrl_rpc(device):
     pw_client = PigweedClient(device, RPC_PROTOS)
@@ -144,6 +154,7 @@ def test_ligth_ctrl_rpc(device):
     assert status.ok() == True
     assert payload.on == False
 
+
 def test_button_ctrl_rpc(device):
     pw_client = PigweedClient(device, RPC_PROTOS)
 
@@ -155,7 +166,7 @@ def test_button_ctrl_rpc(device):
     compare_state = not initial_state
     status, payload = pw_client.rpcs.chip.rpc.Button.Event(idx=0, pushed=True)
     assert status.ok() == True
-    sleep(0.5)
+    sleep(2)
     status, payload = pw_client.rpcs.chip.rpc.Lighting.Get()
     assert status.ok() == True
     assert payload.on == compare_state
@@ -163,7 +174,7 @@ def test_button_ctrl_rpc(device):
     compare_state = initial_state
     status, payload = pw_client.rpcs.chip.rpc.Button.Event(idx=0, pushed=True)
     assert status.ok() == True
-    sleep(0.5)
+    sleep(2)
     status, payload = pw_client.rpcs.chip.rpc.Lighting.Get()
     assert status.ok() == True
     assert payload.on == compare_state
