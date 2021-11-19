@@ -89,7 +89,10 @@ void MdnsContexts::Delete(GenericContext * context)
         }
     }
 
-    DNSServiceRefDeallocate(context->serviceRef);
+    if (context->serviceRef != nullptr)
+    {
+        DNSServiceRefDeallocate(context->serviceRef);
+    }
     chip::Platform::Delete(context);
 }
 
@@ -293,7 +296,7 @@ CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, 
 
     sdCtx = chip::Platform::New<RegisterContext>(type, nullptr);
     err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, NULL, ntohs(port), recordLen,
-                             recordBytesPtr, OnRegister, sdCtx);
+                               recordBytesPtr, OnRegister, sdCtx);
     TXTRecordDeallocate(recordRef);
 
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
@@ -485,13 +488,8 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
                       reinterpret_cast<struct sockaddr *>(&sockaddr), ttl, sdCtx);
 
         // Don't leak memory.
-        std::vector<TextEntry>::iterator textEntry;
-        for (textEntry = sdCtx->textEntries.begin(); textEntry != sdCtx->textEntries.end(); textEntry++)
-        {
-            free(const_cast<char *>(textEntry->mKey));
-            free(const_cast<uint8_t *>(textEntry->mData));
-        }
-
+        sdCtx->serviceRef = nullptr;
+        MdnsContexts::GetInstance().Delete(sdCtx);
         return CHIP_NO_ERROR;
     }
 }
