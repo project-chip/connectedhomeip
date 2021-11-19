@@ -57,7 +57,7 @@ private:
      *
      */
     CHIP_ERROR DispatchBufferedData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, const StatusIB & aStatus,
-                                    bool endOfReport = false);
+                                    bool aEndOfReport = false);
 
     /*
      * Buffer up list data as they arrive.
@@ -84,10 +84,13 @@ private:
 
 private:
     /*
-     * Allocate a packet buffer, copy the element where the reader is positioned into that buffer and
-     * return the buffer back to the caller.
+     * Given a reader positioned at a list element, allocate a packet buffer, copy the list item where
+     * the reader is positioned into that buffer and add it to our buffered list for tracking.
+     *
+     * This should be called in list index order starting from the lowest index that needs to be buffered.
+     *
      */
-    CHIP_ERROR AllocAndCopyElement(TLV::TLVReader & reader, System::PacketBufferHandle & handle);
+    CHIP_ERROR BufferListItem(TLV::TLVReader & reader);
 
     ConcreteDataAttributePath mBufferedPath;
     std::vector<System::PacketBufferHandle> mBufferedList;

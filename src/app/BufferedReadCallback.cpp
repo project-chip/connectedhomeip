@@ -54,7 +54,7 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aR
     // To generate the final reconstituted list, we need to allocate a contiguous
     // buffer than can hold the entirety of its contents. To do so, we need to figure out
     // how big a buffer to allocate. This requires walking the buffered list items and computing their TLV sizes,
-    // sum theming all up and adding a bit of slop to account for the TLV array the list elements will go into.
+    // summing them all up and adding a bit of slop to account for the TLV array the list elements will go into.
     //
     // The alternative was to use a PacketBufferTLVWriter backed by chained packet buffers to
     // write out the list - this would have removed the need for this first pass. However,
@@ -67,8 +67,7 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aR
     uint32_t totalBufSize = 0;
     for (size_t i = 0; i < mBufferedList.size(); i++)
     {
-        auto bufHandle = mBufferedList[i].Retain();
-        totalBufSize += bufHandle->TotalLength();
+        totalBufSize += mBufferedList[i]->TotalLength();
     }
 
     //
@@ -101,9 +100,22 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aR
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BufferedReadCallback::AllocAndCopyElement(TLV::TLVReader & reader, System::PacketBufferHandle & handle)
+CHIP_ERROR BufferedReadCallback::BufferListItem(TLV::TLVReader & reader)
 {
     System::PacketBufferTLVWriter writer;
+    System::PacketBufferHandle handle;
+
+    //
+    // We conservatively allocate a packet buffer as big as an IPv6 MTU (since we're buffering
+    // data received over the wire, which should always fit within that).
+    //
+    // We could have snapshotted the reader at its current position, advanced it past the current element
+    // and computed the delta in its read point to figure out the size of the element before allocating
+    // our target buffer. However, the reader's current position is already set past the control octet
+    // and the tag. Consequently, the computed size is always going to omit the sizes of these two parts of the
+    // TLV element. Since the tag can vary in size, for now, let's just do the safe thing. In the future, if this is a problem,
+    // we can improve this.
+    //
     handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
 
     writer.Init(std::move(handle), false);
@@ -115,6 +127,8 @@ CHIP_ERROR BufferedReadCallback::AllocAndCopyElement(TLV::TLVReader & reader, Sy
     // if we can.
     //
     handle.RightSize();
+
+    mBufferedList.push_back(std::move(handle));
 
     return CHIP_NO_ERROR;
 }
@@ -135,9 +149,7 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteDataAttributePath & aP
 
         while ((err = apData->Next()) == CHIP_NO_ERROR)
         {
-            System::PacketBufferHandle handle;
-            ReturnErrorOnFailure(AllocAndCopyElement(*apData, handle));
-            mBufferedList.push_back(std::move(handle));
+            ReturnErrorOnFailure(BufferListItem(*apData));
         }
 
         if (err == CHIP_END_OF_TLV)
@@ -150,16 +162,14 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteDataAttributePath & aP
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        System::PacketBufferHandle handle;
-        ReturnErrorOnFailure(AllocAndCopyElement(*apData, handle));
-        mBufferedList.push_back(std::move(handle));
+        ReturnErrorOnFailure(BufferListItem(*apData));
     }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath,
-                                                      const StatusIB & aStatusIB, bool endOfReport)
+                                                      const StatusIB & aStatusIB, bool aEndOfReport)
 {
     if (aPath == mBufferedPath)
     {
@@ -168,7 +178,7 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ReadClient * apReadC
         // we need to continue to buffer up this list's data, so return immediately without dispatching
         // the existing buffered up contents.
         //
-        if (!endOfReport)
+        if (!aEndOfReport)
         {
             return CHIP_NO_ERROR;
         }
