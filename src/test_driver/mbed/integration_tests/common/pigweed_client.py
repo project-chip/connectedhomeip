@@ -23,7 +23,7 @@ from pw_hdlc.rpc import HdlcRpcClient, default_channels
 class PigweedClient:
     def __init__(self, device, protos):
         """
-        Pigweed Client class containing RPC client initalization and service functions
+        Pigweed Client class containing RPC client initialization and service functions
         Create HdlcRpcCLient object and redirect serial communication to it
         :param device: test device instance
         :param protos: array of RPC protocols

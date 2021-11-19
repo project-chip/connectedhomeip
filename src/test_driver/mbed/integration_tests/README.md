@@ -114,15 +114,15 @@ $ source ./scripts/activate.sh
 Python CHIP Controller and RPC console are required for the correct run
 integration tests. Build and install them inside the development environment.
 
-For buiding and installing Python CHIP Controller please visit
+For building and installing Python CHIP Controller please visit
 [Python CHIP Controller](../../../../docs/guides/python_chip_controller_building.md)
 
-For buiding and installing RPC console please visit
+For building and installing RPC console please visit
 [CHIP RPC CONSOLE](../../../../examples/common/pigweed/rpc_console/README.md)
 
 ## Setup WiFi access point
 
-The way of runing the WiFi access point depends on the platform on which the
+The way of running the WiFi access point depends on the platform on which the
 tests are run. Choose the best one. Just remember the network credentials ssid
 and password.
 
@@ -149,7 +149,7 @@ Preparation of the device for testing should consist of two steps:
 -   flash binary image to device
 
 For more information how to build and flash example application please visit
-their documentaiton.
+their documentation.
 
 # Tests configuration
 
@@ -174,7 +174,7 @@ parameters:
 
 # Test run
 
-To run Mbed intgration tests execute the pytest command with the arguments
+To run Mbed integration tests execute the pytest command with the arguments
 mentioned above. For example:
 
 `pytest --platforms=CY8CPROTO_062_4343W --network=$AP_SSID:$AP_PASSWORD ... src/test_driver/mbed/integration_tests/{APP_NAME}/test_app.py`
@@ -185,11 +185,11 @@ the testing Matter application:
 -   shell - testing shell commands and check base device functionalities
 -   lock-app - testing WiFi provisioning and execute ZCL command to control
     lock, use RPC client to run base device functionalities, control lock and
-    trigger some button acitons
+    trigger some button actions
 -   lighting-app - testing WiFi provisioning and execute ZCL command to control
     light, use RPC client to run base device functionalities, control light and
-    trigger some button acitons
--   pigweed-app - use RPC client to send echo message and receive the repsosne
+    trigger some button actions
+-   pigweed-app - use RPC client to send echo message and receive the response
 -   unit-tests - check unit-tests result
 
 For more details on how to run tests using PyTest see:
