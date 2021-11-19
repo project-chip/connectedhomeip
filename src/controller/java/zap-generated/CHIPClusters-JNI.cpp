@@ -4653,7 +4653,7 @@ JNI_METHOD(void, GroupsCluster, addGroupIfIdentifying)
     onFailure.release();
 }
 JNI_METHOD(void, GroupsCluster, getGroupMembership)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupCount, jobject groupList)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupList)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4661,8 +4661,6 @@ JNI_METHOD(void, GroupsCluster, getGroupMembership)
 
     chip::app::Clusters::Groups::Commands::GetGroupMembership::Type request;
 
-    request.groupCount =
-        static_cast<decltype(request.groupCount)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupCount));
     request.groupList = chip::app::DataModel::List<const uint16_t>();
 
     std::unique_ptr<CHIPGroupsClusterGetGroupMembershipResponseCallback,

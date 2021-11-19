@@ -2584,6 +2584,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_GROUP_NAME_LENGTH
+ *
+ * @brief Defines the maximum length of the group names
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_NAME_LENGTH
+#define CHIP_CONFIG_MAX_GROUP_NAME_LENGTH 16
+#endif
+
+/**
  * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC
  *
  * Defines the number of access control entries supported per fabric in the

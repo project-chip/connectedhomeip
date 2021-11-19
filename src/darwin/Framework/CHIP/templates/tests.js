@@ -165,6 +165,7 @@ function getTests()
     'TestDelayCommands',
     'TestDescriptorCluster',
     'TestBasicInformation',
+    'TestGroupsCluster',
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',

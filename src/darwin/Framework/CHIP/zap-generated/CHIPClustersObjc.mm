@@ -3193,7 +3193,6 @@ using namespace chip::app::Clusters;
 {
     ListFreer listFreer;
     Groups::Commands::GetGroupMembership::Type request;
-    request.groupCount = payload.groupCount.unsignedCharValue;
     {
         using ListType = std::remove_reference_t<decltype(request.groupList)>;
         using ListMemberType = ListMemberTypeGetter<ListType>::Type;

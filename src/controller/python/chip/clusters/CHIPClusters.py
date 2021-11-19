@@ -1810,7 +1810,6 @@ class ChipClusters:
                 "commandId": 0x00000002,
                 "commandName": "GetGroupMembership",
                 "args": {
-                    "groupCount": "int",
                     "groupList": "int",
                 },
             },

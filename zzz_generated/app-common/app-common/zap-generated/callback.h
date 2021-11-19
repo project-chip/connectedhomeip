@@ -12299,7 +12299,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(
  * @brief Groups Cluster GetGroupMembershipResponse Command callback (from server)
  */
 bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                            uint8_t capacity, uint8_t groupCount,
+                                                            uint8_t capacity,
                                                             /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 /**
  * @brief Groups Cluster RemoveGroup Command callback (from client)
