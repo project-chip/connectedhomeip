@@ -47,6 +47,8 @@ enum TLVCommonProfiles
 enum TLVTagFields
 {
     kProfileIdMask    = 0xFFFFFFFF00000000ULL,
+    kProfileNumMask   = 0x0000FFFF00000000ULL,
+    kVendorIdMask     = 0xFFFF000000000000ULL,
     kProfileIdShift   = 32,
     kVendorIdShift    = 48,
     kProfileNumShift  = 32,
@@ -165,7 +167,7 @@ inline uint32_t ProfileIdFromTag(Tag tag)
  */
 inline uint16_t ProfileNumFromTag(Tag tag)
 {
-    return static_cast<uint16_t>((tag & kProfileIdMask) >> kProfileIdShift);
+    return static_cast<uint16_t>((tag & kProfileNumMask) >> kProfileNumShift);
 }
 
 /**
@@ -194,7 +196,7 @@ inline uint32_t TagNumFromTag(Tag tag)
  */
 inline uint16_t VendorIdFromTag(Tag tag)
 {
-    return static_cast<uint16_t>((tag & kProfileIdMask) >> kVendorIdShift);
+    return static_cast<uint16_t>((tag & kVendorIdMask) >> kVendorIdShift);
 }
 
 /**
@@ -218,6 +220,8 @@ inline bool IsSpecialTag(Tag tag)
 {
     return (tag & kProfileIdMask) == kSpecialTagMarker;
 }
+
+constexpr uint8_t kMaxTLVTagLength = 8;
 
 } // namespace TLV
 } // namespace chip

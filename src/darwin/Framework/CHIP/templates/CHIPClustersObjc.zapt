@@ -7,6 +7,7 @@
 #import <Foundation/Foundation.h>
 
 #include <CHIP/CHIPCluster.h>
+#include <CHIP/CHIPCommandPayloadsObjc.h>
 
 typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
 
@@ -22,18 +23,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIP{{asUpperCamelCase name}} : CHIPCluster
 
 {{#chip_cluster_commands}}
-{{#if (zcl_command_arguments_count this.id)}}
-- (void){{asLowerCamelCase name}}:{{#chip_cluster_command_arguments_with_structs_expanded}}{{#not_first}}{{asLowerCamelCase label}}:{{/not_first}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_cluster_command_arguments_with_structs_expanded}}responseHandler:(ResponseHandler)responseHandler;
-{{else}}
-- (void){{asLowerCamelCase name}}:(ResponseHandler)responseHandler;
-{{/if}}
+- (void){{asLowerCamelCase name}}:(CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Payload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 - (void)read{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler;
 {{#if isWritableAttribute}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler;
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value responseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{#if isReportableAttribute}}
 - (void) subscribe{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval responseHandler:(ResponseHandler)responseHandler;

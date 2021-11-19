@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-/* This file contains the declarations for OTAImageProcessor, a platform-agnostic
+/* This file contains the declarations for OTAImageProcessorDriver, a platform-agnostic
  * interface for processing downloaded chunks of OTA image data.
  * Each platform should provide an implementation of this interface.
  */
@@ -27,7 +27,8 @@
 // chunks of OTA image data (data could be raw image data meant for flash or
 // metadata). Each platform should provide an implementation of this
 // interface.
-class OTAImageProcessor
+
+class OTAImageProcessorDriver
 {
 public:
     // Open file, find block of space in persistent memory, or allocate a buffer, etc.
@@ -46,5 +47,5 @@ public:
     virtual CHIP_ERROR Abort() = 0;
 
     // Destructor
-    virtual ~OTAImageProcessor() = default;
+    virtual ~OTAImageProcessorDriver() = default;
 };

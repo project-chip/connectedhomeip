@@ -28,6 +28,7 @@ namespace app {
  */
 struct ConcreteAttributePath
 {
+    ConcreteAttributePath() {}
     ConcreteAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         mEndpointId(aEndpointId), mClusterId(aClusterId), mAttributeId(aAttributeId)
     {}

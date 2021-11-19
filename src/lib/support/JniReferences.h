@@ -20,7 +20,7 @@
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
-#include <pthread.h>
+#include <string>
 
 namespace chip {
 class JniReferences
@@ -36,11 +36,6 @@ public:
         static JniReferences jniReferences;
         return jniReferences;
     }
-
-    /**
-     * Returns a stack lock to be shared by all controller JNI code.
-     */
-    pthread_mutex_t * GetStackLock();
 
     /**
      * Set the JavaVM.
@@ -80,10 +75,55 @@ public:
 
     void ThrowError(JNIEnv * env, jclass exceptionCls, CHIP_ERROR errToThrow);
 
+    /**
+     * Creates a java.util.Optional wrapping the specified jobject. If the wrapped jobject is null, an empty
+     * Optional will be returned.
+     */
+    CHIP_ERROR CreateOptional(jobject objectToWrap, jobject & outOptional);
+
+    /**
+     * Retrieve the value of a java.util.Optional, or nullptr if the Optional is empty.
+     */
+    CHIP_ERROR GetOptionalValue(jobject optionalObj, jobject & optionalValue);
+
+    /**
+     * Get a primitive jint from the Java boxed type Integer, using intValue().
+     */
+    jint IntegerToPrimitive(jobject boxedObject);
+
+    /**
+     * Get a primitive jlong from the Java boxed type Long, using longValue().
+     */
+    jlong LongToPrimitive(jobject boxedObject);
+
+    /**
+     * Get a primitive jboolean from the Java boxed type Booelan, using booleanValue().
+     */
+    jboolean BooleanToPrimitive(jobject boxedObject);
+
+    /**
+     * Creates a boxed type (e.g. java.lang.Integer) based on the the class name ("java/lang/Integer"), constructor JNI signature
+     * ("(I)V"), and value.
+     */
+    template <class T>
+    CHIP_ERROR CreateBoxedObject(std::string boxedTypeClsName, std::string constructorSignature, T value, jobject & outObj)
+    {
+        JNIEnv * env   = GetEnvForCurrentThread();
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        jclass boxedTypeCls;
+        err = GetClassRef(env, boxedTypeClsName.c_str(), boxedTypeCls);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+        jmethodID boxedTypeConstructor = env->GetMethodID(boxedTypeCls, "<init>", constructorSignature.c_str());
+        outObj                         = env->NewObject(boxedTypeCls, boxedTypeConstructor, value);
+        env->DeleteGlobalRef(boxedTypeCls);
+
+        return err;
+    }
+
 private:
     JniReferences() {}
 
-    pthread_mutex_t mStackLock = PTHREAD_MUTEX_INITIALIZER;
     JavaVM * mJvm              = nullptr;
     jobject mClassLoader       = nullptr;
     jmethodID mFindClassMethod = nullptr;

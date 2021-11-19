@@ -129,6 +129,15 @@ enum EmberAfApplicationLauncherStatus : uint8_t
     EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SYSTEM_BUSY       = 2,
 };
 
+// Enum for AssociationFailureCause
+enum EmberAfAssociationFailureCause : uint8_t
+{
+    EMBER_ZCL_ASSOCIATION_FAILURE_CAUSE_UNKNOWN               = 0,
+    EMBER_ZCL_ASSOCIATION_FAILURE_CAUSE_ASSOCIATION_FAILED    = 1,
+    EMBER_ZCL_ASSOCIATION_FAILURE_CAUSE_AUTHENTICATION_FAILED = 2,
+    EMBER_ZCL_ASSOCIATION_FAILURE_CAUSE_SSID_NOT_FOUND        = 3,
+};
+
 // Enum for AttributeWritePermission
 enum EmberAfAttributeWritePermission : uint8_t
 {
@@ -1488,9 +1497,9 @@ enum EmberAfStartUpOnOffValue : uint8_t
 // Enum for StatusCode
 enum EmberAfStatusCode : uint8_t
 {
-    EMBER_ZCL_STATUS_CODE_SUCCESS       = 0,
-    EMBER_ZCL_STATUS_CODE_BUSY          = 1,
-    EMBER_ZCL_STATUS_CODE_GENERAL_ERROR = 2,
+    EMBER_ZCL_STATUS_CODE_BUSY                 = 1,
+    EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR = 2,
+    EMBER_ZCL_STATUS_CODE_WINDOW_NOT_OPEN      = 3,
 };
 
 // Enum for StepMode
@@ -1559,6 +1568,13 @@ enum EmberAfThermostatSystemMode : uint8_t
     EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_EMERGENCY_HEATING = 5,
     EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_PRECOOLING        = 6,
     EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_FAN_ONLY          = 7,
+};
+
+// Enum for ThreadConnectionStatus
+enum EmberAfThreadConnectionStatus : uint8_t
+{
+    EMBER_ZCL_THREAD_CONNECTION_STATUS_CONNECTED     = 0,
+    EMBER_ZCL_THREAD_CONNECTION_STATUS_NOT_CONNECTED = 1,
 };
 
 // Enum for TimeEncoding
@@ -1654,6 +1670,13 @@ enum EmberAfWcType : uint8_t
     EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT    = 8,
     EMBER_ZCL_WC_TYPE_PROJECTOR_SCREEN            = 9,
     EMBER_ZCL_WC_TYPE_UNKNOWN                     = 255,
+};
+
+// Enum for WiFiConnectionStatus
+enum EmberAfWiFiConnectionStatus : uint8_t
+{
+    EMBER_ZCL_WI_FI_CONNECTION_STATUS_CONNECTED     = 0,
+    EMBER_ZCL_WI_FI_CONNECTION_STATUS_NOT_CONNECTED = 1,
 };
 
 // Enum for WiFiVersionType

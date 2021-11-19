@@ -22,6 +22,9 @@
 #include "ConfigureFabricCommand.h"
 #include "PairingCommand.h"
 
+#include <app/server/Dnssd.h>
+#include <lib/dnssd/Resolver.h>
+
 class Unpair : public PairingCommand
 {
 public:
@@ -149,6 +152,19 @@ public:
     {}
 };
 
+class StartUdcServerCommand : public CHIPCommand
+{
+public:
+    StartUdcServerCommand() : CHIPCommand("start-udc-server") {}
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(300); }
+
+    CHIP_ERROR RunCommand() override
+    {
+        chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kDisabled);
+        return CHIP_NO_ERROR;
+    }
+};
+
 void registerCommandsPairing(Commands & commands)
 {
     const char * clusterName = "Pairing";
@@ -174,6 +190,7 @@ void registerCommandsPairing(Commands & commands)
         // TODO - enable CommissionedListCommand once DNS Cache is implemented
         //        make_unique<CommissionedListCommand>(),
         make_unique<ConfigureFabricCommand>(),
+        make_unique<StartUdcServerCommand>(),
     };
 
     commands.Register(clusterName, clusterCommands);

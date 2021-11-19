@@ -114,8 +114,8 @@ CHIP_ERROR OTARequestor::SetupCASESessionManager(chip::FabricIndex fabricIndex)
     // CSM has not been setup so create a new instance of it
     if (mCASESessionManager == nullptr)
     {
-        Server * server         = &(Server::GetInstance());
-        FabricInfo * fabricInfo = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
+        chip::Server * server         = &(chip::Server::GetInstance());
+        chip::FabricInfo * fabricInfo = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
         if (fabricInfo == nullptr)
         {
             ChipLogError(SoftwareUpdate, "Did not find fabric for index %d", fabricIndex);
@@ -131,12 +131,12 @@ CHIP_ERROR OTARequestor::SetupCASESessionManager(chip::FabricIndex fabricIndex)
             .imDelegate = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
         };
 
-        CASESessionManagerConfig sessionManagerConfig = {
+        chip::CASESessionManagerConfig sessionManagerConfig = {
             .sessionInitParams = initParams,
             .dnsCache          = nullptr,
         };
 
-        mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
+        mCASESessionManager = chip::Platform::New<chip::CASESessionManager>(sessionManagerConfig);
     }
 
     if (mCASESessionManager == nullptr)

@@ -29,7 +29,8 @@
         than "global") that are not present in the struct ? }}
   {{else}}
     VerifyOrReturn(CheckValue
-      {{~#if (isString type)}}AsString("{{label}}", {{actual}}, "{{expected}}")
+      {{~#if (isOctetString type)}}AsString("{{label}}", {{actual}}, chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral expected}}"), {{expected.length}}))
+      {{else if (isCharString type)}}AsString("{{label}}", {{actual}}, chip::CharSpan("{{expected}}", {{expected.length}}))
       {{else}}<{{chipType}}>("{{label}}", {{actual}}, {{expected}}{{asTypeLiteralSuffix type}})
       {{/if}}
     );

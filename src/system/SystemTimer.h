@@ -229,7 +229,7 @@ public:
 
 private:
     friend class LayerImplLwIP;
-    static BitMapObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
+    static chip::ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
     static Stats::count_t mNumInUse;
     static Stats::count_t mHighWatermark;
 

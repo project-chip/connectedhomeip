@@ -19,15 +19,6 @@
 
 namespace chip {
 namespace app {
-CHIP_ERROR TimedRequestMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    // make a copy of the reader here
-    mReader.Init(aReader);
-    VerifyOrReturnError(TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR TimedRequestMessage::Parser::CheckSchemaValidity() const
 {
@@ -73,7 +64,7 @@ CHIP_ERROR TimedRequestMessage::Parser::CheckSchemaValidity() const
             err = CHIP_NO_ERROR;
         }
     }
-    ReturnLogErrorOnFailure(err);
+    ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -81,11 +72,6 @@ CHIP_ERROR TimedRequestMessage::Parser::CheckSchemaValidity() const
 CHIP_ERROR TimedRequestMessage::Parser::GetTimeoutMs(uint16_t * const apTimeoutMs) const
 {
     return GetUnsignedInteger(to_underlying(Tag::kTimeoutMs), apTimeoutMs);
-}
-
-CHIP_ERROR TimedRequestMessage::Builder::Init(TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
 }
 
 TimedRequestMessage::Builder & TimedRequestMessage::Builder::TimeoutMs(const uint16_t aTimeoutMs)

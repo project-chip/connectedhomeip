@@ -296,7 +296,7 @@ void emberAfPrintAttributeTable(void)
                     emberAfAttributesPrint("%2x", mfgCode);
                 }
                 emberAfAttributesPrint(" / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
-                                       (emberAfAttributeIsReadOnly(metaData) ? "RO" : "RW"),
+                                       (metaData->IsReadOnly() ? "RO" : "RW"),
                                        (emberAfAttributeIsTokenized(metaData)
                                             ? " token "
                                             : (emberAfAttributeIsExternal(metaData) ? "extern " : "  RAM  ")));
@@ -524,7 +524,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
             return EMBER_ZCL_STATUS_INVALID_DATA_TYPE;
         }
 
-        if (emberAfAttributeIsReadOnly(metadata))
+        if (metadata->IsReadOnly())
         {
             emberAfAttributesPrintln("%pattr not writable", "WRITE ERR: ");
             emberAfAttributesFlush();

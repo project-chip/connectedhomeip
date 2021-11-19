@@ -49,8 +49,6 @@ buildconfig_header("inet_buildconfig") {
     defines +=
         [ "INET_PLATFORM_CONFIG_INCLUDE=${chip_inet_platform_config_include}" ]
   }
-
-  defines += [ "CHIP_INET_END_POINT_IMPL_CONFIG_FILE=<inet/EndPointBasisImpl${chip_system_config_inet}.h>" ]
 }
 
 source_set("inet_config_header") {
@@ -69,7 +67,7 @@ static_library("inet") {
 
   sources = [
     "EndPointBasis.h",
-    "EndPointBasisImpl${chip_system_config_inet}.h",
+    "EndPointState${chip_system_config_inet}.h",
     "IANAConstants.h",
     "IPAddress-StringFuncts.cpp",
     "IPAddress.cpp",

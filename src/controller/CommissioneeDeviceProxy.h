@@ -37,7 +37,6 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/DLLUtil.h>
 #include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/PASESession.h>
@@ -53,8 +52,6 @@
 #endif
 
 namespace chip {
-
-class DeviceStatusDelegate;
 
 constexpr size_t kOpCSRNonceLength       = 32;
 constexpr size_t kAttestationNonceLength = 32;
@@ -82,22 +79,12 @@ struct ControllerDeviceInitParams
     Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 };
 
-class CommissioneeDeviceProxy : public DeviceProxy, Messaging::ExchangeDelegate
+class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
 {
 public:
     ~CommissioneeDeviceProxy();
     CommissioneeDeviceProxy() {}
     CommissioneeDeviceProxy(const CommissioneeDeviceProxy &) = delete;
-
-    /**
-     * @brief
-     *   Set the delegate object which will be called when a message is received.
-     *   The user of this Device object must reset the delegate (by calling
-     *   SetDelegate(nullptr)) before releasing their delegate object.
-     *
-     * @param[in] delegate   The pointer to the delegate object.
-     */
-    void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
 
     /**
      * @brief
@@ -178,34 +165,13 @@ public:
 
     /**
      * @brief
-     *   Called when a connection is closing.
+     *   Called when the associated session is released
      *
      *   The receiver should release all resources associated with the connection.
      *
      * @param session A handle to the secure session
      */
-    void OnConnectionExpired(SessionHandle session) override;
-
-    /**
-     * @brief
-     *   This function is called when a message is received from the corresponding CHIP
-     *   device. The message ownership is transferred to the function, and it is expected
-     *   to release the message buffer before returning.
-     *
-     * @param[in] exchange      The exchange context the message was received
-     *                          on.  The Device guarantees that it will call
-     *                          Close() on exchange when it's done processing
-     *                          the message.
-     * @param[in] payloadHeader Reference to payload header in the message
-     * @param[in] msgBuf        The message buffer
-     */
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && msgBuf) override;
-
-    /**
-     * @brief ExchangeDelegate implementation of OnResponseTimeout.
-     */
-    void OnResponseTimeout(Messaging::ExchangeContext * exchange) override;
+    void OnSessionReleased(SessionHandle session) override;
 
     /**
      *  In case there exists an open session to the device, mark it as expired.
@@ -335,8 +301,6 @@ private:
 
     PASESession mPairing;
 
-    DeviceStatusDelegate * mStatusDelegate = nullptr;
-
     SessionManager * mSessionManager = nullptr;
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
@@ -346,9 +310,6 @@ private:
     Controller::DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
 
     uint8_t mSequenceNumber = 0;
-
-    uint32_t mLocalMessageCounter = 0;
-    uint32_t mPeerMessageCounter  = 0;
 
     /**
      * @brief

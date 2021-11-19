@@ -9,12 +9,13 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import chip.clusterinfo.ClusterCommandCallback
 import chip.clusterinfo.ClusterInfo
-import chip.clusterinfo.CommandInfo
+import chip.clusterinfo.InteractionInfo
 import chip.clusterinfo.CommandResponseInfo
 import chip.clusterinfo.DelegatedClusterCallback
 import chip.devicecontroller.ChipClusters
@@ -52,7 +53,7 @@ class ClusterDetailFragment : Fragment() {
   private lateinit var selectedClusterInfo: ClusterInfo
   private lateinit var selectedCluster: ChipClusters.BaseChipCluster
   private lateinit var selectedCommandCallback: DelegatedClusterCallback
-  private lateinit var selectedCommandInfo: CommandInfo
+  private lateinit var selectedInteractionInfo: InteractionInfo
   private var devicePtr = 0L
   private var endpointId = 0
 
@@ -67,18 +68,24 @@ class ClusterDetailFragment : Fragment() {
     return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
       deviceController.setCompletionListener(GenericChipDeviceListener())
       commandAutoCompleteTv.visibility = View.GONE
-      clusterAutoCompleteSetup(clusterAutoCompleteTv, commandAutoCompleteTv, parameterList)
+      clusterAutoCompleteSetup(
+        clusterAutoCompleteTv,
+        commandAutoCompleteTv,
+        parameterList,
+        callbackList
+      )
       commandAutoCompleteSetup(commandAutoCompleteTv, inflater, parameterList, callbackList)
       invokeCommand.setOnClickListener {
+        callbackList.removeAllViews()
         val commandArguments = HashMap<String, Any>()
         parameterList.forEach {
           val type =
-            selectedCommandInfo.commandParameters[it.clusterParameterNameTv.text.toString()]!!.type
+            selectedInteractionInfo.commandParameters[it.clusterParameterNameTv.text.toString()]!!.type
           val data = castStringToType(it.clusterParameterData.text.toString(), type)!!
 
           commandArguments[it.clusterParameterNameTv.text.toString()] = data
         }
-        selectedCommandInfo.getCommandFunction()
+        selectedInteractionInfo.getCommandFunction()
           .invokeCommand(selectedCluster, selectedCommandCallback, commandArguments)
       }
     }
@@ -87,9 +94,8 @@ class ClusterDetailFragment : Fragment() {
   private fun castStringToType(data: String, type: Class<*>): Any? {
     return when (type) {
       Int::class.java -> data.toInt()
-      String::class.java -> data
       Boolean::class.java -> data.toBoolean()
-      else -> null
+      else -> data
     }
   }
 
@@ -102,7 +108,8 @@ class ClusterDetailFragment : Fragment() {
   private fun clusterAutoCompleteSetup(
     clusterAutoComplete: AutoCompleteTextView,
     commandAutoComplete: AutoCompleteTextView,
-    parameterList: LinearLayout
+    parameterList: LinearLayout,
+    callbackList: LinearLayout
   ) {
     val clusterNameList = constructHint(clusterMap)
     val clusterAdapter =
@@ -113,6 +120,7 @@ class ClusterDetailFragment : Fragment() {
       // when new cluster is selected, clear the command text and possible parameterList
       commandAutoComplete.setText("", false)
       parameterList.removeAllViews()
+      callbackList.removeAllViews()
       // populate all the commands that belong to the selected cluster
       val selectedCluster: String = clusterAutoComplete.adapter.getItem(position).toString()
       val commandAdapter = getCommandOptions(selectedCluster)
@@ -127,12 +135,13 @@ class ClusterDetailFragment : Fragment() {
     callbackList: LinearLayout
   ) {
     commandAutoComplete.setOnItemClickListener { parent, view, position, id ->
-      // when new command is selected, clear all the parameterList
+      // when new command is selected, clear all the parameterList and callbackList
       parameterList.removeAllViews()
+      callbackList.removeAllViews()
       selectedCluster = selectedClusterInfo.createClusterFunction.create(devicePtr, endpointId)
       val selectedCommand: String = commandAutoComplete.adapter.getItem(position).toString()
-      selectedCommandInfo = selectedClusterInfo.commands[selectedCommand]!!
-      selectedCommandCallback = selectedCommandInfo.commandCallbackSupplier.get()
+      selectedInteractionInfo = selectedClusterInfo.commands[selectedCommand]!!
+      selectedCommandCallback = selectedInteractionInfo.commandCallbackSupplier.get()
       populateCommandParameter(inflater, parameterList)
       selectedCommandCallback.setCallbackDelegate(object : ClusterCommandCallback {
         override fun onSuccess(responseValues: Map<CommandResponseInfo, Any>) {
@@ -157,7 +166,7 @@ class ClusterDetailFragment : Fragment() {
   }
 
   private fun populateCommandParameter(inflater: LayoutInflater, parameterList: LinearLayout) {
-    selectedCommandInfo.commandParameters.forEach { (paramName, paramInfo) ->
+    selectedInteractionInfo.commandParameters.forEach { (paramName, paramInfo) ->
       val param = inflater.inflate(R.layout.cluster_parameter_item, null, false) as ConstraintLayout
       param.clusterParameterNameTv.text = "${paramName}"
       param.clusterParameterTypeTv.text = "${paramInfo.type}"
@@ -171,12 +180,57 @@ class ClusterDetailFragment : Fragment() {
     callbackList: LinearLayout
   ) {
     responseValues.forEach { (variableNameType, response) ->
-      val callback =
+      if (response is List<*>) {
+        createListReadAttributeView(response, inflater, callbackList, variableNameType)
+      } else {
+        createBasicReadAttributeView(response, inflater, callbackList, variableNameType)
+      }
+    }
+  }
+
+  private fun createBasicReadAttributeView(
+    response: Any,
+    inflater: LayoutInflater,
+    callbackList: LinearLayout,
+    variableNameType: CommandResponseInfo
+  ) {
+    val callbackItem =
+      inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
+    callbackItem.clusterCallbackNameTv.text = variableNameType.name
+    callbackItem.clusterCallbackDataTv.text = response.toString()
+    callbackItem.clusterCallbackTypeTv.text = variableNameType.type
+    callbackList.addView(callbackItem)
+  }
+
+  private fun createListReadAttributeView(
+    response: List<*>,
+    inflater: LayoutInflater,
+    callbackList: LinearLayout,
+    variableNameType: CommandResponseInfo
+  ) {
+    if (response.isEmpty()) {
+      val emptyCallback =
         inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
-      callback.clusterCallbackNameTv.text = variableNameType.name
-      callback.clusterCallbackDataTv.text = response.toString()
-      callback.clusterCallbackTypeTv.text = variableNameType.type
-      callbackList.addView(callback)
+      emptyCallback.clusterCallbackNameTv.text = "Result is empty"
+      callbackList.addView(emptyCallback)
+    } else {
+      response.forEachIndexed { index, it ->
+        val readAttributeCallbackItem =
+          inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
+        readAttributeCallbackItem.clusterCallbackNameTv.text = variableNameType.name + "[$index]"
+        val objectString = it.toString()
+        val callbackClassName = it!!.javaClass.toString().split('$').last()
+        readAttributeCallbackItem.clusterCallbackDataTv.text = callbackClassName
+        readAttributeCallbackItem.clusterCallbackDataTv.setOnClickListener {
+          AlertDialog.Builder(requireContext())
+            .setTitle(callbackClassName)
+            .setMessage(objectString)
+            .create()
+            .show()
+        }
+        readAttributeCallbackItem.clusterCallbackTypeTv.text = "List<$callbackClassName>"
+        callbackList.addView(readAttributeCallbackItem)
+      }
     }
   }
 

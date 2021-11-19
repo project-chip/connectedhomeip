@@ -32,8 +32,8 @@
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
+#include <credentials/FabricTable.h>
 #include <system/TimeSource.h>
-#include <transport/FabricTable.h>
 
 #include <app/server/Server.h>
 

@@ -174,11 +174,23 @@ CHIP_ERROR MbedConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
 
-    int err = kv_get(key, reinterpret_cast<void *>(buf), bufSize, &outLen);
+    kv_info_t info;
 
+    int err = kv_get_info(key, &info);
     if (err != MBED_SUCCESS)
     {
         return CHIP_ERROR_INTERNAL;
+    }
+
+    err = kv_get(key, reinterpret_cast<void *>(buf), bufSize, &outLen);
+    if (err != MBED_SUCCESS)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (bufSize < info.size)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
     return CHIP_NO_ERROR;

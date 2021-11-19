@@ -30,6 +30,7 @@
 #include <app/DeviceProxy.h>
 #include <app/util/error-mapping.h>
 #include <controller/InvokeInteraction.h>
+#include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>
 
 namespace chip {
@@ -40,6 +41,9 @@ using CommandResponseSuccessCallback = void(void * context, const T & responseOb
 using CommandResponseFailureCallback = void(void * context, EmberAfStatus status);
 using WriteResponseSuccessCallback   = void (*)(void * context);
 using WriteResponseFailureCallback   = void (*)(void * context, EmberAfStatus status);
+template <typename T>
+using ReadResponseSuccessCallback = void (*)(void * context, T responseData);
+using ReadResponseFailureCallback = void (*)(void * context, EmberAfStatus status);
 
 class DLL_EXPORT ClusterBase
 {
@@ -47,6 +51,7 @@ public:
     virtual ~ClusterBase() {}
 
     CHIP_ERROR Associate(DeviceProxy * device, EndpointId endpoint);
+    CHIP_ERROR AssociateWithGroup(DeviceProxy * device, GroupId groupId);
 
     void Dissociate();
 
@@ -58,9 +63,25 @@ public:
      * Success and Failure callbacks must be passed in through which the decoded response is provided as well as notification of any
      * failure.
      */
-    template <typename RequestDataT, typename ResponseDataT>
+    template <typename RequestDataT>
     CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
-                             CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb);
+                             CommandResponseSuccessCallback<typename RequestDataT::ResponseType> successCb,
+                             CommandResponseFailureCallback failureCb)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
+                                                const typename RequestDataT::ResponseType & responseData) {
+            successCb(context, responseData);
+        };
+
+        auto onFailureCb = [context, failureCb](const app::StatusIB & aStatus, CHIP_ERROR aError) {
+            failureCb(context, app::ToEmberAfStatus(aStatus.mStatus));
+        };
+
+        return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
+                                    onSuccessCb, onFailureCb);
+    };
 
     /**
      * Functions for writing attributes.  We have lots of different
@@ -90,8 +111,9 @@ public:
             }
         };
 
-        return chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId,
-                                                          requestData, onSuccessCb, onFailureCb);
+        return chip::Controller::WriteAttribute<AttrType>((mSessionHandle.HasValue()) ? mSessionHandle.Value()
+                                                                                      : mDevice->GetSecureSession().Value(),
+                                                          mEndpoint, clusterId, attributeId, requestData, onSuccessCb, onFailureCb);
     }
 
     template <typename AttributeInfo>
@@ -100,6 +122,42 @@ public:
     {
         return WriteAttribute(requestData, context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb,
                               failureCb);
+    }
+
+    /**
+     * Read an attribute and get a type-safe callback with the attribute value.
+     */
+    template <typename AttributeInfo>
+    CHIP_ERROR ReadAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> successCb,
+                             ReadResponseFailureCallback failureCb)
+    {
+        return ReadAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
+            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb, failureCb);
+    }
+
+    template <typename DecodableType, typename DecodableArgType>
+    CHIP_ERROR ReadAttribute(void * context, ClusterId clusterId, AttributeId attributeId,
+                             ReadResponseSuccessCallback<DecodableArgType> successCb, ReadResponseFailureCallback failureCb)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath, const DecodableType & aData) {
+            if (successCb != nullptr)
+            {
+                successCb(context, aData);
+            }
+        };
+
+        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
+                                                CHIP_ERROR aError) {
+            if (failureCb != nullptr)
+            {
+                failureCb(context, app::ToEmberAfStatus(status.mStatus));
+            }
+        };
+
+        return Controller::ReadAttribute<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
+                                                        mEndpoint, clusterId, attributeId, onSuccessCb, onFailureCb);
     }
 
 protected:
@@ -123,6 +181,7 @@ protected:
     const ClusterId mClusterId;
     DeviceProxy * mDevice;
     EndpointId mEndpoint;
+    chip::Optional<SessionHandle> mSessionHandle;
 };
 
 } // namespace Controller

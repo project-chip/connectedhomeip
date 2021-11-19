@@ -56,6 +56,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     mClusterInfoPool[CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS - 1].mpNext = nullptr;
     mpNextAvailableClusterInfo                                      = mClusterInfoPool;
 
+    mMagic++;
+
     return CHIP_NO_ERROR;
 }
 
@@ -76,21 +78,20 @@ void InteractionModelEngine::Shutdown()
 
     mCommandHandlerList = nullptr;
 
-    //
-    // Since modifying the pool during iteration is generally frowned upon,
-    // I've chosen to just destroy the object but not necessarily de-allocate it.
-    //
-    // This poses a problem when shutting down and restarting the stack, since the
-    // IMEngine is a statically constructed singleton, and this lingering state will
-    // cause issues.
-    //
-    // This doesn't pose a problem right now because there shouldn't be any actual objects
-    // left here due to the synchronous nature of command handling.
-    //
-    // Filed #10332 to track this.
-    //
-    mCommandHandlerObjs.ForEachActiveObject([](CommandHandler * obj) -> bool {
-        obj->~CommandHandler();
+    // Increase magic number to invalidate all Handle-s.
+    mMagic++;
+
+    mCommandHandlerObjs.ForEachActiveObject([this](CommandHandler * obj) -> bool {
+        // Modifying the pool during iteration is generally frowned upon.
+        // This is almost safe since mCommandHandlerObjs is a BitMapObjectPool which won't malfunction when modifying the inner
+        // record while during traversal. But this behavior is not guranteed, so we should fix this by implementing DeallocateAll.
+        //
+        // Deallocate an CommandHandler will call its destructor (and abort the exchange context it holds) without calling
+        // Shutdown().
+        //
+        // TODO(@kghost, #10332) Implement DeallocateAll and replace this.
+
+        mCommandHandlerObjs.Deallocate(obj);
         return true;
     });
 
@@ -155,7 +156,6 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
             return err;
         }
     }
-
     return CHIP_ERROR_NO_MEMORY;
 }
 
@@ -262,34 +262,12 @@ CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteCli
         {
             continue;
         }
-
         ReturnLogErrorOnFailure(writeClient.Init(mpExchangeMgr, apCallback));
         apWriteClient.SetWriteClient(&writeClient);
         return CHIP_NO_ERROR;
     }
 
     return CHIP_ERROR_NO_MEMORY;
-}
-
-CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext,
-                                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    ChipLogDetail(InteractionModel, "Msg type %d not supported", aPayloadHeader.GetMessageType());
-
-    // Todo: Add status report
-    // err = SendStatusReport(ec, kChipProfile_Common, kStatus_UnsupportedMessage);
-    // SuccessOrExit(err);
-
-    apExchangeContext = nullptr;
-
-    // Todo: Fix the below check after the above status report is implemented.
-    if (nullptr != apExchangeContext)
-    {
-        apExchangeContext->Abort();
-    }
-    return err;
 }
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
@@ -299,23 +277,27 @@ void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 
 CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
                                                           const PayloadHeader & aPayloadHeader,
-                                                          System::PacketBufferHandle && aPayload)
+                                                          System::PacketBufferHandle && aPayload,
+                                                          Protocols::InteractionModel::Status & aStatus)
 {
     CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(this);
     if (commandHandler == nullptr)
     {
+        ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
+        aStatus = Protocols::InteractionModel::Status::Busy;
         return CHIP_ERROR_NO_MEMORY;
     }
-    return commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
+    ReturnErrorOnFailure(commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload)));
+    aStatus = Protocols::InteractionModel::Status::Success;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
                                                         const PayloadHeader & aPayloadHeader,
                                                         System::PacketBufferHandle && aPayload,
-                                                        ReadHandler::InteractionType aInteractionType)
+                                                        ReadHandler::InteractionType aInteractionType,
+                                                        Protocols::InteractionModel::Status & aStatus)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     ChipLogDetail(InteractionModel, "Received %s request",
                   aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
 
@@ -328,10 +310,10 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
             bool keepSubscriptions = true;
             System::PacketBufferTLVReader reader;
             reader.Init(aPayload.Retain());
-            SuccessOrExit(err = reader.Next());
+            ReturnErrorOnFailure(reader.Next());
             SubscribeRequestMessage::Parser subscribeRequestParser;
-            SuccessOrExit(err = subscribeRequestParser.Init(reader));
-            err = subscribeRequestParser.GetKeepSubscriptions(&keepSubscriptions);
+            ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
+            CHIP_ERROR err = subscribeRequestParser.GetKeepSubscriptions(&keepSubscriptions);
             if (err == CHIP_NO_ERROR && !keepSubscriptions)
             {
                 readHandler.Shutdown(ReadHandler::ShutdownOptions::AbortCurrentExchange);
@@ -343,49 +325,39 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     {
         if (readHandler.IsFree())
         {
-            err = readHandler.Init(mpExchangeMgr, mpDelegate, apExchangeContext, aInteractionType);
-            SuccessOrExit(err);
-            err               = readHandler.OnReadInitialRequest(std::move(aPayload));
-            apExchangeContext = nullptr;
-            break;
+            ReturnErrorOnFailure(readHandler.Init(mpExchangeMgr, mpDelegate, apExchangeContext, aInteractionType));
+            ReturnErrorOnFailure(readHandler.OnReadInitialRequest(std::move(aPayload)));
+            aStatus = Protocols::InteractionModel::Status::Success;
+            return CHIP_NO_ERROR;
         }
     }
 
-exit:
+    ChipLogProgress(InteractionModel, "no resource for %s interaction",
+                    aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
+    aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
 
-    if (nullptr != apExchangeContext)
-    {
-        apExchangeContext->Abort();
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,
-                                                  const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+                                                  const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
+                                                  Protocols::InteractionModel::Status & aStatus)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     ChipLogDetail(InteractionModel, "Received Write request");
 
     for (auto & writeHandler : mWriteHandlers)
     {
         if (writeHandler.IsFree())
         {
-            err = writeHandler.Init(mpDelegate);
-            SuccessOrExit(err);
-            err               = writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload));
-            apExchangeContext = nullptr;
-            break;
+            ReturnErrorOnFailure(writeHandler.Init(mpDelegate));
+            ReturnErrorOnFailure(writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload)));
+            aStatus = Protocols::InteractionModel::Status::Success;
+            return CHIP_NO_ERROR;
         }
     }
-
-exit:
-
-    if (nullptr != apExchangeContext)
-    {
-        apExchangeContext->Abort();
-    }
-    return err;
+    ChipLogProgress(InteractionModel, "no resource for write interaction");
+    aStatus = Protocols::InteractionModel::Status::Busy;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext,
@@ -412,7 +384,6 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
         {
             continue;
         }
-
         return readClient.OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
     }
     return CHIP_NO_ERROR;
@@ -421,31 +392,43 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
 CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
                                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Failure;
+
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {
-        return OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
+        SuccessOrExit(OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
     {
-        return OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), ReadHandler::InteractionType::Read);
+        SuccessOrExit(OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
+                                           ReadHandler::InteractionType::Read, status));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
-        return OnWriteRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
+        SuccessOrExit(OnWriteRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeRequest))
     {
-        return OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
-                                    ReadHandler::InteractionType::Subscribe);
+        SuccessOrExit(OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
+                                           ReadHandler::InteractionType::Subscribe, status));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
-        return OnUnsolicitedReportData(apExchangeContext, aPayloadHeader, std::move(aPayload));
+        ReturnErrorOnFailure(OnUnsolicitedReportData(apExchangeContext, aPayloadHeader, std::move(aPayload)));
+        status = Protocols::InteractionModel::Status::Success;
     }
     else
     {
-        return OnUnknownMsgType(apExchangeContext, aPayloadHeader, std::move(aPayload));
+        ChipLogProgress(InteractionModel, "Msg type %d not supported", aPayloadHeader.GetMessageType());
     }
+
+exit:
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        err = StatusResponse::SendStatusResponse(status, apExchangeContext, false /*aExpectResponse*/);
+    }
+    return err;
 }
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)

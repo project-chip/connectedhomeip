@@ -150,7 +150,12 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
         {{else if (isCharString type)}}
         ChipLogProgress(Zcl, "    %.*s,", static_cast<int>(entry.size()), entry.data());
         {{else}}
-        ChipLogProgress(Zcl, "    {{asPrintFormat type}},", entry);
+        {{~! NOTE: asPrintFormat does not handle the isArray case at
+            all right, but we want the print format for our _entries_
+            anyway.  Indirect through a partial that will let us set
+            isArray to false. ~}}
+        {{~#*inline "asPrintFormatForElement"}}{{asPrintFormat type}}{{/inline~}}
+        ChipLogProgress(Zcl, "    {{>asPrintFormatForElement isArray=false}},", entry);
         {{/if}}
 #endif // CHIP_PROGRESS_LOGGING
     }
@@ -205,16 +210,6 @@ void chip_ime_SetFailureResponseDelegate(FailureResponseDelegate delegate)
 {{#chip_client_clusters}}
 // Cluster {{asUpperCamelCase name}}
 
-{{#chip_cluster_commands}}
-chip::ChipError::StorageType chip_ime_AppendCommand_{{asUpperCamelCase clusterName}}_{{asUpperCamelCase name}}(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId, chip::GroupId{{#chip_cluster_command_arguments_with_structs_expanded}}, {{#if (isString type)}}const uint8_t * {{asLowerCamelCase label}}, uint32_t {{asLowerCamelCase label}}_Len{{else}}{{chipType}} {{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments_with_structs_expanded}})
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::{{asUpperCamelCase clusterName}}Cluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.{{asUpperCamelCase name}}(nullptr, nullptr{{#chip_cluster_command_arguments_with_structs_expanded}}, {{#if (isOctetString type)}}chip::ByteSpan({{asLowerCamelCase label}}, {{asLowerCamelCase label}}_Len){{else if (isCharString type)}}chip::CharSpan(reinterpret_cast<const char*>({{asLowerCamelCase label}}), {{asLowerCamelCase label}}_Len){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments_with_structs_expanded}}).AsInteger();
-}
-{{/chip_cluster_commands}}
-
 {{#chip_server_cluster_attributes}}
 chip::ChipError::StorageType chip_ime_ReadAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
 {
@@ -243,15 +238,6 @@ chip::ChipError::StorageType chip_ime_SubscribeAttribute_{{asUpperCamelCase pare
 }
 {{/if}}
 
-{{#if isWritableAttribute}}
-chip::ChipError::StorageType chip_ime_WriteAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId, chip::GroupId, {{#if (isString type)}} uint8_t * value, size_t len{{else}}{{chipType}} value{{/if}})
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.WriteAttribute{{asUpperCamelCase name}}(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), {{#if (isOctetString type)}} chip::ByteSpan(value, len){{else if (isCharString type)}} chip::CharSpan(reinterpret_cast<const char*>(value), len){{else}}value{{/if}}).AsInteger();
-}
-{{/if}}
 {{/chip_server_cluster_attributes}}
 
 // End of Cluster {{asUpperCamelCase name}}

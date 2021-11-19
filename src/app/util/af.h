@@ -148,6 +148,17 @@ bool emberAfContainsServerWithMfgCode(chip::EndpointId endpoint, chip::ClusterId
 bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
+ * @brief Returns true if endpoint of given index contains the ZCL server with specified id.
+ *
+ * This function returns true if
+ * the endpoint of given index contains server of a given cluster.
+ * If this function is used with a manufacturer specific clusterId
+ * then this will return the first cluster that it finds in the Cluster table.
+ * and will not return any other clusters that share that id.
+ */
+bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
+
+/**
  * @brief Returns true if endpoint contains cluster client.
  *
  * This function returns true if
@@ -361,13 +372,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
  * @param cluster EmberAfCluster* to consider
  */
 #define emberAfClusterIsManufacturerSpecific(cluster) ((cluster)->clusterId >= 0xFC00)
-
-/**
- * @brief macro that returns true if attribute is read only.
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsReadOnly(metadata) (((metadata)->mask & ATTRIBUTE_MASK_WRITABLE) == 0)
 
 /**
  * @brief macro that returns true if client attribute, and false if server.

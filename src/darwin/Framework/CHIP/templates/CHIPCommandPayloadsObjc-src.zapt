@@ -1,0 +1,11 @@
+{{> header}}
+
+#import "CHIPCommandPayloadsObjc.h"
+
+{{#zcl_clusters}}
+{{#zcl_commands}}
+@implementation CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Payload
+@end
+
+{{/zcl_commands}}
+{{/zcl_clusters}}

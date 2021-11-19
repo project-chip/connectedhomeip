@@ -23,8 +23,10 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
+#include <platform/GeneralFaults.h>
 #include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
 
@@ -65,6 +67,16 @@ class GenericThreadStackManagerImpl_OpenThread;
 template <class>
 class GenericThreadStackManagerImpl_OpenThread_LwIP;
 } // namespace Internal
+
+// Maximum length of vendor defined name or prefix of the software thread that is
+// static for the duration of the thread.
+static constexpr size_t kMaxThreadNameLength = 32;
+
+struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type
+{
+    char NameBuf[kMaxThreadNameLength + 1];
+    ThreadMetrics * Next; /* Pointer to the next structure.  */
+};
 
 class PlatformManager;
 
@@ -177,6 +189,14 @@ public:
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed);
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
 
+    /*
+     * Get the linked list of thread metrics of the current plaform. After usage, each caller of GetThreadMetrics
+     * needs to release the thread metrics list it gets via ReleaseThreadMetrics.
+     *
+     */
+    CHIP_ERROR GetThreadMetrics(ThreadMetrics ** threadMetricsOut);
+    void ReleaseThreadMetrics(ThreadMetrics * threadMetrics);
+
     /**
      * General Diagnostics methods.
      */
@@ -184,6 +204,10 @@ public:
     CHIP_ERROR GetUpTime(uint64_t & upTime);
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
     CHIP_ERROR GetBootReasons(uint8_t & bootReasons);
+
+    CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults);
+    CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults);
+    CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults);
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool IsChipStackLockedByCurrentThread() const;
@@ -446,6 +470,16 @@ inline CHIP_ERROR PlatformManager::GetCurrentHeapHighWatermark(uint64_t & curren
     return static_cast<ImplClass *>(this)->_GetCurrentHeapHighWatermark(currentHeapHighWatermark);
 }
 
+inline CHIP_ERROR PlatformManager::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+    return static_cast<ImplClass *>(this)->_GetThreadMetrics(threadMetricsOut);
+}
+
+inline void PlatformManager::ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{
+    return static_cast<ImplClass *>(this)->_ReleaseThreadMetrics(threadMetrics);
+}
+
 inline CHIP_ERROR PlatformManager::GetRebootCount(uint16_t & rebootCount)
 {
     return static_cast<ImplClass *>(this)->_GetRebootCount(rebootCount);
@@ -464,6 +498,21 @@ inline CHIP_ERROR PlatformManager::GetTotalOperationalHours(uint32_t & totalOper
 inline CHIP_ERROR PlatformManager::GetBootReasons(uint8_t & bootReasons)
 {
     return static_cast<ImplClass *>(this)->_GetBootReasons(bootReasons);
+}
+
+inline CHIP_ERROR PlatformManager::GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
+{
+    return static_cast<ImplClass *>(this)->_GetActiveHardwareFaults(hardwareFaults);
+}
+
+inline CHIP_ERROR PlatformManager::GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
+{
+    return static_cast<ImplClass *>(this)->_GetActiveRadioFaults(radioFaults);
+}
+
+inline CHIP_ERROR PlatformManager::GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
+{
+    return static_cast<ImplClass *>(this)->_GetActiveNetworkFaults(networkFaults);
 }
 
 } // namespace DeviceLayer

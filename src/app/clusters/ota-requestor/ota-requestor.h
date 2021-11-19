@@ -22,7 +22,7 @@
 
 #include "ota-requestor-driver.h"
 #include "ota-requestor-interface.h"
-
+#include <app/CASESessionManager.h>
 #pragma once
 
 // This class implements all of the core logic of the OTA Requestor
@@ -36,9 +36,13 @@ public:
     void TriggerImmediateQuery();
 
     // A setter for the delegate class pointer
-    void setOtaRequestorDriver(OTARequestorDriver *driver) { otaRequestorDriver = driver; }
+    void SetOtaRequestorDriver(OTARequestorDriver *driver) { mOtaRequestorDriver = driver; }
 
-    // Application interface declarations end
+    // Application directs the Requestor to abort any processing related to
+    // the image update
+    void AbortImageUpdate();
+
+    // Application interface declarations -- end
 
     // Virtual functions from OTARequestorInterface start
     // Handler for the AnnounceOTAProvider command
@@ -52,13 +56,12 @@ public:
 private:
 
     // Variables
-    OTARequestorDriver * otaRequestorDriver;
+    OTARequestorDriver * mOtaRequestorDriver;
     chip::NodeId mProviderNodeId;
     chip::FabricIndex mProviderFabricIndex;
     uint32_t mOtaStartDelayMs;
-    CASESessionManager * mCASESessionManager = nullptr;
+    chip::CASESessionManager * mCASESessionManager = nullptr;
 
     // Functions
     CHIP_ERROR  SetupCASESessionManager(chip::FabricIndex fabricIndex);
-
 };

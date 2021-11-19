@@ -1,8 +1,8 @@
 #include "app/clusters/ota-requestor/ota-image-processor.h"
 
-class LinuxOTAImageProcessor : public OTAImageProcessor {
+class LinuxOTAImageProcessor : public OTAImageProcessorDriver {
 
-    // Virtuial functions from OTAImageProcessor -- start
+    // Virtuial functions from OTAImageProcessorDriver -- start
     // Open file, find block of space in persistent memory, or allocate a buffer, etc.
     CHIP_ERROR PrepareDownload() { return CHIP_NO_ERROR;}
 
@@ -18,5 +18,5 @@ class LinuxOTAImageProcessor : public OTAImageProcessor {
     // releasing buffers, etc.
     CHIP_ERROR Abort() { return CHIP_NO_ERROR;}
 
-    // Virtuial functions from OTAImageProcessor -- end
+    // Virtuial functions from OTAImageProcessorDriver -- end
 };

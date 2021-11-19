@@ -25,6 +25,7 @@
 #include <app/CommandHandler.h>
 
 #include <app/util/util.h>
+
 #pragma once
 
 // Interface class to connect the OTA Software Update Requestor cluster command processing

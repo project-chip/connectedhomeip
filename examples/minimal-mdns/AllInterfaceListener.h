@@ -39,7 +39,7 @@ public:
         if (mState == State::kIpV4)
         {
 #if INET_CONFIG_ENABLE_IPV4
-            *id   = Inet::InterfaceId::Null();
+            *id   = chip::Inet::InterfaceId::Null();
             *type = chip::Inet::IPAddressType::kIPv4;
 #endif
             mState = State::kIpV6;
@@ -113,7 +113,7 @@ private:
             return true;
         }
 
-        printf("Usable interface: %s (%d)\n", name, static_cast<int>(mIterator.GetInterfaceId()));
+        printf("Usable interface: %s\n", name);
 
         return false;
     }
