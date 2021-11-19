@@ -241,7 +241,7 @@ class ClusterDetailFragment : Fragment() {
         } else {
           it!!.javaClass.toString().split('$').last()
         }
-        attributeCallbackItem.clusterCallbackDataTv.text = callbackClassName
+        attributeCallbackItem.clusterCallbackDataTv.text = objectString
         attributeCallbackItem.clusterCallbackDataTv.setOnClickListener {
           AlertDialog.Builder(requireContext())
             .setTitle(callbackClassName)
