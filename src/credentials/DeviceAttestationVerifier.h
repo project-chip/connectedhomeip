@@ -78,6 +78,22 @@ enum CertificateType : uint8_t
     kPAI     = 2,
 };
 
+struct DeviceInfoForAttestation
+{
+    // Vendor ID reported by device in Basic Information cluster
+    uint16_t vendorId = 0;
+    // Product ID reported by device in Basic Information cluster
+    uint16_t productId = 0;
+    // Vendor ID from  DAC/PAI/PAA
+    uint16_t dacVendorId = 0;
+    // Product ID from DAC
+    uint16_t dacProductId = 0;
+    // Product ID from PAI cert (0 if absent)
+    uint16_t paiProductId = 0;
+    // Vendor ID from  PAA cert (0 if absent)
+    uint16_t paaProductId = 0;
+};
+
 class DeviceAttestationVerifier
 {
 public:
@@ -125,20 +141,14 @@ public:
      *
      * @param[in] certDeclBuffer   A ByteSpan with the Certification Declaration content.
      * @param[in] firmwareInfo     A ByteSpan with the Firmware Information content.
-     * @param[in] clusterVendorId
-     * @param[in] clusterProductId
-     * @param[in] dacVendorId
-     * @param[in] dacProductId
-     * @param[in] paiProductId
+     * @param[in] deviceInfo
      *
      * @returns AttestationVerificationResult::kSuccess on success or another specific
      *          value from AttestationVerificationResult enum on failure.
      */
     virtual AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
                                                                                 const ByteSpan & firmwareInfo,
-                                                                                uint16_t clusterVendorId, uint16_t clusterProductId,
-                                                                                uint16_t dacVendorId, uint16_t dacProductId,
-                                                                                uint16_t paiProductId) = 0;
+                                                                                DeviceInfoForAttestation deviceInfo) = 0;
 
     // TODO: Validate Firmware Information
 

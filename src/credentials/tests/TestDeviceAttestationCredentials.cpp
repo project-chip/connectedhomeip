@@ -282,9 +282,15 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
 
     NL_TEST_ASSERT(inSuite, cd_payload.data_equal(ByteSpan(sTestCMS_CDContent)));
 
-    attestation_result = default_verifier->ValidateCertificateDeclarationPayload(
-        cd_payload, ByteSpan(), sTestCMS_CertElements.VendorId, sTestCMS_CertElements.ProductIds[0], sTestCMS_CertElements.VendorId,
-        sTestCMS_CertElements.ProductIds[0], sTestCMS_CertElements.ProductIds[0]);
+    DeviceInfoForAttestation deviceInfo{
+        .vendorId     = sTestCMS_CertElements.VendorId,
+        .productId    = sTestCMS_CertElements.ProductIds[0],
+        .dacVendorId  = sTestCMS_CertElements.VendorId,
+        .dacProductId = sTestCMS_CertElements.ProductIds[0],
+        .paiProductId = sTestCMS_CertElements.ProductIds[0],
+        .paaProductId = sTestCMS_CertElements.ProductIds[0],
+    };
+    attestation_result = default_verifier->ValidateCertificateDeclarationPayload(cd_payload, ByteSpan(), deviceInfo);
     NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
 }
 

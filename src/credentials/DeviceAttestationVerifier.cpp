@@ -54,17 +54,12 @@ public:
     }
 
     AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
-                                                                        const ByteSpan & firmwareInfo, uint16_t clusterVendorId,
-                                                                        uint16_t clusterProductId, uint16_t dacVendorId,
-                                                                        uint16_t dacProductId, uint16_t paiProductId) override
+                                                                        const ByteSpan & firmwareInfo,
+                                                                        DeviceInfoForAttestation deviceInfo) override
     {
         (void) certDeclBuffer;
         (void) firmwareInfo;
-        (void) clusterVendorId;
-        (void) clusterProductId;
-        (void) dacVendorId;
-        (void) dacProductId;
-        (void) paiProductId;
+        (void) deviceInfo;
         return AttestationVerificationResult::kNotImplemented;
     }
 };

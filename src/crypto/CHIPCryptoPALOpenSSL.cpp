@@ -41,6 +41,7 @@
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
@@ -1775,17 +1776,18 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
 
 namespace {
 
-CHIP_ERROR ExtractDNAttributeFromX509Cert(bool isVID, const ByteSpan & certificate, uint16_t & id)
+CHIP_ERROR _ExtractDNAttributeFromX509Cert(const char * oidString, const ByteSpan & certificate, uint16_t & id)
 {
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    X509 * x509certificate             = nullptr;
-    const unsigned char * pCertificate = certificate.data();
-    constexpr char vidNeedle[]         = "1.3.6.1.4.1.37244.2.1"; // Matter VID OID - taken from Spec
-    constexpr char pidNeedle[]         = "1.3.6.1.4.1.37244.2.2"; // Matter PID OID - taken from Spec
-    constexpr size_t needleSize        = sizeof(vidNeedle);
-    char buff[needleSize]              = { 0 };
-    X509_NAME * subject                = nullptr;
-    int x509EntryCountIdx              = 0;
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    X509 * x509certificate                    = nullptr;
+    const unsigned char * pCertificate        = certificate.data();
+    size_t oidStringSize                      = strlen(oidString) + 1;
+    constexpr size_t sOidStringSize           = 22;
+    char dnAttributeOidString[sOidStringSize] = { 0 };
+    X509_NAME * subject                       = nullptr;
+    int x509EntryCountIdx                     = 0;
+
+    VerifyOrReturnError(oidStringSize == sOidStringSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     x509certificate = d2i_X509(NULL, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -1799,22 +1801,22 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(bool isVID, const ByteSpan & certifica
         VerifyOrExit(name_entry != nullptr, err = CHIP_ERROR_INTERNAL);
         ASN1_OBJECT * object = X509_NAME_ENTRY_get_object(name_entry);
         VerifyOrExit(object != nullptr, err = CHIP_ERROR_INTERNAL);
-        VerifyOrExit(OBJ_obj2txt(buff, sizeof(buff), object, 0) != 0, err = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(OBJ_obj2txt(dnAttributeOidString, sizeof(dnAttributeOidString), object, 0) != 0, err = CHIP_ERROR_INTERNAL);
 
-        if (strncmp(isVID ? vidNeedle : pidNeedle, buff, needleSize) == 0)
+        if (strncmp(oidString, dnAttributeOidString, sizeof(dnAttributeOidString)) == 0)
         {
             ASN1_STRING * data_entry = X509_NAME_ENTRY_get_data(name_entry);
             VerifyOrExit(data_entry != nullptr, err = CHIP_ERROR_INTERNAL);
             unsigned char * str = ASN1_STRING_data(data_entry);
             VerifyOrExit(str != nullptr, err = CHIP_ERROR_INTERNAL);
 
-            id = static_cast<uint16_t>(strtoul(reinterpret_cast<const char *>(str), NULL, 16));
+            VerifyOrExit(ArgParser::ParseInt(reinterpret_cast<const char *>(str), id, 16), err = CHIP_ERROR_INTERNAL);
             break;
         }
     }
 
     // returning CHIP_ERROR_KEY_NOT_FOUND to indicate VID is not present in the certificate.
-    VerifyOrReturnError(x509EntryCountIdx < X509_NAME_entry_count(subject), CHIP_ERROR_KEY_NOT_FOUND);
+    VerifyOrExit(x509EntryCountIdx < X509_NAME_entry_count(subject), err = CHIP_ERROR_KEY_NOT_FOUND);
 
 exit:
     X509_free(x509certificate);
@@ -1824,19 +1826,22 @@ exit:
 
 } // namespace
 
-CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
+CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id)
 {
-    vid = VendorId::NotSpecified;
-    uint16_t id;
-    ReturnErrorOnFailure(ExtractDNAttributeFromX509Cert(true, certificate, id));
-    vid = static_cast<VendorId>(id);
-    return CHIP_NO_ERROR;
-}
+    constexpr char vidOidString[] = "1.3.6.1.4.1.37244.2.1"; // Matter VID OID - taken from Spec
+    constexpr char pidOidString[] = "1.3.6.1.4.1.37244.2.2"; // Matter PID OID - taken from Spec
 
-CHIP_ERROR ExtractPIDFromX509Cert(const ByteSpan & certificate, uint16_t & pid)
-{
-    pid = 0xFFFFu; // not specified
-    return ExtractDNAttributeFromX509Cert(false, certificate, pid);
+    switch (matterOid)
+    {
+    case MatterOid::kVendorId:
+        id = VendorId::NotSpecified;
+        return _ExtractDNAttributeFromX509Cert(vidOidString, certificate, id);
+    case MatterOid::kProductId:
+        id = 0; // PID not specified value
+        return _ExtractDNAttributeFromX509Cert(pidOidString, certificate, id);
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 }
 
 } // namespace Crypto

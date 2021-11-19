@@ -1275,8 +1275,8 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(pubkey.ConstBytes(), keypair.Pubkey().ConstBytes(), pubkey.Length()) == 0);
 
         // Let's corrupt the CSR buffer and make sure it fails to verify
-        csr[length - 2] = (uint8_t) (csr[length - 2] + 1);
-        csr[length - 1] = (uint8_t) (csr[length - 1] + 1);
+        csr[length - 2] = (uint8_t)(csr[length - 2] + 1);
+        csr[length - 1] = (uint8_t)(csr[length - 1] + 1);
 
         NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csr, length, pubkey) != CHIP_NO_ERROR);
     }
@@ -1928,7 +1928,7 @@ static void TestVID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     HeapChecker heapChecker(inSuite);
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VendorId vid;
+    uint16_t vid;
     /*
     credentials/test/attestation/Chip-Test-DAC-FFF1-8000-000A-Cert.pem
     -----BEGIN CERTIFICATE-----
@@ -1945,7 +1945,7 @@ static void TestVID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     OS8H8W2E/ctS268o19k=
     -----END CERTIFICATE-----
     */
-    VendorId expectedVid                   = (VendorId) 0xFFF1;
+    uint16_t expectedVid                   = 0xFFF1;
     static const uint8_t sDacCertificate[] = {
         0x30, 0x82, 0x01, 0xEA, 0x30, 0x82, 0x01, 0x8F, 0xA0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x05, 0x1A, 0x69, 0xE5, 0xE7,
         0x80, 0x34, 0x3E, 0x30, 0x0A, 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x04, 0x03, 0x02, 0x30, 0x46, 0x31, 0x18, 0x30,
@@ -1975,14 +1975,14 @@ static void TestVID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     };
     ByteSpan cert(sDacCertificate);
 
-    err = ExtractVIDFromX509Cert(cert, vid);
+    err = ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, cert, vid);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, vid == expectedVid);
 
     // Test scenario where Certificate does not contain a Vendor ID field
     err = GetTestCert(TestCert::kNode01_01, TestCertLoadFlags::kDERForm, cert);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = ExtractVIDFromX509Cert(cert, vid);
+    err = ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, cert, vid);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_KEY_NOT_FOUND);
 }
 
@@ -2039,14 +2039,14 @@ static void TestPID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     };
     ByteSpan cert(sDacCertificate);
 
-    err = ExtractPIDFromX509Cert(cert, pid);
+    err = ExtractDNAttributeFromX509Cert(MatterOid::kProductId, cert, pid);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, pid == expectedPid);
 
     // Test scenario where Certificate does not contain a Vendor ID field
     err = GetTestCert(TestCert::kNode01_01, TestCertLoadFlags::kDERForm, cert);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = ExtractPIDFromX509Cert(cert, pid);
+    err = ExtractDNAttributeFromX509Cert(MatterOid::kProductId, cert, pid);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_KEY_NOT_FOUND);
 }
 

@@ -27,6 +27,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
@@ -62,6 +63,36 @@ struct CertificationElements
     bool DACOriginVIDandPIDPresent;
 };
 
+class CertificationElementsDecoder
+{
+public:
+    uint16_t FormatVersion;
+    uint16_t VendorId;
+    bool ContainsPID;
+    uint32_t DeviceTypeId;
+    char CertificateId[kCertificateIdLength + 1];
+    uint8_t SecurityLevel;
+    uint16_t SecurityInformation;
+    uint16_t VersionNumber;
+    uint8_t CertificationType;
+    uint16_t DACOriginVendorId;
+    uint16_t DACOriginProductId;
+    bool DACOriginVIDandPIDPresent;
+
+    CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements);
+    bool IsProductIdIn(const ByteSpan & encodedCertElements, uint16_t productId);
+
+private:
+    CHIP_ERROR PrepareToReadProductIdList(const ByteSpan & encodedCertElements);
+    CHIP_ERROR GetNextProductId(uint16_t & productId);
+
+    ByteSpan mCertificationDeclarationData;
+    bool mIsInitialized = false;
+    TLV::TLVReader mReader;
+    TLV::TLVType mOuterContainerType1 = TLV::kTLVType_Structure;
+    TLV::TLVType mOuterContainerType2 = TLV::kTLVType_Structure;
+};
+
 /**
  * @brief Encode certification elements in TLV format.
  *
@@ -70,7 +101,8 @@ struct CertificationElements
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR EncodeCertificationElements(const CertificationElements & certElements, MutableByteSpan & encodedCertElements);
+CHIP_ERROR
+EncodeCertificationElements(const CertificationElements & certElements, MutableByteSpan & encodedCertElements);
 
 /**
  * @brief Decode certification elements from TLV encoded structure.

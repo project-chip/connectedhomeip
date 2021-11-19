@@ -1217,15 +1217,16 @@ CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
  **/
 CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid);
 
-/**
- * @brief Extracts the Vendor ID from an X509 Certificate.
- **/
-CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid);
+enum class MatterOid
+{
+    kVendorId,
+    kProductId,
+};
 
 /**
- * @brief Extracts the Product ID from an X509 Certificate.
+ * @brief Extracts one of the IDs listed in MatterOid enum from an X509 Certificate.
  **/
-CHIP_ERROR ExtractPIDFromX509Cert(const ByteSpan & certificate, uint16_t & pid);
+CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id);
 
 } // namespace Crypto
 } // namespace chip
