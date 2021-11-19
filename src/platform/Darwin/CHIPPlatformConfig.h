@@ -104,7 +104,7 @@
 
 // TODO - Fine tune MRP default parameters for Darwin platform
 #define CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL (15000)
-#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (2000)
+#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (2000_ms32)
 
 // ==================== Security Configuration Overrides ====================
 

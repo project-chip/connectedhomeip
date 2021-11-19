@@ -263,7 +263,7 @@ void ChannelContext::EnterCasePairingState()
     Transport::PeerAddress addr;
     addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(prepare.mAddress);
 
-    auto session = mExchangeManager->GetSessionManager()->CreateUnauthenticatedSession(addr, gMRPConfig);
+    auto session = mExchangeManager->GetSessionManager()->CreateUnauthenticatedSession(addr, gDefaultMRPConfig);
     if (!session.HasValue())
     {
         ExitCasePairingState();

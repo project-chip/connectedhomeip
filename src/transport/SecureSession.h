@@ -51,7 +51,7 @@ class SecureSession
 {
 public:
     SecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric,
-                  ReliableMessageProtocolConfig config, System::Clock::Timestamp currentTime) :
+                  const ReliableMessageProtocolConfig & config, System::Clock::Timestamp currentTime) :
         mPeerNodeId(peerNodeId),
         mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mFabric(fabric), mMRPConfig(config)
     {
@@ -69,9 +69,9 @@ public:
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
 
-    void SetMRPConfig(ReliableMessageProtocolConfig config) { mMRPConfig = config; }
+    void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
-    ReliableMessageProtocolConfig GetMRPConfig() const { return mMRPConfig; }
+    const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
 
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }

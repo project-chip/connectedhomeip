@@ -205,15 +205,13 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     exchange->GetSessionHandle().SetMRPConfig(&ctx.GetSecureSessionManager(),
                                               {
-                                                  10_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-                                                  10_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
                                               });
 
     // Let's drop the initial message
@@ -234,6 +232,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
+    // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
@@ -274,8 +273,8 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 
     exchange->GetSessionHandle().SetMRPConfig(&ctx.GetSecureSessionManager(),
                                               {
-                                                  50_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-                                                  50_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
                                               });
 
     // Let's drop the initial message
@@ -294,6 +293,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
+    // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
@@ -329,15 +329,13 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     exchange->GetSessionHandle().SetMRPConfig(&ctx.GetSecureSessionManager(),
                                               {
-                                                  10_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-                                                  10_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
                                               });
 
     mockSender.mMessageDispatch.mRetainMessageOnSend = false;
@@ -355,6 +353,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     // Ensure the message was dropped
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
 
+    // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
@@ -386,10 +385,8 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     ExchangeContext * exchange = ctx.NewUnauthenticatedExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
@@ -425,15 +422,13 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     exchange->GetSessionHandle().SetMRPConfig(&ctx.GetSecureSessionManager(),
                                               {
-                                                  10_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-                                                  10_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
                                               });
 
     // Let's drop the initial message
@@ -453,6 +448,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
 
+    // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
@@ -487,15 +483,13 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     exchange->GetSessionHandle().SetMRPConfig(&ctx.GetSecureSessionManager(),
                                               {
-                                                  10_ms32, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
-                                                  10_ms32, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
                                               });
 
     // Let's not drop the message. Expectation is that it is received by the peer, but the ack is dropped
@@ -525,6 +519,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
@@ -562,15 +557,13 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     ExchangeContext * exchange = ctx.NewUnauthenticatedExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     exchange->GetSessionHandle().SetMRPConfig(&ctx.GetSecureSessionManager(),
                                               {
-                                                  10_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-                                                  10_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
                                               });
 
     // Let's drop the initial message
@@ -590,6 +583,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
 
+    // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
@@ -635,15 +629,13 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     exchange->GetSessionHandle().SetMRPConfig(&ctx.GetSecureSessionManager(),
                                               {
-                                                  10_ms32, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
-                                                  10_ms32, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
+                                                  64_ms32, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
                                               });
 
     // Let's not drop the message. Expectation is that it is received by the peer, but the ack is dropped
@@ -674,6 +666,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mDropAckResponse = false;
     mockReceiver.mRetainExchange  = false;
 
+    // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
@@ -1192,6 +1185,7 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     mockSender.IsOnMessageReceivedCalled   = false;
     mockSender.mReceivedPiggybackAck       = false;
 
+    // sleep 65 ms to trigger re-transmit from sender
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
@@ -1220,6 +1214,7 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
     }
 
+    // sleep 65*3 ms to trigger re-transmit from receiver
     chip::test_utils::SleepMillis(65 * 3);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 

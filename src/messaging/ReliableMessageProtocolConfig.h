@@ -42,7 +42,7 @@ namespace chip {
  *
  */
 #ifndef CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
-#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (1800_ms32)
+#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (300_ms32)
 #endif // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
 
 /**
@@ -56,19 +56,19 @@ namespace chip {
  * needs (e.g. sleeping period) using Service Discovery TXT record CRI key.
  */
 #ifndef CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-#define CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL (30000_ms32)
+#define CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL (5000_ms32)
 #endif // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
 
 /**
- *  @def CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
+ *  @def CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
  *
  *  @brief
  *    The default acknowledgment timeout in milliseconds.
  *
  */
-#ifndef CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
-#define CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK (200_ms32)
-#endif // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
+#ifndef CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
+#define CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT (200_ms32)
+#endif // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
 
 /**
  *  @def CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
@@ -107,15 +107,15 @@ namespace chip {
 struct ReliableMessageProtocolConfig
 {
     ReliableMessageProtocolConfig(System::Clock::Milliseconds32 idleInterval, System::Clock::Milliseconds32 activeInterval) :
-        mIdleRetransTimeoutTick(idleInterval), mActiveRetransTimeoutTick(activeInterval)
+        mIdleRetransTimeout(idleInterval), mActiveRetransTimeout(activeInterval)
     {}
 
     System::Clock::Milliseconds32
-        mIdleRetransTimeoutTick; /**< Configurable timeout in msec for retransmission of the first sent message. */
+        mIdleRetransTimeout; /**< Configurable timeout in msec for retransmission of the first sent message. */
     System::Clock::Milliseconds32
-        mActiveRetransTimeoutTick; /**< Configurable timeout in msec for retransmission of all subsequent messages. */
+        mActiveRetransTimeout; /**< Configurable timeout in msec for retransmission of all subsequent messages. */
 };
 
-extern ReliableMessageProtocolConfig gMRPConfig;
+extern const ReliableMessageProtocolConfig gDefaultMRPConfig;
 
 } // namespace chip

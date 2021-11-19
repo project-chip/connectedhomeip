@@ -167,7 +167,7 @@ public:
     void SetResponseTimeout(Timeout timeout);
 
     // Helper function for easily accessing MRP config
-    ReliableMessageProtocolConfig GetMRPConfig() const;
+    const ReliableMessageProtocolConfig & GetMRPConfig() const;
 
 private:
     Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.

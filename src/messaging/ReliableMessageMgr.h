@@ -62,11 +62,11 @@ public:
         RetransTableEntry(ReliableMessageContext * rc);
         ~RetransTableEntry();
 
-        ExchangeHandle ec;                            /**< The context for the stored CHIP message. */
-        EncryptedPacketBufferHandle retainedBuf;      /**< The packet buffer holding the CHIP message. */
-        System::Clock::Timestamp nextRetransTimeTick; /**< A counter representing the next retransmission time for the message. */
-        uint8_t sendCount;                            /**< A counter representing the number of times the message has been sent. */
-        bool inUse;
+        ExchangeHandle ec;                        /**< The context for the stored CHIP message. */
+        EncryptedPacketBufferHandle retainedBuf;  /**< The packet buffer holding the CHIP message. */
+        System::Clock::Timestamp nextRetransTime; /**< A counter representing the next retransmission time for the message. */
+        uint8_t sendCount;                        /**< The number of times we have tried to send this entry,
+                                                       including both successfully and failure send. */
     };
 
 public:

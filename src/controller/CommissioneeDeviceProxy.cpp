@@ -112,13 +112,14 @@ CHIP_ERROR CommissioneeDeviceProxy::CloseSession()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr, ReliableMessageProtocolConfig config)
+CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
+                                                     const ReliableMessageProtocolConfig & config)
 {
     bool didLoad;
 
     mDeviceAddress = addr;
 
-    mMRPConfig.SetValue(config);
+    mMRPConfig = config;
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 

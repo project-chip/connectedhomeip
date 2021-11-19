@@ -81,12 +81,12 @@ public:
     const chip::ByteSpan GetMac() const { return chip::ByteSpan(mMacStorage, mMacLength); }
 
     // Common Flags
-    Derived & SetMRPConfig(ReliableMessageProtocolConfig config)
+    Derived & SetMRPConfig(const ReliableMessageProtocolConfig & config)
     {
         mMRPConfig.SetValue(config);
         return *reinterpret_cast<Derived *>(this);
     }
-    Optional<ReliableMessageProtocolConfig> GetMRPConfig() const { return mMRPConfig; }
+    const Optional<ReliableMessageProtocolConfig> & GetMRPConfig() const { return mMRPConfig; }
     Derived & SetTcpSupported(Optional<bool> tcpSupported)
     {
         mTcpSupported = tcpSupported;

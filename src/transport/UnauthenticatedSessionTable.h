@@ -48,7 +48,7 @@ public:
 class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
 {
 public:
-    UnauthenticatedSession(const PeerAddress & address, ReliableMessageProtocolConfig config) :
+    UnauthenticatedSession(const PeerAddress & address, const ReliableMessageProtocolConfig & config) :
         mPeerAddress(address), mMRPConfig(config)
     {}
 
@@ -62,9 +62,9 @@ public:
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 
-    void SetMRPConfig(ReliableMessageProtocolConfig config) { mMRPConfig = config; }
+    void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
-    ReliableMessageProtocolConfig GetMRPConfig() { return mMRPConfig; }
+    const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
 
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
@@ -94,7 +94,8 @@ public:
      * @return the session found or allocated, nullptr if not found and allocation failed.
      */
     CHECK_RETURN_VALUE
-    Optional<UnauthenticatedSessionHandle> FindOrAllocateEntry(const PeerAddress & address, ReliableMessageProtocolConfig config)
+    Optional<UnauthenticatedSessionHandle> FindOrAllocateEntry(const PeerAddress & address,
+                                                               const ReliableMessageProtocolConfig & config)
     {
         UnauthenticatedSession * result = FindEntry(address);
         if (result != nullptr)
@@ -128,7 +129,8 @@ private:
      * CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR AllocEntry(const PeerAddress & address, ReliableMessageProtocolConfig config, UnauthenticatedSession *& entry)
+    CHIP_ERROR AllocEntry(const PeerAddress & address, const ReliableMessageProtocolConfig & config,
+                          UnauthenticatedSession *& entry)
     {
         entry = mEntries.CreateObject(address, config);
         if (entry != nullptr)

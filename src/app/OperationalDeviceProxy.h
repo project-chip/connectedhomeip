@@ -119,7 +119,7 @@ public:
     {
         mDeviceAddress = ToPeerAddress(nodeResolutionData);
 
-        mMRPConfig.SetValue(nodeResolutionData.GetMRPConfig());
+        mMRPConfig = nodeResolutionData.GetMRPConfig();
 
         if (mState == State::NeedsAddress)
         {
@@ -140,7 +140,7 @@ public:
      *   Since the device settings might have been moved from RAM to the persistent storage, the function
      *   will load the device settings first, before making the changes.
      */
-    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, ReliableMessageProtocolConfig config);
+    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
 
     PeerId GetPeerId() const { return mPeerId; }
 

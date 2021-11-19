@@ -56,10 +56,8 @@ struct ResolvedNodeData
 
     ReliableMessageProtocolConfig GetMRPConfig() const
     {
-        return ReliableMessageProtocolConfig{
-            GetMrpRetryIntervalIdle().ValueOr(gMRPConfig.mIdleRetransTimeoutTick),
-            GetMrpRetryIntervalActive().ValueOr(gMRPConfig.mActiveRetransTimeoutTick),
-        };
+        return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().ValueOr(gDefaultMRPConfig.mIdleRetransTimeout),
+                                             GetMrpRetryIntervalActive().ValueOr(gDefaultMRPConfig.mActiveRetransTimeout));
     }
     Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mMrpRetryIntervalIdle; }
     Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mMrpRetryIntervalActive; }
@@ -68,11 +66,11 @@ struct ResolvedNodeData
     size_t mNumIPs = 0;
     Inet::InterfaceId mInterfaceId;
     Inet::IPAddress mAddress[kMaxIPAddresses];
-    uint16_t mPort                                                  = 0;
-    char mHostName[kHostNameMaxLength + 1]                          = {};
-    bool mSupportsTcp                                               = false;
-    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalIdle   = NullOptional;
-    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalActive = NullOptional;
+    uint16_t mPort                         = 0;
+    char mHostName[kHostNameMaxLength + 1] = {};
+    bool mSupportsTcp                      = false;
+    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalIdle;
+    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalActive;
     System::Clock::Timestamp mExpiryTime;
 };
 

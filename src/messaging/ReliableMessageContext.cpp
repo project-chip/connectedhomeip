@@ -39,7 +39,7 @@
 namespace chip {
 namespace Messaging {
 
-ReliableMessageContext::ReliableMessageContext() : mNextAckTimeTick(0), mPendingPeerAckMessageCounter(0) {}
+ReliableMessageContext::ReliableMessageContext() : mNextAckTime(0), mPendingPeerAckMessageCounter(0) {}
 
 bool ReliableMessageContext::AutoRequestAck() const
 {
@@ -226,7 +226,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
         // Replace the Pending ack message counter.
         SetPendingPeerAckMessageCounter(messageCounter);
         using namespace System::Clock::Literals;
-        mNextAckTimeTick = System::SystemClock().GetMonotonicTimestamp() + CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK;
+        mNextAckTime = System::SystemClock().GetMonotonicTimestamp() + CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT;
         return CHIP_NO_ERROR;
     }
 }

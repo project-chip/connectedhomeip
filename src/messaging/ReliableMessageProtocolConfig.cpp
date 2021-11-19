@@ -30,7 +30,7 @@ namespace chip {
 
 using namespace System::Clock::Literals;
 
-ReliableMessageProtocolConfig gMRPConfig{ CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL,
-                                          CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL };
+const ReliableMessageProtocolConfig gDefaultMRPConfig(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL,
+                                                      CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
 
 } // namespace chip

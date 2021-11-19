@@ -501,7 +501,7 @@ void ExchangeContext::MessageHandled()
     Close();
 }
 
-ReliableMessageProtocolConfig ExchangeContext::GetMRPConfig() const
+const ReliableMessageProtocolConfig & ExchangeContext::GetMRPConfig() const
 {
     return GetSessionHandle().GetMRPConfig(GetExchangeMgr()->GetSessionManager());
 }

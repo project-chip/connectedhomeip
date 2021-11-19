@@ -385,22 +385,22 @@ bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
 
 void ResetRetryIntervalIdle(DiscoveredNodeData & nodeData)
 {
-    nodeData.mrpRetryIntervalIdle.Reset();
+    nodeData.mrpRetryIntervalIdle.ClearValue();
 }
 
 void ResetRetryIntervalIdle(ResolvedNodeData & nodeData)
 {
-    nodeData.mMrpRetryIntervalIdle.Reset();
+    nodeData.mMrpRetryIntervalIdle.ClearValue();
 }
 
 void ResetRetryIntervalActive(DiscoveredNodeData & nodeData)
 {
-    nodeData.mrpRetryIntervalActive.Reset();
+    nodeData.mrpRetryIntervalActive.ClearValue();
 }
 
 void ResetRetryIntervalActive(ResolvedNodeData & nodeData)
 {
-    nodeData.mMrpRetryIntervalActive.Reset();
+    nodeData.mMrpRetryIntervalActive.ClearValue();
 }
 
 // Test CRI

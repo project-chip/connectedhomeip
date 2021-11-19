@@ -84,8 +84,8 @@ public:
     // torn down, at the very least.
     const Transport::PeerAddress * GetPeerAddress(SessionManager * sessionManager) const;
 
-    ReliableMessageProtocolConfig GetMRPConfig(SessionManager * sessionManager);
-    void SetMRPConfig(SessionManager * sessionManager, ReliableMessageProtocolConfig config);
+    const ReliableMessageProtocolConfig & GetMRPConfig(SessionManager * sessionManager) const;
+    void SetMRPConfig(SessionManager * sessionManager, const ReliableMessageProtocolConfig & config);
 
     Transport::UnauthenticatedSessionHandle GetUnauthenticatedSession() const { return mUnauthenticatedSessionHandle.Value(); }
 

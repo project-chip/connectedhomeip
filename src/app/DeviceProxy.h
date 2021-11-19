@@ -81,7 +81,7 @@ public:
 
     virtual bool IsActive() const { return true; }
 
-    Optional<ReliableMessageProtocolConfig> GetMRPConfig() const { return mMRPConfig; }
+    const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
 
 protected:
     virtual bool IsSecureConnected() const = 0;
@@ -90,7 +90,7 @@ protected:
 
     app::CHIPDeviceCallbacksMgr & mCallbacksMgr = app::CHIPDeviceCallbacksMgr::GetInstance();
 
-    Optional<ReliableMessageProtocolConfig> mMRPConfig;
+    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 };
 
 } // namespace chip

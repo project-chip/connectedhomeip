@@ -87,10 +87,10 @@ public:
      * @brief
      *   Get the value of peer session counter which is synced during session establishment
      */
-    virtual ReliableMessageProtocolConfig GetMRPConfig()
+    virtual const ReliableMessageProtocolConfig & GetMRPConfig() const
     {
         // TODO(#6652): This is a stub implementation, should be replaced by the real one when CASE and PASE is completed
-        return gMRPConfig;
+        return gDefaultMRPConfig;
     }
 
     virtual const char * GetI2RSessionInfo() const = 0;

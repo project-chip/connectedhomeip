@@ -360,7 +360,7 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
                                      System::PacketBufferHandle && msg)
 {
     Optional<Transport::UnauthenticatedSessionHandle> optionalSession =
-        mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, gMRPConfig);
+        mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, gDefaultMRPConfig);
     if (!optionalSession.HasValue())
     {
         ChipLogError(Inet, "UnauthenticatedSession exhausted");

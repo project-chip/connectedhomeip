@@ -56,7 +56,7 @@ public:
      */
     CHECK_RETURN_VALUE
     SecureSession * CreateNewSecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric,
-                                           ReliableMessageProtocolConfig config)
+                                           const ReliableMessageProtocolConfig & config)
     {
         return mEntries.CreateObject(localSessionId, peerNodeId, peerSessionId, fabric, config,
                                      mTimeSource.GetMonotonicTimestamp());

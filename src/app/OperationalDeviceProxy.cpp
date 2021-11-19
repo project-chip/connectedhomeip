@@ -86,14 +86,15 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
     return err;
 }
 
-CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr, ReliableMessageProtocolConfig config)
+CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
+                                                    const ReliableMessageProtocolConfig & config)
 {
     VerifyOrReturnLogError(mState != State::Uninitialized, CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     mDeviceAddress = addr;
 
-    mMRPConfig.SetValue(config);
+    mMRPConfig = config;
 
     if (mState == State::NeedsAddress)
     {
@@ -142,7 +143,7 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
     // Create a UnauthenticatedSession for CASE pairing.
     // Don't use mSecureSession here, because mSecureSession is for encrypted communication.
     Optional<SessionHandle> session =
-        mInitParams.sessionManager->CreateUnauthenticatedSession(mDeviceAddress, mMRPConfig.ValueOr(gMRPConfig));
+        mInitParams.sessionManager->CreateUnauthenticatedSession(mDeviceAddress, mMRPConfig);
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
 
     Messaging::ExchangeContext * exchange = mInitParams.exchangeMgr->NewContext(session.Value(), &mCASESession);

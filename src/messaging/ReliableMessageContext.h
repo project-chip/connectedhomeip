@@ -223,7 +223,7 @@ private:
     friend class ExchangeContext;
     friend class ExchangeMessageDispatch;
 
-    System::Clock::Timestamp mNextAckTimeTick; // Next time for triggering Solo Ack
+    System::Clock::Timestamp mNextAckTime; // Next time for triggering Solo Ack
     uint32_t mPendingPeerAckMessageCounter;
 };
 

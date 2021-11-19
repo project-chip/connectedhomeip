@@ -39,14 +39,14 @@ const PeerAddress * SessionHandle::GetPeerAddress(SessionManager * sessionManage
     return &GetUnauthenticatedSession()->GetPeerAddress();
 }
 
-ReliableMessageProtocolConfig SessionHandle::GetMRPConfig(SessionManager * sessionManager)
+const ReliableMessageProtocolConfig & SessionHandle::GetMRPConfig(SessionManager * sessionManager) const
 {
     if (IsSecure())
     {
         SecureSession * secureSession = sessionManager->GetSecureSession(*this);
         if (secureSession == nullptr)
         {
-            return gMRPConfig;
+            return gDefaultMRPConfig;
         }
         return secureSession->GetMRPConfig();
     }
@@ -56,7 +56,7 @@ ReliableMessageProtocolConfig SessionHandle::GetMRPConfig(SessionManager * sessi
     }
 }
 
-void SessionHandle::SetMRPConfig(SessionManager * sessionManager, ReliableMessageProtocolConfig config)
+void SessionHandle::SetMRPConfig(SessionManager * sessionManager, const ReliableMessageProtocolConfig & config)
 {
     if (IsSecure())
     {
