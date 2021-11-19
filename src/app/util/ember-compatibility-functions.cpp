@@ -136,12 +136,13 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     }
 }
 
-CHIP_ERROR CheckAccessControl(const SubjectDescriptor & aSubjectDescriptor, EndpointId aEndpoint, ClusterId aCluster, bool aWrite)
+Protocols::InteractionModel::Status CheckAccessControl(const SubjectDescriptor & aSubjectDescriptor, EndpointId aEndpoint, ClusterId aCluster, bool aWrite)
 {
     RequestPath requestPath = { .cluster = aCluster, .endpoint = aEndpoint };
     // TODO: get required privilege using ember APIs, as it could be custom
     Privilege privilege = aWrite ? Privilege::kOperate : Privilege::kView;
-    return GetAccessControl().Check(aSubjectDescriptor, requestPath, privilege);
+    CHIP_ERROR err = GetAccessControl().Check(aSubjectDescriptor, requestPath, privilege);
+    return (err == CHIP_NO_ERROR) ? Protocols::InteractionModel::Status::Success : (err == CHIP_ERROR_ACCESS_DENIED) ? Protocols::InteractionModel::Status::UnsupportedAccess : Protocols::InteractionModel::Status::Failure;
 }
 
 } // namespace
@@ -226,228 +227,248 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
-    AttributeDataIB::Builder attributeDataIBBuilder;
-    AttributePathIB::Builder attributePathIBBuilder;
-    AttributeStatusIB::Builder attributeStatusIBBuilder;
-    TLV::TLVWriter * writer = nullptr;
+
     TLV::TLVWriter backup;
     aAttributeReport.Checkpoint(backup);
 
-    attributeDataIBBuilder = aAttributeReport.CreateAttributeData();
-    attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
+    AttributeDataIB::Builder attributeDataIBBuilder = aAttributeReport.CreateAttributeData();
+    AttributePathIB::Builder attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
     attributePathIBBuilder.Endpoint(aPath.mEndpointId)
         .Cluster(aPath.mClusterId)
         .Attribute(aPath.mAttributeId)
         .EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePathIBBuilder.GetError());
 
-    CHIP_ERROR accessControlStatus = CheckAccessControl(aSubjectDescriptor, aPath.mEndpointId, aPath.mClusterId, false);
+    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Failure;
 
-    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
-    if (attrOverride != nullptr)
     {
-        // TODO: We should probably clone the writer and convert failures here
-        // into status responses, unless our caller already does that.
-        writer = attributeDataIBBuilder.GetWriter();
+        TLV::TLVWriter * writer = attributeDataIBBuilder.GetWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
-        AttributeValueEncoder valueEncoder(writer, aSubjectDescriptor.fabricIndex);
-        ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
 
-        ChipLogDetail(DataManagement, "################# attribute access override #################");
+        bool accessControlChecked = false;
 
-        ReturnErrorOnFailure(accessControlStatus);
-
-        if (valueEncoder.TriedEncode())
+        AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
+        if (attrOverride != nullptr)
         {
-            // TODO: Add DataVersion support
-            attributeDataIBBuilder.DataVersion(kTemporaryDataVersion).EndOfAttributeDataIB();
-            ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
-            return CHIP_NO_ERROR;
+            // TODO: We should probably clone the writer and convert failures here
+            // into status responses, unless our caller already does that.
+
+            AttributeValueEncoder valueEncoder(writer, aSubjectDescriptor.fabricIndex);
+            ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
+
+            auto accessControlStatus = CheckAccessControl(aSubjectDescriptor, aPath.mEndpointId, aPath.mClusterId, /* write = */ false);
+            if (accessControlStatus != Protocols::InteractionModel::Status::Success)
+            {
+                status = accessControlStatus;
+                ExitNow();
+            }
+            accessControlChecked = true;
+
+            if (valueEncoder.TriedEncode())
+            {
+                // TODO: Add DataVersion support
+                attributeDataIBBuilder.DataVersion(kTemporaryDataVersion).EndOfAttributeDataIB();
+                ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
+                return CHIP_NO_ERROR;
+            }
+        }
+
+        EmberAfAttributeMetadata * metadata = nullptr;
+        {
+            EmberAfAttributeSearchRecord record;
+            record.endpoint           = aPath.mEndpointId;
+            record.clusterId          = aPath.mClusterId;
+            record.clusterMask        = CLUSTER_MASK_SERVER;
+            record.attributeId        = aPath.mAttributeId;
+            record.manufacturerCode   = EMBER_AF_NULL_MANUFACTURER_CODE;
+            EmberAfStatus emberStatus = emAfReadOrWriteAttribute(&record, &metadata, attributeData, sizeof(attributeData),
+                                                                /* write = */ false);
+            if (emberStatus != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                status = ToInteractionModelStatus(emberStatus);
+                ExitNow();
+            }
+        }
+
+        if (!accessControlChecked)
+        {
+            auto accessControlStatus = CheckAccessControl(aSubjectDescriptor, aPath.mEndpointId, aPath.mClusterId, /* write = */ false);
+            if (accessControlStatus != Protocols::InteractionModel::Status::Success)
+            {
+                status = accessControlStatus;
+                ExitNow();
+            }
+            accessControlChecked = true;
+        }
+
+        {
+            EmberAfAttributeType attributeType = metadata->attributeType;
+            bool isNullable                    = metadata->IsNullable();
+            writer                             = attributeDataIBBuilder.GetWriter();
+            TLV::Tag tag = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
+            switch (BaseType(attributeType))
+            {
+            case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data
+                ReturnErrorOnFailure(writer->PutNull(tag));
+                break;
+            case ZCL_BOOLEAN_ATTRIBUTE_TYPE: // Boolean
+                ReturnErrorOnFailure(attributeBufferToNumericTlvData<bool>(*writer, isNullable));
+                break;
+            case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
+                ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint8_t>(*writer, isNullable));
+                break;
+            case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
+            {
+                ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint16_t>(*writer, isNullable));
+                break;
+            }
+            case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
+            {
+                ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint32_t>(*writer, isNullable));
+                break;
+            }
+            case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
+            {
+                ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint64_t>(*writer, isNullable));
+                break;
+            }
+            case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
+            {
+                ReturnErrorOnFailure(attributeBufferToNumericTlvData<int8_t>(*writer, isNullable));
+                break;
+            }
+            case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
+            {
+                ReturnErrorOnFailure(attributeBufferToNumericTlvData<int16_t>(*writer, isNullable));
+                break;
+            }
+            case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
+            {
+                ReturnErrorOnFailure(attributeBufferToNumericTlvData<int32_t>(*writer, isNullable));
+                break;
+            }
+            case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
+            {
+                ReturnErrorOnFailure(attributeBufferToNumericTlvData<int64_t>(*writer, isNullable));
+                break;
+            }
+            case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
+            {
+                char * actualData  = reinterpret_cast<char *>(attributeData + 1);
+                uint8_t dataLength = attributeData[0];
+                if (dataLength == 0xFF)
+                {
+                    if (isNullable)
+                    {
+                        ReturnErrorOnFailure(writer->PutNull(tag));
+                    }
+                    else
+                    {
+                        return CHIP_ERROR_INCORRECT_STATE;
+                    }
+                }
+                else
+                {
+                    ReturnErrorOnFailure(writer->PutString(tag, actualData, dataLength));
+                }
+                break;
+            }
+            case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE: {
+                char * actualData = reinterpret_cast<char *>(attributeData + 2); // The pascal string contains 2 bytes length
+                uint16_t dataLength;
+                memcpy(&dataLength, attributeData, sizeof(dataLength));
+                if (dataLength == 0xFFFF)
+                {
+                    if (isNullable)
+                    {
+                        ReturnErrorOnFailure(writer->PutNull(tag));
+                    }
+                    else
+                    {
+                        return CHIP_ERROR_INCORRECT_STATE;
+                    }
+                }
+                else
+                {
+                    ReturnErrorOnFailure(writer->PutString(tag, actualData, dataLength));
+                }
+                break;
+            }
+            case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
+            {
+                uint8_t * actualData = attributeData + 1;
+                uint8_t dataLength   = attributeData[0];
+                if (dataLength == 0xFF)
+                {
+                    if (isNullable)
+                    {
+                        ReturnErrorOnFailure(writer->PutNull(tag));
+                    }
+                    else
+                    {
+                        return CHIP_ERROR_INCORRECT_STATE;
+                    }
+                }
+                else
+                {
+                    ReturnErrorOnFailure(writer->Put(tag, chip::ByteSpan(actualData, dataLength)));
+                }
+                break;
+            }
+            case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE: {
+                uint8_t * actualData = attributeData + 2; // The pascal string contains 2 bytes length
+                uint16_t dataLength;
+                memcpy(&dataLength, attributeData, sizeof(dataLength));
+                if (dataLength == 0xFFFF)
+                {
+                    if (isNullable)
+                    {
+                        ReturnErrorOnFailure(writer->PutNull(tag));
+                    }
+                    else
+                    {
+                        return CHIP_ERROR_INCORRECT_STATE;
+                    }
+                }
+                else
+                {
+                    ReturnErrorOnFailure(writer->Put(tag, chip::ByteSpan(actualData, dataLength)));
+                }
+                break;
+            }
+            case ZCL_ARRAY_ATTRIBUTE_TYPE: {
+                // We only get here for attributes of list type that have no override
+                // registered.  There should not be any nonempty lists like that.
+                uint16_t size = emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData);
+                if (size != 2)
+                {
+                    // The value returned by emberAfAttributeValueSize for a list
+                    // includes the space needed to store the list length (2 bytes) plus
+                    // the space needed to store the actual list items.  We expect it to
+                    // return 2 here, indicating a zero-length list.  If it doesn't,
+                    // something has gone wrong.
+                    return CHIP_ERROR_INCORRECT_STATE;
+                }
+
+                // Just encode an empty array.
+                TLV::TLVType containerType;
+                ReturnErrorOnFailure(writer->StartContainer(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),
+                                                            TLV::kTLVType_Array, containerType));
+                ReturnErrorOnFailure(writer->EndContainer(containerType));
+                break;
+            }
+            default:
+                ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
+                status = Protocols::InteractionModel::Status::UnsupportedRead;
+                ExitNow();
+            }
         }
     }
 
-    EmberAfAttributeMetadata * metadata = NULL;
-    EmberAfAttributeSearchRecord record;
-    record.endpoint           = aPath.mEndpointId;
-    record.clusterId          = aPath.mClusterId;
-    record.clusterMask        = CLUSTER_MASK_SERVER;
-    record.attributeId        = aPath.mAttributeId;
-    record.manufacturerCode   = EMBER_AF_NULL_MANUFACTURER_CODE;
-    EmberAfStatus emberStatus = emAfReadOrWriteAttribute(&record, &metadata, attributeData, sizeof(attributeData),
-                                                         /* write = */ false);
+    status = Protocols::InteractionModel::Status::Success;
 
-    if (emberStatus == EMBER_ZCL_STATUS_SUCCESS && accessControlStatus != CHIP_NO_ERROR)
-    {
-        emberStatus =
-            (accessControlStatus == CHIP_ERROR_ACCESS_DENIED) ? EMBER_ZCL_STATUS_NOT_AUTHORIZED : EMBER_ZCL_STATUS_SOFTWARE_FAILURE;
-    }
-
-    if (emberStatus == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        EmberAfAttributeType attributeType = metadata->attributeType;
-        bool isNullable                    = metadata->IsNullable();
-        writer                             = attributeDataIBBuilder.GetWriter();
-        VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
-        TLV::Tag tag = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
-        switch (BaseType(attributeType))
-        {
-        case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data
-            ReturnErrorOnFailure(writer->PutNull(tag));
-            break;
-        case ZCL_BOOLEAN_ATTRIBUTE_TYPE: // Boolean
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<bool>(*writer, isNullable));
-            break;
-        case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint8_t>(*writer, isNullable));
-            break;
-        case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint16_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint32_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint64_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<int8_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<int16_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<int32_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<int64_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
-        {
-            char * actualData  = reinterpret_cast<char *>(attributeData + 1);
-            uint8_t dataLength = attributeData[0];
-            if (dataLength == 0xFF)
-            {
-                if (isNullable)
-                {
-                    ReturnErrorOnFailure(writer->PutNull(tag));
-                }
-                else
-                {
-                    return CHIP_ERROR_INCORRECT_STATE;
-                }
-            }
-            else
-            {
-                ReturnErrorOnFailure(writer->PutString(tag, actualData, dataLength));
-            }
-            break;
-        }
-        case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE: {
-            char * actualData = reinterpret_cast<char *>(attributeData + 2); // The pascal string contains 2 bytes length
-            uint16_t dataLength;
-            memcpy(&dataLength, attributeData, sizeof(dataLength));
-            if (dataLength == 0xFFFF)
-            {
-                if (isNullable)
-                {
-                    ReturnErrorOnFailure(writer->PutNull(tag));
-                }
-                else
-                {
-                    return CHIP_ERROR_INCORRECT_STATE;
-                }
-            }
-            else
-            {
-                ReturnErrorOnFailure(writer->PutString(tag, actualData, dataLength));
-            }
-            break;
-        }
-        case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
-        {
-            uint8_t * actualData = attributeData + 1;
-            uint8_t dataLength   = attributeData[0];
-            if (dataLength == 0xFF)
-            {
-                if (isNullable)
-                {
-                    ReturnErrorOnFailure(writer->PutNull(tag));
-                }
-                else
-                {
-                    return CHIP_ERROR_INCORRECT_STATE;
-                }
-            }
-            else
-            {
-                ReturnErrorOnFailure(writer->Put(tag, chip::ByteSpan(actualData, dataLength)));
-            }
-            break;
-        }
-        case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE: {
-            uint8_t * actualData = attributeData + 2; // The pascal string contains 2 bytes length
-            uint16_t dataLength;
-            memcpy(&dataLength, attributeData, sizeof(dataLength));
-            if (dataLength == 0xFFFF)
-            {
-                if (isNullable)
-                {
-                    ReturnErrorOnFailure(writer->PutNull(tag));
-                }
-                else
-                {
-                    return CHIP_ERROR_INCORRECT_STATE;
-                }
-            }
-            else
-            {
-                ReturnErrorOnFailure(writer->Put(tag, chip::ByteSpan(actualData, dataLength)));
-            }
-            break;
-        }
-        case ZCL_ARRAY_ATTRIBUTE_TYPE: {
-            // We only get here for attributes of list type that have no override
-            // registered.  There should not be any nonempty lists like that.
-            uint16_t size = emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData);
-            if (size != 2)
-            {
-                // The value returned by emberAfAttributeValueSize for a list
-                // includes the space needed to store the list length (2 bytes) plus
-                // the space needed to store the actual list items.  We expect it to
-                // return 2 here, indicating a zero-length list.  If it doesn't,
-                // something has gone wrong.
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
-
-            // Just encode an empty array.
-            TLV::TLVType containerType;
-            ReturnErrorOnFailure(writer->StartContainer(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),
-                                                        TLV::kTLVType_Array, containerType));
-            ReturnErrorOnFailure(writer->EndContainer(containerType));
-            break;
-        }
-        default:
-            ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
-            emberStatus = EMBER_ZCL_STATUS_WRITE_ONLY;
-        }
-    }
-
-    Protocols::InteractionModel::Status imStatus = ToInteractionModelStatus(emberStatus);
-    if (imStatus == Protocols::InteractionModel::Status::Success)
+exit:
+    if (status == Protocols::InteractionModel::Status::Success)
     {
         // TODO: Add DataVersion support
         attributeDataIBBuilder.DataVersion(kTemporaryDataVersion).EndOfAttributeDataIB();
@@ -456,6 +477,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
     else
     {
         aAttributeReport.Rollback(backup);
+        AttributeStatusIB::Builder attributeStatusIBBuilder;
         attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
         attributePathIBBuilder   = attributeStatusIBBuilder.CreatePath();
         attributePathIBBuilder.Endpoint(aPath.mEndpointId)
@@ -464,7 +486,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
             .EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePathIBBuilder.GetError());
         StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
-        statusIBBuilder.EncodeStatusIB(StatusIB(imStatus));
+        statusIBBuilder.EncodeStatusIB(StatusIB(status));
         ReturnErrorOnFailure(statusIBBuilder.GetError());
         attributeStatusIBBuilder.EndOfAttributeStatusIB();
         ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
@@ -564,71 +586,88 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * metadata, TLV::TLVR
 }
 } // namespace
 
+// TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
+// as the input argument.
 CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
                                   TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    Protocols::InteractionModel::Status imStatus = Protocols::InteractionModel::Status::Failure;
     AttributePathParams attributePathParams;
     attributePathParams.mEndpointId  = aClusterInfo.mEndpointId;
     attributePathParams.mClusterId   = aClusterInfo.mClusterId;
     attributePathParams.mAttributeId = aClusterInfo.mAttributeId;
 
-    CHIP_ERROR accessControlStatus =
-        CheckAccessControl(aSubjectDescriptor, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, true);
+    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Failure;
 
-    // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
-    // as the input argument.
-    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
-    if (attrOverride != nullptr)
     {
-        ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
-        AttributeValueDecoder valueDecoder(aReader);
-        ReturnErrorOnFailure(attrOverride->Write(path, valueDecoder));
+        bool accessControlChecked = false;
 
-        ChipLogDetail(DataManagement, "################# attribute access override #################");
-
-        ReturnErrorOnFailure(accessControlStatus);
-
-        if (valueDecoder.TriedDecode())
+        AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
+        if (attrOverride != nullptr)
         {
-            return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+            ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
+            AttributeValueDecoder valueDecoder(aReader);
+            ReturnErrorOnFailure(attrOverride->Write(path, valueDecoder));
+
+            auto accessControlStatus = CheckAccessControl(aSubjectDescriptor, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, /* write = */ true);
+            if (accessControlStatus != Protocols::InteractionModel::Status::Success)
+            {
+                status = accessControlStatus;
+                ExitNow();
+            }
+            accessControlChecked = true;
+
+            if (valueDecoder.TriedDecode())
+            {
+                status = Protocols::InteractionModel::Status::Success;
+                ExitNow();
+            }
+        }
+
+        // Passing nullptr as buf to emberAfReadAttribute means we only need attribute type here,
+        // and ember will not do data read & copy in this case.
+        const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(
+            aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0);
+        if (metadata == nullptr)
+        {
+            status = Protocols::InteractionModel::Status::UnsupportedAttribute;
+            ExitNow();
+        }
+
+        if (!accessControlChecked)
+        {
+            auto accessControlStatus = CheckAccessControl(aSubjectDescriptor, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, /* write = */ true);
+            if (accessControlStatus != Protocols::InteractionModel::Status::Success)
+            {
+                status = accessControlStatus;
+                ExitNow();
+            }
+            accessControlChecked = true;
+        }
+
+        {
+            uint16_t dataLen = 0;
+            auto error = prepareWriteData(metadata, aReader, dataLen);
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(error));
+                status = Protocols::InteractionModel::Status::InvalidValue;
+                ExitNow();
+            }
+            if (dataLen > metadata->size)
+            {
+                ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
+                status = Protocols::InteractionModel::Status::InvalidValue;
+                ExitNow();
+            }
+
+            status = ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
+                                                                            aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0,
+                                                                            attributeData, metadata->attributeType));
         }
     }
 
-    // Passing nullptr as buf to emberAfReadAttribute means we only need attribute type here,
-    // and ember will not do data read & copy in this case.
-    const EmberAfAttributeMetadata * attributeMetadata = emberAfLocateAttributeMetadata(
-        aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0);
-    CHIP_ERROR preparationError = CHIP_NO_ERROR;
-    uint16_t dataLen            = 0;
-
-    if (attributeMetadata == nullptr)
-    {
-        imStatus = Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
-    else if (accessControlStatus != CHIP_NO_ERROR)
-    {
-        imStatus = (accessControlStatus == CHIP_ERROR_ACCESS_DENIED) ? Protocols::InteractionModel::Status::UnsupportedAccess
-                                                                     : Protocols::InteractionModel::Status::Failure;
-    }
-    else if ((preparationError = prepareWriteData(attributeMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(preparationError));
-        imStatus = Protocols::InteractionModel::Status::InvalidValue;
-    }
-    else if (dataLen > attributeMetadata->size)
-    {
-        ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
-        imStatus = Protocols::InteractionModel::Status::InvalidValue;
-    }
-    else
-    {
-        imStatus = ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
-                                                                          aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0,
-                                                                          attributeData, attributeMetadata->attributeType));
-    }
-
-    return apWriteHandler->AddStatus(attributePathParams, imStatus);
+exit:
+    return apWriteHandler->AddStatus(attributePathParams, status);
 }
 
 } // namespace app
