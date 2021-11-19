@@ -23,6 +23,5 @@ efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 chip_enable_pw_rpc = true
 cpp_standard = "gnu++17"
 chip_build_tests = true
-chip_enable_happy_tests = false
 chip_enable_openthread = true
 chip_monolithic_tests = true

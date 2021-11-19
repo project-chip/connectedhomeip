@@ -6612,6 +6612,40 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeListInt8uWithValue:(NSArray * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::ListInt8u::TypeInfo;
+        TypeInfo::Type cppValue;
+        {
+            using ListType = std::remove_reference_t<decltype(cppValue)>;
+            using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+            if (value.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType>(value.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i = 0; i < value.count; ++i) {
+                    if (![value[i] isKindOfClass:[NSNumber class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_0 = (NSNumber *) value[i];
+                    listHolder_0->mList[i] = element_0.unsignedCharValue;
+                }
+                cppValue = ListType(listHolder_0->mList, value.count);
+            } else {
+                cppValue = ListType();
+            }
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
 - (void)readAttributeListOctetStringWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPTestClusterListOctetStringListAttributeCallbackBridge(
@@ -6620,12 +6654,81 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeListOctetStringWithValue:(NSArray * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::ListOctetString::TypeInfo;
+        TypeInfo::Type cppValue;
+        {
+            using ListType = std::remove_reference_t<decltype(cppValue)>;
+            using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+            if (value.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType>(value.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i = 0; i < value.count; ++i) {
+                    if (![value[i] isKindOfClass:[NSData class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_0 = (NSData *) value[i];
+                    listHolder_0->mList[i] = [self asByteSpan:element_0];
+                }
+                cppValue = ListType(listHolder_0->mList, value.count);
+            } else {
+                cppValue = ListType();
+            }
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
 - (void)readAttributeListStructOctetStringWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPTestClusterListStructOctetStringListAttributeCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
             return self.cppCluster.ReadAttributeListStructOctetString(success, failure);
         });
+}
+
+- (void)writeAttributeListStructOctetStringWithValue:(NSArray * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        ListFreer listFreer;
+        using TypeInfo = TestCluster::Attributes::ListStructOctetString::TypeInfo;
+        TypeInfo::Type cppValue;
+        {
+            using ListType = std::remove_reference_t<decltype(cppValue)>;
+            using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+            if (value.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType>(value.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i = 0; i < value.count; ++i) {
+                    if (![value[i] isKindOfClass:[CHIPTestClusterClusterTestListStructOctet class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_0 = (CHIPTestClusterClusterTestListStructOctet *) value[i];
+                    listHolder_0->mList[i].fabricIndex = element_0.fabricIndex.unsignedLongLongValue;
+                    listHolder_0->mList[i].operationalCert = [self asByteSpan:element_0.operationalCert];
+                }
+                cppValue = ListType(listHolder_0->mList, value.count);
+            } else {
+                cppValue = ListType();
+            }
+        }
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
 }
 
 - (void)readAttributeLongOctetStringWithResponseHandler:(ResponseHandler)responseHandler

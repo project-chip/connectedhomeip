@@ -3499,16 +3499,19 @@ class ChipClusters:
                 "attributeName": "ListInt8u",
                 "attributeId": 0x0000001A,
                 "type": "int",
+                "writable": True,
             },
             0x0000001B: {
                 "attributeName": "ListOctetString",
                 "attributeId": 0x0000001B,
                 "type": "bytes",
+                "writable": True,
             },
             0x0000001C: {
                 "attributeName": "ListStructOctetString",
                 "attributeId": 0x0000001C,
                 "type": "",
+                "writable": True,
             },
             0x0000001D: {
                 "attributeName": "LongOctetString",

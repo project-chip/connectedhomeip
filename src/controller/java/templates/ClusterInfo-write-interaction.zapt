@@ -17,6 +17,7 @@ public class ClusterWriteMapping {
       Map<String, InteractionInfo> write{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
         {{#chip_server_cluster_attributes}}
         {{#if isWritableAttribute}}
+        {{#unless isList}}
         Map<String, CommandParameterInfo> write{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         CommandParameterInfo {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameterInfo = new CommandParameterInfo("value", {{asJavaBasicType type}}.class);
         write{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams.put("value",{{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParameterInfo);
@@ -32,6 +33,7 @@ public class ClusterWriteMapping {
           write{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams
         );
         write{{asUpperCamelCase ../name}}InteractionInfo.put("write{{asUpperCamelCase name}}Attribute", write{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo);
+        {{/unless}}
         {{/if}}
         {{/chip_server_cluster_attributes}}
         writeAttributeMap.put("{{asLowerCamelCase name}}", write{{asUpperCamelCase name}}InteractionInfo);
