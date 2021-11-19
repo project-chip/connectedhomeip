@@ -56,6 +56,13 @@ static constexpr uint32_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Cryp
 
 // Muximum number of CASE Authenticated Tags (CAT) in the CHIP certificate subject.
 static constexpr size_t kMaxSubjectCATAttributeCount = CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES - 2;
+static constexpr uint32_t kUndefinedCAT              = 0;
+
+struct CATValues
+{
+    uint32_t val[kMaxSubjectCATAttributeCount];
+};
+static constexpr CATValues kUndefinedCATs = { { Credentials::kUndefinedCAT } };
 
 /** Data Element Tags for the CHIP Certificate
  */
@@ -800,15 +807,25 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
 CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, NodeId * nodeId, FabricId * fabricId);
 
 /**
- * Extract CASE Authenticated Tags from an operational certificate that has already been
- * parsed.
+ * Extract CASE Authenticated Tags from an operational certificate in ByteSpan TLV-encoded form.
  *
- * All values in the 'cats' array will be set either to a valid CAT value or zero (undefined) value.
+ * All values in the 'cats' struct will be set either to a valid CAT value or zero (undefined) value.
  *
  * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert is not NOC.
  * @return CHIP_ERROR_BUFFER_TOO_SMALL if the passed-in CATs array is too small.
  */
-CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, uint32_t * cats, uint8_t catsSize);
+CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats);
+
+/**
+ * Extract CASE Authenticated Tags from an operational certificate that has already been
+ * parsed.
+ *
+ * All values in the 'cats' struct will be set either to a valid CAT value or zero (undefined) value.
+ *
+ * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert is not NOC.
+ * @return CHIP_ERROR_BUFFER_TOO_SMALL if the passed-in CATs array is too small.
+ */
+CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues & cats);
 
 /**
  * Extract Node ID and Fabric ID from an operational certificate in ByteSpan TLV-encoded

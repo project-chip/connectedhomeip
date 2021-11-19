@@ -1113,27 +1113,40 @@ static void TestChipCert_ExtractCATsFromOpCert(nlTestSuite * inSuite, void * inC
     struct TestCase
     {
         uint8_t Cert;
-        uint32_t ExpectedCAT[kMaxSubjectCATAttributeCount];
+        CATValues ExpectedCATs;
     };
 
     // clang-format off
     static constexpr TestCase sTestCases[] = {
         // Cert                  CATs
-        // =============================================================
-        {  TestCert::kNode01_01, {          0,          0,          0 } },
-        {  TestCert::kNode01_02, {          0,          0,          0 } },
-        {  TestCert::kNode02_01, {          0,          0,          0 } },
-        {  TestCert::kNode02_02, {          0,          0,          0 } },
-        {  TestCert::kNode02_03, { 0xABCD0001,          0,          0 } },
-        {  TestCert::kNode02_04, { 0xABCE1002, 0xABCD0003,          0 } },
-        {  TestCert::kNode02_05, { 0xABCD0010, 0xABCE1008,          0 } },
-        {  TestCert::kNode02_06, {          0,          0,          0 } },
-        {  TestCert::kNode02_07, {          0,          0,          0 } },
-        {  TestCert::kNode02_08, { 0xABCF00A0, 0xABCD0020, 0xABCE0100 } },
+        // ============================================================================
+        {  TestCert::kNode01_01, { { kUndefinedCAT, kUndefinedCAT, kUndefinedCAT } } },
+        {  TestCert::kNode01_02, { { kUndefinedCAT, kUndefinedCAT, kUndefinedCAT } } },
+        {  TestCert::kNode02_01, { { kUndefinedCAT, kUndefinedCAT, kUndefinedCAT } } },
+        {  TestCert::kNode02_02, { { kUndefinedCAT, kUndefinedCAT, kUndefinedCAT } } },
+        {  TestCert::kNode02_03, { {    0xABCD0001, kUndefinedCAT, kUndefinedCAT } } },
+        {  TestCert::kNode02_04, { {    0xABCE1002,    0xABCD0003, kUndefinedCAT } } },
+        {  TestCert::kNode02_05, { {    0xABCD0010,    0xABCE1008, kUndefinedCAT } } },
+        {  TestCert::kNode02_06, { { kUndefinedCAT, kUndefinedCAT, kUndefinedCAT } } },
+        {  TestCert::kNode02_07, { { kUndefinedCAT, kUndefinedCAT, kUndefinedCAT } } },
+        {  TestCert::kNode02_08, { {    0xABCF00A0,    0xABCD0020,    0xABCE0100 } } },
     };
     // clang-format on
 
     // Test extraction from the raw ByteSpan form.
+    for (auto & testCase : sTestCases)
+    {
+        ByteSpan cert;
+        CHIP_ERROR err = GetTestCert(testCase.Cert, sNullLoadFlag, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        CATValues cats;
+        err = ExtractCATsFromOpCert(cert, cats);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, memcmp(&cats, &testCase.ExpectedCATs, sizeof(cats)) == 0);
+    }
+
+    // Test extraction from the parsed form.
     ChipCertificateSet certSet;
     for (auto & testCase : sTestCases)
     {
@@ -1143,10 +1156,10 @@ static void TestChipCert_ExtractCATsFromOpCert(nlTestSuite * inSuite, void * inC
         err = LoadTestCert(certSet, testCase.Cert, sNullLoadFlag, sNullDecodeFlag);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        uint32_t cats[kMaxSubjectCATAttributeCount];
-        err = ExtractCATsFromOpCert(certSet.GetCertSet()[0], cats, ArraySize(cats));
+        CATValues cats;
+        err = ExtractCATsFromOpCert(certSet.GetCertSet()[0], cats);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, memcmp(cats, testCase.ExpectedCAT, sizeof(cats)) == 0);
+        NL_TEST_ASSERT(inSuite, memcmp(&cats, &testCase.ExpectedCATs, sizeof(cats)) == 0);
 
         certSet.Release();
     }
@@ -1159,24 +1172,9 @@ static void TestChipCert_ExtractCATsFromOpCert(nlTestSuite * inSuite, void * inC
         err = LoadTestCert(certSet, TestCert::kRoot01, sNullLoadFlag, sNullDecodeFlag);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        uint32_t cats[kMaxSubjectCATAttributeCount];
-        err = ExtractCATsFromOpCert(certSet.GetCertSet()[0], cats, ArraySize(cats));
+        CATValues cats;
+        err = ExtractCATsFromOpCert(certSet.GetCertSet()[0], cats);
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
-
-        certSet.Release();
-    }
-
-    // Error case: CAT array is too small.
-    {
-        CHIP_ERROR err = certSet.Init(1);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-        err = LoadTestCert(certSet, TestCert::kNode02_08, sNullLoadFlag, sNullDecodeFlag);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-        uint32_t cats[kMaxSubjectCATAttributeCount - 1];
-        err = ExtractCATsFromOpCert(certSet.GetCertSet()[0], cats, ArraySize(cats));
-        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
         certSet.Release();
     }
@@ -1276,7 +1274,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test CHIP Verify Generated Cert Chain", TestChipCert_VerifyGeneratedCerts),
     NL_TEST_DEF("Test CHIP Verify Generated Cert Chain No ICA", TestChipCert_VerifyGeneratedCertsNoICA),
     NL_TEST_DEF("Test extracting PeerId from node certificate", TestChipCert_ExtractPeerId),
-    NL_TEST_DEF("Test extracting CAST Authenticated Tags from node certificate", TestChipCert_ExtractCATsFromOpCert),
+    NL_TEST_DEF("Test extracting CASE Authenticated Tags from node certificate", TestChipCert_ExtractCATsFromOpCert),
     NL_TEST_DEF("Test extracting PublicKey and SKID from chip certificate", TestChipCert_ExtractPublicKeyAndSKID),
     NL_TEST_SENTINEL()
 };

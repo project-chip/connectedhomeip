@@ -70,7 +70,10 @@ using PBKDF2_sha256_crypto = PBKDF2_sha256HSM;
 using PBKDF2_sha256_crypto = PBKDF2_sha256;
 #endif
 
-PASESession::PASESession() {}
+PASESession::PASESession()
+{
+    SetSessionType(SessionType::kPASE);
+}
 
 PASESession::~PASESession()
 {

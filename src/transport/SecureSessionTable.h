@@ -44,8 +44,10 @@ public:
     /**
      * Allocates a new secure session out of the internal resource pool.
      *
+     * @param sessionType secure session type
      * @param localSessionId represents the encryption key ID assigned by local node
      * @param peerNodeId represents peer Node's ID
+     * @param peerCATs represents peer CASE Authenticated Tags
      * @param peerSessionId represents the encryption key ID assigned by peer node
      * @param fabric represents fabric ID for the session
      *
@@ -55,9 +57,11 @@ public:
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    SecureSession * CreateNewSecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric)
+    SecureSession * CreateNewSecureSession(SessionType sessionType, uint16_t localSessionId, NodeId peerNodeId,
+                                           Credentials::CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric)
     {
-        return mEntries.CreateObject(localSessionId, peerNodeId, peerSessionId, fabric, mTimeSource.GetMonotonicTimestamp());
+        return mEntries.CreateObject(sessionType, localSessionId, peerNodeId, peerCATs, peerSessionId, fabric,
+                                     mTimeSource.GetMonotonicTimestamp());
     }
 
     void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }

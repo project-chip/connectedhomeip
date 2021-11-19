@@ -883,9 +883,21 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
-CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, uint32_t * cats, uint8_t catsSize)
+CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats)
+{
+    ChipCertificateSet certSet;
+
+    ReturnErrorOnFailure(certSet.Init(1));
+
+    ReturnErrorOnFailure(certSet.LoadCert(opcert, BitFlags<CertDecodeFlags>()));
+
+    return ExtractCATsFromOpCert(certSet.GetCertSet()[0], cats);
+}
+
+CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues & cats)
 {
     uint8_t catCount = 0;
+    uint8_t catsSize = ArraySize(cats.val);
     uint8_t certType;
 
     ReturnErrorOnFailure(opcert.mSubjectDN.GetCertType(certType));
@@ -897,13 +909,16 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, uint32_t * 
         const auto & rdn = subjectDN.rdn[i];
         if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipCASEAuthenticatedTag)
         {
+            // This error should never happen in practice because valid NOC cannot have more
+            // than kMaxSubjectCATAttributeCount CATs in its subject. The chack that it is
+            // valid NOC was done above.
             ReturnErrorCodeIf(catCount == catsSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-            cats[catCount++] = static_cast<uint32_t>(rdn.mChipVal);
+            cats.val[catCount++] = static_cast<uint32_t>(rdn.mChipVal);
         }
     }
     for (uint8_t i = catCount; i < catsSize; ++i)
     {
-        cats[i] = 0;
+        cats.val[i] = kUndefinedCAT;
     }
 
     return CHIP_NO_ERROR;

@@ -26,6 +26,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/SessionTypes.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
@@ -39,10 +40,14 @@ public:
     PairingSession() {}
     virtual ~PairingSession() {}
 
+    SessionType GetSessionType() const { return mSessionType; }
+
     // TODO: the session should know which peer we are trying to connect to at start
     // mPeerNodeId should be const and assigned at the construction, such that GetPeerNodeId will never return kUndefinedNodeId, and
     // SetPeerNodeId is not necessary.
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
+
+    Credentials::CATValues GetPeerCATs() const { return mPeerCATs; }
 
     // TODO: the local key id should be allocateed at start
     // mLocalSessionId should be const and assigned at the construction, such that GetLocalSessionId will always return a valid key
@@ -104,7 +109,9 @@ protected:
         return firstFieldSize + 4 + EstimateTLVStructOverhead(otherFields...);
     }
 
+    void SetSessionType(SessionType sessionType) { mSessionType = sessionType; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
+    void SetPeerCATs(Credentials::CATValues peerCATs) { mPeerCATs = peerCATs; }
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
     void SetLocalSessionId(uint16_t id) { mLocalSessionId = id; }
     void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
@@ -163,14 +170,18 @@ protected:
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear()
     {
+        mSessionType = SessionType::kUndefined;
         mPeerNodeId  = kUndefinedNodeId;
+        mPeerCATs    = Credentials::kUndefinedCATs;
         mPeerAddress = Transport::PeerAddress::Uninitialized();
         mPeerSessionId.ClearValue();
         mLocalSessionId = kInvalidKeyId;
     }
 
 private:
-    NodeId mPeerNodeId = kUndefinedNodeId;
+    SessionType mSessionType         = SessionType::kUndefined;
+    NodeId mPeerNodeId               = kUndefinedNodeId;
+    Credentials::CATValues mPeerCATs = Credentials::kUndefinedCATs;
 
     // TODO: the local key id should be allocateed at start
     // then we can remove kInvalidKeyId

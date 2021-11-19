@@ -40,11 +40,8 @@ constexpr NodeId kMinTemporaryLocalId = 0xFFFF'FFFE'0000'0000ULL;
 constexpr NodeId kMaxTemporaryLocalId = 0xFFFF'FFFE'FFFF'FFFEULL;
 constexpr NodeId kPlaceholderNodeId   = 0xFFFF'FFFE'FFFF'FFFFULL;
 
-constexpr NodeId kMinCASEAuthTag1 = 0xFFFF'FFFD'0000'0000ULL;
-constexpr NodeId kMaxCASEAuthTag1 = 0xFFFF'FFFD'FFFF'FFFFULL;
-
-constexpr NodeId kMinCASEAuthTag2 = 0xFFFF'FFFC'0000'0000ULL;
-constexpr NodeId kMaxCASEAuthTag2 = 0xFFFF'FFFC'FFFF'FFFFULL;
+constexpr NodeId kMinCASEAuthTag = 0xFFFF'FFFD'0000'0000ULL;
+constexpr NodeId kMaxCASEAuthTag = 0xFFFF'FFFD'FFFF'FFFFULL;
 
 constexpr NodeId kMinPAKEKeyId = 0xFFFF'FFFB'0000'0000ULL;
 constexpr NodeId kMaxPAKEKeyId = 0xFFFF'FFFB'FFFF'FFFFULL;

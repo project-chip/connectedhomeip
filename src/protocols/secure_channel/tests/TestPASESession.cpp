@@ -101,6 +101,11 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegate;
     PASESession pairing;
 
+    NL_TEST_ASSERT(inSuite, pairing.GetSessionType() == SessionType::kPASE);
+    Credentials::CATValues peerCATs;
+    peerCATs = pairing.GetPeerCATs();
+    NL_TEST_ASSERT(inSuite, memcmp(&peerCATs, &Credentials::kUndefinedCATs, sizeof(Credentials::CATValues)) == 0);
+
     gLoopback.Reset();
 
     NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, ByteSpan(nullptr, 0), 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);

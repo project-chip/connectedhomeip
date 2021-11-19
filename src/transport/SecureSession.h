@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <credentials/CHIPCert.h>
+#include <lib/core/SessionTypes.h>
 #include <transport/CryptoContext.h>
 #include <transport/SessionMessageCounter.h>
 #include <transport/raw/Base.h>
@@ -37,8 +39,10 @@ static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
  * Defines state of a peer connection at a transport layer.
  *
  * Information contained within the state:
+ *   - SessionType represents CASE or PASE session
  *   - PeerAddress represents how to talk to the peer
  *   - PeerNodeId is the unique ID of the peer
+ *   - PeerCATs represents CASE Authenticated Tags
  *   - SendMessageIndex is an ever increasing index for sending messages
  *   - LastActivityTime is a monotonic timestamp of when this connection was
  *     last used. Inactive connections can expire.
@@ -49,10 +53,11 @@ static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
 class SecureSession
 {
 public:
-    SecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric,
-                  System::Clock::Timestamp currentTime) :
-        mPeerNodeId(peerNodeId),
-        mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mFabric(fabric)
+    SecureSession(SessionType sessionType, uint16_t localSessionId, NodeId peerNodeId, Credentials::CATValues peerCATs,
+                  uint16_t peerSessionId, FabricIndex fabric, System::Clock::Timestamp currentTime) :
+        mSessionType(sessionType),
+        mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
+        mFabric(fabric)
     {
         SetLastActivityTime(currentTime);
     }
@@ -66,7 +71,9 @@ public:
     PeerAddress & GetPeerAddress() { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
+    SessionType GetSessionType() const { return mSessionType; }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    Credentials::CATValues GetPeerCATs() const { return mPeerCATs; }
 
     void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval)
     {
@@ -104,7 +111,9 @@ public:
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
+    const SessionType mSessionType;
     const NodeId mPeerNodeId;
+    const Credentials::CATValues mPeerCATs;
     const uint16_t mLocalSessionId;
     const uint16_t mPeerSessionId;
     const FabricIndex mFabric;
