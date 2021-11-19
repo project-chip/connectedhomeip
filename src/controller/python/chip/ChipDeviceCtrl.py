@@ -494,11 +494,11 @@ class ChipDeviceController(object):
         if blocking:
             return im.GetAttributeReadResponse(im.DEFAULT_ATTRIBUTEREAD_APPID)
 
-    def ZCLWriteAttribute(self, cluster, attribute, nodeid, endpoint, groupid, value, blocking=True):
+    def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, blocking=True):
         req = None
         try:
-            req = ClusterAttribute.AttributeWriteRequest(EndpointId=endpoint, Attribute=eval(
-                f"GeneratedObjects.{cluster}.Attributes.{attribute}"), Data=value)
+            req = eval(
+                f"GeneratedObjects.{cluster}.Attributes.{attribute}")(value)
         except:
             raise UnknownAttribute(cluster, attribute)
 
