@@ -24,6 +24,8 @@ public class TvApp {
 
   public native void setWakeOnLanManager(WakeOnLanManager manager);
 
+  public native void setMediaInputManager(MediaInputManager manager);
+
   static {
     System.loadLibrary("TvApp");
   }

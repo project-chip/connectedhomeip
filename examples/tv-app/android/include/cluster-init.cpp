@@ -20,7 +20,6 @@
 #include "application-launcher/ApplicationLauncherManager.h"
 #include "audio-output/AudioOutputManager.h"
 #include "content-launcher/ContentLauncherManager.h"
-#include "media-input/MediaInputManager.h"
 #include "target-navigator/TargetNavigatorManager.h"
 #include "tv-channel/TvChannelManager.h"
 
@@ -203,33 +202,6 @@ void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
     if (!attrAccessRegistered)
     {
         registerAttributeAccessOverride(&gContentLauncherAttrAccess);
-        attrAccessRegistered = true;
-    }
-}
-
-namespace {
-
-TvAttrAccess<MediaInputManager, app::Clusters::MediaInput::Attributes::MediaInputList::TypeInfo,
-             &MediaInputManager::proxyGetInputList>
-    gMediaInputAttrAccess;
-
-} // anonymous namespace
-
-/** @brief Media Input Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
-{
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gMediaInputAttrAccess);
         attrAccessRegistered = true;
     }
 }
