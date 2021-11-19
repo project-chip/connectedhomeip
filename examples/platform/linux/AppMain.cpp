@@ -128,7 +128,10 @@ int ChipLinuxAppInit(int argc, char ** argv)
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
+#if 0
+    // TODO: more access control configuration
     SetAccessControl(Access::Examples::GetAccessControl());
+#endif
     err = GetAccessControl().Init();
     SuccessOrExit(err);
 

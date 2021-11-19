@@ -28,6 +28,9 @@ AccessControl & GetAccessControl();
 // Returns an example access control delegate.
 AccessControl::Delegate & GetAccessControlDelegate();
 
+// Returns a transitional access control which always allows.
+AccessControl & GetTransitionalAccessControl();
+
 } // namespace Examples
 } // namespace Access
 } // namespace chip

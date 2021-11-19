@@ -288,8 +288,8 @@ public:
 
         virtual void Release() {}
 
-        virtual CHIP_ERROR Init() { return CHIP_ERROR_NOT_IMPLEMENTED; }
-        virtual CHIP_ERROR Finish() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+        virtual CHIP_ERROR Init() { return CHIP_NO_ERROR; }
+        virtual CHIP_ERROR Finish() { return CHIP_NO_ERROR; }
 
         // Capabilities
         virtual CHIP_ERROR GetMaxEntries(int & value) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -317,6 +317,12 @@ public:
         virtual CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex) const
         {
             return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
+        // Transitional (will be removed later)
+        virtual bool IsTransitional() const
+        {
+            return true;
         }
 
         // Listening
