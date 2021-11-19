@@ -17,6 +17,7 @@
  */
 
 #include "KeypadInputManager.h"
+#include "MediaInputManager.h"
 #include "WakeOnLanManager.h"
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <jni.h>
@@ -43,4 +44,9 @@ JNI_METHOD(void, setKeypadInputManager)(JNIEnv *, jobject, jobject manager)
 JNI_METHOD(void, setWakeOnLanManager)(JNIEnv *, jobject, jobject manager)
 {
     WakeOnLanMgr().InitializeWithObjects(manager);
+}
+
+JNI_METHOD(void, setMediaInputManager)(JNIEnv *, jobject, jobject manager)
+{
+    MediaInputMgr().InitializeWithObjects(manager);
 }
