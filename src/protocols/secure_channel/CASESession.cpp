@@ -175,7 +175,7 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mMessageDigestLen = LittleEndian::HostSwap16(static_cast<uint16_t>(sizeof(mMessageDigest)));
     serializable.mVersion          = kCASESessionVersion;
     serializable.mPeerNodeId       = LittleEndian::HostSwap64(peerNodeId);
-    for (uint8_t i = 0; i < ArraySize(serializable.mPeerCATs.val); i++)
+    for (size_t i = 0; i < ArraySize(serializable.mPeerCATs.val); i++)
     {
         serializable.mPeerCATs.val[i] = LittleEndian::HostSwap32(GetPeerCATs().val[i]);
     }
@@ -204,7 +204,7 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
 
     SetPeerNodeId(LittleEndian::HostSwap64(serializable.mPeerNodeId));
     Credentials::CATValues peerCATs;
-    for (uint8_t i = 0; i < ArraySize(serializable.mPeerCATs.val); i++)
+    for (size_t i = 0; i < ArraySize(serializable.mPeerCATs.val); i++)
     {
         peerCATs.val[i] = LittleEndian::HostSwap32(serializable.mPeerCATs.val[i]);
     }

@@ -897,7 +897,7 @@ CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats)
 CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues & cats)
 {
     uint8_t catCount = 0;
-    uint8_t catsSize = ArraySize(cats.val);
+    size_t catsSize = ArraySize(cats.val);
     uint8_t certType;
 
     ReturnErrorOnFailure(opcert.mSubjectDN.GetCertType(certType));
@@ -913,6 +913,7 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues &
             // than kMaxSubjectCATAttributeCount CATs in its subject. The chack that it is
             // valid NOC was done above.
             ReturnErrorCodeIf(catCount == catsSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(CanCastTo<uint32_t>(rdn.mChipVal), CHIP_ERROR_INVALID_ARGUMENT);
             cats.val[catCount++] = static_cast<uint32_t>(rdn.mChipVal);
         }
     }
