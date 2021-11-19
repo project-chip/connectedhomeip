@@ -19,23 +19,24 @@
 #pragma once
 
 #include <app/util/af-types.h>
+#include <jni.h>
 #include <lib/core/CHIPError.h>
-
-#include "../endpoint-configuration/EndpointConfigurationStorage.h"
 
 class WakeOnLanManager
 {
 public:
-    CHIP_ERROR Init();
-    void store(chip::EndpointId endpoint, char macAddress[32]);
-    void setMacAddress(chip::EndpointId endpoint, char * macAddress);
-
-    static WakeOnLanManager & GetInstance()
-    {
-        static WakeOnLanManager instance;
-        return instance;
-    }
+    void InitializeWithObjects(jobject managerObject);
+    void InitWakeOnLanCluster(chip::EndpointId endpoint);
 
 private:
-    EndpointConfigurationStorage * es = nullptr;
+    friend WakeOnLanManager & WakeOnLanMgr();
+
+    static WakeOnLanManager sInstance;
+    jobject mWakeOnLanManagerObject = nullptr;
+    jmethodID mGetMacMethod = nullptr;
 };
+
+inline WakeOnLanManager & WakeOnLanMgr()
+{
+    return WakeOnLanManager::sInstance;
+}
