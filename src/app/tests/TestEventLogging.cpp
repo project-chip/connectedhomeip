@@ -50,9 +50,9 @@ static const uint32_t kLivenessChangeEvent        = 1;
 static const chip::EndpointId kTestEndpointId     = 2;
 static const chip::TLV::Tag kLivenessDeviceStatus = chip::TLV::ContextTag(1);
 
-static uint8_t gDebugEventBuffer[256];
-static uint8_t gInfoEventBuffer[256];
-static uint8_t gCritEventBuffer[256];
+static uint8_t gDebugEventBuffer[128];
+static uint8_t gInfoEventBuffer[128];
+static uint8_t gCritEventBuffer[128];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
 class TestContext : public chip::Test::AppContext

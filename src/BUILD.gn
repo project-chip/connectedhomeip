@@ -49,15 +49,21 @@ if (chip_build_tests) {
       "${chip_root}/src/inet/tests",
       "${chip_root}/src/lib/asn1/tests",
       "${chip_root}/src/lib/core/tests",
-      "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
-      "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
-      "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
-      "${chip_root}/src/lib/dnssd/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/protocols/bdx/tests",
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
       "${chip_root}/src/transport/retransmit/tests",
     ]
+
+    # Skip DNSSD tests for Mbed platform due to flash memory size limitations
+    if (current_os != "mbed") {
+      deps += [
+        "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
+        "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
+        "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
+        "${chip_root}/src/lib/dnssd/tests",
+      ]
+    }
 
     if (current_os != "zephyr" && current_os != "mbed") {
       deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
@@ -101,7 +107,10 @@ if (chip_build_tests) {
     if (chip_device_platform != "nrfconnect" &&
         chip_device_platform != "efr32") {
       # TODO(#10447): Controller test has HF on EFR32.
-      deps += [ "${chip_root}/src/controller/tests" ]
+      deps += [
+        "${chip_root}/src/controller/tests",
+        "${chip_root}/src/controller/tests/data_model",
+      ]
     }
 
     if (current_os != "zephyr" && current_os != "mbed" &&
@@ -113,14 +122,6 @@ if (chip_build_tests) {
       build_monolithic_library = true
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"
-    }
-  }
-
-  if (chip_enable_happy_tests) {
-    group("happy_tests") {
-      deps = [
-        "${chip_root}/src/test_driver/happy/tests/standalone/inet:inet_tests",
-      ]
     }
   }
 

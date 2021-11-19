@@ -164,12 +164,31 @@ union EmberAfDefaultOrMinMaxAttributeValue
     EmberAfAttributeMinMaxValue * ptrToMinMaxValue;
 };
 
+// Attribute masks modify how attributes are used by the framework
+//
+// Attribute that has this mask is NOT read-only
+#define ATTRIBUTE_MASK_WRITABLE (0x01)
+// Attribute that has this mask is saved to a token
+#define ATTRIBUTE_MASK_TOKENIZE (0x02)
+// Attribute that has this mask has a min/max values
+#define ATTRIBUTE_MASK_MIN_MAX (0x04)
+// Manufacturer specific attribute
+#define ATTRIBUTE_MASK_MANUFACTURER_SPECIFIC (0x08)
+// Attribute deferred to external storage
+#define ATTRIBUTE_MASK_EXTERNAL_STORAGE (0x10)
+// Attribute is singleton
+#define ATTRIBUTE_MASK_SINGLETON (0x20)
+// Attribute is a client attribute
+#define ATTRIBUTE_MASK_CLIENT (0x40)
+// Attribute is nullable
+#define ATTRIBUTE_MASK_NULLABLE (0x80)
+
 /**
  * @brief Each attribute has it's metadata stored in such struct.
  *
  * There is only one of these per attribute across all endpoints.
  */
-typedef struct
+struct EmberAfAttributeMetadata
 {
     /**
      * Attribute ID, according to ZCL specs.
@@ -185,8 +204,7 @@ typedef struct
     uint16_t size;
     /**
      * Attribute mask, tagging attribute with specific
-     * functionality. See ATTRIBUTE_MASK_ macros defined
-     * in att-storage.h.
+     * functionality.
      */
     EmberAfAttributeMask mask;
     /**
@@ -194,7 +212,17 @@ typedef struct
      * depends on the mask.
      */
     EmberAfDefaultOrMinMaxAttributeValue defaultValue;
-} EmberAfAttributeMetadata;
+
+    /**
+     * Check whether this attribute is nullable.
+     */
+    bool IsNullable() const { return mask & ATTRIBUTE_MASK_NULLABLE; }
+
+    /**
+     * Check whether this attribute is readonly.
+     */
+    bool IsReadOnly() const { return !(mask & ATTRIBUTE_MASK_WRITABLE); }
+};
 
 /**
  * @brief Struct describing cluster

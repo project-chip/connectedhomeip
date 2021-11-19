@@ -53,6 +53,7 @@ public:
     bool HasFabricIndex() const { return (mFabric != kUndefinedFabricIndex); }
     FabricIndex GetFabricIndex() const { return mFabric; }
     void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
+    void SetGroupId(GroupId groupId) { mGroupId.SetValue(groupId); }
 
     bool operator==(const SessionHandle & that) const
     {
@@ -74,6 +75,7 @@ public:
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsGroupSession() const { return mGroupId.HasValue(); }
+    const Optional<GroupId> & GetGroupId() const { return mGroupId; }
     const Optional<uint16_t> & GetPeerSessionId() const { return mPeerSessionId; }
     const Optional<uint16_t> & GetLocalSessionId() const { return mLocalSessionId; }
 

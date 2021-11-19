@@ -36,16 +36,17 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callbac
     VerifyOrReturnError(mpExchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    AttributeDataIBs::Builder AttributeDataIBsBuilder;
+    AttributeDataIBs::Builder attributeDataIBsBuilder;
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     mMessageWriter.Init(std::move(packet));
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
-
-    AttributeDataIBsBuilder = mWriteRequestBuilder.CreateAttributeDataIBsBuilder();
-    ReturnErrorOnFailure(AttributeDataIBsBuilder.GetError());
+    mWriteRequestBuilder.TimedRequest(false).IsFabricFiltered(false);
+    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
+    attributeDataIBsBuilder = mWriteRequestBuilder.CreateWriteRequests();
+    ReturnErrorOnFailure(attributeDataIBsBuilder.GetError());
 
     ClearExistingExchangeContext();
     mpExchangeMgr         = apExchangeMgr;
@@ -137,7 +138,7 @@ CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    AttributeDataIB::Builder AttributeDataIB = mWriteRequestBuilder.GetAttributeReportIBsBuilder().CreateAttributeDataIBBuilder();
+    AttributeDataIB::Builder AttributeDataIB = mWriteRequestBuilder.GetWriteRequests().CreateAttributeDataIBBuilder();
     SuccessOrExit(AttributeDataIB.GetError());
     err = ConstructAttributePath(attributePathParams, AttributeDataIB);
 
@@ -149,7 +150,7 @@ CHIP_ERROR WriteClient::FinishAttribute()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    AttributeDataIB::Builder AttributeDataIB = mWriteRequestBuilder.GetAttributeReportIBsBuilder().GetAttributeDataIBBuilder();
+    AttributeDataIB::Builder AttributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
 
     // TODO: Add attribute version support
     AttributeDataIB.DataVersion(0);
@@ -163,15 +164,13 @@ exit:
 
 TLV::TLVWriter * WriteClient::GetAttributeDataIBTLVWriter()
 {
-    return mWriteRequestBuilder.GetAttributeReportIBsBuilder().GetAttributeDataIBBuilder().GetWriter();
+    return mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder().GetWriter();
 }
 
 CHIP_ERROR WriteClient::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
                                                AttributeDataIB::Builder aAttributeDataIB)
 {
-    // We do not support wildcard write now, reject them on client side.
-    VerifyOrReturnError(!aAttributePathParams.HasWildcard() && aAttributePathParams.IsValidAttributePath(),
-                        CHIP_ERROR_INVALID_PATH_LIST);
+    VerifyOrReturnError(aAttributePathParams.IsValidAttributePath(), CHIP_ERROR_INVALID_PATH_LIST);
     return aAttributePathParams.BuildAttributePath(aAttributeDataIB.CreatePath());
 }
 
@@ -180,7 +179,7 @@ CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributeDataIBs::Builder AttributeDataIBsBuilder;
     VerifyOrExit(mState == State::AddAttribute, err = CHIP_ERROR_INCORRECT_STATE);
-    AttributeDataIBsBuilder = mWriteRequestBuilder.GetAttributeReportIBsBuilder().EndOfAttributeDataIBs();
+    AttributeDataIBsBuilder = mWriteRequestBuilder.GetWriteRequests().EndOfAttributeDataIBs();
     err                     = AttributeDataIBsBuilder.GetError();
     SuccessOrExit(err);
 
@@ -244,17 +243,28 @@ CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::T
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
     mpExchangeCtx->SetResponseTimeout(timeout);
 
+    // kExpectResponse is ignored by ExchangeContext in case of groupcast
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
+
     MoveToState(State::AwaitingResponse);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(DataManagement, "Write client failed to SendWriteRequest");
         ClearExistingExchangeContext();
+    }
+
+    if (session.IsGroupSession())
+    {
+        // Always shutdown on Group communication
+        ChipLogDetail(DataManagement, "Closing on group Communication ");
+        ShutdownInternal();
     }
 
     return err;
@@ -268,15 +278,23 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
     // This should never fail because even if SendWriteRequest is called
     // back-to-back, the second call will call Close() on the first exchange,
     // which clears the OnMessageReceived callback.
+    VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrDie(apExchangeContext == mpExchangeCtx);
-
-    // Verify that the message is an Write Response. If not, this is an unexpected message.
-    // Signal the error through the error callback and shutdown the client.
-    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse),
-                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-
-    err = ProcessWriteResponseMessage(std::move(aPayload));
+    if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse))
+    {
+        err = ProcessWriteResponseMessage(std::move(aPayload));
+        SuccessOrExit(err);
+    }
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    {
+        StatusIB status;
+        err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    }
 
 exit:
     if (mpCallback != nullptr)
@@ -350,10 +368,11 @@ CHIP_ERROR WriteClientHandle::SendWriteRequest(SessionHandle session, System::Cl
 {
     CHIP_ERROR err = mpWriteClient->SendWriteRequest(session, timeout);
 
+    // Transferring ownership of the underlying WriteClient to the IM layer. IM will manage its lifetime.
+    // For groupcast writes, there is no transfer of ownership since the interaction is done upon transmission of the action
     if (err == CHIP_NO_ERROR)
     {
-        // On success, the InteractionModelEngine will be responible to take care of the lifecycle of the WriteClient, so we release
-        // the WriteClient without closing it.
+        // Release the WriteClient without closing it.
         mpWriteClient = nullptr;
     }
     else

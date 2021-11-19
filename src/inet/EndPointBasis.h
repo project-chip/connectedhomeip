@@ -38,43 +38,18 @@ class InetLayer;
 class DLL_EXPORT EndPointBase
 {
 public:
+    EndPointBase(InetLayer & aInetLayer, void * aAppState = nullptr) : mAppState(aAppState), mInetLayer(aInetLayer) {}
+
     /**
      *  Returns a reference to the Inet layer object that owns this basis object.
      */
-    InetLayer & Layer() const { return *mInetLayer; }
+    InetLayer & Layer() const { return mInetLayer; }
 
-    /**
-     *  Returns \c true if the basis object was obtained by the specified Inet layer instance.
-     *
-     *  @note
-     *      Does not check whether the object is actually obtained by the system layer instance associated with the Inet layer
-     *      instance. It merely tests whether \c aInetLayer is the Inet layer instance that was provided to \c InitInetLayerBasis.
-     */
-    bool IsCreatedByInetLayer(const InetLayer & aInetLayer) const { return mInetLayer == &aInetLayer; }
-
-    void * AppState;
+    void * mAppState;
 
 private:
-    InetLayer * mInetLayer; /**< Pointer to the InetLayer object that owns this object. */
-
-protected:
-    virtual ~EndPointBase() = default;
-
-    void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = nullptr)
-    {
-        AppState   = aAppState;
-        mInetLayer = &aInetLayer;
-        InitEndPointBasisImpl();
-    }
-
-    virtual void InitEndPointBasisImpl() = 0;
+    InetLayer & mInetLayer; /**< InetLayer object that owns this object. */
 };
 
 } // namespace Inet
 } // namespace chip
-
-#ifdef CHIP_INET_END_POINT_IMPL_CONFIG_FILE
-#include CHIP_INET_END_POINT_IMPL_CONFIG_FILE
-#else // CHIP_INET_END_POINT_IMPL_CONFIG_FILE
-#include <inet/EndPointBasisImplSockets.h>
-#endif // CHIP_INET_END_POINT_IMPL_CONFIG_FILE

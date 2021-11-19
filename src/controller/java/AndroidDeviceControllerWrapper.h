@@ -35,7 +35,6 @@
  * Generally it contains the DeviceController class itself, plus any related delegates/callbacks.
  */
 class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate,
-                                       public chip::DeviceStatusDelegate,
                                        public chip::Controller::OperationalCredentialsDelegate,
                                        public chip::PersistentStorageDelegate,
                                        public chip::FabricStorage
@@ -69,10 +68,6 @@ public:
     }
 
     void SetFabricIdForNextNOCRequest(chip::FabricId fabricId) override { mNextFabricId = fabricId; }
-
-    // DeviceStatusDelegate implementation
-    void OnMessage(chip::System::PacketBufferHandle && msg) override;
-    void OnStatusChange(void) override;
 
     // PersistentStorageDelegate implementation
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;

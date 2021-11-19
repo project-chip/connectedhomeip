@@ -704,6 +704,8 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         result.mPort        = port;
         result.mAddressType = ToAddressType(protocol);
         result.mInterface   = Inet::InterfaceId::Null();
+        // It's not clear if we can get the actual value from avahi, so just assume default.
+        result.mTtlSeconds = AVAHI_DEFAULT_TTL_HOST_NAME;
         if (interface != AVAHI_IF_UNSPEC)
         {
             result.mInterface = static_cast<chip::Inet::InterfaceId>(interface);

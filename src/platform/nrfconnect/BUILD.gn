@@ -20,6 +20,7 @@ assert(chip_device_platform == "nrfconnect")
 
 static_library("nrfconnect") {
   sources = [
+    "../SingletonConfigurationManager.cpp",
     "../Zephyr/BLEManagerImpl.cpp",
     "../Zephyr/ConfigurationManagerImpl.cpp",
     "../Zephyr/KeyValueStoreManagerImpl.cpp",

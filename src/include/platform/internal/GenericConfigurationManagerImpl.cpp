@@ -44,8 +44,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::Init()
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
@@ -54,36 +54,36 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::Init()
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetVendorName(char * buf, size_t bufSize)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetVendorName(char * buf, size_t bufSize)
 {
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetProductName(char * buf, size_t bufSize)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductName(char * buf, size_t bufSize)
 {
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetFirmwareRevisionString(char * buf, size_t bufSize)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareRevisionString(char * buf, size_t bufSize)
 {
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSerialNumber(char * buf, size_t bufSize)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSerialNumber(char * buf, size_t bufSize)
 {
     CHIP_ERROR err;
     size_t serialNumLen = 0; // without counting null-terminator
-    err                 = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
+    err                 = ReadConfigValueStr(ConfigClass::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
 
 #ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
     if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -103,26 +103,26 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSerialNumber(char * bu
     return err;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreSerialNumber(const char * serialNum, size_t serialNumLen)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSerialNumber(const char * serialNum, size_t serialNumLen)
 {
-    return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_SerialNum, serialNum, serialNumLen);
+    return WriteConfigValueStr(ConfigClass::kConfigKey_SerialNum, serialNum, serialNumLen);
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetPrimaryWiFiMACAddress(uint8_t * buf)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StorePrimaryWiFiMACAddress(const uint8_t * buf)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StorePrimaryWiFiMACAddress(const uint8_t * buf)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetPrimaryMACAddress(MutableByteSpan buf)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(MutableByteSpan buf)
 {
     if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -149,8 +149,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetPrimaryMACAddress(Muta
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetPrimary802154MACAddress(uint8_t * buf)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimary802154MACAddress(uint8_t * buf)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     return ThreadStackManager().GetPrimary802154MACAddress(buf);
@@ -159,27 +159,27 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetPrimary802154MACAddres
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StorePrimary802154MACAddress(const uint8_t * buf)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StorePrimary802154MACAddress(const uint8_t * buf)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetProductRevisionString(char * buf, size_t bufSize)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductRevisionString(char * buf, size_t bufSize)
 {
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetProductRevision(uint16_t & productRev)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductRevision(uint16_t & productRev)
 {
     CHIP_ERROR err;
     uint32_t val;
 
-    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_ProductRevision, val);
+    err = ReadConfigValue(ConfigClass::kConfigKey_ProductRevision, val);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         productRev = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION);
@@ -193,14 +193,15 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetProductRevision
     return err;
 }
 
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreProductRevision(uint16_t productRev)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreProductRevision(uint16_t productRev)
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_ProductRevision, static_cast<uint32_t>(productRev));
+    return WriteConfigValue(ConfigClass::kConfigKey_ProductRevision, static_cast<uint32_t>(productRev));
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetManufacturingDate(uint16_t & year, uint8_t & month,
+                                                                              uint8_t & dayOfMonth)
 {
     CHIP_ERROR err;
     enum
@@ -211,7 +212,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetManufacturingDate(uint
     size_t dateLen;
     char * parseEnd;
 
-    err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
+    err = ReadConfigValueStr(ConfigClass::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
     SuccessOrExit(err);
 
     VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -239,14 +240,14 @@ exit:
     return err;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen)
 {
-    return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_ManufacturingDate, mfgDate, mfgDateLen);
+    return WriteConfigValueStr(ConfigClass::kConfigKey_ManufacturingDate, mfgDate, mfgDateLen);
 }
 
-template <class ImplClass>
-void GenericConfigurationManagerImpl<ImplClass>::InitiateFactoryReset()
+template <class ConfigClass>
+void GenericConfigurationManagerImpl<ConfigClass>::InitiateFactoryReset()
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     _IncrementLifetimeCounter();
@@ -254,12 +255,12 @@ void GenericConfigurationManagerImpl<ImplClass>::InitiateFactoryReset()
     // Inheriting classes should call this method so the lifetime counter is updated if necessary.
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSetupPinCode(uint32_t & setupPinCode)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSetupPinCode(uint32_t & setupPinCode)
 {
     CHIP_ERROR err;
 
-    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_SetupPinCode, setupPinCode);
+    err = ReadConfigValue(ConfigClass::kConfigKey_SetupPinCode, setupPinCode);
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -273,19 +274,19 @@ exit:
     return err;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreSetupPinCode(uint32_t setupPinCode)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSetupPinCode(uint32_t setupPinCode)
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_SetupPinCode, setupPinCode);
+    return WriteConfigValue(ConfigClass::kConfigKey_SetupPinCode, setupPinCode);
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSetupDiscriminator(uint16_t & setupDiscriminator)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
     CHIP_ERROR err;
     uint32_t val;
 
-    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_SetupDiscriminator, val);
+    err = ReadConfigValue(ConfigClass::kConfigKey_SetupDiscriminator, val);
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -301,78 +302,120 @@ exit:
     return err;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreSetupDiscriminator(uint16_t setupDiscriminator)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSetupDiscriminator(uint16_t setupDiscriminator)
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_SetupDiscriminator, static_cast<uint32_t>(setupDiscriminator));
+    return WriteConfigValue(ConfigClass::kConfigKey_SetupDiscriminator, static_cast<uint32_t>(setupDiscriminator));
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRegulatoryLocation(uint32_t & location)
+{
+    return ReadConfigValue(ConfigClass::kConfigKey_RegulatoryLocation, location);
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreRegulatoryLocation(uint32_t location)
+{
+    return WriteConfigValue(ConfigClass::kConfigKey_RegulatoryLocation, location);
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
+{
+    return ReadConfigValueStr(ConfigClass::kConfigKey_CountryCode, buf, bufSize, codeLen);
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreCountryCode(const char * code, size_t codeLen)
+{
+    return WriteConfigValueStr(ConfigClass::kConfigKey_CountryCode, code, codeLen);
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetBreadcrumb(uint64_t & breadcrumb)
+{
+    return ReadConfigValue(ConfigClass::kConfigKey_Breadcrumb, breadcrumb);
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreBreadcrumb(uint64_t breadcrumb)
+{
+    return WriteConfigValue(ConfigClass::kConfigKey_Breadcrumb, breadcrumb);
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetRegulatoryLocation(uint32_t & location)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetRebootCount(uint32_t & rebootCount)
 {
-    return Impl()->ReadConfigValue(ImplClass::kConfigKey_RegulatoryLocation, location);
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreRegulatoryLocation(uint32_t location)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreRebootCount(uint32_t rebootCount)
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_RegulatoryLocation, location);
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    return Impl()->ReadConfigValueStr(ImplClass::kConfigKey_CountryCode, buf, bufSize, codeLen);
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreCountryCode(const char * code, size_t codeLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreTotalOperationalHours(uint32_t totalOperationalHours)
 {
-    return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_CountryCode, code, codeLen);
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetBreadcrumb(uint64_t & breadcrumb)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetBootReasons(uint32_t & bootReasons)
 {
-    return Impl()->ReadConfigValue(ImplClass::kConfigKey_Breadcrumb, breadcrumb);
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreBreadcrumb(uint64_t breadcrumb)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreBootReasons(uint32_t bootReasons)
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_Breadcrumb, breadcrumb);
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetLifetimeCounter(uint16_t & lifetimeCounter)
+{
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetLifetimeCounter(uint16_t & lifetimeCounter)
-{
     lifetimeCounter = static_cast<uint16_t>(mLifetimePersistedCounter.GetValue());
     return CHIP_NO_ERROR;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_IncrementLifetimeCounter()
-{
-    return mLifetimePersistedCounter.Advance();
-}
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetFailSafeArmed(bool & val)
-{
-    return Impl()->ReadConfigValue(ImplClass::kConfigKey_FailSafeArmed, val);
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::SetFailSafeArmed(bool val)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::_IncrementLifetimeCounter()
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_FailSafeArmed, val);
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    return mLifetimePersistedCounter.Advance();
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
 }
 
-template <class ImplClass>
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFailSafeArmed(bool & val)
+{
+    return ReadConfigValue(ConfigClass::kConfigKey_FailSafeArmed, val);
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetFailSafeArmed(bool val)
+{
+    return WriteConfigValue(ConfigClass::kConfigKey_FailSafeArmed, val);
+}
+
+template <class ConfigClass>
 CHIP_ERROR
-GenericConfigurationManagerImpl<ImplClass>::GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo)
+GenericConfigurationManagerImpl<ConfigClass>::GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo)
 {
     CHIP_ERROR err;
     uint16_t id;
@@ -396,8 +439,8 @@ exit:
     return err;
 }
 
-template <class ImplClass>
-bool GenericConfigurationManagerImpl<ImplClass>::IsFullyProvisioned()
+template <class ConfigClass>
+bool GenericConfigurationManagerImpl<ConfigClass>::IsFullyProvisioned()
 {
 #if CHIP_BYPASS_RENDEZVOUS
     return true;
@@ -414,8 +457,8 @@ bool GenericConfigurationManagerImpl<ImplClass>::IsFullyProvisioned()
 #endif // CHIP_BYPASS_RENDEZVOUS
 }
 
-template <class ImplClass>
-bool GenericConfigurationManagerImpl<ImplClass>::IsCommissionableDeviceTypeEnabled()
+template <class ConfigClass>
+bool GenericConfigurationManagerImpl<ConfigClass>::IsCommissionableDeviceTypeEnabled()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE
     return true;
@@ -424,49 +467,48 @@ bool GenericConfigurationManagerImpl<ImplClass>::IsCommissionableDeviceTypeEnabl
 #endif
 }
 
-template <class ImplClass>
-bool GenericConfigurationManagerImpl<ImplClass>::IsCommissionableDeviceNameEnabled()
+template <class ConfigClass>
+bool GenericConfigurationManagerImpl<ConfigClass>::IsCommissionableDeviceNameEnabled()
 {
     return CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME == 1;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetCommissionableDeviceName(char * buf, size_t bufSize)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetCommissionableDeviceName(char * buf, size_t bufSize)
 {
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetInitialPairingInstruction(char * buf, size_t bufSize)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingInstruction(char * buf, size_t bufSize)
 {
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSecondaryPairingInstruction(char * buf, size_t bufSize)
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingInstruction(char * buf, size_t bufSize)
 {
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION);
     return CHIP_NO_ERROR;
 }
 
-#if !defined(NDEBUG)
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::RunUnitTests()
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::RunUnitTests()
 {
+#if !defined(NDEBUG)
     ChipLogProgress(DeviceLayer, "Running configuration unit test");
-    Impl()->RunConfigUnitTest();
-
+    RunConfigUnitTest();
+#endif
     return CHIP_NO_ERROR;
 }
-#endif
 
-template <class ImplClass>
-void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
+template <class ConfigClass>
+void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
 {
     CHIP_ERROR err;
 
@@ -546,9 +588,6 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
         ChipLogProgress(DeviceLayer, "  Device Type: %" PRIu16 " (0x%" PRIX16 ")", deviceType, deviceType);
     }
 }
-
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

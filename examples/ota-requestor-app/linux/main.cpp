@@ -254,18 +254,31 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::FabricIndex peerFabricIndex = providerFabricIndex)
 {
-    Server * server                        = &(Server::GetInstance());
+    Server * server           = &(Server::GetInstance());
+    chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(peerFabricIndex);
+    if (fabric == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Did not find fabric for index %d", peerFabricIndex);
+        return;
+    }
+
     chip::DeviceProxyInitParams initParams = {
         .sessionManager = &(server->GetSecureSessionManager()),
         .exchangeMgr    = &(server->GetExchangeManager()),
         .idAllocator    = &(server->GetSessionIDAllocator()),
-        .fabricInfo     = server->GetFabricTable().FindFabricWithIndex(providerFabricIndex),
+        .fabricInfo     = fabric,
         // TODO: Determine where this should be instantiated
         .imDelegate = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
     };
 
     chip::OperationalDeviceProxy * operationalDeviceProxy =
-        new chip::OperationalDeviceProxy(initParams, PeerId().SetNodeId(providerNodeId));
+        chip::Platform::New<chip::OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(peerNodeId));
+    if (operationalDeviceProxy == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Failed in creating an instance of OperationalDeviceProxy");
+        return;
+    }
+
     server->SetOperationalDeviceProxy(operationalDeviceProxy);
 
     // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node ID
@@ -278,8 +291,7 @@ void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::Fabri
     operationalDeviceProxy->GetMRPIntervals(idleInterval, activeInterval);
     operationalDeviceProxy->UpdateDeviceData(addr, idleInterval, activeInterval);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
+    CHIP_ERROR err = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot establish connection to peer device: %" CHIP_ERROR_FORMAT, err.Format());

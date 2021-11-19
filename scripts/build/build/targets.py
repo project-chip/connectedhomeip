@@ -105,13 +105,17 @@ def HostTargets():
         targets.append(target.Extend('arm64', board=HostBoard.ARM64))
 
     app_targets = []
+
+    # RPC console compilation only for native
+    app_targets.append(
+        targets[0].Extend('rpc-console', app=HostApp.RPC_CONSOLE))
+
     for target in targets:
         app_targets.append(target.Extend(
             'all-clusters', app=HostApp.ALL_CLUSTERS))
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
-        app_targets.append(target.Extend(
-            'rpc-console', app=HostApp.RPC_CONSOLE))
+        app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
 
     for target in app_targets:
         yield target
@@ -126,6 +130,7 @@ def Esp32Targets():
     yield esp32_target.Extend('m5stack-all-clusters-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
     yield esp32_target.Extend('m5stack-all-clusters-rpc', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True)
     yield esp32_target.Extend('m5stack-all-clusters-rpc-ipv6only', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS, enable_rpcs=True, enable_ipv4=False)
+
     yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
 
     devkitc = esp32_target.Extend('devkitc', board=Esp32Board.DevKitC)

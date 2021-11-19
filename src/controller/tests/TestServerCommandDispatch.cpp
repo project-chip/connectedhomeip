@@ -114,10 +114,18 @@ public:
 private:
 };
 
+// We want to send a TestSimpleArgumentRequest::Type, but get a
+// TestStructArrayArgumentResponse in return, so need to shadow the actual
+// ResponseType that TestSimpleArgumentRequest has.
+struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+{
+    using ResponseType = TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType;
+};
+
 void TestCommandInteraction::TestNoHandler(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    TestCluster::Commands::TestSimpleArgumentRequest::Type request;
+    FakeRequest request;
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     request.arg1 = true;
@@ -142,8 +150,8 @@ void TestCommandInteraction::TestNoHandler(nlTestSuite * apSuite, void * apConte
 
     ctx.EnableAsyncDispatch();
 
-    chip::Controller::InvokeCommandRequest<TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
+    chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+                                           onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -176,7 +184,7 @@ DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    TestCluster::Commands::TestSimpleArgumentRequest::Type request;
+    FakeRequest request;
     auto sessionHandle = ctx.GetSessionBobToAlice();
     TestClusterCommandHandler commandHandler;
 
@@ -220,8 +228,8 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     responseDirective = kSendDataResponse;
 
-    chip::Controller::InvokeCommandRequest<TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
+    chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+                                           onFailureCb);
 
     ctx.DrainAndServiceIO();
 

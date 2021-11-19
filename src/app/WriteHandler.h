@@ -109,7 +109,9 @@ private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;
-    State mState = State::Uninitialized;
+    State mState           = State::Uninitialized;
+    bool mIsTimedRequest   = false;
+    bool mIsFabricFiltered = false;
 };
 } // namespace app
 } // namespace chip

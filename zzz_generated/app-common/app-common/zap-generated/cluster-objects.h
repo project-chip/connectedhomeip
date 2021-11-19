@@ -28,6 +28,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
+#include <app/data-model/NullObject.h>
 #include <app/util/basic-types.h>
 #include <lib/support/BitFlags.h>
 #include <protocols/interaction_model/Constants.h>
@@ -42,8 +43,9 @@ namespace Attributes {
 namespace MainsVoltage {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltage::Id; }
@@ -52,8 +54,9 @@ struct TypeInfo
 namespace MainsFrequency {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsFrequency::Id; }
@@ -62,8 +65,9 @@ struct TypeInfo
 namespace MainsAlarmMask {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsAlarmMask::Id; }
@@ -72,8 +76,9 @@ struct TypeInfo
 namespace MainsVoltageMinThreshold {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltageMinThreshold::Id; }
@@ -82,8 +87,9 @@ struct TypeInfo
 namespace MainsVoltageMaxThreshold {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltageMaxThreshold::Id; }
@@ -92,8 +98,9 @@ struct TypeInfo
 namespace MainsVoltageDwellTrip {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltageDwellTrip::Id; }
@@ -102,8 +109,9 @@ struct TypeInfo
 namespace BatteryVoltage {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltage::Id; }
@@ -112,8 +120,9 @@ struct TypeInfo
 namespace BatteryPercentageRemaining {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageRemaining::Id; }
@@ -122,8 +131,9 @@ struct TypeInfo
 namespace BatteryManufacturer {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryManufacturer::Id; }
@@ -132,8 +142,9 @@ struct TypeInfo
 namespace BatterySize {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatterySize::Id; }
@@ -142,8 +153,9 @@ struct TypeInfo
 namespace BatteryAhrRating {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAhrRating::Id; }
@@ -152,8 +164,9 @@ struct TypeInfo
 namespace BatteryQuantity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryQuantity::Id; }
@@ -162,8 +175,9 @@ struct TypeInfo
 namespace BatteryRatedVoltage {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryRatedVoltage::Id; }
@@ -172,8 +186,9 @@ struct TypeInfo
 namespace BatteryAlarmMask {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAlarmMask::Id; }
@@ -182,8 +197,9 @@ struct TypeInfo
 namespace BatteryVoltageMinThreshold {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageMinThreshold::Id; }
@@ -192,8 +208,9 @@ struct TypeInfo
 namespace BatteryVoltageThreshold1 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageThreshold1::Id; }
@@ -202,8 +219,9 @@ struct TypeInfo
 namespace BatteryVoltageThreshold2 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageThreshold2::Id; }
@@ -212,8 +230,9 @@ struct TypeInfo
 namespace BatteryVoltageThreshold3 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageThreshold3::Id; }
@@ -222,8 +241,9 @@ struct TypeInfo
 namespace BatteryPercentageMinThreshold {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageMinThreshold::Id; }
@@ -232,8 +252,9 @@ struct TypeInfo
 namespace BatteryPercentageThreshold1 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageThreshold1::Id; }
@@ -242,8 +263,9 @@ struct TypeInfo
 namespace BatteryPercentageThreshold2 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageThreshold2::Id; }
@@ -252,8 +274,9 @@ struct TypeInfo
 namespace BatteryPercentageThreshold3 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageThreshold3::Id; }
@@ -262,8 +285,9 @@ struct TypeInfo
 namespace BatteryAlarmState {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAlarmState::Id; }
@@ -272,8 +296,9 @@ struct TypeInfo
 namespace Battery2Voltage {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Voltage::Id; }
@@ -282,8 +307,9 @@ struct TypeInfo
 namespace Battery2PercentageRemaining {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageRemaining::Id; }
@@ -292,8 +318,9 @@ struct TypeInfo
 namespace Battery2Manufacturer {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Manufacturer::Id; }
@@ -302,8 +329,9 @@ struct TypeInfo
 namespace Battery2Size {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Size::Id; }
@@ -312,8 +340,9 @@ struct TypeInfo
 namespace Battery2AhrRating {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AhrRating::Id; }
@@ -322,8 +351,9 @@ struct TypeInfo
 namespace Battery2Quantity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Quantity::Id; }
@@ -332,8 +362,9 @@ struct TypeInfo
 namespace Battery2RatedVoltage {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2RatedVoltage::Id; }
@@ -342,8 +373,9 @@ struct TypeInfo
 namespace Battery2AlarmMask {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AlarmMask::Id; }
@@ -352,8 +384,9 @@ struct TypeInfo
 namespace Battery2VoltageMinThreshold {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageMinThreshold::Id; }
@@ -362,8 +395,9 @@ struct TypeInfo
 namespace Battery2VoltageThreshold1 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageThreshold1::Id; }
@@ -372,8 +406,9 @@ struct TypeInfo
 namespace Battery2VoltageThreshold2 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageThreshold2::Id; }
@@ -382,8 +417,9 @@ struct TypeInfo
 namespace Battery2VoltageThreshold3 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageThreshold3::Id; }
@@ -392,8 +428,9 @@ struct TypeInfo
 namespace Battery2PercentageMinThreshold {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageMinThreshold::Id; }
@@ -402,8 +439,9 @@ struct TypeInfo
 namespace Battery2PercentageThreshold1 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageThreshold1::Id; }
@@ -412,8 +450,9 @@ struct TypeInfo
 namespace Battery2PercentageThreshold2 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageThreshold2::Id; }
@@ -422,8 +461,9 @@ struct TypeInfo
 namespace Battery2PercentageThreshold3 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageThreshold3::Id; }
@@ -432,8 +472,9 @@ struct TypeInfo
 namespace Battery2AlarmState {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AlarmState::Id; }
@@ -442,8 +483,9 @@ struct TypeInfo
 namespace Battery3Voltage {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Voltage::Id; }
@@ -452,8 +494,9 @@ struct TypeInfo
 namespace Battery3PercentageRemaining {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageRemaining::Id; }
@@ -462,8 +505,9 @@ struct TypeInfo
 namespace Battery3Manufacturer {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Manufacturer::Id; }
@@ -472,8 +516,9 @@ struct TypeInfo
 namespace Battery3Size {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Size::Id; }
@@ -482,8 +527,9 @@ struct TypeInfo
 namespace Battery3AhrRating {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AhrRating::Id; }
@@ -492,8 +538,9 @@ struct TypeInfo
 namespace Battery3Quantity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Quantity::Id; }
@@ -502,8 +549,9 @@ struct TypeInfo
 namespace Battery3RatedVoltage {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3RatedVoltage::Id; }
@@ -512,8 +560,9 @@ struct TypeInfo
 namespace Battery3AlarmMask {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AlarmMask::Id; }
@@ -522,8 +571,9 @@ struct TypeInfo
 namespace Battery3VoltageMinThreshold {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageMinThreshold::Id; }
@@ -532,8 +582,9 @@ struct TypeInfo
 namespace Battery3VoltageThreshold1 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageThreshold1::Id; }
@@ -542,8 +593,9 @@ struct TypeInfo
 namespace Battery3VoltageThreshold2 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageThreshold2::Id; }
@@ -552,8 +604,9 @@ struct TypeInfo
 namespace Battery3VoltageThreshold3 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageThreshold3::Id; }
@@ -562,8 +615,9 @@ struct TypeInfo
 namespace Battery3PercentageMinThreshold {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageMinThreshold::Id; }
@@ -572,8 +626,9 @@ struct TypeInfo
 namespace Battery3PercentageThreshold1 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageThreshold1::Id; }
@@ -582,8 +637,9 @@ struct TypeInfo
 namespace Battery3PercentageThreshold2 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageThreshold2::Id; }
@@ -592,8 +648,9 @@ struct TypeInfo
 namespace Battery3PercentageThreshold3 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageThreshold3::Id; }
@@ -602,8 +659,9 @@ struct TypeInfo
 namespace Battery3AlarmState {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AlarmState::Id; }
@@ -612,8 +670,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -622,8 +681,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -637,8 +697,9 @@ namespace Attributes {
 namespace CurrentTemperature {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTemperature::Id; }
@@ -647,8 +708,9 @@ struct TypeInfo
 namespace MinTempExperienced {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinTempExperienced::Id; }
@@ -657,8 +719,9 @@ struct TypeInfo
 namespace MaxTempExperienced {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxTempExperienced::Id; }
@@ -667,8 +730,9 @@ struct TypeInfo
 namespace OverTempTotalDwell {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverTempTotalDwell::Id; }
@@ -677,8 +741,9 @@ struct TypeInfo
 namespace DeviceTempAlarmMask {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DeviceTempAlarmMask::Id; }
@@ -687,8 +752,9 @@ struct TypeInfo
 namespace LowTempThreshold {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LowTempThreshold::Id; }
@@ -697,8 +763,9 @@ struct TypeInfo
 namespace HighTempThreshold {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HighTempThreshold::Id; }
@@ -707,8 +774,9 @@ struct TypeInfo
 namespace LowTempDwellTripPoint {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LowTempDwellTripPoint::Id; }
@@ -717,8 +785,9 @@ struct TypeInfo
 namespace HighTempDwellTripPoint {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HighTempDwellTripPoint::Id; }
@@ -727,8 +796,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -737,8 +807,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -792,6 +863,31 @@ using IdentifyIdentifyType                 = EmberAfIdentifyIdentifyType;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Identify {
+struct Type;
+struct DecodableType;
+} // namespace Identify
+
+namespace IdentifyQueryResponse {
+struct Type;
+struct DecodableType;
+} // namespace IdentifyQueryResponse
+
+namespace IdentifyQuery {
+struct Type;
+struct DecodableType;
+} // namespace IdentifyQuery
+
+namespace TriggerEffect {
+struct Type;
+struct DecodableType;
+} // namespace TriggerEffect
+
+} // namespace Commands
+
+namespace Commands {
 namespace Identify {
 enum class Fields
 {
@@ -808,6 +904,8 @@ public:
     uint16_t identifyTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -836,6 +934,8 @@ public:
     uint16_t timeout;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -861,6 +961,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType;
 };
 
 struct DecodableType
@@ -890,6 +992,8 @@ public:
     IdentifyEffectVariant effectVariant;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -909,8 +1013,9 @@ namespace Attributes {
 namespace IdentifyTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IdentifyTime::Id; }
@@ -919,8 +1024,9 @@ struct TypeInfo
 namespace IdentifyType {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IdentifyType::Id; }
@@ -929,8 +1035,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -939,8 +1046,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -949,6 +1057,61 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Identify
 namespace Groups {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace AddGroup {
+struct Type;
+struct DecodableType;
+} // namespace AddGroup
+
+namespace AddGroupResponse {
+struct Type;
+struct DecodableType;
+} // namespace AddGroupResponse
+
+namespace ViewGroup {
+struct Type;
+struct DecodableType;
+} // namespace ViewGroup
+
+namespace ViewGroupResponse {
+struct Type;
+struct DecodableType;
+} // namespace ViewGroupResponse
+
+namespace GetGroupMembership {
+struct Type;
+struct DecodableType;
+} // namespace GetGroupMembership
+
+namespace GetGroupMembershipResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetGroupMembershipResponse
+
+namespace RemoveGroup {
+struct Type;
+struct DecodableType;
+} // namespace RemoveGroup
+
+namespace RemoveGroupResponse {
+struct Type;
+struct DecodableType;
+} // namespace RemoveGroupResponse
+
+namespace RemoveAllGroups {
+struct Type;
+struct DecodableType;
+} // namespace RemoveAllGroups
+
+namespace AddGroupIfIdentifying {
+struct Type;
+struct DecodableType;
+} // namespace AddGroupIfIdentifying
+
+} // namespace Commands
 
 namespace Commands {
 namespace AddGroup {
@@ -969,6 +1132,8 @@ public:
     chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Groups::Commands::AddGroupResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1000,6 +1165,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1029,6 +1196,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1061,6 +1230,8 @@ public:
     chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1093,6 +1264,8 @@ public:
     DataModel::List<const uint16_t> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1126,6 +1299,8 @@ public:
     DataModel::List<const uint16_t> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1156,6 +1331,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Groups::Commands::RemoveGroupResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1186,6 +1363,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1212,6 +1391,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1241,6 +1422,8 @@ public:
     chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1260,8 +1443,9 @@ namespace Attributes {
 namespace NameSupport {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
@@ -1270,8 +1454,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -1280,8 +1465,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -1294,7 +1480,7 @@ namespace Scenes {
 // Bitmap for ScenesCopyMode
 enum class ScenesCopyMode : uint8_t
 {
-    kCopyAllScenes = 0,
+    kCopyAllScenes = 0x1,
 };
 
 namespace Structs {
@@ -1323,6 +1509,106 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace AddScene {
+struct Type;
+struct DecodableType;
+} // namespace AddScene
+
+namespace AddSceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace AddSceneResponse
+
+namespace ViewScene {
+struct Type;
+struct DecodableType;
+} // namespace ViewScene
+
+namespace ViewSceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace ViewSceneResponse
+
+namespace RemoveScene {
+struct Type;
+struct DecodableType;
+} // namespace RemoveScene
+
+namespace RemoveSceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace RemoveSceneResponse
+
+namespace RemoveAllScenes {
+struct Type;
+struct DecodableType;
+} // namespace RemoveAllScenes
+
+namespace RemoveAllScenesResponse {
+struct Type;
+struct DecodableType;
+} // namespace RemoveAllScenesResponse
+
+namespace StoreScene {
+struct Type;
+struct DecodableType;
+} // namespace StoreScene
+
+namespace StoreSceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace StoreSceneResponse
+
+namespace RecallScene {
+struct Type;
+struct DecodableType;
+} // namespace RecallScene
+
+namespace GetSceneMembership {
+struct Type;
+struct DecodableType;
+} // namespace GetSceneMembership
+
+namespace GetSceneMembershipResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetSceneMembershipResponse
+
+namespace EnhancedAddScene {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedAddScene
+
+namespace EnhancedAddSceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedAddSceneResponse
+
+namespace EnhancedViewScene {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedViewScene
+
+namespace EnhancedViewSceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedViewSceneResponse
+
+namespace CopyScene {
+struct Type;
+struct DecodableType;
+} // namespace CopyScene
+
+namespace CopySceneResponse {
+struct Type;
+struct DecodableType;
+} // namespace CopySceneResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace AddScene {
 enum class Fields
 {
@@ -1347,6 +1633,8 @@ public:
     DataModel::List<const Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::AddSceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1383,6 +1671,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1415,6 +1705,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::ViewSceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1454,6 +1746,8 @@ public:
     DataModel::List<const Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1489,6 +1783,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1522,6 +1818,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1552,6 +1850,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1582,6 +1882,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1613,6 +1915,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::StoreSceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1646,6 +1950,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1680,6 +1986,8 @@ public:
     uint16_t transitionTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1710,6 +2018,8 @@ public:
     uint16_t groupId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1746,6 +2056,8 @@ public:
     DataModel::List<const uint8_t> sceneList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1786,6 +2098,8 @@ public:
     DataModel::List<const Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1822,6 +2136,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1854,6 +2170,8 @@ public:
     uint8_t sceneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1893,6 +2211,8 @@ public:
     DataModel::List<const Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1934,6 +2254,8 @@ public:
     uint8_t sceneIdTo;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Scenes::Commands::CopySceneResponse::DecodableType;
 };
 
 struct DecodableType
@@ -1970,6 +2292,8 @@ public:
     uint8_t sceneIdFrom;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -1990,8 +2314,9 @@ namespace Attributes {
 namespace SceneCount {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SceneCount::Id; }
@@ -2000,8 +2325,9 @@ struct TypeInfo
 namespace CurrentScene {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentScene::Id; }
@@ -2010,8 +2336,9 @@ struct TypeInfo
 namespace CurrentGroup {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentGroup::Id; }
@@ -2020,8 +2347,9 @@ struct TypeInfo
 namespace SceneValid {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SceneValid::Id; }
@@ -2030,8 +2358,9 @@ struct TypeInfo
 namespace NameSupport {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
@@ -2040,8 +2369,9 @@ struct TypeInfo
 namespace LastConfiguredBy {
 struct TypeInfo
 {
-    using Type          = chip::NodeId;
-    using DecodableType = chip::NodeId;
+    using Type             = chip::NodeId;
+    using DecodableType    = chip::NodeId;
+    using DecodableArgType = chip::NodeId;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LastConfiguredBy::Id; }
@@ -2050,8 +2380,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -2060,8 +2391,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -2110,8 +2442,68 @@ using OnOffEffectIdentifier                = EmberAfOnOffEffectIdentifier;
 // Bitmap for OnOffControl
 enum class OnOffControl : uint8_t
 {
-    kAcceptOnlyWhenOn = 0,
+    kAcceptOnlyWhenOn = 0x1,
 };
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Off {
+struct Type;
+struct DecodableType;
+} // namespace Off
+
+namespace SampleMfgSpecificOffWithTransition {
+struct Type;
+struct DecodableType;
+} // namespace SampleMfgSpecificOffWithTransition
+
+namespace On {
+struct Type;
+struct DecodableType;
+} // namespace On
+
+namespace SampleMfgSpecificOnWithTransition {
+struct Type;
+struct DecodableType;
+} // namespace SampleMfgSpecificOnWithTransition
+
+namespace SampleMfgSpecificOnWithTransition2 {
+struct Type;
+struct DecodableType;
+} // namespace SampleMfgSpecificOnWithTransition2
+
+namespace Toggle {
+struct Type;
+struct DecodableType;
+} // namespace Toggle
+
+namespace SampleMfgSpecificToggleWithTransition {
+struct Type;
+struct DecodableType;
+} // namespace SampleMfgSpecificToggleWithTransition
+
+namespace SampleMfgSpecificToggleWithTransition2 {
+struct Type;
+struct DecodableType;
+} // namespace SampleMfgSpecificToggleWithTransition2
+
+namespace OffWithEffect {
+struct Type;
+struct DecodableType;
+} // namespace OffWithEffect
+
+namespace OnWithRecallGlobalScene {
+struct Type;
+struct DecodableType;
+} // namespace OnWithRecallGlobalScene
+
+namespace OnWithTimedOff {
+struct Type;
+struct DecodableType;
+} // namespace OnWithTimedOff
+
+} // namespace Commands
 
 namespace Commands {
 namespace Off {
@@ -2127,6 +2519,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2151,6 +2545,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2175,6 +2571,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2199,6 +2597,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2223,6 +2623,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2247,6 +2649,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2271,6 +2675,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2295,6 +2701,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2324,6 +2732,8 @@ public:
     OnOffDelayedAllOffEffectVariant effectVariant;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2350,6 +2760,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2381,6 +2793,8 @@ public:
     uint16_t offWaitTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2401,8 +2815,9 @@ namespace Attributes {
 namespace OnOff {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnOff::Id; }
@@ -2411,8 +2826,9 @@ struct TypeInfo
 namespace SampleMfgSpecificAttribute0x00000x1002 {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00000x1002::Id; }
@@ -2421,8 +2837,9 @@ struct TypeInfo
 namespace SampleMfgSpecificAttribute0x00000x1049 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00000x1049::Id; }
@@ -2431,8 +2848,9 @@ struct TypeInfo
 namespace SampleMfgSpecificAttribute0x00010x1002 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00010x1002::Id; }
@@ -2441,8 +2859,9 @@ struct TypeInfo
 namespace SampleMfgSpecificAttribute0x00010x1040 {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00010x1040::Id; }
@@ -2451,8 +2870,9 @@ struct TypeInfo
 namespace GlobalSceneControl {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::GlobalSceneControl::Id; }
@@ -2461,8 +2881,9 @@ struct TypeInfo
 namespace OnTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnTime::Id; }
@@ -2471,8 +2892,9 @@ struct TypeInfo
 namespace OffWaitTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OffWaitTime::Id; }
@@ -2481,8 +2903,9 @@ struct TypeInfo
 namespace StartUpOnOff {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpOnOff::Id; }
@@ -2491,8 +2914,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -2501,8 +2925,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -2516,8 +2941,9 @@ namespace Attributes {
 namespace SwitchType {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SwitchType::Id; }
@@ -2526,8 +2952,9 @@ struct TypeInfo
 namespace SwitchActions {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SwitchActions::Id; }
@@ -2536,8 +2963,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -2546,8 +2974,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -2582,6 +3011,51 @@ using StepMode                             = EmberAfStepMode;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace MoveToLevel {
+struct Type;
+struct DecodableType;
+} // namespace MoveToLevel
+
+namespace Move {
+struct Type;
+struct DecodableType;
+} // namespace Move
+
+namespace Step {
+struct Type;
+struct DecodableType;
+} // namespace Step
+
+namespace Stop {
+struct Type;
+struct DecodableType;
+} // namespace Stop
+
+namespace MoveToLevelWithOnOff {
+struct Type;
+struct DecodableType;
+} // namespace MoveToLevelWithOnOff
+
+namespace MoveWithOnOff {
+struct Type;
+struct DecodableType;
+} // namespace MoveWithOnOff
+
+namespace StepWithOnOff {
+struct Type;
+struct DecodableType;
+} // namespace StepWithOnOff
+
+namespace StopWithOnOff {
+struct Type;
+struct DecodableType;
+} // namespace StopWithOnOff
+
+} // namespace Commands
+
+namespace Commands {
 namespace MoveToLevel {
 enum class Fields
 {
@@ -2604,6 +3078,8 @@ public:
     uint8_t optionOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2641,6 +3117,8 @@ public:
     uint8_t optionOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2680,6 +3158,8 @@ public:
     uint8_t optionOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2714,6 +3194,8 @@ public:
     uint8_t optionOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2745,6 +3227,8 @@ public:
     uint16_t transitionTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2776,6 +3260,8 @@ public:
     uint8_t rate;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2809,6 +3295,8 @@ public:
     uint16_t transitionTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2836,6 +3324,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -2853,8 +3343,9 @@ namespace Attributes {
 namespace CurrentLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentLevel::Id; }
@@ -2863,8 +3354,9 @@ struct TypeInfo
 namespace RemainingTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
@@ -2873,8 +3365,9 @@ struct TypeInfo
 namespace MinLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinLevel::Id; }
@@ -2883,8 +3376,9 @@ struct TypeInfo
 namespace MaxLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxLevel::Id; }
@@ -2893,8 +3387,9 @@ struct TypeInfo
 namespace CurrentFrequency {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFrequency::Id; }
@@ -2903,8 +3398,9 @@ struct TypeInfo
 namespace MinFrequency {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinFrequency::Id; }
@@ -2913,8 +3409,9 @@ struct TypeInfo
 namespace MaxFrequency {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxFrequency::Id; }
@@ -2923,8 +3420,9 @@ struct TypeInfo
 namespace Options {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Options::Id; }
@@ -2933,8 +3431,9 @@ struct TypeInfo
 namespace OnOffTransitionTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnOffTransitionTime::Id; }
@@ -2943,8 +3442,9 @@ struct TypeInfo
 namespace OnLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnLevel::Id; }
@@ -2953,8 +3453,9 @@ struct TypeInfo
 namespace OnTransitionTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnTransitionTime::Id; }
@@ -2963,8 +3464,9 @@ struct TypeInfo
 namespace OffTransitionTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OffTransitionTime::Id; }
@@ -2973,8 +3475,9 @@ struct TypeInfo
 namespace DefaultMoveRate {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultMoveRate::Id; }
@@ -2983,8 +3486,9 @@ struct TypeInfo
 namespace StartUpCurrentLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpCurrentLevel::Id; }
@@ -2993,8 +3497,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -3003,8 +3508,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -3013,6 +3519,41 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace LevelControl
 namespace Alarms {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetAlarm {
+struct Type;
+struct DecodableType;
+} // namespace ResetAlarm
+
+namespace Alarm {
+struct Type;
+struct DecodableType;
+} // namespace Alarm
+
+namespace ResetAllAlarms {
+struct Type;
+struct DecodableType;
+} // namespace ResetAllAlarms
+
+namespace GetAlarmResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetAlarmResponse
+
+namespace GetAlarm {
+struct Type;
+struct DecodableType;
+} // namespace GetAlarm
+
+namespace ResetAlarmLog {
+struct Type;
+struct DecodableType;
+} // namespace ResetAlarmLog
+
+} // namespace Commands
 
 namespace Commands {
 namespace ResetAlarm {
@@ -3033,6 +3574,8 @@ public:
     chip::ClusterId clusterId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3064,6 +3607,8 @@ public:
     chip::ClusterId clusterId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3090,6 +3635,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3123,6 +3670,8 @@ public:
     uint32_t timeStamp;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3151,6 +3700,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::Alarms::Commands::GetAlarmResponse::DecodableType;
 };
 
 struct DecodableType
@@ -3175,6 +3726,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3192,8 +3745,9 @@ namespace Attributes {
 namespace AlarmCount {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmCount::Id; }
@@ -3202,8 +3756,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -3212,8 +3767,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -3227,8 +3783,9 @@ namespace Attributes {
 namespace Time {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Time::Id; }
@@ -3237,8 +3794,9 @@ struct TypeInfo
 namespace TimeStatus {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TimeStatus::Id; }
@@ -3247,8 +3805,9 @@ struct TypeInfo
 namespace TimeZone {
 struct TypeInfo
 {
-    using Type          = int32_t;
-    using DecodableType = int32_t;
+    using Type             = int32_t;
+    using DecodableType    = int32_t;
+    using DecodableArgType = int32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TimeZone::Id; }
@@ -3257,8 +3816,9 @@ struct TypeInfo
 namespace DstStart {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DstStart::Id; }
@@ -3267,8 +3827,9 @@ struct TypeInfo
 namespace DstEnd {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DstEnd::Id; }
@@ -3277,8 +3838,9 @@ struct TypeInfo
 namespace DstShift {
 struct TypeInfo
 {
-    using Type          = int32_t;
-    using DecodableType = int32_t;
+    using Type             = int32_t;
+    using DecodableType    = int32_t;
+    using DecodableArgType = int32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DstShift::Id; }
@@ -3287,8 +3849,9 @@ struct TypeInfo
 namespace StandardTime {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StandardTime::Id; }
@@ -3297,8 +3860,9 @@ struct TypeInfo
 namespace LocalTime {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalTime::Id; }
@@ -3307,8 +3871,9 @@ struct TypeInfo
 namespace LastSetTime {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LastSetTime::Id; }
@@ -3317,8 +3882,9 @@ struct TypeInfo
 namespace ValidUntilTime {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ValidUntilTime::Id; }
@@ -3327,8 +3893,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -3337,8 +3904,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -3352,8 +3920,9 @@ namespace Attributes {
 namespace ActiveText {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveText::Id; }
@@ -3362,8 +3931,9 @@ struct TypeInfo
 namespace Description {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
@@ -3372,8 +3942,9 @@ struct TypeInfo
 namespace InactiveText {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InactiveText::Id; }
@@ -3382,8 +3953,9 @@ struct TypeInfo
 namespace OutOfService {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OutOfService::Id; }
@@ -3392,8 +3964,9 @@ struct TypeInfo
 namespace Polarity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Polarity::Id; }
@@ -3402,8 +3975,9 @@ struct TypeInfo
 namespace PresentValue {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PresentValue::Id; }
@@ -3412,8 +3986,9 @@ struct TypeInfo
 namespace Reliability {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Reliability::Id; }
@@ -3422,8 +3997,9 @@ struct TypeInfo
 namespace StatusFlags {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StatusFlags::Id; }
@@ -3432,8 +4008,9 @@ struct TypeInfo
 namespace ApplicationType {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationType::Id; }
@@ -3442,8 +4019,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -3452,8 +4030,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -3539,6 +4118,116 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace PowerProfileRequest {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileRequest
+
+namespace PowerProfileNotification {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileNotification
+
+namespace PowerProfileStateRequest {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileStateRequest
+
+namespace PowerProfileResponse {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileResponse
+
+namespace GetPowerProfilePriceResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetPowerProfilePriceResponse
+
+namespace PowerProfileStateResponse {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileStateResponse
+
+namespace GetOverallSchedulePriceResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetOverallSchedulePriceResponse
+
+namespace GetPowerProfilePrice {
+struct Type;
+struct DecodableType;
+} // namespace GetPowerProfilePrice
+
+namespace EnergyPhasesScheduleNotification {
+struct Type;
+struct DecodableType;
+} // namespace EnergyPhasesScheduleNotification
+
+namespace PowerProfilesStateNotification {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfilesStateNotification
+
+namespace EnergyPhasesScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace EnergyPhasesScheduleResponse
+
+namespace GetOverallSchedulePrice {
+struct Type;
+struct DecodableType;
+} // namespace GetOverallSchedulePrice
+
+namespace PowerProfileScheduleConstraintsRequest {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileScheduleConstraintsRequest
+
+namespace EnergyPhasesScheduleRequest {
+struct Type;
+struct DecodableType;
+} // namespace EnergyPhasesScheduleRequest
+
+namespace EnergyPhasesScheduleStateRequest {
+struct Type;
+struct DecodableType;
+} // namespace EnergyPhasesScheduleStateRequest
+
+namespace EnergyPhasesScheduleStateResponse {
+struct Type;
+struct DecodableType;
+} // namespace EnergyPhasesScheduleStateResponse
+
+namespace GetPowerProfilePriceExtendedResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetPowerProfilePriceExtendedResponse
+
+namespace EnergyPhasesScheduleStateNotification {
+struct Type;
+struct DecodableType;
+} // namespace EnergyPhasesScheduleStateNotification
+
+namespace PowerProfileScheduleConstraintsNotification {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileScheduleConstraintsNotification
+
+namespace PowerProfileScheduleConstraintsResponse {
+struct Type;
+struct DecodableType;
+} // namespace PowerProfileScheduleConstraintsResponse
+
+namespace GetPowerProfilePriceExtended {
+struct Type;
+struct DecodableType;
+} // namespace GetPowerProfilePriceExtended
+
+} // namespace Commands
+
+namespace Commands {
 namespace PowerProfileRequest {
 enum class Fields
 {
@@ -3555,6 +4244,8 @@ public:
     uint8_t powerProfileId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::PowerProfileResponse::DecodableType;
 };
 
 struct DecodableType
@@ -3589,6 +4280,8 @@ public:
     DataModel::List<const Structs::TransferredPhase::Type> transferredPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3617,6 +4310,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::PowerProfileStateResponse::DecodableType;
 };
 
 struct DecodableType
@@ -3650,6 +4345,8 @@ public:
     DataModel::List<const Structs::TransferredPhase::Type> transferredPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3687,6 +4384,8 @@ public:
     uint8_t priceTrailingDigit;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3720,6 +4419,8 @@ public:
     DataModel::List<const Structs::PowerProfileRecord::Type> powerProfileRecords;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3753,6 +4454,8 @@ public:
     uint8_t priceTrailingDigit;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3783,6 +4486,8 @@ public:
     uint8_t powerProfileId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::GetPowerProfilePriceResponse::DecodableType;
 };
 
 struct DecodableType
@@ -3815,6 +4520,8 @@ public:
     DataModel::List<const Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3847,6 +4554,8 @@ public:
     DataModel::List<const Structs::PowerProfileRecord::Type> powerProfileRecords;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3880,6 +4589,8 @@ public:
     DataModel::List<const Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -3907,6 +4618,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::GetOverallSchedulePriceResponse::DecodableType;
 };
 
 struct DecodableType
@@ -3934,6 +4647,8 @@ public:
     uint8_t powerProfileId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::PowerProfileScheduleConstraintsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -3962,6 +4677,8 @@ public:
     uint8_t powerProfileId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::EnergyPhasesScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -3990,6 +4707,8 @@ public:
     uint8_t powerProfileId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::EnergyPhasesScheduleStateResponse::DecodableType;
 };
 
 struct DecodableType
@@ -4022,6 +4741,8 @@ public:
     DataModel::List<const Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4058,6 +4779,8 @@ public:
     uint8_t priceTrailingDigit;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4093,6 +4816,8 @@ public:
     DataModel::List<const Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4127,6 +4852,8 @@ public:
     uint16_t stopBefore;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4161,6 +4888,8 @@ public:
     uint16_t stopBefore;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4195,6 +4924,8 @@ public:
     uint16_t powerProfileStartTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PowerProfile::Commands::GetPowerProfilePriceExtendedResponse::DecodableType;
 };
 
 struct DecodableType
@@ -4215,8 +4946,9 @@ namespace Attributes {
 namespace TotalProfileNum {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalProfileNum::Id; }
@@ -4225,8 +4957,9 @@ struct TypeInfo
 namespace MultipleScheduling {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MultipleScheduling::Id; }
@@ -4235,8 +4968,9 @@ struct TypeInfo
 namespace EnergyFormatting {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnergyFormatting::Id; }
@@ -4245,8 +4979,9 @@ struct TypeInfo
 namespace EnergyRemote {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnergyRemote::Id; }
@@ -4255,8 +4990,9 @@ struct TypeInfo
 namespace ScheduleMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScheduleMode::Id; }
@@ -4265,8 +5001,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -4275,8 +5012,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -4350,9 +5088,54 @@ using WarningEvent                         = EmberAfWarningEvent;
 // Bitmap for RemoteEnableFlagsAndDeviceStatus2
 enum class RemoteEnableFlagsAndDeviceStatus2 : uint8_t
 {
-    kRemoteEnableFlags      = 0,
-    kDeviceStatus2Structure = 4,
+    kRemoteEnableFlags      = 0xF,
+    kDeviceStatus2Structure = 0xF0,
 };
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ExecutionOfACommand {
+struct Type;
+struct DecodableType;
+} // namespace ExecutionOfACommand
+
+namespace SignalStateResponse {
+struct Type;
+struct DecodableType;
+} // namespace SignalStateResponse
+
+namespace SignalState {
+struct Type;
+struct DecodableType;
+} // namespace SignalState
+
+namespace SignalStateNotification {
+struct Type;
+struct DecodableType;
+} // namespace SignalStateNotification
+
+namespace WriteFunctions {
+struct Type;
+struct DecodableType;
+} // namespace WriteFunctions
+
+namespace OverloadPauseResume {
+struct Type;
+struct DecodableType;
+} // namespace OverloadPauseResume
+
+namespace OverloadPause {
+struct Type;
+struct DecodableType;
+} // namespace OverloadPause
+
+namespace OverloadWarning {
+struct Type;
+struct DecodableType;
+} // namespace OverloadWarning
+
+} // namespace Commands
 
 namespace Commands {
 namespace ExecutionOfACommand {
@@ -4371,6 +5154,8 @@ public:
     CommandIdentification commandId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4403,6 +5188,8 @@ public:
     ApplianceStatus applianceStatus2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4430,6 +5217,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ApplianceControl::Commands::SignalStateResponse::DecodableType;
 };
 
 struct DecodableType
@@ -4461,6 +5250,8 @@ public:
     ApplianceStatus applianceStatus2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4495,6 +5286,8 @@ public:
     DataModel::List<const uint8_t> functionData;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4522,6 +5315,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4546,6 +5341,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4573,6 +5370,8 @@ public:
     WarningEvent warningEvent;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4591,8 +5390,9 @@ namespace Attributes {
 namespace StartTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartTime::Id; }
@@ -4601,8 +5401,9 @@ struct TypeInfo
 namespace FinishTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FinishTime::Id; }
@@ -4611,8 +5412,9 @@ struct TypeInfo
 namespace RemainingTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
@@ -4621,8 +5423,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -4631,8 +5434,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -4669,8 +5473,9 @@ namespace Attributes {
 namespace DeviceList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::DeviceType::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::DeviceType::DecodableType>;
+    using Type             = DataModel::List<const Structs::DeviceType::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::DeviceType::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::DeviceType::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DeviceList::Id; }
@@ -4679,8 +5484,9 @@ struct TypeInfo
 namespace ServerList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const chip::ClusterId>;
-    using DecodableType = DataModel::DecodableList<chip::ClusterId>;
+    using Type             = DataModel::List<const chip::ClusterId>;
+    using DecodableType    = DataModel::DecodableList<chip::ClusterId>;
+    using DecodableArgType = const DataModel::DecodableList<chip::ClusterId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ServerList::Id; }
@@ -4689,8 +5495,9 @@ struct TypeInfo
 namespace ClientList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const chip::ClusterId>;
-    using DecodableType = DataModel::DecodableList<chip::ClusterId>;
+    using Type             = DataModel::List<const chip::ClusterId>;
+    using DecodableType    = DataModel::DecodableList<chip::ClusterId>;
+    using DecodableArgType = const DataModel::DecodableList<chip::ClusterId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClientList::Id; }
@@ -4699,8 +5506,9 @@ struct TypeInfo
 namespace PartsList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const chip::EndpointId>;
-    using DecodableType = DataModel::DecodableList<chip::EndpointId>;
+    using Type             = DataModel::List<const chip::EndpointId>;
+    using DecodableType    = DataModel::DecodableList<chip::EndpointId>;
+    using DecodableArgType = const DataModel::DecodableList<chip::EndpointId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartsList::Id; }
@@ -4709,8 +5517,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -4719,8 +5528,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -4729,6 +5539,36 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Descriptor
 namespace PollControl {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace CheckIn {
+struct Type;
+struct DecodableType;
+} // namespace CheckIn
+
+namespace CheckInResponse {
+struct Type;
+struct DecodableType;
+} // namespace CheckInResponse
+
+namespace FastPollStop {
+struct Type;
+struct DecodableType;
+} // namespace FastPollStop
+
+namespace SetLongPollInterval {
+struct Type;
+struct DecodableType;
+} // namespace SetLongPollInterval
+
+namespace SetShortPollInterval {
+struct Type;
+struct DecodableType;
+} // namespace SetShortPollInterval
+
+} // namespace Commands
 
 namespace Commands {
 namespace CheckIn {
@@ -4744,6 +5584,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::PollControl::Commands::CheckInResponse::DecodableType;
 };
 
 struct DecodableType
@@ -4773,6 +5615,8 @@ public:
     uint16_t fastPollTimeout;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4799,6 +5643,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4826,6 +5672,8 @@ public:
     uint32_t newLongPollInterval;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4854,6 +5702,8 @@ public:
     uint16_t newShortPollInterval;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -4872,8 +5722,9 @@ namespace Attributes {
 namespace CheckInInterval {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CheckInInterval::Id; }
@@ -4882,8 +5733,9 @@ struct TypeInfo
 namespace LongPollInterval {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongPollInterval::Id; }
@@ -4892,8 +5744,9 @@ struct TypeInfo
 namespace ShortPollInterval {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ShortPollInterval::Id; }
@@ -4902,8 +5755,9 @@ struct TypeInfo
 namespace FastPollTimeout {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FastPollTimeout::Id; }
@@ -4912,8 +5766,9 @@ struct TypeInfo
 namespace CheckInIntervalMin {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CheckInIntervalMin::Id; }
@@ -4922,8 +5777,9 @@ struct TypeInfo
 namespace LongPollIntervalMin {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongPollIntervalMin::Id; }
@@ -4932,8 +5788,9 @@ struct TypeInfo
 namespace FastPollTimeoutMax {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FastPollTimeoutMax::Id; }
@@ -4942,8 +5799,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -4952,8 +5810,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -5022,18 +5881,18 @@ using EndpointListTypeEnum                 = EmberAfEndpointListTypeEnum;
 // Bitmap for CommandBits
 enum class CommandBits : uint16_t
 {
-    kInstantAction               = 0,
-    kInstantActionWithTransition = 1,
-    kStartAction                 = 2,
-    kStartActionWithDuration     = 3,
-    kStopAction                  = 4,
-    kPauseAction                 = 5,
-    kPauseActionWithDuration     = 6,
-    kResumeAction                = 7,
-    kEnableAction                = 8,
-    kEnableActionWithDuration    = 9,
-    kDisableAction               = 10,
-    kDisableActionWithDuration   = 11,
+    kInstantAction               = 0x1,
+    kInstantActionWithTransition = 0x2,
+    kStartAction                 = 0x4,
+    kStartActionWithDuration     = 0x8,
+    kStopAction                  = 0x10,
+    kPauseAction                 = 0x20,
+    kPauseActionWithDuration     = 0x40,
+    kResumeAction                = 0x80,
+    kEnableAction                = 0x100,
+    kEnableActionWithDuration    = 0x200,
+    kDisableAction               = 0x400,
+    kDisableActionWithDuration   = 0x800,
 };
 
 namespace Structs {
@@ -5092,6 +5951,71 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace InstantAction {
+struct Type;
+struct DecodableType;
+} // namespace InstantAction
+
+namespace InstantActionWithTransition {
+struct Type;
+struct DecodableType;
+} // namespace InstantActionWithTransition
+
+namespace StartAction {
+struct Type;
+struct DecodableType;
+} // namespace StartAction
+
+namespace StartActionWithDuration {
+struct Type;
+struct DecodableType;
+} // namespace StartActionWithDuration
+
+namespace StopAction {
+struct Type;
+struct DecodableType;
+} // namespace StopAction
+
+namespace PauseAction {
+struct Type;
+struct DecodableType;
+} // namespace PauseAction
+
+namespace PauseActionWithDuration {
+struct Type;
+struct DecodableType;
+} // namespace PauseActionWithDuration
+
+namespace ResumeAction {
+struct Type;
+struct DecodableType;
+} // namespace ResumeAction
+
+namespace EnableAction {
+struct Type;
+struct DecodableType;
+} // namespace EnableAction
+
+namespace EnableActionWithDuration {
+struct Type;
+struct DecodableType;
+} // namespace EnableActionWithDuration
+
+namespace DisableAction {
+struct Type;
+struct DecodableType;
+} // namespace DisableAction
+
+namespace DisableActionWithDuration {
+struct Type;
+struct DecodableType;
+} // namespace DisableActionWithDuration
+
+} // namespace Commands
+
+namespace Commands {
 namespace InstantAction {
 enum class Fields
 {
@@ -5110,6 +6034,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5143,6 +6069,8 @@ public:
     uint16_t transitionTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5175,6 +6103,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5208,6 +6138,8 @@ public:
     uint32_t duration;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5240,6 +6172,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5271,6 +6205,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5304,6 +6240,8 @@ public:
     uint32_t duration;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5336,6 +6274,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5367,6 +6307,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5400,6 +6342,8 @@ public:
     uint32_t duration;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5432,6 +6376,8 @@ public:
     Optional<uint32_t> invokeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5465,6 +6411,8 @@ public:
     uint32_t duration;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5485,8 +6433,9 @@ namespace Attributes {
 namespace ActionList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::ActionStruct::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::ActionStruct::DecodableType>;
+    using Type             = DataModel::List<const Structs::ActionStruct::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::ActionStruct::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::ActionStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActionList::Id; }
@@ -5495,8 +6444,9 @@ struct TypeInfo
 namespace EndpointList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::EndpointListStruct::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::EndpointListStruct::DecodableType>;
+    using Type             = DataModel::List<const Structs::EndpointListStruct::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::EndpointListStruct::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::EndpointListStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EndpointList::Id; }
@@ -5505,8 +6455,9 @@ struct TypeInfo
 namespace SetupUrl {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetupUrl::Id; }
@@ -5515,8 +6466,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -5525,8 +6477,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -5535,6 +6488,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace BridgedActions
 namespace Basic {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace StartUp {
+struct Type;
+struct DecodableType;
+} // namespace StartUp
+
+namespace MfgSpecificPing {
+struct Type;
+struct DecodableType;
+} // namespace MfgSpecificPing
+
+namespace ShutDown {
+struct Type;
+struct DecodableType;
+} // namespace ShutDown
+
+namespace Leave {
+struct Type;
+struct DecodableType;
+} // namespace Leave
+
+} // namespace Commands
 
 namespace Commands {
 namespace StartUp {
@@ -5550,6 +6528,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5574,6 +6554,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5598,6 +6580,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5622,6 +6606,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -5639,8 +6625,9 @@ namespace Attributes {
 namespace InteractionModelVersion {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InteractionModelVersion::Id; }
@@ -5649,8 +6636,9 @@ struct TypeInfo
 namespace VendorName {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
@@ -5659,8 +6647,9 @@ struct TypeInfo
 namespace VendorID {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
@@ -5669,8 +6658,9 @@ struct TypeInfo
 namespace ProductName {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
@@ -5679,8 +6669,9 @@ struct TypeInfo
 namespace ProductID {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductID::Id; }
@@ -5689,8 +6680,9 @@ struct TypeInfo
 namespace UserLabel {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
@@ -5699,8 +6691,9 @@ struct TypeInfo
 namespace Location {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Location::Id; }
@@ -5709,8 +6702,9 @@ struct TypeInfo
 namespace HardwareVersion {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersion::Id; }
@@ -5719,8 +6713,9 @@ struct TypeInfo
 namespace HardwareVersionString {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersionString::Id; }
@@ -5729,8 +6724,9 @@ struct TypeInfo
 namespace SoftwareVersion {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersion::Id; }
@@ -5739,8 +6735,9 @@ struct TypeInfo
 namespace SoftwareVersionString {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersionString::Id; }
@@ -5749,8 +6746,9 @@ struct TypeInfo
 namespace ManufacturingDate {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ManufacturingDate::Id; }
@@ -5759,8 +6757,9 @@ struct TypeInfo
 namespace PartNumber {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
@@ -5769,8 +6768,9 @@ struct TypeInfo
 namespace ProductURL {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductURL::Id; }
@@ -5779,8 +6779,9 @@ struct TypeInfo
 namespace ProductLabel {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductLabel::Id; }
@@ -5789,8 +6790,9 @@ struct TypeInfo
 namespace SerialNumber {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SerialNumber::Id; }
@@ -5799,8 +6801,9 @@ struct TypeInfo
 namespace LocalConfigDisabled {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalConfigDisabled::Id; }
@@ -5809,8 +6812,9 @@ struct TypeInfo
 namespace Reachable {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
@@ -5819,8 +6823,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -5829,14 +6834,139 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace StartUp {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kSoftwareVersion = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    uint32_t softwareVersion;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    uint32_t softwareVersion;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace StartUp
+namespace ShutDown {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ShutDown
+namespace Leave {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000002;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace Leave
+namespace ReachableChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000003;
+
+enum class Fields
+{
+    kReachableNewValue = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    bool reachableNewValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+
+    bool reachableNewValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ReachableChanged
+} // namespace Events
 } // namespace Basic
 namespace OtaSoftwareUpdateProvider {
 // Need to convert consumers to using the new enum classes, so we
@@ -5881,6 +7011,36 @@ using OTAQueryStatus                       = EmberAfOTAQueryStatus;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace QueryImage {
+struct Type;
+struct DecodableType;
+} // namespace QueryImage
+
+namespace ApplyUpdateRequest {
+struct Type;
+struct DecodableType;
+} // namespace ApplyUpdateRequest
+
+namespace NotifyUpdateApplied {
+struct Type;
+struct DecodableType;
+} // namespace NotifyUpdateApplied
+
+namespace QueryImageResponse {
+struct Type;
+struct DecodableType;
+} // namespace QueryImageResponse
+
+namespace ApplyUpdateResponse {
+struct Type;
+struct DecodableType;
+} // namespace ApplyUpdateResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace QueryImage {
 enum class Fields
 {
@@ -5911,6 +7071,8 @@ public:
     Optional<chip::ByteSpan> metadataForProvider;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
 };
 
 struct DecodableType
@@ -5948,6 +7110,8 @@ public:
     uint32_t newVersion;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
 };
 
 struct DecodableType
@@ -5979,6 +7143,8 @@ public:
     uint32_t softwareVersion;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6022,6 +7188,8 @@ public:
     Optional<chip::ByteSpan> metadataForRequestor;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6059,6 +7227,8 @@ public:
     uint32_t delayedActionTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6078,8 +7248,9 @@ namespace Attributes {
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -6088,8 +7259,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -6111,6 +7283,16 @@ enum class OTAAnnouncementReason : uint8_t
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OTAAnnouncementReason                = EmberAfOTAAnnouncementReason;
 #endif
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace AnnounceOtaProvider {
+struct Type;
+struct DecodableType;
+} // namespace AnnounceOtaProvider
+
+} // namespace Commands
 
 namespace Commands {
 namespace AnnounceOtaProvider {
@@ -6135,6 +7317,8 @@ public:
     Optional<chip::ByteSpan> metadataForNode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6156,8 +7340,9 @@ namespace Attributes {
 namespace DefaultOtaProvider {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultOtaProvider::Id; }
@@ -6166,8 +7351,9 @@ struct TypeInfo
 namespace UpdatePossible {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UpdatePossible::Id; }
@@ -6176,8 +7362,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -6186,8 +7373,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -6201,8 +7389,9 @@ namespace Attributes {
 namespace Status {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
@@ -6211,8 +7400,9 @@ struct TypeInfo
 namespace Order {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Order::Id; }
@@ -6221,8 +7411,9 @@ struct TypeInfo
 namespace Description {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
@@ -6231,8 +7422,9 @@ struct TypeInfo
 namespace WiredAssessedInputVoltage {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedInputVoltage::Id; }
@@ -6241,8 +7433,9 @@ struct TypeInfo
 namespace WiredAssessedInputFrequency {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedInputFrequency::Id; }
@@ -6251,8 +7444,9 @@ struct TypeInfo
 namespace WiredCurrentType {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredCurrentType::Id; }
@@ -6261,8 +7455,9 @@ struct TypeInfo
 namespace WiredAssessedCurrent {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedCurrent::Id; }
@@ -6271,8 +7466,9 @@ struct TypeInfo
 namespace WiredNominalVoltage {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredNominalVoltage::Id; }
@@ -6281,8 +7477,9 @@ struct TypeInfo
 namespace WiredMaximumCurrent {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredMaximumCurrent::Id; }
@@ -6291,8 +7488,9 @@ struct TypeInfo
 namespace WiredPresent {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredPresent::Id; }
@@ -6301,8 +7499,9 @@ struct TypeInfo
 namespace ActiveWiredFaults {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const uint8_t>;
-    using DecodableType = DataModel::DecodableList<uint8_t>;
+    using Type             = DataModel::List<const uint8_t>;
+    using DecodableType    = DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveWiredFaults::Id; }
@@ -6311,8 +7510,9 @@ struct TypeInfo
 namespace BatteryVoltage {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltage::Id; }
@@ -6321,8 +7521,9 @@ struct TypeInfo
 namespace BatteryPercentRemaining {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentRemaining::Id; }
@@ -6331,8 +7532,9 @@ struct TypeInfo
 namespace BatteryTimeRemaining {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryTimeRemaining::Id; }
@@ -6341,8 +7543,9 @@ struct TypeInfo
 namespace BatteryChargeLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargeLevel::Id; }
@@ -6351,8 +7554,9 @@ struct TypeInfo
 namespace BatteryReplacementNeeded {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplacementNeeded::Id; }
@@ -6361,8 +7565,9 @@ struct TypeInfo
 namespace BatteryReplaceability {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplaceability::Id; }
@@ -6371,8 +7576,9 @@ struct TypeInfo
 namespace BatteryPresent {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPresent::Id; }
@@ -6381,8 +7587,9 @@ struct TypeInfo
 namespace ActiveBatteryFaults {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const uint8_t>;
-    using DecodableType = DataModel::DecodableList<uint8_t>;
+    using Type             = DataModel::List<const uint8_t>;
+    using DecodableType    = DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatteryFaults::Id; }
@@ -6391,8 +7598,9 @@ struct TypeInfo
 namespace BatteryReplacementDescription {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplacementDescription::Id; }
@@ -6401,8 +7609,9 @@ struct TypeInfo
 namespace BatteryCommonDesignation {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryCommonDesignation::Id; }
@@ -6411,8 +7620,9 @@ struct TypeInfo
 namespace BatteryANSIDesignation {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryANSIDesignation::Id; }
@@ -6421,8 +7631,9 @@ struct TypeInfo
 namespace BatteryIECDesignation {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryIECDesignation::Id; }
@@ -6431,8 +7642,9 @@ struct TypeInfo
 namespace BatteryApprovedChemistry {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryApprovedChemistry::Id; }
@@ -6441,8 +7653,9 @@ struct TypeInfo
 namespace BatteryCapacity {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryCapacity::Id; }
@@ -6451,8 +7664,9 @@ struct TypeInfo
 namespace BatteryQuantity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryQuantity::Id; }
@@ -6461,8 +7675,9 @@ struct TypeInfo
 namespace BatteryChargeState {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargeState::Id; }
@@ -6471,8 +7686,9 @@ struct TypeInfo
 namespace BatteryTimeToFullCharge {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryTimeToFullCharge::Id; }
@@ -6481,8 +7697,9 @@ struct TypeInfo
 namespace BatteryFunctionalWhileCharging {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryFunctionalWhileCharging::Id; }
@@ -6491,8 +7708,9 @@ struct TypeInfo
 namespace BatteryChargingCurrent {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargingCurrent::Id; }
@@ -6501,8 +7719,9 @@ struct TypeInfo
 namespace ActiveBatteryChargeFaults {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const uint8_t>;
-    using DecodableType = DataModel::DecodableList<uint8_t>;
+    using Type             = DataModel::List<const uint8_t>;
+    using DecodableType    = DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatteryChargeFaults::Id; }
@@ -6511,8 +7730,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -6521,8 +7741,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -6580,6 +7801,41 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ArmFailSafe {
+struct Type;
+struct DecodableType;
+} // namespace ArmFailSafe
+
+namespace ArmFailSafeResponse {
+struct Type;
+struct DecodableType;
+} // namespace ArmFailSafeResponse
+
+namespace SetRegulatoryConfig {
+struct Type;
+struct DecodableType;
+} // namespace SetRegulatoryConfig
+
+namespace SetRegulatoryConfigResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetRegulatoryConfigResponse
+
+namespace CommissioningComplete {
+struct Type;
+struct DecodableType;
+} // namespace CommissioningComplete
+
+namespace CommissioningCompleteResponse {
+struct Type;
+struct DecodableType;
+} // namespace CommissioningCompleteResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace ArmFailSafe {
 enum class Fields
 {
@@ -6600,6 +7856,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType;
 };
 
 struct DecodableType
@@ -6632,6 +7890,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6667,6 +7927,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType;
 };
 
 struct DecodableType
@@ -6700,6 +7962,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6726,6 +7990,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType;
 };
 
 struct DecodableType
@@ -6755,6 +8021,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -6774,8 +8042,9 @@ namespace Attributes {
 namespace Breadcrumb {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Breadcrumb::Id; }
@@ -6784,8 +8053,9 @@ struct TypeInfo
 namespace BasicCommissioningInfoList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::BasicCommissioningInfoType::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::BasicCommissioningInfoType::DecodableType>;
+    using Type             = DataModel::List<const Structs::BasicCommissioningInfoType::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::BasicCommissioningInfoType::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::BasicCommissioningInfoType::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BasicCommissioningInfoList::Id; }
@@ -6794,8 +8064,9 @@ struct TypeInfo
 namespace RegulatoryConfigList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const RegulatoryLocationType>;
-    using DecodableType = DataModel::DecodableList<RegulatoryLocationType>;
+    using Type             = DataModel::List<const RegulatoryLocationType>;
+    using DecodableType    = DataModel::DecodableList<RegulatoryLocationType>;
+    using DecodableArgType = const DataModel::DecodableList<RegulatoryLocationType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RegulatoryConfigList::Id; }
@@ -6804,8 +8075,9 @@ struct TypeInfo
 namespace LocationCapabilityList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const RegulatoryLocationType>;
-    using DecodableType = DataModel::DecodableList<RegulatoryLocationType>;
+    using Type             = DataModel::List<const RegulatoryLocationType>;
+    using DecodableType    = DataModel::DecodableList<RegulatoryLocationType>;
+    using DecodableArgType = const DataModel::DecodableList<RegulatoryLocationType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocationCapabilityList::Id; }
@@ -6814,8 +8086,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -6824,8 +8097,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -6913,6 +8187,91 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ScanNetworks {
+struct Type;
+struct DecodableType;
+} // namespace ScanNetworks
+
+namespace ScanNetworksResponse {
+struct Type;
+struct DecodableType;
+} // namespace ScanNetworksResponse
+
+namespace AddWiFiNetwork {
+struct Type;
+struct DecodableType;
+} // namespace AddWiFiNetwork
+
+namespace AddWiFiNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace AddWiFiNetworkResponse
+
+namespace UpdateWiFiNetwork {
+struct Type;
+struct DecodableType;
+} // namespace UpdateWiFiNetwork
+
+namespace UpdateWiFiNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace UpdateWiFiNetworkResponse
+
+namespace AddThreadNetwork {
+struct Type;
+struct DecodableType;
+} // namespace AddThreadNetwork
+
+namespace AddThreadNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace AddThreadNetworkResponse
+
+namespace UpdateThreadNetwork {
+struct Type;
+struct DecodableType;
+} // namespace UpdateThreadNetwork
+
+namespace UpdateThreadNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace UpdateThreadNetworkResponse
+
+namespace RemoveNetwork {
+struct Type;
+struct DecodableType;
+} // namespace RemoveNetwork
+
+namespace RemoveNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace RemoveNetworkResponse
+
+namespace EnableNetwork {
+struct Type;
+struct DecodableType;
+} // namespace EnableNetwork
+
+namespace EnableNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace EnableNetworkResponse
+
+namespace DisableNetwork {
+struct Type;
+struct DecodableType;
+} // namespace DisableNetwork
+
+namespace DisableNetworkResponse {
+struct Type;
+struct DecodableType;
+} // namespace DisableNetworkResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace ScanNetworks {
 enum class Fields
 {
@@ -6933,6 +8292,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType;
 };
 
 struct DecodableType
@@ -6969,6 +8330,8 @@ public:
     DataModel::List<const Structs::ThreadInterfaceScanResult::Type> threadScanResults;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7006,6 +8369,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7039,6 +8404,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7074,6 +8441,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7107,6 +8476,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7140,6 +8511,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7172,6 +8545,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7205,6 +8580,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7237,6 +8614,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7270,6 +8649,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7302,6 +8683,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7335,6 +8718,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7367,6 +8752,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7400,6 +8787,8 @@ public:
     uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7432,6 +8821,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7451,8 +8842,9 @@ namespace Attributes {
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -7461,8 +8853,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -7513,6 +8906,21 @@ using LogsTransferProtocol                 = EmberAfLogsTransferProtocol;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace RetrieveLogsRequest {
+struct Type;
+struct DecodableType;
+} // namespace RetrieveLogsRequest
+
+namespace RetrieveLogsResponse {
+struct Type;
+struct DecodableType;
+} // namespace RetrieveLogsResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace RetrieveLogsRequest {
 enum class Fields
 {
@@ -7533,6 +8941,8 @@ public:
     chip::ByteSpan transferFileDesignator;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -7569,6 +8979,8 @@ public:
     uint32_t timeSinceBoot;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7590,8 +9002,9 @@ namespace Attributes {
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -7600,8 +9013,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -7730,8 +9144,9 @@ namespace Attributes {
 namespace NetworkInterfaces {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::NetworkInterfaceType::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::NetworkInterfaceType::DecodableType>;
+    using Type             = DataModel::List<const Structs::NetworkInterfaceType::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::NetworkInterfaceType::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::NetworkInterfaceType::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NetworkInterfaces::Id; }
@@ -7740,8 +9155,9 @@ struct TypeInfo
 namespace RebootCount {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RebootCount::Id; }
@@ -7750,8 +9166,9 @@ struct TypeInfo
 namespace UpTime {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UpTime::Id; }
@@ -7760,8 +9177,9 @@ struct TypeInfo
 namespace TotalOperationalHours {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalOperationalHours::Id; }
@@ -7770,8 +9188,9 @@ struct TypeInfo
 namespace BootReasons {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BootReasons::Id; }
@@ -7780,8 +9199,9 @@ struct TypeInfo
 namespace ActiveHardwareFaults {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const uint8_t>;
-    using DecodableType = DataModel::DecodableList<uint8_t>;
+    using Type             = DataModel::List<const uint8_t>;
+    using DecodableType    = DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveHardwareFaults::Id; }
@@ -7790,8 +9210,9 @@ struct TypeInfo
 namespace ActiveRadioFaults {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const uint8_t>;
-    using DecodableType = DataModel::DecodableList<uint8_t>;
+    using Type             = DataModel::List<const uint8_t>;
+    using DecodableType    = DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveRadioFaults::Id; }
@@ -7800,8 +9221,9 @@ struct TypeInfo
 namespace ActiveNetworkFaults {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const uint8_t>;
-    using DecodableType = DataModel::DecodableList<uint8_t>;
+    using Type             = DataModel::List<const uint8_t>;
+    using DecodableType    = DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveNetworkFaults::Id; }
@@ -7810,8 +9232,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -7820,18 +9243,184 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace HardwareFaultChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kCurrent  = 0,
+    kPrevious = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    DataModel::List<const HardwareFaultType> current;
+    DataModel::List<const HardwareFaultType> previous;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    DataModel::DecodableList<HardwareFaultType> current;
+    DataModel::DecodableList<HardwareFaultType> previous;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace HardwareFaultChange
+namespace RadioFaultChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kCurrent  = 0,
+    kPrevious = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    DataModel::List<const RadioFaultType> current;
+    DataModel::List<const RadioFaultType> previous;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    DataModel::DecodableList<RadioFaultType> current;
+    DataModel::DecodableList<RadioFaultType> previous;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace RadioFaultChange
+namespace NetworkFaultChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000002;
+
+enum class Fields
+{
+    kCurrent  = 0,
+    kPrevious = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    DataModel::List<const NetworkFaultType> current;
+    DataModel::List<const NetworkFaultType> previous;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    DataModel::DecodableList<NetworkFaultType> current;
+    DataModel::DecodableList<NetworkFaultType> previous;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace NetworkFaultChange
+namespace BootReason {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000003;
+
+enum class Fields
+{
+    kBootReason = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    BootReasonType bootReason;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    BootReasonType bootReason;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace BootReason
+} // namespace Events
 } // namespace GeneralDiagnostics
 namespace SoftwareDiagnostics {
 
 namespace Structs {
+namespace SoftwareFault {
+enum class Fields
+{
+    kId             = 0,
+    kName           = 1,
+    kFaultRecording = 2,
+};
+
+struct Type
+{
+public:
+    uint64_t id;
+    chip::CharSpan name;
+    chip::ByteSpan faultRecording;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace SoftwareFault
 namespace ThreadMetrics {
 enum class Fields
 {
@@ -7861,6 +9450,16 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetWatermarks {
+struct Type;
+struct DecodableType;
+} // namespace ResetWatermarks
+
+} // namespace Commands
+
+namespace Commands {
 namespace ResetWatermarks {
 enum class Fields
 {
@@ -7874,6 +9473,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -7891,8 +9492,9 @@ namespace Attributes {
 namespace ThreadMetrics {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::ThreadMetrics::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::ThreadMetrics::DecodableType>;
+    using Type             = DataModel::List<const Structs::ThreadMetrics::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::ThreadMetrics::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::ThreadMetrics::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ThreadMetrics::Id; }
@@ -7901,8 +9503,9 @@ struct TypeInfo
 namespace CurrentHeapFree {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHeapFree::Id; }
@@ -7911,8 +9514,9 @@ struct TypeInfo
 namespace CurrentHeapUsed {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHeapUsed::Id; }
@@ -7921,8 +9525,9 @@ struct TypeInfo
 namespace CurrentHeapHighWatermark {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHeapHighWatermark::Id; }
@@ -7931,8 +9536,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -7941,14 +9547,50 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace SoftwareFault {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kSoftwareFault = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+
+    Structs::SoftwareFault::Type softwareFault;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+
+    Structs::SoftwareFault::DecodableType softwareFault;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SoftwareFault
+} // namespace Events
 } // namespace SoftwareDiagnostics
 namespace ThreadNetworkDiagnostics {
 // Need to convert consumers to using the new enum classes, so we
@@ -7981,6 +9623,18 @@ enum class RoutingRole : uint8_t
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using RoutingRole                          = EmberAfRoutingRole;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ThreadConnectionStatus
+enum class ThreadConnectionStatus : uint8_t
+{
+    kConnected    = 0x00,
+    kNotConnected = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ThreadConnectionStatus               = EmberAfThreadConnectionStatus;
 #endif
 
 namespace Structs {
@@ -8127,6 +9781,16 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCounts {
+struct Type;
+struct DecodableType;
+} // namespace ResetCounts
+
+} // namespace Commands
+
+namespace Commands {
 namespace ResetCounts {
 enum class Fields
 {
@@ -8140,6 +9804,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -8157,8 +9823,9 @@ namespace Attributes {
 namespace Channel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Channel::Id; }
@@ -8167,8 +9834,9 @@ struct TypeInfo
 namespace RoutingRole {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RoutingRole::Id; }
@@ -8177,8 +9845,9 @@ struct TypeInfo
 namespace NetworkName {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NetworkName::Id; }
@@ -8187,8 +9856,9 @@ struct TypeInfo
 namespace PanId {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PanId::Id; }
@@ -8197,8 +9867,9 @@ struct TypeInfo
 namespace ExtendedPanId {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ExtendedPanId::Id; }
@@ -8207,8 +9878,9 @@ struct TypeInfo
 namespace MeshLocalPrefix {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeshLocalPrefix::Id; }
@@ -8217,8 +9889,9 @@ struct TypeInfo
 namespace OverrunCount {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
@@ -8227,8 +9900,9 @@ struct TypeInfo
 namespace NeighborTableList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::NeighborTable::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::NeighborTable::DecodableType>;
+    using Type             = DataModel::List<const Structs::NeighborTable::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::NeighborTable::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::NeighborTable::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NeighborTableList::Id; }
@@ -8237,8 +9911,9 @@ struct TypeInfo
 namespace RouteTableList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::RouteTable::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::RouteTable::DecodableType>;
+    using Type             = DataModel::List<const Structs::RouteTable::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::RouteTable::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::RouteTable::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RouteTableList::Id; }
@@ -8247,8 +9922,9 @@ struct TypeInfo
 namespace PartitionId {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartitionId::Id; }
@@ -8257,8 +9933,9 @@ struct TypeInfo
 namespace Weighting {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Weighting::Id; }
@@ -8267,8 +9944,9 @@ struct TypeInfo
 namespace DataVersion {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DataVersion::Id; }
@@ -8277,8 +9955,9 @@ struct TypeInfo
 namespace StableDataVersion {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StableDataVersion::Id; }
@@ -8287,8 +9966,9 @@ struct TypeInfo
 namespace LeaderRouterId {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LeaderRouterId::Id; }
@@ -8297,8 +9977,9 @@ struct TypeInfo
 namespace DetachedRoleCount {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DetachedRoleCount::Id; }
@@ -8307,8 +9988,9 @@ struct TypeInfo
 namespace ChildRoleCount {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChildRoleCount::Id; }
@@ -8317,8 +9999,9 @@ struct TypeInfo
 namespace RouterRoleCount {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RouterRoleCount::Id; }
@@ -8327,8 +10010,9 @@ struct TypeInfo
 namespace LeaderRoleCount {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LeaderRoleCount::Id; }
@@ -8337,8 +10021,9 @@ struct TypeInfo
 namespace AttachAttemptCount {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttachAttemptCount::Id; }
@@ -8347,8 +10032,9 @@ struct TypeInfo
 namespace PartitionIdChangeCount {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartitionIdChangeCount::Id; }
@@ -8357,8 +10043,9 @@ struct TypeInfo
 namespace BetterPartitionAttachAttemptCount {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BetterPartitionAttachAttemptCount::Id; }
@@ -8367,8 +10054,9 @@ struct TypeInfo
 namespace ParentChangeCount {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ParentChangeCount::Id; }
@@ -8377,8 +10065,9 @@ struct TypeInfo
 namespace TxTotalCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxTotalCount::Id; }
@@ -8387,8 +10076,9 @@ struct TypeInfo
 namespace TxUnicastCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxUnicastCount::Id; }
@@ -8397,8 +10087,9 @@ struct TypeInfo
 namespace TxBroadcastCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxBroadcastCount::Id; }
@@ -8407,8 +10098,9 @@ struct TypeInfo
 namespace TxAckRequestedCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxAckRequestedCount::Id; }
@@ -8417,8 +10109,9 @@ struct TypeInfo
 namespace TxAckedCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxAckedCount::Id; }
@@ -8427,8 +10120,9 @@ struct TypeInfo
 namespace TxNoAckRequestedCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxNoAckRequestedCount::Id; }
@@ -8437,8 +10131,9 @@ struct TypeInfo
 namespace TxDataCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxDataCount::Id; }
@@ -8447,8 +10142,9 @@ struct TypeInfo
 namespace TxDataPollCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxDataPollCount::Id; }
@@ -8457,8 +10153,9 @@ struct TypeInfo
 namespace TxBeaconCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxBeaconCount::Id; }
@@ -8467,8 +10164,9 @@ struct TypeInfo
 namespace TxBeaconRequestCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxBeaconRequestCount::Id; }
@@ -8477,8 +10175,9 @@ struct TypeInfo
 namespace TxOtherCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxOtherCount::Id; }
@@ -8487,8 +10186,9 @@ struct TypeInfo
 namespace TxRetryCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxRetryCount::Id; }
@@ -8497,8 +10197,9 @@ struct TypeInfo
 namespace TxDirectMaxRetryExpiryCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxDirectMaxRetryExpiryCount::Id; }
@@ -8507,8 +10208,9 @@ struct TypeInfo
 namespace TxIndirectMaxRetryExpiryCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxIndirectMaxRetryExpiryCount::Id; }
@@ -8517,8 +10219,9 @@ struct TypeInfo
 namespace TxErrCcaCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxErrCcaCount::Id; }
@@ -8527,8 +10230,9 @@ struct TypeInfo
 namespace TxErrAbortCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxErrAbortCount::Id; }
@@ -8537,8 +10241,9 @@ struct TypeInfo
 namespace TxErrBusyChannelCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxErrBusyChannelCount::Id; }
@@ -8547,8 +10252,9 @@ struct TypeInfo
 namespace RxTotalCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxTotalCount::Id; }
@@ -8557,8 +10263,9 @@ struct TypeInfo
 namespace RxUnicastCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxUnicastCount::Id; }
@@ -8567,8 +10274,9 @@ struct TypeInfo
 namespace RxBroadcastCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxBroadcastCount::Id; }
@@ -8577,8 +10285,9 @@ struct TypeInfo
 namespace RxDataCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxDataCount::Id; }
@@ -8587,8 +10296,9 @@ struct TypeInfo
 namespace RxDataPollCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxDataPollCount::Id; }
@@ -8597,8 +10307,9 @@ struct TypeInfo
 namespace RxBeaconCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxBeaconCount::Id; }
@@ -8607,8 +10318,9 @@ struct TypeInfo
 namespace RxBeaconRequestCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxBeaconRequestCount::Id; }
@@ -8617,8 +10329,9 @@ struct TypeInfo
 namespace RxOtherCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxOtherCount::Id; }
@@ -8627,8 +10340,9 @@ struct TypeInfo
 namespace RxAddressFilteredCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxAddressFilteredCount::Id; }
@@ -8637,8 +10351,9 @@ struct TypeInfo
 namespace RxDestAddrFilteredCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxDestAddrFilteredCount::Id; }
@@ -8647,8 +10362,9 @@ struct TypeInfo
 namespace RxDuplicatedCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxDuplicatedCount::Id; }
@@ -8657,8 +10373,9 @@ struct TypeInfo
 namespace RxErrNoFrameCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrNoFrameCount::Id; }
@@ -8667,8 +10384,9 @@ struct TypeInfo
 namespace RxErrUnknownNeighborCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrUnknownNeighborCount::Id; }
@@ -8677,8 +10395,9 @@ struct TypeInfo
 namespace RxErrInvalidSrcAddrCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrInvalidSrcAddrCount::Id; }
@@ -8687,8 +10406,9 @@ struct TypeInfo
 namespace RxErrSecCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrSecCount::Id; }
@@ -8697,8 +10417,9 @@ struct TypeInfo
 namespace RxErrFcsCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrFcsCount::Id; }
@@ -8707,8 +10428,9 @@ struct TypeInfo
 namespace RxErrOtherCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrOtherCount::Id; }
@@ -8717,8 +10439,9 @@ struct TypeInfo
 namespace ActiveTimestamp {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveTimestamp::Id; }
@@ -8727,8 +10450,9 @@ struct TypeInfo
 namespace PendingTimestamp {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PendingTimestamp::Id; }
@@ -8737,8 +10461,9 @@ struct TypeInfo
 namespace Delay {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Delay::Id; }
@@ -8747,8 +10472,9 @@ struct TypeInfo
 namespace SecurityPolicy {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::SecurityPolicy::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::SecurityPolicy::DecodableType>;
+    using Type             = DataModel::List<const Structs::SecurityPolicy::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::SecurityPolicy::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::SecurityPolicy::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SecurityPolicy::Id; }
@@ -8757,8 +10483,9 @@ struct TypeInfo
 namespace ChannelMask {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelMask::Id; }
@@ -8767,8 +10494,9 @@ struct TypeInfo
 namespace OperationalDatasetComponents {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::OperationalDatasetComponents::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::OperationalDatasetComponents::DecodableType>;
+    using Type             = DataModel::List<const Structs::OperationalDatasetComponents::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::OperationalDatasetComponents::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::OperationalDatasetComponents::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalDatasetComponents::Id; }
@@ -8777,8 +10505,9 @@ struct TypeInfo
 namespace ActiveNetworkFaultsList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const NetworkFault>;
-    using DecodableType = DataModel::DecodableList<NetworkFault>;
+    using Type             = DataModel::List<const NetworkFault>;
+    using DecodableType    = DataModel::DecodableList<NetworkFault>;
+    using DecodableArgType = const DataModel::DecodableList<NetworkFault> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveNetworkFaultsList::Id; }
@@ -8787,8 +10516,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -8797,16 +10527,66 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace ConnectionStatus {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kConnectionStatus = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+
+    ThreadConnectionStatus connectionStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+
+    ThreadConnectionStatus connectionStatus;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ConnectionStatus
+} // namespace Events
 } // namespace ThreadNetworkDiagnostics
 namespace WiFiNetworkDiagnostics {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for AssociationFailureCause
+enum class AssociationFailureCause : uint8_t
+{
+    kUnknown              = 0x00,
+    kAssociationFailed    = 0x01,
+    kAuthenticationFailed = 0x02,
+    kSsidNotFound         = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using AssociationFailureCause              = EmberAfAssociationFailureCause;
+#endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -8826,6 +10606,18 @@ using SecurityType                         = EmberAfSecurityType;
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for WiFiConnectionStatus
+enum class WiFiConnectionStatus : uint8_t
+{
+    kConnected    = 0x00,
+    kNotConnected = 0x01,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using WiFiConnectionStatus                 = EmberAfWiFiConnectionStatus;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WiFiVersionType
 enum class WiFiVersionType : uint8_t
 {
@@ -8841,6 +10633,16 @@ using WiFiVersionType                      = EmberAfWiFiVersionType;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCounts {
+struct Type;
+struct DecodableType;
+} // namespace ResetCounts
+
+} // namespace Commands
+
+namespace Commands {
 namespace ResetCounts {
 enum class Fields
 {
@@ -8854,6 +10656,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -8871,8 +10675,9 @@ namespace Attributes {
 namespace Bssid {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bssid::Id; }
@@ -8881,8 +10686,9 @@ struct TypeInfo
 namespace SecurityType {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SecurityType::Id; }
@@ -8891,8 +10697,9 @@ struct TypeInfo
 namespace WiFiVersion {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiFiVersion::Id; }
@@ -8901,8 +10708,9 @@ struct TypeInfo
 namespace ChannelNumber {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelNumber::Id; }
@@ -8911,8 +10719,9 @@ struct TypeInfo
 namespace Rssi {
 struct TypeInfo
 {
-    using Type          = int8_t;
-    using DecodableType = int8_t;
+    using Type             = int8_t;
+    using DecodableType    = int8_t;
+    using DecodableArgType = int8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Rssi::Id; }
@@ -8921,8 +10730,9 @@ struct TypeInfo
 namespace BeaconLostCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BeaconLostCount::Id; }
@@ -8931,8 +10741,9 @@ struct TypeInfo
 namespace BeaconRxCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BeaconRxCount::Id; }
@@ -8941,8 +10752,9 @@ struct TypeInfo
 namespace PacketMulticastRxCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketMulticastRxCount::Id; }
@@ -8951,8 +10763,9 @@ struct TypeInfo
 namespace PacketMulticastTxCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketMulticastTxCount::Id; }
@@ -8961,8 +10774,9 @@ struct TypeInfo
 namespace PacketUnicastRxCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketUnicastRxCount::Id; }
@@ -8971,8 +10785,9 @@ struct TypeInfo
 namespace PacketUnicastTxCount {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketUnicastTxCount::Id; }
@@ -8981,8 +10796,9 @@ struct TypeInfo
 namespace CurrentMaxRate {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMaxRate::Id; }
@@ -8991,8 +10807,9 @@ struct TypeInfo
 namespace OverrunCount {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
@@ -9001,8 +10818,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -9011,14 +10829,119 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace Disconnection {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kReasonCode = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+
+    uint16_t reasonCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+
+    uint16_t reasonCode;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace Disconnection
+namespace AssociationFailure {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kAssociationFailure = 0,
+    kStatus             = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+
+    AssociationFailureCause associationFailure;
+    uint16_t status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+
+    AssociationFailureCause associationFailure;
+    uint16_t status;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AssociationFailure
+namespace ConnectionStatus {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000002;
+
+enum class Fields
+{
+    kConnectionStatus = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+
+    WiFiConnectionStatus connectionStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+
+    WiFiConnectionStatus connectionStatus;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ConnectionStatus
+} // namespace Events
 } // namespace WiFiNetworkDiagnostics
 namespace EthernetNetworkDiagnostics {
 // Need to convert consumers to using the new enum classes, so we
@@ -9043,6 +10966,16 @@ using PHYRateType                          = EmberAfPHYRateType;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCounts {
+struct Type;
+struct DecodableType;
+} // namespace ResetCounts
+
+} // namespace Commands
+
+namespace Commands {
 namespace ResetCounts {
 enum class Fields
 {
@@ -9056,6 +10989,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9073,8 +11008,9 @@ namespace Attributes {
 namespace PHYRate {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PHYRate::Id; }
@@ -9083,8 +11019,9 @@ struct TypeInfo
 namespace FullDuplex {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FullDuplex::Id; }
@@ -9093,8 +11030,9 @@ struct TypeInfo
 namespace PacketRxCount {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketRxCount::Id; }
@@ -9103,8 +11041,9 @@ struct TypeInfo
 namespace PacketTxCount {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketTxCount::Id; }
@@ -9113,8 +11052,9 @@ struct TypeInfo
 namespace TxErrCount {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxErrCount::Id; }
@@ -9123,8 +11063,9 @@ struct TypeInfo
 namespace CollisionCount {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CollisionCount::Id; }
@@ -9133,8 +11074,9 @@ struct TypeInfo
 namespace OverrunCount {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
@@ -9143,8 +11085,9 @@ struct TypeInfo
 namespace CarrierDetect {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CarrierDetect::Id; }
@@ -9153,8 +11096,9 @@ struct TypeInfo
 namespace TimeSinceReset {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TimeSinceReset::Id; }
@@ -9163,8 +11107,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -9173,8 +11118,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -9183,6 +11129,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace EthernetNetworkDiagnostics
 namespace BridgedDeviceBasic {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace StartUp {
+struct Type;
+struct DecodableType;
+} // namespace StartUp
+
+namespace ShutDown {
+struct Type;
+struct DecodableType;
+} // namespace ShutDown
+
+namespace Leave {
+struct Type;
+struct DecodableType;
+} // namespace Leave
+
+namespace ReachableChanged {
+struct Type;
+struct DecodableType;
+} // namespace ReachableChanged
+
+} // namespace Commands
 
 namespace Commands {
 namespace StartUp {
@@ -9198,6 +11169,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9222,6 +11195,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9246,6 +11221,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9270,6 +11247,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9287,8 +11266,9 @@ namespace Attributes {
 namespace VendorName {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
@@ -9297,8 +11277,9 @@ struct TypeInfo
 namespace VendorID {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
@@ -9307,8 +11288,9 @@ struct TypeInfo
 namespace ProductName {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
@@ -9317,8 +11299,9 @@ struct TypeInfo
 namespace UserLabel {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
@@ -9327,8 +11310,9 @@ struct TypeInfo
 namespace HardwareVersion {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersion::Id; }
@@ -9337,8 +11321,9 @@ struct TypeInfo
 namespace HardwareVersionString {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersionString::Id; }
@@ -9347,8 +11332,9 @@ struct TypeInfo
 namespace SoftwareVersion {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersion::Id; }
@@ -9357,8 +11343,9 @@ struct TypeInfo
 namespace SoftwareVersionString {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersionString::Id; }
@@ -9367,8 +11354,9 @@ struct TypeInfo
 namespace ManufacturingDate {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ManufacturingDate::Id; }
@@ -9377,8 +11365,9 @@ struct TypeInfo
 namespace PartNumber {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
@@ -9387,8 +11376,9 @@ struct TypeInfo
 namespace ProductURL {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductURL::Id; }
@@ -9397,8 +11387,9 @@ struct TypeInfo
 namespace ProductLabel {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductLabel::Id; }
@@ -9407,8 +11398,9 @@ struct TypeInfo
 namespace SerialNumber {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SerialNumber::Id; }
@@ -9417,8 +11409,9 @@ struct TypeInfo
 namespace Reachable {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
@@ -9427,8 +11420,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -9437,8 +11431,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -9452,8 +11447,9 @@ namespace Attributes {
 namespace NumberOfPositions {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfPositions::Id; }
@@ -9462,8 +11458,9 @@ struct TypeInfo
 namespace CurrentPosition {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPosition::Id; }
@@ -9472,8 +11469,9 @@ struct TypeInfo
 namespace MultiPressMax {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MultiPressMax::Id; }
@@ -9482,8 +11480,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -9492,8 +11491,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -9508,13 +11508,33 @@ namespace AdministratorCommissioning {
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
-    kSuccess      = 0x00,
-    kBusy         = 0x01,
-    kGeneralError = 0x02,
+    kBusy               = 0x01,
+    kPAKEParameterError = 0x02,
+    kWindowNotOpen      = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using StatusCode                           = EmberAfStatusCode;
 #endif
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace OpenCommissioningWindow {
+struct Type;
+struct DecodableType;
+} // namespace OpenCommissioningWindow
+
+namespace OpenBasicCommissioningWindow {
+struct Type;
+struct DecodableType;
+} // namespace OpenBasicCommissioningWindow
+
+namespace RevokeCommissioning {
+struct Type;
+struct DecodableType;
+} // namespace RevokeCommissioning
+
+} // namespace Commands
 
 namespace Commands {
 namespace OpenCommissioningWindow {
@@ -9543,6 +11563,8 @@ public:
     uint16_t passcodeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9576,6 +11598,8 @@ public:
     uint16_t commissioningTimeout;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9601,6 +11625,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9618,8 +11644,9 @@ namespace Attributes {
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -9628,8 +11655,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -9711,6 +11739,76 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace AttestationRequest {
+struct Type;
+struct DecodableType;
+} // namespace AttestationRequest
+
+namespace AttestationResponse {
+struct Type;
+struct DecodableType;
+} // namespace AttestationResponse
+
+namespace CertificateChainRequest {
+struct Type;
+struct DecodableType;
+} // namespace CertificateChainRequest
+
+namespace CertificateChainResponse {
+struct Type;
+struct DecodableType;
+} // namespace CertificateChainResponse
+
+namespace OpCSRRequest {
+struct Type;
+struct DecodableType;
+} // namespace OpCSRRequest
+
+namespace OpCSRResponse {
+struct Type;
+struct DecodableType;
+} // namespace OpCSRResponse
+
+namespace AddNOC {
+struct Type;
+struct DecodableType;
+} // namespace AddNOC
+
+namespace UpdateNOC {
+struct Type;
+struct DecodableType;
+} // namespace UpdateNOC
+
+namespace NOCResponse {
+struct Type;
+struct DecodableType;
+} // namespace NOCResponse
+
+namespace UpdateFabricLabel {
+struct Type;
+struct DecodableType;
+} // namespace UpdateFabricLabel
+
+namespace RemoveFabric {
+struct Type;
+struct DecodableType;
+} // namespace RemoveFabric
+
+namespace AddTrustedRootCertificate {
+struct Type;
+struct DecodableType;
+} // namespace AddTrustedRootCertificate
+
+namespace RemoveTrustedRootCertificate {
+struct Type;
+struct DecodableType;
+} // namespace RemoveTrustedRootCertificate
+
+} // namespace Commands
+
+namespace Commands {
 namespace AttestationRequest {
 enum class Fields
 {
@@ -9727,6 +11825,8 @@ public:
     chip::ByteSpan attestationNonce;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType;
 };
 
 struct DecodableType
@@ -9757,6 +11857,8 @@ public:
     chip::ByteSpan signature;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9786,6 +11888,8 @@ public:
     uint8_t certificateType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType;
 };
 
 struct DecodableType
@@ -9814,6 +11918,8 @@ public:
     chip::ByteSpan certificate;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9842,6 +11948,8 @@ public:
     chip::ByteSpan CSRNonce;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType;
 };
 
 struct DecodableType
@@ -9872,6 +11980,8 @@ public:
     chip::ByteSpan attestationSignature;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -9909,6 +12019,8 @@ public:
     uint16_t adminVendorId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 };
 
 struct DecodableType
@@ -9943,6 +12055,8 @@ public:
     Optional<chip::ByteSpan> ICACValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 };
 
 struct DecodableType
@@ -9976,6 +12090,8 @@ public:
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10006,6 +12122,8 @@ public:
     chip::CharSpan label;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10034,6 +12152,8 @@ public:
     uint8_t fabricIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10062,6 +12182,8 @@ public:
     chip::ByteSpan rootCertificate;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10090,6 +12212,8 @@ public:
     chip::ByteSpan trustedRootIdentifier;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10108,8 +12232,9 @@ namespace Attributes {
 namespace FabricsList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::FabricDescriptor::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::FabricDescriptor::DecodableType>;
+    using Type             = DataModel::List<const Structs::FabricDescriptor::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::FabricDescriptor::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::FabricDescriptor::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FabricsList::Id; }
@@ -10118,8 +12243,9 @@ struct TypeInfo
 namespace SupportedFabrics {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedFabrics::Id; }
@@ -10128,8 +12254,9 @@ struct TypeInfo
 namespace CommissionedFabrics {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CommissionedFabrics::Id; }
@@ -10138,8 +12265,9 @@ struct TypeInfo
 namespace TrustedRootCertificates {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const chip::ByteSpan>;
-    using DecodableType = DataModel::DecodableList<chip::ByteSpan>;
+    using Type             = DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const DataModel::DecodableList<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TrustedRootCertificates::Id; }
@@ -10148,8 +12276,9 @@ struct TypeInfo
 namespace CurrentFabricIndex {
 struct TypeInfo
 {
-    using Type          = chip::FabricIndex;
-    using DecodableType = chip::FabricIndex;
+    using Type             = chip::FabricIndex;
+    using DecodableType    = chip::FabricIndex;
+    using DecodableArgType = chip::FabricIndex;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFabricIndex::Id; }
@@ -10158,8 +12287,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -10168,8 +12298,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -10206,8 +12337,9 @@ namespace Attributes {
 namespace LabelList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::LabelStruct::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::LabelStruct::DecodableType>;
+    using Type             = DataModel::List<const Structs::LabelStruct::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::LabelStruct::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::LabelStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LabelList::Id; }
@@ -10216,8 +12348,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -10226,8 +12359,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -10241,8 +12375,9 @@ namespace Attributes {
 namespace StateValue {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StateValue::Id; }
@@ -10251,8 +12386,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -10261,8 +12397,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -10282,8 +12419,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
 
     bool stateValue;
@@ -10353,6 +12490,16 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ChangeToMode {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToMode
+
+} // namespace Commands
+
+namespace Commands {
 namespace ChangeToMode {
 enum class Fields
 {
@@ -10369,6 +12516,8 @@ public:
     uint8_t newMode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10387,8 +12536,9 @@ namespace Attributes {
 namespace CurrentMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
@@ -10397,8 +12547,9 @@ struct TypeInfo
 namespace SupportedModes {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::ModeOptionStruct::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::ModeOptionStruct::DecodableType>;
+    using Type             = DataModel::List<const Structs::ModeOptionStruct::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::ModeOptionStruct::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::ModeOptionStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
@@ -10407,8 +12558,9 @@ struct TypeInfo
 namespace OnMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
@@ -10417,8 +12569,9 @@ struct TypeInfo
 namespace StartUpMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
@@ -10427,8 +12580,9 @@ struct TypeInfo
 namespace Description {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
@@ -10437,8 +12591,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -10447,8 +12602,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -10462,8 +12618,9 @@ namespace Attributes {
 namespace PhysicalClosedLimit {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimit::Id; }
@@ -10472,8 +12629,9 @@ struct TypeInfo
 namespace MotorStepSize {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MotorStepSize::Id; }
@@ -10482,8 +12640,9 @@ struct TypeInfo
 namespace Status {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
@@ -10492,8 +12651,9 @@ struct TypeInfo
 namespace ClosedLimit {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClosedLimit::Id; }
@@ -10502,8 +12662,9 @@ struct TypeInfo
 namespace Mode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Mode::Id; }
@@ -10512,8 +12673,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -10522,8 +12684,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -10622,14 +12785,289 @@ using DoorLockUserType                     = EmberAfDoorLockUserType;
 // Bitmap for DoorLockDayOfWeek
 enum class DoorLockDayOfWeek : uint8_t
 {
-    kSunday    = 0,
-    kMonday    = 1,
-    kTuesday   = 2,
-    kWednesday = 3,
-    kThursday  = 4,
-    kFriday    = 5,
-    kSaturday  = 6,
+    kSunday    = 0x1,
+    kMonday    = 0x2,
+    kTuesday   = 0x4,
+    kWednesday = 0x8,
+    kThursday  = 0x10,
+    kFriday    = 0x20,
+    kSaturday  = 0x40,
 };
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace LockDoor {
+struct Type;
+struct DecodableType;
+} // namespace LockDoor
+
+namespace LockDoorResponse {
+struct Type;
+struct DecodableType;
+} // namespace LockDoorResponse
+
+namespace UnlockDoor {
+struct Type;
+struct DecodableType;
+} // namespace UnlockDoor
+
+namespace UnlockDoorResponse {
+struct Type;
+struct DecodableType;
+} // namespace UnlockDoorResponse
+
+namespace Toggle {
+struct Type;
+struct DecodableType;
+} // namespace Toggle
+
+namespace ToggleResponse {
+struct Type;
+struct DecodableType;
+} // namespace ToggleResponse
+
+namespace UnlockWithTimeout {
+struct Type;
+struct DecodableType;
+} // namespace UnlockWithTimeout
+
+namespace UnlockWithTimeoutResponse {
+struct Type;
+struct DecodableType;
+} // namespace UnlockWithTimeoutResponse
+
+namespace GetLogRecord {
+struct Type;
+struct DecodableType;
+} // namespace GetLogRecord
+
+namespace GetLogRecordResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetLogRecordResponse
+
+namespace SetPin {
+struct Type;
+struct DecodableType;
+} // namespace SetPin
+
+namespace SetPinResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetPinResponse
+
+namespace GetPin {
+struct Type;
+struct DecodableType;
+} // namespace GetPin
+
+namespace GetPinResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetPinResponse
+
+namespace ClearPin {
+struct Type;
+struct DecodableType;
+} // namespace ClearPin
+
+namespace ClearPinResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearPinResponse
+
+namespace ClearAllPins {
+struct Type;
+struct DecodableType;
+} // namespace ClearAllPins
+
+namespace ClearAllPinsResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearAllPinsResponse
+
+namespace SetUserStatus {
+struct Type;
+struct DecodableType;
+} // namespace SetUserStatus
+
+namespace SetUserStatusResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetUserStatusResponse
+
+namespace GetUserStatus {
+struct Type;
+struct DecodableType;
+} // namespace GetUserStatus
+
+namespace GetUserStatusResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetUserStatusResponse
+
+namespace SetWeekdaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace SetWeekdaySchedule
+
+namespace SetWeekdayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetWeekdayScheduleResponse
+
+namespace GetWeekdaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace GetWeekdaySchedule
+
+namespace GetWeekdayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetWeekdayScheduleResponse
+
+namespace ClearWeekdaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace ClearWeekdaySchedule
+
+namespace ClearWeekdayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearWeekdayScheduleResponse
+
+namespace SetYeardaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace SetYeardaySchedule
+
+namespace SetYeardayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetYeardayScheduleResponse
+
+namespace GetYeardaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace GetYeardaySchedule
+
+namespace GetYeardayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetYeardayScheduleResponse
+
+namespace ClearYeardaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace ClearYeardaySchedule
+
+namespace ClearYeardayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearYeardayScheduleResponse
+
+namespace SetHolidaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace SetHolidaySchedule
+
+namespace SetHolidayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetHolidayScheduleResponse
+
+namespace GetHolidaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace GetHolidaySchedule
+
+namespace GetHolidayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetHolidayScheduleResponse
+
+namespace ClearHolidaySchedule {
+struct Type;
+struct DecodableType;
+} // namespace ClearHolidaySchedule
+
+namespace ClearHolidayScheduleResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearHolidayScheduleResponse
+
+namespace SetUserType {
+struct Type;
+struct DecodableType;
+} // namespace SetUserType
+
+namespace SetUserTypeResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetUserTypeResponse
+
+namespace GetUserType {
+struct Type;
+struct DecodableType;
+} // namespace GetUserType
+
+namespace GetUserTypeResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetUserTypeResponse
+
+namespace SetRfid {
+struct Type;
+struct DecodableType;
+} // namespace SetRfid
+
+namespace SetRfidResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetRfidResponse
+
+namespace GetRfid {
+struct Type;
+struct DecodableType;
+} // namespace GetRfid
+
+namespace GetRfidResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetRfidResponse
+
+namespace ClearRfid {
+struct Type;
+struct DecodableType;
+} // namespace ClearRfid
+
+namespace ClearRfidResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearRfidResponse
+
+namespace ClearAllRfids {
+struct Type;
+struct DecodableType;
+} // namespace ClearAllRfids
+
+namespace ClearAllRfidsResponse {
+struct Type;
+struct DecodableType;
+} // namespace ClearAllRfidsResponse
+
+namespace OperationEventNotification {
+struct Type;
+struct DecodableType;
+} // namespace OperationEventNotification
+
+namespace ProgrammingEventNotification {
+struct Type;
+struct DecodableType;
+} // namespace ProgrammingEventNotification
+
+} // namespace Commands
 
 namespace Commands {
 namespace LockDoor {
@@ -10648,6 +13086,8 @@ public:
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::LockDoorResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10676,6 +13116,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10704,6 +13146,8 @@ public:
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10732,6 +13176,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10760,6 +13206,8 @@ public:
     chip::CharSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ToggleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10788,6 +13236,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10818,6 +13268,8 @@ public:
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10847,6 +13299,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10875,6 +13329,8 @@ public:
     uint16_t logIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10915,6 +13371,8 @@ public:
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -10955,6 +13413,8 @@ public:
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetPinResponse::DecodableType;
 };
 
 struct DecodableType
@@ -10986,6 +13446,8 @@ public:
     DoorLockSetPinOrIdStatus status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11014,6 +13476,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetPinResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11048,6 +13512,8 @@ public:
     chip::ByteSpan pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11079,6 +13545,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearPinResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11107,6 +13575,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11132,6 +13602,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11159,6 +13631,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11189,6 +13663,8 @@ public:
     uint8_t userStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetUserStatusResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11218,6 +13694,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11246,6 +13724,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetUserStatusResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11276,6 +13756,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11317,6 +13799,8 @@ public:
     uint8_t endMinute;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11351,6 +13835,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11381,6 +13867,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11424,6 +13912,8 @@ public:
     uint8_t endMinute;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11461,6 +13951,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11490,6 +13982,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11524,6 +14018,8 @@ public:
     uint32_t localEndTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11555,6 +14051,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11585,6 +14083,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11622,6 +14122,8 @@ public:
     uint32_t localEndTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11656,6 +14158,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11685,6 +14189,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11719,6 +14225,8 @@ public:
     uint8_t operatingModeDuringHoliday;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11750,6 +14258,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11778,6 +14288,8 @@ public:
     uint8_t scheduleId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11814,6 +14326,8 @@ public:
     uint8_t operatingModeDuringHoliday;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11846,6 +14360,8 @@ public:
     uint8_t scheduleId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11874,6 +14390,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11904,6 +14422,8 @@ public:
     DoorLockUserType userType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11933,6 +14453,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -11961,6 +14483,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType;
 };
 
 struct DecodableType
@@ -11991,6 +14515,8 @@ public:
     DoorLockUserType userType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12026,6 +14552,8 @@ public:
     chip::ByteSpan id;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetRfidResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12057,6 +14585,8 @@ public:
     DoorLockSetPinOrIdStatus status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12085,6 +14615,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetRfidResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12119,6 +14651,8 @@ public:
     chip::ByteSpan rfid;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12150,6 +14684,8 @@ public:
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12178,6 +14714,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12203,6 +14741,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -12230,6 +14770,8 @@ public:
     uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12268,6 +14810,8 @@ public:
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12315,6 +14859,8 @@ public:
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12340,8 +14886,9 @@ namespace Attributes {
 namespace LockState {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LockState::Id; }
@@ -12350,8 +14897,9 @@ struct TypeInfo
 namespace LockType {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LockType::Id; }
@@ -12360,8 +14908,9 @@ struct TypeInfo
 namespace ActuatorEnabled {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActuatorEnabled::Id; }
@@ -12370,8 +14919,9 @@ struct TypeInfo
 namespace DoorState {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DoorState::Id; }
@@ -12380,8 +14930,9 @@ struct TypeInfo
 namespace DoorOpenEvents {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DoorOpenEvents::Id; }
@@ -12390,8 +14941,9 @@ struct TypeInfo
 namespace DoorClosedEvents {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DoorClosedEvents::Id; }
@@ -12400,8 +14952,9 @@ struct TypeInfo
 namespace OpenPeriod {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OpenPeriod::Id; }
@@ -12410,8 +14963,9 @@ struct TypeInfo
 namespace NumLockRecordsSupported {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumLockRecordsSupported::Id; }
@@ -12420,8 +14974,9 @@ struct TypeInfo
 namespace NumTotalUsersSupported {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumTotalUsersSupported::Id; }
@@ -12430,8 +14985,9 @@ struct TypeInfo
 namespace NumPinUsersSupported {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumPinUsersSupported::Id; }
@@ -12440,8 +14996,9 @@ struct TypeInfo
 namespace NumRfidUsersSupported {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumRfidUsersSupported::Id; }
@@ -12450,8 +15007,9 @@ struct TypeInfo
 namespace NumWeekdaySchedulesSupportedPerUser {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumWeekdaySchedulesSupportedPerUser::Id; }
@@ -12460,8 +15018,9 @@ struct TypeInfo
 namespace NumYeardaySchedulesSupportedPerUser {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumYeardaySchedulesSupportedPerUser::Id; }
@@ -12470,8 +15029,9 @@ struct TypeInfo
 namespace NumHolidaySchedulesSupportedPerUser {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumHolidaySchedulesSupportedPerUser::Id; }
@@ -12480,8 +15040,9 @@ struct TypeInfo
 namespace MaxPinLength {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxPinLength::Id; }
@@ -12490,8 +15051,9 @@ struct TypeInfo
 namespace MinPinLength {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinPinLength::Id; }
@@ -12500,8 +15062,9 @@ struct TypeInfo
 namespace MaxRfidCodeLength {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxRfidCodeLength::Id; }
@@ -12510,8 +15073,9 @@ struct TypeInfo
 namespace MinRfidCodeLength {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinRfidCodeLength::Id; }
@@ -12520,8 +15084,9 @@ struct TypeInfo
 namespace EnableLogging {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnableLogging::Id; }
@@ -12530,8 +15095,9 @@ struct TypeInfo
 namespace Language {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Language::Id; }
@@ -12540,8 +15106,9 @@ struct TypeInfo
 namespace LedSettings {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LedSettings::Id; }
@@ -12550,8 +15117,9 @@ struct TypeInfo
 namespace AutoRelockTime {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AutoRelockTime::Id; }
@@ -12560,8 +15128,9 @@ struct TypeInfo
 namespace SoundVolume {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoundVolume::Id; }
@@ -12570,8 +15139,9 @@ struct TypeInfo
 namespace OperatingMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperatingMode::Id; }
@@ -12580,8 +15150,9 @@ struct TypeInfo
 namespace SupportedOperatingModes {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedOperatingModes::Id; }
@@ -12590,8 +15161,9 @@ struct TypeInfo
 namespace DefaultConfigurationRegister {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultConfigurationRegister::Id; }
@@ -12600,8 +15172,9 @@ struct TypeInfo
 namespace EnableLocalProgramming {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnableLocalProgramming::Id; }
@@ -12610,8 +15183,9 @@ struct TypeInfo
 namespace EnableOneTouchLocking {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnableOneTouchLocking::Id; }
@@ -12620,8 +15194,9 @@ struct TypeInfo
 namespace EnableInsideStatusLed {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnableInsideStatusLed::Id; }
@@ -12630,8 +15205,9 @@ struct TypeInfo
 namespace EnablePrivacyModeButton {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnablePrivacyModeButton::Id; }
@@ -12640,8 +15216,9 @@ struct TypeInfo
 namespace WrongCodeEntryLimit {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WrongCodeEntryLimit::Id; }
@@ -12650,8 +15227,9 @@ struct TypeInfo
 namespace UserCodeTemporaryDisableTime {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UserCodeTemporaryDisableTime::Id; }
@@ -12660,8 +15238,9 @@ struct TypeInfo
 namespace SendPinOverTheAir {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SendPinOverTheAir::Id; }
@@ -12670,8 +15249,9 @@ struct TypeInfo
 namespace RequirePinForRfOperation {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RequirePinForRfOperation::Id; }
@@ -12680,8 +15260,9 @@ struct TypeInfo
 namespace ZigbeeSecurityLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZigbeeSecurityLevel::Id; }
@@ -12690,8 +15271,9 @@ struct TypeInfo
 namespace AlarmMask {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
@@ -12700,8 +15282,9 @@ struct TypeInfo
 namespace KeypadOperationEventMask {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadOperationEventMask::Id; }
@@ -12710,8 +15293,9 @@ struct TypeInfo
 namespace RfOperationEventMask {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RfOperationEventMask::Id; }
@@ -12720,8 +15304,9 @@ struct TypeInfo
 namespace ManualOperationEventMask {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ManualOperationEventMask::Id; }
@@ -12730,8 +15315,9 @@ struct TypeInfo
 namespace RfidOperationEventMask {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RfidOperationEventMask::Id; }
@@ -12740,8 +15326,9 @@ struct TypeInfo
 namespace KeypadProgrammingEventMask {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadProgrammingEventMask::Id; }
@@ -12750,8 +15337,9 @@ struct TypeInfo
 namespace RfProgrammingEventMask {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RfProgrammingEventMask::Id; }
@@ -12760,8 +15348,9 @@ struct TypeInfo
 namespace RfidProgrammingEventMask {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RfidProgrammingEventMask::Id; }
@@ -12770,8 +15359,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -12780,8 +15370,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -12794,48 +15385,88 @@ namespace WindowCovering {
 // Bitmap for WcConfigStatus
 enum class WcConfigStatus : uint8_t
 {
-    kOperational               = 0,
-    kOnline                    = 1,
-    kOpenAndUpCommandsReversed = 2,
-    kLiftPositionAware         = 3,
-    kTiltPositionAware         = 4,
-    kLiftEncoderControlled     = 5,
-    kTiltEncoderControlled     = 6,
+    kOperational               = 0x1,
+    kOnline                    = 0x2,
+    kOpenAndUpCommandsReversed = 0x4,
+    kLiftPositionAware         = 0x8,
+    kTiltPositionAware         = 0x10,
+    kLiftEncoderControlled     = 0x20,
+    kTiltEncoderControlled     = 0x40,
 };
 
 // Bitmap for WcMode
 enum class WcMode : uint8_t
 {
-    kMotorDirectionReversed = 0,
-    kCalibrationMode        = 1,
-    kMaintenanceMode        = 2,
-    kLEDFeedback            = 3,
+    kMotorDirectionReversed = 0x1,
+    kCalibrationMode        = 0x2,
+    kMaintenanceMode        = 0x4,
+    kLEDFeedback            = 0x8,
 };
 
 // Bitmap for WcOperationalStatus
 enum class WcOperationalStatus : uint8_t
 {
-    kGlobal = 0,
-    kLift   = 2,
-    kTilt   = 4,
+    kGlobal = 0x3,
+    kLift   = 0xC,
+    kTilt   = 0x30,
 };
 
 // Bitmap for WcSafetyStatus
 enum class WcSafetyStatus : uint16_t
 {
-    kRemoteLockout       = 0,
-    kTamperDetection     = 1,
-    kFailedCommunication = 2,
-    kPositionFailure     = 3,
-    kThermalProtection   = 4,
-    kObstacleDetected    = 5,
-    kPower               = 6,
-    kStopInput           = 7,
-    kMotorJammed         = 8,
-    kHardwareFailure     = 9,
-    kManualOperation     = 10,
-    kProtection          = 11,
+    kRemoteLockout       = 0x1,
+    kTamperDetection     = 0x2,
+    kFailedCommunication = 0x4,
+    kPositionFailure     = 0x8,
+    kThermalProtection   = 0x10,
+    kObstacleDetected    = 0x20,
+    kPower               = 0x40,
+    kStopInput           = 0x80,
+    kMotorJammed         = 0x100,
+    kHardwareFailure     = 0x200,
+    kManualOperation     = 0x400,
+    kProtection          = 0x800,
 };
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace UpOrOpen {
+struct Type;
+struct DecodableType;
+} // namespace UpOrOpen
+
+namespace DownOrClose {
+struct Type;
+struct DecodableType;
+} // namespace DownOrClose
+
+namespace StopMotion {
+struct Type;
+struct DecodableType;
+} // namespace StopMotion
+
+namespace GoToLiftValue {
+struct Type;
+struct DecodableType;
+} // namespace GoToLiftValue
+
+namespace GoToLiftPercentage {
+struct Type;
+struct DecodableType;
+} // namespace GoToLiftPercentage
+
+namespace GoToTiltValue {
+struct Type;
+struct DecodableType;
+} // namespace GoToTiltValue
+
+namespace GoToTiltPercentage {
+struct Type;
+struct DecodableType;
+} // namespace GoToTiltPercentage
+
+} // namespace Commands
 
 namespace Commands {
 namespace UpOrOpen {
@@ -12851,6 +15482,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12875,6 +15508,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12899,6 +15534,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12926,6 +15563,8 @@ public:
     uint16_t liftValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12956,6 +15595,8 @@ public:
     uint16_t liftPercent100thsValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -12985,6 +15626,8 @@ public:
     uint16_t tiltValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13015,6 +15658,8 @@ public:
     uint16_t tiltPercent100thsValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13034,8 +15679,9 @@ namespace Attributes {
 namespace Type {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Type::Id; }
@@ -13044,8 +15690,9 @@ struct TypeInfo
 namespace PhysicalClosedLimitLift {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimitLift::Id; }
@@ -13054,8 +15701,9 @@ struct TypeInfo
 namespace PhysicalClosedLimitTilt {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimitTilt::Id; }
@@ -13064,8 +15712,9 @@ struct TypeInfo
 namespace CurrentPositionLift {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLift::Id; }
@@ -13074,8 +15723,9 @@ struct TypeInfo
 namespace CurrentPositionTilt {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTilt::Id; }
@@ -13084,8 +15734,9 @@ struct TypeInfo
 namespace NumberOfActuationsLift {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfActuationsLift::Id; }
@@ -13094,8 +15745,9 @@ struct TypeInfo
 namespace NumberOfActuationsTilt {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfActuationsTilt::Id; }
@@ -13104,8 +15756,9 @@ struct TypeInfo
 namespace ConfigStatus {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ConfigStatus::Id; }
@@ -13114,8 +15767,9 @@ struct TypeInfo
 namespace CurrentPositionLiftPercentage {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLiftPercentage::Id; }
@@ -13124,8 +15778,9 @@ struct TypeInfo
 namespace CurrentPositionTiltPercentage {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTiltPercentage::Id; }
@@ -13134,8 +15789,9 @@ struct TypeInfo
 namespace OperationalStatus {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalStatus::Id; }
@@ -13144,8 +15800,9 @@ struct TypeInfo
 namespace TargetPositionLiftPercent100ths {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetPositionLiftPercent100ths::Id; }
@@ -13154,8 +15811,9 @@ struct TypeInfo
 namespace TargetPositionTiltPercent100ths {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetPositionTiltPercent100ths::Id; }
@@ -13164,8 +15822,9 @@ struct TypeInfo
 namespace EndProductType {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EndProductType::Id; }
@@ -13174,8 +15833,9 @@ struct TypeInfo
 namespace CurrentPositionLiftPercent100ths {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLiftPercent100ths::Id; }
@@ -13184,8 +15844,9 @@ struct TypeInfo
 namespace CurrentPositionTiltPercent100ths {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTiltPercent100ths::Id; }
@@ -13194,8 +15855,9 @@ struct TypeInfo
 namespace InstalledOpenLimitLift {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstalledOpenLimitLift::Id; }
@@ -13204,8 +15866,9 @@ struct TypeInfo
 namespace InstalledClosedLimitLift {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstalledClosedLimitLift::Id; }
@@ -13214,8 +15877,9 @@ struct TypeInfo
 namespace InstalledOpenLimitTilt {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstalledOpenLimitTilt::Id; }
@@ -13224,8 +15888,9 @@ struct TypeInfo
 namespace InstalledClosedLimitTilt {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstalledClosedLimitTilt::Id; }
@@ -13234,8 +15899,9 @@ struct TypeInfo
 namespace VelocityLift {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VelocityLift::Id; }
@@ -13244,8 +15910,9 @@ struct TypeInfo
 namespace AccelerationTimeLift {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AccelerationTimeLift::Id; }
@@ -13254,8 +15921,9 @@ struct TypeInfo
 namespace DecelerationTimeLift {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DecelerationTimeLift::Id; }
@@ -13264,8 +15932,9 @@ struct TypeInfo
 namespace Mode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Mode::Id; }
@@ -13274,8 +15943,9 @@ struct TypeInfo
 namespace IntermediateSetpointsLift {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IntermediateSetpointsLift::Id; }
@@ -13284,8 +15954,9 @@ struct TypeInfo
 namespace IntermediateSetpointsTilt {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IntermediateSetpointsTilt::Id; }
@@ -13294,8 +15965,9 @@ struct TypeInfo
 namespace SafetyStatus {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SafetyStatus::Id; }
@@ -13304,8 +15976,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -13314,8 +15987,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -13324,6 +15998,21 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace WindowCovering
 namespace BarrierControl {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace BarrierControlGoToPercent {
+struct Type;
+struct DecodableType;
+} // namespace BarrierControlGoToPercent
+
+namespace BarrierControlStop {
+struct Type;
+struct DecodableType;
+} // namespace BarrierControlStop
+
+} // namespace Commands
 
 namespace Commands {
 namespace BarrierControlGoToPercent {
@@ -13342,6 +16031,8 @@ public:
     uint8_t percentOpen;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13367,6 +16058,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -13384,8 +16077,9 @@ namespace Attributes {
 namespace BarrierMovingState {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierMovingState::Id; }
@@ -13394,8 +16088,9 @@ struct TypeInfo
 namespace BarrierSafetyStatus {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierSafetyStatus::Id; }
@@ -13404,8 +16099,9 @@ struct TypeInfo
 namespace BarrierCapabilities {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCapabilities::Id; }
@@ -13414,8 +16110,9 @@ struct TypeInfo
 namespace BarrierOpenEvents {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierOpenEvents::Id; }
@@ -13424,8 +16121,9 @@ struct TypeInfo
 namespace BarrierCloseEvents {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCloseEvents::Id; }
@@ -13434,8 +16132,9 @@ struct TypeInfo
 namespace BarrierCommandOpenEvents {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCommandOpenEvents::Id; }
@@ -13444,8 +16143,9 @@ struct TypeInfo
 namespace BarrierCommandCloseEvents {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCommandCloseEvents::Id; }
@@ -13454,8 +16154,9 @@ struct TypeInfo
 namespace BarrierOpenPeriod {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierOpenPeriod::Id; }
@@ -13464,8 +16165,9 @@ struct TypeInfo
 namespace BarrierClosePeriod {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierClosePeriod::Id; }
@@ -13474,8 +16176,9 @@ struct TypeInfo
 namespace BarrierPosition {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierPosition::Id; }
@@ -13484,8 +16187,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -13494,8 +16198,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -13538,23 +16243,24 @@ using PumpOperationMode                    = EmberAfPumpOperationMode;
 // Bitmap for PumpStatus
 enum class PumpStatus : uint16_t
 {
-    kDeviceFault       = 0,
-    kSupplyfault       = 1,
-    kSpeedLow          = 2,
-    kSpeedHigh         = 3,
-    kLocalOverride     = 4,
-    kRunning           = 5,
-    kRemotePressure    = 6,
-    kRemoteFlow        = 7,
-    kRemoteTemperature = 8,
+    kDeviceFault       = 0x1,
+    kSupplyfault       = 0x2,
+    kSpeedLow          = 0x4,
+    kSpeedHigh         = 0x8,
+    kLocalOverride     = 0x10,
+    kRunning           = 0x20,
+    kRemotePressure    = 0x40,
+    kRemoteFlow        = 0x80,
+    kRemoteTemperature = 0x100,
 };
 
 namespace Attributes {
 namespace MaxPressure {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxPressure::Id; }
@@ -13563,8 +16269,9 @@ struct TypeInfo
 namespace MaxSpeed {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxSpeed::Id; }
@@ -13573,8 +16280,9 @@ struct TypeInfo
 namespace MaxFlow {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxFlow::Id; }
@@ -13583,8 +16291,9 @@ struct TypeInfo
 namespace MinConstPressure {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinConstPressure::Id; }
@@ -13593,8 +16302,9 @@ struct TypeInfo
 namespace MaxConstPressure {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstPressure::Id; }
@@ -13603,8 +16313,9 @@ struct TypeInfo
 namespace MinCompPressure {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinCompPressure::Id; }
@@ -13613,8 +16324,9 @@ struct TypeInfo
 namespace MaxCompPressure {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxCompPressure::Id; }
@@ -13623,8 +16335,9 @@ struct TypeInfo
 namespace MinConstSpeed {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinConstSpeed::Id; }
@@ -13633,8 +16346,9 @@ struct TypeInfo
 namespace MaxConstSpeed {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstSpeed::Id; }
@@ -13643,8 +16357,9 @@ struct TypeInfo
 namespace MinConstFlow {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinConstFlow::Id; }
@@ -13653,8 +16368,9 @@ struct TypeInfo
 namespace MaxConstFlow {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstFlow::Id; }
@@ -13663,8 +16379,9 @@ struct TypeInfo
 namespace MinConstTemp {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinConstTemp::Id; }
@@ -13673,8 +16390,9 @@ struct TypeInfo
 namespace MaxConstTemp {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstTemp::Id; }
@@ -13683,8 +16401,9 @@ struct TypeInfo
 namespace PumpStatus {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PumpStatus::Id; }
@@ -13693,8 +16412,9 @@ struct TypeInfo
 namespace EffectiveOperationMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EffectiveOperationMode::Id; }
@@ -13703,8 +16423,9 @@ struct TypeInfo
 namespace EffectiveControlMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EffectiveControlMode::Id; }
@@ -13713,8 +16434,9 @@ struct TypeInfo
 namespace Capacity {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Capacity::Id; }
@@ -13723,8 +16445,9 @@ struct TypeInfo
 namespace Speed {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Speed::Id; }
@@ -13733,8 +16456,9 @@ struct TypeInfo
 namespace LifetimeRunningHours {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeRunningHours::Id; }
@@ -13743,8 +16467,9 @@ struct TypeInfo
 namespace Power {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Power::Id; }
@@ -13753,8 +16478,9 @@ struct TypeInfo
 namespace LifetimeEnergyConsumed {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeEnergyConsumed::Id; }
@@ -13763,8 +16489,9 @@ struct TypeInfo
 namespace OperationMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationMode::Id; }
@@ -13773,8 +16500,9 @@ struct TypeInfo
 namespace ControlMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ControlMode::Id; }
@@ -13783,8 +16511,9 @@ struct TypeInfo
 namespace AlarmMask {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
@@ -13793,8 +16522,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -13803,8 +16533,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -13823,8 +16554,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -13851,8 +16582,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000001;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -13879,8 +16610,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000002;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -13907,8 +16638,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000003;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -13935,8 +16666,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000004;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -13963,8 +16694,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000005;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -13991,8 +16722,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000006;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -14019,8 +16750,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000007;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -14047,8 +16778,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000008;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -14075,8 +16806,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000009;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -14103,8 +16834,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000A;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -14131,8 +16862,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000B;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -14159,8 +16890,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x0000000C;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -14187,8 +16918,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000D;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -14215,8 +16946,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000E;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -14243,8 +16974,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000F;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -14271,8 +17002,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000010;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -14308,22 +17039,62 @@ using SetpointAdjustMode                   = EmberAfSetpointAdjustMode;
 // Bitmap for DayOfWeek
 enum class DayOfWeek : uint8_t
 {
-    kSunday         = 0,
-    kMonday         = 1,
-    kTuesday        = 2,
-    kWednesday      = 3,
-    kThursday       = 4,
-    kFriday         = 5,
-    kSaturday       = 6,
-    kAwayOrVacation = 7,
+    kSunday         = 0x1,
+    kMonday         = 0x2,
+    kTuesday        = 0x4,
+    kWednesday      = 0x8,
+    kThursday       = 0x10,
+    kFriday         = 0x20,
+    kSaturday       = 0x40,
+    kAwayOrVacation = 0x80,
 };
 
 // Bitmap for ModeForSequence
 enum class ModeForSequence : uint8_t
 {
-    kHeatSetpointFieldPresent = 0,
-    kCoolSetpointFieldPresent = 1,
+    kHeatSetpointFieldPresent = 0x1,
+    kCoolSetpointFieldPresent = 0x2,
 };
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SetpointRaiseLower {
+struct Type;
+struct DecodableType;
+} // namespace SetpointRaiseLower
+
+namespace CurrentWeeklySchedule {
+struct Type;
+struct DecodableType;
+} // namespace CurrentWeeklySchedule
+
+namespace SetWeeklySchedule {
+struct Type;
+struct DecodableType;
+} // namespace SetWeeklySchedule
+
+namespace RelayStatusLog {
+struct Type;
+struct DecodableType;
+} // namespace RelayStatusLog
+
+namespace GetWeeklySchedule {
+struct Type;
+struct DecodableType;
+} // namespace GetWeeklySchedule
+
+namespace ClearWeeklySchedule {
+struct Type;
+struct DecodableType;
+} // namespace ClearWeeklySchedule
+
+namespace GetRelayStatusLog {
+struct Type;
+struct DecodableType;
+} // namespace GetRelayStatusLog
+
+} // namespace Commands
 
 namespace Commands {
 namespace SetpointRaiseLower {
@@ -14344,6 +17115,8 @@ public:
     int8_t amount;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -14379,6 +17152,8 @@ public:
     DataModel::List<const uint8_t> payload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -14416,6 +17191,8 @@ public:
     DataModel::List<const uint8_t> payload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -14457,6 +17234,8 @@ public:
     uint16_t unreadEntries;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -14492,6 +17271,8 @@ public:
     chip::BitFlags<ModeForSequence> modeToReturn;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -14518,6 +17299,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -14542,6 +17325,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -14559,8 +17344,9 @@ namespace Attributes {
 namespace LocalTemperature {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalTemperature::Id; }
@@ -14569,8 +17355,9 @@ struct TypeInfo
 namespace OutdoorTemperature {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OutdoorTemperature::Id; }
@@ -14579,8 +17366,9 @@ struct TypeInfo
 namespace Occupancy {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Occupancy::Id; }
@@ -14589,8 +17377,9 @@ struct TypeInfo
 namespace AbsMinHeatSetpointLimit {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AbsMinHeatSetpointLimit::Id; }
@@ -14599,8 +17388,9 @@ struct TypeInfo
 namespace AbsMaxHeatSetpointLimit {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AbsMaxHeatSetpointLimit::Id; }
@@ -14609,8 +17399,9 @@ struct TypeInfo
 namespace AbsMinCoolSetpointLimit {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AbsMinCoolSetpointLimit::Id; }
@@ -14619,8 +17410,9 @@ struct TypeInfo
 namespace AbsMaxCoolSetpointLimit {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AbsMaxCoolSetpointLimit::Id; }
@@ -14629,8 +17421,9 @@ struct TypeInfo
 namespace PiCoolingDemand {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PiCoolingDemand::Id; }
@@ -14639,8 +17432,9 @@ struct TypeInfo
 namespace PiHeatingDemand {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PiHeatingDemand::Id; }
@@ -14649,8 +17443,9 @@ struct TypeInfo
 namespace HvacSystemTypeConfiguration {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HvacSystemTypeConfiguration::Id; }
@@ -14659,8 +17454,9 @@ struct TypeInfo
 namespace LocalTemperatureCalibration {
 struct TypeInfo
 {
-    using Type          = int8_t;
-    using DecodableType = int8_t;
+    using Type             = int8_t;
+    using DecodableType    = int8_t;
+    using DecodableArgType = int8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalTemperatureCalibration::Id; }
@@ -14669,8 +17465,9 @@ struct TypeInfo
 namespace OccupiedCoolingSetpoint {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedCoolingSetpoint::Id; }
@@ -14679,8 +17476,9 @@ struct TypeInfo
 namespace OccupiedHeatingSetpoint {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedHeatingSetpoint::Id; }
@@ -14689,8 +17487,9 @@ struct TypeInfo
 namespace UnoccupiedCoolingSetpoint {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedCoolingSetpoint::Id; }
@@ -14699,8 +17498,9 @@ struct TypeInfo
 namespace UnoccupiedHeatingSetpoint {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedHeatingSetpoint::Id; }
@@ -14709,8 +17509,9 @@ struct TypeInfo
 namespace MinHeatSetpointLimit {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinHeatSetpointLimit::Id; }
@@ -14719,8 +17520,9 @@ struct TypeInfo
 namespace MaxHeatSetpointLimit {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxHeatSetpointLimit::Id; }
@@ -14729,8 +17531,9 @@ struct TypeInfo
 namespace MinCoolSetpointLimit {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinCoolSetpointLimit::Id; }
@@ -14739,8 +17542,9 @@ struct TypeInfo
 namespace MaxCoolSetpointLimit {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxCoolSetpointLimit::Id; }
@@ -14749,8 +17553,9 @@ struct TypeInfo
 namespace MinSetpointDeadBand {
 struct TypeInfo
 {
-    using Type          = int8_t;
-    using DecodableType = int8_t;
+    using Type             = int8_t;
+    using DecodableType    = int8_t;
+    using DecodableArgType = int8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinSetpointDeadBand::Id; }
@@ -14759,8 +17564,9 @@ struct TypeInfo
 namespace RemoteSensing {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemoteSensing::Id; }
@@ -14769,8 +17575,9 @@ struct TypeInfo
 namespace ControlSequenceOfOperation {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ControlSequenceOfOperation::Id; }
@@ -14779,8 +17586,9 @@ struct TypeInfo
 namespace SystemMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SystemMode::Id; }
@@ -14789,8 +17597,9 @@ struct TypeInfo
 namespace AlarmMask {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
@@ -14799,8 +17608,9 @@ struct TypeInfo
 namespace ThermostatRunningMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ThermostatRunningMode::Id; }
@@ -14809,8 +17619,9 @@ struct TypeInfo
 namespace StartOfWeek {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartOfWeek::Id; }
@@ -14819,8 +17630,9 @@ struct TypeInfo
 namespace NumberOfWeeklyTransitions {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfWeeklyTransitions::Id; }
@@ -14829,8 +17641,9 @@ struct TypeInfo
 namespace NumberOfDailyTransitions {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfDailyTransitions::Id; }
@@ -14839,8 +17652,9 @@ struct TypeInfo
 namespace TemperatureSetpointHold {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHold::Id; }
@@ -14849,8 +17663,9 @@ struct TypeInfo
 namespace TemperatureSetpointHoldDuration {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHoldDuration::Id; }
@@ -14859,8 +17674,9 @@ struct TypeInfo
 namespace ThermostatProgrammingOperationMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ThermostatProgrammingOperationMode::Id; }
@@ -14869,8 +17685,9 @@ struct TypeInfo
 namespace HvacRelayState {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HvacRelayState::Id; }
@@ -14879,8 +17696,9 @@ struct TypeInfo
 namespace SetpointChangeSource {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeSource::Id; }
@@ -14889,8 +17707,9 @@ struct TypeInfo
 namespace SetpointChangeAmount {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeAmount::Id; }
@@ -14899,8 +17718,9 @@ struct TypeInfo
 namespace SetpointChangeSourceTimestamp {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeSourceTimestamp::Id; }
@@ -14909,8 +17729,9 @@ struct TypeInfo
 namespace AcType {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcType::Id; }
@@ -14919,8 +17740,9 @@ struct TypeInfo
 namespace AcCapacity {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCapacity::Id; }
@@ -14929,8 +17751,9 @@ struct TypeInfo
 namespace AcRefrigerantType {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcRefrigerantType::Id; }
@@ -14939,8 +17762,9 @@ struct TypeInfo
 namespace AcCompressor {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCompressor::Id; }
@@ -14949,8 +17773,9 @@ struct TypeInfo
 namespace AcErrorCode {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcErrorCode::Id; }
@@ -14959,8 +17784,9 @@ struct TypeInfo
 namespace AcLouverPosition {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcLouverPosition::Id; }
@@ -14969,8 +17795,9 @@ struct TypeInfo
 namespace AcCoilTemperature {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCoilTemperature::Id; }
@@ -14979,8 +17806,9 @@ struct TypeInfo
 namespace AcCapacityFormat {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCapacityFormat::Id; }
@@ -14989,8 +17817,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -14999,8 +17828,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -15014,8 +17844,9 @@ namespace Attributes {
 namespace FanMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FanMode::Id; }
@@ -15024,8 +17855,9 @@ struct TypeInfo
 namespace FanModeSequence {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FanModeSequence::Id; }
@@ -15034,8 +17866,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -15044,8 +17877,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -15059,8 +17893,9 @@ namespace Attributes {
 namespace RelativeHumidity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidity::Id; }
@@ -15069,8 +17904,9 @@ struct TypeInfo
 namespace DehumidificationCooling {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationCooling::Id; }
@@ -15079,8 +17915,9 @@ struct TypeInfo
 namespace RhDehumidificationSetpoint {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RhDehumidificationSetpoint::Id; }
@@ -15089,8 +17926,9 @@ struct TypeInfo
 namespace RelativeHumidityMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidityMode::Id; }
@@ -15099,8 +17937,9 @@ struct TypeInfo
 namespace DehumidificationLockout {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationLockout::Id; }
@@ -15109,8 +17948,9 @@ struct TypeInfo
 namespace DehumidificationHysteresis {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationHysteresis::Id; }
@@ -15119,8 +17959,9 @@ struct TypeInfo
 namespace DehumidificationMaxCool {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationMaxCool::Id; }
@@ -15129,8 +17970,9 @@ struct TypeInfo
 namespace RelativeHumidityDisplay {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidityDisplay::Id; }
@@ -15139,8 +17981,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -15149,8 +17992,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -15164,8 +18008,9 @@ namespace Attributes {
 namespace TemperatureDisplayMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureDisplayMode::Id; }
@@ -15174,8 +18019,9 @@ struct TypeInfo
 namespace KeypadLockout {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadLockout::Id; }
@@ -15184,8 +18030,9 @@ struct TypeInfo
 namespace ScheduleProgrammingVisibility {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScheduleProgrammingVisibility::Id; }
@@ -15194,8 +18041,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -15204,8 +18052,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -15320,21 +18169,121 @@ using SaturationStepMode                   = EmberAfSaturationStepMode;
 // Bitmap for ColorCapabilities
 enum class ColorCapabilities : uint16_t
 {
-    kHueSaturationSupported    = 0,
-    kEnhancedHueSupported      = 1,
-    kColorLoopSupported        = 2,
-    kXYAttributesSupported     = 3,
-    kColorTemperatureSupported = 4,
+    kHueSaturationSupported    = 0x1,
+    kEnhancedHueSupported      = 0x2,
+    kColorLoopSupported        = 0x4,
+    kXYAttributesSupported     = 0x8,
+    kColorTemperatureSupported = 0x10,
 };
 
 // Bitmap for ColorLoopUpdateFlags
 enum class ColorLoopUpdateFlags : uint8_t
 {
-    kUpdateAction    = 0,
-    kUpdateDirection = 1,
-    kUpdateTime      = 2,
-    kUpdateStartHue  = 3,
+    kUpdateAction    = 0x1,
+    kUpdateDirection = 0x2,
+    kUpdateTime      = 0x4,
+    kUpdateStartHue  = 0x8,
 };
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace MoveToHue {
+struct Type;
+struct DecodableType;
+} // namespace MoveToHue
+
+namespace MoveHue {
+struct Type;
+struct DecodableType;
+} // namespace MoveHue
+
+namespace StepHue {
+struct Type;
+struct DecodableType;
+} // namespace StepHue
+
+namespace MoveToSaturation {
+struct Type;
+struct DecodableType;
+} // namespace MoveToSaturation
+
+namespace MoveSaturation {
+struct Type;
+struct DecodableType;
+} // namespace MoveSaturation
+
+namespace StepSaturation {
+struct Type;
+struct DecodableType;
+} // namespace StepSaturation
+
+namespace MoveToHueAndSaturation {
+struct Type;
+struct DecodableType;
+} // namespace MoveToHueAndSaturation
+
+namespace MoveToColor {
+struct Type;
+struct DecodableType;
+} // namespace MoveToColor
+
+namespace MoveColor {
+struct Type;
+struct DecodableType;
+} // namespace MoveColor
+
+namespace StepColor {
+struct Type;
+struct DecodableType;
+} // namespace StepColor
+
+namespace MoveToColorTemperature {
+struct Type;
+struct DecodableType;
+} // namespace MoveToColorTemperature
+
+namespace EnhancedMoveToHue {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedMoveToHue
+
+namespace EnhancedMoveHue {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedMoveHue
+
+namespace EnhancedStepHue {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedStepHue
+
+namespace EnhancedMoveToHueAndSaturation {
+struct Type;
+struct DecodableType;
+} // namespace EnhancedMoveToHueAndSaturation
+
+namespace ColorLoopSet {
+struct Type;
+struct DecodableType;
+} // namespace ColorLoopSet
+
+namespace StopMoveStep {
+struct Type;
+struct DecodableType;
+} // namespace StopMoveStep
+
+namespace MoveColorTemperature {
+struct Type;
+struct DecodableType;
+} // namespace MoveColorTemperature
+
+namespace StepColorTemperature {
+struct Type;
+struct DecodableType;
+} // namespace StepColorTemperature
+
+} // namespace Commands
 
 namespace Commands {
 namespace MoveToHue {
@@ -15361,6 +18310,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15399,6 +18350,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15438,6 +18391,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15476,6 +18431,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15513,6 +18470,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15552,6 +18511,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15592,6 +18553,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15632,6 +18595,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15670,6 +18635,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15709,6 +18676,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15747,6 +18716,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15786,6 +18757,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15824,6 +18797,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15863,6 +18838,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15903,6 +18880,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15947,6 +18926,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -15983,6 +18964,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16022,6 +19005,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16067,6 +19052,8 @@ public:
     uint8_t optionsOverride;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -16091,8 +19078,9 @@ namespace Attributes {
 namespace CurrentHue {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHue::Id; }
@@ -16101,8 +19089,9 @@ struct TypeInfo
 namespace CurrentSaturation {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentSaturation::Id; }
@@ -16111,8 +19100,9 @@ struct TypeInfo
 namespace RemainingTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
@@ -16121,8 +19111,9 @@ struct TypeInfo
 namespace CurrentX {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentX::Id; }
@@ -16131,8 +19122,9 @@ struct TypeInfo
 namespace CurrentY {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentY::Id; }
@@ -16141,8 +19133,9 @@ struct TypeInfo
 namespace DriftCompensation {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DriftCompensation::Id; }
@@ -16151,8 +19144,9 @@ struct TypeInfo
 namespace CompensationText {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompensationText::Id; }
@@ -16161,8 +19155,9 @@ struct TypeInfo
 namespace ColorTemperature {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorTemperature::Id; }
@@ -16171,8 +19166,9 @@ struct TypeInfo
 namespace ColorMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorMode::Id; }
@@ -16181,8 +19177,9 @@ struct TypeInfo
 namespace ColorControlOptions {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorControlOptions::Id; }
@@ -16191,8 +19188,9 @@ struct TypeInfo
 namespace NumberOfPrimaries {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfPrimaries::Id; }
@@ -16201,8 +19199,9 @@ struct TypeInfo
 namespace Primary1X {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary1X::Id; }
@@ -16211,8 +19210,9 @@ struct TypeInfo
 namespace Primary1Y {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary1Y::Id; }
@@ -16221,8 +19221,9 @@ struct TypeInfo
 namespace Primary1Intensity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary1Intensity::Id; }
@@ -16231,8 +19232,9 @@ struct TypeInfo
 namespace Primary2X {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary2X::Id; }
@@ -16241,8 +19243,9 @@ struct TypeInfo
 namespace Primary2Y {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary2Y::Id; }
@@ -16251,8 +19254,9 @@ struct TypeInfo
 namespace Primary2Intensity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary2Intensity::Id; }
@@ -16261,8 +19265,9 @@ struct TypeInfo
 namespace Primary3X {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary3X::Id; }
@@ -16271,8 +19276,9 @@ struct TypeInfo
 namespace Primary3Y {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary3Y::Id; }
@@ -16281,8 +19287,9 @@ struct TypeInfo
 namespace Primary3Intensity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary3Intensity::Id; }
@@ -16291,8 +19298,9 @@ struct TypeInfo
 namespace Primary4X {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary4X::Id; }
@@ -16301,8 +19309,9 @@ struct TypeInfo
 namespace Primary4Y {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary4Y::Id; }
@@ -16311,8 +19320,9 @@ struct TypeInfo
 namespace Primary4Intensity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary4Intensity::Id; }
@@ -16321,8 +19331,9 @@ struct TypeInfo
 namespace Primary5X {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary5X::Id; }
@@ -16331,8 +19342,9 @@ struct TypeInfo
 namespace Primary5Y {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary5Y::Id; }
@@ -16341,8 +19353,9 @@ struct TypeInfo
 namespace Primary5Intensity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary5Intensity::Id; }
@@ -16351,8 +19364,9 @@ struct TypeInfo
 namespace Primary6X {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary6X::Id; }
@@ -16361,8 +19375,9 @@ struct TypeInfo
 namespace Primary6Y {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary6Y::Id; }
@@ -16371,8 +19386,9 @@ struct TypeInfo
 namespace Primary6Intensity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary6Intensity::Id; }
@@ -16381,8 +19397,9 @@ struct TypeInfo
 namespace WhitePointX {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WhitePointX::Id; }
@@ -16391,8 +19408,9 @@ struct TypeInfo
 namespace WhitePointY {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WhitePointY::Id; }
@@ -16401,8 +19419,9 @@ struct TypeInfo
 namespace ColorPointRX {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRX::Id; }
@@ -16411,8 +19430,9 @@ struct TypeInfo
 namespace ColorPointRY {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRY::Id; }
@@ -16421,8 +19441,9 @@ struct TypeInfo
 namespace ColorPointRIntensity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRIntensity::Id; }
@@ -16431,8 +19452,9 @@ struct TypeInfo
 namespace ColorPointGX {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGX::Id; }
@@ -16441,8 +19463,9 @@ struct TypeInfo
 namespace ColorPointGY {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGY::Id; }
@@ -16451,8 +19474,9 @@ struct TypeInfo
 namespace ColorPointGIntensity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGIntensity::Id; }
@@ -16461,8 +19485,9 @@ struct TypeInfo
 namespace ColorPointBX {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBX::Id; }
@@ -16471,8 +19496,9 @@ struct TypeInfo
 namespace ColorPointBY {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBY::Id; }
@@ -16481,8 +19507,9 @@ struct TypeInfo
 namespace ColorPointBIntensity {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBIntensity::Id; }
@@ -16491,8 +19518,9 @@ struct TypeInfo
 namespace EnhancedCurrentHue {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnhancedCurrentHue::Id; }
@@ -16501,8 +19529,9 @@ struct TypeInfo
 namespace EnhancedColorMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnhancedColorMode::Id; }
@@ -16511,8 +19540,9 @@ struct TypeInfo
 namespace ColorLoopActive {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopActive::Id; }
@@ -16521,8 +19551,9 @@ struct TypeInfo
 namespace ColorLoopDirection {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopDirection::Id; }
@@ -16531,8 +19562,9 @@ struct TypeInfo
 namespace ColorLoopTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopTime::Id; }
@@ -16541,8 +19573,9 @@ struct TypeInfo
 namespace ColorLoopStartEnhancedHue {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopStartEnhancedHue::Id; }
@@ -16551,8 +19584,9 @@ struct TypeInfo
 namespace ColorLoopStoredEnhancedHue {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopStoredEnhancedHue::Id; }
@@ -16561,8 +19595,9 @@ struct TypeInfo
 namespace ColorCapabilities {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorCapabilities::Id; }
@@ -16571,8 +19606,9 @@ struct TypeInfo
 namespace ColorTempPhysicalMin {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorTempPhysicalMin::Id; }
@@ -16581,8 +19617,9 @@ struct TypeInfo
 namespace ColorTempPhysicalMax {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorTempPhysicalMax::Id; }
@@ -16591,8 +19628,9 @@ struct TypeInfo
 namespace CoupleColorTempToLevelMinMireds {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CoupleColorTempToLevelMinMireds::Id; }
@@ -16601,8 +19639,9 @@ struct TypeInfo
 namespace StartUpColorTemperatureMireds {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpColorTemperatureMireds::Id; }
@@ -16611,8 +19650,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -16621,8 +19661,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -16636,8 +19677,9 @@ namespace Attributes {
 namespace PhysicalMinLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalMinLevel::Id; }
@@ -16646,8 +19688,9 @@ struct TypeInfo
 namespace PhysicalMaxLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalMaxLevel::Id; }
@@ -16656,8 +19699,9 @@ struct TypeInfo
 namespace BallastStatus {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BallastStatus::Id; }
@@ -16666,8 +19710,9 @@ struct TypeInfo
 namespace MinLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinLevel::Id; }
@@ -16676,8 +19721,9 @@ struct TypeInfo
 namespace MaxLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxLevel::Id; }
@@ -16686,8 +19732,9 @@ struct TypeInfo
 namespace PowerOnLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerOnLevel::Id; }
@@ -16696,8 +19743,9 @@ struct TypeInfo
 namespace PowerOnFadeTime {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerOnFadeTime::Id; }
@@ -16706,8 +19754,9 @@ struct TypeInfo
 namespace IntrinsicBallastFactor {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IntrinsicBallastFactor::Id; }
@@ -16716,8 +19765,9 @@ struct TypeInfo
 namespace BallastFactorAdjustment {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BallastFactorAdjustment::Id; }
@@ -16726,8 +19776,9 @@ struct TypeInfo
 namespace LampQuality {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampQuality::Id; }
@@ -16736,8 +19787,9 @@ struct TypeInfo
 namespace LampType {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampType::Id; }
@@ -16746,8 +19798,9 @@ struct TypeInfo
 namespace LampManufacturer {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampManufacturer::Id; }
@@ -16756,8 +19809,9 @@ struct TypeInfo
 namespace LampRatedHours {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampRatedHours::Id; }
@@ -16766,8 +19820,9 @@ struct TypeInfo
 namespace LampBurnHours {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampBurnHours::Id; }
@@ -16776,8 +19831,9 @@ struct TypeInfo
 namespace LampAlarmMode {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampAlarmMode::Id; }
@@ -16786,8 +19842,9 @@ struct TypeInfo
 namespace LampBurnHoursTripPoint {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampBurnHoursTripPoint::Id; }
@@ -16796,8 +19853,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -16806,8 +19864,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -16833,8 +19892,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = DataModel::Nullable<uint16_t>;
-    using DecodableType = DataModel::Nullable<uint16_t>;
+    using Type             = DataModel::Nullable<uint16_t>;
+    using DecodableType    = DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16843,8 +19903,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = DataModel::Nullable<uint16_t>;
-    using DecodableType = DataModel::Nullable<uint16_t>;
+    using Type             = DataModel::Nullable<uint16_t>;
+    using DecodableType    = DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16853,8 +19914,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = DataModel::Nullable<uint16_t>;
-    using DecodableType = DataModel::Nullable<uint16_t>;
+    using Type             = DataModel::Nullable<uint16_t>;
+    using DecodableType    = DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16863,8 +19925,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16873,8 +19936,9 @@ struct TypeInfo
 namespace LightSensorType {
 struct TypeInfo
 {
-    using Type          = DataModel::Nullable<uint8_t>;
-    using DecodableType = DataModel::Nullable<uint8_t>;
+    using Type             = DataModel::Nullable<uint8_t>;
+    using DecodableType    = DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LightSensorType::Id; }
@@ -16883,8 +19947,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -16893,8 +19958,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -16908,8 +19974,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16918,8 +19985,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16928,8 +19996,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -16938,8 +20007,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -16948,8 +20018,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -16958,8 +20029,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -16973,8 +20045,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -16983,8 +20056,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -16993,8 +20067,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17003,8 +20078,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17013,8 +20089,9 @@ struct TypeInfo
 namespace ScaledValue {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScaledValue::Id; }
@@ -17023,8 +20100,9 @@ struct TypeInfo
 namespace MinScaledValue {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinScaledValue::Id; }
@@ -17033,8 +20111,9 @@ struct TypeInfo
 namespace MaxScaledValue {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxScaledValue::Id; }
@@ -17043,8 +20122,9 @@ struct TypeInfo
 namespace ScaledTolerance {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScaledTolerance::Id; }
@@ -17053,8 +20133,9 @@ struct TypeInfo
 namespace Scale {
 struct TypeInfo
 {
-    using Type          = int8_t;
-    using DecodableType = int8_t;
+    using Type             = int8_t;
+    using DecodableType    = int8_t;
+    using DecodableArgType = int8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Scale::Id; }
@@ -17063,8 +20144,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17073,8 +20155,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17088,8 +20171,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17098,8 +20182,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17108,8 +20193,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17118,8 +20204,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17128,8 +20215,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17138,8 +20226,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17153,8 +20242,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17163,8 +20253,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17173,8 +20264,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17183,8 +20275,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17193,8 +20286,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17203,8 +20297,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17218,8 +20313,9 @@ namespace Attributes {
 namespace Occupancy {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Occupancy::Id; }
@@ -17228,8 +20324,9 @@ struct TypeInfo
 namespace OccupancySensorType {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorType::Id; }
@@ -17238,8 +20335,9 @@ struct TypeInfo
 namespace OccupancySensorTypeBitmap {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorTypeBitmap::Id; }
@@ -17248,8 +20346,9 @@ struct TypeInfo
 namespace PirOccupiedToUnoccupiedDelay {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PirOccupiedToUnoccupiedDelay::Id; }
@@ -17258,8 +20357,9 @@ struct TypeInfo
 namespace PirUnoccupiedToOccupiedDelay {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PirUnoccupiedToOccupiedDelay::Id; }
@@ -17268,8 +20368,9 @@ struct TypeInfo
 namespace PirUnoccupiedToOccupiedThreshold {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PirUnoccupiedToOccupiedThreshold::Id; }
@@ -17278,8 +20379,9 @@ struct TypeInfo
 namespace UltrasonicOccupiedToUnoccupiedDelay {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id; }
@@ -17288,8 +20390,9 @@ struct TypeInfo
 namespace UltrasonicUnoccupiedToOccupiedDelay {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id; }
@@ -17298,8 +20401,9 @@ struct TypeInfo
 namespace UltrasonicUnoccupiedToOccupiedThreshold {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id; }
@@ -17308,8 +20412,9 @@ struct TypeInfo
 namespace PhysicalContactOccupiedToUnoccupiedDelay {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id; }
@@ -17318,8 +20423,9 @@ struct TypeInfo
 namespace PhysicalContactUnoccupiedToOccupiedDelay {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id; }
@@ -17328,8 +20434,9 @@ struct TypeInfo
 namespace PhysicalContactUnoccupiedToOccupiedThreshold {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id; }
@@ -17338,8 +20445,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17348,8 +20456,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17363,8 +20472,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17373,8 +20483,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17383,8 +20494,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17393,8 +20505,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17403,8 +20516,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17413,8 +20527,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17428,8 +20543,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17438,8 +20554,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17448,8 +20565,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17458,8 +20576,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17468,8 +20587,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17478,8 +20598,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17493,8 +20614,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17503,8 +20625,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17513,8 +20636,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17523,8 +20647,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17533,8 +20658,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17543,8 +20669,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17558,8 +20685,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17568,8 +20696,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17578,8 +20707,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17588,8 +20718,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17598,8 +20729,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17608,8 +20740,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17623,8 +20756,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17633,8 +20767,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17643,8 +20778,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17653,8 +20789,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17663,8 +20800,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17673,8 +20811,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17688,8 +20827,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17698,8 +20838,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17708,8 +20849,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17718,8 +20860,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17728,8 +20871,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17738,8 +20882,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17753,8 +20898,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17763,8 +20909,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17773,8 +20920,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17783,8 +20931,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17793,8 +20942,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17803,8 +20953,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17818,8 +20969,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17828,8 +20980,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17838,8 +20991,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17848,8 +21002,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17858,8 +21013,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17868,8 +21024,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17883,8 +21040,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17893,8 +21051,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17903,8 +21062,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17913,8 +21073,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17923,8 +21084,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17933,8 +21095,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -17948,8 +21111,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -17958,8 +21122,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -17968,8 +21133,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -17978,8 +21144,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -17988,8 +21155,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -17998,8 +21166,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18013,8 +21182,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18023,8 +21193,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18033,8 +21204,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18043,8 +21215,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18053,8 +21226,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18063,8 +21237,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18078,8 +21253,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18088,8 +21264,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18098,8 +21275,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18108,8 +21286,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18118,8 +21297,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18128,8 +21308,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18143,8 +21324,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18153,8 +21335,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18163,8 +21346,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18173,8 +21357,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18183,8 +21368,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18193,8 +21379,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18208,8 +21395,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18218,8 +21406,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18228,8 +21417,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18238,8 +21428,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18248,8 +21439,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18258,8 +21450,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18273,8 +21466,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18283,8 +21477,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18293,8 +21488,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18303,8 +21499,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18313,8 +21510,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18323,8 +21521,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18338,8 +21537,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18348,8 +21548,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18358,8 +21559,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18368,8 +21570,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18378,8 +21581,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18388,8 +21592,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18403,8 +21608,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18413,8 +21619,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18423,8 +21630,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18433,8 +21641,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18443,8 +21652,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18453,8 +21663,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18468,8 +21679,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18478,8 +21690,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18488,8 +21701,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18498,8 +21712,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18508,8 +21723,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18518,8 +21734,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18533,8 +21750,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18543,8 +21761,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18553,8 +21772,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18563,8 +21783,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18573,8 +21794,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18583,8 +21805,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18598,8 +21821,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18608,8 +21832,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18618,8 +21843,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18628,8 +21854,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18638,8 +21865,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18648,8 +21876,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18663,8 +21892,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18673,8 +21903,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18683,8 +21914,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18693,8 +21925,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18703,8 +21936,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18713,8 +21947,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18728,8 +21963,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18738,8 +21974,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18748,8 +21985,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18758,8 +21996,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18768,8 +22007,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18778,8 +22018,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18793,8 +22034,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18803,8 +22045,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18813,8 +22056,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18823,8 +22067,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18833,8 +22078,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18843,8 +22089,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18858,8 +22105,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18868,8 +22116,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18878,8 +22127,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18888,8 +22138,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18898,8 +22149,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18908,8 +22160,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18923,8 +22176,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18933,8 +22187,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -18943,8 +22198,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -18953,8 +22209,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -18963,8 +22220,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -18973,8 +22231,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -18988,8 +22247,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -18998,8 +22258,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -19008,8 +22269,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -19018,8 +22280,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -19028,8 +22291,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -19038,8 +22302,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -19053,8 +22318,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -19063,8 +22329,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -19073,8 +22340,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -19083,8 +22351,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -19093,8 +22362,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -19103,8 +22373,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -19118,8 +22389,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -19128,8 +22400,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -19138,8 +22411,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -19148,8 +22422,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -19158,8 +22433,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -19168,8 +22444,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -19183,8 +22460,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -19193,8 +22471,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -19203,8 +22482,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -19213,8 +22493,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -19223,8 +22504,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -19233,8 +22515,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -19248,8 +22531,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -19258,8 +22542,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -19268,8 +22553,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -19278,8 +22564,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type          = float;
-    using DecodableType = float;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -19288,8 +22575,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -19298,8 +22586,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -19352,17 +22641,57 @@ using IasZoneType                          = EmberAfIasZoneType;
 // Bitmap for IasZoneStatus
 enum class IasZoneStatus : uint16_t
 {
-    kAlarm1             = 0,
-    kAlarm2             = 1,
-    kTamper             = 2,
-    kBattery            = 3,
-    kSupervisionReports = 4,
-    kRestoreReports     = 5,
-    kTrouble            = 6,
-    kAc                 = 7,
-    kTest               = 8,
-    kBatteryDefect      = 9,
+    kAlarm1             = 0x1,
+    kAlarm2             = 0x2,
+    kTamper             = 0x4,
+    kBattery            = 0x8,
+    kSupervisionReports = 0x10,
+    kRestoreReports     = 0x20,
+    kTrouble            = 0x40,
+    kAc                 = 0x80,
+    kTest               = 0x100,
+    kBatteryDefect      = 0x200,
 };
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ZoneEnrollResponse {
+struct Type;
+struct DecodableType;
+} // namespace ZoneEnrollResponse
+
+namespace ZoneStatusChangeNotification {
+struct Type;
+struct DecodableType;
+} // namespace ZoneStatusChangeNotification
+
+namespace InitiateNormalOperationMode {
+struct Type;
+struct DecodableType;
+} // namespace InitiateNormalOperationMode
+
+namespace ZoneEnrollRequest {
+struct Type;
+struct DecodableType;
+} // namespace ZoneEnrollRequest
+
+namespace InitiateTestMode {
+struct Type;
+struct DecodableType;
+} // namespace InitiateTestMode
+
+namespace InitiateNormalOperationModeResponse {
+struct Type;
+struct DecodableType;
+} // namespace InitiateNormalOperationModeResponse
+
+namespace InitiateTestModeResponse {
+struct Type;
+struct DecodableType;
+} // namespace InitiateTestModeResponse
+
+} // namespace Commands
 
 namespace Commands {
 namespace ZoneEnrollResponse {
@@ -19383,6 +22712,8 @@ public:
     uint8_t zoneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -19418,6 +22749,8 @@ public:
     uint16_t delay;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -19446,6 +22779,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasZone::Commands::InitiateNormalOperationModeResponse::DecodableType;
 };
 
 struct DecodableType
@@ -19475,6 +22810,8 @@ public:
     uint16_t manufacturerCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasZone::Commands::ZoneEnrollResponse::DecodableType;
 };
 
 struct DecodableType
@@ -19506,6 +22843,8 @@ public:
     uint8_t currentZoneSensitivityLevel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasZone::Commands::InitiateTestModeResponse::DecodableType;
 };
 
 struct DecodableType
@@ -19532,6 +22871,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -19556,6 +22897,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -19573,8 +22916,9 @@ namespace Attributes {
 namespace ZoneState {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneState::Id; }
@@ -19583,8 +22927,9 @@ struct TypeInfo
 namespace ZoneType {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneType::Id; }
@@ -19593,8 +22938,9 @@ struct TypeInfo
 namespace ZoneStatus {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneStatus::Id; }
@@ -19603,8 +22949,9 @@ struct TypeInfo
 namespace IasCieAddress {
 struct TypeInfo
 {
-    using Type          = chip::NodeId;
-    using DecodableType = chip::NodeId;
+    using Type             = chip::NodeId;
+    using DecodableType    = chip::NodeId;
+    using DecodableArgType = chip::NodeId;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IasCieAddress::Id; }
@@ -19613,8 +22960,9 @@ struct TypeInfo
 namespace ZoneId {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneId::Id; }
@@ -19623,8 +22971,9 @@ struct TypeInfo
 namespace NumberOfZoneSensitivityLevelsSupported {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfZoneSensitivityLevelsSupported::Id; }
@@ -19633,8 +22982,9 @@ struct TypeInfo
 namespace CurrentZoneSensitivityLevel {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentZoneSensitivityLevel::Id; }
@@ -19643,8 +22993,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -19653,8 +23004,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -19790,16 +23142,16 @@ using IasZoneType                          = EmberAfIasZoneType;
 // Bitmap for IasZoneStatus
 enum class IasZoneStatus : uint16_t
 {
-    kAlarm1             = 0,
-    kAlarm2             = 1,
-    kTamper             = 2,
-    kBattery            = 3,
-    kSupervisionReports = 4,
-    kRestoreReports     = 5,
-    kTrouble            = 6,
-    kAc                 = 7,
-    kTest               = 8,
-    kBatteryDefect      = 9,
+    kAlarm1             = 0x1,
+    kAlarm2             = 0x2,
+    kTamper             = 0x4,
+    kBattery            = 0x8,
+    kSupervisionReports = 0x10,
+    kRestoreReports     = 0x20,
+    kTrouble            = 0x40,
+    kAc                 = 0x80,
+    kTest               = 0x100,
+    kBatteryDefect      = 0x200,
 };
 
 namespace Structs {
@@ -19826,6 +23178,106 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Arm {
+struct Type;
+struct DecodableType;
+} // namespace Arm
+
+namespace ArmResponse {
+struct Type;
+struct DecodableType;
+} // namespace ArmResponse
+
+namespace Bypass {
+struct Type;
+struct DecodableType;
+} // namespace Bypass
+
+namespace GetZoneIdMapResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetZoneIdMapResponse
+
+namespace Emergency {
+struct Type;
+struct DecodableType;
+} // namespace Emergency
+
+namespace GetZoneInformationResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetZoneInformationResponse
+
+namespace Fire {
+struct Type;
+struct DecodableType;
+} // namespace Fire
+
+namespace ZoneStatusChanged {
+struct Type;
+struct DecodableType;
+} // namespace ZoneStatusChanged
+
+namespace Panic {
+struct Type;
+struct DecodableType;
+} // namespace Panic
+
+namespace PanelStatusChanged {
+struct Type;
+struct DecodableType;
+} // namespace PanelStatusChanged
+
+namespace GetZoneIdMap {
+struct Type;
+struct DecodableType;
+} // namespace GetZoneIdMap
+
+namespace GetPanelStatusResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetPanelStatusResponse
+
+namespace GetZoneInformation {
+struct Type;
+struct DecodableType;
+} // namespace GetZoneInformation
+
+namespace SetBypassedZoneList {
+struct Type;
+struct DecodableType;
+} // namespace SetBypassedZoneList
+
+namespace GetPanelStatus {
+struct Type;
+struct DecodableType;
+} // namespace GetPanelStatus
+
+namespace BypassResponse {
+struct Type;
+struct DecodableType;
+} // namespace BypassResponse
+
+namespace GetBypassedZoneList {
+struct Type;
+struct DecodableType;
+} // namespace GetBypassedZoneList
+
+namespace GetZoneStatusResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetZoneStatusResponse
+
+namespace GetZoneStatus {
+struct Type;
+struct DecodableType;
+} // namespace GetZoneStatus
+
+} // namespace Commands
+
+namespace Commands {
 namespace Arm {
 enum class Fields
 {
@@ -19846,6 +23298,8 @@ public:
     uint8_t zoneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasAce::Commands::ArmResponse::DecodableType;
 };
 
 struct DecodableType
@@ -19876,6 +23330,8 @@ public:
     IasAceArmNotification armNotification;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -19908,6 +23364,8 @@ public:
     chip::CharSpan armDisarmCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasAce::Commands::BypassResponse::DecodableType;
 };
 
 struct DecodableType
@@ -19968,6 +23426,8 @@ public:
     uint16_t section15;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20008,6 +23468,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20041,6 +23503,8 @@ public:
     chip::CharSpan zoneLabel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20069,6 +23533,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20102,6 +23568,8 @@ public:
     chip::CharSpan zoneLabel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20130,6 +23598,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20163,6 +23633,8 @@ public:
     IasAceAlarmStatus alarmStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20191,6 +23663,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasAce::Commands::GetZoneIdMapResponse::DecodableType;
 };
 
 struct DecodableType
@@ -20224,6 +23698,8 @@ public:
     IasAceAlarmStatus alarmStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20255,6 +23731,8 @@ public:
     uint8_t zoneId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasAce::Commands::GetZoneInformationResponse::DecodableType;
 };
 
 struct DecodableType
@@ -20285,6 +23763,8 @@ public:
     DataModel::List<const uint8_t> zoneIds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20311,6 +23791,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasAce::Commands::GetPanelStatusResponse::DecodableType;
 };
 
 struct DecodableType
@@ -20340,6 +23822,8 @@ public:
     DataModel::List<const IasAceBypassResult> bypassResult;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20366,6 +23850,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20397,6 +23883,8 @@ public:
     DataModel::List<const Structs::IasAceZoneStatusResult::Type> zoneStatusResult;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20433,6 +23921,8 @@ public:
     uint16_t zoneStatusMask;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IasAce::Commands::GetZoneStatusResponse::DecodableType;
 };
 
 struct DecodableType
@@ -20454,8 +23944,9 @@ namespace Attributes {
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -20464,8 +23955,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -20478,18 +23970,33 @@ namespace IasWd {
 // Bitmap for SquawkInfo
 enum class SquawkInfo : uint8_t
 {
-    kMode   = 4,
-    kStrobe = 3,
-    kLevel  = 0,
+    kMode   = 0xF0,
+    kStrobe = 0x8,
+    kLevel  = 0x3,
 };
 
 // Bitmap for WarningInfo
 enum class WarningInfo : uint8_t
 {
-    kMode       = 4,
-    kStrobe     = 2,
-    kSirenLevel = 0,
+    kMode       = 0xF0,
+    kStrobe     = 0xC,
+    kSirenLevel = 0x3,
 };
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace StartWarning {
+struct Type;
+struct DecodableType;
+} // namespace StartWarning
+
+namespace Squawk {
+struct Type;
+struct DecodableType;
+} // namespace Squawk
+
+} // namespace Commands
 
 namespace Commands {
 namespace StartWarning {
@@ -20514,6 +24021,8 @@ public:
     uint8_t strobeLevel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20545,6 +24054,8 @@ public:
     chip::BitFlags<SquawkInfo> squawkInfo;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20563,8 +24074,9 @@ namespace Attributes {
 namespace MaxDuration {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxDuration::Id; }
@@ -20573,8 +24085,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -20583,8 +24096,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -20598,8 +24112,9 @@ namespace Attributes {
 namespace WakeOnLanMacAddress {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WakeOnLanMacAddress::Id; }
@@ -20608,8 +24123,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -20618,8 +24134,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -20706,6 +24223,31 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ChangeChannel {
+struct Type;
+struct DecodableType;
+} // namespace ChangeChannel
+
+namespace ChangeChannelResponse {
+struct Type;
+struct DecodableType;
+} // namespace ChangeChannelResponse
+
+namespace ChangeChannelByNumber {
+struct Type;
+struct DecodableType;
+} // namespace ChangeChannelByNumber
+
+namespace SkipChannel {
+struct Type;
+struct DecodableType;
+} // namespace SkipChannel
+
+} // namespace Commands
+
+namespace Commands {
 namespace ChangeChannel {
 enum class Fields
 {
@@ -20722,6 +24264,8 @@ public:
     chip::CharSpan match;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType;
 };
 
 struct DecodableType
@@ -20752,6 +24296,8 @@ public:
     TvChannelErrorType errorType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20783,6 +24329,8 @@ public:
     uint16_t minorNumber;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20812,6 +24360,8 @@ public:
     uint16_t count;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20830,8 +24380,9 @@ namespace Attributes {
 namespace TvChannelList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::TvChannelInfo::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::TvChannelInfo::DecodableType>;
+    using Type             = DataModel::List<const Structs::TvChannelInfo::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::TvChannelInfo::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::TvChannelInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TvChannelList::Id; }
@@ -20840,8 +24391,9 @@ struct TypeInfo
 namespace TvChannelLineup {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TvChannelLineup::Id; }
@@ -20850,8 +24402,9 @@ struct TypeInfo
 namespace CurrentTvChannel {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTvChannel::Id; }
@@ -20860,8 +24413,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -20870,8 +24424,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -20918,6 +24473,21 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace NavigateTarget {
+struct Type;
+struct DecodableType;
+} // namespace NavigateTarget
+
+namespace NavigateTargetResponse {
+struct Type;
+struct DecodableType;
+} // namespace NavigateTargetResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace NavigateTarget {
 enum class Fields
 {
@@ -20936,6 +24506,8 @@ public:
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType;
 };
 
 struct DecodableType
@@ -20967,6 +24539,8 @@ public:
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -20986,8 +24560,9 @@ namespace Attributes {
 namespace TargetNavigatorList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::NavigateTargetTargetInfo::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::NavigateTargetTargetInfo::DecodableType>;
+    using Type             = DataModel::List<const Structs::NavigateTargetTargetInfo::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::NavigateTargetTargetInfo::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::NavigateTargetTargetInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetNavigatorList::Id; }
@@ -20996,8 +24571,9 @@ struct TypeInfo
 namespace CurrentNavigatorTarget {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentNavigatorTarget::Id; }
@@ -21006,8 +24582,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -21016,8 +24593,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -21081,6 +24659,121 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace MediaPlay {
+struct Type;
+struct DecodableType;
+} // namespace MediaPlay
+
+namespace MediaPlayResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaPlayResponse
+
+namespace MediaPause {
+struct Type;
+struct DecodableType;
+} // namespace MediaPause
+
+namespace MediaPauseResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaPauseResponse
+
+namespace MediaStop {
+struct Type;
+struct DecodableType;
+} // namespace MediaStop
+
+namespace MediaStopResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaStopResponse
+
+namespace MediaStartOver {
+struct Type;
+struct DecodableType;
+} // namespace MediaStartOver
+
+namespace MediaStartOverResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaStartOverResponse
+
+namespace MediaPrevious {
+struct Type;
+struct DecodableType;
+} // namespace MediaPrevious
+
+namespace MediaPreviousResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaPreviousResponse
+
+namespace MediaNext {
+struct Type;
+struct DecodableType;
+} // namespace MediaNext
+
+namespace MediaNextResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaNextResponse
+
+namespace MediaRewind {
+struct Type;
+struct DecodableType;
+} // namespace MediaRewind
+
+namespace MediaRewindResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaRewindResponse
+
+namespace MediaFastForward {
+struct Type;
+struct DecodableType;
+} // namespace MediaFastForward
+
+namespace MediaFastForwardResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaFastForwardResponse
+
+namespace MediaSkipForward {
+struct Type;
+struct DecodableType;
+} // namespace MediaSkipForward
+
+namespace MediaSkipForwardResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaSkipForwardResponse
+
+namespace MediaSkipBackward {
+struct Type;
+struct DecodableType;
+} // namespace MediaSkipBackward
+
+namespace MediaSkipBackwardResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaSkipBackwardResponse
+
+namespace MediaSeek {
+struct Type;
+struct DecodableType;
+} // namespace MediaSeek
+
+namespace MediaSeekResponse {
+struct Type;
+struct DecodableType;
+} // namespace MediaSeekResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace MediaPlay {
 enum class Fields
 {
@@ -21094,6 +24787,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21121,6 +24816,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21146,6 +24843,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21173,6 +24872,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21198,6 +24899,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21225,6 +24928,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21250,6 +24955,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21277,6 +24984,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21302,6 +25011,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21329,6 +25040,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21354,6 +25067,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21381,6 +25096,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21406,6 +25123,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21433,6 +25152,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21458,6 +25179,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21485,6 +25208,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21513,6 +25238,8 @@ public:
     uint64_t deltaPositionMilliseconds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21541,6 +25268,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21569,6 +25298,8 @@ public:
     uint64_t deltaPositionMilliseconds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21597,6 +25328,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21625,6 +25358,8 @@ public:
     uint64_t position;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType;
 };
 
 struct DecodableType
@@ -21653,6 +25388,8 @@ public:
     MediaPlaybackStatus mediaPlaybackStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21671,8 +25408,9 @@ namespace Attributes {
 namespace PlaybackState {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PlaybackState::Id; }
@@ -21681,8 +25419,9 @@ struct TypeInfo
 namespace StartTime {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartTime::Id; }
@@ -21691,8 +25430,9 @@ struct TypeInfo
 namespace Duration {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Duration::Id; }
@@ -21701,8 +25441,9 @@ struct TypeInfo
 namespace PositionUpdatedAt {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PositionUpdatedAt::Id; }
@@ -21711,8 +25452,9 @@ struct TypeInfo
 namespace Position {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Position::Id; }
@@ -21721,8 +25463,9 @@ struct TypeInfo
 namespace PlaybackSpeed {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PlaybackSpeed::Id; }
@@ -21731,8 +25474,9 @@ struct TypeInfo
 namespace SeekRangeEnd {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SeekRangeEnd::Id; }
@@ -21741,8 +25485,9 @@ struct TypeInfo
 namespace SeekRangeStart {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SeekRangeStart::Id; }
@@ -21751,8 +25496,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -21761,8 +25507,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -21822,6 +25569,31 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SelectInput {
+struct Type;
+struct DecodableType;
+} // namespace SelectInput
+
+namespace ShowInputStatus {
+struct Type;
+struct DecodableType;
+} // namespace ShowInputStatus
+
+namespace HideInputStatus {
+struct Type;
+struct DecodableType;
+} // namespace HideInputStatus
+
+namespace RenameInput {
+struct Type;
+struct DecodableType;
+} // namespace RenameInput
+
+} // namespace Commands
+
+namespace Commands {
 namespace SelectInput {
 enum class Fields
 {
@@ -21838,6 +25610,8 @@ public:
     uint8_t index;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21863,6 +25637,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21887,6 +25663,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21916,6 +25694,8 @@ public:
     chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -21935,8 +25715,9 @@ namespace Attributes {
 namespace MediaInputList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::MediaInputInfo::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::MediaInputInfo::DecodableType>;
+    using Type             = DataModel::List<const Structs::MediaInputInfo::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::MediaInputInfo::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::MediaInputInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MediaInputList::Id; }
@@ -21945,8 +25726,9 @@ struct TypeInfo
 namespace CurrentMediaInput {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMediaInput::Id; }
@@ -21955,8 +25737,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -21965,8 +25748,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -21975,6 +25759,16 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace MediaInput
 namespace LowPower {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Sleep {
+struct Type;
+struct DecodableType;
+} // namespace Sleep
+
+} // namespace Commands
 
 namespace Commands {
 namespace Sleep {
@@ -21990,6 +25784,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22007,8 +25803,9 @@ namespace Attributes {
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -22017,8 +25814,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -22138,6 +25936,21 @@ using KeypadInputStatus                    = EmberAfKeypadInputStatus;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SendKey {
+struct Type;
+struct DecodableType;
+} // namespace SendKey
+
+namespace SendKeyResponse {
+struct Type;
+struct DecodableType;
+} // namespace SendKeyResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace SendKey {
 enum class Fields
 {
@@ -22154,6 +25967,8 @@ public:
     KeypadInputCecKeyCode keyCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22182,6 +25997,8 @@ public:
     KeypadInputStatus status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22200,8 +26017,9 @@ namespace Attributes {
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -22210,8 +26028,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -22403,6 +26222,31 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace LaunchContent {
+struct Type;
+struct DecodableType;
+} // namespace LaunchContent
+
+namespace LaunchContentResponse {
+struct Type;
+struct DecodableType;
+} // namespace LaunchContentResponse
+
+namespace LaunchURL {
+struct Type;
+struct DecodableType;
+} // namespace LaunchURL
+
+namespace LaunchURLResponse {
+struct Type;
+struct DecodableType;
+} // namespace LaunchURLResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace LaunchContent {
 enum class Fields
 {
@@ -22421,6 +26265,8 @@ public:
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22452,6 +26298,8 @@ public:
     ContentLaunchStatus contentLaunchStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22483,6 +26331,8 @@ public:
     chip::CharSpan displayString;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22514,6 +26364,8 @@ public:
     ContentLaunchStatus contentLaunchStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22533,8 +26385,9 @@ namespace Attributes {
 namespace AcceptsHeaderList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const chip::ByteSpan>;
-    using DecodableType = DataModel::DecodableList<chip::ByteSpan>;
+    using Type             = DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const DataModel::DecodableList<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcceptsHeaderList::Id; }
@@ -22543,8 +26396,9 @@ struct TypeInfo
 namespace SupportedStreamingTypes {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const ContentLaunchStreamingType>;
-    using DecodableType = DataModel::DecodableList<ContentLaunchStreamingType>;
+    using Type             = DataModel::List<const ContentLaunchStreamingType>;
+    using DecodableType    = DataModel::DecodableList<ContentLaunchStreamingType>;
+    using DecodableArgType = const DataModel::DecodableList<ContentLaunchStreamingType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedStreamingTypes::Id; }
@@ -22553,8 +26407,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -22563,8 +26418,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -22616,6 +26472,21 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SelectOutput {
+struct Type;
+struct DecodableType;
+} // namespace SelectOutput
+
+namespace RenameOutput {
+struct Type;
+struct DecodableType;
+} // namespace RenameOutput
+
+} // namespace Commands
+
+namespace Commands {
 namespace SelectOutput {
 enum class Fields
 {
@@ -22632,6 +26503,8 @@ public:
     uint8_t index;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22662,6 +26535,8 @@ public:
     chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22681,8 +26556,9 @@ namespace Attributes {
 namespace AudioOutputList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::AudioOutputInfo::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::AudioOutputInfo::DecodableType>;
+    using Type             = DataModel::List<const Structs::AudioOutputInfo::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::AudioOutputInfo::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::AudioOutputInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AudioOutputList::Id; }
@@ -22691,8 +26567,9 @@ struct TypeInfo
 namespace CurrentAudioOutput {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentAudioOutput::Id; }
@@ -22701,8 +26578,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -22711,8 +26589,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -22759,6 +26638,21 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace LaunchApp {
+struct Type;
+struct DecodableType;
+} // namespace LaunchApp
+
+namespace LaunchAppResponse {
+struct Type;
+struct DecodableType;
+} // namespace LaunchAppResponse
+
+} // namespace Commands
+
+namespace Commands {
 namespace LaunchApp {
 enum class Fields
 {
@@ -22779,6 +26673,8 @@ public:
     chip::CharSpan applicationId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType;
 };
 
 struct DecodableType
@@ -22811,6 +26707,8 @@ public:
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22830,8 +26728,9 @@ namespace Attributes {
 namespace ApplicationLauncherList {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const uint16_t>;
-    using DecodableType = DataModel::DecodableList<uint16_t>;
+    using Type             = DataModel::List<const uint16_t>;
+    using DecodableType    = DataModel::DecodableList<uint16_t>;
+    using DecodableArgType = const DataModel::DecodableList<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationLauncherList::Id; }
@@ -22840,8 +26739,9 @@ struct TypeInfo
 namespace CatalogVendorId {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CatalogVendorId::Id; }
@@ -22850,8 +26750,9 @@ struct TypeInfo
 namespace ApplicationId {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationId::Id; }
@@ -22860,8 +26761,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -22870,8 +26772,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -22896,6 +26799,16 @@ using ApplicationBasicStatus               = EmberAfApplicationBasicStatus;
 #endif
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ChangeStatus {
+struct Type;
+struct DecodableType;
+} // namespace ChangeStatus
+
+} // namespace Commands
+
+namespace Commands {
 namespace ChangeStatus {
 enum class Fields
 {
@@ -22912,6 +26825,8 @@ public:
     ApplicationBasicStatus status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -22930,8 +26845,9 @@ namespace Attributes {
 namespace VendorName {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
@@ -22940,8 +26856,9 @@ struct TypeInfo
 namespace VendorId {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorId::Id; }
@@ -22950,8 +26867,9 @@ struct TypeInfo
 namespace ApplicationName {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationName::Id; }
@@ -22960,8 +26878,9 @@ struct TypeInfo
 namespace ProductId {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductId::Id; }
@@ -22970,8 +26889,9 @@ struct TypeInfo
 namespace ApplicationId {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationId::Id; }
@@ -22980,8 +26900,9 @@ struct TypeInfo
 namespace CatalogVendorId {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CatalogVendorId::Id; }
@@ -22990,8 +26911,9 @@ struct TypeInfo
 namespace ApplicationStatus {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationStatus::Id; }
@@ -23000,8 +26922,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -23010,8 +26933,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -23020,6 +26944,26 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ApplicationBasic
 namespace AccountLogin {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace GetSetupPIN {
+struct Type;
+struct DecodableType;
+} // namespace GetSetupPIN
+
+namespace GetSetupPINResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetSetupPINResponse
+
+namespace Login {
+struct Type;
+struct DecodableType;
+} // namespace Login
+
+} // namespace Commands
 
 namespace Commands {
 namespace GetSetupPIN {
@@ -23038,6 +26982,8 @@ public:
     chip::CharSpan tempAccountIdentifier;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType;
 };
 
 struct DecodableType
@@ -23066,6 +27012,8 @@ public:
     chip::CharSpan setupPIN;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23096,6 +27044,8 @@ public:
     chip::CharSpan setupPIN;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23115,8 +27065,9 @@ namespace Attributes {
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -23125,8 +27076,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -23153,9 +27105,9 @@ using SimpleEnum                           = EmberAfSimpleEnum;
 // Bitmap for SimpleBitmap
 enum class SimpleBitmap : uint8_t
 {
-    kValueA = 0,
-    kValueB = 1,
-    kValueC = 2,
+    kValueA = 0x1,
+    kValueB = 0x2,
+    kValueC = 0x4,
 };
 
 namespace Structs {
@@ -23349,6 +27301,141 @@ using DecodableType = Type;
 } // namespace Structs
 
 namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Test {
+struct Type;
+struct DecodableType;
+} // namespace Test
+
+namespace TestSpecificResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestSpecificResponse
+
+namespace TestNotHandled {
+struct Type;
+struct DecodableType;
+} // namespace TestNotHandled
+
+namespace TestAddArgumentsResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestAddArgumentsResponse
+
+namespace TestSpecific {
+struct Type;
+struct DecodableType;
+} // namespace TestSpecific
+
+namespace TestSimpleArgumentResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestSimpleArgumentResponse
+
+namespace TestUnknownCommand {
+struct Type;
+struct DecodableType;
+} // namespace TestUnknownCommand
+
+namespace TestStructArrayArgumentResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestStructArrayArgumentResponse
+
+namespace TestAddArguments {
+struct Type;
+struct DecodableType;
+} // namespace TestAddArguments
+
+namespace TestListInt8UReverseResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestListInt8UReverseResponse
+
+namespace TestSimpleArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestSimpleArgumentRequest
+
+namespace TestEnumsResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestEnumsResponse
+
+namespace TestStructArrayArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestStructArrayArgumentRequest
+
+namespace TestNullableOptionalResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestNullableOptionalResponse
+
+namespace TestStructArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestStructArgumentRequest
+
+namespace TestComplexNullableOptionalResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestComplexNullableOptionalResponse
+
+namespace TestNestedStructArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestNestedStructArgumentRequest
+
+namespace BooleanResponse {
+struct Type;
+struct DecodableType;
+} // namespace BooleanResponse
+
+namespace TestListStructArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestListStructArgumentRequest
+
+namespace TestListInt8UArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestListInt8UArgumentRequest
+
+namespace TestNestedStructListArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestNestedStructListArgumentRequest
+
+namespace TestListNestedStructListArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestListNestedStructListArgumentRequest
+
+namespace TestListInt8UReverseRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestListInt8UReverseRequest
+
+namespace TestEnumsRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestEnumsRequest
+
+namespace TestNullableOptionalRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestNullableOptionalRequest
+
+namespace TestComplexNullableOptionalRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestComplexNullableOptionalRequest
+
+} // namespace Commands
+
+namespace Commands {
 namespace Test {
 enum class Fields
 {
@@ -23362,6 +27449,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23389,6 +27478,8 @@ public:
     uint8_t returnValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23414,6 +27505,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23441,6 +27534,8 @@ public:
     uint8_t returnValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23466,6 +27561,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType;
 };
 
 struct DecodableType
@@ -23493,6 +27590,8 @@ public:
     bool returnValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23518,6 +27617,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23555,6 +27656,8 @@ public:
     bool arg6;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23590,6 +27693,8 @@ public:
     uint8_t arg2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -23619,6 +27724,8 @@ public:
     DataModel::List<const uint8_t> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23647,6 +27754,8 @@ public:
     bool arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestSimpleArgumentResponse::DecodableType;
 };
 
 struct DecodableType
@@ -23677,6 +27786,8 @@ public:
     SimpleEnum arg2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23716,6 +27827,8 @@ public:
     bool arg6;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType;
 };
 
 struct DecodableType
@@ -23755,6 +27868,8 @@ public:
     Optional<DataModel::Nullable<uint8_t>> originalValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23786,6 +27901,8 @@ public:
     Structs::SimpleStruct::Type arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 };
 
 struct DecodableType
@@ -23868,6 +27985,8 @@ public:
     Optional<DataModel::List<const SimpleEnum>> nullableOptionalListValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23923,6 +28042,8 @@ public:
     Structs::NestedStruct::Type arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 };
 
 struct DecodableType
@@ -23951,6 +28072,8 @@ public:
     bool value;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -23979,6 +28102,8 @@ public:
     DataModel::List<const Structs::SimpleStruct::Type> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24007,6 +28132,8 @@ public:
     DataModel::List<const uint8_t> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24035,6 +28162,8 @@ public:
     Structs::NestedStructList::Type arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24063,6 +28192,8 @@ public:
     DataModel::List<const Structs::NestedStructList::Type> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24091,6 +28222,8 @@ public:
     DataModel::List<const uint8_t> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24121,6 +28254,8 @@ public:
     SimpleEnum arg2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24150,6 +28285,8 @@ public:
     Optional<DataModel::Nullable<uint8_t>> arg1;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24200,6 +28337,8 @@ public:
     Optional<DataModel::Nullable<DataModel::List<const SimpleEnum>>> nullableOptionalList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType;
 };
 
 struct DecodableType
@@ -24229,8 +28368,9 @@ namespace Attributes {
 namespace Boolean {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Boolean::Id; }
@@ -24239,8 +28379,9 @@ struct TypeInfo
 namespace Bitmap8 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap8::Id; }
@@ -24249,8 +28390,9 @@ struct TypeInfo
 namespace Bitmap16 {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap16::Id; }
@@ -24259,8 +28401,9 @@ struct TypeInfo
 namespace Bitmap32 {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap32::Id; }
@@ -24269,8 +28412,9 @@ struct TypeInfo
 namespace Bitmap64 {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap64::Id; }
@@ -24279,8 +28423,9 @@ struct TypeInfo
 namespace Int8u {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int8u::Id; }
@@ -24289,8 +28434,9 @@ struct TypeInfo
 namespace Int16u {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int16u::Id; }
@@ -24299,8 +28445,9 @@ struct TypeInfo
 namespace Int32u {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int32u::Id; }
@@ -24309,8 +28456,9 @@ struct TypeInfo
 namespace Int64u {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int64u::Id; }
@@ -24319,8 +28467,9 @@ struct TypeInfo
 namespace Int8s {
 struct TypeInfo
 {
-    using Type          = int8_t;
-    using DecodableType = int8_t;
+    using Type             = int8_t;
+    using DecodableType    = int8_t;
+    using DecodableArgType = int8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int8s::Id; }
@@ -24329,8 +28478,9 @@ struct TypeInfo
 namespace Int16s {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int16s::Id; }
@@ -24339,8 +28489,9 @@ struct TypeInfo
 namespace Int32s {
 struct TypeInfo
 {
-    using Type          = int32_t;
-    using DecodableType = int32_t;
+    using Type             = int32_t;
+    using DecodableType    = int32_t;
+    using DecodableArgType = int32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int32s::Id; }
@@ -24349,8 +28500,9 @@ struct TypeInfo
 namespace Int64s {
 struct TypeInfo
 {
-    using Type          = int64_t;
-    using DecodableType = int64_t;
+    using Type             = int64_t;
+    using DecodableType    = int64_t;
+    using DecodableArgType = int64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int64s::Id; }
@@ -24359,8 +28511,9 @@ struct TypeInfo
 namespace Enum8 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Enum8::Id; }
@@ -24369,8 +28522,9 @@ struct TypeInfo
 namespace Enum16 {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Enum16::Id; }
@@ -24379,8 +28533,9 @@ struct TypeInfo
 namespace OctetString {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OctetString::Id; }
@@ -24389,8 +28544,9 @@ struct TypeInfo
 namespace ListInt8u {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const uint8_t>;
-    using DecodableType = DataModel::DecodableList<uint8_t>;
+    using Type             = DataModel::List<const uint8_t>;
+    using DecodableType    = DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListInt8u::Id; }
@@ -24399,8 +28555,9 @@ struct TypeInfo
 namespace ListOctetString {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const chip::ByteSpan>;
-    using DecodableType = DataModel::DecodableList<chip::ByteSpan>;
+    using Type             = DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const DataModel::DecodableList<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListOctetString::Id; }
@@ -24409,8 +28566,9 @@ struct TypeInfo
 namespace ListStructOctetString {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::TestListStructOctet::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::TestListStructOctet::DecodableType>;
+    using Type             = DataModel::List<const Structs::TestListStructOctet::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::TestListStructOctet::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::TestListStructOctet::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListStructOctetString::Id; }
@@ -24419,8 +28577,9 @@ struct TypeInfo
 namespace LongOctetString {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongOctetString::Id; }
@@ -24429,8 +28588,9 @@ struct TypeInfo
 namespace CharString {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CharString::Id; }
@@ -24439,8 +28599,9 @@ struct TypeInfo
 namespace LongCharString {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongCharString::Id; }
@@ -24449,8 +28610,9 @@ struct TypeInfo
 namespace EpochUs {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EpochUs::Id; }
@@ -24459,8 +28621,9 @@ struct TypeInfo
 namespace EpochS {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EpochS::Id; }
@@ -24469,8 +28632,9 @@ struct TypeInfo
 namespace VendorId {
 struct TypeInfo
 {
-    using Type          = chip::VendorId;
-    using DecodableType = chip::VendorId;
+    using Type             = chip::VendorId;
+    using DecodableType    = chip::VendorId;
+    using DecodableArgType = chip::VendorId;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorId::Id; }
@@ -24479,8 +28643,9 @@ struct TypeInfo
 namespace ListNullablesAndOptionalsStruct {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::NullablesAndOptionalsStruct::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::NullablesAndOptionalsStruct::DecodableType>;
+    using Type             = DataModel::List<const Structs::NullablesAndOptionalsStruct::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::NullablesAndOptionalsStruct::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::NullablesAndOptionalsStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListNullablesAndOptionalsStruct::Id; }
@@ -24489,18 +28654,207 @@ struct TypeInfo
 namespace Unsupported {
 struct TypeInfo
 {
-    using Type          = bool;
-    using DecodableType = bool;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Unsupported::Id; }
 };
 } // namespace Unsupported
+namespace NullableBoolean {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<bool>;
+    using DecodableType    = DataModel::Nullable<bool>;
+    using DecodableArgType = const DataModel::Nullable<bool> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableBoolean::Id; }
+};
+} // namespace NullableBoolean
+namespace NullableBitmap8 {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint8_t>;
+    using DecodableType    = DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap8::Id; }
+};
+} // namespace NullableBitmap8
+namespace NullableBitmap16 {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint16_t>;
+    using DecodableType    = DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap16::Id; }
+};
+} // namespace NullableBitmap16
+namespace NullableBitmap32 {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint32_t>;
+    using DecodableType    = DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap32::Id; }
+};
+} // namespace NullableBitmap32
+namespace NullableBitmap64 {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint64_t>;
+    using DecodableType    = DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap64::Id; }
+};
+} // namespace NullableBitmap64
+namespace NullableInt8u {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint8_t>;
+    using DecodableType    = DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt8u::Id; }
+};
+} // namespace NullableInt8u
+namespace NullableInt16u {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint16_t>;
+    using DecodableType    = DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt16u::Id; }
+};
+} // namespace NullableInt16u
+namespace NullableInt32u {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint32_t>;
+    using DecodableType    = DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt32u::Id; }
+};
+} // namespace NullableInt32u
+namespace NullableInt64u {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint64_t>;
+    using DecodableType    = DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt64u::Id; }
+};
+} // namespace NullableInt64u
+namespace NullableInt8s {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<int8_t>;
+    using DecodableType    = DataModel::Nullable<int8_t>;
+    using DecodableArgType = const DataModel::Nullable<int8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt8s::Id; }
+};
+} // namespace NullableInt8s
+namespace NullableInt16s {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<int16_t>;
+    using DecodableType    = DataModel::Nullable<int16_t>;
+    using DecodableArgType = const DataModel::Nullable<int16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt16s::Id; }
+};
+} // namespace NullableInt16s
+namespace NullableInt32s {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<int32_t>;
+    using DecodableType    = DataModel::Nullable<int32_t>;
+    using DecodableArgType = const DataModel::Nullable<int32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt32s::Id; }
+};
+} // namespace NullableInt32s
+namespace NullableInt64s {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<int64_t>;
+    using DecodableType    = DataModel::Nullable<int64_t>;
+    using DecodableArgType = const DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt64s::Id; }
+};
+} // namespace NullableInt64s
+namespace NullableEnum8 {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint8_t>;
+    using DecodableType    = DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableEnum8::Id; }
+};
+} // namespace NullableEnum8
+namespace NullableEnum16 {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint16_t>;
+    using DecodableType    = DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableEnum16::Id; }
+};
+} // namespace NullableEnum16
+namespace NullableOctetString {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<chip::ByteSpan>;
+    using DecodableType    = DataModel::Nullable<chip::ByteSpan>;
+    using DecodableArgType = const DataModel::Nullable<chip::ByteSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableOctetString::Id; }
+};
+} // namespace NullableOctetString
+namespace NullableCharString {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<chip::CharSpan>;
+    using DecodableType    = DataModel::Nullable<chip::CharSpan>;
+    using DecodableArgType = const DataModel::Nullable<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableCharString::Id; }
+};
+} // namespace NullableCharString
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -24509,8 +28863,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -24535,8 +28890,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000001;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1;
@@ -24716,24 +29071,64 @@ using MessagingControlTransmission         = EmberAfMessagingControlTransmission
 // Bitmap for MessagingConfirmationControl
 enum class MessagingConfirmationControl : uint8_t
 {
-    kNoReturned  = 0,
-    kYesReturned = 1,
+    kNoReturned  = 0x1,
+    kYesReturned = 0x2,
 };
 
 // Bitmap for MessagingControlMask
 enum class MessagingControlMask : uint8_t
 {
-    kTransMechanism              = 0,
-    kMessageUrgency              = 2,
-    kEnhancedConfirmationRequest = 5,
-    kMessageConfirmation         = 7,
+    kTransMechanism              = 0x3,
+    kMessageUrgency              = 0xC,
+    kEnhancedConfirmationRequest = 0x20,
+    kMessageConfirmation         = 0x80,
 };
 
 // Bitmap for MessagingExtendedControlMask
 enum class MessagingExtendedControlMask : uint8_t
 {
-    kMessageConfirmationStatus = 0,
+    kMessageConfirmationStatus = 0x1,
 };
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace DisplayMessage {
+struct Type;
+struct DecodableType;
+} // namespace DisplayMessage
+
+namespace GetLastMessage {
+struct Type;
+struct DecodableType;
+} // namespace GetLastMessage
+
+namespace CancelMessage {
+struct Type;
+struct DecodableType;
+} // namespace CancelMessage
+
+namespace MessageConfirmation {
+struct Type;
+struct DecodableType;
+} // namespace MessageConfirmation
+
+namespace DisplayProtectedMessage {
+struct Type;
+struct DecodableType;
+} // namespace DisplayProtectedMessage
+
+namespace GetMessageCancellation {
+struct Type;
+struct DecodableType;
+} // namespace GetMessageCancellation
+
+namespace CancelAllMessages {
+struct Type;
+struct DecodableType;
+} // namespace CancelAllMessages
+
+} // namespace Commands
 
 namespace Commands {
 namespace DisplayMessage {
@@ -24762,6 +29157,8 @@ public:
     chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24792,6 +29189,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24821,6 +29220,8 @@ public:
     chip::BitFlags<MessagingControlMask> messageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24856,6 +29257,8 @@ public:
     chip::ByteSpan messageResponse;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24897,6 +29300,8 @@ public:
     chip::BitFlags<MessagingExtendedControlMask> optionalExtendedMessageControl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24930,6 +29335,8 @@ public:
     uint32_t earliestImplementationTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24958,6 +29365,8 @@ public:
     uint32_t implementationDateTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -24976,8 +29385,9 @@ namespace Attributes {
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -24986,8 +29396,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -25001,8 +29412,9 @@ namespace Attributes {
 namespace BasicIdentification {
 struct TypeInfo
 {
-    using Type          = uint64_t;
-    using DecodableType = uint64_t;
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BasicIdentification::Id; }
@@ -25011,8 +29423,9 @@ struct TypeInfo
 namespace CompanyName {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompanyName::Id; }
@@ -25021,8 +29434,9 @@ struct TypeInfo
 namespace CompanyId {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompanyId::Id; }
@@ -25031,8 +29445,9 @@ struct TypeInfo
 namespace BrandName {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BrandName::Id; }
@@ -25041,8 +29456,9 @@ struct TypeInfo
 namespace BrandId {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BrandId::Id; }
@@ -25051,8 +29467,9 @@ struct TypeInfo
 namespace Model {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Model::Id; }
@@ -25061,8 +29478,9 @@ struct TypeInfo
 namespace PartNumber {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
@@ -25071,8 +29489,9 @@ struct TypeInfo
 namespace ProductRevision {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductRevision::Id; }
@@ -25081,8 +29500,9 @@ struct TypeInfo
 namespace SoftwareRevision {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareRevision::Id; }
@@ -25091,8 +29511,9 @@ struct TypeInfo
 namespace ProductTypeName {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductTypeName::Id; }
@@ -25101,8 +29522,9 @@ struct TypeInfo
 namespace ProductTypeId {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductTypeId::Id; }
@@ -25111,8 +29533,9 @@ struct TypeInfo
 namespace CecedSpecificationVersion {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CecedSpecificationVersion::Id; }
@@ -25121,8 +29544,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -25131,8 +29555,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -25146,8 +29571,9 @@ namespace Attributes {
 namespace CompanyName {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompanyName::Id; }
@@ -25156,8 +29582,9 @@ struct TypeInfo
 namespace MeterTypeId {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeterTypeId::Id; }
@@ -25166,8 +29593,9 @@ struct TypeInfo
 namespace DataQualityId {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DataQualityId::Id; }
@@ -25176,8 +29604,9 @@ struct TypeInfo
 namespace CustomerName {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CustomerName::Id; }
@@ -25186,8 +29615,9 @@ struct TypeInfo
 namespace Model {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Model::Id; }
@@ -25196,8 +29626,9 @@ struct TypeInfo
 namespace PartNumber {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
@@ -25206,8 +29637,9 @@ struct TypeInfo
 namespace ProductRevision {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductRevision::Id; }
@@ -25216,8 +29648,9 @@ struct TypeInfo
 namespace SoftwareRevision {
 struct TypeInfo
 {
-    using Type          = chip::ByteSpan;
-    using DecodableType = chip::ByteSpan;
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareRevision::Id; }
@@ -25226,8 +29659,9 @@ struct TypeInfo
 namespace UtilityName {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UtilityName::Id; }
@@ -25236,8 +29670,9 @@ struct TypeInfo
 namespace Pod {
 struct TypeInfo
 {
-    using Type          = chip::CharSpan;
-    using DecodableType = chip::CharSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Pod::Id; }
@@ -25246,8 +29681,9 @@ struct TypeInfo
 namespace AvailablePower {
 struct TypeInfo
 {
-    using Type          = int32_t;
-    using DecodableType = int32_t;
+    using Type             = int32_t;
+    using DecodableType    = int32_t;
+    using DecodableArgType = int32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AvailablePower::Id; }
@@ -25256,8 +29692,9 @@ struct TypeInfo
 namespace PowerThreshold {
 struct TypeInfo
 {
-    using Type          = int32_t;
-    using DecodableType = int32_t;
+    using Type             = int32_t;
+    using DecodableType    = int32_t;
+    using DecodableArgType = int32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerThreshold::Id; }
@@ -25266,8 +29703,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -25276,8 +29714,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -25305,17 +29744,42 @@ using EventIdentification                  = EmberAfEventIdentification;
 // Bitmap for AlertCount
 enum class AlertCount : uint8_t
 {
-    kNumberOfAlerts = 0,
-    kTypeOfAlert    = 4,
+    kNumberOfAlerts = 0xF,
+    kTypeOfAlert    = 0xF0,
 };
 
 // Bitmap for AlertStructure
 enum class AlertStructure : uint32_t
 {
-    kAlertId          = 0,
-    kCategory         = 8,
-    kPresenceRecovery = 12,
+    kAlertId          = 0xFF,
+    kCategory         = 0xF00,
+    kPresenceRecovery = 0x3000,
 };
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace GetAlerts {
+struct Type;
+struct DecodableType;
+} // namespace GetAlerts
+
+namespace GetAlertsResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetAlertsResponse
+
+namespace AlertsNotification {
+struct Type;
+struct DecodableType;
+} // namespace AlertsNotification
+
+namespace EventsNotification {
+struct Type;
+struct DecodableType;
+} // namespace EventsNotification
+
+} // namespace Commands
 
 namespace Commands {
 namespace GetAlerts {
@@ -25331,6 +29795,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ApplianceEventsAndAlert::Commands::GetAlertsResponse::DecodableType;
 };
 
 struct DecodableType
@@ -25360,6 +29826,8 @@ public:
     DataModel::List<const chip::BitFlags<AlertStructure>> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25391,6 +29859,8 @@ public:
     DataModel::List<const chip::BitFlags<AlertStructure>> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25422,6 +29892,8 @@ public:
     EventIdentification eventId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25441,8 +29913,9 @@ namespace Attributes {
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -25451,8 +29924,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -25461,6 +29935,41 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ApplianceEventsAndAlert
 namespace ApplianceStatistics {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace LogNotification {
+struct Type;
+struct DecodableType;
+} // namespace LogNotification
+
+namespace LogRequest {
+struct Type;
+struct DecodableType;
+} // namespace LogRequest
+
+namespace LogResponse {
+struct Type;
+struct DecodableType;
+} // namespace LogResponse
+
+namespace LogQueueRequest {
+struct Type;
+struct DecodableType;
+} // namespace LogQueueRequest
+
+namespace LogQueueResponse {
+struct Type;
+struct DecodableType;
+} // namespace LogQueueResponse
+
+namespace StatisticsAvailable {
+struct Type;
+struct DecodableType;
+} // namespace StatisticsAvailable
+
+} // namespace Commands
 
 namespace Commands {
 namespace LogNotification {
@@ -25485,6 +29994,8 @@ public:
     DataModel::List<const uint8_t> logPayload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25516,6 +30027,8 @@ public:
     uint32_t logId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ApplianceStatistics::Commands::LogResponse::DecodableType;
 };
 
 struct DecodableType
@@ -25550,6 +30063,8 @@ public:
     DataModel::List<const uint8_t> logPayload;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25578,6 +30093,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ApplianceStatistics::Commands::LogQueueResponse::DecodableType;
 };
 
 struct DecodableType
@@ -25607,6 +30124,8 @@ public:
     DataModel::List<const uint32_t> logIds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25638,6 +30157,8 @@ public:
     DataModel::List<const uint32_t> logIds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25657,8 +30178,9 @@ namespace Attributes {
 namespace LogMaxSize {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LogMaxSize::Id; }
@@ -25667,8 +30189,9 @@ struct TypeInfo
 namespace LogQueueMaxSize {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LogQueueMaxSize::Id; }
@@ -25677,8 +30200,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -25687,8 +30211,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -25697,6 +30222,31 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ApplianceStatistics
 namespace ElectricalMeasurement {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace GetProfileInfoResponseCommand {
+struct Type;
+struct DecodableType;
+} // namespace GetProfileInfoResponseCommand
+
+namespace GetProfileInfoCommand {
+struct Type;
+struct DecodableType;
+} // namespace GetProfileInfoCommand
+
+namespace GetMeasurementProfileResponseCommand {
+struct Type;
+struct DecodableType;
+} // namespace GetMeasurementProfileResponseCommand
+
+namespace GetMeasurementProfileCommand {
+struct Type;
+struct DecodableType;
+} // namespace GetMeasurementProfileCommand
+
+} // namespace Commands
 
 namespace Commands {
 namespace GetProfileInfoResponseCommand {
@@ -25721,6 +30271,8 @@ public:
     DataModel::List<const uint16_t> listOfAttributes;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25749,6 +30301,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25786,6 +30340,8 @@ public:
     DataModel::List<const uint8_t> intervals;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25823,6 +30379,8 @@ public:
     uint8_t numberOfIntervals;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -25843,8 +30401,9 @@ namespace Attributes {
 namespace MeasurementType {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementType::Id; }
@@ -25853,8 +30412,9 @@ struct TypeInfo
 namespace DcVoltage {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltage::Id; }
@@ -25863,8 +30423,9 @@ struct TypeInfo
 namespace DcVoltageMin {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMin::Id; }
@@ -25873,8 +30434,9 @@ struct TypeInfo
 namespace DcVoltageMax {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMax::Id; }
@@ -25883,8 +30445,9 @@ struct TypeInfo
 namespace DcCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrent::Id; }
@@ -25893,8 +30456,9 @@ struct TypeInfo
 namespace DcCurrentMin {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMin::Id; }
@@ -25903,8 +30467,9 @@ struct TypeInfo
 namespace DcCurrentMax {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMax::Id; }
@@ -25913,8 +30478,9 @@ struct TypeInfo
 namespace DcPower {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPower::Id; }
@@ -25923,8 +30489,9 @@ struct TypeInfo
 namespace DcPowerMin {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMin::Id; }
@@ -25933,8 +30500,9 @@ struct TypeInfo
 namespace DcPowerMax {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMax::Id; }
@@ -25943,8 +30511,9 @@ struct TypeInfo
 namespace DcVoltageMultiplier {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMultiplier::Id; }
@@ -25953,8 +30522,9 @@ struct TypeInfo
 namespace DcVoltageDivisor {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageDivisor::Id; }
@@ -25963,8 +30533,9 @@ struct TypeInfo
 namespace DcCurrentMultiplier {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMultiplier::Id; }
@@ -25973,8 +30544,9 @@ struct TypeInfo
 namespace DcCurrentDivisor {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentDivisor::Id; }
@@ -25983,8 +30555,9 @@ struct TypeInfo
 namespace DcPowerMultiplier {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMultiplier::Id; }
@@ -25993,8 +30566,9 @@ struct TypeInfo
 namespace DcPowerDivisor {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerDivisor::Id; }
@@ -26003,8 +30577,9 @@ struct TypeInfo
 namespace AcFrequency {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequency::Id; }
@@ -26013,8 +30588,9 @@ struct TypeInfo
 namespace AcFrequencyMin {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMin::Id; }
@@ -26023,8 +30599,9 @@ struct TypeInfo
 namespace AcFrequencyMax {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMax::Id; }
@@ -26033,8 +30610,9 @@ struct TypeInfo
 namespace NeutralCurrent {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NeutralCurrent::Id; }
@@ -26043,8 +30621,9 @@ struct TypeInfo
 namespace TotalActivePower {
 struct TypeInfo
 {
-    using Type          = int32_t;
-    using DecodableType = int32_t;
+    using Type             = int32_t;
+    using DecodableType    = int32_t;
+    using DecodableArgType = int32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalActivePower::Id; }
@@ -26053,8 +30632,9 @@ struct TypeInfo
 namespace TotalReactivePower {
 struct TypeInfo
 {
-    using Type          = int32_t;
-    using DecodableType = int32_t;
+    using Type             = int32_t;
+    using DecodableType    = int32_t;
+    using DecodableArgType = int32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalReactivePower::Id; }
@@ -26063,8 +30643,9 @@ struct TypeInfo
 namespace TotalApparentPower {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalApparentPower::Id; }
@@ -26073,8 +30654,9 @@ struct TypeInfo
 namespace Measured1stHarmonicCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured1stHarmonicCurrent::Id; }
@@ -26083,8 +30665,9 @@ struct TypeInfo
 namespace Measured3rdHarmonicCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured3rdHarmonicCurrent::Id; }
@@ -26093,8 +30676,9 @@ struct TypeInfo
 namespace Measured5thHarmonicCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured5thHarmonicCurrent::Id; }
@@ -26103,8 +30687,9 @@ struct TypeInfo
 namespace Measured7thHarmonicCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured7thHarmonicCurrent::Id; }
@@ -26113,8 +30698,9 @@ struct TypeInfo
 namespace Measured9thHarmonicCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured9thHarmonicCurrent::Id; }
@@ -26123,8 +30709,9 @@ struct TypeInfo
 namespace Measured11thHarmonicCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured11thHarmonicCurrent::Id; }
@@ -26133,8 +30720,9 @@ struct TypeInfo
 namespace MeasuredPhase1stHarmonicCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase1stHarmonicCurrent::Id; }
@@ -26143,8 +30731,9 @@ struct TypeInfo
 namespace MeasuredPhase3rdHarmonicCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase3rdHarmonicCurrent::Id; }
@@ -26153,8 +30742,9 @@ struct TypeInfo
 namespace MeasuredPhase5thHarmonicCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase5thHarmonicCurrent::Id; }
@@ -26163,8 +30753,9 @@ struct TypeInfo
 namespace MeasuredPhase7thHarmonicCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase7thHarmonicCurrent::Id; }
@@ -26173,8 +30764,9 @@ struct TypeInfo
 namespace MeasuredPhase9thHarmonicCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase9thHarmonicCurrent::Id; }
@@ -26183,8 +30775,9 @@ struct TypeInfo
 namespace MeasuredPhase11thHarmonicCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase11thHarmonicCurrent::Id; }
@@ -26193,8 +30786,9 @@ struct TypeInfo
 namespace AcFrequencyMultiplier {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMultiplier::Id; }
@@ -26203,8 +30797,9 @@ struct TypeInfo
 namespace AcFrequencyDivisor {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyDivisor::Id; }
@@ -26213,8 +30808,9 @@ struct TypeInfo
 namespace PowerMultiplier {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerMultiplier::Id; }
@@ -26223,8 +30819,9 @@ struct TypeInfo
 namespace PowerDivisor {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerDivisor::Id; }
@@ -26233,8 +30830,9 @@ struct TypeInfo
 namespace HarmonicCurrentMultiplier {
 struct TypeInfo
 {
-    using Type          = int8_t;
-    using DecodableType = int8_t;
+    using Type             = int8_t;
+    using DecodableType    = int8_t;
+    using DecodableArgType = int8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HarmonicCurrentMultiplier::Id; }
@@ -26243,8 +30841,9 @@ struct TypeInfo
 namespace PhaseHarmonicCurrentMultiplier {
 struct TypeInfo
 {
-    using Type          = int8_t;
-    using DecodableType = int8_t;
+    using Type             = int8_t;
+    using DecodableType    = int8_t;
+    using DecodableArgType = int8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhaseHarmonicCurrentMultiplier::Id; }
@@ -26253,8 +30852,9 @@ struct TypeInfo
 namespace InstantaneousVoltage {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousVoltage::Id; }
@@ -26263,8 +30863,9 @@ struct TypeInfo
 namespace InstantaneousLineCurrent {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousLineCurrent::Id; }
@@ -26273,8 +30874,9 @@ struct TypeInfo
 namespace InstantaneousActiveCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousActiveCurrent::Id; }
@@ -26283,8 +30885,9 @@ struct TypeInfo
 namespace InstantaneousReactiveCurrent {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousReactiveCurrent::Id; }
@@ -26293,8 +30896,9 @@ struct TypeInfo
 namespace InstantaneousPower {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousPower::Id; }
@@ -26303,8 +30907,9 @@ struct TypeInfo
 namespace RmsVoltage {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltage::Id; }
@@ -26313,8 +30918,9 @@ struct TypeInfo
 namespace RmsVoltageMin {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMin::Id; }
@@ -26323,8 +30929,9 @@ struct TypeInfo
 namespace RmsVoltageMax {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMax::Id; }
@@ -26333,8 +30940,9 @@ struct TypeInfo
 namespace RmsCurrent {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrent::Id; }
@@ -26343,8 +30951,9 @@ struct TypeInfo
 namespace RmsCurrentMin {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMin::Id; }
@@ -26353,8 +30962,9 @@ struct TypeInfo
 namespace RmsCurrentMax {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMax::Id; }
@@ -26363,8 +30973,9 @@ struct TypeInfo
 namespace ActivePower {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePower::Id; }
@@ -26373,8 +30984,9 @@ struct TypeInfo
 namespace ActivePowerMin {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMin::Id; }
@@ -26383,8 +30995,9 @@ struct TypeInfo
 namespace ActivePowerMax {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMax::Id; }
@@ -26393,8 +31006,9 @@ struct TypeInfo
 namespace ReactivePower {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePower::Id; }
@@ -26403,8 +31017,9 @@ struct TypeInfo
 namespace ApparentPower {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPower::Id; }
@@ -26413,8 +31028,9 @@ struct TypeInfo
 namespace PowerFactor {
 struct TypeInfo
 {
-    using Type          = int8_t;
-    using DecodableType = int8_t;
+    using Type             = int8_t;
+    using DecodableType    = int8_t;
+    using DecodableArgType = int8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactor::Id; }
@@ -26423,8 +31039,9 @@ struct TypeInfo
 namespace AverageRmsVoltageMeasurementPeriod {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriod::Id; }
@@ -26433,8 +31050,9 @@ struct TypeInfo
 namespace AverageRmsUnderVoltageCounter {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounter::Id; }
@@ -26443,8 +31061,9 @@ struct TypeInfo
 namespace RmsExtremeOverVoltagePeriod {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriod::Id; }
@@ -26453,8 +31072,9 @@ struct TypeInfo
 namespace RmsExtremeUnderVoltagePeriod {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriod::Id; }
@@ -26463,8 +31083,9 @@ struct TypeInfo
 namespace RmsVoltageSagPeriod {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriod::Id; }
@@ -26473,8 +31094,9 @@ struct TypeInfo
 namespace RmsVoltageSwellPeriod {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriod::Id; }
@@ -26483,8 +31105,9 @@ struct TypeInfo
 namespace AcVoltageMultiplier {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageMultiplier::Id; }
@@ -26493,8 +31116,9 @@ struct TypeInfo
 namespace AcVoltageDivisor {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageDivisor::Id; }
@@ -26503,8 +31127,9 @@ struct TypeInfo
 namespace AcCurrentMultiplier {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentMultiplier::Id; }
@@ -26513,8 +31138,9 @@ struct TypeInfo
 namespace AcCurrentDivisor {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentDivisor::Id; }
@@ -26523,8 +31149,9 @@ struct TypeInfo
 namespace AcPowerMultiplier {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcPowerMultiplier::Id; }
@@ -26533,8 +31160,9 @@ struct TypeInfo
 namespace AcPowerDivisor {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcPowerDivisor::Id; }
@@ -26543,8 +31171,9 @@ struct TypeInfo
 namespace OverloadAlarmsMask {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverloadAlarmsMask::Id; }
@@ -26553,8 +31182,9 @@ struct TypeInfo
 namespace VoltageOverload {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VoltageOverload::Id; }
@@ -26563,8 +31193,9 @@ struct TypeInfo
 namespace CurrentOverload {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentOverload::Id; }
@@ -26573,8 +31204,9 @@ struct TypeInfo
 namespace AcOverloadAlarmsMask {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcOverloadAlarmsMask::Id; }
@@ -26583,8 +31215,9 @@ struct TypeInfo
 namespace AcVoltageOverload {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageOverload::Id; }
@@ -26593,8 +31226,9 @@ struct TypeInfo
 namespace AcCurrentOverload {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentOverload::Id; }
@@ -26603,8 +31237,9 @@ struct TypeInfo
 namespace AcActivePowerOverload {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcActivePowerOverload::Id; }
@@ -26613,8 +31248,9 @@ struct TypeInfo
 namespace AcReactivePowerOverload {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcReactivePowerOverload::Id; }
@@ -26623,8 +31259,9 @@ struct TypeInfo
 namespace AverageRmsOverVoltage {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltage::Id; }
@@ -26633,8 +31270,9 @@ struct TypeInfo
 namespace AverageRmsUnderVoltage {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltage::Id; }
@@ -26643,8 +31281,9 @@ struct TypeInfo
 namespace RmsExtremeOverVoltage {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltage::Id; }
@@ -26653,8 +31292,9 @@ struct TypeInfo
 namespace RmsExtremeUnderVoltage {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltage::Id; }
@@ -26663,8 +31303,9 @@ struct TypeInfo
 namespace RmsVoltageSag {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSag::Id; }
@@ -26673,8 +31314,9 @@ struct TypeInfo
 namespace RmsVoltageSwell {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwell::Id; }
@@ -26683,8 +31325,9 @@ struct TypeInfo
 namespace LineCurrentPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LineCurrentPhaseB::Id; }
@@ -26693,8 +31336,9 @@ struct TypeInfo
 namespace ActiveCurrentPhaseB {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCurrentPhaseB::Id; }
@@ -26703,8 +31347,9 @@ struct TypeInfo
 namespace ReactiveCurrentPhaseB {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactiveCurrentPhaseB::Id; }
@@ -26713,8 +31358,9 @@ struct TypeInfo
 namespace RmsVoltagePhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltagePhaseB::Id; }
@@ -26723,8 +31369,9 @@ struct TypeInfo
 namespace RmsVoltageMinPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMinPhaseB::Id; }
@@ -26733,8 +31380,9 @@ struct TypeInfo
 namespace RmsVoltageMaxPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMaxPhaseB::Id; }
@@ -26743,8 +31391,9 @@ struct TypeInfo
 namespace RmsCurrentPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentPhaseB::Id; }
@@ -26753,8 +31402,9 @@ struct TypeInfo
 namespace RmsCurrentMinPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMinPhaseB::Id; }
@@ -26763,8 +31413,9 @@ struct TypeInfo
 namespace RmsCurrentMaxPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMaxPhaseB::Id; }
@@ -26773,8 +31424,9 @@ struct TypeInfo
 namespace ActivePowerPhaseB {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerPhaseB::Id; }
@@ -26783,8 +31435,9 @@ struct TypeInfo
 namespace ActivePowerMinPhaseB {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMinPhaseB::Id; }
@@ -26793,8 +31446,9 @@ struct TypeInfo
 namespace ActivePowerMaxPhaseB {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMaxPhaseB::Id; }
@@ -26803,8 +31457,9 @@ struct TypeInfo
 namespace ReactivePowerPhaseB {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePowerPhaseB::Id; }
@@ -26813,8 +31468,9 @@ struct TypeInfo
 namespace ApparentPowerPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPowerPhaseB::Id; }
@@ -26823,8 +31479,9 @@ struct TypeInfo
 namespace PowerFactorPhaseB {
 struct TypeInfo
 {
-    using Type          = int8_t;
-    using DecodableType = int8_t;
+    using Type             = int8_t;
+    using DecodableType    = int8_t;
+    using DecodableArgType = int8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactorPhaseB::Id; }
@@ -26833,8 +31490,9 @@ struct TypeInfo
 namespace AverageRmsVoltageMeasurementPeriodPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::Id; }
@@ -26843,8 +31501,9 @@ struct TypeInfo
 namespace AverageRmsOverVoltageCounterPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltageCounterPhaseB::Id; }
@@ -26853,8 +31512,9 @@ struct TypeInfo
 namespace AverageRmsUnderVoltageCounterPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounterPhaseB::Id; }
@@ -26863,8 +31523,9 @@ struct TypeInfo
 namespace RmsExtremeOverVoltagePeriodPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriodPhaseB::Id; }
@@ -26873,8 +31534,9 @@ struct TypeInfo
 namespace RmsExtremeUnderVoltagePeriodPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriodPhaseB::Id; }
@@ -26883,8 +31545,9 @@ struct TypeInfo
 namespace RmsVoltageSagPeriodPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriodPhaseB::Id; }
@@ -26893,8 +31556,9 @@ struct TypeInfo
 namespace RmsVoltageSwellPeriodPhaseB {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriodPhaseB::Id; }
@@ -26903,8 +31567,9 @@ struct TypeInfo
 namespace LineCurrentPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LineCurrentPhaseC::Id; }
@@ -26913,8 +31578,9 @@ struct TypeInfo
 namespace ActiveCurrentPhaseC {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCurrentPhaseC::Id; }
@@ -26923,8 +31589,9 @@ struct TypeInfo
 namespace ReactiveCurrentPhaseC {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactiveCurrentPhaseC::Id; }
@@ -26933,8 +31600,9 @@ struct TypeInfo
 namespace RmsVoltagePhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltagePhaseC::Id; }
@@ -26943,8 +31611,9 @@ struct TypeInfo
 namespace RmsVoltageMinPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMinPhaseC::Id; }
@@ -26953,8 +31622,9 @@ struct TypeInfo
 namespace RmsVoltageMaxPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMaxPhaseC::Id; }
@@ -26963,8 +31633,9 @@ struct TypeInfo
 namespace RmsCurrentPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentPhaseC::Id; }
@@ -26973,8 +31644,9 @@ struct TypeInfo
 namespace RmsCurrentMinPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMinPhaseC::Id; }
@@ -26983,8 +31655,9 @@ struct TypeInfo
 namespace RmsCurrentMaxPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMaxPhaseC::Id; }
@@ -26993,8 +31666,9 @@ struct TypeInfo
 namespace ActivePowerPhaseC {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerPhaseC::Id; }
@@ -27003,8 +31677,9 @@ struct TypeInfo
 namespace ActivePowerMinPhaseC {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMinPhaseC::Id; }
@@ -27013,8 +31688,9 @@ struct TypeInfo
 namespace ActivePowerMaxPhaseC {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMaxPhaseC::Id; }
@@ -27023,8 +31699,9 @@ struct TypeInfo
 namespace ReactivePowerPhaseC {
 struct TypeInfo
 {
-    using Type          = int16_t;
-    using DecodableType = int16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePowerPhaseC::Id; }
@@ -27033,8 +31710,9 @@ struct TypeInfo
 namespace ApparentPowerPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPowerPhaseC::Id; }
@@ -27043,8 +31721,9 @@ struct TypeInfo
 namespace PowerFactorPhaseC {
 struct TypeInfo
 {
-    using Type          = int8_t;
-    using DecodableType = int8_t;
+    using Type             = int8_t;
+    using DecodableType    = int8_t;
+    using DecodableArgType = int8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactorPhaseC::Id; }
@@ -27053,8 +31732,9 @@ struct TypeInfo
 namespace AverageRmsVoltageMeasurementPeriodPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::Id; }
@@ -27063,8 +31743,9 @@ struct TypeInfo
 namespace AverageRmsOverVoltageCounterPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltageCounterPhaseC::Id; }
@@ -27073,8 +31754,9 @@ struct TypeInfo
 namespace AverageRmsUnderVoltageCounterPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounterPhaseC::Id; }
@@ -27083,8 +31765,9 @@ struct TypeInfo
 namespace RmsExtremeOverVoltagePeriodPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriodPhaseC::Id; }
@@ -27093,8 +31776,9 @@ struct TypeInfo
 namespace RmsExtremeUnderVoltagePeriodPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriodPhaseC::Id; }
@@ -27103,8 +31787,9 @@ struct TypeInfo
 namespace RmsVoltageSagPeriodPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriodPhaseC::Id; }
@@ -27113,8 +31798,9 @@ struct TypeInfo
 namespace RmsVoltageSwellPeriodPhaseC {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriodPhaseC::Id; }
@@ -27123,8 +31809,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -27133,8 +31820,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -27143,6 +31831,21 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ElectricalMeasurement
 namespace Binding {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Bind {
+struct Type;
+struct DecodableType;
+} // namespace Bind
+
+namespace Unbind {
+struct Type;
+struct DecodableType;
+} // namespace Unbind
+
+} // namespace Commands
 
 namespace Commands {
 namespace Bind {
@@ -27167,6 +31870,8 @@ public:
     chip::ClusterId clusterId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -27204,6 +31909,8 @@ public:
     chip::ClusterId clusterId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -27225,8 +31932,9 @@ namespace Attributes {
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -27235,8 +31943,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -27313,8 +32022,9 @@ namespace Attributes {
 namespace Groups {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::GroupState::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::GroupState::DecodableType>;
+    using Type             = DataModel::List<const Structs::GroupState::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::GroupState::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::GroupState::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Groups::Id; }
@@ -27323,8 +32033,9 @@ struct TypeInfo
 namespace GroupKeys {
 struct TypeInfo
 {
-    using Type          = DataModel::List<const Structs::GroupKey::Type>;
-    using DecodableType = DataModel::DecodableList<Structs::GroupKey::DecodableType>;
+    using Type             = DataModel::List<const Structs::GroupKey::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::GroupKey::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::GroupKey::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::GroupKeys::Id; }
@@ -27333,8 +32044,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -27343,8 +32055,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -27353,6 +32066,16 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace GroupKeyManagement
 namespace SampleMfgSpecificCluster {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace CommandOne {
+struct Type;
+struct DecodableType;
+} // namespace CommandOne
+
+} // namespace Commands
 
 namespace Commands {
 namespace CommandOne {
@@ -27371,6 +32094,8 @@ public:
     uint8_t argOne;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -27389,8 +32114,9 @@ namespace Attributes {
 namespace EmberSampleAttribute {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute::Id; }
@@ -27399,8 +32125,9 @@ struct TypeInfo
 namespace EmberSampleAttribute2 {
 struct TypeInfo
 {
-    using Type          = uint8_t;
-    using DecodableType = uint8_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute2::Id; }
@@ -27409,8 +32136,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -27419,8 +32147,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
@@ -27429,6 +32158,16 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace SampleMfgSpecificCluster
 namespace SampleMfgSpecificCluster2 {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace CommandTwo {
+struct Type;
+struct DecodableType;
+} // namespace CommandTwo
+
+} // namespace Commands
 
 namespace Commands {
 namespace CommandTwo {
@@ -27447,6 +32186,8 @@ public:
     uint8_t argOne;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
 };
 
 struct DecodableType
@@ -27465,8 +32206,9 @@ namespace Attributes {
 namespace EmberSampleAttribute3 {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute3::Id; }
@@ -27475,8 +32217,9 @@ struct TypeInfo
 namespace EmberSampleAttribute4 {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute4::Id; }
@@ -27485,8 +32228,9 @@ struct TypeInfo
 namespace FeatureMap {
 struct TypeInfo
 {
-    using Type          = uint32_t;
-    using DecodableType = uint32_t;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
@@ -27495,8 +32239,9 @@ struct TypeInfo
 namespace ClusterRevision {
 struct TypeInfo
 {
-    using Type          = uint16_t;
-    using DecodableType = uint16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }

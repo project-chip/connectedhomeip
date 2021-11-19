@@ -36,4 +36,4 @@ tests:
               - name: "target"
                 value: 1
               - name: "data"
-                value: 1
+                value: "1"

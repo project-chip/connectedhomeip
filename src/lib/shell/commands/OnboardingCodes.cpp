@@ -54,7 +54,7 @@ static CHIP_ERROR GetOnboardingQRCodeUrl(bool printHeader)
 
     if (printHeader)
     {
-        streamer_printf(sout, "QRCodeUrl:          ");
+        streamer_printf(sout, "QRCodeUrl:         ");
     }
     ReturnErrorOnFailure(GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)));
 
@@ -72,7 +72,7 @@ static CHIP_ERROR GetOnboardingManualPairingCode(bool printHeader)
 
     if (printHeader)
     {
-        streamer_printf(sout, "ManualPairingCode:  ");
+        streamer_printf(sout, "ManualPairingCode: ");
     }
     ReturnErrorOnFailure(
         GetManualPairingCode(manualPairingCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)));

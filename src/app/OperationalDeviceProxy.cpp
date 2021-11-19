@@ -24,10 +24,11 @@
  *    messages to and from the corresponding CHIP devices.
  */
 
-#include <app/OperationalDeviceProxy.h>
+#include "OperationalDeviceProxy.h"
 
-#include <app/CommandSender.h>
-#include <app/ReadPrepareParams.h>
+#include "CommandSender.h"
+#include "ReadPrepareParams.h"
+
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/Resolver.h>
@@ -228,6 +229,7 @@ void OperationalDeviceProxy::OnSessionEstablished()
     VerifyOrReturn(mState != State::Uninitialized,
                    ChipLogError(Controller, "OnSessionEstablished was called while the device was not initialized"));
 
+    // TODO Update the MRP params based on the MRP params extracted from CASE, when this is available.
     CHIP_ERROR err = mInitParams.sessionManager->NewPairing(
         Optional<Transport::PeerAddress>::Value(mDeviceAddress), mPeerId.GetNodeId(), &mCASESession,
         CryptoContext::SessionRole::kInitiator, mInitParams.fabricInfo->GetFabricIndex());
@@ -262,37 +264,16 @@ void OperationalDeviceProxy::Clear()
 {
     mCASESession.Clear();
 
-    mState          = State::Uninitialized;
-    mStatusDelegate = nullptr;
-    if (mInitParams.exchangeMgr)
-    {
-        // Ensure that any exchange contexts we have open get closed now,
-        // because we don't want them to call back in to us after this
-        // point.
-        mInitParams.exchangeMgr->CloseAllContextsForDelegate(this);
-    }
+    mState      = State::Uninitialized;
     mInitParams = DeviceProxyInitParams();
 }
 
-void OperationalDeviceProxy::OnConnectionExpired(SessionHandle session)
+void OperationalDeviceProxy::OnSessionReleased(SessionHandle session)
 {
     VerifyOrReturn(mSecureSession.HasValue() && mSecureSession.Value() == session,
                    ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));
     mState = State::Initialized;
     mSecureSession.ClearValue();
-}
-
-CHIP_ERROR OperationalDeviceProxy::OnMessageReceived(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
-                                                     System::PacketBufferHandle && msgBuf)
-{
-    if (mState == State::SecureConnected)
-    {
-        if (mStatusDelegate != nullptr)
-        {
-            mStatusDelegate->OnMessage(std::move(msgBuf));
-        }
-    }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
@@ -301,15 +282,6 @@ CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
                                                                              GetDeviceId());
 }
 
-OperationalDeviceProxy::~OperationalDeviceProxy()
-{
-    if (mInitParams.exchangeMgr)
-    {
-        // Ensure that any exchange contexts we have open get closed now,
-        // because we don't want them to call back in to us after this
-        // point.
-        mInitParams.exchangeMgr->CloseAllContextsForDelegate(this);
-    }
-}
+OperationalDeviceProxy::~OperationalDeviceProxy() {}
 
 } // namespace chip

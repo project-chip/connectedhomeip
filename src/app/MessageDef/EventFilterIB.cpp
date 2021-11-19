@@ -57,7 +57,7 @@ CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
 #if CHIP_DETAIL_LOGGING
             {
                 NodeId node;
-                ReturnLogErrorOnFailure(reader.Get(node));
+                ReturnErrorOnFailure(reader.Get(node));
                 PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
             }
 #endif // CHIP_DETAIL_LOGGING
@@ -69,7 +69,7 @@ CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
 #if CHIP_DETAIL_LOGGING
             {
                 uint64_t eventMin;
-                ReturnLogErrorOnFailure(reader.Get(eventMin));
+                ReturnErrorOnFailure(reader.Get(eventMin));
                 PRETTY_PRINT("\tEventMin = 0x%" PRIx64 ",", eventMin);
             }
 #endif // CHIP_DETAIL_LOGGING

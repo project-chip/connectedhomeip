@@ -23,10 +23,15 @@ set -e
 # us tends to be 'tee').
 set -o pipefail
 
+declare INPUT_ARGS=$*
+
 declare -i iterations=2
 declare -i delay=0
 declare -i node_id=0x12344321
 declare -i background_pid=0
+declare -i use_netns=0
+declare -i root_remount=0
+declare -i clean_netns=0
 declare test_case_wrapper=()
 
 usage() {
@@ -38,21 +43,120 @@ usage() {
     echo "  -s CASE_NAME: runs single test case name (e.g. Test_TC_OO_2_2"
     echo "                for Test_TC_OO_2_2.yaml) (by default, all are run)"
     echo "  -w COMMAND: prefix all instantiations with a command (e.g. valgrind) (default: '')"
+    echo "  -n Use linux netns to isolate app and tool executables"
+    echo "  -c execute a netns cleanup and exit"
+    echo "  -r Execute a remount (INTERNAL USE for netns)"
     echo ""
     exit 0
 }
 
-# read shell arguments
-while getopts a:d:i:hs:w: flag; do
+declare app_run_prefix=""
+declare tool_run_prefix=""
+
+netns_setup() {
+    # 2 virtual hosts: for app and for the tool
+    ip netns add app
+    ip netns add tool
+
+    # create links for switch to net connections
+    ip link add eth-app type veth peer name eth-app-switch
+    ip link add eth-tool type veth peer name eth-tool-switch
+
+    # link the connections together
+    ip link set eth-app netns app
+    ip link set eth-tool netns tool
+
+    ip link add name br1 type bridge
+    ip link set br1 up
+    ip link set eth-app-switch master br1
+    ip link set eth-tool-switch master br1
+
+    # mark connections up
+    ip netns exec app ip addr add 10.10.10.1/24 dev eth-app
+    ip netns exec app ip link set dev eth-app up
+    ip netns exec app ip link set dev lo up
+    ip link set dev eth-app-switch up
+
+    ip netns exec tool ip addr add 10.10.10.2/24 dev eth-tool
+    ip netns exec tool ip link set dev eth-tool up
+    ip netns exec tool ip link set dev lo up
+    ip link set dev eth-tool-switch up
+
+    # Force IPv6 to use ULAs that we control
+    ip netns exec tool ip -6 addr flush eth-tool
+    ip netns exec app ip -6 addr flush eth-app
+    ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev eth-tool
+    ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev eth-app
+
+    # TODO(andy314): IPv6 does Duplicate Address Detection even though
+    # we know these addresses are isolated. For a while IPv6 addresses
+    # will be in 'transitional' state and cannot be used.
+    #
+    # This sleep waits for the addresses to become 'global'. Ideally
+    # we should loop/wait here instead.
+    sleep 2
+}
+
+netns_cleanup() {
+    ip netns del app || true
+    ip netns del tool || true
+    ip link del br1 || true
+
+    # attempt  to delete orphaned items just in case
+    ip link del eth-tool || true
+    ip link del eth-tool-switch || true
+    ip link del eth-app || true
+    ip link del eth-app-switch || true
+}
+
+while getopts a:d:i:hs:w:ncr flag; do
     case "$flag" in
-        a) application=$OPTARG ;;
-        d) delay=$OPTARG ;;
-        h) usage ;;
-        i) iterations=$OPTARG ;;
-        s) single_case=$OPTARG ;;
-        w) test_case_wrapper=("$OPTARG") ;;
+    a) application=$OPTARG ;;
+    d) delay=$OPTARG ;;
+    h) usage ;;
+    i) iterations=$OPTARG ;;
+    s) single_case=$OPTARG ;;
+    w) test_case_wrapper=("$OPTARG") ;;
+    n) use_netns=1 ;;
+    c) clean_netns=1 ;;
+    r) root_remount=1 ;;
     esac
 done
+
+if [[ $clean_netns != 0 ]]; then
+    echo "Cleaning network namespaces"
+    netns_cleanup
+    exit 0
+fi
+
+if [[ $root_remount != 0 ]]; then
+    echo 'Creating a separate mount'
+    mount --make-private /
+    mount -t tmpfs tmpfs /run
+fi
+
+if [[ $use_netns != 0 ]]; then
+    echo "Using network namespaces"
+
+    if [[ `id -u` -ne 0 ]]; then
+        echo 'Executing in a new namespace: ' $0 -r $INPUT_ARGS
+        unshare --map-root-user -n -m $0 -r $INPUT_ARGS
+        exit 0
+    else
+        if [[ $root_remount -eq 0 ]]; then
+          # Running as root may be fine in docker/vm however this is not advised
+          # on workstations as changes are global and harder to undo
+          echo 'Running as root: this changes global network namespaces, not ideal'
+        fi
+    fi
+
+    netns_setup
+
+    app_run_prefix="ip netns exec app"
+    tool_run_prefix="ip netns exec tool"
+
+    trap netns_cleanup EXIT
+fi
 
 if [[ $application == "tv" ]]; then
     declare test_filenames="${single_case-TV_*}.yaml"
@@ -76,6 +180,10 @@ cleanup() {
     if [[ $background_pid != 0 ]]; then
         # In case we died on a failure before we cleaned up our background task.
         kill -9 "$background_pid" || true
+    fi
+
+    if [[ $use_netns != 0 ]]; then
+        netns_cleanup
     fi
 }
 trap cleanup EXIT
@@ -123,7 +231,7 @@ for j in "${iter_array[@]}"; do
         touch "$chip_tool_log_file"
         rm -rf /tmp/pid
         (
-            stdbuf -o0 "${test_case_wrapper[@]}" out/debug/standalone/chip-"$application"-app &
+            ${app_run_prefix} stdbuf -o0 "${test_case_wrapper[@]}" out/debug/standalone/chip-"$application"-app &
             echo $! >&3
         ) 3>/tmp/pid | tee "$application_log_file" &
         while ! grep -q "Server Listening" "$application_log_file"; do
@@ -134,10 +242,16 @@ for j in "${iter_array[@]}"; do
         # kicking off the subshell, sometimes we try to do it before
         # the data is there yet.
         background_pid="$(</tmp/pid)"
+        # Only look for commissionable nodes if dns-sd is available
+        if command -v dns-sd &>/dev/null; then
+            echo "          * [CI DEBUG] Looking for commissionable Nodes"
+            # Ignore the error that timeout generates
+            cat <(timeout 1 dns-sd -B _matterc._udp)
+        fi
         echo "          * Pairing to device"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00 | tee "$pairing_log_file"
+        ${tool_run_prefix} "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00 | tee "$pairing_log_file"
         echo "          * Starting test run: $i"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$node_id" "$delay" | tee "$chip_tool_log_file"
+        ${tool_run_prefix} "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$node_id" --delayInMs "$delay" | tee "$chip_tool_log_file"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0

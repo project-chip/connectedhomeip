@@ -21,10 +21,10 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #include "app/server/Server.h"
+#include "credentials/FabricTable.h"
 #include "device_service/device_service.rpc.pb.h"
 #include "platform/ConfigurationManager.h"
 #include "platform/PlatformManager.h"
-#include "transport/FabricTable.h"
 
 namespace chip {
 namespace rpc {

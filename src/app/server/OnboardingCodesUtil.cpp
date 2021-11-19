@@ -48,8 +48,7 @@ void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
         ChipLogProgress(AppServer, "SetupQRCode: [%s]", qrCode.c_str());
         if (GetQRCodeUrl(qrCodeBuffer.Get(), qrCodeBufferMaxSize, qrCode) == CHIP_NO_ERROR)
         {
-            ChipLogProgress(AppServer, "Copy/paste the below URL in a browser to see the QR Code:");
-            ChipLogProgress(AppServer, "%s", qrCodeBuffer.Get());
+            ChipLogProgress(AppServer, "Copy/paste the below URL in a browser to see the QR Code:\r\n    %s", qrCodeBuffer.Get());
         }
     }
     else

@@ -20,6 +20,7 @@ function getTests()
   const BinaryInput = [
     'Test_TC_BI_1_1',
     'Test_TC_BI_2_1',
+    'Test_TC_BI_2_2',
   ];
 
   const BooleanState = [
@@ -67,6 +68,10 @@ function getTests()
     'Test_TC_FLW_1_1',
     'Test_TC_FLW_2_1',
     'Test_TC_FLW_2_2',
+  ];
+
+  const IlluminanceMeasurement = [
+    'Test_TC_ILL_1_1',
   ];
 
   const OccupancySensing = [
@@ -132,6 +137,7 @@ function getTests()
 
   const Thermostat = [
     'Test_TC_TSTAT_1_1',
+    'Test_TC_TSTAT_2_1',
   ];
 
   const ThermostatUserConfiguration = [
@@ -142,6 +148,7 @@ function getTests()
 
   const ThreadNetworkDiagnostics = [
     'Test_TC_DIAGTH_1_1',
+    'Test_TC_DIAGSW_3_2',
   ];
 
   const WindowCovering = [
@@ -179,6 +186,7 @@ function getTests()
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
+    'TestGroupMessaging',
   ];
 
   const SoftwareDiagnostics = [
@@ -196,6 +204,7 @@ function getTests()
     DeviceManagement, //
     ElectricalMeasurement, //
     FlowMeasurement, //
+    IlluminanceMeasurement, //
     LevelControl, //
     MediaControl, //
     OccupancySensing, //

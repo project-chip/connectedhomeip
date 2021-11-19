@@ -83,10 +83,8 @@ public:
     virtual CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev)                                  = 0;
     virtual CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode)                                     = 0;
     virtual CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator)                         = 0;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
     // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
-    virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) = 0;
-#endif
+    virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter)                  = 0;
     virtual CHIP_ERROR GetRegulatoryLocation(uint32_t & location)                      = 0;
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
     virtual CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb)                            = 0;
@@ -100,12 +98,16 @@ public:
     virtual CHIP_ERROR StoreRegulatoryLocation(uint32_t location)                      = 0;
     virtual CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen)             = 0;
     virtual CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb)                            = 0;
+    virtual CHIP_ERROR GetRebootCount(uint32_t & rebootCount)                          = 0;
+    virtual CHIP_ERROR StoreRebootCount(uint32_t rebootCount)                          = 0;
+    virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours)      = 0;
+    virtual CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours)      = 0;
+    virtual CHIP_ERROR GetBootReasons(uint32_t & bootReasons)                          = 0;
+    virtual CHIP_ERROR StoreBootReasons(uint32_t bootReasons)                          = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 
-#if !defined(NDEBUG)
     virtual CHIP_ERROR RunUnitTests() = 0;
-#endif
 
     virtual bool IsFullyProvisioned()   = 0;
     virtual void InitiateFactoryReset() = 0;
@@ -151,20 +153,19 @@ protected:
 };
 
 /**
- * Returns a reference to the public interface of the ConfigurationManager singleton object.
+ * Returns a reference to a ConfigurationManager object.
  *
- * chip application should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
+ * Applications should use this to access the features of the ConfigurationManager.
  */
 extern ConfigurationManager & ConfigurationMgr();
 
 /**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
+ * Sets a reference to a ConfigurationManager object.
  *
- * chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the selected platform.
+ * This must be called before any calls to ConfigurationMgr. If a nullptr is passed in,
+ * no changes will be made.
  */
-extern ConfigurationManagerImpl & ConfigurationMgrImpl();
+extern void SetConfigurationMgr(ConfigurationManager * configurationManager);
 
 } // namespace DeviceLayer
 } // namespace chip

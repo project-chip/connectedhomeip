@@ -73,6 +73,7 @@ public:
     System::Clock::Timeout _GetWiFiAPIdleTimeout();
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
     CHIP_ERROR _GetAndLogWifiStatsCounters();
+    CHIP_ERROR _GetWiFiBssId(ByteSpan & value);
     CHIP_ERROR _GetWiFiSecurityType(uint8_t & securityType);
     CHIP_ERROR _GetWiFiVersion(uint8_t & wiFiVersion);
     CHIP_ERROR _GetWiFiChannelNumber(uint16_t & channelNumber);
@@ -193,6 +194,12 @@ inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiScanDone()
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiStationProvisionChange()
 {}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiBssId(ByteSpan & value)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
 
 template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetWiFiSecurityType(uint8_t & securityType)
