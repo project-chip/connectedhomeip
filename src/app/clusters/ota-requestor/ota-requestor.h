@@ -29,7 +29,7 @@
 class OTARequestor : public OTARequestorInterface
 {
 public:
-    // Application interface declarations start
+    // Application interface declarations -- start
 
     // Application directs the Requestor to start the Image Query process
     // and download the new image if available
@@ -44,15 +44,21 @@ public:
     // Handler for the AnnounceOTAProvider command
     EmberAfStatus HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) {return EMBER_ZCL_STATUS_SUCCESS;}
+        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
 
-    // TBD: This probably doesn't need to be a method OTARequestorInterface as the response handler is
-    // explicitly supplied at command invocation
-    // Handler for the QueryImageResponse command
-    // virtual bool HandleQueryImageResponse(chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType) = 0;
-    // Virtual functions from OTARequestorInterface end
+    // Virtual functions from OTARequestorInterface -- end
+    void ConnectToProvider();
 
 private:
+
+    // Variables
     OTARequestorDriver * otaRequestorDriver;
+    chip::NodeId mProviderNodeId;
+    chip::FabricIndex mProviderFabricIndex;
+    uint32_t mOtaStartDelayMs;
+    CASESessionManager * mCASESessionManager = nullptr;
+
+    // Functions
+    CHIP_ERROR  SetupCASESessionManager(chip::FabricIndex fabricIndex);
 
 };
