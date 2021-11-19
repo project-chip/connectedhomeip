@@ -57,7 +57,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     auto net_if = get_mbed_net_if();
-    if (net_if == nullptr && net_if->wifiInterface() == nullptr)
+    if (net_if == nullptr || net_if->wifiInterface() == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to extract the MAC address: WiFi interface not available");
         return CHIP_ERROR_INTERNAL;
