@@ -68,6 +68,7 @@ struct CASESessionSerializable
     uint16_t mMessageDigestLen;
     uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
     NodeId mPeerNodeId;
+    Credentials::CATValues mPeerCATs;
     uint16_t mLocalSessionId;
     uint16_t mPeerSessionId;
     uint8_t mResumptionId[kCASEResumptionIDSize];
