@@ -24,7 +24,6 @@
 #include "system/TLVPacketBufferBackingStore.h"
 #include <app/BufferedReadCallback.h>
 #include <app/InteractionModelEngine.h>
-#include <lib/core/CHIPTLVText.hpp>
 #include <lib/support/ScopedBuffer.h>
 
 namespace chip {

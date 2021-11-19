@@ -26,7 +26,6 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
-#include <lib/core/CHIPTLVText.hpp>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <vector>
