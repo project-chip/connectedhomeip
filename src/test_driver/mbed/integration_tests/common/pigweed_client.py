@@ -19,6 +19,7 @@ import importlib
 
 from pw_hdlc.rpc import HdlcRpcClient, default_channels
 
+
 class PigweedClient:
     def __init__(self, device, protos):
         """
@@ -32,7 +33,7 @@ class PigweedClient:
         self.last_timeout = self.device.serial.get_timeout()
         self.device.serial.set_timeout(0.01)
         self._pw_rpc_client = HdlcRpcClient(lambda: self.device.serial.read(4096),
-                                           protos, default_channels(self.device.serial.write))
+                                            protos, default_channels(self.device.serial.write))
         self._rpcs = self._pw_rpc_client.rpcs()
 
     def __del__(self):

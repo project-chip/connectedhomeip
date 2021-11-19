@@ -32,25 +32,25 @@ PROFILE=release
 
 for i in "$@"; do
     case $i in
-    -b=* | --board=*)
-        TARGET_BOARD="${i#*=}"
-        shift
-        ;;
-    -t=* | --toolchain=*)
-        TOOLCHAIN="${i#*=}"
-        shift
-        ;;
-    -p=* | --profile=*)
-        PROFILE="${i#*=}"
-        shift
-        ;;
-    -c=* | --command=*)
-        COMMAND="${i#*=}"
-        shift
-        ;;
-    *)
-        # unknown option
-        ;;
+        -b=* | --board=*)
+            TARGET_BOARD="${i#*=}"
+            shift
+            ;;
+        -t=* | --toolchain=*)
+            TOOLCHAIN="${i#*=}"
+            shift
+            ;;
+        -p=* | --profile=*)
+            PROFILE="${i#*=}"
+            shift
+            ;;
+        -c=* | --command=*)
+            COMMAND="${i#*=}"
+            shift
+            ;;
+        *)
+            # unknown option
+            ;;
     esac
 done
 

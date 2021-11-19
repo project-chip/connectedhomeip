@@ -33,6 +33,7 @@ BLE_DEVICE_NAME = "MBED-lock"
 DEVICE_NODE_ID = 1234
 RPC_PROTOS = [device_service_pb2, button_service_pb2, locking_service_pb2]
 
+
 @pytest.mark.smoketest
 def test_smoke_test(device):
     device.reset(duration=1)
@@ -51,15 +52,18 @@ def test_wifi_provisioning(device, network):
     device_details = get_device_details(device)
     assert device_details != None and len(device_details) != 0
 
-    assert check_chip_ble_devices_advertising(devCtrl, BLE_DEVICE_NAME, device_details)
+    assert check_chip_ble_devices_advertising(
+        devCtrl, BLE_DEVICE_NAME, device_details)
 
-    ret = connect_device_over_ble(devCtrl, int(device_details["Discriminator"]), int(device_details["SetUpPINCode"]), DEVICE_NODE_ID)
+    ret = connect_device_over_ble(devCtrl, int(device_details["Discriminator"]), int(
+        device_details["SetUpPINCode"]), DEVICE_NODE_ID)
     assert ret != None and ret == DEVICE_NODE_ID
 
     ret = device.wait_for_output("Device completed Rendezvous process")
     assert ret != None and len(ret) > 0
 
-    ret = commissioning_wifi(devCtrl, network_ssid, network_pass, DEVICE_NODE_ID)
+    ret = commissioning_wifi(devCtrl, network_ssid,
+                             network_pass, DEVICE_NODE_ID)
     assert ret == 0
 
     ret = device.wait_for_output("StationConnected")
@@ -71,31 +75,36 @@ def test_wifi_provisioning(device, network):
 
 def test_lock_ctrl(device):
     devCtrl = ChipDeviceCtrl.ChipDeviceController()
-    
+
     device_details = get_device_details(device)
     assert device_details != None and len(device_details) != 0
 
-    assert check_chip_ble_devices_advertising(devCtrl, BLE_DEVICE_NAME, device_details)
+    assert check_chip_ble_devices_advertising(
+        devCtrl, BLE_DEVICE_NAME, device_details)
 
-    ret = connect_device_over_ble(devCtrl, int(device_details["Discriminator"]), int(device_details["SetUpPINCode"]), DEVICE_NODE_ID)
+    ret = connect_device_over_ble(devCtrl, int(device_details["Discriminator"]), int(
+        device_details["SetUpPINCode"]), DEVICE_NODE_ID)
     assert ret != None and ret == DEVICE_NODE_ID
 
     ret = device.wait_for_output("Device completed Rendezvous process")
     assert ret != None and len(ret) > 0
 
-    err, res = send_zcl_command(devCtrl, "OnOff Off {} 1 0".format(DEVICE_NODE_ID))
+    err, res = send_zcl_command(
+        devCtrl, "OnOff Off {} 1 0".format(DEVICE_NODE_ID))
     assert err == 0
 
     ret = device.wait_for_output("Unlock Action has been completed", 20)
     assert ret != None and len(ret) > 0
 
-    err, res = send_zcl_command(devCtrl, "OnOff On {} 1 0".format(DEVICE_NODE_ID))
+    err, res = send_zcl_command(
+        devCtrl, "OnOff On {} 1 0".format(DEVICE_NODE_ID))
     assert err == 0
 
     ret = device.wait_for_output("Lock Action has been completed", 20)
     assert ret != None and len(ret) > 0
 
-    err, res = send_zcl_command(devCtrl, "OnOff Toggle {} 1 0".format(DEVICE_NODE_ID))
+    err, res = send_zcl_command(
+        devCtrl, "OnOff Toggle {} 1 0".format(DEVICE_NODE_ID))
     assert err == 0
 
     ret = device.wait_for_output("Unlock Action has been completed", 20)
@@ -116,7 +125,8 @@ def test_device_info_rpc(device):
 
     assert int(device_details["VendorID"]) == payload.vendor_id
     assert int(device_details["ProductID"]) == payload.product_id
-    assert int(device_details["Discriminator"]) == payload.pairing_info.discriminator
+    assert int(device_details["Discriminator"]
+               ) == payload.pairing_info.discriminator
     assert int(device_details["SetUpPINCode"]) == payload.pairing_info.code
 
 
@@ -140,7 +150,7 @@ def test_device_ota_rpc(device):
 
 def test_lock_ctrl_rpc(device):
     pw_client = PigweedClient(device, RPC_PROTOS)
-    
+
     # Check locked
     status, payload = pw_client.rpcs.chip.rpc.Locking.Set(locked=True)
     assert status.ok() == True
@@ -148,7 +158,7 @@ def test_lock_ctrl_rpc(device):
     assert status.ok() == True
     assert payload.locked == True
 
-     # Check unlocked
+    # Check unlocked
     status, payload = pw_client.rpcs.chip.rpc.Locking.Set(locked=False)
     assert status.ok() == True
     status, payload = pw_client.rpcs.chip.rpc.Locking.Get()

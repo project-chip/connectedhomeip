@@ -29,6 +29,7 @@ class SerialConnection:
     :param timeout: serial read timeout in seconds (float)
     :param inter_byte_delay: time in second between two bytes sent on the serial line (float)
     """
+
     def __init__(self, port=None, baudrate=9600, timeout=1, inter_byte_delay=None):
         self.ser = Serial(port, baudrate, timeout=timeout)
         self.inter_byte_delay = inter_byte_delay

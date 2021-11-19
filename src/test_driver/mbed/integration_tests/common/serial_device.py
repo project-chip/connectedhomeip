@@ -57,8 +57,10 @@ class SerialDevice(Device):
         input_thread_name = '<-- {}'.format(self.name)
         output_thread_name = '--> {}'.format(self.name)
 
-        self.it = threading.Thread(target=self._input_thread, name=input_thread_name)
-        self.ot = threading.Thread(target=self._output_thread, name=output_thread_name)
+        self.it = threading.Thread(
+            target=self._input_thread, name=input_thread_name)
+        self.ot = threading.Thread(
+            target=self._output_thread, name=output_thread_name)
 
     def reset(self, duration=0.25):
         """
