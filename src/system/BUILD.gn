@@ -139,8 +139,6 @@ static_library("system") {
     "SystemLayerImpl.h",
     "SystemMutex.cpp",
     "SystemMutex.h",
-    "SystemObject.cpp",
-    "SystemObject.h",
     "SystemPacketBuffer.cpp",
     "SystemPacketBuffer.h",
     "SystemStats.cpp",
