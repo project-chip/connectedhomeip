@@ -104,15 +104,14 @@ struct EventSchema
 
 /**
  * @brief
- *   The struct that provides an application set system or UTC timestamp.
+ *   The struct that provides an application set System or Epoch timestamp.
  */
 struct Timestamp
 {
     enum class Type
     {
-        kInvalid = 0,
-        kSystem,
-        kUTC
+        kSystem = 0,
+        kEpoch
     };
     Timestamp() {}
     Timestamp(Type aType) : mType(aType) { mValue = 0; }
@@ -120,7 +119,7 @@ struct Timestamp
     Timestamp(System::Clock::Timestamp aValue) : mType(Type::kSystem), mValue(aValue.count()) {}
     static Timestamp UTC(uint64_t aValue)
     {
-        Timestamp timestamp(Type::kUTC, aValue);
+        Timestamp timestamp(Type::kEpoch, aValue);
         return timestamp;
     }
     static Timestamp System(System::Clock::Timestamp aValue)
@@ -129,7 +128,10 @@ struct Timestamp
         return timestamp;
     }
 
-    Type mType      = Type::kInvalid;
+    bool IsSystem() { return mType == Type::kSystem; }
+    bool IsEpoch() { return mType == Type::kEpoch; }
+
+    Type mType      = Type::kSystem;
     uint64_t mValue = 0;
 };
 
@@ -144,9 +146,9 @@ public:
         kUrgent = 0,
         kNotUrgent,
     };
-    EventOptions(void) : mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
+    EventOptions(void) : mTimestamp(Timestamp::Type::kSystem), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
 
-    EventOptions(Type aType) : mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(aType) {}
+    EventOptions(Type aType) : mTimestamp(Timestamp::Type::kSystem), mpEventSchema(nullptr), mUrgent(aType) {}
 
     EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
 
@@ -167,7 +169,7 @@ struct EventLoadOutContext
 {
     EventLoadOutContext(TLV::TLVWriter & aWriter, PriorityLevel aPriority, EventNumber aStartingEventNumber) :
         mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber),
-        mCurrentSystemTime(Timestamp::Type::kSystem), mCurrentEventNumber(0), mCurrentUTCTime(Timestamp::Type::kUTC), mFirst(true)
+        mCurrentSystemTime(Timestamp::Type::kSystem), mCurrentEventNumber(0), mCurrentUTCTime(Timestamp::Type::kEpoch), mFirst(true)
     {}
 
     TLV::TLVWriter & mWriter;

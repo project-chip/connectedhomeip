@@ -175,30 +175,13 @@ class BaseTestHelper:
             "Sending On/Off commands to device {} endpoint {}".format(nodeid, endpoint))
         err, resp = self.devCtrl.ZCLSend("OnOff", "On", nodeid,
                                          endpoint, group, {}, blocking=True)
-        if err != 0 or resp is None or resp.Status != 0:
+        if err != 0:
             self.logger.error(
                 "failed to send OnOff.On: error is {} with im response{}".format(err, resp))
             return False
         err, resp = self.devCtrl.ZCLSend("OnOff", "Off", nodeid,
                                          endpoint, group, {}, blocking=True)
-        if err != 0 or resp is None or resp.Status != 0:
-            self.logger.error(
-                "failed to send OnOff.Off: error is {} with im response {}".format(err, resp))
-            return False
-        return True
-
-    def TestOnOffCluster(self, nodeid: int, endpoint: int, group: int):
-        self.logger.info(
-            "Sending On/Off commands to device {} endpoint {}".format(nodeid, endpoint))
-        err, resp = self.devCtrl.ZCLSend("OnOff", "On", nodeid,
-                                         endpoint, group, {}, blocking=True)
-        if err != 0 or resp is None or resp.Status != 0:
-            self.logger.error(
-                "failed to send OnOff.On: error is {} with im response{}".format(err, resp))
-            return False
-        err, resp = self.devCtrl.ZCLSend("OnOff", "Off", nodeid,
-                                         endpoint, group, {}, blocking=True)
-        if err != 0 or resp is None or resp.Status != 0:
+        if err != 0:
             self.logger.error(
                 "failed to send OnOff.Off: error is {} with im response {}".format(err, resp))
             return False

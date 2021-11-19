@@ -473,6 +473,42 @@ public:
                                 chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & list);
 };
 
+class CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+};
+
+class CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+};
+
+class CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+};
+
 class CHIPGroupKeyManagementGroupsListAttributeCallbackBridge
     : public CHIPCallbackBridge<GroupKeyManagementGroupsListAttributeCallback>
 {

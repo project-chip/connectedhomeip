@@ -42,7 +42,7 @@ using {{asType label}} = EmberAf{{asType label}};
 // Bitmap for {{label}}
 enum class {{asType label}} : {{asUnderlyingZclType type}} {
 {{#zcl_bitmap_items}}
-k{{asUpperCamelCase label}} = {{asOffset mask}},
+k{{asUpperCamelCase label}} = {{asHex mask}},
 {{/zcl_bitmap_items}}
 };
 {{/zcl_bitmaps}}
@@ -195,8 +195,8 @@ enum class Fields {
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::{{asUpperCamelCase priority}};
-    static constexpr EventId eventId = {{asMEI manufacturerCode code}};
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_event_fields}}

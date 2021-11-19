@@ -40,7 +40,6 @@ jobs:
             image: connectedhomeip/chip-build:0.5.28
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
-                - "/tmp/happy_test_logs:/tmp/happy_test_logs"
             options:
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -52,10 +51,7 @@ jobs:
             - name: Bootstrap
               timeout-minutes: 10
               run: |
-                  mkdir -p /tmp/happy_test_logs ;
                   mkdir -p /tmp/log_output ;
-                  scripts/tests/happy_tests.sh install_packages ;
-                  scripts/tests/happy_tests.sh bootstrap ;
                   scripts/build/gn_bootstrap.sh ;
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
@@ -82,20 +78,13 @@ jobs:
                      *) ;;
                   esac
 
-                  scripts/build/gn_gen.sh --args="$GN_ARGS chip_enable_happy_tests=true"
+                  scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
               timeout-minutes: 8
-              run: scripts/build/gn_build.sh
+              run: scripts/run_in_build_env.sh "ninja -C out/$BUILD_TYPE"
             - name: Run Tests
               timeout-minutes: 15
-              run: RUN_HAPPY_TESTS=1 scripts/tests/gn_tests.sh
-            - name: Uploading Happy Test Log
-              uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
-              with:
-                  name:
-                      happy_log-${{ steps.outsuffix.outputs.value }}-${{ matrix.type }}
-                  path: /tmp/happy_test_logs/
+              run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage

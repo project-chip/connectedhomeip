@@ -124,9 +124,9 @@ limitations under the License.
     <!--<attribute side="server" code="0x0017" define="FLOAT_SINGLE" type="FLOAT_SINGLE" writable="true" default="0" optional="false">float_single</attribute>-->
     <!--<attribute side="server" code="0x0018" define="FLOAT_DOUBLE" type="FLOAT_DOUBLE" writable="true" default="0" optional="false">float_double</attribute>-->
     <attribute side="server" code="0x0019" define="OCTET_STRING" type="OCTET_STRING" length="10" writable="true" optional="false">octet_string</attribute>
-    <attribute side="server" code="0x001A" define="LIST" type="ARRAY" entryType="INT8U" length="10" writable="false" optional="false">list_int8u</attribute>
-    <attribute side="server" code="0x001B" define="LIST_OCTET_STRING" type="ARRAY" entryType="OCTET_STRING" length="254" writable="false" optional="false">list_octet_string</attribute>
-    <attribute side="server" code="0x001C" define="LIST_STRUCT_OCTET_STRING" type="ARRAY" entryType="TestListStructOctet" length="254" writable="false" optional="false">list_struct_octet_string</attribute>
+    <attribute side="server" code="0x001A" define="LIST" type="ARRAY" entryType="INT8U" length="10" writable="true" optional="false">list_int8u</attribute>
+    <attribute side="server" code="0x001B" define="LIST_OCTET_STRING" type="ARRAY" entryType="OCTET_STRING" length="254" writable="true" optional="false">list_octet_string</attribute>
+    <attribute side="server" code="0x001C" define="LIST_STRUCT_OCTET_STRING" type="ARRAY" entryType="TestListStructOctet" length="254" writable="true" optional="false">list_struct_octet_string</attribute>
     <!--<attribute side="server" code="0x001B" define="STRUCT" type="ARRAY" writable="true" optional="false">struct</attribute>-->
     <attribute side="server" code="0x001D" define="LONG_OCTET_STRING" type="LONG_OCTET_STRING" length="1000" writable="true" optional="false">long_octet_string</attribute>
     <attribute side="server" code="0x001E" define="CHAR_STRING" type="CHAR_STRING" length="10" writable="true" optional="false">char_string</attribute>

@@ -36126,6 +36126,10 @@ public:
         // incorrect mTestIndex value observed when we get the response.
         switch (mTestIndex++)
         {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Group Write Attribute\n");
+            err = TestGroupWriteAttribute_0();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -36137,11 +36141,35 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 0;
+    const uint16_t mTestCount = 1;
+
+    static void OnFailureCallback_0(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_0(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_0(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_0(); }
 
     //
     // Tests methods
     //
+
+    CHIP_ERROR TestGroupWriteAttribute_0()
+    {
+        const chip::GroupId groupId = 1234;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.AssociateWithGroup(mDevice, groupId);
+
+        chip::CharSpan locationArgument;
+        locationArgument = chip::Span<const char>("usgarbage: not in length on purpose", 2);
+
+        return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            locationArgument, this, OnSuccessCallback_0, OnFailureCallback_0);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0() { NextTest(); }
 };
 
 class Test_TC_DIAGSW_1_1 : public TestCommand

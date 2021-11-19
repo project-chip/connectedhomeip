@@ -36,6 +36,7 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/FabricTable.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
@@ -44,7 +45,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <string.h>
-#include <transport/FabricTable.h>
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -679,11 +679,11 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
 
-    VerifyOrExit(gFabricBeingCommissioned.SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(gFabricBeingCommissioned.SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_INVALID_FIELD);
 
 exit:
     emberAfSendImmediateDefaultResponse(status);
-    if (status == EMBER_ZCL_STATUS_FAILURE)
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         gFabricBeingCommissioned.Reset();
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddTrustedRootCert request.");

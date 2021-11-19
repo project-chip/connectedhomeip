@@ -40,7 +40,7 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
     {
       id value;
       {{>decode_value target="value" source=(concat "data." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE); return;"}}
-      response[@"{{asUpperCamelCase label}}"] = value;
+      response[@"{{asStructPropertyName label}}"] = value;
     }
     {{/chip_cluster_response_arguments}}
     DispatchSuccess(context, response);
@@ -60,16 +60,16 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
           {{! TODO: Add support for nullable types, probably by having a templated ToObjectiveCType function }}
           {{else if isArray}}
           {{! TODO: Add support for list members of structs in list attributes }}
-          @"{{asUpperCamelCase name}}": [[NSMutableArray alloc] init],
+          @"{{asStructPropertyName name}}": [[NSMutableArray alloc] init],
           {{else if (isOctetString type)}}
-          @"{{asUpperCamelCase name}}" : [NSData dataWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size()],
+          @"{{asStructPropertyName name}}" : [NSData dataWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size()],
           {{else if (isCharString type)}}
-          @"{{asUpperCamelCase name}}" : [[NSString alloc] initWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size() encoding:NSUTF8StringEncoding],
+          @"{{asStructPropertyName name}}" : [[NSString alloc] initWithBytes:entry.{{asLowerCamelCase name}}.data() length:entry.{{asLowerCamelCase name}}.size() encoding:NSUTF8StringEncoding],
           {{else if isStruct}}
           {{! TODO: Add support for struct members of structs in list attributes }}
-          @"{{asUpperCamelCase name}}": @{}
+          @"{{asStructPropertyName name}}": @{}
           {{else}}
-          @"{{asUpperCamelCase name}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entry.{{asLowerCamelCase name}}],
+          @"{{asStructPropertyName name}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entry.{{asLowerCamelCase name}}],
           {{/if}}
           {{/chip_attribute_list_entryTypes}}
         }];

@@ -219,5 +219,7 @@ inline bool IsSpecialTag(Tag tag)
     return (tag & kProfileIdMask) == kSpecialTagMarker;
 }
 
+constexpr uint8_t kMaxTLVTagLength = 8;
+
 } // namespace TLV
 } // namespace chip

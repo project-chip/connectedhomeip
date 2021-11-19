@@ -542,53 +542,58 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * metadata, TLV::TLVR
 }
 } // namespace
 
-static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader,
-                                                                          WriteHandler * apWriteHandler)
+static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(const ConcreteAttributePath aPath,
+                                                                          const EmberAfAttributeMetadata * aMetadata,
+                                                                          TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    // Passing nullptr as buf to emberAfReadAttribute means we only need attribute type here, and ember will not do data read &
-    // copy in this case.
-    const EmberAfAttributeMetadata * attributeMetadata = emberAfLocateAttributeMetadata(
-        aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0);
-
-    if (attributeMetadata == nullptr)
-    {
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
-
     CHIP_ERROR preparationError = CHIP_NO_ERROR;
     uint16_t dataLen            = 0;
-    if ((preparationError = prepareWriteData(attributeMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
+    if ((preparationError = prepareWriteData(aMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(preparationError));
         return Protocols::InteractionModel::Status::InvalidValue;
     }
 
-    if (dataLen > attributeMetadata->size)
+    if (dataLen > aMetadata->size)
     {
         ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
         return Protocols::InteractionModel::Status::InvalidValue;
     }
 
-    return ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
-                                                                  aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0, attributeData,
-                                                                  attributeMetadata->attributeType));
+    return ToInteractionModelStatus(emberAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
+                                                                  CLUSTER_MASK_SERVER, 0, attributeData, aMetadata->attributeType));
 }
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
+    // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
+    // as the input argument.
     AttributePathParams attributePathParams;
     attributePathParams.mEndpointId  = aClusterInfo.mEndpointId;
     attributePathParams.mClusterId   = aClusterInfo.mClusterId;
     attributePathParams.mAttributeId = aClusterInfo.mAttributeId;
 
-    // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
-    // as the input argument.
+    // Named aPath for now to reduce the amount of code change that needs to
+    // happen when the above TODO is resolved.
+    ConcreteAttributePath aPath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
+
+    if (attributeMetadata == nullptr)
+    {
+        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedAttribute);
+    }
+
+    if (attributeMetadata->IsReadOnly())
+    {
+        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedWrite);
+    }
+
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
     if (attrOverride != nullptr)
     {
-        ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
         AttributeValueDecoder valueDecoder(aReader);
-        ReturnErrorOnFailure(attrOverride->Write(path, valueDecoder));
+        ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
 
         if (valueDecoder.TriedDecode())
         {
@@ -596,7 +601,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
         }
     }
 
-    auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
+    auto imCode = WriteSingleClusterDataInternal(aPath, attributeMetadata, aReader, apWriteHandler);
     return apWriteHandler->AddStatus(attributePathParams, imCode);
 }
 

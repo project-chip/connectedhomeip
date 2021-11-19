@@ -27,6 +27,7 @@ executable("chip-im-initiator") {
 
   deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
@@ -46,6 +47,7 @@ executable("chip-im-responder") {
 
   deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",

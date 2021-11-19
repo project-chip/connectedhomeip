@@ -34,20 +34,13 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Ameba platform.
  */
-class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-                                 private Internal::AmebaConfig
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::AmebaConfig>
 {
 public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
-    // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
-    // defined on this class.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
-#endif
-
     // ===== Members that implement the ConfigurationManager public interface.
 
     CHIP_ERROR Init(void) override;
@@ -64,6 +57,20 @@ private:
     CHIP_ERROR StoreBootReasons(uint32_t bootReasons) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
+
+    // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
+    CHIP_ERROR ReadConfigValue(Key key, bool & val) override;
+    CHIP_ERROR ReadConfigValue(Key key, uint32_t & val) override;
+    CHIP_ERROR ReadConfigValue(Key key, uint64_t & val) override;
+    CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen) override;
+    CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen) override;
+    CHIP_ERROR WriteConfigValue(Key key, bool val) override;
+    CHIP_ERROR WriteConfigValue(Key key, uint32_t val) override;
+    CHIP_ERROR WriteConfigValue(Key key, uint64_t val) override;
+    CHIP_ERROR WriteConfigValueStr(Key key, const char * str) override;
+    CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen) override;
+    CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
+    void RunConfigUnitTest(void) override;
 
     // ===== Private members reserved for use by this class only.
 

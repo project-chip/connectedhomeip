@@ -125,14 +125,6 @@ if (chip_build_tests) {
     }
   }
 
-  if (chip_enable_happy_tests) {
-    group("happy_tests") {
-      deps = [
-        "${chip_root}/src/test_driver/happy/tests/standalone/inet:inet_tests",
-      ]
-    }
-  }
-
   chip_test_group("fake_platform_tests") {
     deps = [ "${chip_root}/src/lib/dnssd/platform/tests" ]
   }
