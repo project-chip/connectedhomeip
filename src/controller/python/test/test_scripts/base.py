@@ -16,6 +16,7 @@
 #
 
 from dataclasses import dataclass
+from inspect import Attribute
 from typing import Any
 import typing
 from chip import ChipDeviceCtrl
@@ -28,6 +29,8 @@ import logging
 import time
 import ctypes
 import chip.clusters as Clusters
+
+from controller.python.chip.clusters.Attribute import AttributePath
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -315,23 +318,20 @@ class BaseTestHelper:
         return True
 
     def TestSubscription(self, nodeid: int, endpoint: int):
-        class _subscriptionHandler(IM.OnSubscriptionReport):
-            def __init__(self, path: IM.AttributePath, logger: logging.Logger):
-                super(_subscriptionHandler, self).__init__()
-                self.subscriptionReceived = 0
-                self.path = path
-                self.countLock = threading.Lock()
-                self.cv = threading.Condition(self.countLock)
-                self.logger = logger
+        desiredPath = None
+        receivedUpdate = 0
+        updateLock = threading.Lock()
+        updateCv = threading.Condition(updateLock)
 
-            def OnData(self, path: IM.AttributePath, subscriptionId: int, data: typing.Any) -> None:
-                if path != self.path:
-                    return
-                logger.info(
-                    f"Received report from server: path: {path}, value: {data}, subscriptionId: {subscriptionId}")
-                with self.countLock:
-                    self.subscriptionReceived += 1
-                    self.cv.notify_all()
+        def OnValueChangeData(path: AttributePath, data: typing.Any) -> None:
+            nonlocal desiredPath, updateCv, updateLock, receivedUpdate
+            if path != desiredPath:
+                return
+            logger.info(
+                f"Received report from server: path: {path}, value: {data}")
+            with updateLock:
+                receivedUpdate += 1
+                updateCv.notify_all()
 
         class _conductAttributeChange(threading.Thread):
             def __init__(self, devCtrl: ChipDeviceCtrl.ChipDeviceController, nodeid: int, endpoint: int):
@@ -350,21 +350,18 @@ class BaseTestHelper:
             subscribedPath = IM.AttributePath(
                 nodeId=nodeid, endpointId=endpoint, clusterId=6, attributeId=0)
             # OnOff Cluster, OnOff Attribute
-            handler = _subscriptionHandler(subscribedPath, self.logger)
-            IM.SetAttributeReportCallback(subscribedPath, handler)
             self.devCtrl.ZCLSubscribeAttribute(
                 "OnOff", "OnOff", nodeid, endpoint, 1, 10)
             changeThread = _conductAttributeChange(
                 self.devCtrl, nodeid, endpoint)
             # Reset the number of subscriptions received as subscribing causes a callback.
-            handler.subscriptionReceived = 0
             changeThread.start()
-            with handler.cv:
-                while handler.subscriptionReceived < 5:
+            with updateCv:
+                while receivedUpdate < 5:
                     # We should observe 5 attribute changes
                     # The changing thread will change the value after 3 seconds. If we're waiting more than 10, assume something
                     # is really wrong and bail out here with some information.
-                    if not handler.cv.wait(10.0):
+                    if not updateCv.wait(10.0):
                         self.logger.error(
                             f"Failed to receive subscription update")
                         break
@@ -375,7 +372,7 @@ class BaseTestHelper:
                 # Thread join timed out
                 self.logger.error(f"Failed to join change thread")
                 return False
-            return True if handler.subscriptionReceived == 5 else False
+            return True if receivedUpdate == 5 else False
 
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")

@@ -416,7 +416,7 @@ class ChipDeviceController(object):
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
-    ]]):
+    ]], reportInterval: typing.Tuple[int, int] = None):
         '''
         Read a list of attributes from a target node
 
@@ -431,10 +431,13 @@ class ChipDeviceController(object):
 
         The cluster and attributes specified above are to be selected from the generated cluster objects.
 
-        e.g 
+        e.g.
             ReadAttribute(1, [ 1 ] ) -- case 4 above.
             ReadAttribute(1, [ Clusters.Basic ] ) -- case 5 above.
             ReadAttribute(1, [ (1, Clusters.Basic.Attributes.Location ] ) -- case 1 above.
+
+        reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
+            When not provided, a read request will be sent.
         '''
 
         eventLoop = asyncio.get_running_loop()
@@ -471,7 +474,7 @@ class ChipDeviceController(object):
             attrs.append(ClusterAttribute.AttributePath(
                 EndpointId=endpoint, Cluster=cluster, Attribute=attribute))
         res = self._ChipStack.Call(
-            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, attrs))
+            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future
@@ -491,13 +494,13 @@ class ChipDeviceController(object):
             return (int(ex.state), None)
 
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
-        device = self.GetConnectedDeviceSync(nodeid)
+        req = None
+        try:
+            req = eval(f"GeneratedObjects.{cluster}.Attributes.{attribute}")
+        except:
+            raise UnknownAttribute(cluster, attribute)
 
-        # We are not using IM for Attributes.
-        self._Cluster.ReadAttribute(
-            device, cluster, attribute, endpoint, groupid, False)
-        if blocking:
-            return im.GetAttributeReadResponse(im.DEFAULT_ATTRIBUTEREAD_APPID)
+        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)]))
 
     def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, blocking=True):
         req = None
@@ -510,15 +513,12 @@ class ChipDeviceController(object):
         return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req)]))
 
     def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True):
-        device = self.GetConnectedDeviceSync(nodeid)
-
-        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
-        im.ClearCommandStatus(commandSenderHandle)
-        self._Cluster.SubscribeAttribute(
-            device, cluster, attribute, endpoint, minInterval, maxInterval, commandSenderHandle != 0)
-        if blocking:
-            # We only send 1 command by this function, so index is always 0
-            return im.WaitCommandIndexStatus(commandSenderHandle, 1)
+        req = None
+        try:
+            req = eval(f"GeneratedObjects.{cluster}.Attributes.{attribute}")
+        except:
+            raise UnknownAttribute(cluster, attribute)
+        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], reportInterval=(minInterval, maxInterval)))
 
     def ZCLShutdownSubscription(self, subscriptionId: int):
         res = self._ChipStack.Call(
