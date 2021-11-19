@@ -502,7 +502,7 @@ class ChipDeviceController(object):
         except:
             raise UnknownAttribute(cluster, attribute)
 
-        return asyncio.run(self.WriteAttribute(nodeid, [req]))
+        return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req)]))
 
     def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True):
         device = self.GetConnectedDeviceSync(nodeid)
