@@ -119,8 +119,7 @@ def test_ble_adv_check(device):
 
     sleep(1)
 
-    ble_chip_device = scan_chip_ble_devices(devCtrl, BLE_DEVICE_NAME)
-    assert ble_chip_device != None and len(ble_chip_device) != 0
+    assert check_chip_ble_devices_advertising(devCtrl, BLE_DEVICE_NAME)
 
     ret = device.send(command="ble adv stop", expected_output="Done")
     assert ret != None and len(ret) > 0
@@ -130,8 +129,7 @@ def test_ble_adv_check(device):
 
     sleep(1)
 
-    ble_chip_device = scan_chip_ble_devices(devCtrl, BLE_DEVICE_NAME)
-    assert ble_chip_device != None and len(ble_chip_device) == 0
+    assert not check_chip_ble_devices_advertising(devCtrl, BLE_DEVICE_NAME)
 
 
 def test_device_config_check(device):
@@ -200,10 +198,11 @@ def test_wifi_mode(device):
         assert ret[-2].strip() == mode
 
 
-def test_wifi_connect(device, ap):
-    network_param = ap.get_network_param()
+def test_wifi_connect(device, network):
+    network_ssid = network[0]
+    network_pass = network[1]
 
-    ret = device.send(command="wifi connect {} {}".format(network_param['ssid'], network_param['password']), expected_output="Done")
+    ret = device.send(command="wifi connect {} {}".format(network_ssid, network_pass), expected_output="Done")
     assert ret != None and len(ret) > 0
 
     ret = device.wait_for_output("StationConnected", 30)

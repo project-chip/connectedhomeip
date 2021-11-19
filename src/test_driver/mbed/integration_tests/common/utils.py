@@ -116,14 +116,14 @@ def send_zcl_command(devCtrl, line):
         err, res = devCtrl.ZCLSend(args[0], args[1], int(
             args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command), blocking=True)
         if err != 0:
-            log.error("Failed to receive command response: {}".format(res))
+            log.error("Failed to send ZCL command [{}] {}.".format(err, res))
         elif res != None:
-            log.info("Received command status response:")
+            log.info("Success, received command response:")
             log.info(res)
         else:
-            log.info("Success, no status code is attached with response.")
+            log.info("Success, no command response.")
     except exceptions.ChipStackException as ex:
-        log.error("An exception occurred during process ZCL command:")
+        log.error("An exception occurred during processing ZCL command:")
         log.error(str(ex))
         err = -1
     except Exception as ex:
@@ -153,7 +153,7 @@ def scan_chip_ble_devices(devCtrl):
 
     return devices
 
-def check_chip_ble_devices_advertising(devCtrl, name, deviceDetails):
+def check_chip_ble_devices_advertising(devCtrl, name, deviceDetails=None):
     """
     Check if CHIP device advertise
     BLE scanning for 10 seconds and compare with device details
@@ -164,18 +164,23 @@ def check_chip_ble_devices_advertising(devCtrl, name, deviceDetails):
     """
     ble_chip_device = scan_chip_ble_devices(devCtrl)
     if ble_chip_device == None or len(ble_chip_device) == 0:
-        log.error("No BLE CHIP device found")
+        log.info("No BLE CHIP device found")
         return False
 
     chip_device_found = False
 
     for ble_device in ble_chip_device:
-        if (ble_device["name"] == name and
-            int(ble_device["discriminator"]) == int(deviceDetails["Discriminator"]) and
-            int(ble_device["vendorId"]) == int(deviceDetails["VendorID"]) and
-            int(ble_device["productId"]) == int(deviceDetails["ProductID"])):
-            chip_device_found = True
-            break
+        if deviceDetails != None:
+            if (ble_device["name"] == name and
+                int(ble_device["discriminator"]) == int(deviceDetails["Discriminator"]) and
+                int(ble_device["vendorId"]) == int(deviceDetails["VendorID"]) and
+                int(ble_device["productId"]) == int(deviceDetails["ProductID"])):
+                chip_device_found = True
+                break
+        else:
+            if (ble_device["name"] == name):
+                chip_device_found = True
+                break
 
     return chip_device_found
 
