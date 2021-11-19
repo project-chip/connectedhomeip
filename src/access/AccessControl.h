@@ -320,10 +320,7 @@ public:
         }
 
         // Transitional (will be removed later)
-        virtual bool IsTransitional() const
-        {
-            return true;
-        }
+        virtual bool IsTransitional() const { return true; }
 
         // Listening
         virtual void SetListener(Listener & listener) { mListener = &listener; }

@@ -136,13 +136,16 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     }
 }
 
-Protocols::InteractionModel::Status CheckAccessControl(const SubjectDescriptor & aSubjectDescriptor, EndpointId aEndpoint, ClusterId aCluster, bool aWrite)
+Protocols::InteractionModel::Status CheckAccessControl(const SubjectDescriptor & aSubjectDescriptor, EndpointId aEndpoint,
+                                                       ClusterId aCluster, bool aWrite)
 {
     RequestPath requestPath = { .cluster = aCluster, .endpoint = aEndpoint };
     // TODO: get required privilege using ember APIs, as it could be custom
     Privilege privilege = aWrite ? Privilege::kOperate : Privilege::kView;
-    CHIP_ERROR err = GetAccessControl().Check(aSubjectDescriptor, requestPath, privilege);
-    return (err == CHIP_NO_ERROR) ? Protocols::InteractionModel::Status::Success : (err == CHIP_ERROR_ACCESS_DENIED) ? Protocols::InteractionModel::Status::UnsupportedAccess : Protocols::InteractionModel::Status::Failure;
+    CHIP_ERROR err      = GetAccessControl().Check(aSubjectDescriptor, requestPath, privilege);
+    return (err == CHIP_NO_ERROR) ? Protocols::InteractionModel::Status::Success
+                                  : (err == CHIP_ERROR_ACCESS_DENIED) ? Protocols::InteractionModel::Status::UnsupportedAccess
+                                                                      : Protocols::InteractionModel::Status::Failure;
 }
 
 } // namespace
@@ -256,7 +259,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
             AttributeValueEncoder valueEncoder(writer, aSubjectDescriptor.fabricIndex);
             ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
 
-            auto accessControlStatus = CheckAccessControl(aSubjectDescriptor, aPath.mEndpointId, aPath.mClusterId, /* write = */ false);
+            auto accessControlStatus =
+                CheckAccessControl(aSubjectDescriptor, aPath.mEndpointId, aPath.mClusterId, /* write = */ false);
             if (accessControlStatus != Protocols::InteractionModel::Status::Success)
             {
                 status = accessControlStatus;
@@ -282,7 +286,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
             record.attributeId        = aPath.mAttributeId;
             record.manufacturerCode   = EMBER_AF_NULL_MANUFACTURER_CODE;
             EmberAfStatus emberStatus = emAfReadOrWriteAttribute(&record, &metadata, attributeData, sizeof(attributeData),
-                                                                /* write = */ false);
+                                                                 /* write = */ false);
             if (emberStatus != EMBER_ZCL_STATUS_SUCCESS)
             {
                 status = ToInteractionModelStatus(emberStatus);
@@ -292,7 +296,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
 
         if (!accessControlChecked)
         {
-            auto accessControlStatus = CheckAccessControl(aSubjectDescriptor, aPath.mEndpointId, aPath.mClusterId, /* write = */ false);
+            auto accessControlStatus =
+                CheckAccessControl(aSubjectDescriptor, aPath.mEndpointId, aPath.mClusterId, /* write = */ false);
             if (accessControlStatus != Protocols::InteractionModel::Status::Success)
             {
                 status = accessControlStatus;
@@ -305,7 +310,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
             EmberAfAttributeType attributeType = metadata->attributeType;
             bool isNullable                    = metadata->IsNullable();
             writer                             = attributeDataIBBuilder.GetWriter();
-            TLV::Tag tag = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
+            TLV::Tag tag                       = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
             switch (BaseType(attributeType))
             {
             case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data
@@ -608,7 +613,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
             AttributeValueDecoder valueDecoder(aReader);
             ReturnErrorOnFailure(attrOverride->Write(path, valueDecoder));
 
-            auto accessControlStatus = CheckAccessControl(aSubjectDescriptor, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, /* write = */ true);
+            auto accessControlStatus =
+                CheckAccessControl(aSubjectDescriptor, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, /* write = */ true);
             if (accessControlStatus != Protocols::InteractionModel::Status::Success)
             {
                 status = accessControlStatus;
@@ -635,7 +641,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 
         if (!accessControlChecked)
         {
-            auto accessControlStatus = CheckAccessControl(aSubjectDescriptor, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, /* write = */ true);
+            auto accessControlStatus =
+                CheckAccessControl(aSubjectDescriptor, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, /* write = */ true);
             if (accessControlStatus != Protocols::InteractionModel::Status::Success)
             {
                 status = accessControlStatus;
@@ -646,7 +653,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 
         {
             uint16_t dataLen = 0;
-            auto error = prepareWriteData(metadata, aReader, dataLen);
+            auto error       = prepareWriteData(metadata, aReader, dataLen);
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(error));

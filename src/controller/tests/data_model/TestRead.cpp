@@ -103,7 +103,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

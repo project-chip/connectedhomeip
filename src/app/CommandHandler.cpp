@@ -105,13 +105,13 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     invokeRequests.GetReader(&invokeRequestsReader);
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
-    ChipLogDetail(DataManagement, "========= F");
+        ChipLogDetail(DataManagement, "========= F");
         VerifyOrReturnError(TLV::AnonymousTag == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         CommandDataIB::Parser commandData;
         ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
-    ChipLogDetail(DataManagement, "========= G");
+        ChipLogDetail(DataManagement, "========= G");
         ReturnErrorOnFailure(ProcessCommandDataIB(commandData));
-    ChipLogDetail(DataManagement, "========= H");
+        ChipLogDetail(DataManagement, "========= H");
     }
     ChipLogDetail(DataManagement, "========= I");
 
@@ -189,7 +189,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
 
 CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
 {
-    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     SubjectDescriptor subjectDescriptor;
     CommandPathIB::Parser commandPath;
     TLV::TLVReader commandDataReader;
