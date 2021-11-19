@@ -129,7 +129,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
 
             TLV::TLVWriter attributeBackup;
             attributeReportIBs.Checkpoint(attributeBackup);
-            err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeReportIBs, readPath);
+            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, readPath);
             if (err != CHIP_NO_ERROR)
             {
                 // We met a error during writing reports, one common case is we are running out of buffer, rollback the

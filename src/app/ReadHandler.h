@@ -144,7 +144,7 @@ public:
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
-    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+    FabricIndex GetAccessingFabricIndex() const { return mFabricIndex; }
 
 private:
     friend class TestReadInteraction;
