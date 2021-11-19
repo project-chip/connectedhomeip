@@ -897,7 +897,7 @@ CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats)
 CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues & cats)
 {
     uint8_t catCount = 0;
-    size_t catsSize = ArraySize(cats.val);
+    size_t catsSize  = ArraySize(cats.val);
     uint8_t certType;
 
     ReturnErrorOnFailure(opcert.mSubjectDN.GetCertType(certType));
