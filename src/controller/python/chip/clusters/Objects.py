@@ -25348,6 +25348,8 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
+            value: 'uint' = None
+
     class Events:
         @dataclass
         class TestEvent(ClusterEventDescriptor):
@@ -25372,6 +25374,7 @@ class TestCluster(Cluster):
                             Label="arg6", Tag=6, Type=typing.List[TestCluster.Enums.SimpleEnum], IsArray=True),
                     ])
 
+            arg1: 'uint' = None
             arg2: 'TestCluster.Enums.SimpleEnum' = None
             arg3: 'bool' = None
             arg4: 'TestCluster.Structs.SimpleStruct' = None

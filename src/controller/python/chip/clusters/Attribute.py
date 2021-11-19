@@ -29,7 +29,6 @@ import chip.tlv
 import inspect
 import sys
 import logging
-import ipdb
 
 
 @dataclass
