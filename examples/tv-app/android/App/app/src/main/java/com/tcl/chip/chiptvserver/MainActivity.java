@@ -17,6 +17,8 @@ import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
 import com.tcl.chip.tvapp.TvApp;
+import com.tcl.chip.tvapp.WakeOnLanManagerStub;
+
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     mManualPairingCodeTxt = findViewById(R.id.manualPairingCodeTxt);
     TvApp tvApp = new TvApp();
     tvApp.setKeypadInputManager(new KeypadInputManagerStub());
+    tvApp.setWakeOnLanManager(new WakeOnLanManagerStub());
 
     AndroidChipPlatform chipPlatform =
         new AndroidChipPlatform(

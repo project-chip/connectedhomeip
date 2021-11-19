@@ -48,10 +48,10 @@ shared_library("jni") {
     "include/target-navigator/TargetNavigatorManager.h",
     "include/tv-channel/TvChannelManager.cpp",
     "include/tv-channel/TvChannelManager.h",
-    "include/wake-on-lan/WakeOnLanManager.cpp",
-    "include/wake-on-lan/WakeOnLanManager.h",
     "java/KeypadInputManager.cpp",
     "java/KeypadInputManager.h",
+    "java/WakeOnLanManager.cpp",
+    "java/WakeOnLanManager.h",
     "java/TVApp-JNI.cpp",
   ]
 
@@ -85,6 +85,8 @@ android_library("java") {
   sources = [
     "java/src/com/tcl/chip/tvapp/KeypadInputManager.java",
     "java/src/com/tcl/chip/tvapp/KeypadInputManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",
+    "java/src/com/tcl/chip/tvapp/WakeOnLanManagerStub.java",
     "java/src/com/tcl/chip/tvapp/TvApp.java",
   ]
 
