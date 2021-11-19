@@ -50,26 +50,44 @@ public:
         GroupId group = 0;
         // Group name
         CharSpan name;
-
         GroupMapping() = default;
-        GroupMapping(EndpointId eid, GroupId gid) : endpoint(eid), group(gid) {}
-        GroupMapping(EndpointId eid, GroupId gid, const CharSpan & groupName) : endpoint(eid), group(gid), name(groupName) {}
-        GroupMapping(EndpointId eid, GroupId gid, const char * groupName) :
-            endpoint(eid), group(gid), name(CharSpan(groupName, strnlen(groupName, CHIP_CONFIG_MAX_GROUP_NAME_LENGTH)))
-        {}
+        GroupMapping(EndpointId eid, GroupId gid, const char * groupName) : endpoint(eid), group(gid)
+        {
+            if (nullptr == groupName)
+            {
+                name = CharSpan(nullptr, 0);
+            }
+            else
+            {
+                name = CharSpan(groupName, strnlen(groupName, CHIP_CONFIG_MAX_GROUP_NAME_LENGTH));
+            }
+        }
 
-        bool operator==(const GroupMapping & other) { return this->endpoint == other.endpoint && this->group == other.group; }
+        bool operator==(const GroupMapping & other)
+        {
+            return (this->endpoint == other.endpoint) && (this->group == other.group) &&
+                strncmp(this->name.data(), other.name.data(), std::min(this->name.size(), other.name.size()));
+        }
     };
 
     // A group state maps the group key set to use for encryption/decryption for a given group ID.
     struct GroupState
     {
+        GroupState() = default;
+        GroupState(chip::FabricIndex fabric, chip::GroupId group_id, uint16_t key_set) :
+            fabric_index(fabric), group(group_id), keyset_index(key_set)
+        {}
         // Fabric Index associated with the group state entry's fabric scoping
-        chip::FabricIndex fabric_index;
+        chip::FabricIndex fabric_index = 0;
         // Identifies the group within the scope of the given fabric
-        chip::GroupId group;
+        chip::GroupId group = 0;
         // References the set of group keys that generate operationa group keys for use with the given group
-        uint16_t key_set_index;
+        uint16_t keyset_index = 0;
+        bool operator==(const GroupState & other)
+        {
+            return this->fabric_index == other.fabric_index && this->group == other.group &&
+                this->keyset_index == other.keyset_index;
+        }
     };
 
     // A operational group key set, usable by many GroupState mappings
@@ -81,14 +99,27 @@ public:
             kLowLatency = 1
         };
 
+        KeySet() = default;
+        KeySet(uint16_t id, SecurityPolicy poli, uint8_t num_keys) : keyset_id(id), policy(poli), num_keys_used(num_keys) {}
+        KeySet(SecurityPolicy poli, uint8_t num_keys) : keyset_id(0), policy(poli), num_keys_used(num_keys) {}
+
         // The actual keys for the group key set
         EpochKey epoch_keys[3];
-        // Logical index provided by the Administrator that configured the entry
-        uint16_t key_set_index;
+        // Logical id provided by the Administrator that configured the entry
+        uint16_t keyset_id = 0;
         // Security policy to use for groups that use this keyset
-        SecurityPolicy policy;
+        SecurityPolicy policy = SecurityPolicy::kStandard;
         // Number of keys present
-        uint8_t num_keys_used;
+        uint8_t num_keys_used = 0;
+
+        bool operator==(const KeySet & other)
+        {
+            if (this->policy == other.policy && this->num_keys_used == other.num_keys_used)
+            {
+                return !memcmp(this->epoch_keys, other.epoch_keys, this->num_keys_used * sizeof(EpochKey));
+            }
+            return false;
+        }
     };
 
     // Iterator for group mappings under a given endpoint. Associated with
@@ -185,7 +216,10 @@ public:
     virtual CHIP_ERROR Init() = 0;
     virtual void Finish()     = 0;
 
-    // Endpoints
+    //
+    // Group Mappings
+    //
+
     virtual bool HasGroupNamesSupport()                                                                 = 0;
     virtual bool GroupMappingExists(chip::FabricIndex fabric_index, const GroupMapping & mapping)       = 0;
     virtual CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping)    = 0;
@@ -199,7 +233,10 @@ public:
      */
     virtual GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint) = 0;
 
-    // States
+    //
+    // Group States
+    //
+
     virtual CHIP_ERROR SetGroupState(size_t state_index, const GroupState & state) = 0;
     virtual CHIP_ERROR GetGroupState(size_t state_index, GroupState & state)       = 0;
     virtual CHIP_ERROR RemoveGroupState(size_t state_index)                        = 0;
@@ -218,10 +255,13 @@ public:
      */
     virtual GroupStateIterator * IterateGroupStates(chip::FabricIndex fabric_index) = 0;
 
-    // Keys
-    virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, const KeySet & keys) = 0;
-    virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, KeySet & keys)       = 0;
-    virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index)                   = 0;
+    //
+    // Key Sets
+    //
+
+    virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id, const KeySet & keys) = 0;
+    virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id, KeySet & keys)       = 0;
+    virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id)                   = 0;
     /**
      *  Returns an iterator that may be used to obtain the KeySets associated with the given fabric. The number
      *  of concurrent iterator instances is limited, and must be released using their own Release() method.
