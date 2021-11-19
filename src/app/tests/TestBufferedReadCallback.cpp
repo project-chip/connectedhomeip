@@ -160,14 +160,14 @@ void DataSeriesValidator::OnAttributeData(const ReadClient * apReadClient, const
     case ValidationInstruction::kListAttributeC_NotEmpty: {
         if (mInstructionList[mCurrentInstruction].mValidationType == ValidationInstruction::kListAttributeC_NotEmpty_Chunked)
         {
-            expectedListLength = 1024;
+            expectedListLength = 512;
         }
         else
         {
             expectedListLength = 2;
         }
 
-        ChipLogProgress(DataManagement, "\t\t -- Validating C[%d]", expectedListLength);
+        ChipLogProgress(DataManagement, "\t\t -- Validating C[%" PRIu32 "]", expectedListLength);
 
         Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo::DecodableType value;
         size_t len;
@@ -215,14 +215,14 @@ void DataSeriesValidator::OnAttributeData(const ReadClient * apReadClient, const
     case ValidationInstruction::kListAttributeD_NotEmpty_Chunked: {
         if (mInstructionList[mCurrentInstruction].mValidationType == ValidationInstruction::kListAttributeD_NotEmpty_Chunked)
         {
-            expectedListLength = 1024;
+            expectedListLength = 512;
         }
         else
         {
             expectedListLength = 2;
         }
 
-        ChipLogProgress(DataManagement, "\t\t -- Validating D[%d]", expectedListLength);
+        ChipLogProgress(DataManagement, "\t\t -- Validating D[%" PRIu32 "]", expectedListLength);
 
         Clusters::TestCluster::Attributes::ListInt8u::TypeInfo::DecodableType value;
         size_t len;
@@ -434,9 +434,9 @@ void DataSeriesGenerator::Generate()
                 callback->OnAttributeData(nullptr, path, &reader, status);
             }
 
-            ChipLogProgress(DataManagement, "\t -- Generating C0..C1024");
+            ChipLogProgress(DataManagement, "\t -- Generating C0..C512");
 
-            for (int i = 0; i < 1024; i++)
+            for (int i = 0; i < 512; i++)
             {
                 Clusters::TestCluster::Structs::TestListStructOctet::Type listItem;
 
@@ -477,9 +477,9 @@ void DataSeriesGenerator::Generate()
                 callback->OnAttributeData(nullptr, path, &reader, status);
             }
 
-            ChipLogProgress(DataManagement, "\t -- Generating D0..D1024");
+            ChipLogProgress(DataManagement, "\t -- Generating D0..D512");
 
-            for (int i = 0; i < 1024; i++)
+            for (int i = 0; i < 512; i++)
             {
                 handle = System::PacketBufferHandle::New(1000);
                 writer.Init(std::move(handle), true);

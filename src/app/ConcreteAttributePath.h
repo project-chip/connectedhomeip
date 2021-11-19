@@ -80,11 +80,12 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
 {
     enum class ListOperation
     {
-        NotList,
-        ReplaceAll,
-        UpdateItem,
-        DeleteItem,
-        AppendItem
+        NotList,     // Path points to an attribute that isn't a list.
+        ReplaceAll,  // Path points to an attribute that is a list, indicating that the contents of the list should be replaced in
+                     // its entirety.
+        ReplaceItem, // Path points to a specific item in a list, indicating that that item should be replaced in its entirety.
+        DeleteItem,  // Path points to a specific item in a list, indicating that that item should be deleted from the list.
+        AppendItem   // Path points to an attribute that is a list, indicating that an item should be appended into the list.
     };
 
     ConcreteDataAttributePath() {}
@@ -104,6 +105,10 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
     bool IsListOperation() const { return mListOp != ListOperation::NotList; }
     bool IsListItemOperation() const { return ((mListOp != ListOperation::NotList) && (mListOp != ListOperation::ReplaceAll)); }
 
+    //
+    // This index is only valid if `mListOp` is set to a list item operation, i.e
+    // ReplaceItem, DeleteItem or AppendItem. Otherwise, it is to be ignored.
+    //
     uint16_t mListIndex   = 0;
     ListOperation mListOp = ListOperation::NotList;
 };

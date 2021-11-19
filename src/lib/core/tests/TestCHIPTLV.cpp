@@ -4322,9 +4322,6 @@ static void CheckCHIPTLVScopedBuffer(nlTestSuite * inSuite, void * inContext)
         ScopedBufferTLVReader reader;
         uint8_t val;
 
-        err = reader.Get(val);
-        NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
-
         reader.Init(std::move(buf), 64);
 
         err = reader.Next();
@@ -4336,6 +4333,9 @@ static void CheckCHIPTLVScopedBuffer(nlTestSuite * inSuite, void * inContext)
 
         reader.TakeBuffer(buf);
         NL_TEST_ASSERT(inSuite, buf.Get() != nullptr);
+
+        err = reader.Get(val);
+        NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
     }
 }
 

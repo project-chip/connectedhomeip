@@ -51,15 +51,15 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aR
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
 
     //
-    // To generate the final reconstiuted list, we need to allocate a contiguous
-    // buffer than can hold the entirety of its contents. To do so, we'd need to first
-    // walk the buffered list items and compute their TLV sizes, sum them all up and add a bit
-    // of slop to account for the TLV array those list elements will go into.
+    // To generate the final reconstituted list, we need to allocate a contiguous
+    // buffer than can hold the entirety of its contents. To do so, we need to figure out
+    // how big a buffer to allocate. This requires walking the buffered list items and computing their TLV sizes,
+    // sum theming all up and adding a bit of slop to account for the TLV array the list elements will go into.
     //
     // The alternative was to use a PacketBufferTLVWriter backed by chained packet buffers to
     // write out the list - this would have removed the need for this first pass. However,
-    // we cannot actually back a TLVReader with a chained buffer, since that violates the ability
-    // for us to create readers off-of readers since each reader would assume exclusive ownership of the chained
+    // we cannot actually back a TLVReader with a chained buffer since that violates the ability
+    // for us to create readers off-of readers. Each reader would assume exclusive ownership of the chained
     // buffer and mutate the state within TLVPacketBufferBackingStore, preventing shared use.
     //
     // To avoid that, a single contiguous buffer is the best likely approach for now.
