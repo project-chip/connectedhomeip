@@ -84,19 +84,19 @@ def test_lock_ctrl(device):
     assert ret != None and len(ret) > 0
 
     err, res = send_zcl_command(devCtrl, "OnOff Off {} 1 0".format(DEVICE_NODE_ID))
-    assert err == 0 and res["Status"] == 0
+    assert err == 0
 
     ret = device.wait_for_output("Unlock Action has been completed", 20)
     assert ret != None and len(ret) > 0
 
     err, res = send_zcl_command(devCtrl, "OnOff On {} 1 0".format(DEVICE_NODE_ID))
-    assert err == 0 and res["Status"] == 0
+    assert err == 0
 
     ret = device.wait_for_output("Lock Action has been completed", 20)
     assert ret != None and len(ret) > 0
 
     err, res = send_zcl_command(devCtrl, "OnOff Toggle {} 1 0".format(DEVICE_NODE_ID))
-    assert err == 0 and res["Status"] == 0
+    assert err == 0
 
     ret = device.wait_for_output("Unlock Action has been completed", 20)
     assert ret != None and len(ret) > 0
