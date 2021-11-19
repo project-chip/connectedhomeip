@@ -63,8 +63,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     char hardwareVersionString[DeviceLayer::ConfigurationManager::kMaxHardwareVersionStringLength + 1];
     if (ConfigurationMgr().GetHardwareVersionString(hardwareVersionString, sizeof(hardwareVersionString)) == CHIP_NO_ERROR)
     {
-        status =
-            Attributes::HardwareVersionString::Set(endpoint, CharSpan(hardwareVersionString, strlen(hardwareVersionString)));
+        status = Attributes::HardwareVersionString::Set(endpoint, CharSpan(hardwareVersionString, strlen(hardwareVersionString)));
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                        ChipLogError(Zcl, "Error setting Hardware Version String: 0x%02x", status));
     }
@@ -79,8 +78,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     char softwareVersionString[DeviceLayer::ConfigurationManager::kMaxSoftwareVersionLength + 1];
     if (ConfigurationMgr().GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString)) == CHIP_NO_ERROR)
     {
-        status =
-            Attributes::SoftwareVersionString::Set(endpoint, CharSpan(softwareVersionString, strlen(softwareVersionString)));
+        status = Attributes::SoftwareVersionString::Set(endpoint, CharSpan(softwareVersionString, strlen(softwareVersionString)));
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                        ChipLogError(Zcl, "Error setting Software Version String: 0x%02x", status));
     }
@@ -107,8 +105,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     {
         snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "-%02" PRIu16 "-%02" PRIu16,
                  manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
-        status =
-            Attributes::ManufacturingDate::Set(endpoint, CharSpan(manufacturingDateString, strlen(manufacturingDateString)));
+        status = Attributes::ManufacturingDate::Set(endpoint, CharSpan(manufacturingDateString, strlen(manufacturingDateString)));
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                        ChipLogError(Zcl, "Error setting Manufacturing Date String: 0x%02x", status));
     }
