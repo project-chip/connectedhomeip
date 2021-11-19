@@ -217,7 +217,7 @@ public:
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath,
                                  AttributeReportIB::Builder & aAttributeReport)
 {
     AttributeDataIB::Builder attributeData;
@@ -226,7 +226,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
 
     if (aPath.mClusterId >= Test::kMockEndpointMin)
     {
-        return Test::ReadSingleMockClusterData(aAccessingFabricIndex, aPath, aAttributeReport);
+        return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReport);
     }
 
     if (!(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId))

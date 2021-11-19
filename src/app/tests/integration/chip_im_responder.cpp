@@ -110,7 +110,7 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     (void) apCommandObj;
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteAttributePath & aPath,
                                  AttributeReportIB::Builder & aAttributeReport)
 {
     AttributeDataIB::Builder attributeData = aAttributeReport.CreateAttributeData();
@@ -124,7 +124,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
