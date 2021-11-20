@@ -26,12 +26,11 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <messaging/ReliableMessageProtocolConfig.h>
-
 #include <inet/InetLayer.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/support/DLLUtil.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/MessageHeader.h>
 

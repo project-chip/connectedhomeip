@@ -27,8 +27,9 @@
 
 #include <system/SystemConfig.h>
 
+#include <stdint.h>
+
 namespace chip {
-namespace Messaging {
 
 /**
  *  @def CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
@@ -118,16 +119,12 @@ namespace Messaging {
  */
 struct ReliableMessageProtocolConfig
 {
-    uint32_t mIdleRetransTimeoutTick;   /**< Configurable timeout in msec for retransmission of the first sent message. */
+    ReliableMessageProtocolConfig(uint32_t idleInterval, uint32_t activeInterval) : mIdleRetransTimeoutTick(idleInterval), mActiveRetransTimeoutTick(activeInterval) {}
+
+    uint32_t mIdleRetransTimeoutTick; /**< Configurable timeout in msec for retransmission of the first sent message. */
     uint32_t mActiveRetransTimeoutTick; /**< Configurable timeout in msec for retransmission of all subsequent messages. */
 };
 
-const ReliableMessageProtocolConfig gDefaultReliableMessageProtocolConfig = {
-    CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
-    CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
-};
+extern const ReliableMessageProtocolConfig gDefaultMRPConfig;
 
-// clang-format on
-
-} // namespace Messaging
 } // namespace chip

@@ -281,9 +281,8 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
 {
 
     if (node.longDiscriminator != 0 || node.vendorId != 0 || node.productId != 0 || node.commissioningMode != 0 ||
-        node.deviceType != 0 || node.rotatingIdLen != 0 || node.pairingHint != 0 ||
-        node.mrpRetryIntervalIdle != kUndefinedRetryInterval || node.mrpRetryIntervalActive != kUndefinedRetryInterval ||
-        node.supportsTcp)
+        node.deviceType != 0 || node.rotatingIdLen != 0 || node.pairingHint != 0 || node.mrpRetryIntervalIdle.HasValue() ||
+        node.mrpRetryIntervalActive.HasValue() || node.supportsTcp)
     {
         return false;
     }
@@ -381,28 +380,27 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
 bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
 {
     return nodeData.mPeerId == PeerId{} && nodeData.mNumIPs == 0 && nodeData.mPort == 0 &&
-        nodeData.mMrpRetryIntervalIdle == kUndefinedRetryInterval && nodeData.mMrpRetryIntervalActive == kUndefinedRetryInterval &&
-        !nodeData.mSupportsTcp;
+        !nodeData.mMrpRetryIntervalIdle.HasValue() && !nodeData.mMrpRetryIntervalActive.HasValue() && !nodeData.mSupportsTcp;
 }
 
 void ResetRetryIntervalIdle(DiscoveredNodeData & nodeData)
 {
-    nodeData.mrpRetryIntervalIdle = kUndefinedRetryInterval;
+    nodeData.mrpRetryIntervalIdle.ClearValue();
 }
 
 void ResetRetryIntervalIdle(ResolvedNodeData & nodeData)
 {
-    nodeData.mMrpRetryIntervalIdle = kUndefinedRetryInterval;
+    nodeData.mMrpRetryIntervalIdle.ClearValue();
 }
 
 void ResetRetryIntervalActive(DiscoveredNodeData & nodeData)
 {
-    nodeData.mrpRetryIntervalActive = kUndefinedRetryInterval;
+    nodeData.mrpRetryIntervalActive.ClearValue();
 }
 
 void ResetRetryIntervalActive(ResolvedNodeData & nodeData)
 {
-    nodeData.mMrpRetryIntervalActive = kUndefinedRetryInterval;
+    nodeData.mMrpRetryIntervalActive.ClearValue();
 }
 
 // Test CRI
