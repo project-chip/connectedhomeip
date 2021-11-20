@@ -250,7 +250,7 @@ private:
      *
      */
     bool IsFree() const { return mState == ClientState::Uninitialized; }
-    bool IsSubscriptionTypeIdle() const { return mState == ClientState::SubscriptionActive; }
+    bool IsSubscriptionIdle() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 

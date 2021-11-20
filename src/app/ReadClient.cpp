@@ -291,7 +291,6 @@ CHIP_ERROR ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apEx
 {
     mpExchangeCtx  = apExchangeContext;
     CHIP_ERROR err = ProcessReportData(std::move(aPayload));
-    mpExchangeCtx  = nullptr;
     if (err != CHIP_NO_ERROR)
     {
         ShutdownInternal(err);
@@ -306,7 +305,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
 
     bool isEventReportsPresent       = false;
     bool isAttributeReportIBsPresent = false;
-    bool suppressResponse            = false;
+    bool suppressResponse            = true;
     uint64_t subscriptionId          = 0;
     EventReports::Parser EventReports;
     AttributeReportIBs::Parser attributeReportIBs;
@@ -326,7 +325,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     err = report.GetSuppressResponse(&suppressResponse);
     if (CHIP_END_OF_TLV == err)
     {
-        err = CHIP_NO_ERROR;
+        suppressResponse = false;
+        err              = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
@@ -399,12 +399,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         mpCallback->OnReportEnd(this);
     }
 
-    if (!suppressResponse)
-    {
-        // TODO: Add status report support and correspond handler in ReadHandler, particular for situation when there
-        // are multiple reports
-    }
-
 exit:
     if (IsSubscriptionType())
     {
@@ -418,14 +412,19 @@ exit:
         }
     }
 
-    StatusResponse::SendStatusResponse(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
-                                                            : Protocols::InteractionModel::Status::InvalidSubscription,
-                                       mpExchangeCtx, IsAwaitingSubscribeResponse() || mPendingMoreChunks);
-
-    if (!mInitialReport && !mPendingMoreChunks)
+    if (!suppressResponse)
     {
-        mpExchangeCtx = nullptr;
+        bool noResponseExpected = IsSubscriptionIdle() && !mPendingMoreChunks;
+        err = StatusResponse::SendStatusResponse(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
+                                                                      : Protocols::InteractionModel::Status::InvalidSubscription,
+                                                 mpExchangeCtx, !noResponseExpected);
+
+        if (noResponseExpected || (err != CHIP_NO_ERROR))
+        {
+            mpExchangeCtx = nullptr;
+        }
     }
+
     mInitialReport = false;
     return err;
 }
@@ -449,10 +448,8 @@ CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttribute
     // The ReportData must contain a concrete attribute path
     err = aAttributePath.GetEndpoint(&(aClusterInfo.mEndpointId));
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
     err = aAttributePath.GetCluster(&(aClusterInfo.mClusterId));
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
     err = aAttributePath.GetAttribute(&(aClusterInfo.mAttributeId));
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
