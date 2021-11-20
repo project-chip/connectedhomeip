@@ -14247,6 +14247,11 @@ bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster TestEmitTestEventResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestEmitTestEventResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                                uint64_t value);
+/**
  * @brief Test Cluster Cluster TestListInt8UArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
@@ -14288,6 +14293,12 @@ bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
 bool emberAfTestClusterClusterTestComplexNullableOptionalRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster TestEmitTestEventRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::DecodableType & commandData);
 /**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */

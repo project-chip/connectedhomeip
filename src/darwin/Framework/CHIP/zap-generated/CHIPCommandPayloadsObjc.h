@@ -1800,6 +1800,10 @@
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 @end
 
+@interface CHIPTestClusterClusterTestEmitTestEventResponsePayload : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull value;
+@end
+
 @interface CHIPTestClusterClusterTestListInt8UArgumentRequestPayload : NSObject
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 @end
@@ -1838,6 +1842,15 @@
 @property (strong, nonatomic) NSArray * _Nullable nullableList;
 @property (strong, nonatomic) NSArray * _Nullable optionalList;
 @property (strong, nonatomic) NSArray * _Nullable nullableOptionalList;
+@end
+
+@interface CHIPTestClusterClusterTestEmitTestEventRequestPayload : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull arg1;
+@property (strong, nonatomic) NSNumber * _Nonnull arg2;
+@property (strong, nonatomic) NSNumber * _Nonnull arg3;
+@property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull arg4;
+@property (strong, nonatomic) NSArray * _Nonnull arg5;
+@property (strong, nonatomic) NSArray * _Nonnull arg6;
 @end
 
 @interface CHIPMessagingClusterDisplayMessagePayload : NSObject

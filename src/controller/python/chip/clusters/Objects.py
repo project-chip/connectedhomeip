@@ -21628,6 +21628,22 @@ class TestCluster(Cluster):
             arg1: 'typing.List[TestCluster.Structs.SimpleStruct]' = None
 
         @dataclass
+        class TestEmitTestEventResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0009
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="value", Tag=0, Type=uint),
+                    ])
+
+            value: 'uint' = None
+
+        @dataclass
         class TestListInt8UArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050F
             command_id: typing.ClassVar[int] = 0x000A
@@ -21774,6 +21790,37 @@ class TestCluster(Cluster):
             nullableList: 'typing.Union[Nullable, typing.List[TestCluster.Enums.SimpleEnum]]' = None
             optionalList: 'typing.Optional[typing.List[TestCluster.Enums.SimpleEnum]]' = None
             nullableOptionalList: 'typing.Union[None, Nullable, typing.List[TestCluster.Enums.SimpleEnum]]' = None
+
+        @dataclass
+        class TestEmitTestEventRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0011
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="arg1", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="arg2", Tag=1, Type=TestCluster.Enums.SimpleEnum),
+                        ClusterObjectFieldDescriptor(
+                            Label="arg3", Tag=2, Type=bool),
+                        ClusterObjectFieldDescriptor(
+                            Label="arg4", Tag=3, Type=TestCluster.Structs.SimpleStruct),
+                        ClusterObjectFieldDescriptor(
+                            Label="arg5", Tag=4, Type=typing.List[TestCluster.Structs.SimpleStruct]),
+                        ClusterObjectFieldDescriptor(
+                            Label="arg6", Tag=5, Type=typing.List[TestCluster.Enums.SimpleEnum]),
+                    ])
+
+            arg1: 'uint' = None
+            arg2: 'TestCluster.Enums.SimpleEnum' = None
+            arg3: 'bool' = None
+            arg4: 'TestCluster.Structs.SimpleStruct' = None
+            arg5: 'typing.List[TestCluster.Structs.SimpleStruct]' = None
+            arg6: 'typing.List[TestCluster.Enums.SimpleEnum]' = None
 
     class Attributes:
         class Boolean(ClusterAttributeDescriptor):

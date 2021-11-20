@@ -1057,6 +1057,9 @@
 @implementation CHIPTestClusterClusterTestListStructArgumentRequestPayload
 @end
 
+@implementation CHIPTestClusterClusterTestEmitTestEventResponsePayload
+@end
+
 @implementation CHIPTestClusterClusterTestListInt8UArgumentRequestPayload
 @end
 
@@ -1076,6 +1079,9 @@
 @end
 
 @implementation CHIPTestClusterClusterTestComplexNullableOptionalRequestPayload
+@end
+
+@implementation CHIPTestClusterClusterTestEmitTestEventRequestPayload
 @end
 
 @implementation CHIPMessagingClusterDisplayMessagePayload
