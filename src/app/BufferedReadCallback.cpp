@@ -36,7 +36,7 @@ void BufferedReadCallback::OnReportBegin(const ReadClient * apReadClient)
 
 void BufferedReadCallback::OnReportEnd(const ReadClient * apReadClient)
 {
-    CHIP_ERROR err = DispatchBufferedData(nullptr, mBufferedPath, StatusIB(), true);
+    CHIP_ERROR err = DispatchBufferedData(apReadClient, mBufferedPath, StatusIB(), true);
     if (err != CHIP_NO_ERROR)
     {
         mCallback.OnError(apReadClient, err);
