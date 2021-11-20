@@ -119,17 +119,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
 ExchangeContext * ExchangeManager::NewContext(SessionHandle session, ExchangeDelegate * delegate)
 {
     ExchangeContext * context = mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
-
-    uint32_t mrpIdleInterval   = CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL;
-    uint32_t mrpActiveInterval = CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL;
-
-    session.GetMRPIntervals(GetSessionManager(), mrpIdleInterval, mrpActiveInterval);
-
-    ReliableMessageProtocolConfig mrpConfig;
-    mrpConfig.mIdleRetransTimeoutTick   = mrpIdleInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
-    mrpConfig.mActiveRetransTimeoutTick = mrpActiveInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
-    context->GetReliableMessageContext()->SetConfig(mrpConfig);
-
+    context->GetReliableMessageContext()->SetConfig(session.GetMRPConfig(GetSessionManager()));
     return context;
 }
 
