@@ -24,6 +24,7 @@
 
 #pragma once
 #include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventHeader.h>
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
@@ -62,6 +63,16 @@ public:
         virtual ~Callback() = default;
 
         /**
+         * Used to signal the commencement of processing of the first attribute report received in a given exchange.
+         */
+        virtual void OnReportBegin(const ReadClient * apReadClient) {}
+
+        /**
+         * Used to signal the completion of processing of the last attribute report in a given exchange.
+         */
+        virtual void OnReportEnd(const ReadClient * apReadClient) {}
+
+        /**
          * The ReadClient object MUST continue to exist after this call is completed.
          *
          * This callback will be called when receiving event data received in the Read and Subscribe interactions
@@ -93,8 +104,8 @@ public:
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
-        virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, TLV::TLVReader * apData,
-                                     const StatusIB & aStatus)
+        virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath,
+                                     TLV::TLVReader * apData, const StatusIB & aStatus)
         {}
 
         /**

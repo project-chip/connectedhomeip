@@ -115,7 +115,8 @@ CHIP_ERROR ReadEvent(Messaging::ExchangeManager * apExchangeMgr, const SessionHa
 
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, callback.get()));
+    ReturnErrorOnFailure(
+        engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, &callback.get()->GetBufferedCallback()));
 
     err = readClient->SendReadRequest(readParams);
     if (err != CHIP_NO_ERROR)

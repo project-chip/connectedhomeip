@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "app/ConcreteAttributePath.h"
 #include <cinttypes>
 
 #include <app/CommandSender.h>
@@ -80,9 +81,16 @@ void PythonInteractionModelDelegate::OnError(const app::CommandSender * apComman
     DeviceControllerInteractionModelDelegate::OnError(apCommandSender, aStatus, aError);
 }
 
-void PythonInteractionModelDelegate::OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath,
-                                                     TLV::TLVReader * apData, const app::StatusIB & status)
+void PythonInteractionModelDelegate::OnAttributeData(const app::ReadClient * apReadClient,
+                                                     const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                                                     const app::StatusIB & status)
 {
+    //
+    // We shouldn't be getting list item operations in the provided path since that should be handled by the buffered read callback.
+    // If we do, that's a bug.
+    //
+    VerifyOrDie(!aPath.IsListItemOperation());
+
     if (onReportDataFunct != nullptr)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;

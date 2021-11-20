@@ -42,7 +42,7 @@ public:
     // Register for the SoftwareDiagnostics cluster on all endpoints.
     SoftwareDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
 
-    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &), AttributeValueEncoder & aEncoder);
@@ -51,7 +51,7 @@ private:
 
 SoftwareDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != SoftwareDiagnostics::Id)
     {

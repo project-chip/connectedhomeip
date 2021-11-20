@@ -234,12 +234,14 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
     if (attrOverride != nullptr)
     {
+        ConcreteReadAttributePath readPath(aPath);
+
         // TODO: We should probably clone the writer and convert failures here
         // into status responses, unless our caller already does that.
         writer = attributeDataIBBuilder.GetWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
         AttributeValueEncoder valueEncoder(writer, aAccessingFabricIndex);
-        ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
+        ReturnErrorOnFailure(attrOverride->Read(readPath, valueEncoder));
 
         if (valueEncoder.TriedEncode())
         {
@@ -575,7 +577,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 
     // Named aPath for now to reduce the amount of code change that needs to
     // happen when the above TODO is resolved.
-    ConcreteAttributePath aPath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
+    ConcreteDataAttributePath aPath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
 
