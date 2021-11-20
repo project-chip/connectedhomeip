@@ -138,7 +138,7 @@
             /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (client) */                                                      \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */         \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Bridged Device Basic (client) */                                                              \
+            /* Endpoint: 1, Cluster: Bridged Device Basic Information (client) */                                                  \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT) | ZAP_ATTRIBUTE_MASK(SINGLETON),                             \
               ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                                                       \
                                                                                                                                    \
@@ -314,7 +314,7 @@
             }, /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (client) */                                                   \
             {                                                                                                                      \
                 0x0039, ZAP_ATTRIBUTE_INDEX(20), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Bridged Device Basic (client) */                                                           \
+            }, /* Endpoint: 1, Cluster: Bridged Device Basic Information (client) */                                               \
             { 0x003B, ZAP_ATTRIBUTE_INDEX(21), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Switch (client) */ \
             {                                                                                                                      \
                 0x003C, ZAP_ATTRIBUTE_INDEX(22), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \

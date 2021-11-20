@@ -4507,6 +4507,38 @@ class Descriptor(Cluster):
 
 
 @dataclass
+class Acl(Cluster):
+    id: typing.ClassVar[int] = 0x001F
+
+    class Attributes:
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+
+@dataclass
 class PollControl(Cluster):
     id: typing.ClassVar[int] = 0x0020
 
@@ -5851,6 +5883,134 @@ class OtaSoftwareUpdateRequestor(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = None
+
+
+@dataclass
+class LocalizationConfiguration(Cluster):
+    id: typing.ClassVar[int] = 0x002B
+
+    class Attributes:
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002B
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002B
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+
+@dataclass
+class LocalizationTimeFormat(Cluster):
+    id: typing.ClassVar[int] = 0x002C
+
+    class Attributes:
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+
+@dataclass
+class LocalizationUnit(Cluster):
+    id: typing.ClassVar[int] = 0x002D
+
+    class Attributes:
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+
+@dataclass
+class PowerSourceConfiguration(Cluster):
+    id: typing.ClassVar[int] = 0x002E
+
+    class Attributes:
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
 
 
 @dataclass
@@ -9442,6 +9602,70 @@ class EthernetNetworkDiagnostics(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = None
+
+
+@dataclass
+class TimeSynchronization(Cluster):
+    id: typing.ClassVar[int] = 0x0038
+
+    class Attributes:
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+
+@dataclass
+class BridgedDeviceBasicInformation(Cluster):
+    id: typing.ClassVar[int] = 0x0039
+
+    class Attributes:
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0039
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0039
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
 
 
 @dataclass

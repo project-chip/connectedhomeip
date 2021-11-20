@@ -1525,47 +1525,16 @@ JNI_METHOD(void, BridgedActionsCluster, stopAction)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(jlong, BridgedDeviceBasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+JNI_METHOD(jlong, BridgedDeviceBasicInformationCluster, initWithDevice)
+(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
-    BridgedDeviceBasicCluster * cppCluster = new BridgedDeviceBasicCluster();
+    BridgedDeviceBasicInformationCluster * cppCluster = new BridgedDeviceBasicInformationCluster();
 
     cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, BridgedDeviceBasicCluster, writeUserLabelAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
-{
-    chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
-
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
-
-    CHIP_ERROR err                         = CHIP_NO_ERROR;
-    BridgedDeviceBasicCluster * cppCluster = reinterpret_cast<BridgedDeviceBasicCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    JniUtfString valueStr(env, value);
-    err = cppCluster->WriteAttributeUserLabel(onSuccess->Cancel(), onFailure->Cancel(),
-                                              chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    onSuccess.release();
-    onFailure.release();
-}
 JNI_METHOD(jlong, ColorControlCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;

@@ -597,83 +597,12 @@ class ChipClusters:
             },
         },
     }
-    _BRIDGED_DEVICE_BASIC_CLUSTER_INFO = {
-        "clusterName": "BridgedDeviceBasic",
+    _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO = {
+        "clusterName": "BridgedDeviceBasicInformation",
         "clusterId": 0x00000039,
         "commands": {
         },
         "attributes": {
-            0x00000001: {
-                "attributeName": "VendorName",
-                "attributeId": 0x00000001,
-                "type": "str",
-            },
-            0x00000002: {
-                "attributeName": "VendorID",
-                "attributeId": 0x00000002,
-                "type": "int",
-            },
-            0x00000003: {
-                "attributeName": "ProductName",
-                "attributeId": 0x00000003,
-                "type": "str",
-            },
-            0x00000005: {
-                "attributeName": "UserLabel",
-                "attributeId": 0x00000005,
-                "type": "str",
-                "writable": True,
-            },
-            0x00000007: {
-                "attributeName": "HardwareVersion",
-                "attributeId": 0x00000007,
-                "type": "int",
-            },
-            0x00000008: {
-                "attributeName": "HardwareVersionString",
-                "attributeId": 0x00000008,
-                "type": "str",
-            },
-            0x00000009: {
-                "attributeName": "SoftwareVersion",
-                "attributeId": 0x00000009,
-                "type": "int",
-            },
-            0x0000000A: {
-                "attributeName": "SoftwareVersionString",
-                "attributeId": 0x0000000A,
-                "type": "str",
-            },
-            0x0000000B: {
-                "attributeName": "ManufacturingDate",
-                "attributeId": 0x0000000B,
-                "type": "str",
-            },
-            0x0000000C: {
-                "attributeName": "PartNumber",
-                "attributeId": 0x0000000C,
-                "type": "str",
-            },
-            0x0000000D: {
-                "attributeName": "ProductURL",
-                "attributeId": 0x0000000D,
-                "type": "str",
-            },
-            0x0000000E: {
-                "attributeName": "ProductLabel",
-                "attributeId": 0x0000000E,
-                "type": "str",
-            },
-            0x0000000F: {
-                "attributeName": "SerialNumber",
-                "attributeId": 0x0000000F,
-                "type": "str",
-            },
-            0x00000011: {
-                "attributeName": "Reachable",
-                "attributeId": 0x00000011,
-                "type": "bool",
-            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -4464,7 +4393,7 @@ class ChipClusters:
         0x0000F000: _BINDING_CLUSTER_INFO,
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000025: _BRIDGED_ACTIONS_CLUSTER_INFO,
-        0x00000039: _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
+        0x00000039: _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO,
         0x00000300: _COLOR_CONTROL_CLUSTER_INFO,
         0x0000050A: _CONTENT_LAUNCHER_CLUSTER_INFO,
         0x0000001D: _DESCRIPTOR_CLUSTER_INFO,
@@ -4524,7 +4453,7 @@ class ChipClusters:
         "Binding": _BINDING_CLUSTER_INFO,
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "BridgedActions": _BRIDGED_ACTIONS_CLUSTER_INFO,
-        "BridgedDeviceBasic": _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
+        "BridgedDeviceBasicInformation": _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO,
         "ColorControl": _COLOR_CONTROL_CLUSTER_INFO,
         "ContentLauncher": _CONTENT_LAUNCHER_CLUSTER_INFO,
         "Descriptor": _DESCRIPTOR_CLUSTER_INFO,
@@ -4799,50 +4728,8 @@ class ChipClusters:
     def ClusterBridgedActions_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BridgedActions_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
-    def ClusterBridgedDeviceBasic_ReadAttributeVendorName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeVendorID(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorID(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeProductName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ProductName(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_UserLabel(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeHardwareVersion(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersion(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeHardwareVersionString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersionString(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeSoftwareVersion(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_SoftwareVersion(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeSoftwareVersionString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_SoftwareVersionString(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeManufacturingDate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ManufacturingDate(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributePartNumber(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_PartNumber(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeProductURL(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ProductURL(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeProductLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ProductLabel(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeSerialNumber(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_SerialNumber(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeReachable(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_Reachable(device, ZCLendpoint, ZCLgroupid)
-
-    def ClusterBridgedDeviceBasic_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBridgedDeviceBasicInformation_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasicInformation_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterColorControl_ReadAttributeCurrentHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentHue(device, ZCLendpoint, ZCLgroupid)
@@ -6430,67 +6317,11 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_BridgedActions_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_BridgedActions_ClusterRevision.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic
-        # Cluster BridgedDeviceBasic ReadAttribute VendorName
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName.argtypes = [
+        # Cluster BridgedDeviceBasicInformation
+        # Cluster BridgedDeviceBasicInformation ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasicInformation_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorName.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute VendorID
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorID.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_VendorID.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute ProductName
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ProductName.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ProductName.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute UserLabel
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_UserLabel.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_UserLabel.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute HardwareVersion
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersion.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersion.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute HardwareVersionString
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersionString.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersionString.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute SoftwareVersion
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_SoftwareVersion.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_SoftwareVersion.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute SoftwareVersionString
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_SoftwareVersionString.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_SoftwareVersionString.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute ManufacturingDate
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ManufacturingDate.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ManufacturingDate.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute PartNumber
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_PartNumber.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_PartNumber.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute ProductURL
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ProductURL.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ProductURL.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute ProductLabel
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ProductLabel.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ProductLabel.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute SerialNumber
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_SerialNumber.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_SerialNumber.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute Reachable
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_Reachable.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_Reachable.restype = ctypes.c_uint32
-        # Cluster BridgedDeviceBasic ReadAttribute ClusterRevision
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ClusterRevision.argtypes = [
-            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ClusterRevision.restype = ctypes.c_uint32
+        self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasicInformation_ClusterRevision.restype = ctypes.c_uint32
         # Cluster ColorControl
         # Cluster ColorControl ReadAttribute CurrentHue
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentHue.argtypes = [
