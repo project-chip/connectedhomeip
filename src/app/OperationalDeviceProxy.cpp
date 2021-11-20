@@ -86,16 +86,15 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
     return err;
 }
 
-CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr, uint32_t mrpIdleInterval,
-                                                    uint32_t mrpActiveInterval)
+CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
+                                                    const ReliableMessageProtocolConfig & config)
 {
     VerifyOrReturnLogError(mState != State::Uninitialized, CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     mDeviceAddress = addr;
 
-    mMrpIdleInterval   = mrpIdleInterval;
-    mMrpActiveInterval = mrpActiveInterval;
+    mMRPConfig = config;
 
     if (mState == State::NeedsAddress)
     {
@@ -121,7 +120,7 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
         if (secureSession != nullptr)
         {
             secureSession->SetPeerAddress(addr);
-            secureSession->SetMRPIntervals(mrpIdleInterval, mrpActiveInterval);
+            secureSession->SetMRPConfig(mMRPConfig);
         }
     }
 
@@ -144,10 +143,8 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
 {
     // Create a UnauthenticatedSession for CASE pairing.
     // Don't use mSecureSession here, because mSecureSession is for encrypted communication.
-    Optional<SessionHandle> session = mInitParams.sessionManager->CreateUnauthenticatedSession(mDeviceAddress);
+    Optional<SessionHandle> session = mInitParams.sessionManager->CreateUnauthenticatedSession(mDeviceAddress, mMRPConfig);
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
-
-    session.Value().GetUnauthenticatedSession()->SetMRPIntervals(mMrpIdleInterval, mMrpActiveInterval);
 
     Messaging::ExchangeContext * exchange = mInitParams.exchangeMgr->NewContext(session.Value(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);

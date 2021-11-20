@@ -112,15 +112,14 @@ CHIP_ERROR CommissioneeDeviceProxy::CloseSession()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr, uint32_t mrpIdleInterval,
-                                                     uint32_t mrpActiveInterval)
+CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
+                                                     const ReliableMessageProtocolConfig & config)
 {
     bool didLoad;
 
     mDeviceAddress = addr;
 
-    mMrpIdleInterval   = mrpIdleInterval;
-    mMrpActiveInterval = mrpActiveInterval;
+    mMRPConfig = config;
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 
@@ -135,7 +134,7 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
 
     Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
     secureSession->SetPeerAddress(addr);
-    secureSession->SetMRPIntervals(mrpIdleInterval, mrpActiveInterval);
+    secureSession->SetMRPConfig(config);
 
     return CHIP_NO_ERROR;
 }
