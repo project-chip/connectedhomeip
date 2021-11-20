@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/EventLoggingDelegate.h>
 #include <app/ConcreteEventPath.h>
+#include <app/EventLoggingDelegate.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/List.h> // So we can encode lists
 
@@ -29,18 +29,16 @@ namespace app {
 template <typename T>
 class EventLogger : EventLoggingDelegate
 {
-  public:
-    EventLogger(const T &aEventData) : mEventData(aEventData) {};
-    CHIP_ERROR WriteEvent(chip::TLV::TLVWriter &aWriter) final override
-    {
-        return mEventData.Encode(aWriter, TLV::AnonymousTag);
-    }
-  private:
-    const T &mEventData;
+public:
+    EventLogger(const T & aEventData) : mEventData(aEventData){};
+    CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override { return mEventData.Encode(aWriter, TLV::AnonymousTag); }
+
+private:
+    const T & mEventData;
 };
 
 template <typename T>
-CHIP_ERROR LogEvent(const T &aEventData, EndpointId aEndpoint, EventOptions aEventOptions, EventNumber &aEventNumber)
+CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventOptions aEventOptions, EventNumber & aEventNumber)
 {
     EventLogger<T> eventData(aEventData);
     ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
