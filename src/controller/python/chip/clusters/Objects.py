@@ -4840,13 +4840,13 @@ class BridgedActions(Cluster):
                         ClusterObjectFieldDescriptor(
                             Label="type", Tag=2, Type=BridgedActions.Enums.EndpointListTypeEnum),
                         ClusterObjectFieldDescriptor(
-                            Label="endpoints", Tag=3, Type=bytes),
+                            Label="endpoints", Tag=3, Type=typing.List[uint]),
                     ])
 
             endpointListID: 'uint' = None
             name: 'str' = None
             type: 'BridgedActions.Enums.EndpointListTypeEnum' = None
-            endpoints: 'bytes' = None
+            endpoints: 'typing.List[uint]' = None
 
     class Commands:
         @dataclass

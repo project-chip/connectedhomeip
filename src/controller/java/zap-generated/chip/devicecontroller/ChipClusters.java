@@ -1698,14 +1698,11 @@ public class ChipClusters {
       public Integer endpointListID;
       public String name;
       public Integer type;
-      public byte[] endpoints;
 
-      public EndpointListAttribute(
-          Integer endpointListID, String name, Integer type, byte[] endpoints) {
+      public EndpointListAttribute(Integer endpointListID, String name, Integer type) {
         this.endpointListID = endpointListID;
         this.name = name;
         this.type = type;
-        this.endpoints = endpoints;
       }
 
       @Override
@@ -1721,10 +1718,6 @@ public class ChipClusters {
 
         output.append("int type: ");
         output.append(this.type);
-        output.append("\n");
-
-        output.append("byte[] ");
-        output.append(Arrays.toString(endpoints));
         output.append("\n");
 
         return output.toString();
