@@ -36,7 +36,6 @@
 
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
-#include <system/SystemLayer.h>
 #include <system/SystemMutex.h>
 #include <system/SystemStats.h>
 
@@ -50,6 +49,8 @@
 
 namespace chip {
 namespace System {
+
+class Layer;
 
 using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
 
