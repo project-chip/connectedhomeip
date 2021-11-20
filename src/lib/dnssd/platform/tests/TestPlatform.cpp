@@ -46,13 +46,15 @@ test::ExpectedCall operationalCall1 = test::ExpectedCall()
                                           .SetInstanceName("BEEFBEEFF00DF00D-1111222233334444")
                                           .SetHostName(host)
                                           .AddSubtype("_IBEEFBEEFF00DF00D");
-OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingParameters()
-                                                          .SetPeerId(kPeerId2)
-                                                          .SetMac(ByteSpan(kMac))
-                                                          .SetPort(CHIP_PORT)
-                                                          .EnableIpV4(true)
-                                                          .SetMRPConfig(ReliableMessageProtocolConfig(64 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT, 128 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT))
-                                                          .SetTcpSupported(Optional<bool>(true));
+OperationalAdvertisingParameters operationalParams2 =
+    OperationalAdvertisingParameters()
+        .SetPeerId(kPeerId2)
+        .SetMac(ByteSpan(kMac))
+        .SetPort(CHIP_PORT)
+        .EnableIpV4(true)
+        .SetMRPConfig(ReliableMessageProtocolConfig(64 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
+                                                    128 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT))
+        .SetTcpSupported(Optional<bool>(true));
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
                                           .SetServiceName("_matter")
@@ -95,7 +97,8 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetRotatingId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
         // 3600005 is over the max, so this should be adjusted by the platform
-        .SetMRPConfig(ReliableMessageProtocolConfig(3600000 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT, 3600064 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT));
+        .SetMRPConfig(ReliableMessageProtocolConfig(3600000 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
+                                                    3600064 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT));
 
 test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)

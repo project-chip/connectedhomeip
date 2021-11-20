@@ -144,8 +144,9 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
     {
         auto mrp = optionalMrp.Value();
         optionalMrp.SetValue(ReliableMessageProtocolConfig(
-                mrp.mIdleRetransTimeoutTick + (sedPollingConfig.SlowPollingIntervalMS >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT),
-                mrp.mActiveRetransTimeoutTick + (sedPollingConfig.FastPollingIntervalMS >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)));
+            mrp.mIdleRetransTimeoutTick + (sedPollingConfig.SlowPollingIntervalMS >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT),
+            mrp.mActiveRetransTimeoutTick +
+                (sedPollingConfig.FastPollingIntervalMS >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)));
     }
 #endif
     if (optionalMrp.HasValue())
@@ -158,8 +159,8 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
                                 "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
                 mrp.mIdleRetransTimeoutTick = kMaxRetryInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
             }
-            size_t writtenCharactersNumber =
-                snprintf(mrpRetryIdleStorage, sizeof(mrpRetryIdleStorage), "%" PRIu32, mrp.mIdleRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT);
+            size_t writtenCharactersNumber = snprintf(mrpRetryIdleStorage, sizeof(mrpRetryIdleStorage), "%" PRIu32,
+                                                      mrp.mIdleRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT);
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalIdleMaxLength),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtEntryStorage[txtEntryIdx++] = { "CRI", Uint8::from_const_char(mrpRetryIdleStorage), strlen(mrpRetryIdleStorage) };
@@ -172,8 +173,8 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
                                 "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
                 mrp.mActiveRetransTimeoutTick = kMaxRetryInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
             }
-            size_t writtenCharactersNumber =
-                snprintf(mrpRetryActiveStorage, sizeof(mrpRetryActiveStorage), "%" PRIu32, mrp.mActiveRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT);
+            size_t writtenCharactersNumber = snprintf(mrpRetryActiveStorage, sizeof(mrpRetryActiveStorage), "%" PRIu32,
+                                                      mrp.mActiveRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT);
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalActiveMaxLength),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtEntryStorage[txtEntryIdx++] = { "CRA", Uint8::from_const_char(mrpRetryActiveStorage),

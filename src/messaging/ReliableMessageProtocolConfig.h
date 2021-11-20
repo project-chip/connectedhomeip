@@ -119,9 +119,11 @@ namespace chip {
  */
 struct ReliableMessageProtocolConfig
 {
-    ReliableMessageProtocolConfig(uint32_t idleInterval, uint32_t activeInterval) : mIdleRetransTimeoutTick(idleInterval), mActiveRetransTimeoutTick(activeInterval) {}
+    ReliableMessageProtocolConfig(uint32_t idleInterval, uint32_t activeInterval) :
+        mIdleRetransTimeoutTick(idleInterval), mActiveRetransTimeoutTick(activeInterval)
+    {}
 
-    uint32_t mIdleRetransTimeoutTick; /**< Configurable timeout in msec for retransmission of the first sent message. */
+    uint32_t mIdleRetransTimeoutTick;   /**< Configurable timeout in msec for retransmission of the first sent message. */
     uint32_t mActiveRetransTimeoutTick; /**< Configurable timeout in msec for retransmission of all subsequent messages. */
 };
 

@@ -71,13 +71,15 @@ FullQName kCompressedIdSubName2                 = FullQName(kCompressedIdSubPart
 PtrResourceRecord ptrServiceSubCompressedId1    = PtrResourceRecord(kDnsSdQueryName, kCompressedIdSubName1);
 PtrResourceRecord ptrServiceSubCompressedId2    = PtrResourceRecord(kDnsSdQueryName, kCompressedIdSubName2);
 
-OperationalAdvertisingParameters operationalParams1 = OperationalAdvertisingParameters()
-                                                          .SetPeerId(kPeerId1)
-                                                          .SetMac(ByteSpan(kMac))
-                                                          .SetPort(CHIP_PORT)
-                                                          .EnableIpV4(true)
-                                                          .SetTcpSupported(chip::Optional<bool>(false))
-                                                          .SetMRPConfig(ReliableMessageProtocolConfig(64 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT, 128 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT));
+OperationalAdvertisingParameters operationalParams1 =
+    OperationalAdvertisingParameters()
+        .SetPeerId(kPeerId1)
+        .SetMac(ByteSpan(kMac))
+        .SetPort(CHIP_PORT)
+        .EnableIpV4(true)
+        .SetTcpSupported(chip::Optional<bool>(false))
+        .SetMRPConfig(ReliableMessageProtocolConfig(64 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
+                                                    128 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT));
 OperationalAdvertisingParameters operationalParams2 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId2).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams3 =
@@ -178,7 +180,8 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetRotatingId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
         // 3600005 is more than the max so should be adjusted down
-        .SetMRPConfig(ReliableMessageProtocolConfig(3600000 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT, 3600064 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT));
+        .SetMRPConfig(ReliableMessageProtocolConfig(3600000 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
+                                                    3600064 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT));
 QNamePart txtCommissionableNodeParamsLargeEnhancedParts[] = { "D=22",          "VP=555+897",       "CM=2",       "DT=25",
                                                               "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3",
                                                               "CRA=3600000",   "CRI=3600000",      "T=1" };

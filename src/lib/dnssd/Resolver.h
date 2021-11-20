@@ -56,9 +56,12 @@ struct ResolvedNodeData
 
     ReliableMessageProtocolConfig GetMRPConfig() const
     {
-        return ReliableMessageProtocolConfig(
-            GetMrpRetryIntervalIdle().ValueOr(gDefaultMRPConfig.mIdleRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT) >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
-            GetMrpRetryIntervalActive().ValueOr(gDefaultMRPConfig.mActiveRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT) >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT);
+        return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().ValueOr(gDefaultMRPConfig.mIdleRetransTimeoutTick
+                                                                               << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT) >>
+                                                 CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
+                                             GetMrpRetryIntervalActive().ValueOr(gDefaultMRPConfig.mActiveRetransTimeoutTick
+                                                                                 << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT) >>
+                                                 CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT);
     }
     Optional<uint32_t> GetMrpRetryIntervalIdle() const { return mMrpRetryIntervalIdle; }
     Optional<uint32_t> GetMrpRetryIntervalActive() const { return mMrpRetryIntervalActive; }

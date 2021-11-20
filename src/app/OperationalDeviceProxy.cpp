@@ -143,8 +143,7 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
 {
     // Create a UnauthenticatedSession for CASE pairing.
     // Don't use mSecureSession here, because mSecureSession is for encrypted communication.
-    Optional<SessionHandle> session =
-        mInitParams.sessionManager->CreateUnauthenticatedSession(mDeviceAddress, mMRPConfig);
+    Optional<SessionHandle> session = mInitParams.sessionManager->CreateUnauthenticatedSession(mDeviceAddress, mMRPConfig);
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
 
     Messaging::ExchangeContext * exchange = mInitParams.exchangeMgr->NewContext(session.Value(), &mCASESession);
