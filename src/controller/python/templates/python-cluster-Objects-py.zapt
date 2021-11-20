@@ -88,6 +88,7 @@ class {{asUpperCamelCase name}}(Cluster):
 {{#first}}
     class Attributes:
 {{/first}}
+        @dataclass
         class {{asUpperCamelCase label}}(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -103,6 +104,12 @@ class {{asUpperCamelCase name}}(Cluster):
                 return ClusterObjectFieldDescriptor(Type={{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}})
             {{else}}
                 return ClusterObjectFieldDescriptor(Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}})
+            {{/if}}
+
+            {{#if entryType}}
+            value: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = None
+            {{else}}
+            value: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = None
             {{/if}}
 
 {{/zcl_attributes_server}}
