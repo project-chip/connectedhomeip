@@ -62,7 +62,7 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 
 CHIP_ERROR
 Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
-                            const ConcreteAttributePath & aPath)
+                            const ConcreteReadAttributePath & aPath)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -100,6 +100,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
     SuccessOrExit(err = aReportDataBuilder.GetError());
 
     {
+        // TODO: Figure out how AttributePathExpandIterator should handle read
+        // vs write paths.
         ConcreteAttributePath readPath;
 
         // For each path included in the interested path of the read handler...
@@ -129,7 +131,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
 
             TLV::TLVWriter attributeBackup;
             attributeReportIBs.Checkpoint(attributeBackup);
-            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, readPath);
+            ConcreteReadAttributePath pathForRetrieval(readPath);
+            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, pathForRetrieval);
             if (err != CHIP_NO_ERROR)
             {
                 // We met a error during writing reports, one common case is we are running out of buffer, rollback the
