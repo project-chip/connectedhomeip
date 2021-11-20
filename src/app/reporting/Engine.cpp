@@ -106,7 +106,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
              apReadHandler->GetAttributePathExpandIterator()->Next())
         {
-            if (!apReadHandler->IsInitialReport())
+            if (!apReadHandler->IsPriming())
             {
                 bool concretePathDirty = false;
                 // TODO: Optimize this implementation by making the iterator only emit intersected paths.

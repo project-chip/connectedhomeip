@@ -47,7 +47,7 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
-    mInitialReport             = true;
+    mIsPrimingReports          = true;
     MoveToState(HandlerState::Initialized);
     mpDelegate          = apDelegate;
     mSubscriptionId     = 0;
@@ -103,7 +103,7 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
-    mInitialReport             = false;
+    mIsPrimingReports          = false;
     mpDelegate                 = nullptr;
     mHoldReport                = false;
     mDirty                     = false;
@@ -156,7 +156,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
         else if (IsSubscriptionType())
         {
             InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
-            if (IsInitialReport())
+            if (IsPriming())
             {
                 err           = SendSubscribeResponse();
                 mpExchangeCtx = nullptr;
@@ -192,7 +192,7 @@ exit:
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks)
 {
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
-    if (IsInitialReport() || IsChunkedReport())
+    if (IsPriming() || IsChunkedReport())
     {
         mSessionHandle.SetValue(mpExchangeCtx->GetSessionHandle());
     }
@@ -209,7 +209,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
                                                 Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     if (err == CHIP_NO_ERROR)
     {
-        if (IsSubscriptionType() && !IsInitialReport())
+        if (IsSubscriptionType() && !IsPriming())
         {
             err = RefreshSubscribeSyncTimer();
         }
@@ -384,7 +384,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
         SuccessOrExit(err);
         err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
         SuccessOrExit(err);
-        mInitialReport = true;
+        mIsPrimingReports = true;
     }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
@@ -527,7 +527,7 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(RefreshSubscribeSyncTimer());
-    mInitialReport = false;
+    mIsPrimingReports = false;
     MoveToState(HandlerState::GeneratingReports);
     if (mpDelegate != nullptr)
     {

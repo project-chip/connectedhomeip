@@ -129,7 +129,7 @@ public:
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() { return mInteractionType == InteractionType::Subscribe; }
     bool IsChunkedReport() { return mIsChunkedReport; }
-    bool IsInitialReport() { return mInitialReport; }
+    bool IsPriming() { return mIsPrimingReports; }
     bool IsActiveSubscription() const { return mActiveSubscription; }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     void GetSubscriptionId(uint64_t & aSubscriptionId) { aSubscriptionId = mSubscriptionId; }
@@ -193,11 +193,15 @@ private:
     EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
-    bool mInitialReport                        = false;
-    InteractionType mInteractionType           = InteractionType::Read;
-    uint64_t mSubscriptionId                   = 0;
-    uint16_t mMinIntervalFloorSeconds          = 0;
-    uint16_t mMaxIntervalCeilingSeconds        = 0;
+
+    // Tracks whether we're in the initial phase of receiving priming
+    // reports, which is always true for reads and true for subscriptions
+    // prior to receiving a subscribe response.
+    bool mIsPrimingReports              = false;
+    InteractionType mInteractionType    = InteractionType::Read;
+    uint64_t mSubscriptionId            = 0;
+    uint16_t mMinIntervalFloorSeconds   = 0;
+    uint16_t mMaxIntervalCeilingSeconds = 0;
     Optional<SessionHandle> mSessionHandle;
     bool mHoldReport         = false;
     bool mDirty              = false;
