@@ -269,6 +269,7 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
     gUDPManager.Close();
+    gTCPManager.Close();
 
     Shutdown();
 
