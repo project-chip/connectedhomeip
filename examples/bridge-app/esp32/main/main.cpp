@@ -323,8 +323,8 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 
     if (itemChangedMask & Device::kChanged_Name)
     {
-        uint8_t zclName[kNodeLabelSize];
-        ToZclCharString(zclName, dev->GetName(), kNodeLabelSize - 1);
+        uint8_t zclName[kNodeLabelSize+1];
+        ToZclCharString(zclName, dev->GetName(), kNodeLabelSize);
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
                                                ZCL_NODE_LABEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, 0, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
                                                zclName);
