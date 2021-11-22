@@ -81,7 +81,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadListIfSupported(CHIP_ERROR (Diagnost
 
     if ((GetDiagnosticDataProvider().*getter)(faultList) == CHIP_NO_ERROR)
     {
-        err = aEncoder.EncodeList([&faultList](const AttributeValueEncoder::ListEncodeHelper & encoder) -> CHIP_ERROR {
+        err = aEncoder.EncodeList([&faultList](auto encoder) -> CHIP_ERROR {
             for (auto fault : faultList)
             {
                 ReturnErrorOnFailure(encoder.Encode(fault));
@@ -105,7 +105,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEnco
 
     if (ConnectivityMgr().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
     {
-        err = aEncoder.EncodeList([&netifs](const AttributeValueEncoder::ListEncodeHelper & encoder) -> CHIP_ERROR {
+        err = aEncoder.EncodeList([&netifs](auto encoder) -> CHIP_ERROR {
             for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
             {
                 ReturnErrorOnFailure(encoder.Encode(*ifp));
