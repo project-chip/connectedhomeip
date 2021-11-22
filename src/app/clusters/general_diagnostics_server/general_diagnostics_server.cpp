@@ -103,7 +103,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEnco
     CHIP_ERROR err = CHIP_NO_ERROR;
     DeviceLayer::NetworkInterface * netifs;
 
-    if (ConnectivityMgr().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
+    if (DeviceLayer::GetDiagnosticDataProvider().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
     {
         err = aEncoder.EncodeList([&netifs](const TagBoundEncoder & encoder) -> CHIP_ERROR {
             for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
@@ -114,7 +114,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEnco
             return CHIP_NO_ERROR;
         });
 
-        ConnectivityMgr().ReleaseNetworkInterfaces(netifs);
+        DeviceLayer::GetDiagnosticDataProvider().ReleaseNetworkInterfaces(netifs);
     }
     else
     {
