@@ -47,6 +47,8 @@ static_library("Darwin") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "DnssdImpl.cpp",
     "DnssdImpl.h",
     "InetPlatformConfig.h",
