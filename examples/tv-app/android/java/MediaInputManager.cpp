@@ -166,6 +166,7 @@ exit:
 CHIP_ERROR MediaInputManager::GetCurrentInput(chip::app::AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    jint index = -1;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received MediaInputManager::GetInputList");
@@ -173,22 +174,20 @@ CHIP_ERROR MediaInputManager::GetCurrentInput(chip::app::AttributeValueEncoder &
     VerifyOrExit(mGetCurrentInputMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    return aEncoder.EncodeList([this,env](const app::TagBoundEncoder & encoder) -> CHIP_ERROR {
-        jint index = env->CallIntMethod(mMediaInputManagerObject,mGetCurrentInputMethod);
-        if (env->ExceptionCheck())
-        {
-            ChipLogError(AppServer, "Java exception in MediaInputManager::GetCurrentInput");
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+    index = env->CallIntMethod(mMediaInputManagerObject,mGetCurrentInputMethod);
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(AppServer, "Java exception in MediaInputManager::GetCurrentInput");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
-        ChipLogProgress(Zcl, "GetCurrentInput = %d", index);
-
-        //Todo: how to Encode here?
-        // ReturnErrorOnFailure(encoder.Encode(1));
-        return CHIP_NO_ERROR;
-    });
+    ChipLogProgress(Zcl, "GetCurrentInput = %d", index);
+    if (index >= 0)
+    {
+        err = aEncoder.Encode(uint8_t(index));
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
