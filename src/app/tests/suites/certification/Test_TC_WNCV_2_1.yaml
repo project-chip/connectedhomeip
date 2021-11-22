@@ -201,7 +201,6 @@ tests:
       response:
           constraints:
               type: uint16
-              type: uint16
               notValue: 20000
 
     ### Attribute[ 14]: CurrentPositionLiftPercent100ths  ====================
