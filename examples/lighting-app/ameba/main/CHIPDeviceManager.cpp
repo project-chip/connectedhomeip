@@ -66,7 +66,7 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     err = PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    if(CONFIG_NETWORK_LAYER_BLE)
+    if (CONFIG_NETWORK_LAYER_BLE)
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
@@ -87,19 +87,19 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
         printf("StartEventLoopTask() - OK\r\n");
     }
 
- exit:
-     return err;
+exit:
+    return err;
 }
 } // namespace DeviceManager
 } // namespace chip
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
-                                       uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+                                       uint16_t size, uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
 
-    EndpointId endpointId     = attributePath.mEndpointId;
+    EndpointId endpointId   = attributePath.mEndpointId;
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
 
@@ -122,7 +122,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         }
         if (size == 1)
         {
-            //ChipLogProgress(Zcl, "New level: %u ", *value);
+            // ChipLogProgress(Zcl, "New level: %u ", *value);
         }
         else
         {
@@ -145,7 +145,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             hue = *value;
             emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
                                        &saturation, sizeof(uint8_t));
-
         }
         if (attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID)
         {
@@ -168,7 +167,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
     else
     {
-        //ChipLogProgress(Zcl, "Unknown cluster ID: %" PRIx32, clusterId);
+        // ChipLogProgress(Zcl, "Unknown cluster ID: %" PRIx32, clusterId);
         return;
     }
 }
