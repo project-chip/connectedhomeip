@@ -219,7 +219,7 @@ int main(int argc, char * argv[])
     LinuxOTARequestorDriver *requestorUser = new LinuxOTARequestorDriver;
 
     // Connect the two objects
-    requestorCore->setOtaRequestorDriver(requestorUser);
+    requestorCore->SetOtaRequestorDriver(requestorUser);
 
     OTADownloader *downloaderCore = new OTADownloader;
     // TODO: enable    SetDownloaderInstance(downloaderCore);
@@ -227,7 +227,7 @@ int main(int argc, char * argv[])
     LinuxOTAImageProcessor *downloaderUser = new LinuxOTAImageProcessor;
 
     // Connect the two objects
-    downloaderCore->setDelegate(downloaderUser);
+    downloaderCore->SetImageProcessorDelegate(downloaderUser);
 
 
    // If a delay is provided, QueryImage after the timer expires REFACTOR DELETE THIS ??
