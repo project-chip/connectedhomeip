@@ -31,11 +31,6 @@ using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WindowCovering;
 
 
-
-
-
-
-
 inline void OnTriggerEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
     WindowApp::Instance().PostEvent(WindowApp::EventId::WinkOff);
@@ -49,7 +44,8 @@ void OnTriggerEffect(Identify * identify)
 
     if (identify->mCurrentEffectIdentifier == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE)
     {
-        ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d", identify->mEffectVariant);
+        ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
+                        identify->mEffectVariant);
         sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
     }
 
@@ -77,7 +73,6 @@ Identify gIdentify = {
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
     OnTriggerEffect,
 };
-
 
 void WindowApp::Timer::Timeout()
 {
