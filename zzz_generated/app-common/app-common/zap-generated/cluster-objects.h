@@ -7294,6 +7294,21 @@ namespace OtaSoftwareUpdateRequestor {
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ChangeReasonEnum
+enum class ChangeReasonEnum : uint8_t
+{
+    kUnknown         = 0x00,
+    kSuccess         = 0x01,
+    kFailure         = 0x02,
+    kTimeOut         = 0x03,
+    kDelayByProvider = 0x04,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ChangeReasonEnum                     = EmberAfChangeReasonEnum;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAAnnouncementReason
 enum class OTAAnnouncementReason : uint8_t
 {
@@ -7303,6 +7318,25 @@ enum class OTAAnnouncementReason : uint8_t
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OTAAnnouncementReason                = EmberAfOTAAnnouncementReason;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for UpdateStateEnum
+enum class UpdateStateEnum : uint8_t
+{
+    kUnknown              = 0x00,
+    kIdle                 = 0x01,
+    kQuerying             = 0x02,
+    kDelayedOnQuery       = 0x03,
+    kDownloading          = 0x04,
+    kApplying             = 0x05,
+    kDelayedOnApply       = 0x06,
+    kRollingBack          = 0x07,
+    kDelayedOnUserConsent = 0x08,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using UpdateStateEnum                      = EmberAfUpdateStateEnum;
 #endif
 
 namespace Commands {
@@ -7403,6 +7437,128 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace StateTransition {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kPreviousState         = 0,
+    kNewState              = 1,
+    kReason                = 2,
+    kTargetSoftwareVersion = 3,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    UpdateStateEnum previousState;
+    UpdateStateEnum newState;
+    ChangeReasonEnum reason;
+    uint32_t targetSoftwareVersion;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    UpdateStateEnum previousState;
+    UpdateStateEnum newState;
+    ChangeReasonEnum reason;
+    uint32_t targetSoftwareVersion;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace StateTransition
+namespace VersionApplied {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kSoftwareVersion = 0,
+    kProductID       = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    uint32_t softwareVersion;
+    uint16_t productID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    uint32_t softwareVersion;
+    uint16_t productID;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace VersionApplied
+namespace DownloadError {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000002;
+
+enum class Fields
+{
+    kSoftwareVersion = 0,
+    kBytesDownloaded = 1,
+    kProgressPercent = 2,
+    kPlatformCode    = 3,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    uint32_t softwareVersion;
+    uint64_t bytesDownloaded;
+    uint8_t progressPercent;
+    int64_t platformCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    uint32_t softwareVersion;
+    uint64_t bytesDownloaded;
+    uint8_t progressPercent;
+    int64_t platformCode;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace DownloadError
+} // namespace Events
 } // namespace OtaSoftwareUpdateRequestor
 namespace LocalizationConfiguration {
 

@@ -5794,10 +5794,28 @@ class OtaSoftwareUpdateRequestor(Cluster):
     id: typing.ClassVar[int] = 0x002A
 
     class Enums:
+        class ChangeReasonEnum(IntEnum):
+            kUnknown = 0x00
+            kSuccess = 0x01
+            kFailure = 0x02
+            kTimeOut = 0x03
+            kDelayByProvider = 0x04
+
         class OTAAnnouncementReason(IntEnum):
             kSimpleAnnouncement = 0x00
             kUpdateAvailable = 0x01
             kUrgentUpdateAvailable = 0x02
+
+        class UpdateStateEnum(IntEnum):
+            kUnknown = 0x00
+            kIdle = 0x01
+            kQuerying = 0x02
+            kDelayedOnQuery = 0x03
+            kDownloading = 0x04
+            kApplying = 0x05
+            kDelayedOnApply = 0x06
+            kRollingBack = 0x07
+            kDelayedOnUserConsent = 0x08
 
     class Commands:
         @dataclass
@@ -5889,6 +5907,73 @@ class OtaSoftwareUpdateRequestor(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = None
+
+    class Events:
+        @dataclass
+        class StateTransition(ClusterEventDescriptor):
+            cluster_id: typing.ClassVar[int] = 0x002A
+            event_id: typing.ClassVar[int] = 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="previousState", Tag=0, Type=OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum),
+                        ClusterObjectFieldDescriptor(
+                            Label="newState", Tag=1, Type=OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum),
+                        ClusterObjectFieldDescriptor(
+                            Label="reason", Tag=2, Type=OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum),
+                        ClusterObjectFieldDescriptor(
+                            Label="targetSoftwareVersion", Tag=3, Type=uint),
+                    ])
+
+            previousState: 'OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum' = None
+            newState: 'OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum' = None
+            reason: 'OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum' = None
+            targetSoftwareVersion: 'uint' = None
+
+        @dataclass
+        class VersionApplied(ClusterEventDescriptor):
+            cluster_id: typing.ClassVar[int] = 0x002A
+            event_id: typing.ClassVar[int] = 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="softwareVersion", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="productID", Tag=1, Type=uint),
+                    ])
+
+            softwareVersion: 'uint' = None
+            productID: 'uint' = None
+
+        @dataclass
+        class DownloadError(ClusterEventDescriptor):
+            cluster_id: typing.ClassVar[int] = 0x002A
+            event_id: typing.ClassVar[int] = 0x00000002
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="softwareVersion", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="bytesDownloaded", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="progressPercent", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="platformCode", Tag=3, Type=int),
+                    ])
+
+            softwareVersion: 'uint' = None
+            bytesDownloaded: 'uint' = None
+            progressPercent: 'uint' = None
+            platformCode: 'int' = None
 
 
 @dataclass
