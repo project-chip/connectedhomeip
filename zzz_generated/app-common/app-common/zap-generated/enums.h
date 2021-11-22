@@ -259,6 +259,16 @@ enum EmberAfCecedSpecificationVersion : uint8_t
     EMBER_ZCL_CECED_SPECIFICATION_VERSION_COMPLIANT_WITH_V10_CERTIFIED     = 26,
 };
 
+// Enum for ChangeReasonEnum
+enum EmberAfChangeReasonEnum : uint8_t
+{
+    EMBER_ZCL_CHANGE_REASON_ENUM_UNKNOWN           = 0,
+    EMBER_ZCL_CHANGE_REASON_ENUM_SUCCESS           = 1,
+    EMBER_ZCL_CHANGE_REASON_ENUM_FAILURE           = 2,
+    EMBER_ZCL_CHANGE_REASON_ENUM_TIME_OUT          = 3,
+    EMBER_ZCL_CHANGE_REASON_ENUM_DELAY_BY_PROVIDER = 4,
+};
+
 // Enum for ColorControlOptions
 enum EmberAfColorControlOptions : uint8_t
 {
@@ -1595,6 +1605,20 @@ enum EmberAfTvChannelErrorType : uint8_t
 enum EmberAfTvChannelLineupInfoType : uint8_t
 {
     EMBER_ZCL_TV_CHANNEL_LINEUP_INFO_TYPE_MSO = 0,
+};
+
+// Enum for UpdateStateEnum
+enum EmberAfUpdateStateEnum : uint8_t
+{
+    EMBER_ZCL_UPDATE_STATE_ENUM_UNKNOWN                 = 0,
+    EMBER_ZCL_UPDATE_STATE_ENUM_IDLE                    = 1,
+    EMBER_ZCL_UPDATE_STATE_ENUM_QUERYING                = 2,
+    EMBER_ZCL_UPDATE_STATE_ENUM_DELAYED_ON_QUERY        = 3,
+    EMBER_ZCL_UPDATE_STATE_ENUM_DOWNLOADING             = 4,
+    EMBER_ZCL_UPDATE_STATE_ENUM_APPLYING                = 5,
+    EMBER_ZCL_UPDATE_STATE_ENUM_DELAYED_ON_APPLY        = 6,
+    EMBER_ZCL_UPDATE_STATE_ENUM_ROLLING_BACK            = 7,
+    EMBER_ZCL_UPDATE_STATE_ENUM_DELAYED_ON_USER_CONSENT = 8,
 };
 
 // Enum for WarningEvent
