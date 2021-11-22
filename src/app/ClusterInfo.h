@@ -33,6 +33,8 @@ namespace app {
  * so it can be used as a linked list.
  */
 // TODO: The cluster info should be separated into AttributeInfo and EventInfo.
+// Note: The user of ClusterInfo today is ReadHandler and ReportEngine, both of them do not accept Null list index (means list
+//       append operations)
 // Note: The change will happen after #11171 with a better linked list.
 struct ClusterInfo
 {
