@@ -339,6 +339,12 @@ class ChipDeviceController(object):
                 print("Failed in getting the connected device: {}".format(err))
                 raise self._ChipStack.ErrorToException(err)
 
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(self.devCtrl, nodeid, byref(returnDevice)))
+        if res == 0:
+            # TODO: give users more contrtol over whether they want to send this command over a PASE established connection
+            print('Using PASE connection')
+            return returnDevice
+
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
             self.devCtrl, nodeid, _DeviceAvailableFunct(DeviceAvailableCallback)))
         if res != 0:
@@ -593,6 +599,9 @@ class ChipDeviceController(object):
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
                 c_void_p, c_uint64, _DeviceAvailableFunct]
             self._dmLib.pychip_GetConnectedDeviceByNodeId.restype = c_uint32
+
+            self._dmLib.pychip_GetDeviceBeingCommissioned.argtypes = [c_void_p, c_uint64, c_void_p]
+            self._dmLib.pychip_GetDeviceBeingCommissioned.restype = c_uint32
 
             self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.argtypes = [
                 c_void_p]
