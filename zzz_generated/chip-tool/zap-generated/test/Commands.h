@@ -43476,6 +43476,8 @@ private:
         (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
 
+    static void OnDoneCallback_2(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_2(); }
+
     static void OnSuccessCallback_2(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
@@ -43524,7 +43526,6 @@ private:
     void OnSuccessResponse_1(chip::CharSpan location)
     {
         VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("us", 2)));
-
         NextTest();
     }
 
@@ -43560,7 +43561,6 @@ private:
     void OnSuccessResponse_3(chip::CharSpan location)
     {
         VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("", 0)));
-
         NextTest();
     }
 };
