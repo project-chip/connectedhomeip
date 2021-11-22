@@ -252,6 +252,11 @@ exit:
     return err;
 }
 
+FabricIndex WriteHandler::GetAccessingFabricIndex() const
+{
+    return mpExchangeCtx->GetSessionHandle().GetFabricIndex();
+}
+
 const char * WriteHandler::GetStateStr() const
 {
 #if CHIP_DETAIL_LOGGING

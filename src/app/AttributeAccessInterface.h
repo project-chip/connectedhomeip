@@ -105,7 +105,9 @@ private:
 class AttributeValueDecoder
 {
 public:
-    AttributeValueDecoder(TLV::TLVReader & aReader) : mReader(aReader) {}
+    AttributeValueDecoder(TLV::TLVReader & aReader, FabricIndex aAccessingFabricIndex) :
+        mReader(aReader), mAccessingFabricIndex(aAccessingFabricIndex)
+    {}
 
     template <typename T>
     CHIP_ERROR Decode(T & aArg)
@@ -116,9 +118,15 @@ public:
 
     bool TriedDecode() const { return mTriedDecode; }
 
+    /**
+     * The accessing fabric index for this write interaction.
+     */
+    FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
+
 private:
     TLV::TLVReader & mReader;
     bool mTriedDecode = false;
+    const FabricIndex mAccessingFabricIndex;
 };
 
 class AttributeAccessInterface

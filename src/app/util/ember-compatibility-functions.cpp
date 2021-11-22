@@ -594,7 +594,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
     if (attrOverride != nullptr)
     {
-        AttributeValueDecoder valueDecoder(aReader);
+        AttributeValueDecoder valueDecoder(aReader, apWriteHandler->GetAccessingFabricIndex());
         ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
 
         if (valueDecoder.TriedDecode())
