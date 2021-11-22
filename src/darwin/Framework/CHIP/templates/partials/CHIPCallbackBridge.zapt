@@ -35,12 +35,12 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
 )
 {
     {{#if (isStrEqual partial-type "Command")}}
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params new];
     {{#chip_cluster_response_arguments}}
     {
-      id value;
+      {{asObjectiveCMutableClass type parent.parent.name}} * value;
       {{>decode_value target="value" source=(concat "data." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE); return;"}}
-      response[@"{{asStructPropertyName label}}"] = value;
+      response.{{asStructPropertyName label}} = value;
     }
     {{/chip_cluster_response_arguments}}
     DispatchSuccess(context, response);

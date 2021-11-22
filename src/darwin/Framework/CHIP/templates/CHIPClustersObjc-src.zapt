@@ -33,10 +33,10 @@ using namespace chip::app::Clusters;
     have any. }}
 {{#chip_cluster_command_arguments}}
 {{#first}}
-- (void){{asLowerCamelCase parent.name}}WithParams:(CHIP{{asUpperCamelCase parent.parent.name}}Cluster{{asUpperCamelCase parent.name}}Params * {{#unless (commandHasRequiredField parent)}}_Nullable{{/unless}})params completionHandler:(CompletionHandler)completionHandler
+- (void){{asLowerCamelCase parent.name}}WithParams:(CHIP{{asUpperCamelCase parent.parent.name}}Cluster{{asUpperCamelCase parent.name}}Params * {{#unless (commandHasRequiredField parent)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=parent}})completionHandler
 {{/first}}
 {{else}}
-- (void){{asLowerCamelCase parent.name}}WithCompletionHandler:(CompletionHandler)completionHandler
+- (void){{asLowerCamelCase parent.name}}WithCompletionHandler:({{>command_completion_type command=parent}})completionHandler
 {{/chip_cluster_command_arguments}}
 {
     ListFreer listFreer;
@@ -55,7 +55,20 @@ using namespace chip::app::Clusters;
       {{/last}}
     {{/chip_cluster_command_arguments}}
 
-    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
+      {{! For now, don't change the bridge API; instead just use an adapter
+          to invoke our completion handler. This is not great from a
+          type-safety perspective, of course. }}
+      {{#if hasSpecificResponse}}
+        ^(NSError * _Nullable error, id _Nullable value) {
+          completionHandler(value, error);
+        },
+      {{else}}
+        ^(NSError * _Nullable error, id _Nullable value) {
+          completionHandler(error);
+        },
+      {{/if}}
+      ^(Cancelable * success, Cancelable * failure) {
         auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
