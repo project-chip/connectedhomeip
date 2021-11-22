@@ -1587,22 +1587,20 @@ int Test_Teardown(void * inContext)
     return SUCCESS;
 }
 
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestGroupMappings", chip::app::TestGroups::TestGroupMappings),
-    NL_TEST_DEF("TestGroupMappingIterator", chip::app::TestGroups::TestGroupMappingIterator),
-    NL_TEST_DEF("TestGroupStates", chip::app::TestGroups::TestGroupStates),
-    NL_TEST_DEF("TestGroupStateIterator", chip::app::TestGroups::TestGroupStateIterator),
-    NL_TEST_DEF("TestKeySets", chip::app::TestGroups::TestKeySets),
-    NL_TEST_DEF("TestKeySetIterator", chip::app::TestGroups::TestKeySetIterator),
-    // Old Tests
-    NL_TEST_DEF("TestEndpoints", chip::app::TestGroups::TestEndpoints),
-    NL_TEST_DEF("TestEndpointIterator", chip::app::TestGroups::TestEndpointIterator),
-    NL_TEST_DEF("TestStates", chip::app::TestGroups::TestStates),
-    NL_TEST_DEF("TestStateIterator", chip::app::TestGroups::TestStateIterator),
-    NL_TEST_DEF("TestKeys", chip::app::TestGroups::TestKeys),
-    NL_TEST_DEF("TestKeysIterator", chip::app::TestGroups::TestKeysIterator),
-    NL_TEST_DEF("TestPerFabricData", chip::app::TestGroups::TestPerFabricData), NL_TEST_SENTINEL()
-};
+const nlTest sTests[] = { NL_TEST_DEF("TestGroupMappings", chip::app::TestGroups::TestGroupMappings),
+                          NL_TEST_DEF("TestGroupMappingIterator", chip::app::TestGroups::TestGroupMappingIterator),
+                          NL_TEST_DEF("TestGroupStates", chip::app::TestGroups::TestGroupStates),
+                          NL_TEST_DEF("TestGroupStateIterator", chip::app::TestGroups::TestGroupStateIterator),
+                          NL_TEST_DEF("TestKeySets", chip::app::TestGroups::TestKeySets),
+                          NL_TEST_DEF("TestKeySetIterator", chip::app::TestGroups::TestKeySetIterator),
+                          // Old Tests
+                          NL_TEST_DEF("TestEndpoints", chip::app::TestGroups::TestEndpoints),
+                          NL_TEST_DEF("TestEndpointIterator", chip::app::TestGroups::TestEndpointIterator),
+                          NL_TEST_DEF("TestStates", chip::app::TestGroups::TestStates),
+                          NL_TEST_DEF("TestStateIterator", chip::app::TestGroups::TestStateIterator),
+                          NL_TEST_DEF("TestKeys", chip::app::TestGroups::TestKeys),
+                          NL_TEST_DEF("TestKeysIterator", chip::app::TestGroups::TestKeysIterator),
+                          NL_TEST_DEF("TestPerFabricData", chip::app::TestGroups::TestPerFabricData), NL_TEST_SENTINEL() };
 } // namespace
 
 int TestGroups()

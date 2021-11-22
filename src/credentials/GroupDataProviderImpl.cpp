@@ -32,10 +32,10 @@ struct PersistentData
 public:
     virtual ~PersistentData() = default;
 
-    virtual void UpdateKey()                                       = 0;
-    virtual void Clear()                                           = 0;
-    virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const    = 0;
-    virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)        = 0;
+    virtual void UpdateKey()                                    = 0;
+    virtual void Clear()                                        = 0;
+    virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const = 0;
+    virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)     = 0;
 
     CHIP_ERROR Save(chip::PersistentStorageDelegate & storage)
     {
@@ -54,7 +54,7 @@ public:
         // Update storage key
         UpdateKey();
         // Load the serialized data
-        uint16_t size  = static_cast<uint16_t>(sizeof(mBuffer));
+        uint16_t size = static_cast<uint16_t>(sizeof(mBuffer));
         ReturnErrorOnFailure(storage.SyncGetKeyValue(mKey, mBuffer, size));
         // Decode serialized data
         Clear();
