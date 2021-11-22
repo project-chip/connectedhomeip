@@ -117,7 +117,7 @@ class TestDefinition:
                                  name='PAIR')
 
             runner.RunSubprocess(tool_cmd + ['tests', self.run_name, TEST_NODE_ID],
-                                 name='PAIR')
+                                 name='TEST')
         except:
             logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
             runner.capture_delegate.LogContents()
