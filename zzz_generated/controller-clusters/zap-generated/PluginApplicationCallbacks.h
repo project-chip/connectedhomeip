@@ -33,7 +33,7 @@
     MatterBindingPluginClientInitCallback();                                                                                       \
     MatterBooleanStatePluginClientInitCallback();                                                                                  \
     MatterBridgedActionsPluginClientInitCallback();                                                                                \
-    MatterBridgedDeviceBasicPluginClientInitCallback();                                                                            \
+    MatterBridgedDeviceBasicInformationPluginClientInitCallback();                                                                 \
     MatterColorControlPluginClientInitCallback();                                                                                  \
     MatterContentLauncherPluginClientInitCallback();                                                                               \
     MatterDescriptorPluginClientInitCallback();                                                                                    \

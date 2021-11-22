@@ -20,9 +20,6 @@ import("${chip_root}/src/platform/device.gni")
 declare_args() {
   # Enable building tests.
   chip_build_tests = current_os != "freertos"
-
-  # Enable happy tests.
-  chip_enable_happy_tests = false
 }
 
 declare_args() {

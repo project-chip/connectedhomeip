@@ -203,10 +203,22 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mIsChunkedReport = aMoreChunks;
-    MoveToState(HandlerState::AwaitingReportResponse);
-    CHIP_ERROR err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
-                                                Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+    mIsChunkedReport        = aMoreChunks;
+    bool noResponseExpected = IsReadType() && !mIsChunkedReport;
+    if (!noResponseExpected)
+    {
+        MoveToState(HandlerState::AwaitingReportResponse);
+    }
+    CHIP_ERROR err =
+        mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
+                                   Messaging::SendFlags(noResponseExpected ? Messaging::SendMessageFlags::kNone
+                                                                           : Messaging::SendMessageFlags::kExpectResponse));
+    if (err == CHIP_NO_ERROR && noResponseExpected)
+    {
+        mpExchangeCtx = nullptr;
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
+
     if (err == CHIP_NO_ERROR)
     {
         if (IsSubscriptionType() && !IsInitialReport())

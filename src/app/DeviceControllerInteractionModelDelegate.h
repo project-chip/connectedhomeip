@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 
+#include <app/BufferedReadCallback.h>
 #include <app/CommandSender.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/util/error-mapping.h>
@@ -22,6 +23,10 @@ class DeviceControllerInteractionModelDelegate : public chip::app::ReadClient::C
                                                  public chip::app::InteractionModelDelegate
 {
 public:
+    DeviceControllerInteractionModelDelegate() : mBufferedReadAdapter(*this) {}
+
+    app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
+
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
                     const chip::app::StatusIB & aStatus, TLV::TLVReader * aData) override
     {
@@ -72,9 +77,15 @@ public:
                      const app::StatusIB * apStatus) override
     {}
 
-    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath, TLV::TLVReader * apData,
-                         const app::StatusIB & aStatus) override
+    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteDataAttributePath & aPath,
+                         TLV::TLVReader * apData, const app::StatusIB & aStatus) override
     {
+        //
+        // We shouldn't be getting list item operations in the provided path since that should be handled by the buffered read
+        // callback. If we do, that's a bug.
+        //
+        VerifyOrDie(!aPath.IsListItemOperation());
+
         IMReadReportAttributesResponseCallback(apReadClient, &aPath, apData, aStatus.mStatus);
     }
 
@@ -135,6 +146,8 @@ private:
         uint64_t ApplicationId = UINT64_MAX;
         app::AttributePathParams Params;
     };
+
+    app::BufferedReadCallback mBufferedReadAdapter;
     AttributePathTransactionMap mAttributePathTransactionMapPool[CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE];
 };
 

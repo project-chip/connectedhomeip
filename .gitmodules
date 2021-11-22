@@ -46,10 +46,6 @@
 	path = third_party/cirque/repo
 	url = https://github.com/openweave/cirque.git
 	branch  = master
-[submodule "happy"]
-	path = third_party/happy/repo
-	url = https://github.com/openweave/happy.git
-	branch  = master
 [submodule "nanopb"]
 	path = third_party/nanopb/repo
 	url = https://github.com/nanopb/nanopb.git

@@ -143,6 +143,7 @@ public:
     CHIP_ERROR PrepareStatus(const CommandPathParams & aCommandPathParams);
     CHIP_ERROR FinishStatus();
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
+    FabricIndex GetAccessingFabricIndex() const;
 
     /**
      * API for adding a data response.  The template parameter T is generally

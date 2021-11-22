@@ -56,8 +56,8 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BINDING_CLUSTER_ID:
         emberAfBindingClusterInitCallback(endpoint);
         break;
-    case ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID:
-        emberAfBridgedDeviceBasicClusterInitCallback(endpoint);
+    case ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_ID:
+        emberAfBridgedDeviceBasicInformationClusterInitCallback(endpoint);
         break;
     case ZCL_COLOR_CONTROL_CLUSTER_ID:
         emberAfColorControlClusterInitCallback(endpoint);
@@ -221,7 +221,7 @@ void __attribute__((weak)) emberAfBindingClusterInitCallback(EndpointId endpoint
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfBridgedDeviceBasicClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfBridgedDeviceBasicInformationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

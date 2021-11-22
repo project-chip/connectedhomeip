@@ -39,6 +39,10 @@
         {
             "name": "check_test_value",
             "path": "partials/check_test_value.zapt"
+        },
+        {
+            "name": "init_struct_member",
+            "path": "partials/init_struct_member.zapt"
         }
     ],
     "templates": [

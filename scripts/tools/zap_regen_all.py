@@ -40,9 +40,23 @@ def getGlobalTemplatesTargets():
         example_name = example_name[example_name.index('examples/') + 9:]
         example_name = example_name[:example_name.index('/')]
 
-        # Ignore placeholder examples since the zap files there are not intended to
-        # be part of the tree.
+        # Place holder has apps within each build
         if example_name == "placeholder":
+            example_name = filepath.as_posix()
+            example_name = example_name[example_name.index('apps/') + 5:]
+            example_name = example_name[:example_name.index('/')]
+            logging.info("Found example %s (via %s)" %
+                         (example_name, str(filepath)))
+
+            # The name zap-generated is to make includes clear by using
+            # a name like <zap-generated/foo.h>
+            output_dir = os.path.join(
+                'zzz_generated', 'placeholder', example_name, 'zap-generated')
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+            template = 'examples/placeholder/templates/templates.json'
+            targets.append([str(filepath), '-o', output_dir])
+            targets.append([str(filepath), '-o', output_dir, '-t', template])
             continue
 
         logging.info("Found example %s (via %s)" %

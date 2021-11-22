@@ -217,6 +217,11 @@ struct EmberAfAttributeMetadata
      * Check whether this attribute is nullable.
      */
     bool IsNullable() const { return mask & ATTRIBUTE_MASK_NULLABLE; }
+
+    /**
+     * Check whether this attribute is readonly.
+     */
+    bool IsReadOnly() const { return !(mask & ATTRIBUTE_MASK_WRITABLE); }
 };
 
 /**

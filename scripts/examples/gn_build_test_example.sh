@@ -23,7 +23,7 @@ set -e
 CHIP_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"/../..
 
 INPUT_DIR="$CHIP_ROOT/examples/placeholder/linux"
-OUTPUT_DIR="$CHIP_ROOT/out/debug/placeholder"
+OUTPUT_DIR="$CHIP_ROOT/zzz_generated/placeholder"
 
 source "$CHIP_ROOT/scripts/activate.sh"
 
@@ -54,11 +54,11 @@ function runGN() {
     GN_ARGS+="chip_project_config_include_dirs=[\"$INPUT_DIR/apps/$APP_DIR/include\", \"$CHIP_ROOT/config/standalone\"]"
     GN_ARGS+="chip_config_network_layer_ble=false"
 
-    gn gen --check --fail-on-unused-args --root=examples/placeholder/linux "$OUTPUT_DIR" --args="$GN_ARGS"
+    gn gen --check --fail-on-unused-args --root=examples/placeholder/linux "$CHIP_ROOT/out/$APP_DIR" --args="$GN_ARGS"
 }
 
 function runNinja() {
-    ninja -C "$OUTPUT_DIR"
+    ninja -C "$CHIP_ROOT/out/$APP_DIR"
 }
 
 function runAll() {

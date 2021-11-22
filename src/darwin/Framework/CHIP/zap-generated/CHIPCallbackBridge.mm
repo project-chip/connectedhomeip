@@ -1433,11 +1433,6 @@ void CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
     }
     {
         id value;
-        value = [NSNumber numberWithUnsignedChar:data.groupCount];
-        response[@"groupCount"] = value;
-    }
-    {
-        id value;
         value = [[NSMutableArray alloc] init];
         auto iter = data.groupList.begin();
         while (iter.Next()) {

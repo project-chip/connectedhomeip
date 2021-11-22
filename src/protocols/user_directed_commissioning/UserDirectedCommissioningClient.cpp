@@ -25,6 +25,8 @@
 
 #include "UserDirectedCommissioning.h"
 
+#include <unistd.h>
+
 namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {

@@ -2250,8 +2250,7 @@ void CHIPGroupsClusterGetGroupMembershipResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/Integer;)V",
-                                                  &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject capacity;
@@ -2260,17 +2259,11 @@ void CHIPGroupsClusterGetGroupMembershipResponseCallback::CallbackFn(
     std::string capacityCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(capacityClassName.c_str(), capacityCtorSignature.c_str(),
                                                                   dataResponse.capacity, capacity);
-    jobject groupCount;
-
-    std::string groupCountClassName     = "java/lang/Integer";
-    std::string groupCountCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(groupCountClassName.c_str(), groupCountCtorSignature.c_str(),
-                                                                  dataResponse.groupCount, groupCount);
     jobject groupList;
 
     groupList = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, capacity, groupCount, groupList);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, capacity, groupList);
 }
 CHIPGroupsClusterRemoveGroupResponseCallback::CHIPGroupsClusterRemoveGroupResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPGroupsClusterRemoveGroupResponseCallbackType>(CallbackFn, this)

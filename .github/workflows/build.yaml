@@ -91,7 +91,7 @@ jobs:
               timeout-minutes: 20
               run: scripts/run_in_build_env.sh "ninja -C ./out"
     build_linux:
-        name: Build on Linux (gcc_release, clang, mbedtls)
+        name: Build on Linux (gcc_release, clang, mbedtls, simulated)
         timeout-minutes: 60
 
         runs-on: ubuntu-latest
@@ -135,6 +135,14 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
+            - name: Setup and Build Simulated Device
+              timeout-minutes: 5
+              run: |
+                    BUILD_TYPE=simulated
+                    GN_ARGS='chip_tests_zap_config="app1" chip_project_config_include_dirs=["../../examples/placeholder/linux/apps/app1/include", "../../config/standalone"] chip_config_network_layer_ble=false'
+                    CHIP_ROOT_PATH=examples/placeholder/linux
+                    CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
+                    scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
             - name: Setup Build, Run Build and Run Tests
               timeout-minutes: 50
               run: |
@@ -217,7 +225,7 @@ jobs:
                   scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip-0.0-cp37-abi3-linux_x86_64.whl'
                   scripts/run_in_build_env.sh '(cd src/controller/python/test/unit_tests/ && python3 -m unittest -v)'
     build_darwin:
-        name: Build on Darwin (clang, python_lib)
+        name: Build on Darwin (clang, python_lib, simulated)
         timeout-minutes: 90
         runs-on: macos-latest
         if: github.actor != 'restyled-io[bot]'
@@ -251,6 +259,14 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
+            - name: Setup and Build Simulated Device
+              timeout-minutes: 5
+              run: |
+                    BUILD_TYPE=simulated
+                    GN_ARGS='chip_tests_zap_config="app1" chip_project_config_include_dirs=["../../examples/placeholder/linux/apps/app1/include", "../../config/standalone"] chip_config_network_layer_ble=false'
+                    CHIP_ROOT_PATH=examples/placeholder/linux
+                    CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
+                    scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
             - name: Setup Build, Run Build and Run Tests
               timeout-minutes: 75
               # Just go ahead and do the "all" build; on Darwin that's fairly

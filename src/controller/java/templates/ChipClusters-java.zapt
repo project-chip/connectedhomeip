@@ -204,13 +204,16 @@ public class ChipClusters {
       read{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback);
     }
   {{#if isWritableAttribute}}
+  {{! TODO: Lists not supported in attribute writes yet. }}
+  {{#unless isList}}
 
     public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback, {{asJavaBasicType type}} value) {
       write{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, value);
     }
+  {{/unless}}
   {{/if}}
   {{#if isReportableAttribute}}
-
+  {{#unless isList}}
     public void subscribe{{asCamelCased name false}}Attribute(DefaultClusterCallback callback, int minInterval, int maxInterval) {
       subscribe{{asCamelCased name false}}Attribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
@@ -218,6 +221,7 @@ public class ChipClusters {
     public void report{{asCamelCased name false}}Attribute({{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback) {
       report{{asCamelCased name false}}Attribute(chipClusterPtr, callback);
     }
+  {{/unless}}
   {{/if}}
   {{/chip_server_cluster_attributes}}
   {{#chip_server_cluster_attributes}}
@@ -230,14 +234,18 @@ public class ChipClusters {
 {{/if}}
     );
   {{#if isWritableAttribute}}
+  {{! TODO: Lists not supported in attribute writes yet. }}
+  {{#unless isList}}
 
     private native void write{{asUpperCamelCase name}}Attribute(long chipClusterPtr, DefaultClusterCallback callback, {{asJavaBasicType type}} value);
+  {{/unless}}
   {{/if}}
   {{#if isReportableAttribute}}
-
+  {{#unless isList}}
     private native void subscribe{{asCamelCased name false}}Attribute(long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
 
     private native void report{{asCamelCased name false}}Attribute(long chipClusterPtr, {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback);
+  {{/unless}}
   {{/if}}
   {{/chip_server_cluster_attributes}}
   }

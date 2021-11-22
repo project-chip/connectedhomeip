@@ -84,6 +84,8 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
+    FabricIndex GetAccessingFabricIndex() const;
+
 private:
     enum class State
     {

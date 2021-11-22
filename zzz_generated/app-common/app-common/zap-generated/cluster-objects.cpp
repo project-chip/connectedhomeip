@@ -345,7 +345,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupCount)), groupCount));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupList)), groupList));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -362,9 +361,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupCount):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupCount));
-            break;
         case to_underlying(Fields::kGroupList):
             ReturnErrorOnFailure(DataModel::Decode(reader, groupList));
             break;
@@ -384,7 +380,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCapacity)), capacity));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupCount)), groupCount));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupList)), groupList));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -403,9 +398,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
         case to_underlying(Fields::kCapacity):
             ReturnErrorOnFailure(DataModel::Decode(reader, capacity));
-            break;
-        case to_underlying(Fields::kGroupCount):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupCount));
             break;
         case to_underlying(Fields::kGroupList):
             ReturnErrorOnFailure(DataModel::Decode(reader, groupList));
@@ -3728,6 +3720,15 @@ namespace Events {
 } // namespace Events
 
 } // namespace Descriptor
+namespace Acl {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace Acl
 namespace PollControl {
 
 namespace Commands {
@@ -5061,6 +5062,42 @@ namespace Events {
 } // namespace Events
 
 } // namespace OtaSoftwareUpdateRequestor
+namespace LocalizationConfiguration {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace LocalizationConfiguration
+namespace LocalizationTimeFormat {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace LocalizationTimeFormat
+namespace LocalizationUnit {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace LocalizationUnit
+namespace PowerSourceConfiguration {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace PowerSourceConfiguration
 namespace PowerSource {
 
 namespace Commands {
@@ -7141,6 +7178,24 @@ namespace Events {
 } // namespace Events
 
 } // namespace EthernetNetworkDiagnostics
+namespace TimeSynchronization {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace TimeSynchronization
+namespace BridgedDeviceBasicInformation {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Events {
+} // namespace Events
+
+} // namespace BridgedDeviceBasicInformation
 namespace BridgedDeviceBasic {
 
 namespace Commands {
