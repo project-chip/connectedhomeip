@@ -250,14 +250,14 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
                 {
                     // If General Diagnostics cluster is implemented on this endpoint
                     MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                           GeneralDiagnostics::Attributes::GetActiveRadioFaults::Id);
+                                                           GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
                 }
             }
         }
     }
 
     // Get called when the Node detects a network fault has been raised.
-    void OnHardwareFaultsDetected() override
+    void OnNetworkFaultsDetected() override
     {
         ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnHardwareFaultsDetected");
 
@@ -271,7 +271,7 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
                 {
                     // If General Diagnostics cluster is implemented on this endpoint
                     MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                           GeneralDiagnostics::Attributes::GetActiveNetworkFaults::Id);
+                                                           GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
                 }
             }
         }
