@@ -27,7 +27,8 @@ CHIP_ERROR AttributeValueEncoder::EncodeAttributePathIB(AttributePathIB::Builder
     // Encode the list index field if we are encoding a single element in an list.
     if (mCurrentEncodingListIndex != kInvalidListIndex)
     {
-        aAttributePathIBBuilder.ListIndex(mCurrentEncodingListIndex);
+        // The Null ListIndex (append operation)
+        aAttributePathIBBuilder.ListIndex(DataModel::Nullable<ListIndex>());
     }
 
     return aAttributePathIBBuilder.EndOfAttributePathIB().GetError();
