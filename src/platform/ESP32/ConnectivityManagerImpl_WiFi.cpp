@@ -1025,7 +1025,7 @@ uint8_t GetWiFiVersionFromAPRecord(wifi_ap_record_t ap_info)
         return 0;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBssId(ByteSpan& BssId)
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBssId(ByteSpan & BssId)
 {
     wifi_ap_record_t ap_info;
     esp_err_t err;
