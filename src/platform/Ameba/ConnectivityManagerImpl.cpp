@@ -800,19 +800,94 @@ void ConnectivityManagerImpl::DHCPProcess(void)
 
 CHIP_ERROR ConnectivityManagerImpl::_GetWiFiSecurityType(uint8_t & securityType)
 {
+    unsigned int _auth_type;
+    unsigned short _security = 0;
+    rtw_wifi_setting_t setting;
+
+#ifdef CONFIG_PLATFORM_8721D
+    if(wext_get_enc_ext("wlan0", &_security, &setting.key_idx, setting.password) < 0)
+    {
+        securityType = 0;
+    }
+    else
+    {
+        switch(_security){
+        case IW_ENCODE_ALG_NONE:
+            setting.security_type = RTW_SECURITY_OPEN;
+            break;
+        case IW_ENCODE_ALG_WEP:
+            setting.security_type = RTW_SECURITY_WEP_PSK;
+            break;
+        case IW_ENCODE_ALG_TKIP:
+            setting.security_type = RTW_SECURITY_WPA_TKIP_PSK;
+            break;
+        case IW_ENCODE_ALG_CCMP:
+            setting.security_type = RTW_SECURITY_WPA2_AES_PSK;
+            break;
+        default:
+            break;
+        }
+        securityType = setting.security_type;
+    }
+#else
+    wext_get_enc_ext("wlan0", &_security, &setting.key_idx, setting.password);
+    if (wext_get_auth_type("wlan0", &_auth_type) < 0)
+    {
     securityType = 0;
+    }
+    else
+    {
+        switch(_security){
+            case IW_ENCODE_ALG_NONE:
+                setting.security_type = RTW_SECURITY_OPEN;
+                break;
+            case IW_ENCODE_ALG_WEP:
+                setting.security_type = RTW_SECURITY_WEP_PSK;
+                break;
+            case IW_ENCODE_ALG_TKIP:
+                if(_auth_type == WPA_SECURITY)
+                    setting.security_type = RTW_SECURITY_WPA_TKIP_PSK;
+                else if(_auth_type == WPA2_SECURITY)
+                    setting.security_type = RTW_SECURITY_WPA2_TKIP_PSK;
+                break;
+            case IW_ENCODE_ALG_CCMP:
+                if(_auth_type == WPA_SECURITY)
+                    setting.security_type = RTW_SECURITY_WPA_AES_PSK;
+                else if(_auth_type == WPA2_SECURITY)
+                    setting.security_type = RTW_SECURITY_WPA2_AES_PSK;
+                else if(_auth_type == WPA3_SECURITY)
+                    setting.security_type = RTW_SECURITY_WPA3_AES_PSK;
+                break;
+            default:
+                break;
+        }
+        securityType = setting.security_type;
+    }
+#endif
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetWiFiChannelNumber(uint16_t & channelNumber)
 {
+    unsigned char channel;
+
+    if(wext_get_channel("wlan0", &channel) < 0)
     channelNumber = 0;
+    else
+        channelNumber = (uint16_t)channel;
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetWiFiRssi(int8_t & rssi)
 {
+    int _rssi = 0;
+    if(wifi_get_rssi(&_rssi) < 0)
     rssi = 0;
+    else
+        rssi = _rssi;
+
     return CHIP_NO_ERROR;
 }
 
