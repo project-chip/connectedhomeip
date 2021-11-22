@@ -15,26 +15,14 @@
  *   limitations under the License.
  *
  */
+package com.tcl.chip.tvapp;
 
-#include "KeypadInputManager.h"
-#include <app/server/java/AndroidAppServerWrapper.h>
-#include <jni.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/CHIPJNIError.h>
+public class TvApp {
+  public TvApp() {}
 
-#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_tcl_chip_tvapp_TvApp_##METHOD_NAME
+  public native void setKeypadInputManager(KeypadInputManager manager);
 
-jint JNI_OnLoad(JavaVM * jvm, void * reserved)
-{
-    return AndroidAppServerJNI_OnLoad(jvm, reserved);
-}
-
-void JNI_OnUnload(JavaVM * jvm, void * reserved)
-{
-    return AndroidAppServerJNI_OnUnload(jvm, reserved);
-}
-
-JNI_METHOD(void, setKeypadInputManager)(JNIEnv *, jobject, jobject manager)
-{
-    KeypadInputMgr().InitializeWithObjects(manager);
+  static {
+    System.loadLibrary("TvApp");
+  }
 }
