@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # TODO : WindowCovering Test WNCV_2_1 add/complete some Conditional test using the FeatureMap (dynamics Mandatory and Optional attributes)
 
 name: Window Covering [TC-WNCV-2.1] Attributes with server as DUT
@@ -176,8 +175,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
-              maxValue: 10000
+              notValue: 20000
 
     ### Attribute[ 12]: TargetPositionTiltPercent100ths  ====================
     - label: "2: read the RO optional attribute default: TargetPositionTiltPercent100ths"
@@ -203,8 +201,8 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
-              maxValue: 10000
+              type: uint16
+              notValue: 20000
 
     ### Attribute[ 14]: CurrentPositionLiftPercent100ths  ====================
     - label: "2: read the RO optional attribute default: CurrentPositionLiftPercent100ths"
@@ -230,8 +228,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
-              maxValue: 10000
+              notValue: 20000
 
     ### Attribute[ 15]: CurrentPositionTiltPercent100ths  ====================
     - label: "2: read the RO optional attribute default: CurrentPositionTiltPercent100ths"
@@ -257,8 +254,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
-              maxValue: 10000
+              notValue: 20000
 
     ### Attribute[ 16]: InstalledOpenLimitLift  ====================
     - label: "2: read the RO optional attribute default: InstalledOpenLimitLift"
@@ -583,7 +579,7 @@ tests:
       command: "writeAttribute"
       attribute: "CurrentPositionLiftPercentage"
       arguments:
-          value: 50
+          value: 200
       response:
           error: 1
 
@@ -593,8 +589,7 @@ tests:
       response:
           constraints:
               type: uint8
-              minValue: 0
-              maxValue: 100
+              notValue: 200
 
     ### Attribute[  9]: CurrentPositionTiltPercentage  ====================
     - label: "4: read the RO optional attribute default: CurrentPositionTiltPercentage"
@@ -610,7 +605,7 @@ tests:
       command: "writeAttribute"
       attribute: "CurrentPositionTiltPercentage"
       arguments:
-          value: 50
+          value: 200
       response:
           error: 1
 
@@ -620,16 +615,16 @@ tests:
       response:
           constraints:
               type: uint8
-              minValue: 0
-              maxValue: 100
+              notValue: 200
 
 
 
-###################################################
-# FYI Non Tested deprecated attributes
-# 20 VelocityLift
-# 21 AccelerationTimeLift
-# 22 DecelerationTimeLift
-# 24 IntermediateSetpointsLift
-# 25 IntermediateSetpointsTilt
-###################################################
+    ###################################################
+    # FYI Non Tested deprecated attributes
+    # 20 VelocityLift
+    # 21 AccelerationTimeLift
+    # 22 DecelerationTimeLift
+    # 24 IntermediateSetpointsLift
+    # 25 IntermediateSetpointsTilt
+    ###################################################
+

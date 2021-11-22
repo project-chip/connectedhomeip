@@ -19,7 +19,7 @@ config:
     endpoint: 1
 
 tests:
-    ### MANDATORY Attributes
+    ### MANDATORY GLOBAL Attributes
     ### Attribute[0xFFFD]: ClusterRevision =======================================
     - label: "2: read the global attribute: ClusterRevision"
       command: "readAttribute"
@@ -40,14 +40,12 @@ tests:
 
     - label: "3b: reads back global attribute: ClusterRevision"
       command: "readAttribute"
-      attribute: "Type"
+      attribute: "ClusterRevision"
       response:
           constraints:
               type: uint16
               notValue: 201
 
-
-    ### MANDATORY Attributes
     ### Attribute[0xFFFC]: FeatureMap =======================================
     - label: "2: read the global attribute: FeatureMap"
       command: "readAttribute"
@@ -73,3 +71,8 @@ tests:
           constraints:
               type: uint32
               notValue: 32769
+
+
+    ### OPTIONAL GLOBAL Attributes
+    ### None =======================================
+
