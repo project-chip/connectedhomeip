@@ -131,7 +131,7 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHe
             {
                 return CHIP_ERROR_INTERNAL;
             }
-            // TODO #11911
+            // TODO #11911 Update SecureMessageCodec::Encrypt for Group
             ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
 
 #if CHIP_PROGRESS_LOGGING

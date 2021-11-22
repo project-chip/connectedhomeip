@@ -145,7 +145,6 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
 
             // Using endpoint 0 for test purposes
             clusterInfo.mEndpointId = 0;
-            SuccessOrExit(err);
         }
         else
         {

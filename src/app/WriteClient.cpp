@@ -244,12 +244,6 @@ CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::T
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    if ((mpExchangeCtx->IsGroupExchangeContext() && !mpExchangeCtx->IsInitiator()))
-    {
-        err = CHIP_ERROR_INTERNAL;
-        SuccessOrExit(err);
-    }
-
     mpExchangeCtx->SetResponseTimeout(timeout);
 
     // kExpectResponse is ignored by ExchangeContext in case of groupcast
