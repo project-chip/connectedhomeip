@@ -43457,6 +43457,8 @@ private:
         (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_0(chip::to_underlying(status));
     }
 
+    static void OnDoneCallback_0(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_0(); }
+
     static void OnSuccessCallback_0(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_0(); }
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
@@ -43500,7 +43502,7 @@ private:
         locationArgument = chip::Span<const char>("usgarbage: not in length on purpose", 2);
 
         return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_0, OnFailureCallback_0);
+            locationArgument, this, OnSuccessCallback_0, OnFailureCallback_0, OnDoneCallback_0);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
