@@ -71,6 +71,7 @@ using namespace chip::app::Clusters;
 
 {{/if}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
 {{#*inline "callbackParams"}}, minInterval, maxInterval{{#if isAnalog}}, change{{/if}}{{/inline}}
 - (void) subscribe{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval responseHandler:(ResponseHandler)responseHandler
@@ -87,6 +88,7 @@ using namespace chip::app::Clusters;
     }, true);
 }
 
+{{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 

@@ -33,8 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value responseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
 - (void) subscribe{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval responseHandler:(ResponseHandler)responseHandler;
 - (void) report{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler;
+{{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 
