@@ -159,6 +159,12 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     }
 
     {
+        // ExchangeContext for group are supposed to always be Initiator
+        if (IsGroupExchangeContext() && !IsInitiator())
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+
         // Create a new scope for `err`, to avoid shadowing warning previous `err`.
         CHIP_ERROR err = mDispatch->SendMessage(mSession.Value(), mExchangeId, IsInitiator(), GetReliableMessageContext(),
                                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
@@ -445,8 +451,12 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         MessageHandled();
     });
 
-    ReturnErrorOnFailure(
-        mDispatch->OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
+    // TODO : Remove this bypass for group as to perform the MessagePermitted function Issue # 12101
+    if (!IsGroupExchangeContext())
+    {
+        ReturnErrorOnFailure(
+            mDispatch->OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
+    }
 
     if (IsAckPending() && !mDelegate)
     {

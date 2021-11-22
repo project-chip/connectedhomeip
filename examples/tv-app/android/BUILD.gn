@@ -38,8 +38,6 @@ shared_library("jni") {
     "include/content-launcher/ContentLauncherManager.h",
     "include/endpoint-configuration/EndpointConfigurationStorage.cpp",
     "include/endpoint-configuration/EndpointConfigurationStorage.h",
-    "include/keypad-input/KeypadInputManager.cpp",
-    "include/keypad-input/KeypadInputManager.h",
     "include/low-power/LowPowerManager.cpp",
     "include/low-power/LowPowerManager.h",
     "include/media-input/MediaInputManager.cpp",
@@ -52,6 +50,8 @@ shared_library("jni") {
     "include/tv-channel/TvChannelManager.h",
     "include/wake-on-lan/WakeOnLanManager.cpp",
     "include/wake-on-lan/WakeOnLanManager.h",
+    "java/KeypadInputManager.cpp",
+    "java/KeypadInputManager.h",
     "java/TVApp-JNI.cpp",
   ]
 
@@ -82,7 +82,11 @@ android_library("java") {
     "${chip_root}/build/chip/java:shared_cpplib",
   ]
 
-  sources = [ "java/src/com/tcl/tvapp/TvApp.java" ]
+  sources = [
+    "java/src/com/tcl/chip/tvapp/KeypadInputManager.java",
+    "java/src/com/tcl/chip/tvapp/KeypadInputManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/TvApp.java",
+  ]
 
   javac_flags = [ "-Xlint:deprecation" ]
 

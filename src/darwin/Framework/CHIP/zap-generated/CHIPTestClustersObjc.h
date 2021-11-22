@@ -897,6 +897,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributePacketUnicastTxCountWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeCurrentMaxRateWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOverrunCountWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 
 @end

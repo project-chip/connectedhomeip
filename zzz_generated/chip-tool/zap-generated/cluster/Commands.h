@@ -48070,6 +48070,7 @@ private:
 | * PacketUnicastTxCount                                              | 0x000A |
 | * CurrentMaxRate                                                    | 0x000B |
 | * OverrunCount                                                      | 0x000C |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -49212,6 +49213,40 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadWiFiNetworkDiagnosticsFeatureMap : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsFeatureMap()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -52878,6 +52913,7 @@ void registerClusterWiFiNetworkDiagnostics(Commands & commands)
         make_unique<ReportWiFiNetworkDiagnosticsCurrentMaxRate>(),         //
         make_unique<ReadWiFiNetworkDiagnosticsOverrunCount>(),             //
         make_unique<ReportWiFiNetworkDiagnosticsOverrunCount>(),           //
+        make_unique<ReadWiFiNetworkDiagnosticsFeatureMap>(),               //
         make_unique<ReadWiFiNetworkDiagnosticsClusterRevision>(),          //
         make_unique<ReportWiFiNetworkDiagnosticsClusterRevision>(),        //
     };

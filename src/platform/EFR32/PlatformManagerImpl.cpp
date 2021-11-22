@@ -24,6 +24,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/EFR32/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
 
@@ -45,6 +46,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::EFR32Config::Init();
     SuccessOrExit(err);
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
@@ -56,44 +58,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
-}
-
-/*
- * The following Heap stats are compiled values done by the FreeRTOS Heap4 implementation.
- * See /examples/platform/efr32/heap_4_silabs.c
- * It keeps track of the number of calls to allocate and free memory as well as the
- * number of free bytes remaining, but says nothing about fragmentation.
- */
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
-{
-    size_t freeHeapSize = xPortGetFreeHeapSize();
-    currentHeapFree     = static_cast<uint64_t>(freeHeapSize);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
-{
-    // Calculate the Heap used based on Total heap - Free heap
-    int64_t heapUsed = (configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize());
-
-    // Something went wrong, this should not happen
-    VerifyOrReturnError(heapUsed >= 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
-    currentHeapUsed = static_cast<uint64_t>(heapUsed);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
-{
-    // FreeRTOS records the lowest amount of available heap during runtime
-    // currentHeapHighWatermark wants the highest heap usage point so we calculate it here
-    int64_t HighestHeapUsageRecorded = (configTOTAL_HEAP_SIZE - xPortGetMinimumEverFreeHeapSize());
-
-    // Something went wrong, this should not happen
-    VerifyOrReturnError(HighestHeapUsageRecorded >= 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
-    currentHeapHighWatermark = static_cast<uint64_t>(HighestHeapUsageRecorded);
-
-    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

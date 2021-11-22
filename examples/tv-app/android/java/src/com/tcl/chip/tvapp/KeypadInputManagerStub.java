@@ -15,12 +15,18 @@
  *   limitations under the License.
  *
  */
-package com.tcl.tvapp;
+package com.tcl.chip.tvapp;
 
-public class TvApp {
-  public TvApp() {}
+import android.util.Log;
 
-  static {
-    System.loadLibrary("TvApp");
+/** Stub implement of KeypadInputManager, TV manufacture should have there own implements */
+public class KeypadInputManagerStub implements KeypadInputManager {
+
+  private final String TAG = KeypadInputManagerStub.class.getSimpleName();
+
+  @Override
+  public int sendKey(int keyCode) {
+    Log.d(TAG, "sendKey:" + keyCode);
+    return KEY_STATUS_SUCCESS;
   }
 }

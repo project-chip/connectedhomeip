@@ -261,6 +261,12 @@ void WindowAppImpl::DispatchEvent(const WindowApp::Event & event)
         UpdateLEDs();
         UpdateLCD();
         break;
+
+    case EventId::WinkOn:
+    case EventId::WinkOff:
+        mState.isWinking = (EventId::WinkOn == event.mId);
+        UpdateLEDs();
+        break;
     case EventId::ConnectivityStateChanged:
     case EventId::BLEConnectionsChanged:
         UpdateLEDs();
@@ -298,7 +304,11 @@ void WindowAppImpl::UpdateLEDs()
     }
     else
     {
-        if (mState.isThreadProvisioned && mState.isThreadEnabled)
+        if (mState.isWinking)
+        {
+            mStatusLED.Blink(200, 200);
+        }
+        else if (mState.isThreadProvisioned && mState.isThreadEnabled)
         {
             mStatusLED.Blink(950, 50);
         }

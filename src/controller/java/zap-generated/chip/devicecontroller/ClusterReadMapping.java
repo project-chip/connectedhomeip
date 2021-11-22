@@ -5982,6 +5982,18 @@ public class ClusterReadMapping {
     readWiFiNetworkDiagnosticsInteractionInfo.put(
         "readOverrunCountAttribute",
         readWiFiNetworkDiagnosticsOverrunCountAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWiFiNetworkDiagnosticsFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWiFiNetworkDiagnosticsFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readWiFiNetworkDiagnosticsFeatureMapCommandParams);
+    readWiFiNetworkDiagnosticsInteractionInfo.put(
+        "readFeatureMapAttribute", readWiFiNetworkDiagnosticsFeatureMapAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readWiFiNetworkDiagnosticsClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readWiFiNetworkDiagnosticsClusterRevisionAttributeInteractionInfo =

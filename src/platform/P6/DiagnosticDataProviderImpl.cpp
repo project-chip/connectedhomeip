@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,33 +15,26 @@
  *    limitations under the License.
  */
 
-#include "KeypadInputManager.h"
+/**
+ *    @file
+ *          Provides an implementation of the DiagnosticDataProvider object
+ *          for P6 platform.
+ */
 
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <map>
-#include <string>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/DiagnosticDataProvider.h>
+#include <platform/P6/DiagnosticDataProviderImpl.h>
 
-using namespace std;
+namespace chip {
+namespace DeviceLayer {
 
-CHIP_ERROR KeypadInputManager::Init()
+DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // TODO: Store feature map once it is supported
-    map<string, bool> featureMap;
-    featureMap["NV"] = true;
-    featureMap["LK"] = true;
-    featureMap["NK"] = true;
-
-    SuccessOrExit(err);
-exit:
-    return err;
+    static DiagnosticDataProviderImpl sInstance;
+    return sInstance;
 }
 
-EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode)
-{
-    // TODO: Insert code here
-    return EMBER_ZCL_KEYPAD_INPUT_STATUS_SUCCESS;
-}
+} // namespace DeviceLayer
+} // namespace chip
