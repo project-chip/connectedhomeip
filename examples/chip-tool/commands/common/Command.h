@@ -193,6 +193,12 @@ private:
     size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type, bool optional);
     size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, bool optional);
 
+    /**
+     * Add the Argument to our list.  This preserves the property that all
+     * optional arguments come at the end of the list.
+     */
+    size_t AddArgumentToList(Argument && argument);
+
     const char * mName = nullptr;
     std::vector<Argument> mArgs;
 };

@@ -45,9 +45,18 @@ public:
     struct GroupMapping
     {
         // The endpoint to which a GroupId is mapped.
-        EndpointId endpoint;
+        EndpointId endpoint = 0;
         // The GroupId, which, when received in a message will map to the `endpoint`.
-        GroupId group;
+        GroupId group = 0;
+        // Group name
+        CharSpan name;
+
+        GroupMapping() = default;
+        GroupMapping(EndpointId eid, GroupId gid) : endpoint(eid), group(gid) {}
+        GroupMapping(EndpointId eid, GroupId gid, const CharSpan & groupName) : endpoint(eid), group(gid), name(groupName) {}
+        GroupMapping(EndpointId eid, GroupId gid, const char * groupName) :
+            endpoint(eid), group(gid), name(CharSpan(groupName, strnlen(groupName, CHIP_CONFIG_MAX_GROUP_NAME_LENGTH)))
+        {}
 
         bool operator==(const GroupMapping & other) { return this->endpoint == other.endpoint && this->group == other.group; }
     };
@@ -91,7 +100,7 @@ public:
         // Returns the number of entries in total that will be iterated.
         virtual size_t Count() = 0;
         // Returns true if a groupID is found in the iteration.
-        virtual bool Next(GroupId & outGroup) = 0;
+        virtual bool Next(GroupMapping & mapping) = 0;
         // Release the memory allocated by this iterator, if any. Must be called before
         // losing scope of a `GroupMappingIterator *`
         virtual void Release() = 0;
@@ -177,24 +186,49 @@ public:
     virtual void Finish()     = 0;
 
     // Endpoints
-    virtual bool GroupMappingExists(chip::FabricIndex fabric_index, const GroupMapping & mapping)                       = 0;
-    virtual CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping, const char * name) = 0;
-    virtual CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping)                 = 0;
-    virtual CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index)                                           = 0;
-    virtual GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint)            = 0;
+    virtual bool HasGroupNamesSupport()                                                                 = 0;
+    virtual bool GroupMappingExists(chip::FabricIndex fabric_index, const GroupMapping & mapping)       = 0;
+    virtual CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping)    = 0;
+    virtual CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping) = 0;
+    virtual CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint)      = 0;
+    /**
+     *  Returns an iterator that may be used to obtain the GroupMappings for the given endpoint. The number
+     *  of concurrent iterator instances is limited, and must be released using their own Release() method.
+     *  @retval An instance of GroupMappingIterator on success
+     *  @retval nullptr if no iterator instances are available.
+     */
+    virtual GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint) = 0;
 
     // States
-    virtual CHIP_ERROR SetGroupState(size_t state_index, const GroupState & state)  = 0;
-    virtual CHIP_ERROR GetGroupState(size_t state_index, GroupState & state)        = 0;
-    virtual CHIP_ERROR RemoveGroupState(size_t state_index)                         = 0;
-    virtual GroupStateIterator * IterateGroupStates()                               = 0;
+    virtual CHIP_ERROR SetGroupState(size_t state_index, const GroupState & state) = 0;
+    virtual CHIP_ERROR GetGroupState(size_t state_index, GroupState & state)       = 0;
+    virtual CHIP_ERROR RemoveGroupState(size_t state_index)                        = 0;
+    /**
+     *  Returns an iterator that may be used to obtain the GroupStates for all fabrics. The number
+     *  of concurrent iterator instances is limited, and must be released using their own Release() method.
+     *  @retval An instance of GroupStateIterator on success
+     *  @retval nullptr if no iterator instances are available.
+     */
+    virtual GroupStateIterator * IterateGroupStates() = 0;
+    /**
+     *  Returns an iterator that may be used to obtain the GroupStates for the given fabric. The number
+     *  of concurrent iterator instances is limited, and must be released using their own Release() method.
+     *  @retval An instance of GroupStateIterator on success
+     *  @retval nullptr if no iterator instances are available.
+     */
     virtual GroupStateIterator * IterateGroupStates(chip::FabricIndex fabric_index) = 0;
 
     // Keys
     virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, const KeySet & keys) = 0;
     virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, KeySet & keys)       = 0;
     virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index)                   = 0;
-    virtual KeySetIterator * IterateKeySets(chip::FabricIndex fabric_index)                                   = 0;
+    /**
+     *  Returns an iterator that may be used to obtain the KeySets associated with the given fabric. The number
+     *  of concurrent iterator instances is limited, and must be released using their own Release() method.
+     *  @retval An instance of KeySetIterator on success
+     *  @retval nullptr if no iterator instances are available.
+     */
+    virtual KeySetIterator * IterateKeySets(chip::FabricIndex fabric_index) = 0;
 
     // Fabrics
     virtual CHIP_ERROR RemoveFabric(chip::FabricIndex fabric_index) = 0;

@@ -86,6 +86,8 @@ private:
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
+    CHIP_ERROR _GetNetworkInterfaces(NetworkInterface ** netifpp);
+    void _ReleaseNetworkInterfaces(NetworkInterface * netifp);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     using Flags = GenericConnectivityManagerImpl_WiFi::ConnectivityFlags;
     // ===== Members that implement the ConnectivityManager abstract interface.
@@ -113,7 +115,9 @@ private:
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
 
+    CHIP_ERROR _GetWiFiBssId(ByteSpan & BssId);
     CHIP_ERROR _GetWiFiSecurityType(uint8_t & securityType);
+    CHIP_ERROR _GetWiFiVersion(uint8_t & wifiVersion);
     CHIP_ERROR _GetWiFiChannelNumber(uint16_t & channelNumber);
     CHIP_ERROR _GetWiFiRssi(int8_t & rssi);
     CHIP_ERROR _GetWiFiBeaconLostCount(uint32_t & beaconLostCount);
@@ -123,6 +127,7 @@ private:
     CHIP_ERROR _GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount);
     CHIP_ERROR _GetWiFiCurrentMaxRate(uint64_t & currentMaxRate);
     CHIP_ERROR _GetWiFiOverrunCount(uint64_t & overrunCount);
+    CHIP_ERROR _ResetWiFiNetworkDiagnosticsCounts();
 
     // ===== Private members reserved for use by this class only.
 
@@ -134,6 +139,7 @@ private:
     WiFiAPState mWiFiAPState;
     System::Clock::Timeout mWiFiStationReconnectInterval;
     System::Clock::Timeout mWiFiAPIdleTimeout;
+    uint8_t mWiFiMacAddress[kMaxHardwareAddrSize];
     BitFlags<Flags> mFlags;
 
     CHIP_ERROR InitWiFi(void);
@@ -154,7 +160,6 @@ private:
     void OnStationIPv4AddressAvailable(const ip_event_got_ip_t & got_ip);
     void OnStationIPv4AddressLost(void);
     void OnIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
-
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     // ===== Members for internal use by the following friends.

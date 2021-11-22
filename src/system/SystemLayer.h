@@ -37,7 +37,6 @@
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
-#include <system/SystemObject.h>
 #include <system/SystemTimer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

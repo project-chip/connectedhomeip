@@ -204,10 +204,13 @@ public class ChipClusters {
       read{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback);
     }
   {{#if isWritableAttribute}}
+  {{! TODO: Lists not supported in attribute writes yet. }}
+  {{#unless isList}}
 
     public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback, {{asJavaBasicType type}} value) {
       write{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, value);
     }
+  {{/unless}}
   {{/if}}
   {{#if isReportableAttribute}}
 
@@ -230,8 +233,11 @@ public class ChipClusters {
 {{/if}}
     );
   {{#if isWritableAttribute}}
+  {{! TODO: Lists not supported in attribute writes yet. }}
+  {{#unless isList}}
 
     private native void write{{asUpperCamelCase name}}Attribute(long chipClusterPtr, DefaultClusterCallback callback, {{asJavaBasicType type}} value);
+  {{/unless}}
   {{/if}}
   {{#if isReportableAttribute}}
 

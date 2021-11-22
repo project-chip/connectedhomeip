@@ -60,13 +60,11 @@
 @end
 
 @interface CHIPGroupsClusterGetGroupMembershipPayload : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull groupCount;
 @property (strong, nonatomic) NSArray * _Nonnull groupList;
 @end
 
 @interface CHIPGroupsClusterGetGroupMembershipResponsePayload : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull capacity;
-@property (strong, nonatomic) NSNumber * _Nonnull groupCount;
 @property (strong, nonatomic) NSArray * _Nonnull groupList;
 @end
 

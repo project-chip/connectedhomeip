@@ -129,7 +129,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
 
             TLV::TLVWriter attributeBackup;
             attributeReportIBs.Checkpoint(attributeBackup);
-            err = RetrieveClusterData(apReadHandler->GetFabricIndex(), attributeReportIBs, readPath);
+            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, readPath);
             if (err != CHIP_NO_ERROR)
             {
                 // We met a error during writing reports, one common case is we are running out of buffer, rollback the
@@ -324,6 +324,10 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     {
         reportDataBuilder.MoreChunkedMessages(hasMoreChunks);
     }
+    else if (apReadHandler->IsReadType())
+    {
+        reportDataBuilder.SuppressResponse(true);
+    }
 
     reportDataBuilder.EndOfReportDataMessage();
     SuccessOrExit(err = reportDataBuilder.GetError());
@@ -360,6 +364,10 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         apReadHandler->Shutdown(ReadHandler::ShutdownOptions::AbortCurrentExchange);
+    }
+    else if (apReadHandler->IsReadType() && !hasMoreChunks)
+    {
+        apReadHandler->Shutdown();
     }
     return err;
 }

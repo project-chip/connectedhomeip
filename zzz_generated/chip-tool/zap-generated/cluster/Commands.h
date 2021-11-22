@@ -3183,10 +3183,6 @@ static void OnGroupsGetGroupMembershipResponseSuccess(
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("groupCount", 1, data.groupCount);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
         err = LogValue("groupList", 1, data.groupList);
     }
 
@@ -4010,7 +4006,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | Binding                                                             | 0xF000 |
 | BooleanState                                                        | 0x0045 |
 | BridgedActions                                                      | 0x0025 |
-| BridgedDeviceBasic                                                  | 0x0039 |
+| BridgedDeviceBasicInformation                                       | 0x0039 |
 | ColorControl                                                        | 0x0300 |
 | ContentLauncher                                                     | 0x050A |
 | Descriptor                                                          | 0x001D |
@@ -6939,550 +6935,27 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster BridgedDeviceBasic                                          | 0x0039 |
+| Cluster BridgedDeviceBasicInformation                               | 0x0039 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * VendorName                                                        | 0x0001 |
-| * VendorID                                                          | 0x0002 |
-| * ProductName                                                       | 0x0003 |
-| * UserLabel                                                         | 0x0005 |
-| * HardwareVersion                                                   | 0x0007 |
-| * HardwareVersionString                                             | 0x0008 |
-| * SoftwareVersion                                                   | 0x0009 |
-| * SoftwareVersionString                                             | 0x000A |
-| * ManufacturingDate                                                 | 0x000B |
-| * PartNumber                                                        | 0x000C |
-| * ProductURL                                                        | 0x000D |
-| * ProductLabel                                                      | 0x000E |
-| * SerialNumber                                                      | 0x000F |
-| * Reachable                                                         | 0x0011 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
 /*
- * Attribute VendorName
- */
-class ReadBridgedDeviceBasicVendorName : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicVendorName() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "vendor-name");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicVendorName()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeVendorName(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute VendorID
- */
-class ReadBridgedDeviceBasicVendorID : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicVendorID() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "vendor-id");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicVendorID()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeVendorID(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute ProductName
- */
-class ReadBridgedDeviceBasicProductName : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicProductName() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "product-name");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicProductName()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeProductName(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute UserLabel
- */
-class ReadBridgedDeviceBasicUserLabel : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicUserLabel() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "user-label");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicUserLabel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeUserLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-class WriteBridgedDeviceBasicUserLabel : public ModelCommand
-{
-public:
-    WriteBridgedDeviceBasicUserLabel() : ModelCommand("write")
-    {
-        AddArgument("attr-name", "user-label");
-        AddArgument("attr-value", &mValue);
-        ModelCommand::AddArguments();
-    }
-
-    ~WriteBridgedDeviceBasicUserLabel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x01) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.WriteAttributeUserLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::CharSpan mValue;
-};
-
-/*
- * Attribute HardwareVersion
- */
-class ReadBridgedDeviceBasicHardwareVersion : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicHardwareVersion() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "hardware-version");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicHardwareVersion()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeHardwareVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute HardwareVersionString
- */
-class ReadBridgedDeviceBasicHardwareVersionString : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicHardwareVersionString() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "hardware-version-string");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicHardwareVersionString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeHardwareVersionString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute SoftwareVersion
- */
-class ReadBridgedDeviceBasicSoftwareVersion : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicSoftwareVersion() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "software-version");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicSoftwareVersion()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSoftwareVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute SoftwareVersionString
- */
-class ReadBridgedDeviceBasicSoftwareVersionString : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicSoftwareVersionString() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "software-version-string");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicSoftwareVersionString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSoftwareVersionString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute ManufacturingDate
- */
-class ReadBridgedDeviceBasicManufacturingDate : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicManufacturingDate() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "manufacturing-date");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicManufacturingDate()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeManufacturingDate(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute PartNumber
- */
-class ReadBridgedDeviceBasicPartNumber : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicPartNumber() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "part-number");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicPartNumber()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePartNumber(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute ProductURL
- */
-class ReadBridgedDeviceBasicProductURL : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicProductURL() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "product-url");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicProductURL()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeProductURL(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute ProductLabel
- */
-class ReadBridgedDeviceBasicProductLabel : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicProductLabel() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "product-label");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicProductLabel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeProductLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute SerialNumber
- */
-class ReadBridgedDeviceBasicSerialNumber : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicSerialNumber() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "serial-number");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicSerialNumber()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSerialNumber(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute Reachable
- */
-class ReadBridgedDeviceBasicReachable : public ModelCommand
-{
-public:
-    ReadBridgedDeviceBasicReachable() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "reachable");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadBridgedDeviceBasicReachable()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::BridgedDeviceBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeReachable(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
  * Attribute ClusterRevision
  */
-class ReadBridgedDeviceBasicClusterRevision : public ModelCommand
+class ReadBridgedDeviceBasicInformationClusterRevision : public ModelCommand
 {
 public:
-    ReadBridgedDeviceBasicClusterRevision() : ModelCommand("read")
+    ReadBridgedDeviceBasicInformationClusterRevision() : ModelCommand("read")
     {
         AddArgument("attr-name", "cluster-revision");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBridgedDeviceBasicClusterRevision()
+    ~ReadBridgedDeviceBasicInformationClusterRevision()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -7492,7 +6965,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::BridgedDeviceBasicCluster cluster;
+        chip::Controller::BridgedDeviceBasicInformationCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -13591,7 +13064,6 @@ class GroupsGetGroupMembership : public ModelCommand
 public:
     GroupsGetGroupMembership() : ModelCommand("get-group-membership")
     {
-        AddArgument("GroupCount", 0, UINT8_MAX, &mRequest.groupCount);
         // groupList Array parsing is not supported yet
         ModelCommand::AddArguments();
     }
@@ -30703,27 +30175,12 @@ void registerClusterBridgedActions(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterBridgedDeviceBasic(Commands & commands)
+void registerClusterBridgedDeviceBasicInformation(Commands & commands)
 {
-    const char * clusterName = "BridgedDeviceBasic";
+    const char * clusterName = "BridgedDeviceBasicInformation";
 
     commands_list clusterCommands = {
-        make_unique<ReadBridgedDeviceBasicVendorName>(),            //
-        make_unique<ReadBridgedDeviceBasicVendorID>(),              //
-        make_unique<ReadBridgedDeviceBasicProductName>(),           //
-        make_unique<ReadBridgedDeviceBasicUserLabel>(),             //
-        make_unique<WriteBridgedDeviceBasicUserLabel>(),            //
-        make_unique<ReadBridgedDeviceBasicHardwareVersion>(),       //
-        make_unique<ReadBridgedDeviceBasicHardwareVersionString>(), //
-        make_unique<ReadBridgedDeviceBasicSoftwareVersion>(),       //
-        make_unique<ReadBridgedDeviceBasicSoftwareVersionString>(), //
-        make_unique<ReadBridgedDeviceBasicManufacturingDate>(),     //
-        make_unique<ReadBridgedDeviceBasicPartNumber>(),            //
-        make_unique<ReadBridgedDeviceBasicProductURL>(),            //
-        make_unique<ReadBridgedDeviceBasicProductLabel>(),          //
-        make_unique<ReadBridgedDeviceBasicSerialNumber>(),          //
-        make_unique<ReadBridgedDeviceBasicReachable>(),             //
-        make_unique<ReadBridgedDeviceBasicClusterRevision>(),       //
+        make_unique<ReadBridgedDeviceBasicInformationClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -31826,7 +31283,7 @@ void registerClusters(Commands & commands)
     registerClusterBinding(commands);
     registerClusterBooleanState(commands);
     registerClusterBridgedActions(commands);
-    registerClusterBridgedDeviceBasic(commands);
+    registerClusterBridgedDeviceBasicInformation(commands);
     registerClusterColorControl(commands);
     registerClusterContentLauncher(commands);
     registerClusterDescriptor(commands);

@@ -305,7 +305,7 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     {
         if (!readHandler.IsFree() && readHandler.IsSubscriptionType() &&
             readHandler.GetInitiatorNodeId() == apExchangeContext->GetSessionHandle().GetPeerNodeId() &&
-            readHandler.GetFabricIndex() == apExchangeContext->GetSessionHandle().GetFabricIndex())
+            readHandler.GetAccessingFabricIndex() == apExchangeContext->GetSessionHandle().GetFabricIndex())
         {
             bool keepSubscriptions = true;
             System::PacketBufferTLVReader reader;
@@ -376,7 +376,7 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
 
     for (auto & readClient : mReadClients)
     {
-        if (!readClient.IsSubscriptionTypeIdle())
+        if (!readClient.IsSubscriptionIdle())
         {
             continue;
         }

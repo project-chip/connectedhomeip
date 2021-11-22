@@ -64,9 +64,15 @@ class ReadClientCallback : public ReadClient::Callback
 public:
     ReadClientCallback(PyObject * appContext) : mAppContext(appContext) {}
 
-    void OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, TLV::TLVReader * apData,
+    void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const StatusIB & aStatus) override
     {
+        //
+        // We shouldn't be getting list item operations in the provided path since that should be handled by the buffered read
+        // callback. If we do, that's a bug.
+        //
+        VerifyOrDie(!aPath.IsListItemOperation());
+
         uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
         uint32_t size = 0;
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error

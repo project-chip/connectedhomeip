@@ -136,25 +136,10 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("booleanState", writeBooleanStateInteractionInfo);
     Map<String, InteractionInfo> writeBridgedActionsInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("bridgedActions", writeBridgedActionsInteractionInfo);
-    Map<String, InteractionInfo> writeBridgedDeviceBasicInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeBridgedDeviceBasicUserLabelCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedDeviceBasicuserLabelCommandParameterInfo =
-        new CommandParameterInfo("value", String.class);
-    writeBridgedDeviceBasicUserLabelCommandParams.put(
-        "value", bridgedDeviceBasicuserLabelCommandParameterInfo);
-    InteractionInfo writeBridgedDeviceBasicUserLabelAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
-                  .writeUserLabelAttribute(
-                      (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
-            },
-            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeBridgedDeviceBasicUserLabelCommandParams);
-    writeBridgedDeviceBasicInteractionInfo.put(
-        "writeUserLabelAttribute", writeBridgedDeviceBasicUserLabelAttributeInteractionInfo);
-    writeAttributeMap.put("bridgedDeviceBasic", writeBridgedDeviceBasicInteractionInfo);
+    Map<String, InteractionInfo> writeBridgedDeviceBasicInformationInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "bridgedDeviceBasicInformation", writeBridgedDeviceBasicInformationInteractionInfo);
     Map<String, InteractionInfo> writeColorControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeColorControlColorControlOptionsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
