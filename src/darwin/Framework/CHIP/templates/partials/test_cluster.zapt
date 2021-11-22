@@ -19,11 +19,38 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     XCTAssertNotNil(cluster);
 
     {{#if isCommand}}
-    __auto_type * payload = [[CHIP{{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase command}}Payload alloc] init];
-    {{#chip_tests_item_parameters}}
-      {{>test_value target=(concat "payload." (asStructPropertyName label)) definedValue=definedValue cluster=parent.cluster}}
-    {{/chip_tests_item_parameters}}
-    [cluster {{asLowerCamelCase command}}:payload responseHandler:^(NSError * err, NSDictionary * values) {
+      {{! We need a way to easily do something based on whether the command has
+          fields. There are cases when chip_tests_item_parameters has nothing
+          in it even when the command does have fields (e.g. if they are all
+          optional and we are not sending any of them) but the name of our
+          command depends on whether it _could_ have fields. }}
+      {{#*inline "checkForFields"}}
+        {{~#chip_client_clusters}}
+          {{~#if (isStrEqual (asUpperCamelCase name) (asUpperCamelCase ../clusterName))}}
+            {{~#chip_cluster_commands}}
+              {{~#if (isStrEqual (asUpperCamelCase name) (asUpperCamelCase ../../commandName))}}
+                {{~#chip_cluster_command_arguments}}
+                {{~#first}}
+                  {{~../../../textIfFields}}
+                {{/first}}
+                {{else}}
+                  {{~../../../textIfNoFields}}
+                {{/chip_cluster_command_arguments}}
+              {{/if}}
+            {{/chip_cluster_commands}}
+          {{/if}}
+        {{/chip_client_clusters}}
+      {{/inline}}
+      {{> checkForFields clusterName=cluster commandName=command
+          textIfFields=(concat "__auto_type * params = [[CHIP" (asUpperCamelCase cluster) "Cluster" (asUpperCamelCase command) "Params alloc] init];")
+          textIfNoFields=""}}
+      {{#chip_tests_item_parameters}}
+        {{>test_value target=(concat "params." (asStructPropertyName label)) definedValue=definedValue cluster=parent.cluster}}
+      {{/chip_tests_item_parameters}}
+      [cluster {{asLowerCamelCase command}}With
+      {{~> checkForFields clusterName=cluster commandName=command
+           textIfFields="Params:params completionHandler"
+           textIfNoFields="CompletionHandler"}}:^(NSError * err, NSDictionary * values) {
     {{else if isSubscribeAttribute}}
     {{#chip_tests_item_parameters}}
     {{#if (isString type)}}
