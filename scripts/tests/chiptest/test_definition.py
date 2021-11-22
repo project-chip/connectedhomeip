@@ -60,6 +60,7 @@ class ExecutionCapture:
         ))
 
     def LogContents(self):
+        logging.error('================ CAPTURED LOG START ==================')
         for entry in self.captures:
             logging.error('%02d:%02d:%02d.%03d - %-10s: %s',
                           entry.when.hour,
@@ -69,7 +70,7 @@ class ExecutionCapture:
                           entry.source,
                           entry.line
                           )
-        pass
+        logging.error('================ CAPTURED LOG END ====================')
 
 
 @dataclass

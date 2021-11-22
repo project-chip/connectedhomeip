@@ -30,14 +30,16 @@ class LogPipe(threading.Thread):
             and start the thread
             """
         threading.Thread.__init__(self)
+
         self.daemon = False
         self.level = level
         self.fd_read, self.fd_write = os.pipe()
         self.pipeReader = os.fdopen(self.fd_read)
-        self.start()
         self.captured_logs = []
         self.capture_delegate = capture_delegate
         self.name = name
+
+        self.start()
 
     def CapturedLogContains(self, txt: str):
         for l in self.captured_logs:
