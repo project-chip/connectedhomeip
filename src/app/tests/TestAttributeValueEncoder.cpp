@@ -187,7 +187,7 @@ void TestEncodeListOfBools2(nlTestSuite * aSuite, void * aContext)
               0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
               0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
-              0x24, 0x05, 0x00, // Tag (05) Value (1 byte uint) 0x00 (List index)
+              0x34, 0x05, // Tag (05) Null
             0x18, // End of container
             0x29, 0x02, // Tag (02) Value True (Attribute Value)
             0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
@@ -200,13 +200,39 @@ void TestEncodeListOfBools2(nlTestSuite * aSuite, void * aContext)
               0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
               0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
-              0x24, 0x05, 0x01, // Tag (05) Value (1 byte uint) 0x01 (List index)
+              0x34, 0x05, // Tag (05) Null
             0x18, // End of container
             0x28, 0x02, // Tag (02) Value False (Attribute Value)
             0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
           0x18, // End of container
         0x18, // End of container
 
+        // clang-format on
+    };
+    VERIFY_BUFFER_STATE(aSuite, test, expected);
+}
+
+void TestEncodeEmptyList(nlTestSuite * aSuite, void * aContext)
+{
+    TestSetup test(aSuite);
+    CHIP_ERROR err = test.encoder.EncodeList([](auto encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    const uint8_t expected[] = {
+        // clang-format off
+        0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
+        0x15, // Start anonymous struct
+          0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+            0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
+              0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
+              0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
+              0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
+            0x18, // End of container
+            // Intended empty array
+            0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
+            0x18, // End of container
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
+          0x18, // End of container
+        0x18, // End of container
         // clang-format on
     };
     VERIFY_BUFFER_STATE(aSuite, test, expected);
@@ -254,7 +280,7 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
                   0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
                   0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
                   0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
-                  0x24, 0x05, 0x00, // Tag (05) Value (1 byte uint) 0x00 (List index)
+                  0x34, 0x05, // Tag (05) Null
                 0x18, // End of container
                 0x29, 0x02, // Tag (02) Value True (Attribute Value)
                 0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
@@ -278,7 +304,7 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
                   0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
                   0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
                   0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
-                  0x24, 0x05, 0x01, // Tag (05) Value (1 byte uint) 0x00 (List index)
+                  0x34, 0x05, // Tag (05) Null
                 0x18, // End of container
                 0x28, 0x02, // Tag (02) Value False (Attribute Value)
                 0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
@@ -295,11 +321,13 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
 } // anonymous namespace
 
 namespace {
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestEncodeNothing", TestEncodeNothing),           NL_TEST_DEF("TestEncodeBool", TestEncodeBool),
-    NL_TEST_DEF("TestEncodeListOfBools1", TestEncodeListOfBools1), NL_TEST_DEF("TestEncodeListOfBools2", TestEncodeListOfBools2),
-    NL_TEST_DEF("TestEncodeListChunking", TestEncodeListChunking), NL_TEST_SENTINEL()
-};
+const nlTest sTests[] = { NL_TEST_DEF("TestEncodeNothing", TestEncodeNothing),
+                          NL_TEST_DEF("TestEncodeBool", TestEncodeBool),
+                          NL_TEST_DEF("TestEncodeEmptyList", TestEncodeEmptyList),
+                          NL_TEST_DEF("TestEncodeListOfBools1", TestEncodeListOfBools1),
+                          NL_TEST_DEF("TestEncodeListOfBools2", TestEncodeListOfBools2),
+                          NL_TEST_DEF("TestEncodeListChunking", TestEncodeListChunking),
+                          NL_TEST_SENTINEL() };
 }
 
 int TestAttributeValueEncoder()
