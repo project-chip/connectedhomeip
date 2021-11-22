@@ -2987,6 +2987,7 @@ public:
                                                  Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeCurrentMaxRate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeOverrunCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeBssid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                        uint16_t minInterval, uint16_t maxInterval);

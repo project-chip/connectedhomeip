@@ -29578,6 +29578,25 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterWiFiNetworkDiagnosticsReadAttributeFeatureMapWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"WiFiNetworkDiagnosticsReadAttributeFeatureMapWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"WiFiNetworkDiagnostics FeatureMap Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterWiFiNetworkDiagnosticsReadAttributeClusterRevisionWithResponseHandler
 {
     XCTestExpectation * expectation =
