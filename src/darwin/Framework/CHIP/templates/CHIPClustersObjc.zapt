@@ -9,11 +9,8 @@
 #include <CHIP/CHIPCluster.h>
 #include <CHIP/CHIPCommandPayloadsObjc.h>
 
-/* We need to sort out our handlers, but for now just define both
-   ResponseHandler and CompletionHandler to look the same way.  Eventually we
-   will want different completion handlers for different return types. */
-typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
-typedef void (^CompletionHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
+typedef void (^ResponseHandler)(NSError * _Nullable error, id _Nullable values);
+typedef void (^StatusCompletion)(NSError * _Nullable error);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -32,10 +29,10 @@ NS_ASSUME_NONNULL_BEGIN
     have any. }}
 {{#chip_cluster_command_arguments}}
 {{#first}}
-- (void){{asLowerCamelCase parent.name}}WithParams:(CHIP{{asUpperCamelCase parent.parent.name}}Cluster{{asUpperCamelCase parent.name}}Params * {{#unless (commandHasRequiredField parent)}}_Nullable{{/unless}})params completionHandler:(CompletionHandler)completionHandler;
+- (void){{asLowerCamelCase parent.name}}WithParams:(CHIP{{asUpperCamelCase parent.parent.name}}Cluster{{asUpperCamelCase parent.name}}Params * {{#unless (commandHasRequiredField parent)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=parent}})completionHandler;
 {{/first}}
 {{else}}
-- (void){{asLowerCamelCase parent.name}}WithCompletionHandler:(CompletionHandler)completionHandler;
+- (void){{asLowerCamelCase parent.name}}WithCompletionHandler:({{>command_completion_type command=parent}})completionHandler;
 {{/chip_cluster_command_arguments}}
 {{/chip_cluster_commands}}
 

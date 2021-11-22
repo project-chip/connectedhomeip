@@ -2,14 +2,11 @@
   if ({{source}}.HasValue()) {
     {{>decode_value target=target source=(concat source ".Value()") cluster=cluster errorCode=errorCode isOptional=false}}
   } else {
-    {{! TODO: Should just use nil here, but we're still adding these to
-        dictionaries for now }}
-    {{target}} = [NSNull null];
+    {{target}} = nil;
   }
 {{else if isNullable}}
   if ({{source}}.IsNull()) {
-    {{! Again, should use nil here }}
-    {{target}} = [NSNull null];
+    {{target}} = nil;
   } else {
     {{>decode_value target=target source=(concat source ".Value()") cluster=cluster errorCode=errorCode isNullable=false}}
   }

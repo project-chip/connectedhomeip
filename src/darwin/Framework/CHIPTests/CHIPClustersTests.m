@@ -157,7 +157,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster testWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster testWithCompletionHandler:^(NSError * err) {
         NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
@@ -169,7 +169,7 @@ CHIPDevice * GetConnectedDevice()
 
     // Reuse the CHIPCluster Object for multiple times.
 
-    [cluster testWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster testWithCompletionHandler:^(NSError * err) {
         NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
@@ -4125,7 +4125,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -4175,7 +4175,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHueWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(NSError * _Nullable err) {
                    NSLog(@"Move to hue shortest distance command Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
@@ -4201,7 +4201,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHueWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(NSError * _Nullable err) {
                    NSLog(@"Move to hue longest distance command Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
@@ -4227,7 +4227,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHueWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(NSError * _Nullable err) {
                    NSLog(@"Move to hue up command Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
@@ -4253,7 +4253,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHueWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(NSError * _Nullable err) {
                    NSLog(@"Move to hue down command Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
@@ -4272,7 +4272,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -4316,7 +4316,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -4365,7 +4365,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveHueWithParams:params
-             completionHandler:^(NSError * err, NSDictionary * values) {
+             completionHandler:^(NSError * _Nullable err) {
                  NSLog(@"Move hue up command Error: %@", err);
 
                  XCTAssertEqual(err.code, 0);
@@ -4390,7 +4390,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveHueWithParams:params
-             completionHandler:^(NSError * err, NSDictionary * values) {
+             completionHandler:^(NSError * _Nullable err) {
                  NSLog(@"Move hue stop command Error: %@", err);
 
                  XCTAssertEqual(err.code, 0);
@@ -4415,7 +4415,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveHueWithParams:params
-             completionHandler:^(NSError * err, NSDictionary * values) {
+             completionHandler:^(NSError * _Nullable err) {
                  NSLog(@"Move hue down command Error: %@", err);
 
                  XCTAssertEqual(err.code, 0);
@@ -4440,7 +4440,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveHueWithParams:params
-             completionHandler:^(NSError * err, NSDictionary * values) {
+             completionHandler:^(NSError * _Nullable err) {
                  NSLog(@"Move hue stop command Error: %@", err);
 
                  XCTAssertEqual(err.code, 0);
@@ -4459,7 +4459,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -4503,7 +4503,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -4553,7 +4553,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepHueWithParams:params
-             completionHandler:^(NSError * err, NSDictionary * values) {
+             completionHandler:^(NSError * _Nullable err) {
                  NSLog(@"Step hue up command Error: %@", err);
 
                  XCTAssertEqual(err.code, 0);
@@ -4579,7 +4579,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepHueWithParams:params
-             completionHandler:^(NSError * err, NSDictionary * values) {
+             completionHandler:^(NSError * _Nullable err) {
                  NSLog(@"Step hue down command Error: %@", err);
 
                  XCTAssertEqual(err.code, 0);
@@ -4598,7 +4598,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -4642,7 +4642,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -4691,7 +4691,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToSaturationWithParams:params
-                      completionHandler:^(NSError * err, NSDictionary * values) {
+                      completionHandler:^(NSError * _Nullable err) {
                           NSLog(@"Move to saturation command Error: %@", err);
 
                           XCTAssertEqual(err.code, 0);
@@ -4710,7 +4710,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -4754,7 +4754,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -4803,7 +4803,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveSaturationWithParams:params
-                    completionHandler:^(NSError * err, NSDictionary * values) {
+                    completionHandler:^(NSError * _Nullable err) {
                         NSLog(@"Move saturation up command Error: %@", err);
 
                         XCTAssertEqual(err.code, 0);
@@ -4828,7 +4828,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveSaturationWithParams:params
-                    completionHandler:^(NSError * err, NSDictionary * values) {
+                    completionHandler:^(NSError * _Nullable err) {
                         NSLog(@"Move saturation down command Error: %@", err);
 
                         XCTAssertEqual(err.code, 0);
@@ -4847,7 +4847,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -4891,7 +4891,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -4941,7 +4941,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepSaturationWithParams:params
-                    completionHandler:^(NSError * err, NSDictionary * values) {
+                    completionHandler:^(NSError * _Nullable err) {
                         NSLog(@"Step saturation up command Error: %@", err);
 
                         XCTAssertEqual(err.code, 0);
@@ -4967,7 +4967,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepSaturationWithParams:params
-                    completionHandler:^(NSError * err, NSDictionary * values) {
+                    completionHandler:^(NSError * _Nullable err) {
                         NSLog(@"Step saturation down command Error: %@", err);
 
                         XCTAssertEqual(err.code, 0);
@@ -4986,7 +4986,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5030,7 +5030,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5080,7 +5080,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHueAndSaturationWithParams:params
-                            completionHandler:^(NSError * err, NSDictionary * values) {
+                            completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Move To current hue and saturation command Error: %@", err);
 
                                 XCTAssertEqual(err.code, 0);
@@ -5099,7 +5099,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5143,7 +5143,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5193,7 +5193,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToColorWithParams:params
-                 completionHandler:^(NSError * err, NSDictionary * values) {
+                 completionHandler:^(NSError * _Nullable err) {
                      NSLog(@"Move to Color command Error: %@", err);
 
                      XCTAssertEqual(err.code, 0);
@@ -5212,7 +5212,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5256,7 +5256,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5305,7 +5305,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveColorWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(NSError * _Nullable err) {
                    NSLog(@"Move Color command Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
@@ -5328,7 +5328,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stopMoveStepWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Stop Move Step command Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -5347,7 +5347,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5391,7 +5391,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5441,7 +5441,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepColorWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(NSError * _Nullable err) {
                    NSLog(@"Step Color command Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
@@ -5460,7 +5460,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5504,7 +5504,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5553,7 +5553,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToColorTemperatureWithParams:params
-                            completionHandler:^(NSError * err, NSDictionary * values) {
+                            completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Move To Color Temperature command Error: %@", err);
 
                                 XCTAssertEqual(err.code, 0);
@@ -5572,7 +5572,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5616,7 +5616,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5667,7 +5667,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveColorTemperatureWithParams:params
-                          completionHandler:^(NSError * err, NSDictionary * values) {
+                          completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Move up color temperature command Error: %@", err);
 
                               XCTAssertEqual(err.code, 0);
@@ -5694,7 +5694,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveColorTemperatureWithParams:params
-                          completionHandler:^(NSError * err, NSDictionary * values) {
+                          completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Stop Color Temperature command Error: %@", err);
 
                               XCTAssertEqual(err.code, 0);
@@ -5721,7 +5721,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveColorTemperatureWithParams:params
-                          completionHandler:^(NSError * err, NSDictionary * values) {
+                          completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Move down color temperature command Error: %@", err);
 
                               XCTAssertEqual(err.code, 0);
@@ -5740,7 +5740,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5784,7 +5784,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5836,7 +5836,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepColorTemperatureWithParams:params
-                          completionHandler:^(NSError * err, NSDictionary * values) {
+                          completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Step up color temperature command Error: %@", err);
 
                               XCTAssertEqual(err.code, 0);
@@ -5864,7 +5864,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepColorTemperatureWithParams:params
-                          completionHandler:^(NSError * err, NSDictionary * values) {
+                          completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Step down color temperature command Error: %@", err);
 
                               XCTAssertEqual(err.code, 0);
@@ -5883,7 +5883,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5927,7 +5927,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -5977,7 +5977,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveToHueWithParams:params
-                       completionHandler:^(NSError * err, NSDictionary * values) {
+                       completionHandler:^(NSError * _Nullable err) {
                            NSLog(@"Enhanced Move To Hue command Error: %@", err);
 
                            XCTAssertEqual(err.code, 0);
@@ -6021,7 +6021,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -6065,7 +6065,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -6114,7 +6114,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveHueWithParams:params
-                     completionHandler:^(NSError * err, NSDictionary * values) {
+                     completionHandler:^(NSError * _Nullable err) {
                          NSLog(@"Enhanced Move Hue Down command  Error: %@", err);
 
                          XCTAssertEqual(err.code, 0);
@@ -6139,7 +6139,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveHueWithParams:params
-                     completionHandler:^(NSError * err, NSDictionary * values) {
+                     completionHandler:^(NSError * _Nullable err) {
                          NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
 
                          XCTAssertEqual(err.code, 0);
@@ -6164,7 +6164,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveHueWithParams:params
-                     completionHandler:^(NSError * err, NSDictionary * values) {
+                     completionHandler:^(NSError * _Nullable err) {
                          NSLog(@"Enhanced Move Hue Up command Error: %@", err);
 
                          XCTAssertEqual(err.code, 0);
@@ -6189,7 +6189,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveHueWithParams:params
-                     completionHandler:^(NSError * err, NSDictionary * values) {
+                     completionHandler:^(NSError * _Nullable err) {
                          NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
 
                          XCTAssertEqual(err.code, 0);
@@ -6208,7 +6208,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -6252,7 +6252,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -6302,7 +6302,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedStepHueWithParams:params
-                     completionHandler:^(NSError * err, NSDictionary * values) {
+                     completionHandler:^(NSError * _Nullable err) {
                          NSLog(@"Enhanced Step Hue Up command Error: %@", err);
 
                          XCTAssertEqual(err.code, 0);
@@ -6328,7 +6328,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedStepHueWithParams:params
-                     completionHandler:^(NSError * err, NSDictionary * values) {
+                     completionHandler:^(NSError * _Nullable err) {
                          NSLog(@"Enhanced Step Hue Down command Error: %@", err);
 
                          XCTAssertEqual(err.code, 0);
@@ -6347,7 +6347,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -6391,7 +6391,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -6441,7 +6441,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveToHueAndSaturationWithParams:params
-                                    completionHandler:^(NSError * err, NSDictionary * values) {
+                                    completionHandler:^(NSError * _Nullable err) {
                                         NSLog(@"Enhanced move to hue and saturation command Error: %@", err);
 
                                         XCTAssertEqual(err.code, 0);
@@ -6460,7 +6460,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -6504,7 +6504,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -6556,7 +6556,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Set all Attributs Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -6680,7 +6680,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -6733,7 +6733,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Set direction and time while running Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -6809,7 +6809,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Set direction while running Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -6852,7 +6852,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light that we turned on Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -6896,7 +6896,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Precondition : Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -6948,7 +6948,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7000,7 +7000,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7052,7 +7052,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7104,7 +7104,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7156,7 +7156,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7208,7 +7208,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7260,7 +7260,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7312,7 +7312,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7364,7 +7364,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7414,7 +7414,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveToHueWithParams:params
-                       completionHandler:^(NSError * err, NSDictionary * values) {
+                       completionHandler:^(NSError * _Nullable err) {
                            NSLog(@"Enhanced Move To Hue command 10 Error: %@", err);
 
                            XCTAssertEqual(err.code, 0);
@@ -7474,7 +7474,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7526,7 +7526,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7578,7 +7578,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7630,7 +7630,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7682,7 +7682,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7734,7 +7734,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7777,7 +7777,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn Off light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -7797,7 +7797,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Precondition: Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -7850,7 +7850,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -7974,7 +7974,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -8026,7 +8026,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -8078,7 +8078,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -8121,7 +8121,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -8141,7 +8141,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Precondition: Turn on light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -8194,7 +8194,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -8318,7 +8318,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -8370,7 +8370,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -8422,7 +8422,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Color Loop Set Command - Start Color Loop Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -8465,7 +8465,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn off light for color control tests Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -9314,7 +9314,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:1];
     params.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveToLevelWithParams:params
-                 completionHandler:^(NSError * err, NSDictionary * values) {
+                 completionHandler:^(NSError * _Nullable err) {
                      NSLog(@"sends a Move to level command Error: %@", err);
 
                      XCTAssertEqual(err.code, 0);
@@ -9371,7 +9371,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:1];
     params.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveToLevelWithParams:params
-                 completionHandler:^(NSError * err, NSDictionary * values) {
+                 completionHandler:^(NSError * _Nullable err) {
                      NSLog(@"sends a Move to level command Error: %@", err);
 
                      XCTAssertEqual(err.code, 0);
@@ -9452,7 +9452,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:1];
     params.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveToLevelWithParams:params
-                 completionHandler:^(NSError * err, NSDictionary * values) {
+                 completionHandler:^(NSError * _Nullable err) {
                      NSLog(@"sends a Move to level command Error: %@", err);
 
                      XCTAssertEqual(err.code, 0);
@@ -9509,7 +9509,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:1];
     params.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveToLevelWithParams:params
-                 completionHandler:^(NSError * err, NSDictionary * values) {
+                 completionHandler:^(NSError * _Nullable err) {
                      NSLog(@"Reset level to 0 Error: %@", err);
 
                      XCTAssertEqual(err.code, 0);
@@ -9591,7 +9591,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:1];
     params.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveWithParams:params
-          completionHandler:^(NSError * err, NSDictionary * values) {
+          completionHandler:^(NSError * _Nullable err) {
               NSLog(@"sends a Move up command Error: %@", err);
 
               XCTAssertEqual(err.code, 0);
@@ -9672,7 +9672,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:1];
     params.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveWithParams:params
-          completionHandler:^(NSError * err, NSDictionary * values) {
+          completionHandler:^(NSError * _Nullable err) {
               NSLog(@"sends a Move down command Error: %@", err);
 
               XCTAssertEqual(err.code, 0);
@@ -9775,7 +9775,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:1];
     params.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveWithParams:params
-          completionHandler:^(NSError * err, NSDictionary * values) {
+          completionHandler:^(NSError * _Nullable err) {
               NSLog(@"sends a Move up command at default move rate Error: %@", err);
 
               XCTAssertEqual(err.code, 0);
@@ -9824,7 +9824,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Sending on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -9850,7 +9850,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:0];
     params.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepWithParams:params
-          completionHandler:^(NSError * err, NSDictionary * values) {
+          completionHandler:^(NSError * _Nullable err) {
               NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
 
               XCTAssertEqual(err.code, 0);
@@ -9908,7 +9908,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:0];
     params.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepWithParams:params
-          completionHandler:^(NSError * err, NSDictionary * values) {
+          completionHandler:^(NSError * _Nullable err) {
               NSLog(@"Sends step down command to DUT Error: %@", err);
 
               XCTAssertEqual(err.code, 0);
@@ -9966,7 +9966,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:0];
     params.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepWithParams:params
-          completionHandler:^(NSError * err, NSDictionary * values) {
+          completionHandler:^(NSError * _Nullable err) {
               NSLog(@"Sends a Step up command Error: %@", err);
 
               XCTAssertEqual(err.code, 0);
@@ -10017,7 +10017,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Sending off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -10037,7 +10037,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Sending on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -10063,7 +10063,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:0];
     params.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepWithParams:params
-          completionHandler:^(NSError * err, NSDictionary * values) {
+          completionHandler:^(NSError * _Nullable err) {
               NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
 
               XCTAssertEqual(err.code, 0);
@@ -10096,7 +10096,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:1];
     params.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveWithParams:params
-          completionHandler:^(NSError * err, NSDictionary * values) {
+          completionHandler:^(NSError * _Nullable err) {
               NSLog(@"Sends a move up command to DUT Error: %@", err);
 
               XCTAssertEqual(err.code, 0);
@@ -10127,7 +10127,7 @@ CHIPDevice * GetConnectedDevice()
     params.optionMask = [NSNumber numberWithUnsignedChar:0];
     params.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stopWithParams:params
-          completionHandler:^(NSError * err, NSDictionary * values) {
+          completionHandler:^(NSError * _Nullable err) {
               NSLog(@"Sends stop command to DUT Error: %@", err);
 
               XCTAssertEqual(err.code, 0);
@@ -10146,7 +10146,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Sending off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -10192,7 +10192,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestLowPower * cluster = [[CHIPTestLowPower alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster sleepWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster sleepWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Put the device into low power mode Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -10934,7 +10934,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -10977,7 +10977,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11020,7 +11020,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11063,7 +11063,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster toggleWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster toggleWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Toggle Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11107,7 +11107,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster toggleWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster toggleWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Toggle Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11151,7 +11151,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11194,7 +11194,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11238,7 +11238,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11313,7 +11313,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11388,7 +11388,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11511,7 +11511,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11602,7 +11602,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11741,7 +11741,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11808,7 +11808,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -11923,7 +11923,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send On Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -12014,7 +12014,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -12225,7 +12225,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Off Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -16959,7 +16959,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster downOrCloseWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"1a: TH adjusts the the DUT to a non-open position Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -16978,7 +16978,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster upOrOpenWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster upOrOpenWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"2a: TH sends UpOrOpen command to DUT Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -17022,7 +17022,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster upOrOpenWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster upOrOpenWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"1a: TH adjusts the the DUT to a non-closed position Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -17041,7 +17041,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster downOrCloseWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"2a: TH sends DownOrClose command to DUT Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -17085,7 +17085,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster upOrOpenWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster upOrOpenWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"1a: TH adjusts the the DUT to a non-open position Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -17104,7 +17104,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster stopMotionWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster stopMotionWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"2a: TH sends StopMotion command to DUT Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -17148,7 +17148,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster testWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster testWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Test Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -17167,7 +17167,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster testNotHandledWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster testNotHandledWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Test Not Handled Command Error: %@", err);
 
         XCTAssertEqual(err.code, 1);
@@ -17185,13 +17185,14 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster testSpecificWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster testSpecificWithCompletionHandler:^(
+        CHIPTestClusterClusterTestSpecificResponseParams * _Nullable values, NSError * _Nullable err) {
         NSLog(@"Send Test Specific Command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
         {
-            id actualValue = values[@"returnValue"];
+            id actualValue = values.returnValue;
             XCTAssertEqual([actualValue unsignedCharValue], 7);
         }
 
@@ -17213,13 +17214,14 @@ CHIPDevice * GetConnectedDevice()
     params.arg1 = [NSNumber numberWithUnsignedChar:3];
     params.arg2 = [NSNumber numberWithUnsignedChar:17];
     [cluster testAddArgumentsWithParams:params
-                      completionHandler:^(NSError * err, NSDictionary * values) {
+                      completionHandler:^(
+                          CHIPTestClusterClusterTestAddArgumentsResponseParams * _Nullable values, NSError * _Nullable err) {
                           NSLog(@"Send Test Add Arguments Command Error: %@", err);
 
                           XCTAssertEqual(err.code, 0);
 
                           {
-                              id actualValue = values[@"returnValue"];
+                              id actualValue = values.returnValue;
                               XCTAssertEqual([actualValue unsignedCharValue], 20);
                           }
 
@@ -17241,7 +17243,8 @@ CHIPDevice * GetConnectedDevice()
     params.arg1 = [NSNumber numberWithUnsignedChar:250];
     params.arg2 = [NSNumber numberWithUnsignedChar:6];
     [cluster testAddArgumentsWithParams:params
-                      completionHandler:^(NSError * err, NSDictionary * values) {
+                      completionHandler:^(
+                          CHIPTestClusterClusterTestAddArgumentsResponseParams * _Nullable values, NSError * _Nullable err) {
                           NSLog(@"Send failing Test Add Arguments Command Error: %@", err);
 
                           XCTAssertEqual(err.code, 1);
@@ -19944,7 +19947,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:200 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster testWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster testWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Test Command to unsupported endpoint Error: %@", err);
 
         XCTAssertEqual(err.code, 1);
@@ -20057,23 +20060,24 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPTestClusterClusterTestEnumsRequestParams alloc] init];
     params.arg1 = [NSNumber numberWithUnsignedShort:20003U];
     params.arg2 = [NSNumber numberWithUnsignedChar:101];
-    [cluster testEnumsRequestWithParams:params
-                      completionHandler:^(NSError * err, NSDictionary * values) {
-                          NSLog(@"Send a command with a vendor_id and enum Error: %@", err);
+    [cluster
+        testEnumsRequestWithParams:params
+                 completionHandler:^(CHIPTestClusterClusterTestEnumsResponseParams * _Nullable values, NSError * _Nullable err) {
+                     NSLog(@"Send a command with a vendor_id and enum Error: %@", err);
 
-                          XCTAssertEqual(err.code, 0);
+                     XCTAssertEqual(err.code, 0);
 
-                          {
-                              id actualValue = values[@"arg1"];
-                              XCTAssertEqual([actualValue unsignedShortValue], 20003U);
-                          }
-                          {
-                              id actualValue = values[@"arg2"];
-                              XCTAssertEqual([actualValue unsignedCharValue], 101);
-                          }
+                     {
+                         id actualValue = values.arg1;
+                         XCTAssertEqual([actualValue unsignedShortValue], 20003U);
+                     }
+                     {
+                         id actualValue = values.arg2;
+                         XCTAssertEqual([actualValue unsignedCharValue], 101);
+                     }
 
-                          [expectation fulfill];
-                      }];
+                     [expectation fulfill];
+                 }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -20097,13 +20101,14 @@ CHIPDevice * GetConnectedDevice()
     ((CHIPTestClusterClusterSimpleStruct *) params.arg1).f = [NSNumber numberWithUnsignedChar:1];
 
     [cluster testStructArgumentRequestWithParams:params
-                               completionHandler:^(NSError * err, NSDictionary * values) {
+                               completionHandler:^(
+                                   CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
                                    NSLog(@"Send Test Command With Struct Argument and arg1.b is true Error: %@", err);
 
                                    XCTAssertEqual(err.code, 0);
 
                                    {
-                                       id actualValue = values[@"value"];
+                                       id actualValue = values.value;
                                        XCTAssertEqual([actualValue boolValue], true);
                                    }
 
@@ -20132,13 +20137,14 @@ CHIPDevice * GetConnectedDevice()
     ((CHIPTestClusterClusterSimpleStruct *) params.arg1).f = [NSNumber numberWithUnsignedChar:1];
 
     [cluster testStructArgumentRequestWithParams:params
-                               completionHandler:^(NSError * err, NSDictionary * values) {
+                               completionHandler:^(
+                                   CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
                                    NSLog(@"Send Test Command With Struct Argument and arg1.b is false Error: %@", err);
 
                                    XCTAssertEqual(err.code, 0);
 
                                    {
-                                       id actualValue = values[@"value"];
+                                       id actualValue = values.value;
                                        XCTAssertEqual([actualValue boolValue], false);
                                    }
 
@@ -20172,13 +20178,14 @@ CHIPDevice * GetConnectedDevice()
         params.arg1 = temp;
     }
     [cluster testListInt8UArgumentRequestWithParams:params
-                                  completionHandler:^(NSError * err, NSDictionary * values) {
+                                  completionHandler:^(
+                                      CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
                                       NSLog(@"Send Test Command With List of INT8U and none of them is set to 0 Error: %@", err);
 
                                       XCTAssertEqual(err.code, 0);
 
                                       {
-                                          id actualValue = values[@"value"];
+                                          id actualValue = values.value;
                                           XCTAssertEqual([actualValue boolValue], true);
                                       }
 
@@ -20213,13 +20220,14 @@ CHIPDevice * GetConnectedDevice()
         params.arg1 = temp;
     }
     [cluster testListInt8UArgumentRequestWithParams:params
-                                  completionHandler:^(NSError * err, NSDictionary * values) {
+                                  completionHandler:^(
+                                      CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
                                       NSLog(@"Send Test Command With List of INT8U and one of them is set to 0 Error: %@", err);
 
                                       XCTAssertEqual(err.code, 0);
 
                                       {
-                                          id actualValue = values[@"value"];
+                                          id actualValue = values.value;
                                           XCTAssertEqual([actualValue boolValue], false);
                                       }
 
@@ -20252,13 +20260,14 @@ CHIPDevice * GetConnectedDevice()
         params.arg1 = temp;
     }
     [cluster testListInt8UReverseRequestWithParams:params
-                                 completionHandler:^(NSError * err, NSDictionary * values) {
+                                 completionHandler:^(CHIPTestClusterClusterTestListInt8UReverseResponseParams * _Nullable values,
+                                     NSError * _Nullable err) {
                                      NSLog(@"Send Test Command With List of INT8U and get it reversed Error: %@", err);
 
                                      XCTAssertEqual(err.code, 0);
 
                                      {
-                                         id actualValue = values[@"arg1"];
+                                         id actualValue = values.arg1;
                                          XCTAssertEqual([actualValue count], 9);
                                          XCTAssertEqual([actualValue[0] unsignedCharValue], 9);
                                          XCTAssertEqual([actualValue[1] unsignedCharValue], 8);
@@ -20292,13 +20301,14 @@ CHIPDevice * GetConnectedDevice()
         params.arg1 = temp;
     }
     [cluster testListInt8UReverseRequestWithParams:params
-                                 completionHandler:^(NSError * err, NSDictionary * values) {
+                                 completionHandler:^(CHIPTestClusterClusterTestListInt8UReverseResponseParams * _Nullable values,
+                                     NSError * _Nullable err) {
                                      NSLog(@"Send Test Command With empty List of INT8U and get an empty list back Error: %@", err);
 
                                      XCTAssertEqual(err.code, 0);
 
                                      {
-                                         id actualValue = values[@"arg1"];
+                                         id actualValue = values.arg1;
                                          XCTAssertEqual([actualValue count], 0);
                                      }
 
@@ -20340,7 +20350,8 @@ CHIPDevice * GetConnectedDevice()
     }
     [cluster
         testListStructArgumentRequestWithParams:params
-                              completionHandler:^(NSError * err, NSDictionary * values) {
+                              completionHandler:^(
+                                  CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
                                   NSLog(
                                       @"Send Test Command With List of Struct Argument and arg1.b of first item is true Error: %@",
                                       err);
@@ -20348,7 +20359,7 @@ CHIPDevice * GetConnectedDevice()
                                   XCTAssertEqual(err.code, 0);
 
                                   {
-                                      id actualValue = values[@"value"];
+                                      id actualValue = values.value;
                                       XCTAssertEqual([actualValue boolValue], true);
                                   }
 
@@ -20390,7 +20401,8 @@ CHIPDevice * GetConnectedDevice()
     }
     [cluster
         testListStructArgumentRequestWithParams:params
-                              completionHandler:^(NSError * err, NSDictionary * values) {
+                              completionHandler:^(
+                                  CHIPTestClusterClusterBooleanResponseParams * _Nullable values, NSError * _Nullable err) {
                                   NSLog(
                                       @"Send Test Command With List of Struct Argument and arg1.b of first item is false Error: %@",
                                       err);
@@ -20398,7 +20410,7 @@ CHIPDevice * GetConnectedDevice()
                                   XCTAssertEqual(err.code, 0);
 
                                   {
-                                      id actualValue = values[@"value"];
+                                      id actualValue = values.value;
                                       XCTAssertEqual([actualValue boolValue], false);
                                   }
 
@@ -20419,26 +20431,27 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPTestClusterClusterTestNullableOptionalRequestParams alloc] init];
     params.arg1 = [NSNumber numberWithUnsignedChar:5];
     [cluster testNullableOptionalRequestWithParams:params
-                                 completionHandler:^(NSError * err, NSDictionary * values) {
+                                 completionHandler:^(CHIPTestClusterClusterTestNullableOptionalResponseParams * _Nullable values,
+                                     NSError * _Nullable err) {
                                      NSLog(@"Send Test Command with optional arg set. Error: %@", err);
 
                                      XCTAssertEqual(err.code, 0);
 
                                      {
-                                         id actualValue = values[@"wasPresent"];
+                                         id actualValue = values.wasPresent;
                                          XCTAssertEqual([actualValue boolValue], true);
                                      }
                                      {
-                                         id actualValue = values[@"wasNull"];
+                                         id actualValue = values.wasNull;
                                          XCTAssertEqual([actualValue boolValue], false);
                                      }
                                      {
-                                         id actualValue = values[@"value"];
+                                         id actualValue = values.value;
                                          XCTAssertEqual([actualValue unsignedCharValue], 5);
                                      }
                                      {
-                                         id actualValue = values[@"originalValue"];
-                                         XCTAssertFalse([actualValue isKindOfClass:[NSNull class]]);
+                                         id actualValue = values.originalValue;
+                                         XCTAssertFalse(actualValue == nil);
                                          XCTAssertEqual([actualValue unsignedCharValue], 5);
                                      }
 
@@ -20458,13 +20471,14 @@ CHIPDevice * GetConnectedDevice()
 
     __auto_type * params = [[CHIPTestClusterClusterTestNullableOptionalRequestParams alloc] init];
     [cluster testNullableOptionalRequestWithParams:params
-                                 completionHandler:^(NSError * err, NSDictionary * values) {
+                                 completionHandler:^(CHIPTestClusterClusterTestNullableOptionalResponseParams * _Nullable values,
+                                     NSError * _Nullable err) {
                                      NSLog(@"Send Test Command without its optional arg. Error: %@", err);
 
                                      XCTAssertEqual(err.code, 0);
 
                                      {
-                                         id actualValue = values[@"wasPresent"];
+                                         id actualValue = values.wasPresent;
                                          XCTAssertEqual([actualValue boolValue], false);
                                      }
 
@@ -20801,17 +20815,17 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:0U];
     [cluster viewGroupWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 0 (invalid) Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
 
                    {
-                       id actualValue = values[@"status"];
+                       id actualValue = values.status;
                        XCTAssertEqual([actualValue unsignedCharValue], 135);
                    }
                    {
-                       id actualValue = values[@"groupId"];
+                       id actualValue = values.groupId;
                        XCTAssertEqual([actualValue unsignedShortValue], 0U);
                    }
 
@@ -20832,17 +20846,17 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:1U];
     [cluster viewGroupWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 1 (not found) Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
 
                    {
-                       id actualValue = values[@"status"];
+                       id actualValue = values.status;
                        XCTAssertEqual([actualValue unsignedCharValue], 139);
                    }
                    {
-                       id actualValue = values[@"groupId"];
+                       id actualValue = values.groupId;
                        XCTAssertEqual([actualValue unsignedShortValue], 1U);
                    }
 
@@ -20864,17 +20878,17 @@ CHIPDevice * GetConnectedDevice()
     params.groupId = [NSNumber numberWithUnsignedShort:1U];
     params.groupName = @"Group #1";
     [cluster addGroupWithParams:params
-              completionHandler:^(NSError * err, NSDictionary * values) {
+              completionHandler:^(CHIPGroupsClusterAddGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                   NSLog(@"Add Group 1 (new) Error: %@", err);
 
                   XCTAssertEqual(err.code, 0);
 
                   {
-                      id actualValue = values[@"status"];
+                      id actualValue = values.status;
                       XCTAssertEqual([actualValue unsignedCharValue], 0);
                   }
                   {
-                      id actualValue = values[@"groupId"];
+                      id actualValue = values.groupId;
                       XCTAssertEqual([actualValue unsignedShortValue], 1U);
                   }
 
@@ -20895,21 +20909,21 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:1U];
     [cluster viewGroupWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 1 (new) Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
 
                    {
-                       id actualValue = values[@"status"];
+                       id actualValue = values.status;
                        XCTAssertEqual([actualValue unsignedCharValue], 0);
                    }
                    {
-                       id actualValue = values[@"groupId"];
+                       id actualValue = values.groupId;
                        XCTAssertEqual([actualValue unsignedShortValue], 1U);
                    }
                    {
-                       id actualValue = values[@"groupName"];
+                       id actualValue = values.groupName;
                        XCTAssertTrue([actualValue isEqualToString:@"Group #1"]);
                    }
 
@@ -20930,17 +20944,17 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:4369U];
     [cluster viewGroupWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 2 (not found) Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
 
                    {
-                       id actualValue = values[@"status"];
+                       id actualValue = values.status;
                        XCTAssertEqual([actualValue unsignedCharValue], 139);
                    }
                    {
-                       id actualValue = values[@"groupId"];
+                       id actualValue = values.groupId;
                        XCTAssertEqual([actualValue unsignedShortValue], 4369U);
                    }
 
@@ -20961,17 +20975,17 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:32767U];
     [cluster viewGroupWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 3 (not found) Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
 
                    {
-                       id actualValue = values[@"status"];
+                       id actualValue = values.status;
                        XCTAssertEqual([actualValue unsignedCharValue], 139);
                    }
                    {
-                       id actualValue = values[@"groupId"];
+                       id actualValue = values.groupId;
                        XCTAssertEqual([actualValue unsignedShortValue], 32767U);
                    }
 
@@ -20992,21 +21006,21 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:1U];
     [cluster viewGroupWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 1 (existing) Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
 
                    {
-                       id actualValue = values[@"status"];
+                       id actualValue = values.status;
                        XCTAssertEqual([actualValue unsignedCharValue], 0);
                    }
                    {
-                       id actualValue = values[@"groupId"];
+                       id actualValue = values.groupId;
                        XCTAssertEqual([actualValue unsignedShortValue], 1U);
                    }
                    {
-                       id actualValue = values[@"groupName"];
+                       id actualValue = values.groupName;
                        XCTAssertTrue([actualValue isEqualToString:@"Group #1"]);
                    }
 
@@ -21027,17 +21041,17 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterRemoveGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:0U];
     [cluster removeGroupWithParams:params
-                 completionHandler:^(NSError * err, NSDictionary * values) {
+                 completionHandler:^(CHIPGroupsClusterRemoveGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                      NSLog(@"Remove Group 0 (invalid) Error: %@", err);
 
                      XCTAssertEqual(err.code, 0);
 
                      {
-                         id actualValue = values[@"status"];
+                         id actualValue = values.status;
                          XCTAssertEqual([actualValue unsignedCharValue], 135);
                      }
                      {
-                         id actualValue = values[@"groupId"];
+                         id actualValue = values.groupId;
                          XCTAssertEqual([actualValue unsignedShortValue], 0U);
                      }
 
@@ -21058,17 +21072,17 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterRemoveGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:4U];
     [cluster removeGroupWithParams:params
-                 completionHandler:^(NSError * err, NSDictionary * values) {
+                 completionHandler:^(CHIPGroupsClusterRemoveGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                      NSLog(@"Remove Group 4 (not found) Error: %@", err);
 
                      XCTAssertEqual(err.code, 0);
 
                      {
-                         id actualValue = values[@"status"];
+                         id actualValue = values.status;
                          XCTAssertEqual([actualValue unsignedCharValue], 139);
                      }
                      {
-                         id actualValue = values[@"groupId"];
+                         id actualValue = values.groupId;
                          XCTAssertEqual([actualValue unsignedShortValue], 4U);
                      }
 
@@ -21089,21 +21103,21 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:1U];
     [cluster viewGroupWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 1 (not removed) Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
 
                    {
-                       id actualValue = values[@"status"];
+                       id actualValue = values.status;
                        XCTAssertEqual([actualValue unsignedCharValue], 0);
                    }
                    {
-                       id actualValue = values[@"groupId"];
+                       id actualValue = values.groupId;
                        XCTAssertEqual([actualValue unsignedShortValue], 1U);
                    }
                    {
-                       id actualValue = values[@"groupName"];
+                       id actualValue = values.groupName;
                        XCTAssertTrue([actualValue isEqualToString:@"Group #1"]);
                    }
 
@@ -21124,17 +21138,17 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:4369U];
     [cluster viewGroupWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 2 (removed) Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
 
                    {
-                       id actualValue = values[@"status"];
+                       id actualValue = values.status;
                        XCTAssertEqual([actualValue unsignedCharValue], 139);
                    }
                    {
-                       id actualValue = values[@"groupId"];
+                       id actualValue = values.groupId;
                        XCTAssertEqual([actualValue unsignedShortValue], 4369U);
                    }
 
@@ -21152,7 +21166,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster removeAllGroupsWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster removeAllGroupsWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Remove All Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -21174,17 +21188,17 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:1U];
     [cluster viewGroupWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 1 (removed) Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
 
                    {
-                       id actualValue = values[@"status"];
+                       id actualValue = values.status;
                        XCTAssertEqual([actualValue unsignedCharValue], 139);
                    }
                    {
-                       id actualValue = values[@"groupId"];
+                       id actualValue = values.groupId;
                        XCTAssertEqual([actualValue unsignedShortValue], 1U);
                    }
 
@@ -21205,17 +21219,17 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:4369U];
     [cluster viewGroupWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 2 (still removed) Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
 
                    {
-                       id actualValue = values[@"status"];
+                       id actualValue = values.status;
                        XCTAssertEqual([actualValue unsignedCharValue], 139);
                    }
                    {
-                       id actualValue = values[@"groupId"];
+                       id actualValue = values.groupId;
                        XCTAssertEqual([actualValue unsignedShortValue], 4369U);
                    }
 
@@ -21236,17 +21250,17 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
     params.groupId = [NSNumber numberWithUnsignedShort:32767U];
     [cluster viewGroupWithParams:params
-               completionHandler:^(NSError * err, NSDictionary * values) {
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
                    NSLog(@"View Group 3 (removed) Error: %@", err);
 
                    XCTAssertEqual(err.code, 0);
 
                    {
-                       id actualValue = values[@"status"];
+                       id actualValue = values.status;
                        XCTAssertEqual([actualValue unsignedCharValue], 139);
                    }
                    {
-                       id actualValue = values[@"groupId"];
+                       id actualValue = values.groupId;
                        XCTAssertEqual([actualValue unsignedShortValue], 32767U);
                    }
 
@@ -21268,7 +21282,7 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPIdentifyClusterIdentifyParams alloc] init];
     params.identifyTime = [NSNumber numberWithUnsignedShort:0U];
     [cluster identifyWithParams:params
-              completionHandler:^(NSError * err, NSDictionary * values) {
+              completionHandler:^(NSError * _Nullable err) {
                   NSLog(@"Send Identify command and expect success response Error: %@", err);
 
                   XCTAssertEqual(err.code, 0);
@@ -21526,7 +21540,7 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPModeSelectClusterChangeToModeParams alloc] init];
     params.newMode = [NSNumber numberWithUnsignedChar:4];
     [cluster changeToModeWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Change to Supported Mode Error: %@", err);
 
                       XCTAssertEqual(err.code, 0);
@@ -21572,7 +21586,7 @@ CHIPDevice * GetConnectedDevice()
     __auto_type * params = [[CHIPModeSelectClusterChangeToModeParams alloc] init];
     params.newMode = [NSNumber numberWithUnsignedChar:2];
     [cluster changeToModeWithParams:params
-                  completionHandler:^(NSError * err, NSDictionary * values) {
+                  completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Change to Unsupported Mode Error: %@", err);
 
                       XCTAssertEqual(err.code, 1);
@@ -21760,7 +21774,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Set OnOff Attribute to false Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -21824,7 +21838,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster onWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn On the light to see attribute change Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
@@ -21867,7 +21881,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster offWithCompletionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Turn Off the light to see attribute change Error: %@", err);
 
         XCTAssertEqual(err.code, 0);

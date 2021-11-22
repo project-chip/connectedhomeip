@@ -353,7 +353,12 @@
 
                 [cluster
                     updateFabricLabelWithParams:params
-                              completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                              completionHandler:^(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable response,
+                                  NSError * _Nullable error) {
+                                  // TODO: UpdateFabricLabel can return errors
+                                  // via the NOCResponse response, but that
+                                  // seems like a spec bug that should be fixed
+                                  // in the spec.
                                   dispatch_async(dispatch_get_main_queue(), ^{
                                       if (error) {
                                           NSLog(@"Got back error trying to updateFabricLabel %@", error);
@@ -365,7 +370,7 @@
                                                          isError:YES];
                                           });
                                       } else {
-                                          NSLog(@"Successfully updated the label: %@", values);
+                                          NSLog(@"Successfully updated the label: %@", response);
                                           dispatch_async(dispatch_get_main_queue(), ^{
                                               self->_updateFabricLabelTextField.text = @"";
                                               [self
