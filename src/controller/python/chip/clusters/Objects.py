@@ -5309,7 +5309,7 @@ class Basic(Cluster):
             value: 'uint' = None
 
         @dataclass
-        class UserLabel(ClusterAttributeDescriptor):
+        class NodeLabel(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0028
@@ -5515,6 +5515,22 @@ class Basic(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class UniqueID(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0028
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0012
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[str])
+
+            value: 'typing.Optional[str]' = None
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):

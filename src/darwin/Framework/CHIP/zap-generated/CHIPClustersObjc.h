@@ -163,8 +163,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductIDWithResponseHandler:(ResponseHandler)responseHandler;
 
-- (void)readAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeUserLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNodeLabelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNodeLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeLocationWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLocationWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
@@ -191,6 +191,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeLocalConfigDisabledWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeUniqueIDWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 

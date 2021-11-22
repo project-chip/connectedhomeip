@@ -582,7 +582,7 @@ JNI_METHOD(void, BasicCluster, mfgSpecificPing)(JNIEnv * env, jobject self, jlon
     onFailure.release();
 }
 
-JNI_METHOD(void, BasicCluster, writeUserLabelAttribute)
+JNI_METHOD(void, BasicCluster, writeNodeLabelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
 {
     chip::DeviceLayer::StackLock lock;
@@ -605,7 +605,7 @@ JNI_METHOD(void, BasicCluster, writeUserLabelAttribute)
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     JniUtfString valueStr(env, value);
-    err = cppCluster->WriteAttributeUserLabel(onSuccess->Cancel(), onFailure->Cancel(),
+    err = cppCluster->WriteAttributeNodeLabel(onSuccess->Cancel(), onFailure->Cancel(),
                                               chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
     VerifyOrReturn(
         err == CHIP_NO_ERROR,

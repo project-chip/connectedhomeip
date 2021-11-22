@@ -51,9 +51,9 @@ tests:
       wait: "readAttribute"
       attribute: "ProductID"
 
-    - label: "Query User Label"
+    - label: "Query Node Label"
       wait: "readAttribute"
-      attribute: "UserLabel"
+      attribute: "NodeLabel"
 
     - label: "Query User Location"
       wait: "readAttribute"
@@ -102,3 +102,7 @@ tests:
     - label: "Query Reachable"
       wait: "readAttribute"
       attribute: "Reachable"
+
+    - label: "Query UniqueId"
+      wait: "readAttribute"
+      attribute: "UniqueId"

@@ -2255,13 +2255,13 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_ProductID(chip::Device
     return cluster.ReadAttributeProductID(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_UserLabel(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId,
+chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_NodeLabel(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId,
                                                                     chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::BasicCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeUserLabel(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+    return cluster.ReadAttributeNodeLabel(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_Location(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId,
@@ -2380,6 +2380,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_Reachable(chip::Device
     chip::Controller::BasicCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ReadAttributeReachable(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_UniqueID(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId,
+                                                                   chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BasicCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeUniqueID(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_ClusterRevision(chip::DeviceProxy * device,

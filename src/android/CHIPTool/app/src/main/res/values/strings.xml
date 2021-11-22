@@ -113,7 +113,7 @@
     <string name="basic_cluster_vendor_id_text">VendorID</string>
     <string name="basic_cluster_product_name_text">ProductName</string>
     <string name="basic_cluster_product_id_text">ProductID</string>
-    <string name="basic_cluster_user_label_text">UserLabel</string>
+    <string name="basic_cluster_node_label_text">NodeLabel</string>
     <string name="basic_cluster_location_text">Location</string>
     <string name="basic_cluster_hardware_version_text">HardwareVersion</string>
     <string name="basic_cluster_hardware_version_string_text">HardwareVersionString</string>

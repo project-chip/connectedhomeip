@@ -310,7 +310,7 @@ class ChipClusters:
                 "type": "int",
             },
             0x00000005: {
-                "attributeName": "UserLabel",
+                "attributeName": "NodeLabel",
                 "attributeId": 0x00000005,
                 "type": "str",
                 "writable": True,
@@ -376,6 +376,11 @@ class ChipClusters:
                 "attributeName": "Reachable",
                 "attributeId": 0x00000011,
                 "type": "bool",
+            },
+            0x00000012: {
+                "attributeName": "UniqueID",
+                "attributeId": 0x00000012,
+                "type": "str",
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
@@ -4644,8 +4649,8 @@ class ChipClusters:
     def ClusterBasic_ReadAttributeProductID(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_ProductID(device, ZCLendpoint, ZCLgroupid)
 
-    def ClusterBasic_ReadAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_Basic_UserLabel(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBasic_ReadAttributeNodeLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Basic_NodeLabel(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterBasic_ReadAttributeLocation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_Location(device, ZCLendpoint, ZCLgroupid)
@@ -4682,6 +4687,9 @@ class ChipClusters:
 
     def ClusterBasic_ReadAttributeReachable(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_Reachable(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterBasic_ReadAttributeUniqueID(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Basic_UniqueID(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterBasic_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -6201,10 +6209,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_Basic_ProductID.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Basic_ProductID.restype = ctypes.c_uint32
-        # Cluster Basic ReadAttribute UserLabel
-        self._chipLib.chip_ime_ReadAttribute_Basic_UserLabel.argtypes = [
+        # Cluster Basic ReadAttribute NodeLabel
+        self._chipLib.chip_ime_ReadAttribute_Basic_NodeLabel.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_Basic_UserLabel.restype = ctypes.c_uint32
+        self._chipLib.chip_ime_ReadAttribute_Basic_NodeLabel.restype = ctypes.c_uint32
         # Cluster Basic ReadAttribute Location
         self._chipLib.chip_ime_ReadAttribute_Basic_Location.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -6253,6 +6261,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_Basic_Reachable.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Basic_Reachable.restype = ctypes.c_uint32
+        # Cluster Basic ReadAttribute UniqueID
+        self._chipLib.chip_ime_ReadAttribute_Basic_UniqueID.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Basic_UniqueID.restype = ctypes.c_uint32
         # Cluster Basic ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

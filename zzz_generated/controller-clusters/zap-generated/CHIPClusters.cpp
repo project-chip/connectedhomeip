@@ -853,7 +853,7 @@ CHIP_ERROR BasicCluster::ReadAttributeProductID(Callback::Cancelable * onSuccess
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR BasicCluster::ReadAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BasicCluster::ReadAttributeNodeLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId  = mEndpoint;
@@ -863,14 +863,14 @@ CHIP_ERROR BasicCluster::ReadAttributeUserLabel(Callback::Cancelable * onSuccess
                                              BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
-CHIP_ERROR BasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+CHIP_ERROR BasicCluster::WriteAttributeNodeLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  chip::CharSpan value)
 {
     app::WriteClientHandle handle;
     ReturnErrorOnFailure(
         app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
     ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
-        chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::UserLabel::Id), value));
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::NodeLabel::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
@@ -1022,6 +1022,16 @@ CHIP_ERROR BasicCluster::ReadAttributeReachable(Callback::Cancelable * onSuccess
     attributePath.mAttributeId = 0x00000011;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<BooleanAttributeCallback>);
+}
+
+CHIP_ERROR BasicCluster::ReadAttributeUniqueID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000012;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,

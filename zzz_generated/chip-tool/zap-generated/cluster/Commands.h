@@ -5154,7 +5154,7 @@ private:
 | * VendorID                                                          | 0x0002 |
 | * ProductName                                                       | 0x0003 |
 | * ProductID                                                         | 0x0004 |
-| * UserLabel                                                         | 0x0005 |
+| * NodeLabel                                                         | 0x0005 |
 | * Location                                                          | 0x0006 |
 | * HardwareVersion                                                   | 0x0007 |
 | * HardwareVersionString                                             | 0x0008 |
@@ -5167,6 +5167,7 @@ private:
 | * SerialNumber                                                      | 0x000F |
 | * LocalConfigDisabled                                               | 0x0010 |
 | * Reachable                                                         | 0x0011 |
+| * UniqueID                                                          | 0x0012 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -5360,18 +5361,18 @@ private:
 };
 
 /*
- * Attribute UserLabel
+ * Attribute NodeLabel
  */
-class ReadBasicUserLabel : public ModelCommand
+class ReadBasicNodeLabel : public ModelCommand
 {
 public:
-    ReadBasicUserLabel() : ModelCommand("read")
+    ReadBasicNodeLabel() : ModelCommand("read")
     {
-        AddArgument("attr-name", "user-label");
+        AddArgument("attr-name", "node-label");
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicUserLabel()
+    ~ReadBasicNodeLabel()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -5383,7 +5384,7 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeUserLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttributeNodeLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -5393,17 +5394,17 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
-class WriteBasicUserLabel : public ModelCommand
+class WriteBasicNodeLabel : public ModelCommand
 {
 public:
-    WriteBasicUserLabel() : ModelCommand("write")
+    WriteBasicNodeLabel() : ModelCommand("write")
     {
-        AddArgument("attr-name", "user-label");
+        AddArgument("attr-name", "node-label");
         AddArgument("attr-value", &mValue);
         ModelCommand::AddArguments();
     }
 
-    ~WriteBasicUserLabel()
+    ~WriteBasicNodeLabel()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -5415,7 +5416,7 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttributeUserLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+        return cluster.WriteAttributeNodeLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
     }
 
 private:
@@ -5896,6 +5897,40 @@ public:
 private:
     chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute UniqueID
+ */
+class ReadBasicUniqueID : public ModelCommand
+{
+public:
+    ReadBasicUniqueID() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "unique-id");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBasicUniqueID()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0028) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeUniqueID(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -30088,8 +30123,8 @@ void registerClusterBasic(Commands & commands)
         make_unique<ReadBasicVendorID>(),                //
         make_unique<ReadBasicProductName>(),             //
         make_unique<ReadBasicProductID>(),               //
-        make_unique<ReadBasicUserLabel>(),               //
-        make_unique<WriteBasicUserLabel>(),              //
+        make_unique<ReadBasicNodeLabel>(),               //
+        make_unique<WriteBasicNodeLabel>(),              //
         make_unique<ReadBasicLocation>(),                //
         make_unique<WriteBasicLocation>(),               //
         make_unique<ReadBasicHardwareVersion>(),         //
@@ -30104,6 +30139,7 @@ void registerClusterBasic(Commands & commands)
         make_unique<ReadBasicLocalConfigDisabled>(),     //
         make_unique<WriteBasicLocalConfigDisabled>(),    //
         make_unique<ReadBasicReachable>(),               //
+        make_unique<ReadBasicUniqueID>(),                //
         make_unique<ReadBasicClusterRevision>(),         //
     };
 

@@ -521,12 +521,12 @@ public class ChipClusters {
       readProductIDAttribute(chipClusterPtr, callback);
     }
 
-    public void readUserLabelAttribute(CharStringAttributeCallback callback) {
-      readUserLabelAttribute(chipClusterPtr, callback);
+    public void readNodeLabelAttribute(CharStringAttributeCallback callback) {
+      readNodeLabelAttribute(chipClusterPtr, callback);
     }
 
-    public void writeUserLabelAttribute(DefaultClusterCallback callback, String value) {
-      writeUserLabelAttribute(chipClusterPtr, callback, value);
+    public void writeNodeLabelAttribute(DefaultClusterCallback callback, String value) {
+      writeNodeLabelAttribute(chipClusterPtr, callback, value);
     }
 
     public void readLocationAttribute(CharStringAttributeCallback callback) {
@@ -585,6 +585,10 @@ public class ChipClusters {
       readReachableAttribute(chipClusterPtr, callback);
     }
 
+    public void readUniqueIDAttribute(CharStringAttributeCallback callback) {
+      readUniqueIDAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -604,10 +608,10 @@ public class ChipClusters {
     private native void readProductIDAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-    private native void readUserLabelAttribute(
+    private native void readNodeLabelAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
 
-    private native void writeUserLabelAttribute(
+    private native void writeNodeLabelAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, String value);
 
     private native void readLocationAttribute(
@@ -651,6 +655,9 @@ public class ChipClusters {
 
     private native void readReachableAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void readUniqueIDAttribute(
+        long chipClusterPtr, CharStringAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

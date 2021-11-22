@@ -120,6 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeProductLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeSerialNumberWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeReachableWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeUniqueIDWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 
 @end
