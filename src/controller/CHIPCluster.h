@@ -39,8 +39,10 @@ namespace Controller {
 template <typename T>
 using CommandResponseSuccessCallback = void(void * context, const T & responseObject);
 using CommandResponseFailureCallback = void(void * context, EmberAfStatus status);
+using CommandResponseDoneCallback    = void();
 using WriteResponseSuccessCallback   = void (*)(void * context);
 using WriteResponseFailureCallback   = void (*)(void * context, EmberAfStatus status);
+using WriteResponseDoneCallback      = void (*)(void * context);
 template <typename T>
 using ReadResponseSuccessCallback = void (*)(void * context, T responseData);
 using ReadResponseFailureCallback = void (*)(void * context, EmberAfStatus status);
@@ -94,6 +96,14 @@ public:
     CHIP_ERROR WriteAttribute(const AttrType & requestData, void * context, ClusterId clusterId, AttributeId attributeId,
                               WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
     {
+        return WriteAttribute(requestData, context, clusterId, attributeId, successCb, failureCb, nullptr);
+    }
+
+    template <typename AttrType>
+    CHIP_ERROR WriteAttribute(const AttrType & requestData, void * context, ClusterId clusterId, AttributeId attributeId,
+                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
+                              WriteResponseDoneCallback doneCb)
+    {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath) {
@@ -111,9 +121,16 @@ public:
             }
         };
 
-        return chip::Controller::WriteAttribute<AttrType>((mSessionHandle.HasValue()) ? mSessionHandle.Value()
-                                                                                      : mDevice->GetSecureSession().Value(),
-                                                          mEndpoint, clusterId, attributeId, requestData, onSuccessCb, onFailureCb);
+        auto onDoneCb = [context, doneCb](app::WriteClient * pWriteClient) {
+            if (doneCb != nullptr)
+            {
+                doneCb(context);
+            }
+        };
+
+        return chip::Controller::WriteAttribute<AttrType>(
+            (mSessionHandle.HasValue() ? mSessionHandle.Value() : mDevice->GetSecureSession().Value()), mEndpoint, clusterId,
+            attributeId, requestData, onSuccessCb, onFailureCb, onDoneCb);
     }
 
     template <typename AttributeInfo>
@@ -122,6 +139,15 @@ public:
     {
         return WriteAttribute(requestData, context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb,
                               failureCb);
+    }
+
+    template <typename AttributeInfo>
+    CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
+                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
+                              WriteResponseDoneCallback doneCb)
+    {
+        return WriteAttribute(requestData, context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb,
+                              failureCb, doneCb);
     }
 
     /**

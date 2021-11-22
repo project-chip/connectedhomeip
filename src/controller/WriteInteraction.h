@@ -47,7 +47,7 @@ public:
     //
     using OnErrorCallbackType =
         std::function<void(const app::ConcreteAttributePath * path, app::StatusIB status, CHIP_ERROR aError)>;
-    using OnDoneCallbackType = std::function<void(app::WriteClient *, WriteCallback *)>;
+    using OnDoneCallbackType = std::function<void(app::WriteClient *)>;
 
     WriteCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
         mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
@@ -70,12 +70,19 @@ public:
         mOnError(nullptr, app::StatusIB(Protocols::InteractionModel::Status::Failure), aError);
     }
 
-    void OnDone(app::WriteClient * apWriteClient) override { mOnDone(apWriteClient, this); }
+    void OnDone(app::WriteClient * apWriteClient) override
+    {
+        if (mOnDone != nullptr)
+            mOnDone(apWriteClient);
+
+        // Always needs to be the last call
+        chip::Platform::Delete(this);
+    }
 
 private:
-    OnSuccessCallbackType mOnSuccess;
-    OnErrorCallbackType mOnError;
-    OnDoneCallbackType mOnDone;
+    OnSuccessCallbackType mOnSuccess = nullptr;
+    OnErrorCallbackType mOnError     = nullptr;
+    OnDoneCallbackType mOnDone       = nullptr;
 };
 
 /**
@@ -87,13 +94,11 @@ private:
 template <typename AttrType>
 CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
                           const AttrType & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
-                          WriteCallback::OnErrorCallbackType onErrorCb)
+                          WriteCallback::OnErrorCallbackType onErrorCb, WriteCallback::OnDoneCallbackType onDoneCb)
 {
     app::WriteClientHandle handle;
 
-    auto onDone = [](app::WriteClient * apWriteClient, WriteCallback * callback) { chip::Platform::Delete(callback); };
-
-    auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDone);
+    auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDoneCb);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, callback.get()));
@@ -111,14 +116,6 @@ CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpoint
     ReturnErrorOnFailure(handle.SendWriteRequest(sessionHandle));
 
     callback.release();
-
-    if (sessionHandle.IsGroupSession())
-    {
-        // Manually call success callback since OnReponse won't be called in WriteClient for group
-        app::ConcreteAttributePath aPath;
-        onSuccessCb(aPath);
-    }
-
     return CHIP_NO_ERROR;
 }
 
@@ -128,7 +125,16 @@ CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpoint
                           WriteCallback::OnErrorCallbackType onErrorCb)
 {
     return WriteAttribute(sessionHandle, endpointId, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), requestData,
-                          onSuccessCb, onErrorCb);
+                          onSuccessCb, onErrorCb, nullptr);
+}
+
+template <typename AttributeInfo>
+CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpointId,
+                          const typename AttributeInfo::Type & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
+                          WriteCallback::OnErrorCallbackType onErrorCb, WriteCallback::OnDoneCallbackType onDoneCb)
+{
+    return WriteAttribute(sessionHandle, endpointId, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), requestData,
+                          onSuccessCb, onErrorCb, onDoneCb);
 }
 
 } // namespace Controller
