@@ -47,22 +47,26 @@ public:
     virtual ~OTAImageProcessorInterface() {}
 
     /**
-     * Called to prepare for an OTA image download. This may include but not limited to opening the file, finding a block of space in persistent memory, and allocating a buffer.
+     * Called to prepare for an OTA image download. This may include but not limited to opening the file, finding a block of space
+     * in persistent memory, and allocating a buffer.
      */
     virtual CHIP_ERROR PrepareDownload() = 0;
 
     /**
-     * Called when the OTA image download process has completed. This may include but not limited to closing the file and persistent storage.
+     * Called when the OTA image download process has completed. This may include but not limited to closing the file and persistent
+     * storage.
      */
     virtual CHIP_ERROR Finalize() = 0;
 
     /**
-     * Called when the OTA image download process is incomplete or cannot continue. This may include but not limited to erasing everything that has been written and releasing buffers.
+     * Called when the OTA image download process is incomplete or cannot continue. This may include but not limited to erasing
+     * everything that has been written and releasing buffers.
      */
     virtual CHIP_ERROR Abort() = 0;
 
     /**
-     * Called to process a downloaded block of data. This must not be a blocking call to support cases that require IO to elements such as external peripherals/radios.
+     * Called to process a downloaded block of data. This must not be a blocking call to support cases that require IO to elements
+     * such as external peripherals/radios.
      */
     virtual CHIP_ERROR ProcessBlock(ByteSpan & block) = 0;
 

@@ -145,7 +145,7 @@ void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableTyp
 
     // This will kick of a timer which will regularly check for updates to the bdx::TransferSession state machine.
     bdxDownloader->InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions,
-                                   chip::System::Clock::Seconds16(20));
+                                    chip::System::Clock::Seconds16(20));
 }
 
 void OnQueryImageFailure(void * context, EmberAfStatus status)

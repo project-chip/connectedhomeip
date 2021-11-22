@@ -77,7 +77,7 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
     }
     case TransferSession::OutputEventType::kAcceptReceived: {
         OTAImageProcessorParams params = {
-            .imageFile = outFilePath,
+            .imageFile       = outFilePath,
             .downloadedBytes = 0,
             // TODO: Set this to Length field of ReceiveAccept
             .totalFileBytes = 0,

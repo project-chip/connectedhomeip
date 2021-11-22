@@ -33,7 +33,7 @@ public:
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
 
-  private:
+private:
     std::ofstream mOfs;
 };
 
