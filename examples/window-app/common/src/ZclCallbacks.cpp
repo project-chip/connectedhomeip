@@ -42,13 +42,16 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
     if (attributePath.mClusterId == app::Clusters::Identify::Id)
     {
         ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
-        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
-    } else if (attributePath.mClusterId == Id) {
+                        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
+    }
+    else if (attributePath.mClusterId == Id)
+    {
         ChipLogProgress(Zcl, "Window  cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mClusterId));
-    } else {
+    }
+    else
+    {
         ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mClusterId));
     }
-
 
     WindowApp & app     = WindowApp::Instance();
     EndpointId endpoint = attributePath.mEndpointId;
