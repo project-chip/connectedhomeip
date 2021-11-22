@@ -391,12 +391,18 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         TLV::TLVReader attributeReportIBsReader;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
 
-        mpCallback->OnReportBegin(this);
+        if (IsInitialReport())
+        {
+            mpCallback->OnReportBegin(this);
+        }
 
         err = ProcessAttributeReportIBs(attributeReportIBsReader);
         SuccessOrExit(err);
 
-        mpCallback->OnReportEnd(this);
+        if (!mPendingMoreChunks)
+        {
+            mpCallback->OnReportEnd(this);
+        }
     }
 
 exit:
@@ -500,6 +506,10 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
 
             ConcreteDataAttributePath attributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
 
+            //
+            // TODO: Add support for correctly handling appends/updates whenever list chunking support
+            // on the server side is added.
+            //
             if (dataReader.GetType() == TLV::kTLVType_Array)
             {
                 attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
