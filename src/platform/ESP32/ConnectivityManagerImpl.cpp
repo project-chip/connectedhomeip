@@ -71,7 +71,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #endif
 }
 
-static InterfaceType GetInterfaceType(const char* if_desc)
+static InterfaceType GetInterfaceType(const char * if_desc)
 {
     if (strncmp(if_desc, "ap", strnlen(if_desc, 2)) == 0 || strncmp(if_desc, "sta", strnlen(if_desc, 3)) == 0)
         return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI;
@@ -84,7 +84,7 @@ static InterfaceType GetInterfaceType(const char* if_desc)
 
 CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
-    esp_netif_t * netif = esp_netif_next(NULL);
+    esp_netif_t * netif     = esp_netif_next(NULL);
     NetworkInterface * head = NULL;
     if (netif == NULL)
     {
@@ -92,16 +92,16 @@ CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** ne
     }
     else
     {
-        for (esp_netif_t * ifa =  netif; ifa != NULL; ifa = esp_netif_next(ifa))
+        for (esp_netif_t * ifa = netif; ifa != NULL; ifa = esp_netif_next(ifa))
         {
             NetworkInterface * ifp = new NetworkInterface();
             strncpy(ifp->Name, esp_netif_get_ifkey(ifa), Inet::InterfaceId::kMaxIfNameLength);
             ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
-            ifp->name                            = CharSpan(ifp->Name, strlen(ifp->Name));
-            ifp->fabricConnected                 = true;
-            ifp->type                            = GetInterfaceType(esp_netif_get_desc(ifa));
-            ifp->offPremiseServicesReachableIPv4 = false;
-            ifp->offPremiseServicesReachableIPv6 = false;
+            ifp->name                                          = CharSpan(ifp->Name, strlen(ifp->Name));
+            ifp->fabricConnected                               = true;
+            ifp->type                                          = GetInterfaceType(esp_netif_get_desc(ifa));
+            ifp->offPremiseServicesReachableIPv4               = false;
+            ifp->offPremiseServicesReachableIPv6               = false;
             if (esp_netif_get_mac(ifa, ifp->MacAddress) != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "Failed to get network hardware address");

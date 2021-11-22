@@ -35,8 +35,8 @@
 #include "route_hook/esp_route_hook.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/Command.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Dnssd.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
@@ -91,8 +91,6 @@ Identify gIdentify1 = {
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
     OnIdentifyTriggerEffect,
 };
-
-
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
