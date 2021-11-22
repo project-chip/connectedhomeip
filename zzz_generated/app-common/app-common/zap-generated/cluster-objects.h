@@ -11490,7 +11490,7 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
 };
 } // namespace ProductName
-namespace UserLabel {
+namespace NodeLabel {
 struct TypeInfo
 {
     using Type             = chip::CharSpan;
@@ -11498,9 +11498,9 @@ struct TypeInfo
     using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NodeLabel::Id; }
 };
-} // namespace UserLabel
+} // namespace NodeLabel
 namespace HardwareVersion {
 struct TypeInfo
 {
@@ -11611,6 +11611,17 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
 };
 } // namespace Reachable
+namespace UniqueID {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UniqueID::Id; }
+};
+} // namespace UniqueID
 namespace FeatureMap {
 struct TypeInfo
 {

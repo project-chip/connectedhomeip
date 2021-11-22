@@ -7593,7 +7593,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 } // namespace ProductName
 
-namespace UserLabel {
+namespace NodeLabel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
@@ -7621,7 +7621,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
-} // namespace UserLabel
+} // namespace NodeLabel
 
 namespace HardwareVersion {
 
@@ -7771,7 +7771,7 @@ namespace PartNumber {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
-    uint8_t zclString[254 + 1];
+    uint8_t zclString[32 + 1];
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
@@ -7780,16 +7780,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
         return EMBER_ZCL_STATUS_INVALID_VALUE;
     }
 
-    VerifyOrReturnError(value.size() == 254, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
-    memcpy(value.data(), &zclString[1], 254);
+    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    memcpy(value.data(), &zclString[1], 32);
     value.reduce_size(length);
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    static_assert(254 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 254, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
-    uint8_t zclString[254 + 1];
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
     return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
@@ -7801,28 +7801,29 @@ namespace ProductURL {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
-    uint8_t zclString[254 + 1];
+    uint8_t zclString[256 + 2];
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    size_t length = emberAfStringLength(zclString);
-    if (length == NumericAttributeTraits<uint8_t>::kNullValue)
+    size_t length = emberAfLongStringLength(zclString);
+    if (length == NumericAttributeTraits<uint16_t>::kNullValue)
     {
         return EMBER_ZCL_STATUS_INVALID_VALUE;
     }
 
-    VerifyOrReturnError(value.size() == 254, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
-    memcpy(value.data(), &zclString[1], 254);
+    VerifyOrReturnError(value.size() == 256, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    memcpy(value.data(), &zclString[2], 256);
     value.reduce_size(length);
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    static_assert(254 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 254, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
-    uint8_t zclString[254 + 1];
-    emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
-    memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    static_assert(256 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 256, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    uint8_t zclString[256 + 2];
+    emberAfCopyInt16u(zclString, 0, static_cast<uint16_t>(value.size()));
+    memcpy(&zclString[2], value.data(), value.size());
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString,
+                                       ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ProductURL
@@ -7913,6 +7914,36 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 }
 
 } // namespace Reachable
+
+namespace UniqueID {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+{
+    uint8_t zclString[32 + 1];
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, sizeof(zclString));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    size_t length = emberAfStringLength(zclString);
+    if (length == NumericAttributeTraits<uint8_t>::kNullValue)
+    {
+        return EMBER_ZCL_STATUS_INVALID_VALUE;
+    }
+
+    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    memcpy(value.data(), &zclString[1], 32);
+    value.reduce_size(length);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
+{
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    uint8_t zclString[32 + 1];
+    emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteServerAttribute(endpoint, Clusters::BridgedDeviceBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+}
+
+} // namespace UniqueID
 
 } // namespace Attributes
 } // namespace BridgedDeviceBasic
