@@ -16,7 +16,9 @@
  *    limitations under the License.
  */
 
-#include <credentials/GroupDataProvider.h>
+#include "TestPersistentStorageDelegate.h"
+#include <credentials/GroupDataProviderImpl.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
@@ -24,7 +26,7 @@
 
 using namespace chip::Credentials;
 using GroupMapping = GroupDataProvider::GroupMapping;
-using KeySet       = GroupDataProvider::KeySet;
+using Keyset       = GroupDataProvider::Keyset;
 using GroupState   = GroupDataProvider::GroupState;
 using EpochKey     = GroupDataProvider::EpochKey;
 
@@ -521,18 +523,18 @@ void TestGroupStateIterator(nlTestSuite * apSuite, void * apContext)
 }
 
 static EpochKey epoch_keys0[3] = {
-    { 0x0000000000000000, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
-    { 0x0000000000000000, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
-    { 0x0000000000000000, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }
+    { 0x1111111111111111, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+    { 0x2222222222222222, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+    { 0x3333333333333333, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }
 };
 static EpochKey epoch_keys1[3] = {
-    { 0x1000000000000000, { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f } },
-    { 0x2000000000000000, { 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f } },
-    { 0x3000000000000000, { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f } },
+    { 0xaaaaaaaaaaaaaaaa, { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f } },
+    { 0xbbbbbbbbbbbbbbbb, { 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f } },
+    { 0xcccccccccccccccc, { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f } },
 };
 static EpochKey epoch_keys2[2] = {
-    { 0xa000000000000000, { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf } },
-    { 0xb000000000000000, { 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf } },
+    { 0xeeeeeeeeeeeeeeee, { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf } },
+    { 0xffffffffffffffff, { 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf } },
 };
 
 constexpr uint16_t kKeysetId0 = 0x0;
@@ -552,11 +554,11 @@ void TestKeySets(nlTestSuite * apSuite, void * apContext)
     groups->RemoveKeySet(kFabric2, 0);
     groups->RemoveKeySet(kFabric2, 1);
 
-    KeySet keyset0(KeySet::SecurityPolicy::kStandard, 3);
-    KeySet keyset1(KeySet::SecurityPolicy::kStandard, 1);
-    KeySet keyset2(KeySet::SecurityPolicy::kLowLatency, 2);
-    KeySet keyset3(KeySet::SecurityPolicy::kStandard, 3);
-    KeySet keyset;
+    Keyset keyset0(Keyset::SecurityPolicy::kStandard, 3);
+    Keyset keyset1(Keyset::SecurityPolicy::kStandard, 1);
+    Keyset keyset2(Keyset::SecurityPolicy::kLowLatency, 2);
+    Keyset keyset3(Keyset::SecurityPolicy::kStandard, 3);
+    Keyset keyset;
 
     memcpy(keyset0.epoch_keys, epoch_keys0, sizeof(epoch_keys1));
     memcpy(keyset1.epoch_keys, epoch_keys1, sizeof(epoch_keys1));
@@ -578,7 +580,9 @@ void TestKeySets(nlTestSuite * apSuite, void * apContext)
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == groups->GetKeySet(kFabric1, kKeysetId3, keyset));
     NL_TEST_ASSERT(apSuite, keyset == keyset3);
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == groups->GetKeySet(kFabric1, kKeysetId1, keyset));
+    CHIP_ERROR err = groups->GetKeySet(kFabric1, kKeysetId1, keyset);
+    HERE("  * err: %s\n", err.AsString())
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, keyset == keyset1);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == groups->GetKeySet(kFabric1, kKeysetId0, keyset));
     NL_TEST_ASSERT(apSuite, keyset == keyset0);
@@ -654,11 +658,11 @@ void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
     groups->RemoveKeySet(kFabric2, kKeysetId2);
     groups->RemoveKeySet(kFabric2, kKeysetId3);
 
-    KeySet keyset0(KeySet::SecurityPolicy::kStandard, 3);
-    KeySet keyset1(KeySet::SecurityPolicy::kStandard, 1);
-    KeySet keyset2(KeySet::SecurityPolicy::kLowLatency, 2);
-    KeySet keyset3(KeySet::SecurityPolicy::kStandard, 3);
-    KeySet keyset;
+    Keyset keyset0(Keyset::SecurityPolicy::kStandard, 3);
+    Keyset keyset1(Keyset::SecurityPolicy::kStandard, 1);
+    Keyset keyset2(Keyset::SecurityPolicy::kLowLatency, 2);
+    Keyset keyset3(Keyset::SecurityPolicy::kStandard, 3);
+    Keyset keyset;
 
     memcpy(keyset0.epoch_keys, epoch_keys0, sizeof(epoch_keys1));
     memcpy(keyset1.epoch_keys, epoch_keys1, sizeof(epoch_keys1));
@@ -676,13 +680,14 @@ void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
     // Iterate Fabric 1
 
     constexpr size_t expected_count_f1          = 4;
-    const KeySet expected_f1[expected_count_f1] = { keyset1, keyset0, keyset2, keyset3 };
+    const Keyset expected_f1[expected_count_f1] = { keyset1, keyset0, keyset2, keyset3 };
 
     auto it_f1 = groups->IterateKeySets(kFabric1);
     NL_TEST_ASSERT(apSuite, it_f1);
     if (it_f1)
     {
         size_t i = 0;
+        printf("\n\n  ### COUNT %zu/%zu\n\n", expected_count_f1, it_f1->Count());
         NL_TEST_ASSERT(apSuite, expected_count_f1 == it_f1->Count());
 
         while (it_f1->Next(keyset) && i < expected_count_f1)
@@ -697,7 +702,7 @@ void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
     // Iterate Fabric 2
 
     constexpr size_t expected_count_f2          = 3;
-    const KeySet expected_f2[expected_count_f2] = { keyset3, keyset1, keyset2 };
+    const Keyset expected_f2[expected_count_f2] = { keyset3, keyset1, keyset2 };
 
     auto it_f2 = groups->IterateKeySets(kFabric2);
     NL_TEST_ASSERT(apSuite, it_f2);
@@ -901,7 +906,7 @@ void TestEndpointIterator(nlTestSuite * apSuite, void * apContext)
 
     // Endpoint 1
 
-    GroupDataProvider::GroupMappingIterator * it = groups->IterateGroupMappings(kFabric1, kEndpoint1);
+    auto * it = groups->IterateGroupMappings(kFabric1, kEndpoint1);
     NL_TEST_ASSERT(apSuite, it);
 
     GroupDataProvider::GroupMapping mapping;
@@ -1068,7 +1073,7 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
 
     {
         // Fabric Index 1 has 3 entries
-        GroupDataProvider::GroupStateIterator * it = groups->IterateGroupStates(kFabric1);
+        auto * it = groups->IterateGroupStates(kFabric1);
         NL_TEST_ASSERT(apSuite, it != nullptr);
 
         size_t count1 = it->Count();
@@ -1088,7 +1093,7 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
 
     {
         // Fabric Index 2 has 1 entry
-        GroupDataProvider::GroupStateIterator * it = groups->IterateGroupStates(kFabric2);
+        auto * it = groups->IterateGroupStates(kFabric2);
         NL_TEST_ASSERT(apSuite, it != nullptr);
 
         size_t count1 = it->Count();
@@ -1107,7 +1112,7 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
 
     {
         // Fabric Index 1 has 3 entries + Fabric Index 2 has 1 entry
-        GroupDataProvider::GroupStateIterator * it = groups->IterateGroupStates();
+        auto * it = groups->IterateGroupStates();
         NL_TEST_ASSERT(apSuite, it != nullptr);
 
         size_t count1 = it->Count();
@@ -1139,11 +1144,11 @@ void TestKeys(nlTestSuite * apSuite, void * apContext)
 
     // Pairs keys0[a|b], keys1[a|b] have different values. [b] is used as Get target, so it
     // should get overwritten with the values from [a].
-    KeySet keys0a(0, KeySet::SecurityPolicy::kStandard, 3);
-    KeySet keys0b(0, KeySet::SecurityPolicy::kStandard, 2);
-    KeySet keys1a(0, KeySet::SecurityPolicy::kStandard, 3);
-    KeySet keys1b(0, KeySet::SecurityPolicy::kStandard, 2);
-    KeySet keys3(0, KeySet::SecurityPolicy::kStandard, 2);
+    Keyset keys0a(0, Keyset::SecurityPolicy::kStandard, 3);
+    Keyset keys0b(0, Keyset::SecurityPolicy::kStandard, 2);
+    Keyset keys1a(0, Keyset::SecurityPolicy::kStandard, 3);
+    Keyset keys1b(0, Keyset::SecurityPolicy::kStandard, 2);
+    Keyset keys3(0, Keyset::SecurityPolicy::kStandard, 2);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     NL_TEST_ASSERT(apSuite, groups);
@@ -1200,9 +1205,9 @@ void TestKeysIterator(nlTestSuite * apSuite, void * apContext)
     groups->RemoveKeySet(kFabric1, kKeysetId2);
     groups->RemoveKeySet(kFabric1, kKeysetId3);
 
-    KeySet keys0(0, KeySet::SecurityPolicy::kStandard, 3);
-    KeySet keys1(0, KeySet::SecurityPolicy::kStandard, 2);
-    KeySet keys2(0, KeySet::SecurityPolicy::kStandard, 3);
+    Keyset keys0(0, Keyset::SecurityPolicy::kStandard, 3);
+    Keyset keys1(0, Keyset::SecurityPolicy::kStandard, 2);
+    Keyset keys2(0, Keyset::SecurityPolicy::kStandard, 3);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     NL_TEST_ASSERT(apSuite, groups);
@@ -1222,13 +1227,13 @@ void TestKeysIterator(nlTestSuite * apSuite, void * apContext)
     err = groups->SetKeySet(kFabric1, kKeysetId1, keys1);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    GroupDataProvider::KeySetIterator * it = groups->IterateKeySets(kFabric1);
+    auto * it = groups->IterateKeySets(kFabric1);
     NL_TEST_ASSERT(apSuite, it);
 
     size_t count1 = it->Count();
     size_t count2 = 0;
     NL_TEST_ASSERT(apSuite, 3 == count1);
-    GroupDataProvider::KeySet keys;
+    GroupDataProvider::Keyset keys;
 
     uint16_t last_keyset_id = UINT16_MAX;
 
@@ -1361,9 +1366,9 @@ void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
 
     // Keys
 
-    KeySet keys0a(0, KeySet::SecurityPolicy::kStandard, 3);
-    KeySet keys1a(0, KeySet::SecurityPolicy::kLowLatency, 3);
-    KeySet keys_out(0, KeySet::SecurityPolicy::kStandard, 0);
+    Keyset keys0a(0, Keyset::SecurityPolicy::kStandard, 3);
+    Keyset keys1a(0, Keyset::SecurityPolicy::kLowLatency, 3);
+    Keyset keys_out(0, Keyset::SecurityPolicy::kStandard, 0);
 
     NL_TEST_ASSERT(apSuite, groups);
 
@@ -1508,21 +1513,63 @@ void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_ID == err);
 }
 
+static const char * kKey1   = "abc/def";
+static const char * kValue1 = "abc/def";
+static const char * kValue2 = "abc/ghi/xyz";
+static const size_t kSize1  = strlen(kValue1) + 1;
+static const size_t kSize2  = strlen(kValue2) + 1;
+
+void TestStorageDelegate(nlTestSuite * apSuite, void * apContext)
+{
+    chip::TestPersistentStorageDelegate delegate;
+
+    char out[128];
+    uint16_t size = static_cast<uint16_t>(sizeof(out));
+
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == delegate.SyncGetKeyValue(kKey1, out, size));
+
+    size = static_cast<uint16_t>(kSize1);
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == delegate.SyncSetKeyValue(kKey1, kValue1, size));
+
+    size = static_cast<uint16_t>(sizeof(out));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == delegate.SyncGetKeyValue(kKey1, out, size));
+    printf("OUT1(%hu):'%s'\n", size, out);
+    NL_TEST_ASSERT(apSuite, size == kSize1);
+    NL_TEST_ASSERT(apSuite, !memcmp(out, kValue1, kSize1));
+
+    size = static_cast<uint16_t>(kSize2);
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == delegate.SyncSetKeyValue(kKey1, kValue2, size));
+
+    size = static_cast<uint16_t>(sizeof(out));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == delegate.SyncGetKeyValue(kKey1, out, size));
+    printf("OUT2(%hu):'%s'\n", size, out);
+    NL_TEST_ASSERT(apSuite, size == kSize2);
+    NL_TEST_ASSERT(apSuite, !memcmp(out, kValue2, kSize2));
+
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == delegate.SyncDeleteKeyValue(kKey1));
+
+    size = static_cast<uint16_t>(sizeof(out));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == delegate.SyncGetKeyValue(kKey1, out, size));
+}
+
 } // namespace TestGroups
 } // namespace app
 } // namespace chip
 
 namespace {
 
+static chip::TestPersistentStorageDelegate gDelegate;
+static GroupDataProviderImpl gProvider(gDelegate);
+
+// static GroupDataProviderImpl gGroupDataProvider(chip::TestPersistentStorageDelegate());
 /**
  *  Set up the test suite.
  */
 int Test_Setup(void * inContext)
 {
-    GroupDataProvider * groups = GetGroupDataProvider();
+    SetGroupDataProvider(&gProvider);
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
-    VerifyOrReturnError(nullptr != groups, FAILURE);
-    VerifyOrReturnError(CHIP_NO_ERROR == groups->Init(), FAILURE);
+    VerifyOrReturnError(CHIP_NO_ERROR == gProvider.Init(), FAILURE);
     return SUCCESS;
 }
 
@@ -1540,20 +1587,22 @@ int Test_Teardown(void * inContext)
     return SUCCESS;
 }
 
-const nlTest sTests[] = { NL_TEST_DEF("TestGroupMappings", chip::app::TestGroups::TestGroupMappings),
-                          NL_TEST_DEF("TestGroupMappingIterator", chip::app::TestGroups::TestGroupMappingIterator),
-                          NL_TEST_DEF("TestGroupStates", chip::app::TestGroups::TestGroupStates),
-                          NL_TEST_DEF("TestGroupStateIterator", chip::app::TestGroups::TestGroupStateIterator),
-                          NL_TEST_DEF("TestKeySets", chip::app::TestGroups::TestKeySets),
-                          NL_TEST_DEF("TestKeySetIterator", chip::app::TestGroups::TestKeySetIterator),
-                          // Old Tests
-                          NL_TEST_DEF("TestEndpoints", chip::app::TestGroups::TestEndpoints),
-                          NL_TEST_DEF("TestEndpointIterator", chip::app::TestGroups::TestEndpointIterator),
-                          NL_TEST_DEF("TestStates", chip::app::TestGroups::TestStates),
-                          NL_TEST_DEF("TestStateIterator", chip::app::TestGroups::TestStateIterator),
-                          NL_TEST_DEF("TestKeys", chip::app::TestGroups::TestKeys),
-                          NL_TEST_DEF("TestKeysIterator", chip::app::TestGroups::TestKeysIterator),
-                          NL_TEST_DEF("TestPerFabricData", chip::app::TestGroups::TestPerFabricData), NL_TEST_SENTINEL() };
+const nlTest sTests[] = {
+    NL_TEST_DEF("TestGroupMappings", chip::app::TestGroups::TestGroupMappings),
+    NL_TEST_DEF("TestGroupMappingIterator", chip::app::TestGroups::TestGroupMappingIterator),
+    NL_TEST_DEF("TestGroupStates", chip::app::TestGroups::TestGroupStates),
+    NL_TEST_DEF("TestGroupStateIterator", chip::app::TestGroups::TestGroupStateIterator),
+    NL_TEST_DEF("TestKeySets", chip::app::TestGroups::TestKeySets),
+    NL_TEST_DEF("TestKeySetIterator", chip::app::TestGroups::TestKeySetIterator),
+    // Old Tests
+    NL_TEST_DEF("TestEndpoints", chip::app::TestGroups::TestEndpoints),
+    NL_TEST_DEF("TestEndpointIterator", chip::app::TestGroups::TestEndpointIterator),
+    NL_TEST_DEF("TestStates", chip::app::TestGroups::TestStates),
+    NL_TEST_DEF("TestStateIterator", chip::app::TestGroups::TestStateIterator),
+    NL_TEST_DEF("TestKeys", chip::app::TestGroups::TestKeys),
+    NL_TEST_DEF("TestKeysIterator", chip::app::TestGroups::TestKeysIterator),
+    NL_TEST_DEF("TestPerFabricData", chip::app::TestGroups::TestPerFabricData), NL_TEST_SENTINEL()
+};
 } // namespace
 
 int TestGroups()

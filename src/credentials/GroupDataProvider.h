@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <stdint.h>
 #include <sys/types.h>
@@ -31,7 +32,7 @@ public:
     // An EpochKey is a single key usable to determine an operational group key
     struct EpochKey
     {
-        static constexpr size_t kLengthBytes = (128 / 8);
+        static constexpr size_t kLengthBytes = Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
         // Validity start time in microseconds since 2000-01-01T00:00:00 UTC ("the Epoch")
         uint64_t start_time;
         // Actual key bits. Depending on context, it may be a raw epoch key (as seen within `SetKeySet` calls)
@@ -50,6 +51,7 @@ public:
         GroupId group = 0;
         // Group name
         CharSpan name;
+
         GroupMapping() = default;
         GroupMapping(EndpointId eid, GroupId gid, const char * groupName) : endpoint(eid), group(gid)
         {
@@ -91,7 +93,7 @@ public:
     };
 
     // A operational group key set, usable by many GroupState mappings
-    struct KeySet
+    struct Keyset
     {
         enum class SecurityPolicy : uint8_t
         {
@@ -99,9 +101,10 @@ public:
             kLowLatency = 1
         };
 
-        KeySet() = default;
-        KeySet(uint16_t id, SecurityPolicy poli, uint8_t num_keys) : keyset_id(id), policy(poli), num_keys_used(num_keys) {}
-        KeySet(SecurityPolicy poli, uint8_t num_keys) : keyset_id(0), policy(poli), num_keys_used(num_keys) {}
+        Keyset() = default;
+        Keyset(uint16_t id) : keyset_id(id) {}
+        Keyset(uint16_t id, SecurityPolicy poli, uint8_t num_keys) : keyset_id(id), policy(poli), num_keys_used(num_keys) {}
+        Keyset(SecurityPolicy poli, uint8_t num_keys) : keyset_id(0), policy(poli), num_keys_used(num_keys) {}
 
         // The actual keys for the group key set
         EpochKey epoch_keys[3];
@@ -112,7 +115,7 @@ public:
         // Number of keys present
         uint8_t num_keys_used = 0;
 
-        bool operator==(const KeySet & other)
+        bool operator==(const Keyset & other)
         {
             if (this->policy == other.policy && this->num_keys_used == other.num_keys_used)
             {
@@ -122,58 +125,21 @@ public:
         }
     };
 
-    // Iterator for group mappings under a given endpoint. Associated with
-    // Groups cluster logic.
-    class GroupMappingIterator
+    template <typename T>
+    class Iterator
     {
     public:
-        virtual ~GroupMappingIterator() = default;
+        virtual ~Iterator() = default;
         // Returns the number of entries in total that will be iterated.
         virtual size_t Count() = 0;
         // Returns true if a groupID is found in the iteration.
-        virtual bool Next(GroupMapping & mapping) = 0;
+        virtual bool Next(T & item) = 0;
         // Release the memory allocated by this iterator, if any. Must be called before
         // losing scope of a `GroupMappingIterator *`
         virtual void Release() = 0;
 
     protected:
-        GroupMappingIterator() = default;
-    };
-
-    // Iterator for group state information mapping a Group ID to a Group Key Set index,
-    // such as reflected by the Groups attribute of the Group Key Management cluster.
-    class GroupStateIterator
-    {
-    public:
-        virtual ~GroupStateIterator() = default;
-        // Returns the number of entries in total that will be iterated.
-        virtual size_t Count() = 0;
-        // Returns true if a GroupState is found in the iteration.
-        virtual bool Next(GroupState & outEntry) = 0;
-        // Release the memory allocated by this iterator, if any. Must be called before
-        // losing scope of a `GroupStateIterator *`
-        virtual void Release() = 0;
-
-    protected:
-        GroupStateIterator() = default;
-    };
-
-    // Iterator for the Group Key Sets related under a given Fabric.
-    // TODO: Refactor to allow trial decryption and encryption directly, rather than accessing raw keys.
-    class KeySetIterator
-    {
-    public:
-        virtual ~KeySetIterator() = default;
-        // Returns the number of entries in total that will be iterated.
-        virtual size_t Count() = 0;
-        // Returns true if a KeySet is found in the iteration.
-        virtual bool Next(KeySet & outSet) = 0;
-        // Release the memory allocated by this iterator, if any. Must be called before
-        // losing scope of a `KeySetIterator *`
-        virtual void Release() = 0;
-
-    protected:
-        KeySetIterator() = default;
+        Iterator() = default;
     };
 
     // Interface for a listener for changes in any Group configuration. Necessary
@@ -231,7 +197,7 @@ public:
      *  @retval An instance of GroupMappingIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint) = 0;
+    virtual Iterator<GroupMapping> * IterateGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint) = 0;
 
     //
     // Group States
@@ -246,21 +212,21 @@ public:
      *  @retval An instance of GroupStateIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual GroupStateIterator * IterateGroupStates() = 0;
+    virtual Iterator<GroupState> * IterateGroupStates() = 0;
     /**
      *  Returns an iterator that may be used to obtain the GroupStates for the given fabric. The number
      *  of concurrent iterator instances is limited, and must be released using their own Release() method.
      *  @retval An instance of GroupStateIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual GroupStateIterator * IterateGroupStates(chip::FabricIndex fabric_index) = 0;
+    virtual Iterator<GroupState> * IterateGroupStates(chip::FabricIndex fabric_index) = 0;
 
     //
     // Key Sets
     //
 
-    virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id, const KeySet & keys) = 0;
-    virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id, KeySet & keys)       = 0;
+    virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id, const Keyset & keys) = 0;
+    virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id, Keyset & keys)       = 0;
     virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id)                   = 0;
     /**
      *  Returns an iterator that may be used to obtain the KeySets associated with the given fabric. The number
@@ -268,7 +234,7 @@ public:
      *  @retval An instance of KeySetIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual KeySetIterator * IterateKeySets(chip::FabricIndex fabric_index) = 0;
+    virtual Iterator<Keyset> * IterateKeySets(chip::FabricIndex fabric_index) = 0;
 
     // Fabrics
     virtual CHIP_ERROR RemoveFabric(chip::FabricIndex fabric_index) = 0;
