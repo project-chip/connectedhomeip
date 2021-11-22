@@ -3446,6 +3446,8 @@ NS_ASSUME_NONNULL_BEGIN
                                       responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
