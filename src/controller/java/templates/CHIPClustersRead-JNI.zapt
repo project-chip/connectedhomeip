@@ -19,13 +19,17 @@
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, read{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
-{{#if isList}}
-    std::unique_ptr<CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback, void (*)(CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback *)> onSuccess(
-        chip::Platform::New<CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback>(callback), chip::Platform::Delete<CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback>);
-{{else}}
-    std::unique_ptr<CHIP{{chipCallback.name}}AttributeCallback, void (*)(CHIP{{chipCallback.name}}AttributeCallback *)> onSuccess(chip::Platform::New<CHIP{{chipCallback.name}}AttributeCallback>(callback{{#if (isString type)}},
-        {{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}), chip::Platform::Delete<CHIP{{chipCallback.name}}AttributeCallback>);
-{{/if}}
+    using TypeInfo = chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+
+    {{~#*inline "callbackName"}}
+    {{#if_in_global_responses}}
+    CHIP{{chipCallback.name}}AttributeCallback
+    {{else}}
+    CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback
+    {{/if_in_global_responses}}
+    {{/inline}}
+
+    std::unique_ptr<{{>callbackName}}, void (*)({{>callbackName}} *)> onSuccess(chip::Platform::New<{{>callbackName}}>(callback, false), chip::Platform::Delete<{{>callbackName}}>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
 
     std::unique_ptr<chip::CHIPDefaultFailureCallback, void (*)(chip::CHIPDefaultFailureCallback *)> onFailure(chip::Platform::New<chip::CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<chip::CHIPDefaultFailureCallback>);
@@ -35,7 +39,9 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, read{{asUpperCamelCase nam
     chip::Controller::{{asCamelCased ../name false}}Cluster * cppCluster = reinterpret_cast<chip::Controller::{{asCamelCased ../name false}}Cluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->ReadAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel());
+    auto successFn = chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err = cppCluster->ReadAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(err == CHIP_NO_ERROR, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error reading attribute", err));
 
     onSuccess.release();

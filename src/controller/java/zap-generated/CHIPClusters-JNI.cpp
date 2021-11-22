@@ -1953,6 +1953,11 @@ JNI_METHOD(void, BasicCluster, writeNodeLabelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Basic::Attributes::NodeLabel::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -1971,9 +1976,9 @@ JNI_METHOD(void, BasicCluster, writeNodeLabelAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    JniUtfString valueStr(env, value);
-    err = cppCluster->WriteAttributeNodeLabel(onSuccess->Cancel(), onFailure->Cancel(),
-                                              chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -2040,6 +2045,11 @@ JNI_METHOD(void, BasicCluster, writeLocationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Basic::Attributes::Location::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -2058,9 +2068,9 @@ JNI_METHOD(void, BasicCluster, writeLocationAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    JniUtfString valueStr(env, value);
-    err = cppCluster->WriteAttributeLocation(onSuccess->Cancel(), onFailure->Cancel(),
-                                             chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -2610,9 +2620,14 @@ JNI_METHOD(void, BasicCluster, reportSerialNumberAttribute)(JNIEnv * env, jobjec
 }
 
 JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -2631,7 +2646,9 @@ JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeLocalConfigDisabled(onSuccess->Cancel(), onFailure->Cancel(), static_cast<bool>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -2811,9 +2828,14 @@ JNI_METHOD(jlong, BinaryInputBasicCluster, initWithDevice)(JNIEnv * env, jobject
 }
 
 JNI_METHOD(void, BinaryInputBasicCluster, writeOutOfServiceAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -2832,7 +2854,9 @@ JNI_METHOD(void, BinaryInputBasicCluster, writeOutOfServiceAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeOutOfService(onSuccess->Cancel(), onFailure->Cancel(), static_cast<bool>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -2897,9 +2921,14 @@ JNI_METHOD(void, BinaryInputBasicCluster, reportOutOfServiceAttribute)
 }
 
 JNI_METHOD(void, BinaryInputBasicCluster, writePresentValueAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -2918,7 +2947,9 @@ JNI_METHOD(void, BinaryInputBasicCluster, writePresentValueAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributePresentValue(onSuccess->Cancel(), onFailure->Cancel(), static_cast<bool>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -5413,9 +5444,14 @@ JNI_METHOD(void, ColorControlCluster, reportColorModeAttribute)(JNIEnv * env, jo
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorControlOptionsAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -5434,7 +5470,9 @@ JNI_METHOD(void, ColorControlCluster, writeColorControlOptionsAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeColorControlOptions(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -6532,9 +6570,14 @@ JNI_METHOD(void, ColorControlCluster, reportPrimary6IntensityAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeWhitePointXAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -6553,7 +6596,9 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointXAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeWhitePointX(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -6617,9 +6662,14 @@ JNI_METHOD(void, ColorControlCluster, reportWhitePointXAttribute)(JNIEnv * env, 
 }
 
 JNI_METHOD(void, ColorControlCluster, writeWhitePointYAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -6638,7 +6688,9 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointYAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeWhitePointY(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -6702,9 +6754,14 @@ JNI_METHOD(void, ColorControlCluster, reportWhitePointYAttribute)(JNIEnv * env, 
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointRXAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -6723,7 +6780,9 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRXAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeColorPointRX(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -6787,9 +6846,14 @@ JNI_METHOD(void, ColorControlCluster, reportColorPointRXAttribute)(JNIEnv * env,
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointRYAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -6808,7 +6872,9 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRYAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeColorPointRY(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -6872,9 +6938,14 @@ JNI_METHOD(void, ColorControlCluster, reportColorPointRYAttribute)(JNIEnv * env,
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointRIntensityAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -6893,7 +6964,9 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRIntensityAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeColorPointRIntensity(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -6958,9 +7031,14 @@ JNI_METHOD(void, ColorControlCluster, reportColorPointRIntensityAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointGXAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -6979,7 +7057,9 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGXAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeColorPointGX(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -7043,9 +7123,14 @@ JNI_METHOD(void, ColorControlCluster, reportColorPointGXAttribute)(JNIEnv * env,
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointGYAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -7064,7 +7149,9 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGYAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeColorPointGY(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -7128,9 +7215,14 @@ JNI_METHOD(void, ColorControlCluster, reportColorPointGYAttribute)(JNIEnv * env,
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointGIntensityAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -7149,7 +7241,9 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGIntensityAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeColorPointGIntensity(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -7214,9 +7308,14 @@ JNI_METHOD(void, ColorControlCluster, reportColorPointGIntensityAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointBXAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -7235,7 +7334,9 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBXAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeColorPointBX(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -7299,9 +7400,14 @@ JNI_METHOD(void, ColorControlCluster, reportColorPointBXAttribute)(JNIEnv * env,
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointBYAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -7320,7 +7426,9 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBYAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeColorPointBY(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -7384,9 +7492,14 @@ JNI_METHOD(void, ColorControlCluster, reportColorPointBYAttribute)(JNIEnv * env,
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointBIntensityAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -7405,7 +7518,9 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBIntensityAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeColorPointBIntensity(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -8074,9 +8189,14 @@ JNI_METHOD(void, ColorControlCluster, reportCoupleColorTempToLevelMinMiredsAttri
 }
 
 JNI_METHOD(void, ColorControlCluster, writeStartUpColorTemperatureMiredsAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -8095,8 +8215,9 @@ JNI_METHOD(void, ColorControlCluster, writeStartUpColorTemperatureMiredsAttribut
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeStartUpColorTemperatureMireds(onSuccess->Cancel(), onFailure->Cancel(),
-                                                                  static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -11410,9 +11531,14 @@ JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)
 }
 
 JNI_METHOD(void, GeneralCommissioningCluster, writeBreadcrumbAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -11431,7 +11557,9 @@ JNI_METHOD(void, GeneralCommissioningCluster, writeBreadcrumbAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeBreadcrumb(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint64_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -12372,9 +12500,14 @@ JNI_METHOD(void, IdentifyCluster, triggerEffect)
 }
 
 JNI_METHOD(void, IdentifyCluster, writeIdentifyTimeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -12393,7 +12526,9 @@ JNI_METHOD(void, IdentifyCluster, writeIdentifyTimeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeIdentifyTime(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -13725,9 +13860,14 @@ JNI_METHOD(void, LevelControlCluster, reportMaxFrequencyAttribute)(JNIEnv * env,
 }
 
 JNI_METHOD(void, LevelControlCluster, writeOptionsAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -13746,7 +13886,9 @@ JNI_METHOD(void, LevelControlCluster, writeOptionsAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeOptions(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -13810,9 +13952,14 @@ JNI_METHOD(void, LevelControlCluster, reportOptionsAttribute)(JNIEnv * env, jobj
 }
 
 JNI_METHOD(void, LevelControlCluster, writeOnOffTransitionTimeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -13831,7 +13978,9 @@ JNI_METHOD(void, LevelControlCluster, writeOnOffTransitionTimeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeOnOffTransitionTime(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -13896,9 +14045,14 @@ JNI_METHOD(void, LevelControlCluster, reportOnOffTransitionTimeAttribute)
 }
 
 JNI_METHOD(void, LevelControlCluster, writeOnLevelAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -13917,7 +14071,9 @@ JNI_METHOD(void, LevelControlCluster, writeOnLevelAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeOnLevel(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -13981,9 +14137,14 @@ JNI_METHOD(void, LevelControlCluster, reportOnLevelAttribute)(JNIEnv * env, jobj
 }
 
 JNI_METHOD(void, LevelControlCluster, writeOnTransitionTimeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -14002,7 +14163,9 @@ JNI_METHOD(void, LevelControlCluster, writeOnTransitionTimeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeOnTransitionTime(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -14067,9 +14230,14 @@ JNI_METHOD(void, LevelControlCluster, reportOnTransitionTimeAttribute)
 }
 
 JNI_METHOD(void, LevelControlCluster, writeOffTransitionTimeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -14088,7 +14256,9 @@ JNI_METHOD(void, LevelControlCluster, writeOffTransitionTimeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeOffTransitionTime(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -14153,9 +14323,14 @@ JNI_METHOD(void, LevelControlCluster, reportOffTransitionTimeAttribute)
 }
 
 JNI_METHOD(void, LevelControlCluster, writeDefaultMoveRateAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -14174,7 +14349,9 @@ JNI_METHOD(void, LevelControlCluster, writeDefaultMoveRateAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeDefaultMoveRate(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -14239,9 +14416,14 @@ JNI_METHOD(void, LevelControlCluster, reportDefaultMoveRateAttribute)
 }
 
 JNI_METHOD(void, LevelControlCluster, writeStartUpCurrentLevelAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -14260,7 +14442,9 @@ JNI_METHOD(void, LevelControlCluster, writeStartUpCurrentLevelAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeStartUpCurrentLevel(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -15768,9 +15952,14 @@ JNI_METHOD(void, ModeSelectCluster, reportCurrentModeAttribute)(JNIEnv * env, jo
 }
 
 JNI_METHOD(void, ModeSelectCluster, writeOnModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -15789,7 +15978,9 @@ JNI_METHOD(void, ModeSelectCluster, writeOnModeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeOnMode(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -16747,6 +16938,11 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, writeDefaultOtaProviderAttri
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = chip::JniByteArray(env, static_cast<jbyteArray>(value)).byteSpan();
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -16765,9 +16961,9 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, writeDefaultOtaProviderAttri
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    JniByteArray jniArr(env, value);
-    err = cppCluster->WriteAttributeDefaultOtaProvider(onSuccess->Cancel(), onFailure->Cancel(),
-                                                       chip::ByteSpan((const uint8_t *) jniArr.data(), jniArr.size()));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -17508,9 +17704,14 @@ JNI_METHOD(void, OnOffCluster, reportGlobalSceneControlAttribute)(JNIEnv * env, 
     onReport.release();
 }
 
-JNI_METHOD(void, OnOffCluster, writeOnTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+JNI_METHOD(void, OnOffCluster, writeOnTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -17529,7 +17730,9 @@ JNI_METHOD(void, OnOffCluster, writeOnTimeAttribute)(JNIEnv * env, jobject self,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeOnTime(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -17593,9 +17796,14 @@ JNI_METHOD(void, OnOffCluster, reportOnTimeAttribute)(JNIEnv * env, jobject self
 }
 
 JNI_METHOD(void, OnOffCluster, writeOffWaitTimeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -17614,7 +17822,9 @@ JNI_METHOD(void, OnOffCluster, writeOffWaitTimeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeOffWaitTime(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -17678,9 +17888,14 @@ JNI_METHOD(void, OnOffCluster, reportOffWaitTimeAttribute)(JNIEnv * env, jobject
 }
 
 JNI_METHOD(void, OnOffCluster, writeStartUpOnOffAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -17699,7 +17914,9 @@ JNI_METHOD(void, OnOffCluster, writeStartUpOnOffAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeStartUpOnOff(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -17935,9 +18152,14 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, reportSwitchTypeAttribute)
 }
 
 JNI_METHOD(void, OnOffSwitchConfigurationCluster, writeSwitchActionsAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -17956,7 +18178,9 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, writeSwitchActionsAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeSwitchActions(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20517,9 +20741,14 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, reportLifetimeEnergyConsume
 }
 
 JNI_METHOD(void, PumpConfigurationAndControlCluster, writeOperationModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -20538,7 +20767,9 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeOperationModeAttribute
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeOperationMode(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20603,9 +20834,14 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, reportOperationModeAttribut
 }
 
 JNI_METHOD(void, PumpConfigurationAndControlCluster, writeControlModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -20624,7 +20860,9 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeControlModeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeControlMode(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23426,9 +23664,14 @@ JNI_METHOD(void, TestClusterCluster, testUnknownCommand)(JNIEnv * env, jobject s
 }
 
 JNI_METHOD(void, TestClusterCluster, writeBooleanAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -23447,7 +23690,9 @@ JNI_METHOD(void, TestClusterCluster, writeBooleanAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeBoolean(onSuccess->Cancel(), onFailure->Cancel(), static_cast<bool>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23511,9 +23756,14 @@ JNI_METHOD(void, TestClusterCluster, reportBooleanAttribute)(JNIEnv * env, jobje
 }
 
 JNI_METHOD(void, TestClusterCluster, writeBitmap8Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -23532,7 +23782,9 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap8Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeBitmap8(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23596,9 +23848,14 @@ JNI_METHOD(void, TestClusterCluster, reportBitmap8Attribute)(JNIEnv * env, jobje
 }
 
 JNI_METHOD(void, TestClusterCluster, writeBitmap16Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -23617,7 +23874,9 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap16Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeBitmap16(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23681,9 +23940,14 @@ JNI_METHOD(void, TestClusterCluster, reportBitmap16Attribute)(JNIEnv * env, jobj
 }
 
 JNI_METHOD(void, TestClusterCluster, writeBitmap32Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -23702,7 +23966,9 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap32Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeBitmap32(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint32_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23766,9 +24032,14 @@ JNI_METHOD(void, TestClusterCluster, reportBitmap32Attribute)(JNIEnv * env, jobj
 }
 
 JNI_METHOD(void, TestClusterCluster, writeBitmap64Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -23787,7 +24058,9 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap64Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeBitmap64(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint64_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23851,9 +24124,14 @@ JNI_METHOD(void, TestClusterCluster, reportBitmap64Attribute)(JNIEnv * env, jobj
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt8uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -23872,7 +24150,9 @@ JNI_METHOD(void, TestClusterCluster, writeInt8uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeInt8u(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23936,9 +24216,14 @@ JNI_METHOD(void, TestClusterCluster, reportInt8uAttribute)(JNIEnv * env, jobject
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt16uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -23957,7 +24242,9 @@ JNI_METHOD(void, TestClusterCluster, writeInt16uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeInt16u(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24021,9 +24308,14 @@ JNI_METHOD(void, TestClusterCluster, reportInt16uAttribute)(JNIEnv * env, jobjec
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt32uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -24042,7 +24334,9 @@ JNI_METHOD(void, TestClusterCluster, writeInt32uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeInt32u(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint32_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24106,9 +24400,14 @@ JNI_METHOD(void, TestClusterCluster, reportInt32uAttribute)(JNIEnv * env, jobjec
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt64uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -24127,7 +24426,9 @@ JNI_METHOD(void, TestClusterCluster, writeInt64uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeInt64u(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint64_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24191,9 +24492,14 @@ JNI_METHOD(void, TestClusterCluster, reportInt64uAttribute)(JNIEnv * env, jobjec
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt8sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -24212,7 +24518,9 @@ JNI_METHOD(void, TestClusterCluster, writeInt8sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeInt8s(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24276,9 +24584,14 @@ JNI_METHOD(void, TestClusterCluster, reportInt8sAttribute)(JNIEnv * env, jobject
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt16sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -24297,7 +24610,9 @@ JNI_METHOD(void, TestClusterCluster, writeInt16sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeInt16s(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24361,9 +24676,14 @@ JNI_METHOD(void, TestClusterCluster, reportInt16sAttribute)(JNIEnv * env, jobjec
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt32sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -24382,7 +24702,9 @@ JNI_METHOD(void, TestClusterCluster, writeInt32sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeInt32s(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int32_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24446,9 +24768,14 @@ JNI_METHOD(void, TestClusterCluster, reportInt32sAttribute)(JNIEnv * env, jobjec
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt64sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -24467,7 +24794,9 @@ JNI_METHOD(void, TestClusterCluster, writeInt64sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeInt64s(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int64_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24531,9 +24860,14 @@ JNI_METHOD(void, TestClusterCluster, reportInt64sAttribute)(JNIEnv * env, jobjec
 }
 
 JNI_METHOD(void, TestClusterCluster, writeEnum8Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -24552,7 +24886,9 @@ JNI_METHOD(void, TestClusterCluster, writeEnum8Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeEnum8(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24616,9 +24952,14 @@ JNI_METHOD(void, TestClusterCluster, reportEnum8Attribute)(JNIEnv * env, jobject
 }
 
 JNI_METHOD(void, TestClusterCluster, writeEnum16Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -24637,7 +24978,9 @@ JNI_METHOD(void, TestClusterCluster, writeEnum16Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeEnum16(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24704,6 +25047,11 @@ JNI_METHOD(void, TestClusterCluster, writeOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = chip::JniByteArray(env, static_cast<jbyteArray>(value)).byteSpan();
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -24722,9 +25070,9 @@ JNI_METHOD(void, TestClusterCluster, writeOctetStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    JniByteArray jniArr(env, value);
-    err = cppCluster->WriteAttributeOctetString(onSuccess->Cancel(), onFailure->Cancel(),
-                                                chip::ByteSpan((const uint8_t *) jniArr.data(), jniArr.size()));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24791,6 +25139,11 @@ JNI_METHOD(void, TestClusterCluster, writeLongOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = chip::JniByteArray(env, static_cast<jbyteArray>(value)).byteSpan();
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -24809,9 +25162,9 @@ JNI_METHOD(void, TestClusterCluster, writeLongOctetStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    JniByteArray jniArr(env, value);
-    err = cppCluster->WriteAttributeLongOctetString(onSuccess->Cancel(), onFailure->Cancel(),
-                                                    chip::ByteSpan((const uint8_t *) jniArr.data(), jniArr.size()));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24878,6 +25231,11 @@ JNI_METHOD(void, TestClusterCluster, writeCharStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -24896,9 +25254,9 @@ JNI_METHOD(void, TestClusterCluster, writeCharStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    JniUtfString valueStr(env, value);
-    err = cppCluster->WriteAttributeCharString(onSuccess->Cancel(), onFailure->Cancel(),
-                                               chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24965,6 +25323,11 @@ JNI_METHOD(void, TestClusterCluster, writeLongCharStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -24983,9 +25346,9 @@ JNI_METHOD(void, TestClusterCluster, writeLongCharStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    JniUtfString valueStr(env, value);
-    err = cppCluster->WriteAttributeLongCharString(onSuccess->Cancel(), onFailure->Cancel(),
-                                                   chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25049,9 +25412,14 @@ JNI_METHOD(void, TestClusterCluster, reportLongCharStringAttribute)(JNIEnv * env
 }
 
 JNI_METHOD(void, TestClusterCluster, writeEpochUsAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -25070,7 +25438,9 @@ JNI_METHOD(void, TestClusterCluster, writeEpochUsAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeEpochUs(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint64_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25134,9 +25504,14 @@ JNI_METHOD(void, TestClusterCluster, reportEpochUsAttribute)(JNIEnv * env, jobje
 }
 
 JNI_METHOD(void, TestClusterCluster, writeEpochSAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -25155,7 +25530,9 @@ JNI_METHOD(void, TestClusterCluster, writeEpochSAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeEpochS(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint32_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25219,9 +25596,14 @@ JNI_METHOD(void, TestClusterCluster, reportEpochSAttribute)(JNIEnv * env, jobjec
 }
 
 JNI_METHOD(void, TestClusterCluster, writeVendorIdAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -25240,7 +25622,9 @@ JNI_METHOD(void, TestClusterCluster, writeVendorIdAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeVendorId(onSuccess->Cancel(), onFailure->Cancel(), static_cast<chip::VendorId>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25304,9 +25688,14 @@ JNI_METHOD(void, TestClusterCluster, reportVendorIdAttribute)(JNIEnv * env, jobj
 }
 
 JNI_METHOD(void, TestClusterCluster, writeUnsupportedAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -25325,7 +25714,9 @@ JNI_METHOD(void, TestClusterCluster, writeUnsupportedAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeUnsupported(onSuccess->Cancel(), onFailure->Cancel(), static_cast<bool>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25389,9 +25780,19 @@ JNI_METHOD(void, TestClusterCluster, reportUnsupportedAttribute)(JNIEnv * env, j
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableBooleanAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    bool valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().BooleanToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<bool>() : chip::app::DataModel::Nullable<bool>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -25410,7 +25811,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBooleanAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableBoolean(onSuccess->Cancel(), onFailure->Cancel(), static_cast<bool>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25474,9 +25877,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableBooleanAttribute)(JNIEnv * en
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableBitmap8Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    uint8_t valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -25495,7 +25908,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap8Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableBitmap8(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25559,9 +25974,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableBitmap8Attribute)(JNIEnv * en
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableBitmap16Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    uint16_t valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint16_t>() : chip::app::DataModel::Nullable<uint16_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -25580,7 +26005,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap16Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableBitmap16(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25645,9 +26072,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableBitmap16Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableBitmap32Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    uint32_t valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint32_t>() : chip::app::DataModel::Nullable<uint32_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -25666,7 +26103,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap32Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableBitmap32(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint32_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25731,9 +26170,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableBitmap32Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableBitmap64Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    uint64_t valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint64_t>() : chip::app::DataModel::Nullable<uint64_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -25752,7 +26201,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap64Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableBitmap64(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint64_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25817,9 +26268,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableBitmap64Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt8uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    uint8_t valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -25838,7 +26299,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt8uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableInt8u(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25902,9 +26365,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableInt8uAttribute)(JNIEnv * env,
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt16uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    uint16_t valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint16_t>() : chip::app::DataModel::Nullable<uint16_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -25923,7 +26396,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt16uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableInt16u(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25987,9 +26462,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableInt16uAttribute)(JNIEnv * env
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt32uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    uint32_t valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint32_t>() : chip::app::DataModel::Nullable<uint32_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -26008,7 +26493,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt32uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableInt32u(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint32_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -26072,9 +26559,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableInt32uAttribute)(JNIEnv * env
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt64uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    uint64_t valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint64_t>() : chip::app::DataModel::Nullable<uint64_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -26093,7 +26590,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt64uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableInt64u(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint64_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -26157,9 +26656,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableInt64uAttribute)(JNIEnv * env
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt8sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    int8_t valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int8_t>() : chip::app::DataModel::Nullable<int8_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -26178,7 +26687,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt8sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableInt8s(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -26242,9 +26753,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableInt8sAttribute)(JNIEnv * env,
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt16sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    int16_t valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int16_t>() : chip::app::DataModel::Nullable<int16_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -26263,7 +26784,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt16sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableInt16s(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -26327,9 +26850,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableInt16sAttribute)(JNIEnv * env
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt32sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    int32_t valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int32_t>() : chip::app::DataModel::Nullable<int32_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -26348,7 +26881,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt32sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableInt32s(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int32_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -26412,9 +26947,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableInt32sAttribute)(JNIEnv * env
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt64sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    int64_t valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniReferences::GetInstance().LongToPrimitive(value);
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<int64_t>() : chip::app::DataModel::Nullable<int64_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -26433,7 +26978,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt64sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableInt64s(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int64_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -26497,9 +27044,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableInt64sAttribute)(JNIEnv * env
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableEnum8Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    decltype(cppValue) valueValue;
+    if (value != nullptr)
+    {
+        valueValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -26518,7 +27075,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnum8Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableEnum8(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -26582,9 +27141,19 @@ JNI_METHOD(void, TestClusterCluster, reportNullableEnum8Attribute)(JNIEnv * env,
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableEnum16Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    decltype(cppValue) valueValue;
+    if (value != nullptr)
+    {
+        valueValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint16_t>() : chip::app::DataModel::Nullable<uint16_t>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -26603,7 +27172,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnum16Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeNullableEnum16(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -26670,6 +27241,17 @@ JNI_METHOD(void, TestClusterCluster, writeNullableOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    chip::ByteSpan valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniByteArray(env, static_cast<jbyteArray>(value)).byteSpan();
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<chip::ByteSpan>()
+                                : chip::app::DataModel::Nullable<chip::ByteSpan>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -26688,9 +27270,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableOctetStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    JniByteArray jniArr(env, value);
-    err = cppCluster->WriteAttributeNullableOctetString(onSuccess->Cancel(), onFailure->Cancel(),
-                                                        chip::ByteSpan((const uint8_t *) jniArr.data(), jniArr.size()));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -26758,6 +27340,17 @@ JNI_METHOD(void, TestClusterCluster, writeNullableCharStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    chip::CharSpan valueValue;
+    if (value != nullptr)
+    {
+        valueValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+    }
+    cppValue = value == nullptr ? chip::app::DataModel::Nullable<chip::CharSpan>()
+                                : chip::app::DataModel::Nullable<chip::CharSpan>(valueValue);
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -26776,9 +27369,9 @@ JNI_METHOD(void, TestClusterCluster, writeNullableCharStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    JniUtfString valueStr(env, value);
-    err = cppCluster->WriteAttributeNullableCharString(onSuccess->Cancel(), onFailure->Cancel(),
-                                                       chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -27375,9 +27968,14 @@ JNI_METHOD(void, ThermostatCluster, reportAbsMaxCoolSetpointLimitAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeOccupiedCoolingSetpointAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -27396,7 +27994,9 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedCoolingSetpointAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeOccupiedCoolingSetpoint(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -27461,9 +28061,14 @@ JNI_METHOD(void, ThermostatCluster, reportOccupiedCoolingSetpointAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeOccupiedHeatingSetpointAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -27482,7 +28087,9 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedHeatingSetpointAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeOccupiedHeatingSetpoint(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -27547,9 +28154,14 @@ JNI_METHOD(void, ThermostatCluster, reportOccupiedHeatingSetpointAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeMinHeatSetpointLimitAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -27568,7 +28180,9 @@ JNI_METHOD(void, ThermostatCluster, writeMinHeatSetpointLimitAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeMinHeatSetpointLimit(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -27633,9 +28247,14 @@ JNI_METHOD(void, ThermostatCluster, reportMinHeatSetpointLimitAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeMaxHeatSetpointLimitAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -27654,7 +28273,9 @@ JNI_METHOD(void, ThermostatCluster, writeMaxHeatSetpointLimitAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeMaxHeatSetpointLimit(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -27719,9 +28340,14 @@ JNI_METHOD(void, ThermostatCluster, reportMaxHeatSetpointLimitAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeMinCoolSetpointLimitAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -27740,7 +28366,9 @@ JNI_METHOD(void, ThermostatCluster, writeMinCoolSetpointLimitAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeMinCoolSetpointLimit(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -27805,9 +28433,14 @@ JNI_METHOD(void, ThermostatCluster, reportMinCoolSetpointLimitAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeMaxCoolSetpointLimitAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -27826,7 +28459,9 @@ JNI_METHOD(void, ThermostatCluster, writeMaxCoolSetpointLimitAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeMaxCoolSetpointLimit(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int16_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -27891,9 +28526,14 @@ JNI_METHOD(void, ThermostatCluster, reportMaxCoolSetpointLimitAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeMinSetpointDeadBandAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -27912,7 +28552,9 @@ JNI_METHOD(void, ThermostatCluster, writeMinSetpointDeadBandAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeMinSetpointDeadBand(onSuccess->Cancel(), onFailure->Cancel(), static_cast<int8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -27977,9 +28619,14 @@ JNI_METHOD(void, ThermostatCluster, reportMinSetpointDeadBandAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeControlSequenceOfOperationAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -27998,8 +28645,9 @@ JNI_METHOD(void, ThermostatCluster, writeControlSequenceOfOperationAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err =
-        cppCluster->WriteAttributeControlSequenceOfOperation(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -28064,9 +28712,14 @@ JNI_METHOD(void, ThermostatCluster, reportControlSequenceOfOperationAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeSystemModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -28085,7 +28738,9 @@ JNI_METHOD(void, ThermostatCluster, writeSystemModeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeSystemMode(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -28430,9 +29085,14 @@ JNI_METHOD(jlong, ThermostatUserInterfaceConfigurationCluster, initWithDevice)
 }
 
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDisplayModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -28452,7 +29112,9 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDi
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeTemperatureDisplayMode(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -28519,9 +29181,14 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, reportTemperatureD
 }
 
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockoutAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -28541,7 +29208,9 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockout
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeKeypadLockout(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -28608,9 +29277,14 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, reportKeypadLockou
 }
 
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgrammingVisibilityAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -28630,8 +29304,9 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgr
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeScheduleProgrammingVisibility(onSuccess->Cancel(), onFailure->Cancel(),
-                                                                  static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -34125,9 +34800,14 @@ JNI_METHOD(void, WindowCoveringCluster, reportInstalledClosedLimitTiltAttribute)
 }
 
 JNI_METHOD(void, WindowCoveringCluster, writeModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -34146,7 +34826,9 @@ JNI_METHOD(void, WindowCoveringCluster, writeModeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->WriteAttributeMode(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint8_t>(value));
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
