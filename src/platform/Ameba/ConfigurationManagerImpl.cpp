@@ -137,10 +137,11 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 
     wifi_get_mac_address(temp);
 
-    char *token = strtok(temp, ":");
-    while(token != NULL) {
+    char * token = strtok(temp, ":");
+    while (token != NULL)
+    {
         mac[i] = (uint32_t) strtol(token, NULL, 16);
-        token = strtok(NULL, ":");
+        token  = strtok(NULL, ":");
         i++;
     }
 
