@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import chiptest
 import coloredlogs
 import click
 import logging
@@ -29,6 +28,8 @@ from dataclasses import dataclass
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
+import chiptest
+from chiptest.glob_matcher import GlobMatcher
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -75,6 +76,16 @@ class RunContext:
     help='Test to run (use "all" to run all tests)'
 )
 @click.option(
+    '--target-glob',
+    default='',
+    help='What targets to accept (glob)'
+)
+@click.option(
+    '--target-skip-glob',
+    default='',
+    help='What targets to skip (glob)'
+)
+@click.option(
     '--no-log-timestamps',
     default=False,
     is_flag=True,
@@ -91,7 +102,7 @@ class RunContext:
     help='Internal flag for running inside a unshared environment'
 )
 @click.pass_context
-def main(context, log_level, target, no_log_timestamps, root, internal_inside_unshare):
+def main(context, log_level, target, target_glob, target_skip_glob, no_log_timestamps, root, internal_inside_unshare):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -103,6 +114,15 @@ def main(context, log_level, target, no_log_timestamps, root, internal_inside_un
     if 'all' not in target:
         target = set([name.lower() for name in target])
         tests = [test for test in tests if test.name in target]
+
+    if target_glob:
+        matcher = GlobMatcher(target_glob)
+        tests = [test for test in tests if matcher.matches(test.name)]
+
+    if target_skip_glob:
+        matcher = GlobMatcher(target_skip_glob)
+        tests = [test for test in tests if not matcher.matches(test.name)]
+
     tests.sort(key=lambda x: x.name)
 
     context.obj = RunContext(root=root, tests=tests,
