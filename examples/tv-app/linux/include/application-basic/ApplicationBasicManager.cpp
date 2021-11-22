@@ -17,6 +17,7 @@
  */
 
 #include "ApplicationBasicManager.h"
+#include "../../AppPlatform.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -30,6 +31,7 @@
 #include <inipp/inipp.h>
 
 using namespace chip;
+using namespace chip::AppPlatform;
 
 CHIP_ERROR ApplicationBasicManager::Init()
 {
@@ -157,5 +159,14 @@ bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatu
 {
     // TODO: Insert code here
     ChipLogProgress(Zcl, "Sent an application status change request %d for endpoint %d", status, endpoint);
+
+    ContentApp * app = chip::AppPlatform::GetContentAppByEndpointId(endpoint);
+    if (app == nullptr)
+    {
+        ChipLogProgress(Zcl, "No app for endpoint %d", endpoint);
+        return false;
+    }
+    app->SetApplicationStatus(status);
+
     return true;
 }

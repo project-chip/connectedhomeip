@@ -17,19 +17,13 @@
  */
 
 /**
- * @brief Registers shell commands for performing discovery (eg. of commissionable nodes) related to commissioning.
+ * @brief Registers shell commands for a commissionee (eg. end device) related to commissioning.
  */
-
-#include <controller/CHIPDeviceController.h>
-
-using namespace ::chip::Controller;
 
 namespace chip {
 namespace Shell {
 
-void RegisterControllerCommands(chip::Controller::DeviceCommissioner * commissioner);
-CHIP_ERROR pairUDC(bool printHeader, uint32_t pincode, size_t index);
-DeviceCommissioner * GetDeviceCommissioner();
+void RegisterAppPlatformCommands();
 
 } // namespace Shell
 } // namespace chip

@@ -75,6 +75,15 @@ public:
     uint16_t GetLongDiscriminator() const { return mLongDiscriminator; }
     void SetLongDiscriminator(uint16_t value) { mLongDiscriminator = value; }
 
+    uint16_t GetVendorId() const { return mVendorId; }
+    void SetVendorId(uint16_t value) { mVendorId = value; }
+
+    uint16_t GetProductId() const { return mProductId; }
+    void SetProductId(uint16_t value) { mProductId = value; }
+
+    const uint8_t * GetRotatingId() const { return mRotatingId; }
+    void SetRotatingId(const uint8_t * rotatingId) { memcpy(mRotatingId, rotatingId, sizeof(mRotatingId)); }
+
     UDCClientProcessingState GetUDCClientProcessingState() const { return mUDCClientProcessingState; }
     void SetUDCClientProcessingState(UDCClientProcessingState state) { mUDCClientProcessingState = state; }
 
@@ -102,6 +111,9 @@ private:
     char mInstanceName[Dnssd::Commissionable::kInstanceNameMaxLength + 1];
     char mDeviceName[Dnssd::kMaxDeviceNameLen + 1];
     uint16_t mLongDiscriminator = 0;
+    uint16_t mVendorId;
+    uint16_t mProductId;
+    uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
     UDCClientProcessingState mUDCClientProcessingState;
     System::Clock::Timestamp mExpirationTime = System::Clock::kZero;
 };

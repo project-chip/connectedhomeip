@@ -17,6 +17,8 @@
  */
 
 #include "AppMain.h"
+#include "AppPlatform.h"
+#include "AppPlatformShellCommands.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -33,6 +35,10 @@
 #include "include/media-playback/MediaPlaybackManager.h"
 #include "include/target-navigator/TargetNavigatorManager.h"
 #include "include/tv-channel/TvChannelManager.h"
+
+#if defined(ENABLE_CHIP_SHELL)
+#include <lib/shell/Engine.h>
+#endif
 
 using namespace chip;
 using namespace chip::Transport;
@@ -81,6 +87,13 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+
+    chip::AppPlatform::SetupAppPlatform();
+
+#if defined(ENABLE_CHIP_SHELL)
+    chip::Shell::RegisterAppPlatformCommands();
+#endif
+
     ChipLinuxAppMainLoop();
 exit:
     if (err != CHIP_NO_ERROR)

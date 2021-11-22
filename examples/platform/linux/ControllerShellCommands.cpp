@@ -39,6 +39,11 @@ using namespace ::chip::Controller;
 
 DeviceCommissioner * gCommissioner;
 
+DeviceCommissioner * GetDeviceCommissioner()
+{
+    return gCommissioner;
+}
+
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 static CHIP_ERROR ResetUDC(bool printHeader)
 {
@@ -232,7 +237,7 @@ static CHIP_ERROR pairOnNetwork(bool printHeader, uint32_t pincode, uint16_t dis
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR pairUDC(bool printHeader, uint32_t pincode, size_t index)
+CHIP_ERROR pairUDC(bool printHeader, uint32_t pincode, size_t index)
 {
     streamer_t * sout = streamer_get();
 
