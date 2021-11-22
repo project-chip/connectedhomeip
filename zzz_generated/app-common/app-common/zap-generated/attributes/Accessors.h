@@ -1555,10 +1555,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // ch
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ProductName
 
-namespace UserLabel {
+namespace NodeLabel {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace UserLabel
+} // namespace NodeLabel
 
 namespace HardwareVersion {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
@@ -1591,7 +1591,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace PartNumber
 
 namespace ProductURL {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // long_char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ProductURL
 
@@ -1609,6 +1609,11 @@ namespace Reachable {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace Reachable
+
+namespace UniqueID {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace UniqueID
 
 } // namespace Attributes
 } // namespace BridgedDeviceBasic

@@ -9914,7 +9914,7 @@ class BridgedDeviceBasic(Cluster):
             value: 'typing.Optional[str]' = None
 
         @dataclass
-        class UserLabel(ClusterAttributeDescriptor):
+        class NodeLabel(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0039
@@ -10088,6 +10088,22 @@ class BridgedDeviceBasic(Cluster):
                 return ClusterObjectFieldDescriptor(Type=bool)
 
             value: 'bool' = None
+
+        @dataclass
+        class UniqueID(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0039
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0012
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[str])
+
+            value: 'typing.Optional[str]' = None
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
