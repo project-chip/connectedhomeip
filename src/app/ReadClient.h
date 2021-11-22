@@ -266,7 +266,7 @@ private:
     CHIP_ERROR RefreshLivenessCheckTimer();
     void CancelLivenessCheckTimer();
     void MoveToState(const ClientState aTargetState);
-    CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ClusterInfo & aClusterInfo);
+    CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;

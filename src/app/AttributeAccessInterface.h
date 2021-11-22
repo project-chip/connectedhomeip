@@ -111,8 +111,6 @@ public:
     template <typename... Ts>
     CHIP_ERROR EncodeListItem(Ts... aArgs)
     {
-        ReturnErrorOnFailure(EncodeEmptyList());
-
         // We make Encode atomic here, so need to tell the caller to not rollback when we encounter an error during encoding.
         mEncodeState.mAllowPartialData = true;
 
@@ -155,6 +153,9 @@ public:
     CHIP_ERROR EncodeList(ListGenerator aCallback)
     {
         mTriedEncode = true;
+        // Spec 10.5.4.3.1, 10.5.4.6 (Replace a list w/ Multiple IBs)
+        // EmptyList acts as the beginning of the whole array type attribute report.
+        ReturnErrorOnFailure(EncodeEmptyList());
         ReturnErrorOnFailure(aCallback(ListEncodeHelper(*this)));
         // The Encode procedure finished without any error, clear the state.
         mEncodeState = AttributeEncodeState();
