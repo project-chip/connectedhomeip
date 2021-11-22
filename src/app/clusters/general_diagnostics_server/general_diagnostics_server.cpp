@@ -236,7 +236,7 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
     }
 
     // Get called when the Node detects a radio fault has been raised.
-    void OnHardwareFaultsDetected() override
+    void OnRadioFaultsDetected() override
     {
         ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnHardwareFaultsDetected");
 
