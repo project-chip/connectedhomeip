@@ -172,11 +172,12 @@ jobs:
               timeout-minutes: 45
               run: |
                   ./scripts/run_in_build_env.sh \
-                  "./scripts/tests/run_test_suite.py run \
+                  "./scripts/tests/run_test_suite.py \
+                     --target-skip-glob 'tv-*' \
+                     run \
                      --chip-tool ./out/debug/standalone/chip-tool \
                      --all-clusters-app ./out/debug/standalone/chip-all-clusters-app \
                      --tv-app ./out/debug/standalone/chip-tv-app \
-                     --target-skip-glob 'tv-*'
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v2
