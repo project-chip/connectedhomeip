@@ -55,7 +55,7 @@ public:
 
     AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
                                                                         const ByteSpan & firmwareInfo,
-                                                                        DeviceInfoForAttestation deviceInfo) override
+                                                                        const DeviceInfoForAttestation & deviceInfo) override
     {
         (void) certDeclBuffer;
         (void) firmwareInfo;

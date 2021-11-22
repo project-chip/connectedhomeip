@@ -18,6 +18,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -81,17 +82,19 @@ enum CertificateType : uint8_t
 struct DeviceInfoForAttestation
 {
     // Vendor ID reported by device in Basic Information cluster
-    uint16_t vendorId = 0;
+    uint16_t vendorId = VendorId::NotSpecified;
     // Product ID reported by device in Basic Information cluster
     uint16_t productId = 0;
-    // Vendor ID from  DAC/PAI/PAA
-    uint16_t dacVendorId = 0;
+    // Vendor ID from  DAC
+    uint16_t dacVendorId = VendorId::NotSpecified;
     // Product ID from DAC
     uint16_t dacProductId = 0;
+    // Vendor ID from PAI cert
+    uint16_t paiVendorId = VendorId::NotSpecified;
     // Product ID from PAI cert (0 if absent)
     uint16_t paiProductId = 0;
-    // Vendor ID from  PAA cert (0 if absent)
-    uint16_t paaProductId = 0;
+    // Vendor ID from  PAA cert
+    uint16_t paaVendorId = VendorId::NotSpecified;
 };
 
 class DeviceAttestationVerifier
@@ -148,7 +151,7 @@ public:
      */
     virtual AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
                                                                                 const ByteSpan & firmwareInfo,
-                                                                                DeviceInfoForAttestation deviceInfo) = 0;
+                                                                                const DeviceInfoForAttestation & deviceInfo) = 0;
 
     // TODO: Validate Firmware Information
 

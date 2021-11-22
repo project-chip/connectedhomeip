@@ -63,23 +63,25 @@ struct CertificationElements
     bool DACOriginVIDandPIDPresent;
 };
 
+struct CertificationDeclarationContent
+{
+    uint16_t formatVersion;
+    uint16_t vendorId;
+    bool containsPID;
+    uint32_t deviceTypeId;
+    char certificateId[kCertificateIdLength + 1];
+    uint8_t securityLevel;
+    uint16_t securityInformation;
+    uint16_t versionNumber;
+    uint8_t certificationType;
+    uint16_t dacOriginVendorId;
+    uint16_t dacOriginProductId;
+    bool dacOriginVIDandPIDPresent;
+};
+
 class CertificationElementsDecoder
 {
 public:
-    uint16_t FormatVersion;
-    uint16_t VendorId;
-    bool ContainsPID;
-    uint32_t DeviceTypeId;
-    char CertificateId[kCertificateIdLength + 1];
-    uint8_t SecurityLevel;
-    uint16_t SecurityInformation;
-    uint16_t VersionNumber;
-    uint8_t CertificationType;
-    uint16_t DACOriginVendorId;
-    uint16_t DACOriginProductId;
-    bool DACOriginVIDandPIDPresent;
-
-    CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements);
     bool IsProductIdIn(const ByteSpan & encodedCertElements, uint16_t productId);
 
 private:
@@ -101,8 +103,7 @@ private:
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR
-EncodeCertificationElements(const CertificationElements & certElements, MutableByteSpan & encodedCertElements);
+CHIP_ERROR EncodeCertificationElements(const CertificationElements & certElements, MutableByteSpan & encodedCertElements);
 
 /**
  * @brief Decode certification elements from TLV encoded structure.
@@ -113,6 +114,16 @@ EncodeCertificationElements(const CertificationElements & certElements, MutableB
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, CertificationElements & certElements);
+
+/**
+ * @brief Decode certification elements from TLV encoded structure.
+ *
+ * @param[in]  encodedCertElements  A byte span to read the TLV encoded certification elements.
+ * @param[out] certDeclContent         Decoded Certification Declaration Content.
+ *
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, CertificationDeclarationContent & certDeclContent);
 
 /**
  * @brief Generate CMS signed message.

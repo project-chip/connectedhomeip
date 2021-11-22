@@ -1776,7 +1776,7 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
 
 namespace {
 
-CHIP_ERROR _ExtractDNAttributeFromX509Cert(const char * oidString, const ByteSpan & certificate, uint16_t & id)
+CHIP_ERROR ExtractDNAttributeFromX509Cert(const char * oidString, const ByteSpan & certificate, uint16_t & id)
 {
     CHIP_ERROR err                            = CHIP_NO_ERROR;
     X509 * x509certificate                    = nullptr;
@@ -1835,10 +1835,10 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & 
     {
     case MatterOid::kVendorId:
         id = VendorId::NotSpecified;
-        return _ExtractDNAttributeFromX509Cert(vidOidString, certificate, id);
+        return ExtractDNAttributeFromX509Cert(vidOidString, certificate, id);
     case MatterOid::kProductId:
         id = 0; // PID not specified value
-        return _ExtractDNAttributeFromX509Cert(pidOidString, certificate, id);
+        return ExtractDNAttributeFromX509Cert(pidOidString, certificate, id);
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

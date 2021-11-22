@@ -287,8 +287,9 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
         .productId    = sTestCMS_CertElements.ProductIds[0],
         .dacVendorId  = sTestCMS_CertElements.VendorId,
         .dacProductId = sTestCMS_CertElements.ProductIds[0],
+        .paiVendorId  = sTestCMS_CertElements.VendorId,
         .paiProductId = sTestCMS_CertElements.ProductIds[0],
-        .paaProductId = sTestCMS_CertElements.ProductIds[0],
+        .paaVendorId  = sTestCMS_CertElements.VendorId,
     };
     attestation_result = default_verifier->ValidateCertificateDeclarationPayload(cd_payload, ByteSpan(), deviceInfo);
     NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);

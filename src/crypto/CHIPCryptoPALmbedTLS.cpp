@@ -1408,8 +1408,8 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
 
 namespace {
 
-CHIP_ERROR _ExtractDNAttributeFromX509Cert(const uint8_t * oidAttribute, size_t oidAttributeLen, const ByteSpan & certificate,
-                                           uint16_t & id)
+CHIP_ERROR ExtractDNAttributeFromX509Cert(const uint8_t * oidAttribute, size_t oidAttributeLen, const ByteSpan & certificate,
+                                          uint16_t & id)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -1468,12 +1468,12 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & 
     {
     case MatterOid::kVendorId:
         id = VendorId::NotSpecified;
-        return _ExtractDNAttributeFromX509Cert(sOID_AttributeType_ChipVendorId, sizeof(sOID_AttributeType_ChipVendorId),
-                                               certificate, id);
+        return ExtractDNAttributeFromX509Cert(sOID_AttributeType_ChipVendorId, sizeof(sOID_AttributeType_ChipVendorId), certificate,
+                                              id);
     case MatterOid::kProductId:
         id = 0; // PID not specified value
-        return _ExtractDNAttributeFromX509Cert(sOID_AttributeType_ChipProductId, sizeof(sOID_AttributeType_ChipProductId),
-                                               certificate, id);
+        return ExtractDNAttributeFromX509Cert(sOID_AttributeType_ChipProductId, sizeof(sOID_AttributeType_ChipProductId),
+                                              certificate, id);
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

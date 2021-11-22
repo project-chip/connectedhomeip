@@ -176,7 +176,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CertificationElementsDecoder::DecodeCertificationElements(const ByteSpan & encodedCertElements)
+CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, CertificationDeclarationContent & certDeclContent)
 {
     CHIP_ERROR err;
     TLVReader reader;
@@ -191,48 +191,48 @@ CHIP_ERROR CertificationElementsDecoder::DecodeCertificationElements(const ByteS
     ReturnErrorOnFailure(reader.EnterContainer(outerContainer1));
 
     ReturnErrorOnFailure(reader.Next(ContextTag(kTag_FormatVersion)));
-    ReturnErrorOnFailure(reader.Get(FormatVersion));
+    ReturnErrorOnFailure(reader.Get(certDeclContent.formatVersion));
 
     ReturnErrorOnFailure(reader.Next(ContextTag(kTag_VendorId)));
-    ReturnErrorOnFailure(reader.Get(VendorId));
+    ReturnErrorOnFailure(reader.Get(certDeclContent.vendorId));
 
     ReturnErrorOnFailure(reader.Next(kTLVType_Array, ContextTag(kTag_ProductIdArray)));
     ReturnErrorOnFailure(reader.EnterContainer(outerContainer2));
 
-    ContainsPID = true;
+    certDeclContent.containsPID = true;
 
     ReturnErrorOnFailure(reader.ExitContainer(outerContainer2));
 
     ReturnErrorOnFailure(reader.Next(ContextTag(kTag_DeviceTypeId)));
-    ReturnErrorOnFailure(reader.Get(DeviceTypeId));
+    ReturnErrorOnFailure(reader.Get(certDeclContent.deviceTypeId));
 
     ReturnErrorOnFailure(reader.Next(kTLVType_UTF8String, ContextTag(kTag_CertificateId)));
-    ReturnErrorOnFailure(reader.GetString(CertificateId, sizeof(CertificateId)));
-    VerifyOrReturnError(strlen(CertificateId) == kCertificateIdLength, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    ReturnErrorOnFailure(reader.GetString(certDeclContent.certificateId, sizeof(certDeclContent.certificateId)));
+    VerifyOrReturnError(strlen(certDeclContent.certificateId) == kCertificateIdLength, CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     ReturnErrorOnFailure(reader.Next(ContextTag(kTag_SecurityLevel)));
-    ReturnErrorOnFailure(reader.Get(SecurityLevel));
+    ReturnErrorOnFailure(reader.Get(certDeclContent.securityLevel));
 
     ReturnErrorOnFailure(reader.Next(ContextTag(kTag_SecurityInformation)));
-    ReturnErrorOnFailure(reader.Get(SecurityInformation));
+    ReturnErrorOnFailure(reader.Get(certDeclContent.securityInformation));
 
     ReturnErrorOnFailure(reader.Next(ContextTag(kTag_VersionNumber)));
-    ReturnErrorOnFailure(reader.Get(VersionNumber));
+    ReturnErrorOnFailure(reader.Get(certDeclContent.versionNumber));
 
     ReturnErrorOnFailure(reader.Next(ContextTag(kTag_CertificationType)));
-    ReturnErrorOnFailure(reader.Get(CertificationType));
+    ReturnErrorOnFailure(reader.Get(certDeclContent.certificationType));
 
-    DACOriginVIDandPIDPresent = false;
+    certDeclContent.dacOriginVIDandPIDPresent = false;
 
     // If kTag_DACOriginVendorId present then kTag_DACOriginProductId must be present.
     if ((err = reader.Next(ContextTag(kTag_DACOriginVendorId))) == CHIP_NO_ERROR)
     {
-        ReturnErrorOnFailure(reader.Get(DACOriginVendorId));
+        ReturnErrorOnFailure(reader.Get(certDeclContent.dacOriginVendorId));
 
         ReturnErrorOnFailure(reader.Next(ContextTag(kTag_DACOriginProductId)));
-        ReturnErrorOnFailure(reader.Get(DACOriginProductId));
+        ReturnErrorOnFailure(reader.Get(certDeclContent.dacOriginProductId));
 
-        DACOriginVIDandPIDPresent = true;
+        certDeclContent.dacOriginVIDandPIDPresent = true;
 
         err = reader.Next();
     }

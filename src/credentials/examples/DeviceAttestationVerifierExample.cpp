@@ -203,7 +203,7 @@ public:
 
     AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
                                                                         const ByteSpan & firmwareInfo,
-                                                                        DeviceInfoForAttestation deviceInfo) override;
+                                                                        const DeviceInfoForAttestation & deviceInfo) override;
 };
 
 AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
@@ -213,12 +213,12 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
                                                                                const ByteSpan & dacCertDerBuffer,
                                                                                const ByteSpan & attestationNonce)
 {
-    VendorId dacVendorId;
+    VendorId dacVendorId = VendorId::NotSpecified;
     // match DAC and PAI VIDs
     if (!paiCertDerBuffer.empty())
     {
-        uint16_t paiVid;
-        uint16_t dacVid;
+        uint16_t paiVid = VendorId::NotSpecified;
+        uint16_t dacVid = VendorId::NotSpecified;
 
         CHIP_ERROR error     = ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, paiCertDerBuffer, paiVid);
         const bool paiHasVid = error != CHIP_ERROR_KEY_NOT_FOUND;
@@ -265,7 +265,7 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
 
     // if PAA contains VID, see if matches with DAC's VID.
     {
-        uint16_t paaVid;
+        uint16_t paaVid  = VendorId::NotSpecified;
         CHIP_ERROR error = ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, paa, paaVid);
         VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_ERROR_KEY_NOT_FOUND,
                             AttestationVerificationResult::kPaaFormatInvalid);
@@ -298,6 +298,7 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
         .vendorId    = 0xFFF1,
         .productId   = 0x8000, // TODO: Retrieve vendorId and ProductId from Basic Information Cluster
         .dacVendorId = dacVendorId,
+        .paiVendorId = dacVendorId,
     };
     VerifyOrReturnError(ExtractDNAttributeFromX509Cert(MatterOid::kProductId, dacCertDerBuffer, deviceInfo.dacProductId) ==
                             CHIP_NO_ERROR,
@@ -305,9 +306,6 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
     // If PID is missing from PAI, the next method call will return CHIP_ERROR_KEY_NOT_FOUND.
     // Valid return values are then CHIP_NO_ERROR or CHIP_ERROR_KEY_NOT_FOUND.
     CHIP_ERROR error = ExtractDNAttributeFromX509Cert(MatterOid::kProductId, paiCertDerBuffer, deviceInfo.paiProductId);
-    VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_ERROR_KEY_NOT_FOUND,
-                        AttestationVerificationResult::kPaiFormatInvalid);
-    error = ExtractDNAttributeFromX509Cert(MatterOid::kProductId, paa, deviceInfo.paaProductId);
     VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_ERROR_KEY_NOT_FOUND,
                         AttestationVerificationResult::kPaiFormatInvalid);
     return ValidateCertificateDeclarationPayload(certificationDeclarationPayload, firmwareInfoSpan, deviceInfo);
@@ -334,10 +332,11 @@ AttestationVerificationResult ExampleDACVerifier::ValidateCertificationDeclarati
 
 AttestationVerificationResult ExampleDACVerifier::ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
                                                                                         const ByteSpan & firmwareInfo,
-                                                                                        DeviceInfoForAttestation deviceInfo)
+                                                                                        const DeviceInfoForAttestation & deviceInfo)
 {
+    CertificationDeclarationContent cdContent;
     CertificationElementsDecoder cdElementsDecoder;
-    VerifyOrReturnError(cdElementsDecoder.DecodeCertificationElements(certDeclBuffer) == CHIP_NO_ERROR,
+    VerifyOrReturnError(DecodeCertificationElements(certDeclBuffer, cdContent) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kCertificationDeclarationInvalidFormat);
 
     if (!firmwareInfo.empty())
@@ -347,7 +346,7 @@ AttestationVerificationResult ExampleDACVerifier::ValidateCertificateDeclaration
 
     // The vendor_id field in the Certification Declaration SHALL match the VendorID attribute found in the Basic Information
     // cluster
-    VerifyOrReturnError(cdElementsDecoder.VendorId == deviceInfo.vendorId,
+    VerifyOrReturnError(cdContent.vendorId == deviceInfo.vendorId,
                         AttestationVerificationResult::kCertificationDeclarationInvalidVendorId);
 
     //  The product_id_array field in the Certification Declaration SHALL contain the value of the ProductID attribute found in
@@ -355,52 +354,42 @@ AttestationVerificationResult ExampleDACVerifier::ValidateCertificateDeclaration
     VerifyOrReturnError(cdElementsDecoder.IsProductIdIn(certDeclBuffer, deviceInfo.productId),
                         AttestationVerificationResult::kCertificationDeclarationInvalidProductId);
 
-    if (cdElementsDecoder.DACOriginVIDandPIDPresent)
+    if (cdContent.dacOriginVIDandPIDPresent)
     {
-        // The Vendor ID (VID) subject DN in the DAC SHALL match the dac_origin_vendor_id field in the Certification
-        // Declaration.
-        VerifyOrReturnError(deviceInfo.dacVendorId == cdElementsDecoder.DACOriginVendorId,
+        // The Vendor ID (VID) subject DN in the DAC SHALL match the dac_origin_vendor_id field in the Certification Declaration.
+        VerifyOrReturnError(deviceInfo.dacVendorId == cdContent.dacOriginVendorId,
                             AttestationVerificationResult::kCertificationDeclarationInvalidVendorId);
-        // The Product ID (PID) subject DN in the DAC SHALL match the dac_origin_product_id field in the Certification
-        // Declaration.
-        VerifyOrReturnError(deviceInfo.dacProductId == cdElementsDecoder.DACOriginProductId,
+        // The Vendor ID (VID) subject DN in the PAI SHALL match the dac_origin_vendor_id field in the Certification Declaration.
+        VerifyOrReturnError(deviceInfo.paiVendorId == cdContent.dacOriginVendorId,
+                            AttestationVerificationResult::kCertificationDeclarationInvalidVendorId);
+        // The Product ID (PID) subject DN in the DAC SHALL match the dac_origin_product_id field in the Certification Declaration.
+        VerifyOrReturnError(deviceInfo.dacProductId == cdContent.dacOriginProductId,
                             AttestationVerificationResult::kCertificationDeclarationInvalidProductId);
-        // The Product ID (PID) subject DN in the PAI, if such a Product ID is present, SHALL match the dac_origin_product_id
-        // field in the Certification Declaration.
+        // The Product ID (PID) subject DN in the PAI, if such a Product ID is present, SHALL match the dac_origin_product_id field
+        // in the Certification Declaration.
         if (deviceInfo.paiProductId != 0) // if PAI PID is present
         {
-            VerifyOrReturnError(deviceInfo.paiProductId == cdElementsDecoder.DACOriginProductId,
-                                AttestationVerificationResult::kCertificationDeclarationInvalidProductId);
-        }
-        // The Product ID (PID) subject DN in the PAA, if such a Product ID is present, SHALL match the dac_origin_product_id
-        // field in the Certification Declaration.
-        if (deviceInfo.paaProductId != 0) // if PAA PID is present
-        {
-            VerifyOrReturnError(deviceInfo.paaProductId == cdElementsDecoder.DACOriginProductId,
+            VerifyOrReturnError(deviceInfo.paiProductId == cdContent.dacOriginProductId,
                                 AttestationVerificationResult::kCertificationDeclarationInvalidProductId);
         }
     }
     else
     {
         //  The Vendor ID (VID) subject DN in the DAC SHALL match the vendor_id field in the Certification Declaration
-        VerifyOrReturnError(deviceInfo.dacVendorId == cdElementsDecoder.VendorId,
+        VerifyOrReturnError(deviceInfo.dacVendorId == cdContent.vendorId,
                             AttestationVerificationResult::kCertificationDeclarationInvalidVendorId);
-        //  The Product ID (PID) subject DN in the DAC SHALL be present in the product_id_array field in the Certification
-        //  Declaration.
+        // The Vendor ID (VID) subject DN in the PAI SHALL match the vendor_id field in the Certification Declaration.
+        VerifyOrReturnError(deviceInfo.paiVendorId == cdContent.vendorId,
+                            AttestationVerificationResult::kCertificationDeclarationInvalidVendorId);
+        // The Product ID (PID) subject DN in the DAC SHALL be present in the product_id_array field in the Certification
+        // Declaration.
         VerifyOrReturnError(cdElementsDecoder.IsProductIdIn(certDeclBuffer, deviceInfo.dacProductId),
                             AttestationVerificationResult::kCertificationDeclarationInvalidProductId);
-        // The Product ID (PID) subject DN in the PAI, if such a Product ID is present, SHALL match one of the values present in
-        // the product_id_array field in the Certification Declaration.
+        // The Product ID (PID) subject DN in the PAI, if such a Product ID is present, SHALL match one of the values present in the
+        // product_id_array field in the Certification Declaration.
         if (deviceInfo.paiProductId != 0) // if PAI PID is present
         {
             VerifyOrReturnError(cdElementsDecoder.IsProductIdIn(certDeclBuffer, deviceInfo.paiProductId),
-                                AttestationVerificationResult::kCertificationDeclarationInvalidProductId);
-        }
-        // The Product ID (PID) subject DN in the PAA, if such a Product ID is present, SHALL match one of the values present in
-        // the product_id_array field in the Certification Declaration.
-        if (deviceInfo.paaProductId != 0) // if PAA PID is present
-        {
-            VerifyOrReturnError(cdElementsDecoder.IsProductIdIn(certDeclBuffer, deviceInfo.paaProductId),
                                 AttestationVerificationResult::kCertificationDeclarationInvalidProductId);
         }
     }

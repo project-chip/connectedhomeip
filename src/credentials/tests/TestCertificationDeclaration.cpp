@@ -319,12 +319,13 @@ static void TestCD_CertificationElementsDecoder(nlTestSuite * inSuite, void * in
         NL_TEST_ASSERT(inSuite, EncodeCertificationElements(testCase.cdElements, encodedCDPayload) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, testCase.cdContent.data_equal(encodedCDPayload));
 
+        CertificationDeclarationContent certificationDeclarationContent;
         CertificationElementsDecoder certificationElementsDecoder;
-        NL_TEST_ASSERT(inSuite, certificationElementsDecoder.DecodeCertificationElements(encodedCDPayload) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, DecodeCertificationElements(encodedCDPayload, certificationDeclarationContent) == CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(inSuite, certificationElementsDecoder.FormatVersion == testCase.cdElements.FormatVersion);
-        NL_TEST_ASSERT(inSuite, certificationElementsDecoder.VendorId == testCase.cdElements.VendorId);
-        NL_TEST_ASSERT(inSuite, certificationElementsDecoder.ContainsPID == true);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.formatVersion == testCase.cdElements.FormatVersion);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.vendorId == testCase.cdElements.VendorId);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.containsPID == true);
         for (uint8_t j = 0; j < testCase.cdElements.ProductIdsCount; j++)
         {
             NL_TEST_ASSERT(inSuite,
@@ -332,20 +333,20 @@ static void TestCD_CertificationElementsDecoder(nlTestSuite * inSuite, void * in
             // now test for an unexistent ProductId
             NL_TEST_ASSERT(inSuite, certificationElementsDecoder.IsProductIdIn(encodedCDPayload, 0x9000) == false);
         }
-        NL_TEST_ASSERT(inSuite, certificationElementsDecoder.DeviceTypeId == testCase.cdElements.DeviceTypeId);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.deviceTypeId == testCase.cdElements.DeviceTypeId);
         NL_TEST_ASSERT(
             inSuite,
-            memcmp(certificationElementsDecoder.CertificateId, testCase.cdElements.CertificateId, kCertificateIdLength) == 0);
-        NL_TEST_ASSERT(inSuite, certificationElementsDecoder.SecurityLevel == testCase.cdElements.SecurityLevel);
-        NL_TEST_ASSERT(inSuite, certificationElementsDecoder.SecurityInformation == testCase.cdElements.SecurityInformation);
-        NL_TEST_ASSERT(inSuite, certificationElementsDecoder.VersionNumber == testCase.cdElements.VersionNumber);
-        NL_TEST_ASSERT(inSuite, certificationElementsDecoder.CertificationType == testCase.cdElements.CertificationType);
+            memcmp(certificationDeclarationContent.certificateId, testCase.cdElements.CertificateId, kCertificateIdLength) == 0);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.securityLevel == testCase.cdElements.SecurityLevel);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.securityInformation == testCase.cdElements.SecurityInformation);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.versionNumber == testCase.cdElements.VersionNumber);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.certificationType == testCase.cdElements.CertificationType);
         NL_TEST_ASSERT(inSuite,
-                       certificationElementsDecoder.DACOriginVIDandPIDPresent == testCase.cdElements.DACOriginVIDandPIDPresent);
-        if (certificationElementsDecoder.DACOriginVIDandPIDPresent)
+                       certificationDeclarationContent.dacOriginVIDandPIDPresent == testCase.cdElements.DACOriginVIDandPIDPresent);
+        if (certificationDeclarationContent.dacOriginVIDandPIDPresent)
         {
-            NL_TEST_ASSERT(inSuite, certificationElementsDecoder.DACOriginVendorId == testCase.cdElements.DACOriginVendorId);
-            NL_TEST_ASSERT(inSuite, certificationElementsDecoder.DACOriginProductId == testCase.cdElements.DACOriginProductId);
+            NL_TEST_ASSERT(inSuite, certificationDeclarationContent.dacOriginVendorId == testCase.cdElements.DACOriginVendorId);
+            NL_TEST_ASSERT(inSuite, certificationDeclarationContent.dacOriginProductId == testCase.cdElements.DACOriginProductId);
         }
     }
 }
