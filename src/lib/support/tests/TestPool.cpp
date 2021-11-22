@@ -136,6 +136,8 @@ void TestCreateReleaseObjectStatic(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == kSize);
     NL_TEST_ASSERT(inSuite, pool.Allocated() == kSize);
     NL_TEST_ASSERT(inSuite, pool.Exhausted());
+
+    pool.ReleaseAll();
 }
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
@@ -325,6 +327,8 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
     }
     NL_TEST_ASSERT(inSuite, count >= kSize / 2);
     NL_TEST_ASSERT(inSuite, count <= kSize);
+
+    pool.ReleaseAll();
 }
 
 void TestForEachActiveObjectStatic(nlTestSuite * inSuite, void * inContext)

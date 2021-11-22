@@ -223,7 +223,7 @@ private:
     }
 
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
-    BitMapObjectPool<UnauthenticatedSession, kMaxSessionCount> mEntries;
+    BitMapObjectPool<UnauthenticatedSession, kMaxSessionCount, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mEntries;
 };
 
 } // namespace Transport

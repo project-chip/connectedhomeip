@@ -124,7 +124,7 @@ public:
 
 private:
     Time::TimeSource<kTimeSource> mTimeSource;
-    BitMapObjectPool<SecureSession, kMaxSessionCount> mEntries;
+    BitMapObjectPool<SecureSession, kMaxSessionCount, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mEntries;
 };
 
 } // namespace Transport
