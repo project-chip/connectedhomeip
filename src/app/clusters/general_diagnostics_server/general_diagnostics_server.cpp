@@ -213,6 +213,69 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
             }
         }
     }
+
+    // Get called when the Node detects a hardware fault has been raised.
+    void OnHardwareFaultsDetected() override
+    {
+        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnHardwareFaultsDetected");
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
+                }
+            }
+        }
+    }
+
+    // Get called when the Node detects a radio fault has been raised.
+    void OnHardwareFaultsDetected() override
+    {
+        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnHardwareFaultsDetected");
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::GetActiveRadioFaults::Id);
+                }
+            }
+        }
+    }
+
+    // Get called when the Node detects a network fault has been raised.
+    void OnHardwareFaultsDetected() override
+    {
+        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnHardwareFaultsDetected");
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::GetActiveNetworkFaults::Id);
+                }
+            }
+        }
+    }
 };
 
 GeneralDiagnosticDelegate gDiagnosticDelegate;

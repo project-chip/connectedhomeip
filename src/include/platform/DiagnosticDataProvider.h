@@ -49,9 +49,27 @@ public:
 
     /**
      * @brief
-     *   Called after the current device is rebooted
+     *   Called after the current device is rebooted.
      */
     virtual void OnDeviceRebooted() {}
+
+    /**
+     * @brief
+     *   Called when the Node detects a hardware fault has been raised.
+     */
+    virtual void OnHardwareFaultsDetected() {}
+
+    /**
+     * @brief
+     *   Called when the Node detects a radio fault has been raised.
+     */
+    virtual void OnRadioFaultsDetected() {}
+
+    /**
+     * @brief
+     *   Called when the Node detects a network fault has been raised.
+     */
+    virtual void OnNetworkFaultsDetected() {}
 };
 
 /**
