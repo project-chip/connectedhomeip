@@ -176,11 +176,11 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, CertificationDeclarationContent & certDeclContent)
+CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, CertificationElementsWithoutPIDs & certDeclContent)
 {
     CHIP_ERROR err;
     TLVReader reader;
-    TLVType outerContainer1, outerContainer2;
+    TLVType outerContainer;
 
     VerifyOrReturnError(encodedCertElements.size() <= kMaxCMSSignedCDMessage, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -188,7 +188,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
 
     ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag));
 
-    ReturnErrorOnFailure(reader.EnterContainer(outerContainer1));
+    ReturnErrorOnFailure(reader.EnterContainer(outerContainer));
 
     ReturnErrorOnFailure(reader.Next(ContextTag(kTag_FormatVersion)));
     ReturnErrorOnFailure(reader.Get(certDeclContent.formatVersion));
@@ -197,11 +197,8 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
     ReturnErrorOnFailure(reader.Get(certDeclContent.vendorId));
 
     ReturnErrorOnFailure(reader.Next(kTLVType_Array, ContextTag(kTag_ProductIdArray)));
-    ReturnErrorOnFailure(reader.EnterContainer(outerContainer2));
 
-    certDeclContent.containsPID = true;
-
-    ReturnErrorOnFailure(reader.ExitContainer(outerContainer2));
+    // skip PID Array
 
     ReturnErrorOnFailure(reader.Next(ContextTag(kTag_DeviceTypeId)));
     ReturnErrorOnFailure(reader.Get(certDeclContent.deviceTypeId));
@@ -238,7 +235,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT || err == CHIP_NO_ERROR, err);
 
-    ReturnErrorOnFailure(reader.ExitContainer(outerContainer1));
+    ReturnErrorOnFailure(reader.ExitContainer(outerContainer));
 
     ReturnErrorOnFailure(reader.VerifyEndOfContainer());
 

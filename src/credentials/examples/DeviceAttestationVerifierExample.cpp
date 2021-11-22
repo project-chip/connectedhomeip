@@ -334,7 +334,7 @@ AttestationVerificationResult ExampleDACVerifier::ValidateCertificateDeclaration
                                                                                         const ByteSpan & firmwareInfo,
                                                                                         const DeviceInfoForAttestation & deviceInfo)
 {
-    CertificationDeclarationContent cdContent;
+    CertificationElementsWithoutPIDs cdContent;
     CertificationElementsDecoder cdElementsDecoder;
     VerifyOrReturnError(DecodeCertificationElements(certDeclBuffer, cdContent) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kCertificationDeclarationInvalidFormat);

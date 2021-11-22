@@ -63,20 +63,19 @@ struct CertificationElements
     bool DACOriginVIDandPIDPresent;
 };
 
-struct CertificationDeclarationContent
+struct CertificationElementsWithoutPIDs
 {
-    uint16_t formatVersion;
-    uint16_t vendorId;
-    bool containsPID;
-    uint32_t deviceTypeId;
-    char certificateId[kCertificateIdLength + 1];
-    uint8_t securityLevel;
-    uint16_t securityInformation;
-    uint16_t versionNumber;
-    uint8_t certificationType;
-    uint16_t dacOriginVendorId;
-    uint16_t dacOriginProductId;
-    bool dacOriginVIDandPIDPresent;
+    uint16_t formatVersion                       = 0;
+    uint16_t vendorId                            = VendorId::NotSpecified;
+    uint32_t deviceTypeId                        = 0;
+    uint8_t securityLevel                        = 0;
+    uint16_t securityInformation                 = 0;
+    uint16_t versionNumber                       = 0;
+    uint8_t certificationType                    = 0;
+    uint16_t dacOriginVendorId                   = VendorId::NotSpecified;
+    uint16_t dacOriginProductId                  = 0;
+    bool dacOriginVIDandPIDPresent               = false;
+    char certificateId[kCertificateIdLength + 1] = { 0 };
 };
 
 class CertificationElementsDecoder
@@ -123,7 +122,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, CertificationDeclarationContent & certDeclContent);
+CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, CertificationElementsWithoutPIDs & certDeclContent);
 
 /**
  * @brief Generate CMS signed message.

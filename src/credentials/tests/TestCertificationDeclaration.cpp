@@ -319,13 +319,12 @@ static void TestCD_CertificationElementsDecoder(nlTestSuite * inSuite, void * in
         NL_TEST_ASSERT(inSuite, EncodeCertificationElements(testCase.cdElements, encodedCDPayload) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, testCase.cdContent.data_equal(encodedCDPayload));
 
-        CertificationDeclarationContent certificationDeclarationContent;
+        CertificationElementsWithoutPIDs certificationDeclarationContent;
         CertificationElementsDecoder certificationElementsDecoder;
         NL_TEST_ASSERT(inSuite, DecodeCertificationElements(encodedCDPayload, certificationDeclarationContent) == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, certificationDeclarationContent.formatVersion == testCase.cdElements.FormatVersion);
         NL_TEST_ASSERT(inSuite, certificationDeclarationContent.vendorId == testCase.cdElements.VendorId);
-        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.containsPID == true);
         for (uint8_t j = 0; j < testCase.cdElements.ProductIdsCount; j++)
         {
             NL_TEST_ASSERT(inSuite,
