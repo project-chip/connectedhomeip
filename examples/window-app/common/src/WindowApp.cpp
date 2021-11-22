@@ -19,6 +19,7 @@
 #include <WindowApp.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -31,7 +32,7 @@ using namespace chip::app::Clusters::WindowCovering;
 
 
 
-#include <app/clusters/identify-server/identify-server.h>
+
 
 
 
