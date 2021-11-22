@@ -933,18 +933,18 @@ using namespace chip::app::Clusters;
         true);
 }
 
-- (void)readAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler
+- (void)readAttributeNodeLabelWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeUserLabel(success, failure);
+        return self.cppCluster.ReadAttributeNodeLabel(success, failure);
     });
 }
 
-- (void)writeAttributeUserLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeNodeLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         ListFreer listFreer;
-        using TypeInfo = Basic::Attributes::UserLabel::TypeInfo;
+        using TypeInfo = Basic::Attributes::NodeLabel::TypeInfo;
         TypeInfo::Type cppValue;
         cppValue = [self asCharSpan:value];
         auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
@@ -953,21 +953,21 @@ using namespace chip::app::Clusters;
     });
 }
 
-- (void)subscribeAttributeUserLabelWithMinInterval:(uint16_t)minInterval
+- (void)subscribeAttributeNodeLabelWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeUserLabel(success, failure, minInterval, maxInterval);
+        return self.cppCluster.SubscribeAttributeNodeLabel(success, failure, minInterval, maxInterval);
     });
 }
 
-- (void)reportAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler
+- (void)reportAttributeNodeLabelWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPCharStringAttributeCallbackBridge(
         self.callbackQueue, responseHandler,
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReportAttributeUserLabel(success);
+            return self.cppCluster.ReportAttributeNodeLabel(success);
         },
         true);
 }
@@ -1308,6 +1308,13 @@ using namespace chip::app::Clusters;
             return self.cppCluster.ReportAttributeReachable(success);
         },
         true);
+}
+
+- (void)readAttributeUniqueIDWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeUniqueID(success, failure);
+    });
 }
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler

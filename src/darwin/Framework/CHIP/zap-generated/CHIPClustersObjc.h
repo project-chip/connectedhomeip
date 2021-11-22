@@ -268,12 +268,12 @@ NS_ASSUME_NONNULL_BEGIN
                                    responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeProductIDWithResponseHandler:(ResponseHandler)responseHandler;
 
-- (void)readAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeUserLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)subscribeAttributeUserLabelWithMinInterval:(uint16_t)minInterval
+- (void)readAttributeNodeLabelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeNodeLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)subscribeAttributeNodeLabelWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNodeLabelWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeLocationWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLocationWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
@@ -348,6 +348,8 @@ NS_ASSUME_NONNULL_BEGIN
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeUniqueIDWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval

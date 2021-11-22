@@ -80,8 +80,8 @@ public:
             err = TestQueryProductID_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Query User Label\n");
-            err = TestQueryUserLabel_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Query Node Label\n");
+            err = TestQueryNodeLabel_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Query User Location\n");
@@ -131,6 +131,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 19 : Query Reachable\n");
             err = TestQueryReachable_19();
             break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Query UniqueId\n");
+            err = TestQueryUniqueId_20();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -142,7 +146,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 20;
+    const uint16_t mTestCount = 21;
 
     //
     // Tests methods
@@ -209,14 +213,14 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestQueryUserLabel_7()
+    CHIP_ERROR TestQueryNodeLabel_7()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
-        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: UserLabel] Query User Label", endpoint);
+        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: NodeLabel] Query Node Label", endpoint);
 
         ClearAttributeAndCommandPaths();
         mAttributePath = chip::app::ConcreteAttributePath(endpoint, chip::app::Clusters::Basic::Id,
-                                                          chip::app::Clusters::Basic::Attributes::UserLabel::Id);
+                                                          chip::app::Clusters::Basic::Attributes::NodeLabel::Id);
         return CHIP_NO_ERROR;
     }
 
@@ -352,6 +356,17 @@ private:
         ClearAttributeAndCommandPaths();
         mAttributePath = chip::app::ConcreteAttributePath(endpoint, chip::app::Clusters::Basic::Id,
                                                           chip::app::Clusters::Basic::Attributes::Reachable::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestQueryUniqueId_20()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: UniqueId] Query UniqueId", endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mAttributePath = chip::app::ConcreteAttributePath(endpoint, chip::app::Clusters::Basic::Id,
+                                                          chip::app::Clusters::Basic::Attributes::UniqueId::Id);
         return CHIP_NO_ERROR;
     }
 };

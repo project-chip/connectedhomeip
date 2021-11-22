@@ -12550,8 +12550,8 @@ public:
             err = TestQueryProductID_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Query User Label\n");
-            err = TestQueryUserLabel_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Query Node Label\n");
+            err = TestQueryNodeLabel_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Query User Location\n");
@@ -12601,6 +12601,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 17 : Query Reachable\n");
             err = TestQueryReachable_17();
             break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Query UniqueID\n");
+            err = TestQueryUniqueID_18();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -12612,7 +12616,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 18;
+    const uint16_t mTestCount = 19;
 
     static void OnFailureCallback_0(void * context, EmberAfStatus status)
     {
@@ -12669,9 +12673,9 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_5(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_5(void * context, chip::CharSpan userLabel)
+    static void OnSuccessCallback_5(void * context, chip::CharSpan nodeLabel)
     {
-        (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_5(userLabel);
+        (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_5(nodeLabel);
     }
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
@@ -12794,6 +12798,16 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_17(reachable);
     }
 
+    static void OnFailureCallback_18(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_18(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_18(void * context, chip::CharSpan uniqueID)
+    {
+        (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_18(uniqueID);
+    }
+
     //
     // Tests methods
     //
@@ -12890,22 +12904,22 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestQueryUserLabel_5()
+    CHIP_ERROR TestQueryNodeLabel_5()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::UserLabel::TypeInfo>(this, OnSuccessCallback_5,
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::NodeLabel::TypeInfo>(this, OnSuccessCallback_5,
                                                                                                   OnFailureCallback_5);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(chip::CharSpan userLabel)
+    void OnSuccessResponse_5(chip::CharSpan nodeLabel)
     {
-        VerifyOrReturn(CheckConstraintType("userLabel", "", "string"));
-        VerifyOrReturn(CheckConstraintMaxLength("userLabel", userLabel.size(), 32));
+        VerifyOrReturn(CheckConstraintType("nodeLabel", "", "string"));
+        VerifyOrReturn(CheckConstraintMaxLength("nodeLabel", nodeLabel.size(), 32));
         NextTest();
     }
 
@@ -13158,6 +13172,28 @@ private:
     void OnSuccessResponse_17(bool reachable)
     {
         VerifyOrReturn(CheckConstraintType("reachable", "", "boolean"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestQueryUniqueID_18()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::UniqueID::TypeInfo>(this, OnSuccessCallback_18,
+                                                                                                 OnFailureCallback_18);
+    }
+
+    void OnFailureResponse_18(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_18(chip::CharSpan uniqueID)
+    {
+        VerifyOrReturn(CheckConstraintType("uniqueID", "", "string"));
+        VerifyOrReturn(CheckConstraintMaxLength("uniqueID", uniqueID.size(), 32));
         NextTest();
     }
 };

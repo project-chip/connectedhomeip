@@ -868,9 +868,9 @@ namespace ProductID {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace ProductID
 
-namespace UserLabel {
+namespace NodeLabel {
 static constexpr AttributeId Id = 0x00000005;
-} // namespace UserLabel
+} // namespace NodeLabel
 
 namespace Location {
 static constexpr AttributeId Id = 0x00000006;
@@ -919,6 +919,10 @@ static constexpr AttributeId Id = 0x00000010;
 namespace Reachable {
 static constexpr AttributeId Id = 0x00000011;
 } // namespace Reachable
+
+namespace UniqueID {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace UniqueID
 
 namespace FeatureMap {
 static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;

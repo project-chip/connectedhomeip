@@ -866,21 +866,21 @@ public class ChipClusters {
       reportProductIDAttribute(chipClusterPtr, callback);
     }
 
-    public void readUserLabelAttribute(CharStringAttributeCallback callback) {
-      readUserLabelAttribute(chipClusterPtr, callback);
+    public void readNodeLabelAttribute(CharStringAttributeCallback callback) {
+      readNodeLabelAttribute(chipClusterPtr, callback);
     }
 
-    public void writeUserLabelAttribute(DefaultClusterCallback callback, String value) {
-      writeUserLabelAttribute(chipClusterPtr, callback, value);
+    public void writeNodeLabelAttribute(DefaultClusterCallback callback, String value) {
+      writeNodeLabelAttribute(chipClusterPtr, callback, value);
     }
 
-    public void subscribeUserLabelAttribute(
+    public void subscribeNodeLabelAttribute(
         DefaultClusterCallback callback, int minInterval, int maxInterval) {
-      subscribeUserLabelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      subscribeNodeLabelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void reportUserLabelAttribute(CharStringAttributeCallback callback) {
-      reportUserLabelAttribute(chipClusterPtr, callback);
+    public void reportNodeLabelAttribute(CharStringAttributeCallback callback) {
+      reportNodeLabelAttribute(chipClusterPtr, callback);
     }
 
     public void readLocationAttribute(CharStringAttributeCallback callback) {
@@ -1047,6 +1047,10 @@ public class ChipClusters {
       reportReachableAttribute(chipClusterPtr, callback);
     }
 
+    public void readUniqueIDAttribute(CharStringAttributeCallback callback) {
+      readUniqueIDAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -1105,16 +1109,16 @@ public class ChipClusters {
     private native void reportProductIDAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-    private native void readUserLabelAttribute(
+    private native void readNodeLabelAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
 
-    private native void writeUserLabelAttribute(
+    private native void writeNodeLabelAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, String value);
 
-    private native void subscribeUserLabelAttribute(
+    private native void subscribeNodeLabelAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
 
-    private native void reportUserLabelAttribute(
+    private native void reportNodeLabelAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
 
     private native void readLocationAttribute(
@@ -1230,6 +1234,9 @@ public class ChipClusters {
 
     private native void reportReachableAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void readUniqueIDAttribute(
+        long chipClusterPtr, CharStringAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
