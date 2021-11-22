@@ -424,7 +424,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     }
 
 exit:
-    if (status != Protocols::InteractionModel::Status::Success)
+    if (status != Protocols::InteractionModel::Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
         err = StatusResponse::SendStatusResponse(status, apExchangeContext, false /*aExpectResponse*/);
     }
