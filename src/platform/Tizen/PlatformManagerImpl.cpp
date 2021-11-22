@@ -25,8 +25,8 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/Linux/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
+#include <platform/Tizen/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
 
 namespace chip {

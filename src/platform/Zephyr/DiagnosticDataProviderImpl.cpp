@@ -21,17 +21,12 @@
  *          for Zephy platform.
  */
 
-#if !CONFIG_NORDIC_SECURITY_BACKEND
-#include <crypto/CHIPCryptoPAL.h> // nogncheck
-#endif                            // !CONFIG_NORDIC_SECURITY_BACKEND
-
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/Zephy/DiagnosticDataProviderImpl.h>
+#include <platform/Zephyr/DiagnosticDataProviderImpl.h>
 
-#include <drivers/entropy.h>
 #include <malloc.h>
 
 namespace chip {
