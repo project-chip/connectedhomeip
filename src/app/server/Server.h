@@ -21,6 +21,7 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <credentials/FabricTable.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <inet/InetConfig.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
@@ -90,7 +91,7 @@ public:
     static Server & GetInstance() { return sServer; }
 
 private:
-    Server() : mCommissioningWindowManager(this) {}
+    Server() : mCommissioningWindowManager(this), mGroupsProvider(mServerStorage) {}
 
     static Server sServer;
 
@@ -148,6 +149,7 @@ private:
 
     ServerStorageDelegate mServerStorage;
     CommissioningWindowManager mCommissioningWindowManager;
+    Credentials::GroupDataProviderImpl mGroupsProvider;
 
     chip::OperationalDeviceProxy * mOperationalDeviceProxy = nullptr;
 
