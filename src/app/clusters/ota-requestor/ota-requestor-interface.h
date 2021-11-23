@@ -41,7 +41,8 @@ public:
     // TBD: This probably doesn't need to be a method OTARequestorInterface as the response handler is
     // explicitly supplied at command invocation
     // Handler for the QueryImageResponse command
-    // virtual bool HandleQueryImageResponse(chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType) = 0;
+    // virtual bool
+    // HandleQueryImageResponse(chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType) = 0;
 
     // Destructor
     virtual ~OTARequestorInterface() = default;
@@ -51,7 +52,7 @@ public:
 // the following global getter and setter functions.
 
 // Set the object implementing OTARequestorInterface
-void SetRequestorInstance(OTARequestorInterface *instance);
+void SetRequestorInstance(OTARequestorInterface * instance);
 
 // Get the object implementing OTARequestorInterface
-OTARequestorInterface* GetRequestorInstance();
+OTARequestorInterface * GetRequestorInstance();

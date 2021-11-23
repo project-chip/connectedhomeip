@@ -20,10 +20,10 @@
  * Applications implementing the OTA Requestor functionality must include this file.
  */
 
+#include "BDXDownloader.h"
 #include "ota-requestor-driver.h"
 #include "ota-requestor-interface.h"
 #include <app/CASESessionManager.h>
-#include "BDXDownloader.h"
 #pragma once
 
 // This class implements all of the core logic of the OTA Requestor
@@ -37,7 +37,7 @@ public:
     void TriggerImmediateQuery();
 
     // A setter for the delegate class pointer
-    void SetOtaRequestorDriver(OTARequestorDriver *driver) { mOtaRequestorDriver = driver; }
+    void SetOtaRequestorDriver(OTARequestorDriver * driver) { mOtaRequestorDriver = driver; }
 
     // Application directs the Requestor to abort any processing related to
     // the image update
@@ -55,28 +55,28 @@ public:
     void ConnectToProvider();
 
     void mOnConnected(void * context, chip::DeviceProxy * deviceProxy);
-    void mOnQueryImageResponse(void * context,
-                               const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & response);
+    void mOnQueryImageResponse(
+        void * context,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & response);
 
 private:
-
     // Enums
     // Various cases for when OnConnected callback could be called
     enum OnConnectedState
-        {
-         kQueryImage = 0,
-         kStartBDX,
-        };
+    {
+        kQueryImage = 0,
+        kStartBDX,
+    };
 
     // Variables
     OTARequestorDriver * mOtaRequestorDriver;
     chip::NodeId mProviderNodeId;
     chip::FabricIndex mProviderFabricIndex;
-    uint32_t mOtaStartDelayMs = 0;
+    uint32_t mOtaStartDelayMs                      = 0;
     chip::CASESessionManager * mCASESessionManager = nullptr;
-    OnConnectedState onConnectedState        = kQueryImage;
-    chip::Messaging::ExchangeContext * exchangeCtx            = nullptr;
+    OnConnectedState onConnectedState              = kQueryImage;
+    chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
     BdxDownloader bdxDownloader;
     // Functions
-    CHIP_ERROR  SetupCASESessionManager(chip::FabricIndex fabricIndex);
+    CHIP_ERROR SetupCASESessionManager(chip::FabricIndex fabricIndex);
 };

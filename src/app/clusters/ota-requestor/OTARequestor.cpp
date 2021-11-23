@@ -18,10 +18,10 @@
 
 #include "ota-requestor.h"
 
-#include <app/util/util.h>
 #include <app/server/Server.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <app/util/util.h>
 #include <lib/core/CHIPEncoding.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include "BDXDownloader.h"
 
@@ -50,12 +50,12 @@ using chip::bdx::TransferSession;
 using chip::Callback::Callback;
 using chip::System::Layer;
 using chip::Transport::PeerAddress;
-//using namespace chip::ArgParser;
+// using namespace chip::ArgParser;
 using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 // Global instance of the OTARequestorInterface.
-OTARequestorInterface *globalOTARequestorInstance = nullptr;
+OTARequestorInterface * globalOTARequestorInstance = nullptr;
 
 constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this value when starting OTA "immediately"
 
@@ -70,12 +70,12 @@ Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback(OnConnectionFai
 void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response);
 void OnQueryImageFailure(void * context, EmberAfStatus status);
 
-void SetRequestorInstance(OTARequestorInterface *instance)
+void SetRequestorInstance(OTARequestorInterface * instance)
 {
     globalOTARequestorInstance = instance;
 }
 
-OTARequestorInterface *GetRequestorInstance()
+OTARequestorInterface * GetRequestorInstance()
 {
     return globalOTARequestorInstance;
 }
@@ -98,7 +98,7 @@ void OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error)
 // Finds the Requestor instance and calls the corresponding OTARequestor member function
 void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response)
 {
-    OTARequestor *requestorCore = static_cast<OTARequestor *>(GetRequestorInstance());
+    OTARequestor * requestorCore = static_cast<OTARequestor *>(GetRequestorInstance());
 
     assert(requestorCore != nullptr);
 
@@ -220,7 +220,6 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-
 CHIP_ERROR OTARequestor::SetupCASESessionManager(chip::FabricIndex fabricIndex)
 {
     // A previous CASE session had been established
@@ -276,11 +275,10 @@ CHIP_ERROR OTARequestor::SetupCASESessionManager(chip::FabricIndex fabricIndex)
     return CHIP_NO_ERROR;
 }
 
-
 // Converted from SendQueryImageCommand(). Uses code from https://github.com/project-chip/connectedhomeip/pull/12013
 void OTARequestor::ConnectToProvider()
 {
-    chip::NodeId peerNodeId = mProviderNodeId;
+    chip::NodeId peerNodeId           = mProviderNodeId;
     chip::FabricIndex peerFabricIndex = mProviderFabricIndex;
 
     CHIP_ERROR err = SetupCASESessionManager(peerFabricIndex);
@@ -297,7 +295,6 @@ void OTARequestor::ConnectToProvider()
         ChipLogError(SoftwareUpdate, "Cannot establish connection to peer device: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-
     // Old ConnectToProvider(). Delete
 
     // if (mConnectToProviderCallback != nullptr)
@@ -313,13 +310,11 @@ void OTARequestor::ConnectToProvider()
     // }
 }
 
-
-
 // Called whenever FindOrEstablishSession is successful. Finds the Requestor instance
 // and calls the corresponding OTARequestor member function
 void OnConnected(void * context, chip::DeviceProxy * deviceProxy)
 {
-    OTARequestor *requestorCore = static_cast<OTARequestor *>(GetRequestorInstance());
+    OTARequestor * requestorCore = static_cast<OTARequestor *>(GetRequestorInstance());
 
     assert(requestorCore != nullptr);
 
@@ -329,7 +324,7 @@ void OnConnected(void * context, chip::DeviceProxy * deviceProxy)
 // Member function called whenever FindOrEstablishSession is successful
 void OTARequestor::mOnConnected(void * context, chip::DeviceProxy * deviceProxy)
 {
-switch (onConnectedState)
+    switch (onConnectedState)
     {
     case kQueryImage: {
         CHIP_ERROR err = CHIP_NO_ERROR;

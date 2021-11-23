@@ -19,7 +19,6 @@
 //#include <app-common/zap-generated/callback.h>
 //#include <app-common/zap-generated/cluster-objects.h>
 
-
 #include <app/OperationalDeviceProxy.h>
 #include <app/server/Server.h>
 // #include <app/util/util.h>
@@ -36,11 +35,10 @@
 //#include "BDXDownloader.h"
 //#include "ExampleOTARequestor.h"
 
-
-#include "linux-ota-requestor-driver.h"
-#include "linux-ota-image-processor.h"
-#include "app/clusters/ota-requestor/ota-requestor.h"
 #include "app/clusters/ota-requestor/ota-downloader.h"
+#include "app/clusters/ota-requestor/ota-requestor.h"
+#include "linux-ota-image-processor.h"
+#include "linux-ota-requestor-driver.h"
 
 using chip::ByteSpan;
 using chip::CharSpan;
@@ -53,7 +51,7 @@ using chip::OnDeviceConnectionFailure;
 using chip::PeerId;
 using chip::Server;
 using chip::VendorId;
-//using chip::bdx::TransferSession;
+// using chip::bdx::TransferSession;
 using chip::Callback::Callback;
 using chip::Inet::IPAddress;
 using chip::System::Layer;
@@ -209,42 +207,36 @@ int main(int argc, char * argv[])
     // This will allow ExampleOTARequestor to call SendQueryImageCommand REFACTOR DELETE THIS
     //    ExampleOTARequestor::GetInstance().SetConnectToProviderCallback(SendQueryImageCommand);
 
-
     // Initialize and interconnect the Requestor objects
 
     // Initialize the instance of the main Requestor Class
-    OTARequestor *requestorCore = new OTARequestor;
+    OTARequestor * requestorCore = new OTARequestor;
     SetRequestorInstance(requestorCore);
 
-    LinuxOTARequestorDriver *requestorUser = new LinuxOTARequestorDriver;
+    LinuxOTARequestorDriver * requestorUser = new LinuxOTARequestorDriver;
 
     // Connect the two objects
     requestorCore->SetOtaRequestorDriver(requestorUser);
 
-    OTADownloader *downloaderCore = new OTADownloader;
+    OTADownloader * downloaderCore = new OTADownloader;
     // TODO: enable    SetDownloaderInstance(downloaderCore);
 
-    LinuxOTAImageProcessor *downloaderUser = new LinuxOTAImageProcessor;
+    LinuxOTAImageProcessor * downloaderUser = new LinuxOTAImageProcessor;
 
     // Connect the two objects
     downloaderCore->SetImageProcessorDelegate(downloaderUser);
 
-
-   // If a delay is provided, QueryImage after the timer expires REFACTOR DELETE THIS ??
-   // if (delayQueryTimeInSec > 0)
-   // {
-   //   chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
-   //                                                 OnStartDelayTimerHandler, nullptr);
-   // }
+    // If a delay is provided, QueryImage after the timer expires REFACTOR DELETE THIS ??
+    // if (delayQueryTimeInSec > 0)
+    // {
+    //   chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
+    //                                                 OnStartDelayTimerHandler, nullptr);
+    // }
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
     return 0;
 }
-
-
-
-
 
 #if 0 // LISS
 

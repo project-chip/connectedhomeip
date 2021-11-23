@@ -35,10 +35,10 @@ public:
     // API declarations start
 
     // Application calls this method to direct OTADownloader to begin the download
-    void virtual BeginDownload() {};
+    void virtual BeginDownload(){};
 
     // Platform calls this method upon the completion of PrepareDownload() processing
-    void virtual OnPreparedForDownload() {};
+    void virtual OnPreparedForDownload(){};
 
     // Action parameter type for the OnBlockProcessed()
     enum BlockActionType
@@ -48,7 +48,7 @@ public:
     };
 
     // Platform calls this method upon the completion of ProcessBlock() processing
-    void virtual OnBlockProcessed(BlockActionType action) {};
+    void virtual OnBlockProcessed(BlockActionType action){};
 
     // A setter for the delegate class pointer
     void SetImageProcessorDelegate(OTAImageProcessorDriver * delegate) { mImageProcessorDelegate = delegate; }
@@ -57,13 +57,13 @@ public:
 
     // Destructor
     virtual ~OTADownloader() = default;
- private:
+
+private:
     OTAImageProcessorDriver * mImageProcessorDelegate;
 };
 
-
 // Set the object implementing OTADownloader
-void SetDownloaderInstance(OTADownloader *instance);
+void SetDownloaderInstance(OTADownloader * instance);
 
 // Get the object implementing OTADownloaderInterface
-OTADownloader* GetDownloaderInstance();
+OTADownloader * GetDownloaderInstance();

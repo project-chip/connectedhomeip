@@ -39,5 +39,4 @@ public:
 
     // Destructor
     virtual ~OTARequestorDriver() = default;
-
 };

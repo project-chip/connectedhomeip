@@ -18,8 +18,6 @@
 
 #if 0 // LISS
 
-
-
 #include <ExampleOTARequestor.h>
 
 #include <app/util/util.h>

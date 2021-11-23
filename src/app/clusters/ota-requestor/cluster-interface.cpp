@@ -6,11 +6,14 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
     const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
 {
     EmberAfStatus status;
-    OTARequestorInterface *requestor = GetRequestorInstance();
+    OTARequestorInterface * requestor = GetRequestorInstance();
 
-    if(requestor != nullptr) {
+    if (requestor != nullptr)
+    {
         status = requestor->HandleAnnounceOTAProvider(commandObj, commandPath, commandData);
-    } else {
+    }
+    else
+    {
         status = EMBER_ZCL_STATUS_FAILURE;
     }
 
@@ -20,7 +23,8 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
 
 // TBD for now. Not clear what is the API for registering a command response handler
 /* Callbacks for QueryImage response */
-//Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback> mQueryImageResponseCallback(QueryImageResponseHandler, nullptr);
+// Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback> mQueryImageResponseCallback(QueryImageResponseHandler,
+// nullptr);
 
-//void QueryImageResponseHandler(void * context, const QueryImageResponse::DecodableType & response)
+// void QueryImageResponseHandler(void * context, const QueryImageResponse::DecodableType & response)
 //{ }
