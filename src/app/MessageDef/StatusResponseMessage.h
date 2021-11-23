@@ -16,8 +16,8 @@
  */
 
 #pragma once
-#include "Builder.h"
-#include "Parser.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -34,13 +34,9 @@ enum
     kCsTag_Status = 0,
 };
 
-class Parser : public app::Parser
+class Parser : public StructParser
 {
 public:
-    /**
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this response
-     */
-    CHIP_ERROR Init(const TLV::TLVReader & aReader);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
@@ -67,10 +63,9 @@ public:
     CHIP_ERROR GetStatus(Protocols::InteractionModel::Status & aStatus) const;
 };
 
-class Builder : public app::Builder
+class Builder : public StructBuilder
 {
 public:
-    CHIP_ERROR Init(TLV::TLVWriter * const apWriter);
     StatusResponseMessage::Builder & Status(const Protocols::InteractionModel::Status aStatus);
 };
 } // namespace StatusResponseMessage

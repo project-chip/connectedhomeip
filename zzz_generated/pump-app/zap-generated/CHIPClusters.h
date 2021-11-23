@@ -44,6 +44,17 @@ public:
     CHIP_ERROR SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                  uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeMinMeasuredValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                  uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeMaxMeasuredValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
 };
 
 class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
@@ -60,6 +71,17 @@ public:
     CHIP_ERROR SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                  uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeMinMeasuredValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                  uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeMaxMeasuredValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
 };
 
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
@@ -76,6 +98,17 @@ public:
     CHIP_ERROR SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                  uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeMinMeasuredValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                  uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeMaxMeasuredValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
 };
 
 } // namespace Controller

@@ -21,10 +21,11 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #include "app/server/Server.h"
+#include "credentials/FabricTable.h"
 #include "device_service/device_service.rpc.pb.h"
 #include "platform/ConfigurationManager.h"
 #include "platform/PlatformManager.h"
-#include "transport/FabricTable.h"
+#include <platform/DiagnosticDataProvider.h>
 
 namespace chip {
 namespace rpc {
@@ -54,7 +55,7 @@ public:
     virtual pw::Status GetDeviceState(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceState & response)
     {
         uint64_t time_since_boot_sec;
-        DeviceLayer::PlatformMgr().GetUpTime(time_since_boot_sec);
+        DeviceLayer::GetDiagnosticDataProvider().GetUpTime(time_since_boot_sec);
         response.time_since_boot_millis = time_since_boot_sec * 1000;
         size_t count                    = 0;
         for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
@@ -103,8 +104,8 @@ public:
             response.pairing_info.discriminator = static_cast<uint32_t>(discriminator);
             response.has_pairing_info           = true;
         }
-        size_t serial_size;
-        DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number), serial_size);
+
+        DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number));
 
         return pw::OkStatus();
     }

@@ -16,7 +16,7 @@
     "build": {
         "dockerfile": "Dockerfile",
         "args": {
-            "BUILD_VERSION": "0.5.23"
+            "BUILD_VERSION": "0.5.28"
         }
     },
     "remoteUser": "vscode",

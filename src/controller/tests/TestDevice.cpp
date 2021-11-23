@@ -18,12 +18,13 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
-#include <controller/CHIPDevice.h>
+#include <controller/CommissioneeDeviceProxy.h>
 #include <inet/IPAddress.h>
 #include <inet/InetLayer.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
 #include <system/SystemLayerImpl.h>
@@ -44,6 +45,7 @@ using TestTransportMgr = TransportMgr<Transport::UDP>;
 void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext)
 {
     Platform::MemoryInit();
+    chip::DeviceLayer::SetConfigurationMgr(&chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
     DeviceTransportMgr transportMgr;
     SessionManager sessionManager;
     ExchangeManager exchangeMgr;
@@ -83,7 +85,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
         .idAllocator     = &idAllocator,
         .fabricsTable    = fabrics,
     };
-    Device device;
+    CommissioneeDeviceProxy device;
     NodeId mockNodeId           = 1;
     FabricIndex mockFabricIndex = 1;
     Inet::IPAddress mockAddr;

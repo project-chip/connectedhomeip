@@ -7,7 +7,19 @@
 #include <app/data-model/DecodableList.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
+typedef void (*CommandSuccessCallback)(void *, const chip::app::DataModel::NullObjectType &);
+using CHIPCommandSuccessCallbackType = CommandSuccessCallback;
+typedef void (*CHIPDefaultSuccessCallbackType)(void *);
+typedef void (*CHIPDefaultFailureCallbackType)(void *, EmberAfStatus);
+
+{{#chip_client_clusters}}
+{{#chip_cluster_responses}}
+typedef void (*CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackType)(void *, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &);
+{{/chip_cluster_responses}}
+{{/chip_client_clusters}}
+
 {{#>CHIPCallbackBridge header="1" partial-type=""            }}DefaultSuccessCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" partial-type="CommandStatus"}}CommandSuccessCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge header="1" partial-type="Octet_String"}}OctetStringAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge header="1" partial-type="Char_String" }}CharStringAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge header="1" partial-type="Boolean"     }}BooleanAttributeCallback{{/CHIPCallbackBridge}}

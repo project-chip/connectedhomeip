@@ -76,6 +76,8 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
         ExitNow(err = CHIP_ERROR_NO_MEMORY);
     }
 
+    mShouldRunEventLoop.store(false);
+
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
     SuccessOrExit(err);
@@ -124,12 +126,17 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
     CHIP_ERROR err;
     ChipDeviceEvent event;
 
-    VerifyOrDie(mEventLoopTask != NULL);
-
     // Lock the CHIP stack.
     Impl()->LockChipStack();
 
-    while (true)
+    bool oldShouldRunEventLoop = false;
+    if (!mShouldRunEventLoop.compare_exchange_strong(oldShouldRunEventLoop /* expected */, true /* desired */))
+    {
+        ChipLogError(DeviceLayer, "Error trying to run the event loop while it is already running");
+        return;
+    }
+
+    while (mShouldRunEventLoop.load())
     {
         TickType_t waitTime;
 
@@ -250,15 +257,14 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const Chip
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
 {
-    VerifyOrDieWithMsg(false, DeviceLayer, "Shutdown is not implemented");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StopEventLoopTask(void)
 {
-    VerifyOrDieWithMsg(false, DeviceLayer, "StopEventLoopTask is not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    mShouldRunEventLoop.store(false);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal

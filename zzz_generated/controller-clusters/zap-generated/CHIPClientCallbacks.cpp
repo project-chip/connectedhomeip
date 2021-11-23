@@ -155,9 +155,6 @@ void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::T
         Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
@@ -179,9 +176,6 @@ void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvDa
         Callback::Callback<AudioOutputAudioOutputListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void BridgedActionsClusterActionListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
@@ -203,9 +197,6 @@ void BridgedActionsClusterActionListListAttributeFilter(TLV::TLVReader * tlvData
         Callback::Callback<BridgedActionsActionListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void BridgedActionsClusterEndpointListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
@@ -227,9 +218,6 @@ void BridgedActionsClusterEndpointListListAttributeFilter(TLV::TLVReader * tlvDa
         Callback::Callback<BridgedActionsEndpointListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback)
@@ -251,9 +239,6 @@ void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader *
         Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void ContentLauncherClusterSupportedStreamingTypesListAttributeFilter(TLV::TLVReader * tlvData,
                                                                       Callback::Cancelable * onSuccessCallback,
@@ -276,9 +261,6 @@ void ContentLauncherClusterSupportedStreamingTypesListAttributeFilter(TLV::TLVRe
         Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void DescriptorClusterDeviceListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback)
@@ -300,9 +282,6 @@ void DescriptorClusterDeviceListListAttributeFilter(TLV::TLVReader * tlvData, Ca
         Callback::Callback<DescriptorDeviceListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void DescriptorClusterServerListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback)
@@ -324,9 +303,6 @@ void DescriptorClusterServerListListAttributeFilter(TLV::TLVReader * tlvData, Ca
         Callback::Callback<DescriptorServerListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void DescriptorClusterClientListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback)
@@ -348,9 +324,6 @@ void DescriptorClusterClientListListAttributeFilter(TLV::TLVReader * tlvData, Ca
         Callback::Callback<DescriptorClientListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void DescriptorClusterPartsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback)
@@ -372,9 +345,6 @@ void DescriptorClusterPartsListListAttributeFilter(TLV::TLVReader * tlvData, Cal
         Callback::Callback<DescriptorPartsListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void FixedLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback)
@@ -396,9 +366,6 @@ void FixedLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Cal
         Callback::Callback<FixedLabelLabelListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                               Callback::Cancelable * onSuccessCallback,
@@ -423,9 +390,6 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
         Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void GeneralDiagnosticsClusterNetworkInterfacesListAttributeFilter(TLV::TLVReader * tlvData,
                                                                    Callback::Cancelable * onSuccessCallback,
@@ -448,9 +412,72 @@ void GeneralDiagnosticsClusterNetworkInterfacesListAttributeFilter(TLV::TLVReade
         Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
+
+void GeneralDiagnosticsClusterActiveHardwareFaultsListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                      Callback::Cancelable * onSuccessCallback,
+                                                                      Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<uint8_t> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback> * cb =
+        Callback::Callback<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
+void GeneralDiagnosticsClusterActiveRadioFaultsListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                   Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<uint8_t> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback> * cb =
+        Callback::Callback<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
+void GeneralDiagnosticsClusterActiveNetworkFaultsListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                     Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<uint8_t> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback> * cb =
+        Callback::Callback<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
 
 void GroupKeyManagementClusterGroupsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
@@ -472,9 +499,6 @@ void GroupKeyManagementClusterGroupsListAttributeFilter(TLV::TLVReader * tlvData
         Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback)
@@ -496,9 +520,6 @@ void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvD
         Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
@@ -520,9 +541,6 @@ void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData
         Callback::Callback<MediaInputMediaInputListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void ModeSelectClusterSupportedModesListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
@@ -544,9 +562,6 @@ void ModeSelectClusterSupportedModesListAttributeFilter(TLV::TLVReader * tlvData
         Callback::Callback<ModeSelectSupportedModesListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
@@ -568,9 +583,6 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
         Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV::TLVReader * tlvData,
                                                                              Callback::Cancelable * onSuccessCallback,
@@ -593,9 +605,6 @@ void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV
         Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback)
@@ -617,9 +626,27 @@ void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(TLV::TLVReader * t
         Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
+
+void SoftwareDiagnosticsClusterThreadMetricsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback> * cb =
+        Callback::Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
 
 void TvChannelClusterTvChannelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
@@ -641,9 +668,6 @@ void TvChannelClusterTvChannelListListAttributeFilter(TLV::TLVReader * tlvData, 
         Callback::Callback<TvChannelTvChannelListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                   Callback::Cancelable * onSuccessCallback,
@@ -667,9 +691,6 @@ void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader
         Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void TestClusterClusterListInt8uListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback)
@@ -691,9 +712,6 @@ void TestClusterClusterListInt8uListAttributeFilter(TLV::TLVReader * tlvData, Ca
         Callback::Callback<TestClusterListInt8uListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void TestClusterClusterListOctetStringListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
@@ -715,9 +733,6 @@ void TestClusterClusterListOctetStringListAttributeFilter(TLV::TLVReader * tlvDa
         Callback::Callback<TestClusterListOctetStringListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void TestClusterClusterListStructOctetStringListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback)
@@ -739,9 +754,6 @@ void TestClusterClusterListStructOctetStringListAttributeFilter(TLV::TLVReader *
         Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void TestClusterClusterListNullablesAndOptionalsStructListAttributeFilter(TLV::TLVReader * tlvData,
                                                                           Callback::Cancelable * onSuccessCallback,
@@ -764,9 +776,6 @@ void TestClusterClusterListNullablesAndOptionalsStructListAttributeFilter(TLV::T
         Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                          Callback::Cancelable * onSuccessCallback,
@@ -789,9 +798,6 @@ void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(TLV::TL
         Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void ThreadNetworkDiagnosticsClusterRouteTableListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                       Callback::Cancelable * onSuccessCallback,
@@ -814,9 +820,6 @@ void ThreadNetworkDiagnosticsClusterRouteTableListListAttributeFilter(TLV::TLVRe
         Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void ThreadNetworkDiagnosticsClusterSecurityPolicyListAttributeFilter(TLV::TLVReader * tlvData,
                                                                       Callback::Cancelable * onSuccessCallback,
@@ -839,9 +842,6 @@ void ThreadNetworkDiagnosticsClusterSecurityPolicyListAttributeFilter(TLV::TLVRe
         Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void ThreadNetworkDiagnosticsClusterOperationalDatasetComponentsListAttributeFilter(TLV::TLVReader * tlvData,
                                                                                     Callback::Cancelable * onSuccessCallback,
@@ -867,9 +867,6 @@ void ThreadNetworkDiagnosticsClusterOperationalDatasetComponentsListAttributeFil
             onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 void ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                                Callback::Cancelable * onSuccessCallback,
@@ -892,9 +889,6 @@ void ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter(T
         Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // __clang__
 
 bool emberAfAccountLoginClusterGetSetupPINResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                            chip::CharSpan setupPIN)
@@ -1375,19 +1369,17 @@ bool emberAfGroupsClusterAddGroupResponseCallback(EndpointId endpoint, app::Comm
 }
 
 bool emberAfGroupsClusterGetGroupMembershipResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t capacity,
-                                                            uint8_t groupCount,
                                                             /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
 {
     ChipLogProgress(Zcl, "GetGroupMembershipResponse:");
     ChipLogProgress(Zcl, "  capacity: %" PRIu8 "", capacity);
-    ChipLogProgress(Zcl, "  groupCount: %" PRIu8 "", groupCount);
     ChipLogProgress(Zcl, "  groupList: %p", groupList);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("GroupsClusterGetGroupMembershipResponseCallback");
 
     Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback> * cb =
         Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, capacity, groupCount, groupList);
+    cb->mCall(cb->mContext, capacity, groupList);
     return true;
 }
 
@@ -1959,6 +1951,19 @@ bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(EndpointId endp
     Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback> * cb =
         Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, status, data);
+    return true;
+}
+
+bool emberAfTestClusterClusterBooleanResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, bool value)
+{
+    ChipLogProgress(Zcl, "BooleanResponse:");
+    ChipLogProgress(Zcl, "  value: %d", value);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterBooleanResponseCallback");
+
+    Callback::Callback<TestClusterClusterBooleanResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterBooleanResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, value);
     return true;
 }
 

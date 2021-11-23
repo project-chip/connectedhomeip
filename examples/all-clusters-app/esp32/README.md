@@ -12,8 +12,9 @@ control.
         -   [Setting up Python Controller](#setting-up-python-controller)
         -   [Commissioning over BLE](#commissioning-over-ble)
         -   [Cluster control](#cluster-control)
-    -   [Flashing app using script](#flashing-app-using-script)
-    -   [Note](#note)
+        -   [Flashing app using script](#flashing-app-using-script)
+        -   [Note](#note)
+    -   [Using the RPC console](#using-the-rpc-console)
 
 ---
 
@@ -39,14 +40,14 @@ the riscv-esp32-elf toolchain for ESP32C3 modules.
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout
-    [v4.3 tag](https://github.com/espressif/esp-idf/releases/v4.3)
+-   Clone the Espressif ESP-IDF and checkout branch
+    [release/v4.4](https://github.com/espressif/esp-idf/tree/release/v4.4)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout v4.3
+          $ git checkout release/v4.4
           $ git submodule update --init
           $ ./install.sh
 
@@ -260,13 +261,30 @@ actual effect of the commands.
 
 ## Using the RPC console
 
-Enable RPCs in the build using menuconfig:
+You can use the rpc default config to setup everything correctly for RPCs:
 
-    $ idf.py menuconfig
+    $ export SDKCONFIG_DEFAULTS=$PROJECT_ROOT/examples/all-clusters-app/esp32/sdkconfig_m5stack_rpc.defaults
+    $ rm sdkconfig
+    $ idf.py fullclean
 
-Enable the RPC library:
+Alternatively, Enable RPCs in the build using menuconfig:
 
-    Component config → CHIP Core → General Options → Enable Pigweed PRC library
+    - Enable the RPC library and Disable ENABLE_CHIP_SHELL
+
+        Component config → CHIP Core → General Options → Enable Pigweed PRC library
+        Component config → CHIP Core → General Options → Disable CHIP Shell
+
+    - Ensure the UART is correctly configured for your board, for m5stack:
+
+        PW RPC Debug channel → UART port number → 0
+        PW RPC Debug channel → UART communication speed → 115200
+        PW RPC Debug channel → UART RXD pin number → 3
+        PW RPC Debug channel → UART TXD pin number → 1
+
+After configuring you can build and flash normally:
+
+    $ idf.py build
+    $ idf.py flash
 
 After flashing a build with RPCs enabled you can use the rpc console to send
 commands to the device.

@@ -19,6 +19,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/ConnectivityUtils.h>
 #include <platform/internal/BLEManager.h>
 
@@ -91,8 +92,7 @@ CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
     {
         struct ifaddrs * ifa = nullptr;
 
-        /* Walk through linked list, maintaining head pointer so we
-          can free list later */
+        // Walk through linked list, maintaining head pointer so we can free list later.
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
@@ -156,8 +156,7 @@ CHIP_ERROR GetWiFiStatsCount(WiFiStatsCountType type, uint64_t & count)
     {
         struct ifaddrs * ifa = nullptr;
 
-        /* Walk through linked list, maintaining head pointer so we
-          can free list later */
+        // Walk through linked list, maintaining head pointer so we can free list later.
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
@@ -431,6 +430,104 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 
 exit:
     return err;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBssId(ByteSpan & value)
+{
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
+    struct ifaddrs * ifaddr = nullptr;
+
+    // On Linux simulation, we don't have the DBus API to get the BSSID of connected AP. Use mac address
+    // of local WiFi network card instead.
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+    }
+    else
+    {
+        // Walk through linked list, maintaining head pointer so we can free list later.
+        for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
+            {
+                if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, mWiFiMacAddress, kMaxHardwareAddrSize) !=
+                    CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "Failed to get WiFi network hardware address");
+                }
+                else
+                {
+                    // Set 48-bit IEEE MAC Address
+                    value = ByteSpan(mWiFiMacAddress, 6);
+                    err   = CHIP_NO_ERROR;
+                    break;
+                }
+            }
+        }
+
+        freeifaddrs(ifaddr);
+    }
+
+    return err;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiSecurityType(uint8_t & securityType)
+{
+    const gchar * mode = nullptr;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
+    {
+        ChipLogError(DeviceLayer, "wpa_supplicant: _GetWiFiSecurityType: interface proxy not connected");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    mode = wpa_fi_w1_wpa_supplicant1_interface_get_current_auth_mode(mWpaSupplicant.iface);
+    ChipLogProgress(DeviceLayer, "wpa_supplicant: current Wi-Fi security type: %s", mode);
+
+    if (strncmp(mode, "WPA-PSK", 7) == 0)
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
+    }
+    else if (strncmp(mode, "WPA2-PSK", 8) == 0)
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+    }
+    else if (strncmp(mode, "WPA2-EAP", 8) == 0)
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+    }
+    else if (strncmp(mode, "WPA3-PSK", 8) == 0)
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
+    }
+    else if (strncmp(mode, "WEP", 3) == 0)
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
+    }
+    else if (strncmp(mode, "NONE", 4) == 0)
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+    }
+    else if (strncmp(mode, "WPA-NONE", 8) == 0)
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+    }
+    else
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiVersion(uint8_t & wiFiVersion)
+{
+    // We don't have driect API to get the WiFi version yet, retrun 802.11n on Linux simulation.
+    wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+
+    return CHIP_NO_ERROR;
 }
 
 void ConnectivityManagerImpl::_DemandStartWiFiAP()
@@ -1105,8 +1202,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** ne
     {
         NetworkInterface * head = nullptr;
 
-        /* Walk through linked list, maintaining head pointer so we
-          can free list later */
+        // Walk through linked list, maintaining head pointer so we can free list later.
         for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
             if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_PACKET)
@@ -1169,7 +1265,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetEthFullDuplex(bool & fullDuplex)
 
 CHIP_ERROR ConnectivityManagerImpl::_GetEthTimeSinceReset(uint64_t & timeSinceReset)
 {
-    return PlatformMgr().GetUpTime(timeSinceReset);
+    return GetDiagnosticDataProvider().GetUpTime(timeSinceReset);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetEthPacketRxCount(uint64_t & packetRxCount)
@@ -1250,8 +1346,7 @@ CHIP_ERROR ConnectivityManagerImpl::ResetEthernetStatsCount()
     {
         struct ifaddrs * ifa = nullptr;
 
-        /* Walk through linked list, maintaining head pointer so we
-          can free list later */
+        // Walk through linked list, maintaining head pointer so we can free list later.
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
@@ -1421,8 +1516,7 @@ CHIP_ERROR ConnectivityManagerImpl::ResetWiFiStatsCount()
     {
         struct ifaddrs * ifa = nullptr;
 
-        /* Walk through linked list, maintaining head pointer so we
-          can free list later */
+        // Walk through linked list, maintaining head pointer so we can free list later.
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)

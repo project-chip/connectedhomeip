@@ -34,7 +34,15 @@ class InfineonApp(Enum):
         if self == InfineonApp.LOCK:
             return 'chip-p6-lock-example'
         elif self == InfineonApp.ALL_CLUSTERS:
-            return 'chip-p6-all-clusters-example'
+            return 'chip-p6-clusters-example'
+        else:
+            raise Exception('Unknown app type: %r' % self)
+
+    def FlashBundleName(self):
+        if self == InfineonApp.LOCK:
+            return 'lock_app.flashbundle.txt'
+        elif self == InfineonApp.ALL_CLUSTERS:
+            return 'clusters_app.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -75,3 +83,9 @@ class InfineonBuilder(GnBuilder):
         }
 
         return items
+
+    def flashbundle(self):
+        with open(os.path.join(self.output_dir, self.app.FlashBundleName()), 'r') as fp:
+            return {
+                l.strip(): os.path.join(self.output_dir, l.strip()) for l in fp.readlines() if l.strip()
+            }

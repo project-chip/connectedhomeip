@@ -242,6 +242,12 @@
 #define ZCL_CLIENT_LIST_ATTRIBUTE_ID (0x0002)
 #define ZCL_PARTS_LIST_ATTRIBUTE_ID (0x0003)
 
+// Attribute ids for cluster: ACL
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Poll Control
 
 // Client attributes
@@ -301,6 +307,30 @@
 // Server attributes
 #define ZCL_DEFAULT_OTA_PROVIDER_ATTRIBUTE_ID (0x0001)
 #define ZCL_UPDATE_POSSIBLE_ATTRIBUTE_ID (0x0002)
+
+// Attribute ids for cluster: Localization Configuration
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Localization Time Format
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Localization Unit
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Power Source Configuration
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Power Source
 
@@ -487,6 +517,18 @@
 #define ZCL_ETHERNET_OVERRUN_COUNT_ATTRIBUTE_ID (0x0006)
 #define ZCL_CARRIER_DETECT_ATTRIBUTE_ID (0x0007)
 #define ZCL_TIME_SINCE_RESET_ATTRIBUTE_ID (0x0008)
+
+// Attribute ids for cluster: Time Synchronization
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Bridged Device Basic Information
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Bridged Device Basic
 
@@ -1392,6 +1434,23 @@
 #define ZCL_TEST_VENDOR_ID_ATTRIBUTE_ID (0x0022)
 #define ZCL_LIST_OF_STRUCTS_WITH_OPTIONALS_ATTRIBUTE_ID (0x0023)
 #define ZCL_UNSUPPORTED_ATTRIBUTE_ID (0x00FF)
+#define ZCL_NULLABLE_BOOLEAN_ATTRIBUTE_ID (0x8000)
+#define ZCL_NULLABLE_BITMAP8_ATTRIBUTE_ID (0x8001)
+#define ZCL_NULLABLE_BITMAP16_ATTRIBUTE_ID (0x8002)
+#define ZCL_NULLABLE_BITMAP32_ATTRIBUTE_ID (0x8003)
+#define ZCL_NULLABLE_BITMAP64_ATTRIBUTE_ID (0x8004)
+#define ZCL_NULLABLE_INT8_U_ATTRIBUTE_ID (0x8005)
+#define ZCL_NULLABLE_INT16_U_ATTRIBUTE_ID (0x8006)
+#define ZCL_NULLABLE_INT32_U_ATTRIBUTE_ID (0x8008)
+#define ZCL_NULLABLE_INT64_U_ATTRIBUTE_ID (0x800C)
+#define ZCL_NULLABLE_INT8_S_ATTRIBUTE_ID (0x800D)
+#define ZCL_NULLABLE_INT16_S_ATTRIBUTE_ID (0x800E)
+#define ZCL_NULLABLE_INT32_S_ATTRIBUTE_ID (0x8010)
+#define ZCL_NULLABLE_INT64_S_ATTRIBUTE_ID (0x8014)
+#define ZCL_NULLABLE_ENUM8_ATTRIBUTE_ID (0x8015)
+#define ZCL_NULLABLE_ENUM16_ATTRIBUTE_ID (0x8016)
+#define ZCL_NULLABLE_OCTET_STRING_ATTRIBUTE_ID (0x8019)
+#define ZCL_NULLABLE_CHAR_STRING_ATTRIBUTE_ID (0x801E)
 
 // Attribute ids for cluster: Messaging
 

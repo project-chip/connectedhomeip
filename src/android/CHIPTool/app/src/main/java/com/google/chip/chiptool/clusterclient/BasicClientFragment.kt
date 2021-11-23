@@ -8,32 +8,30 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipClusters.BasicCluster
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
-import kotlinx.android.synthetic.main.basic_client_fragment.basicClusterCommandStatus
-import kotlinx.android.synthetic.main.basic_client_fragment.userLabelEd
-import kotlinx.android.synthetic.main.basic_client_fragment.locationEd
 import kotlinx.android.synthetic.main.basic_client_fragment.attributeNameSpinner
-import kotlinx.android.synthetic.main.basic_client_fragment.view.writeUserLabelBtn
-import kotlinx.android.synthetic.main.basic_client_fragment.view.writeLocationBtn
-import kotlinx.android.synthetic.main.basic_client_fragment.view.writeLocalConfigDisabledSwitch
+import kotlinx.android.synthetic.main.basic_client_fragment.basicClusterCommandStatus
+import kotlinx.android.synthetic.main.basic_client_fragment.locationEd
+import kotlinx.android.synthetic.main.basic_client_fragment.userLabelEd
 import kotlinx.android.synthetic.main.basic_client_fragment.view.attributeNameSpinner
 import kotlinx.android.synthetic.main.basic_client_fragment.view.readAttributeBtn
+import kotlinx.android.synthetic.main.basic_client_fragment.view.writeLocalConfigDisabledSwitch
+import kotlinx.android.synthetic.main.basic_client_fragment.view.writeLocationBtn
+import kotlinx.android.synthetic.main.basic_client_fragment.view.writeUserLabelBtn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class BasicClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())
 
-  private val scope = CoroutineScope(Dispatchers.Main + Job())
+  private lateinit var scope: CoroutineScope
 
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
@@ -42,6 +40,8 @@ class BasicClientFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    scope = viewLifecycleOwner.lifecycleScope
+
     return inflater.inflate(R.layout.basic_client_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
 
@@ -85,10 +85,6 @@ class BasicClientFragment : Fragment() {
     }
   }
 
-  override fun onStop() {
-    super.onStop()
-    scope.cancel()
-  }
 
   private fun makeAttributeNamesAdapter(): ArrayAdapter<String> {
     return ArrayAdapter(

@@ -86,23 +86,3 @@ chip_test_suite("tests") {
     sources += [ "TestLwIPDNS.cpp" ]
   }
 }
-
-if (chip_enable_happy_tests) {
-  # The following binaries should be executed by happy.
-  chip_test_suite("happy_tests") {
-    output_name = "libHappyTestInetCommon"
-
-    sources = [ "TestInetLayerMulticast.cpp" ]
-
-    public_configs = [ ":tests_config" ]
-
-    public_deps = [
-      ":tests_lib",
-      "${chip_root}/src/inet",
-      "${chip_root}/src/lib/core",
-      "${nlunit_test_root}:nlunit-test",
-    ]
-
-    tests = [ "TestInetLayerMulticast" ]
-  }
-}

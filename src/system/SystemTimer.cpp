@@ -74,26 +74,43 @@ namespace System {
  *******************************************************************************
  */
 
-ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
+chip::ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
+Stats::count_t Timer::mNumInUse      = 0;
+Stats::count_t Timer::mHighWatermark = 0;
 
 Timer * Timer::New(System::Layer & systemLayer, System::Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
-    Timer * timer = Timer::sPool.TryCreate();
+    Timer * timer = Timer::sPool.CreateObject();
     if (timer == nullptr)
     {
         ChipLogError(chipSystemLayer, "Timer pool EMPTY");
     }
     else
     {
-        timer->AppState     = appState;
+        timer->mAppState    = appState;
         timer->mSystemLayer = &systemLayer;
         timer->mAwakenTime  = SystemClock().GetMonotonicTimestamp() + delay;
         if (!__sync_bool_compare_and_swap(&timer->mOnComplete, nullptr, onComplete))
         {
             chipDie();
         }
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+        static_assert(CHIP_SYSTEM_CONFIG_NUM_TIMERS < CHIP_SYS_STATS_COUNT_MAX, "Stats count is too small");
+        if (++mNumInUse > mHighWatermark)
+        {
+            mHighWatermark = mNumInUse;
+        }
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
     }
     return timer;
+}
+
+void Timer::Release()
+{
+    Timer::sPool.ReleaseObject(this);
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    --mNumInUse;
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
 }
 
 void Timer::Clear()
@@ -107,7 +124,7 @@ void Timer::Clear()
     VerifyOrReturn(__sync_bool_compare_and_swap(&mOnComplete, lOnComplete, nullptr));
 
     // Since this thread changed the state of mOnComplete, release the timer.
-    AppState     = nullptr;
+    mAppState    = nullptr;
     mSystemLayer = nullptr;
 }
 
@@ -116,7 +133,7 @@ void Timer::HandleComplete()
     // Save information needed to perform the callback.
     Layer * lLayer                          = this->mSystemLayer;
     const TimerCompleteCallback lOnComplete = this->mOnComplete;
-    void * lAppState                        = this->AppState;
+    void * lAppState                        = this->mAppState;
 
     // Check if timer is armed
     VerifyOrReturn(lOnComplete != nullptr, );
@@ -124,7 +141,7 @@ void Timer::HandleComplete()
     VerifyOrReturn(__sync_bool_compare_and_swap(&this->mOnComplete, lOnComplete, nullptr), );
 
     // Since this thread changed the state of mOnComplete, release the timer.
-    AppState     = nullptr;
+    mAppState    = nullptr;
     mSystemLayer = nullptr;
     this->Release();
 
@@ -193,7 +210,7 @@ Timer * Timer::List::Remove(TimerCompleteCallback aOnComplete, void * aAppState)
     Timer * previous = nullptr;
     for (Timer * timer = mHead; timer != nullptr; timer = timer->mNextTimer)
     {
-        if (timer->mOnComplete == aOnComplete && timer->AppState == aAppState)
+        if (timer->mOnComplete == aOnComplete && timer->mAppState == aAppState)
         {
             if (previous == nullptr)
             {

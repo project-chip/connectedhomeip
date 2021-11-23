@@ -24,6 +24,9 @@
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
 
+using namespace ::chip::app;
+using namespace ::chip::app::Clusters;
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -382,20 +385,31 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::Thr
     return CHIP_NO_ERROR;
 }
 
-void ThreadStackManagerImpl::_GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig)
-{
-    (void) pollingConfig;
-
-    ChipLogError(DeviceLayer, "Polling config is not supported on linux");
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig)
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+CHIP_ERROR ThreadStackManagerImpl::_GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig)
 {
     (void) pollingConfig;
 
     ChipLogError(DeviceLayer, "Polling config is not supported on linux");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
+
+CHIP_ERROR ThreadStackManagerImpl::_SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig)
+{
+    (void) pollingConfig;
+
+    ChipLogError(DeviceLayer, "Polling config is not supported on linux");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_RequestSEDFastPollingMode(bool onOff)
+{
+    (void) onOff;
+
+    ChipLogError(DeviceLayer, "Polling config is not supported on linux");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+#endif
 
 bool ThreadStackManagerImpl::_HaveMeshConnectivity()
 {
@@ -406,11 +420,6 @@ bool ThreadStackManagerImpl::_HaveMeshConnectivity()
 
     ChipLogError(DeviceLayer, "HaveMeshConnectivity has confusing behavior and shouldn't be called");
     return false;
-}
-
-void ThreadStackManagerImpl::_OnMessageLayerActivityChanged(bool messageLayerIsActive)
-{
-    (void) messageLayerIsActive;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadStatsCounters()
@@ -468,7 +477,25 @@ void ThreadStackManagerImpl::_ResetThreadNetworkDiagnosticsCounts() {}
 CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
                                                                                app::AttributeValueEncoder & encoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    switch (attributeId)
+    {
+    case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id:
+    case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id:
+    case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
+    case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
+    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
+        err = encoder.Encode(DataModel::List<EndpointId>());
+        break;
+    }
+    default: {
+        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        break;
+    }
+    }
+
+    return err;
 }
 
 ThreadStackManager & ThreadStackMgr()

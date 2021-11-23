@@ -33,6 +33,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WiFiNetworkDiagnostics;
 using namespace chip::app::Clusters::WiFiNetworkDiagnostics::Attributes;
 using chip::DeviceLayer::ConnectivityManager;
+using chip::DeviceLayer::ConnectivityMgr;
 
 namespace {
 
@@ -42,11 +43,13 @@ public:
     // Register for the WiFiNetworkDiagnostics cluster on all endpoints.
     WiFiDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), WiFiNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     template <typename T>
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &), AttributeValueEncoder & aEncoder);
+
+    CHIP_ERROR ReadWiFiBssId(AttributeValueEncoder & aEncoder);
 };
 
 template <typename T>
@@ -67,9 +70,27 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityMan
     return aEncoder.Encode(data);
 }
 
+CHIP_ERROR WiFiDiagosticsAttrAccess::ReadWiFiBssId(AttributeValueEncoder & aEncoder)
+{
+    // TODO: Use Nullable<ByteSpan> after we get darwin converted over to the new APIs.
+    Bssid::TypeInfo::Type bssid;
+
+    if (ConnectivityMgr().GetWiFiBssId(bssid) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Zcl, "Node is currently connected to Wi-Fi network with BSSID:");
+        ChipLogByteSpan(Zcl, bssid);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "Node is not currently connected.");
+    }
+
+    return aEncoder.Encode(bssid);
+}
+
 WiFiDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != WiFiNetworkDiagnostics::Id)
     {
@@ -79,6 +100,9 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, A
 
     switch (aPath.mAttributeId)
     {
+    case Bssid::Id: {
+        return ReadWiFiBssId(aEncoder);
+    }
     case Attributes::SecurityType::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiSecurityType, aEncoder);
     }

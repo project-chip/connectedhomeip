@@ -29,18 +29,34 @@
 
 #pragma once
 
-#include <controller/DeviceControllerInteractionModelDelegate.h>
+#include <app/DeviceControllerInteractionModelDelegate.h>
+#include <credentials/FabricTable.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/UDP.h>
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
+#include <transport/raw/BLE.h>
 #endif
 
 namespace chip {
+
+constexpr size_t kMaxDeviceTransportBlePendingPackets = 1;
+
+using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                        ,
+                                        Transport::UDP /* IPv4 */
+#endif
+#if CONFIG_NETWORK_LAYER_BLE
+                                        ,
+                                        Transport::BLE<kMaxDeviceTransportBlePendingPackets> /* BLE */
+#endif
+                                        >;
 
 namespace Controller {
 

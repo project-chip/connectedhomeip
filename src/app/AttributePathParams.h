@@ -19,48 +19,59 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <lib/support/BitFlags.h>
+
+#include <app/ClusterInfo.h>
+#include <app/MessageDef/AttributePathIB.h>
 
 namespace chip {
 namespace app {
 struct AttributePathParams
 {
-    enum class Flags : uint8_t
-    {
-        kFieldIdValid   = 0x01,
-        kListIndexValid = 0x02,
-    };
-
     //
     // TODO: (Issue #10596) Need to ensure that we do not encode the NodeId over the wire
     // if it is either not 'set', or is set to a value that matches accessing fabric
     // on which the interaction is undertaken.
     //
-    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId) : AttributePathParams(0, aEndpointId, aClusterId, 0, 0, {}) {}
-
-    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aFieldId) :
-        AttributePathParams(0, aEndpointId, aClusterId, aFieldId, 0, chip::app::AttributePathParams::Flags::kFieldIdValid)
+    // TODO: (#11420) This class is overlapped with ClusterInfo class, need to do a clean up.
+    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId) :
+        AttributePathParams(aEndpointId, aClusterId, ClusterInfo::kInvalidAttributeId, ClusterInfo::kInvalidListIndex)
     {}
 
-    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aFieldId, ListIndex aListIndex) :
-        AttributePathParams(0, aEndpointId, aClusterId, aFieldId, aListIndex,
-                            BitFlags<Flags>(chip::app::AttributePathParams::Flags::kFieldIdValid,
-                                            chip::app::AttributePathParams::Flags::kListIndexValid))
+    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
+        AttributePathParams(aEndpointId, aClusterId, aAttributeId, ClusterInfo::kInvalidListIndex)
     {}
 
-    AttributePathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, AttributeId aFieldId, ListIndex aListIndex,
-                        const BitFlags<Flags> aFlags) :
-        mNodeId(aNodeId),
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
+    AttributePathParams(ClusterId aClusterId, AttributeId aAttributeId) :
+        AttributePathParams(kInvalidEndpointId, aClusterId, aAttributeId, ClusterInfo::kInvalidListIndex)
+    {}
+
+    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListIndex aListIndex) :
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mAttributeId(aAttributeId), mListIndex(aListIndex)
     {}
 
     AttributePathParams() {}
-    NodeId mNodeId         = 0;
-    EndpointId mEndpointId = 0;
-    ClusterId mClusterId   = 0;
-    AttributeId mFieldId   = 0;
-    ListIndex mListIndex   = 0;
-    BitFlags<Flags> mFlags;
+
+    CHIP_ERROR BuildAttributePath(AttributePathIB::Builder & aBuilder) const;
+
+    bool HasWildcard() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
+
+    /**
+     * SPEC 8.9.2.2
+     * Check that the path meets some basic constraints of an attribute path: If list index is not wildcard, then field id must not
+     * be wildcard. This does not verify that the attribute being targeted is actually of list type when the list index is not
+     * wildcard.
+     */
+    bool IsValidAttributePath() const { return HasWildcardListIndex() || !HasWildcardAttributeId(); }
+
+    inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
+    inline bool HasWildcardClusterId() const { return mClusterId == ClusterInfo::kInvalidClusterId; }
+    inline bool HasWildcardAttributeId() const { return mAttributeId == ClusterInfo::kInvalidAttributeId; }
+    inline bool HasWildcardListIndex() const { return mListIndex == ClusterInfo::kInvalidListIndex; }
+
+    EndpointId mEndpointId   = kInvalidEndpointId;
+    ClusterId mClusterId     = ClusterInfo::kInvalidClusterId;
+    AttributeId mAttributeId = ClusterInfo::kInvalidAttributeId;
+    ListIndex mListIndex     = ClusterInfo::kInvalidListIndex;
 };
 } // namespace app
 } // namespace chip

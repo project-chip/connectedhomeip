@@ -3,14 +3,161 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
+#include <type_traits>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Nullable.h>
 #include <commands/clusters/ModelCommand.h>
+#include <commands/common/CommandInvoker.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
+
+// Value logging functions.  The non-generated ones depend on the
+// generated ones, so are placed here.
+namespace {
+
+{{#zcl_clusters}}
+{{#zcl_structs}}
+CHIP_ERROR LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns=parent.name isArgument=true}} value);
+{{/zcl_structs}}
+{{/zcl_clusters}}
+
+#if CHIP_PROGRESS_LOGGING
+std::string IndentStr(size_t indent)
+{
+  std::string str;
+  for (size_t i = 0; i < indent; ++i) {
+    str.append("  ");
+  }
+  return str;
+}
+#endif // CHIP_PROGRESS_LOGGING
+
+template <typename X, typename std::enable_if_t<std::is_integral<X>::value && !std::is_same<std::remove_cv_t<std::remove_reference_t<X>>, bool>::value, int> = 0>
+CHIP_ERROR LogValue(const char * label, size_t indent, X value)
+{
+    ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, std::to_string(value).c_str());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LogValue(const char * label, size_t indent, bool value)
+{
+    ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, value ? "TRUE" : "FALSE");
+    return CHIP_NO_ERROR;
+}
+
+template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
+CHIP_ERROR LogValue(const char * label, size_t indent, X value)
+{
+    return LogValue(label, indent, chip::to_underlying(value));
+}
+
+
+CHIP_ERROR LogValue(const char * label, size_t indent, chip::CharSpan value)
+{
+    ChipLogProgress(chipTool, "%s%s: %.*s", IndentStr(indent).c_str(), label, static_cast<int>(value.size()), value.data());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LogValue(const char * label, size_t indent, chip::ByteSpan value)
+{
+    ChipLogProgress(chipTool, "%s%s: %zu", IndentStr(indent).c_str(), label, value.size());
+    return CHIP_NO_ERROR;
+}
+
+template <typename X>
+CHIP_ERROR LogValue(const char * label, size_t indent, chip::BitFlags<X> value)
+{
+    return LogValue(label, indent, value.Raw());
+}
+
+template <typename T>
+CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::DataModel::DecodableList<T> & value)
+{
+    size_t count = 0;
+    CHIP_ERROR err = value.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+    ChipLogProgress(chipTool, "%s%s: %zu entries", IndentStr(indent).c_str(), label, count);
+
+    auto iter = value.begin();
+    size_t i = 0;
+    while (iter.Next())
+    {
+      ++i;
+      std::string itemLabel = std::string("[") + std::to_string(i) + "]";
+      ReturnErrorOnFailure(LogValue(itemLabel.c_str(), indent + 1, iter.GetValue()));
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+      ChipLogProgress(chipTool, "%sList truncated due to invalid value", IndentStr(indent+1).c_str());
+    }
+    return iter.GetStatus();
+}
+
+
+template <typename T>
+CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::DataModel::Nullable<T> & value)
+{
+    if (!value.IsNull())
+    {
+        return LogValue(label, indent, value.Value());
+    }
+    ChipLogProgress(chipTool, "%s%s: null", IndentStr(indent).c_str(), label);
+    return CHIP_NO_ERROR;
+}
+
+template <typename T>
+CHIP_ERROR LogValue(const char * label, size_t indent, const chip::Optional<T> & value)
+{
+    if (value.HasValue())
+    {
+        return LogValue(label, indent, value.Value());
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+// We output helpers for all structs here, including ones we might not actually
+// be logging.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+{{#zcl_clusters}}
+{{#zcl_structs}}
+CHIP_ERROR LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns=parent.name isArgument=true}} value)
+{
+  ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+{{#zcl_struct_items}}
+  {
+      CHIP_ERROR err = LogValue("{{asUpperCamelCase label}}", indent + 1, value.{{asLowerCamelCase label}});
+      if (err != CHIP_NO_ERROR)
+      {
+          ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for '{{asUpperCamelCase label}}'", IndentStr(indent + 1).c_str());
+          return err;
+      }
+  }
+{{/zcl_struct_items}}
+  ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+  return CHIP_NO_ERROR;
+}
+{{/zcl_structs}}
+{{/zcl_clusters}}
+#pragma GCC diagnostic pop
+
+} // anonymous namespace
+
+static void OnDefaultSuccessResponseWithoutExit(void * context)
+{
+    ChipLogProgress(chipTool, "Default Success Response");
+}
 
 static void OnDefaultSuccessResponse(void * context)
 {
@@ -38,79 +185,124 @@ static void OnDefaultFailure(void * context, EmberAfStatus status)
     OnDefaultFailureResponse(context, status);
 };
 
-static void OnBooleanAttributeResponse(void * context, bool value)
+static void OnBooleanAttributeReport(void * context, bool value)
 {
     ChipLogProgress(chipTool, "Boolean attribute Response: %d", value);
+}
+
+static void OnBooleanAttributeResponse(void * context, bool value)
+{
+    OnBooleanAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt8uAttributeReport(void * context, uint8_t value)
+{
+    ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
 }
 
 static void OnInt8uAttributeResponse(void * context, uint8_t value)
 {
-    ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
+    OnInt8uAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt16uAttributeReport(void * context, uint16_t value)
+{
+    ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
 }
 
 static void OnInt16uAttributeResponse(void * context, uint16_t value)
 {
-    ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
+    OnInt16uAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt32uAttributeReport(void * context, uint32_t value)
+{
+    ChipLogProgress(chipTool, "Int32u attribute Response: %" PRIu32, value);
 }
 
 static void OnInt32uAttributeResponse(void * context, uint32_t value)
 {
-    ChipLogProgress(chipTool, "Int32u attribute Response: %" PRIu32, value);
+    OnInt32uAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt64uAttributeReport(void * context, uint64_t value)
+{
+    ChipLogProgress(chipTool, "Int64u attribute Response: %" PRIu64, value);
 }
 
 static void OnInt64uAttributeResponse(void * context, uint64_t value)
 {
-    ChipLogProgress(chipTool, "Int64u attribute Response: %" PRIu64, value);
+    OnInt64uAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt8sAttributeReport(void * context, int8_t value)
+{
+    ChipLogProgress(chipTool, "Int8s attribute Response: %" PRId8, value);
 }
 
 static void OnInt8sAttributeResponse(void * context, int8_t value)
 {
-    ChipLogProgress(chipTool, "Int8s attribute Response: %" PRId8, value);
+    OnInt8sAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt16sAttributeReport(void * context, int16_t value)
+{
+    ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
 }
 
 static void OnInt16sAttributeResponse(void * context, int16_t value)
 {
-    ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
+    OnInt16sAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt32sAttributeReport(void * context, int32_t value)
+{
+    ChipLogProgress(chipTool, "Int32s attribute Response: %" PRId32, value);
 }
 
 static void OnInt32sAttributeResponse(void * context, int32_t value)
 {
-    ChipLogProgress(chipTool, "Int32s attribute Response: %" PRId32, value);
+    OnInt32sAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnInt64sAttributeReport(void * context, int64_t value)
+{
+    ChipLogProgress(chipTool, "Int64s attribute Response: %" PRId64, value);
 }
 
 static void OnInt64sAttributeResponse(void * context, int64_t value)
 {
-    ChipLogProgress(chipTool, "Int64s attribute Response: %" PRId64, value);
+    OnInt64sAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnOctetStringAttributeResponse(void * context, const chip::ByteSpan value)
+static void OnOctetStringAttributeReport(void * context, const chip::ByteSpan value)
 {
     char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     if (CHIP_NO_ERROR == chip::Encoding::BytesToUppercaseHexString(value.data(), value.size(), &buffer[0], CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE)) {
@@ -118,14 +310,24 @@ static void OnOctetStringAttributeResponse(void * context, const chip::ByteSpan 
     } else {
         ChipLogProgress(chipTool, "OctetString attribute Response len: %zu", value.size());
     }
+}
+
+static void OnOctetStringAttributeResponse(void * context, const chip::ByteSpan value)
+{
+    OnOctetStringAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnCharStringAttributeResponse(void * context, const chip::CharSpan value)
+static void OnCharStringAttributeReport(void * context, const chip::CharSpan value)
 {
     ChipLogProgress(chipTool, "CharString attribute Response: %.*s", static_cast<int>(value.size()), value.data());
+}
+
+static void OnCharStringAttributeResponse(void * context, const chip::CharSpan value)
+{
+    OnCharStringAttributeReport(context, value);
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -136,69 +338,10 @@ static void OnCharStringAttributeResponse(void * context, const chip::CharSpan v
 {{#if isList}}
 static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
 {
+    CHIP_ERROR err = LogValue("On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse", 0, list);
+
     ModelCommand * command = static_cast<ModelCommand *>(context);
-
-    size_t count = 0;
-    CHIP_ERROR err = list.ComputeSize(&count);
-    if (err != CHIP_NO_ERROR) {
-      command->SetCommandExitStatus(err);
-      return;
-    }
-
-    ChipLogProgress(chipTool, "On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse: %zu entries", count);
-
-    auto iter = list.begin();
-    uint16_t i = 0;
-    while (iter.Next())
-    {
-        ++i;
-#if CHIP_PROGRESS_LOGGING
-        auto & entry = iter.GetValue();
-        {{#if isStruct}}
-        ChipLogProgress(chipTool, "{{type}}[%" PRIu16 "]:", i);
-        {{#chip_attribute_list_entryTypes}}
-        {{~#*inline "field"}}entry.{{asLowerCamelCase name}}{{#if isOptional}}.Value(){{/if}}{{/inline~}}
-        {{~#*inline "fieldValue"}}{{>field}}{{#if isNullable}}.Value(){{/if}}{{/inline~}}
-        {{#if isOptional}}
-        if (entry.{{asLowerCamelCase name}}.HasValue()) {
-        {{/if}}
-        {{#if isNullable}}
-        if ({{>field}}.IsNull()) {
-          ChipLogProgress(chipTool, "  {{asSymbol label}}: null");
-        } else {
-        {{/if}}
-        {{#if isArray}}
-        {{! TODO: Add support for printing list member of struct element of list attribute }}
-        ChipLogProgress(chipTool, "  {{asSymbol label}}: list member of struct element of list attribute printing not supported yet");
-        {{else if (isOctetString type)}}
-        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", {{>fieldValue}}.size());
-        {{else if (isCharString type)}}
-        ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", static_cast<int>({{>fieldValue}}.size()), {{>fieldValue}}.data());
-        {{else if isStruct}}
-        {{! TODO: Add support for printing struct member of struct element of list attribute }}
-        ChipLogProgress(chipTool, "  {{asSymbol label}}: struct member of struct element of list attribute printing not supported yet");
-        {{else}}
-        ChipLogProgress(chipTool, "  {{asSymbol label}}: {{asPrintFormat type}}", {{>fieldValue}});
-        {{/if}}
-        {{#if isNullable}}
-        }
-        {{/if}}
-        {{#if isOptional}}
-        }
-        {{/if}}
-        {{/chip_attribute_list_entryTypes}}
-        {{else}}
-        {{#if (isOctetString type)}}
-        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entry.size());
-        {{else if (isCharString type)}}
-        ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", static_cast<int>(entry.size()), entry.data());
-        {{else}}
-        ChipLogProgress(chipTool, "{{type}}[%" PRIu16 "]: {{asPrintFormat type}}", i, entry);
-        {{/if}}
-        {{/if}}
-#endif // CHIP_PROGRESS_LOGGING
-    }
-    command->SetCommandExitStatus(iter.GetStatus());
+    command->SetCommandExitStatus(err);
 }
 
 {{/if}}
@@ -210,23 +353,15 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
 static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Success(void * context, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data)
 {
     ChipLogProgress(Zcl, "Received {{asUpperCamelCase name}}:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
     {{#chip_cluster_response_arguments}}
-    {{~#*inline "field"}}data.{{asLowerCamelCase label}}{{/inline~}}
-    {{#if isArray}}
-    ChipLogProgress(Zcl, "  {{label}}: Array printing is not implemented yet.");
-    {{else if isOptional}}
-    ChipLogProgress(Zcl, "  {{label}}: Optional printing is not implemented yet.");
-    {{else if (isOctetString type)}}
-    ChipLogProgress(Zcl, "  {{label}}: %zu", {{>field}}.size());
-    {{else if (isCharString type)}}
-    ChipLogProgress(Zcl, "  {{label}}: %.*s", static_cast<int>({{>field}}.size()), {{>field}}.data());
-    {{else}}
-    ChipLogProgress(Zcl, "  {{label}}: {{asPrintFormat type}}", {{>field}});
-    {{/if}}
+    if (err == CHIP_NO_ERROR) {
+       err = LogValue("{{asLowerCamelCase label}}", 1, data.{{asLowerCamelCase label}});
+    }
     {{/chip_cluster_response_arguments}}
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
+    command->SetCommandExitStatus(err);
 };
 
 {{/chip_cluster_responses}}
@@ -277,9 +412,7 @@ public:
         {{/if}}
         {{/chip_cluster_command_non_expanded_arguments}}
 
-        chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.InvokeCommand(mRequest, this, {{#if hasSpecificResponse}}On{{asUpperCamelCase parent.name}}{{asUpperCamelCase response.name}}Success{{else}}OnDefaultSuccess{{/if}}, OnDefaultFailure);
+        return chip::Controller::InvokeCommand(device, this, {{#if hasSpecificResponse}}On{{asUpperCamelCase parent.name}}{{asUpperCamelCase response.name}}Success{{else}}OnDefaultSuccess{{/if}}, OnDefaultFailure, endpointId, mRequest);
     }
 
 private:
@@ -326,6 +459,9 @@ private:
 };
 
 {{#if isWritableAttribute}}
+{{! No list support for writing yet.  Need to figure out how to represent the
+    values. }}
+{{#unless isList}}
 class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
@@ -361,8 +497,10 @@ private:
     {{chipType}} mValue;
 };
 
+{{/unless}}
 {{/if}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
 class Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
@@ -371,12 +509,14 @@ public:
         AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}()
     {
       delete onSuccessCallback;
+      delete onSuccessCallbackWithoutExit;
       delete onFailureCallback;
       delete onReportCallback;
     }
@@ -388,23 +528,28 @@ public:
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttribute{{asUpperCamelCase name}}(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(cluster.ReportAttribute{{asUpperCamelCase name}}(onReportCallback->Cancel()));
 
-        return cluster.SubscribeAttribute{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttribute{{asUpperCamelCase name}}(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onReportCallback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
+    chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onReportCallback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    bool mWait;
 };
 
+{{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
@@ -424,10 +569,16 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#chip_server_cluster_attributes}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{#if isWritableAttribute}}
+        {{! No list support for writing yet.  Need to figure out how to
+            represent the values. }}
+        {{#unless isList}}
         make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        {{/unless}}
         {{/if}}
         {{#if isReportableAttribute}}
+        {{#unless isList}}
         make_unique<Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        {{/unless}}
         {{/if}}
         {{/chip_server_cluster_attributes}}
     };

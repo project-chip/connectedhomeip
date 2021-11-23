@@ -25,6 +25,7 @@ if (chip_enable_openthread) {
 static_library("cc13x2_26x2") {
   sources = [
     "../FreeRTOS/SystemTimeSupport.cpp",
+    "../SingletonConfigurationManager.cpp",
     "BlePlatformConfig.h",
     "CC13X2_26X2Config.cpp",
     "CC13X2_26X2Config.h",
@@ -36,6 +37,8 @@ static_library("cc13x2_26x2") {
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",

@@ -33,6 +33,7 @@ using chip::CharSpan;
 using chip::Optional;
 using chip::Span;
 using chip::app::Clusters::OTAProviderDelegate;
+using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
@@ -61,14 +62,14 @@ bool GenerateBdxUri(const Span<char> & fileDesignator, Span<char> outUri, size_t
     static constexpr char bdxPrefix[] = "bdx://";
     chip::NodeId nodeId               = chip::kTestDeviceNodeId; // TODO: read this dynamically
     size_t nodeIdHexStrLen            = sizeof(nodeId) * 2;
-    size_t expectedLength             = strlen(bdxPrefix) + nodeIdHexStrLen + fileDesignator.size();
+    size_t expectedLength             = strlen(bdxPrefix) + nodeIdHexStrLen + 1 + fileDesignator.size();
 
     if (expectedLength >= availableSize)
     {
         return false;
     }
 
-    size_t written = static_cast<size_t>(snprintf(outUri.data(), availableSize, "%s" ChipLogFormatX64 "%s", bdxPrefix,
+    size_t written = static_cast<size_t>(snprintf(outUri.data(), availableSize, "%s" ChipLogFormatX64 "/%s", bdxPrefix,
                                                   ChipLogValueX64(nodeId), fileDesignator.data()));
 
     return expectedLength == written;
@@ -94,17 +95,14 @@ void OTAProviderExample::SetOTAFilePath(const char * path)
 }
 
 EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj,
-                                                   const chip::app::ConcreteCommandPath & commandPath, uint16_t vendorId,
-                                                   uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
-                                                   const Optional<uint16_t> & hardwareVersion, const Optional<CharSpan> & location,
-                                                   const Optional<bool> & requestorCanConsent,
-                                                   const Optional<ByteSpan> & metadataForProvider)
+                                                   const chip::app::ConcreteCommandPath & commandPath,
+                                                   const QueryImage::DecodableType & commandData)
 {
     // TODO: add confiuration for returning BUSY status
 
     EmberAfOTAQueryStatus queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
-    uint32_t newSoftwareVersion       = softwareVersion + 1; // This implementation will always indicate that an update is available
-                                                             // (if the user provides a file).
+    uint32_t newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
+                                                                   // available (if the user provides a file).
     constexpr char kExampleSoftwareString[] = "Example-Image-V0.1";
     bool userConsentNeeded                  = false;
     uint8_t updateToken[kUpdateTokenLen]    = { 0 };
@@ -149,19 +147,16 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
     }
 
-    chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Type response;
-    response.status                = queryStatus;
-    response.delayedActionTime     = mDelayedActionTimeSec;
-    response.imageURI              = chip::CharSpan(uriBuf, strlen(uriBuf));
-    response.softwareVersion       = newSoftwareVersion;
-    response.softwareVersionString = chip::CharSpan(kExampleSoftwareString, strlen(kExampleSoftwareString));
-    response.updateToken           = chip::ByteSpan(updateToken);
-    response.userConsentNeeded     = userConsentNeeded;
-    // TODO: Once our client is using APIs that handle optional arguments
-    // correctly, update QueryImageResponse to have the right things optional.
-    // At that point we can decide whether to send metadataForRequestor as an
-    // empty ByteSpan or whether to not send it at all.
-    response.metadataForRequestor = chip::ByteSpan();
+    QueryImageResponse::Type response;
+    response.status = queryStatus;
+    response.delayedActionTime.Emplace(mDelayedActionTimeSec);
+    response.imageURI.Emplace(chip::CharSpan(uriBuf, strlen(uriBuf)));
+    response.softwareVersion.Emplace(newSoftwareVersion);
+    response.softwareVersionString.Emplace(chip::CharSpan(kExampleSoftwareString, strlen(kExampleSoftwareString)));
+    response.updateToken.Emplace(chip::ByteSpan(updateToken));
+    response.userConsentNeeded.Emplace(userConsentNeeded);
+    // Could also just not send metadataForRequestor at all.
+    response.metadataForRequestor.Emplace(chip::ByteSpan());
 
     VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     return EMBER_ZCL_STATUS_SUCCESS;
@@ -169,19 +164,19 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
 EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHandler * commandObj,
                                                            const chip::app::ConcreteCommandPath & commandPath,
-                                                           const ByteSpan & updateToken, uint32_t newVersion)
+                                                           const ApplyUpdateRequest::DecodableType & commandData)
 {
     // TODO: handle multiple transfers by tracking updateTokens
 
     EmberAfOTAApplyUpdateAction updateAction = EMBER_ZCL_OTA_APPLY_UPDATE_ACTION_PROCEED; // For now, just allow any update request
     char tokenBuf[kUpdateTokenStrLen]        = { 0 };
 
-    GetUpdateTokenString(updateToken, tokenBuf, kUpdateTokenStrLen);
-    ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, newVersion);
+    GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
+    ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.newVersion);
 
     VerifyOrReturnError(commandObj != nullptr, EMBER_ZCL_STATUS_INVALID_VALUE);
 
-    chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Type response;
+    ApplyUpdateResponse::Type response;
     response.action            = updateAction;
     response.delayedActionTime = mDelayedActionTimeSec;
     VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
@@ -189,12 +184,14 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus OTAProviderExample::HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t softwareVersion)
+EmberAfStatus OTAProviderExample::HandleNotifyUpdateApplied(chip::app::CommandHandler * commandObj,
+                                                            const chip::app::ConcreteCommandPath & commandPath,
+                                                            const NotifyUpdateApplied::DecodableType & commandData)
 {
     char tokenBuf[kUpdateTokenStrLen] = { 0 };
 
-    GetUpdateTokenString(updateToken, tokenBuf, kUpdateTokenStrLen);
-    ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, softwareVersion);
+    GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
+    ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.softwareVersion);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 

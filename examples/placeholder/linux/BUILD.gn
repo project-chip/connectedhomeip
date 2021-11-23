@@ -24,8 +24,15 @@ declare_args() {
 chip_data_model("configuration") {
   zap_file = "apps/${chip_tests_zap_config}/config.zap"
 
-  zap_pregenerated_dir = "${chip_root}/out/debug/placeholder/${chip_tests_zap_config}/zap-generated"
+  zap_pregenerated_dir = "${chip_root}/zzz_generated/placeholder/${chip_tests_zap_config}/zap-generated"
   is_server = true
+}
+
+config("includes") {
+  include_dirs = [
+    ".",
+    "include",
+  ]
 }
 
 executable("chip-${chip_tests_zap_config}") {
@@ -34,8 +41,11 @@ executable("chip-${chip_tests_zap_config}") {
   deps = [
     ":configuration",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/tests/suites/pics",
     "${chip_root}/src/lib",
   ]
+
+  include_dirs = [ "include" ]
 
   cflags = [ "-Wconversion" ]
 

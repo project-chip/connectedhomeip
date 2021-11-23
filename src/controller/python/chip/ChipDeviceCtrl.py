@@ -30,11 +30,12 @@ from __future__ import print_function
 import asyncio
 from ctypes import *
 from .ChipStack import *
-from .interaction_model import delegate as im
+from .interaction_model import InteractionModelError, delegate as im
 from .exceptions import *
 from .clusters import Command as ClusterCommand
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
+from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import *
 import enum
 import threading
@@ -133,6 +134,8 @@ class ChipDeviceController(object):
             self.state = DCState.IDLE
             self._ChipStack.callbackRes = err
             self._ChipStack.completeEvent.set()
+            self._ChipStack.commissioningCompleteEvent.set()
+            self._ChipStack.commissioningEventRes = err
 
         im.InitIMDelegate()
         ClusterCommand.Init(self)
@@ -197,11 +200,20 @@ class ChipDeviceController(object):
         )
 
     def ConnectIP(self, ipaddr, setupPinCode, nodeid):
+        # IP connection will run through full commissioning, so we need to wait
+        # for the commissioning complete event, not just any callback.
         self.state = DCState.RENDEZVOUS_ONGOING
-        return self._ChipStack.CallAsync(
+        self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectIP(
                 self.devCtrl, ipaddr, setupPinCode, nodeid)
         )
+        # Wait up to 5 additional seconds for the commissioning complete event
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            self._ChipStack.commissioningCompleteEvent.wait(5.0)
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            # Error 50 is a timeout
+            return False
+        return self._ChipStack.commissioningEventRes == 0
 
     def ResolveNode(self, nodeid):
         return self._ChipStack.CallAsync(
@@ -365,62 +377,113 @@ class ChipDeviceController(object):
             future.set_exception(self._ChipStack.ErrorToException(res))
         return await future
 
-    def WriteAttribute(self, nodeid: int, attributes):
+    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]]):
+        '''
+        Write a list of attributes on a target node.
+
+        nodeId: Target's Node ID
+        attributes: A list of tuples of type (endpoint, cluster-object):
+
+        E.g
+            (1, Clusters.TestCluster.Attributes.XYZAttribute('hello')) -- Write 'hello' to the XYZ attribute on the test cluster to endpoint 1
+        '''
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
         device = self.GetConnectedDeviceSync(nodeid)
+
+        attrs = []
+        for v in attributes:
+            attrs.append(ClusterAttribute.AttributeWriteRequest(
+                v[0], v[1], v[1].value))
+
         res = self._ChipStack.Call(
             lambda: ClusterAttribute.WriteAttributes(
-                future, eventLoop, device, attributes)
+                future, eventLoop, device, attrs)
         )
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
-        return future
+        return await future
 
-    def ReadAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterAttribute.AttributeReadRequest]]):
+    async def ReadAttribute(self, nodeid: int, attributes: typing.List[typing.Union[
+        None,  # Empty tuple, all wildcard
+        typing.Tuple[int],  # Endpoint
+        # Wildcard endpoint, Cluster id present
+        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+        # Wildcard endpoint, Cluster + Attribute present
+        typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+        # Wildcard attribute id
+        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
+        # Concrete path
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
+    ]]):
+        '''
+        Read a list of attributes from a target node
+
+        nodeId: Target's Node ID
+        attributes: A list of tuples of varying types depending on the type of read being requested:
+            ():                                         Endpoint = *,           Cluster = *,          Attribute = *
+            (Clusters.ClusterA):                        Endpoint = *,           Cluster = specific,   Attribute = *
+            (Clusters.ClusterA.AttributeA):             Endpoint = *,           Cluster = specific,   Attribute = specific
+            (endpoint, Clusters.ClusterA):              Endpoint = specific,    Cluster = specific,   Attribute = *
+            (endpoint, Clusters.ClusterA.AttributeA):   Endpoint = specific,    Cluster = specific,   Attribute = specific
+
+        The cluster and attributes specified above are to be selected from the generated cluster objects.
+
+        NOTE: Only the last variant is currently supported.
+        '''
+
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
         device = self.GetConnectedDeviceSync(nodeid)
-        # TODO: Here, we translates multi attribute read into many individual attribute reads, this should be fixed by implementing Python's attribute read API.
-        res = []
-        for attr in attributes:
-            endpointId = attr[0]
-            attribute = attr[1]
-            clusterInfo = self._Cluster.GetClusterInfoById(
-                attribute.cluster_id)
-            if not clusterInfo:
-                raise UnknownCluster(attribute.cluster_id)
-            attributeInfo = clusterInfo.get("attributes", {}).get(
-                attribute.attribute_id, None)
-            if not attributeInfo:
-                raise UnknownAttribute(
-                    clusterInfo["clusterName"], attribute.attribute_id)
-            self._Cluster.ReadAttribute(
-                device, clusterInfo["clusterName"], attributeInfo["attributeName"], endpointId, 0, False)
-            readRes = im.GetAttributeReadResponse(
-                im.DEFAULT_ATTRIBUTEREAD_APPID)
-            res.append(ClusterAttribute.AttributeReadResult(
-                Path=ClusterAttribute.AttributePath(
-                    EndpointId=endpointId, ClusterId=attribute.cluster_id, AttributeId=attribute.attribute_id),
-                Status=readRes.status,
-                Data=(attribute.FromTagDictOrRawValue(
-                    readRes.value) if readRes.value is not None else None),
-            ))
-        future.set_result(res)
-        return future
+        attrs = []
+        for v in attributes:
+            endpoint = None
+            cluster = None
+            attribute = None
+            if v == () or v == ('*'):
+                # Wildcard
+                pass
+            elif len(v) == 1:
+                if v[0] is int:
+                    endpoint = v[0]
+                elif issubclass(v[0], ClusterObjects.Cluster):
+                    cluster = v[0]
+                elif issubclass(v[0], ClusterObjects.ClusterAttributeDescriptor):
+                    attribute = v[0]
+                else:
+                    raise ValueError("Unsupported Attribute Path")
+            elif len(v) == 2:
+                # endpoint + (cluster) attribute / endpoint + cluster
+                endpoint = v[0]
+                if issubclass(v[1], ClusterObjects.Cluster):
+                    cluster = v[1]
+                elif issubclass(v[1], ClusterAttribute.ClusterAttributeDescriptor):
+                    attribute = v[1]
+                else:
+                    raise ValueError("Unsupported Attribute Path")
+            attrs.append(ClusterAttribute.AttributePath(
+                EndpointId=endpoint, Cluster=cluster, Attribute=attribute))
+        res = self._ChipStack.Call(
+            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, attrs))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+        return await future
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
-        device = self.GetConnectedDeviceSync(nodeid)
-
-        im.ClearCommandStatus(im.PLACEHOLDER_COMMAND_HANDLE)
-        self._Cluster.SendCommand(
-            device, cluster, command, endpoint, groupid, args, True)
-        if blocking:
-            # We only send 1 command by this function, so index is always 0
-            return im.WaitCommandIndexStatus(im.PLACEHOLDER_COMMAND_HANDLE, 1)
-        return (0, None)
+        req = None
+        try:
+            req = eval(
+                f"GeneratedObjects.{cluster}.Commands.{command}")(**args)
+        except:
+            raise UnknownCommand(cluster, command)
+        try:
+            res = asyncio.run(self.SendCommand(nodeid, endpoint, req))
+            print(f"CommandResponse {res}")
+            return (0, res)
+        except InteractionModelError as ex:
+            return (int(ex.state), None)
 
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
         device = self.GetConnectedDeviceSync(nodeid)
@@ -431,14 +494,15 @@ class ChipDeviceController(object):
         if blocking:
             return im.GetAttributeReadResponse(im.DEFAULT_ATTRIBUTEREAD_APPID)
 
-    def ZCLWriteAttribute(self, cluster, attribute, nodeid, endpoint, groupid, value, blocking=True):
-        device = self.GetConnectedDeviceSync(nodeid)
+    def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, blocking=True):
+        req = None
+        try:
+            req = eval(
+                f"GeneratedObjects.{cluster}.Attributes.{attribute}")(value)
+        except:
+            raise UnknownAttribute(cluster, attribute)
 
-        # We are not using IM for Attributes.
-        self._Cluster.WriteAttribute(
-            device, cluster, attribute, endpoint, groupid, value, False)
-        if blocking:
-            return im.GetAttributeWriteResponse(im.DEFAULT_ATTRIBUTEWRITE_APPID)
+        return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req)]))
 
     def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True):
         device = self.GetConnectedDeviceSync(nodeid)

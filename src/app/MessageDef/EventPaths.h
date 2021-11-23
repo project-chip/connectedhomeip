@@ -67,7 +67,7 @@ public:
      *
      *  @return A reference to EventPathIB::Builder
      */
-    EventPathIB::Builder & CreateEventPath();
+    EventPathIB::Builder & CreatePath();
 
     /**
      *  @brief Mark the end of this EventPaths

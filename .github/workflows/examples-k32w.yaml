@@ -31,13 +31,13 @@ jobs:
             BUILD_TYPE: gn_k32w
             GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
             GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-            GH_EVENT_PARENT: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+            GH_EVENT_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-k32w:0.5.23
+            image: connectedhomeip/chip-build-k32w:0.5.28
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -45,6 +45,16 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
+
+            - name: Get parent for size reports
+              run: |
+                MERGE_PARENT="$(git --no-pager log -1 --pretty=tformat:%s | sed -n -e 's/Merge [0-9a-f]\+ into //p')"
+                if test -z "${MERGE_PARENT}" || test "${GH_EVENT_PARENT}" = 0
+                then
+                  MERGE_PARENT=$GH_EVENT_BASE
+                fi
+                echo "GH_EVENT_PARENT=$MERGE_PARENT" >>$GITHUB_ENV
+
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -69,7 +79,7 @@ jobs:
               timeout-minutes: 5
               run: |
                   scripts/examples/k32w_example.sh \
-                  examples/shell/nxp/k32w/k32w0 out/shell_app_debug
+                  examples/shell/nxp/k32w/k32w0 out/shell_app_debug no_low_power
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     k32w k32w061+debug shell \
                     out/shell_app_debug/chip-k32w061-shell-example \
@@ -83,6 +93,7 @@ jobs:
                     k32w k32w061+se05x+release lighting-app \
                     out/lighting_app_se_release/chip-k32w061-light-example \
                     /tmp/bloat_reports/
+
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}

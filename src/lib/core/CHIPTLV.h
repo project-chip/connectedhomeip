@@ -33,6 +33,7 @@
 
 #include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/TypeTraits.h>
 
@@ -942,6 +943,43 @@ protected:
     TLVElementType ElementType() const;
 };
 
+/*
+ * A TLVReader that is backed by a scoped memory buffer that is owned by the reader
+ */
+class ScopedBufferTLVReader : public TLVReader
+{
+public:
+    /*
+     * Construct and initialize the reader by taking ownership of the provided scoped buffer.
+     */
+    ScopedBufferTLVReader(Platform::ScopedMemoryBuffer<uint8_t> && buffer, size_t dataLen) { Init(std::move(buffer), dataLen); }
+
+    ScopedBufferTLVReader() {}
+
+    /*
+     * Initialize the reader by taking ownership of a passed in scoped buffer.
+     */
+    void Init(Platform::ScopedMemoryBuffer<uint8_t> && buffer, size_t dataLen)
+    {
+        mBuffer = std::move(buffer);
+        TLVReader::Init(mBuffer.Get(), dataLen);
+    }
+
+    /*
+     * Take back the buffer owned by the reader and transfer its ownership to
+     * the provided buffer reference. This also re-initializes the reader with
+     * a null buffer to prevent further use of the reader.
+     */
+    void TakeBuffer(Platform::ScopedMemoryBuffer<uint8_t> & buffer)
+    {
+        buffer = std::move(mBuffer);
+        TLVReader::Init(nullptr, 0);
+    }
+
+private:
+    Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
+};
+
 /**
  * A TLVReader that is guaranteed to be backed by a single contiguous buffer.
  * This allows it to expose some additional methods that allow consumers to
@@ -1089,6 +1127,34 @@ public:
      *                              FinalizeBuffer() function.
      */
     CHIP_ERROR Finalize();
+
+    /**
+     * Reserve some buffer for encoding future fields.
+     *
+     * @retval #CHIP_NO_ERROR        Successfully reserved required buffer size.
+     * @retval #CHIP_ERROR_NO_MEMORY The reserved buffer size cannot fits into the remaining buffer size.
+     */
+    CHIP_ERROR ReserveBuffer(uint32_t aBufferSize)
+    {
+        VerifyOrReturnError(mRemainingLen >= aBufferSize, CHIP_ERROR_NO_MEMORY);
+        mReservedSize += aBufferSize;
+        mRemainingLen -= aBufferSize;
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Release previously reserved buffer.
+     *
+     * @retval #CHIP_NO_ERROR        Successfully released reserved buffer size.
+     * @retval #CHIP_ERROR_NO_MEMORY The released buffer is larger than previously reserved buffer size.
+     */
+    CHIP_ERROR UnreserveBuffer(uint32_t aBufferSize)
+    {
+        VerifyOrReturnError(mReservedSize >= aBufferSize, CHIP_ERROR_NO_MEMORY);
+        mReservedSize -= aBufferSize;
+        mRemainingLen += aBufferSize;
+        return CHIP_NO_ERROR;
+    }
 
     /**
      * Encodes a TLV signed integer value.
@@ -2120,6 +2186,7 @@ protected:
     uint32_t mRemainingLen;
     uint32_t mLenWritten;
     uint32_t mMaxLen;
+    uint32_t mReservedSize;
     TLVType mContainerType;
 
 private:
@@ -2157,6 +2224,38 @@ protected:
     CHIP_ERROR WriteElementHead(TLVElementType elemType, Tag tag, uint64_t lenOrVal);
     CHIP_ERROR WriteElementWithData(TLVType type, Tag tag, const uint8_t * data, uint32_t dataLen);
     CHIP_ERROR WriteData(const uint8_t * p, uint32_t len);
+};
+
+/*
+ * A TLVWriter that is backed by a scoped memory buffer that is owned by the writer.
+ */
+class ScopedBufferTLVWriter : public TLVWriter
+{
+public:
+    /*
+     * Construct and initialize the writer by taking ownership of the provided scoped buffer.
+     */
+    ScopedBufferTLVWriter(Platform::ScopedMemoryBuffer<uint8_t> && buffer, size_t dataLen)
+    {
+        mBuffer = std::move(buffer);
+        Init(mBuffer.Get(), dataLen);
+    }
+
+    /*
+     * Finalize the writer and take back the buffer owned by the writer. This transfers its
+     * ownership to the provided buffer reference. This also re-initializes the writer with
+     * a null buffer to prevent further inadvertent use of the writer.
+     */
+    CHIP_ERROR Finalize(Platform::ScopedMemoryBuffer<uint8_t> & buffer)
+    {
+        ReturnErrorOnFailure(TLVWriter::Finalize());
+        buffer = std::move(mBuffer);
+        Init(nullptr, 0);
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
 };
 
 /**

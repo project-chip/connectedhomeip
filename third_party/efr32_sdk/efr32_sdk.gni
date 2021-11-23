@@ -132,10 +132,13 @@ template("efr32_sdk") {
       "${efr32_mcu}=1",
       "${efr32_board}=1",
       "SL_SUPRESS_DEPRECATION_WARNINGS_SDK_3_1",
-      "CHIP_KVS_SECTOR_COUNT=4",
       "CHIP_KVS_BASE_SECTOR_INDEX=((FLASH_SIZE/FLASH_PAGE_SIZE)-(CHIP_KVS_SECTOR_COUNT))",
       "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
       "__HEAP_SIZE=0",
+      "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
+      "MBEDTLS_THREADING_C=1",
+      "MBEDTLS_THREADING_ALT=1",
+      "SL_THREADING_ALT=1",
 
       #"__STACK_SIZE=0",
     ]
@@ -160,7 +163,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
       ]
 
-      defines += [ "EFR32MG12" ]
+      defines += [
+        "EFR32MG12",
+        "CHIP_KVS_SECTOR_COUNT=6",
+      ]
     } else if (efr32_family == "efr32mg21") {
       _include_dirs += [
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
@@ -183,6 +189,7 @@ template("efr32_sdk") {
       defines += [
         "EFR32MG21",
         "EFR32_SERIES2_CONFIG1_MICRO",
+        "CHIP_KVS_SECTOR_COUNT=4",
       ]
     } else if (efr32_family == "efr32mg24") {
       _include_dirs += [
@@ -206,6 +213,7 @@ template("efr32_sdk") {
       defines += [
         "EFR32MG24",
         "EFR32_SERIES2_CONFIG4_MICRO",
+        "CHIP_KVS_SECTOR_COUNT=4",
       ]
     }
 

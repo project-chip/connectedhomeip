@@ -81,7 +81,7 @@ limitations under the License.
     <item name="Name"           type="CHAR_STRING" length="32"/>
     <item name="Type"           type="EndpointListTypeEnum"/>
     <!-- TODO: Change Endpoints to INT16U array once it is supported -->
-    <item name="Endpoints"      type="OCTET_STRING" length="256"/>
+    <item name="Endpoints"      type="ENDPOINT_NO" array="true" length="256"/>
   </struct>
 
   <cluster>
@@ -93,7 +93,7 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="ACTION_LIST" type="ARRAY" entryType="ActionStruct" length="256" writable="false" optional="false">action list</attribute>
     <attribute side="server" code="0x0001" define="ENDPOINT_LIST" type="ARRAY" entryType="EndpointListStruct" length="256" writable="false" optional="false">endpoint list</attribute>
-    <attribute side="server" code="0x0002" define="SETUP_URL" type="CHAR_STRING" length="512" writable="false" optional="true">setup url</attribute>
+    <attribute side="server" code="0x0002" define="SETUP_URL" type="LONG_CHAR_STRING" length="512" writable="false" optional="true">setup url</attribute>
 
     <command source="client" code="0x00" name="InstantAction" optional="true">
       <description>This command triggers an action (state change) on the involved endpoints.</description>

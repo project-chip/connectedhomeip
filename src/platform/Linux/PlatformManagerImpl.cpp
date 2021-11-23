@@ -27,15 +27,16 @@
 #include <app-common/zap-generated/enums.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/Linux/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
 
 #include <thread>
 
 #include <arpa/inet.h>
+#include <dirent.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
-#include <malloc.h>
 #include <net/if.h>
 #include <netinet/in.h>
 #include <signal.h>
@@ -60,27 +61,27 @@ void SignalHandler(int signum)
     switch (signum)
     {
     case SIGINT:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET);
+        ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGHUP:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET);
+        ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGTERM:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT);
+        ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGUSR1:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET);
+        ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGUSR2:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET);
+        ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGTSTP:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED);
+        ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     default:
@@ -209,6 +210,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
@@ -226,13 +230,13 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
     uint64_t upTime = 0;
 
-    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
+    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
     {
         uint32_t totalOperationalHours = 0;
 
-        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgrImpl().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
@@ -247,107 +251,9 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
-{
-    struct mallinfo mallocInfo = mallinfo();
-
-    // Get the current amount of heap memory, in bytes, that are not being utilized
-    // by the current running program.
-    currentHeapFree = mallocInfo.fordblks;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
-{
-    struct mallinfo mallocInfo = mallinfo();
-
-    // Get the current amount of heap memory, in bytes, that are being used by
-    // the current running program.
-    currentHeapUsed = mallocInfo.uordblks;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
-{
-    struct mallinfo mallocInfo = mallinfo();
-
-    // The usecase of this function is embedded devices,on which we would need to intercept
-    // malloc/calloc/free and then record the maximum amount of heap memory,in bytes, that
-    // has been used by the Node.
-    // On Linux, since it uses virtual memory, whereby a page of memory could be copied to
-    // the hard disk, called swap space, and free up that page of memory. So it is impossible
-    // to know accurately peak physical memory it use. We just return the current heap memory
-    // being used by the current running program.
-    currentHeapHighWatermark = mallocInfo.uordblks;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
-{
-    uint32_t count = 0;
-
-    CHIP_ERROR err = ConfigurationMgrImpl().GetRebootCount(count);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        rebootCount = static_cast<uint16_t>(count);
-    }
-
-    return err;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
-{
-    System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
-
-    if (currentTime >= mStartTime)
-    {
-        upTime = std::chrono::duration_cast<System::Clock::Seconds64>(currentTime - mStartTime).count();
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_INVALID_TIME;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperationalHours)
-{
-    uint64_t upTime = 0;
-
-    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
-    {
-        uint32_t totalHours = 0;
-        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
-        }
-    }
-
-    return CHIP_ERROR_INVALID_TIME;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
-{
-    uint32_t reason = 0;
-
-    CHIP_ERROR err = ConfigurationMgrImpl().GetBootReasons(reason);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        bootReasons = static_cast<uint8_t>(reason);
-    }
-
-    return err;
-}
-
 void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
 {
-    PlatformManagerDelegate * delegate = PlatformMgr().GetDelegate();
+    DiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetDelegate();
 
     if (delegate != nullptr)
     {

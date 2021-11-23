@@ -32,11 +32,11 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/LambdaBridge.h>
 #include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
-#include <system/SystemObject.h>
 #include <system/SystemTimer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -49,12 +49,6 @@
 
 namespace chip {
 namespace System {
-
-struct LambdaBridge
-{
-    void (*LambdaProxy)(const void * context);
-    alignas(CHIP_CONFIG_LAMBDA_EVENT_ALIGN) char LambdaBody[CHIP_CONFIG_LAMBDA_EVENT_SIZE];
-};
 
 class Layer;
 using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
@@ -148,6 +142,31 @@ public:
      */
     virtual CHIP_ERROR ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) = 0;
 
+    /**
+     * @brief
+     *   Schedules a lambda even to be run as soon as possible in the CHIP context. This function is not thread-safe,
+     *   it must be called with in the CHIP context
+     *
+     *  @param[in] event   A object encapsulate the context of a lambda
+     *
+     *  @retval    CHIP_NO_ERROR                  On success.
+     *  @retval    other Platform-specific errors generated indicating the reason for failure.
+     */
+    CHIP_ERROR ScheduleLambdaBridge(LambdaBridge && event);
+
+    /**
+     * @brief
+     *   Schedules a lambda object to be run as soon as possible in the CHIP context. This function is not thread-safe,
+     *   it must be called with in the CHIP context
+     */
+    template <typename Lambda>
+    CHIP_ERROR ScheduleLambda(const Lambda & lambda)
+    {
+        LambdaBridge bridge;
+        bridge.Initialize(lambda);
+        return ScheduleLambdaBridge(std::move(bridge));
+    }
+
 private:
     // Copy and assignment NOT DEFINED
     Layer(const Layer &) = delete;
@@ -158,90 +177,6 @@ private:
 
 class LayerLwIP : public Layer
 {
-protected:
-    struct LwIPEventHandlerDelegate;
-
-public:
-    class EventHandlerDelegate
-    {
-    public:
-        typedef CHIP_ERROR (*EventHandlerFunction)(Object & aTarget, EventType aEventType, uintptr_t aArgument);
-
-        bool IsInitialized(void) const;
-        void Init(EventHandlerFunction aFunction);
-        void Prepend(const EventHandlerDelegate *& aDelegateList);
-
-    private:
-        friend class LayerLwIP::LwIPEventHandlerDelegate;
-        EventHandlerFunction mFunction;
-        const EventHandlerDelegate * mNextDelegate;
-    };
-
-    /**
-     * This adds an event handler delegate to the system layer to extend its ability to handle LwIP events.
-     *
-     *  @param[in]  aDelegate   An uninitialied LwIP event handler delegate structure
-     *
-     *  @retval     CHIP_NO_ERROR                 On success.
-     *  @retval     CHIP_ERROR_INVALID_ARGUMENT   If the function pointer contained in aDelegate is NULL
-     */
-    virtual CHIP_ERROR AddEventHandlerDelegate(LayerLwIP::EventHandlerDelegate & aDelegate) = 0;
-
-    /**
-     * This posts an event / message of the specified type with the provided argument to this instance's platform-specific event
-     * queue.
-     *
-     *  @param[in,out]  aTarget     A pointer to the CHIP System Layer object making the post request.
-     *  @param[in]      aEventType  The type of event to post.
-     *  @param[in,out]  aArgument   The argument associated with the event to post.
-     *
-     *  @retval    CHIP_NO_ERROR                  On success.
-     *  @retval    CHIP_ERROR_INCORRECT_STATE     If the state of the Layer object is incorrect.
-     *  @retval    CHIP_ERROR_NO_MEMORY           If the event queue is already full.
-     *  @retval    other Platform-specific errors generated indicating the reason for failure.
-     */
-    virtual CHIP_ERROR PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument) = 0;
-
-    /**
-     * This posts an event / message of the specified type with the provided argument to this instance's platform-specific event
-     * queue.
-     *
-     *  @param[in] event   A object encapsulate the context of a lambda
-     *
-     *  @retval    CHIP_NO_ERROR                  On success.
-     *  @retval    CHIP_ERROR_INCORRECT_STATE     If the state of the Layer object is incorrect.
-     *  @retval    CHIP_ERROR_NO_MEMORY           If the event queue is already full.
-     *  @retval    other Platform-specific errors generated indicating the reason for failure.
-     */
-    virtual CHIP_ERROR ScheduleLambdaBridge(const LambdaBridge & event) = 0;
-
-    template <typename Lambda>
-    CHIP_ERROR ScheduleLambda(const Lambda & lambda)
-    {
-        LambdaBridge event;
-
-        // memcpy is used to move the lambda into the event queue, so it must be trivially copyable
-        static_assert(std::is_trivially_copyable<Lambda>::value);
-        static_assert(sizeof(Lambda) <= CHIP_CONFIG_LAMBDA_EVENT_SIZE);
-        static_assert(alignof(Lambda) <= CHIP_CONFIG_LAMBDA_EVENT_ALIGN);
-
-        // Implicit cast a capture-less lambda into a raw function pointer.
-        event.LambdaProxy = [](const void * body) { (*static_cast<const Lambda *>(body))(); };
-        memcpy(event.LambdaBody, &lambda, sizeof(Lambda));
-
-        return ScheduleLambdaBridge(event);
-    }
-
-protected:
-    // Provide access to private members of EventHandlerDelegate.
-    struct LwIPEventHandlerDelegate : public EventHandlerDelegate
-    {
-        const EventHandlerFunction & GetFunction() const { return mFunction; }
-        const LwIPEventHandlerDelegate * GetNextDelegate() const
-        {
-            return static_cast<const LwIPEventHandlerDelegate *>(mNextDelegate);
-        }
-    };
 };
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP

@@ -18,7 +18,7 @@
  */
 /* this file behaves like a config.h, comes first */
 
-#include "netsocket/WiFiInterface.h"
+#include <net_common.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
@@ -92,7 +92,19 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(val != kWiFiAPMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (mWiFiAPMode != val)
+    {
+        ChipLogDetail(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
+    }
+
+    mWiFiAPMode = val;
+
+exit:
+    return err;
 }
 
 // ==================== ConnectivityManager Platform Internal Methods ====================
@@ -111,7 +123,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiAPIdleTimeout            = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
     mSecurityType                 = NSAPI_SECURITY_WPA_WPA2;
 
-    ::NetworkInterface * net_if = ::NetworkInterface::get_default_instance();
+    auto net_if = get_mbed_net_if();
     if (net_if == nullptr)
     {
         ChipLogError(DeviceLayer, "No network interface available");
@@ -252,10 +264,10 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
         ChipLogProgress(DeviceLayer, "Event - StationConnected");
     }
 
-    // Update IPv4 address
+    // Update IP address
     SocketAddress address;
     auto error = mWifiInterface->get_ip_address(&address);
-    if (error)
+    if (error != NSAPI_ERROR_OK)
     {
         if (mIp4Address != IPAddress::Any)
         {
@@ -268,26 +280,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
             ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
             ChipLogError(DeviceLayer, "Unnexpected loss of Ip4 address");
         }
-    }
-    else
-    {
-        IPAddress addr;
-        if (IPAddress::FromString(address.get_ip_address(), addr) && addr != mIp4Address)
-        {
-            mIp4Address = addr;
-            ChipDeviceEvent event;
-            event.Type                            = DeviceEventType::kInternetConnectivityChange;
-            event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
-            event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-            ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
-            ChipLogProgress(DeviceLayer, "New Ip4 address set: %s", address.get_ip_address());
-        }
-    }
 
-    // Update IPv6 address
-    error = mWifiInterface->get_ipv6_link_local_address(&address);
-    if (error)
-    {
         if (mIp6Address != IPAddress::Any)
         {
             // Unnexpected change, forward to the application
@@ -303,17 +296,34 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
     else
     {
         IPAddress addr;
-        if (IPAddress::FromString(address.get_ip_address(), addr) && addr != mIp6Address)
+        if (address.get_ip_version() == NSAPI_IPv4)
         {
-            mIp6Address = addr;
-            ChipDeviceEvent event;
-            event.Type                            = DeviceEventType::kInternetConnectivityChange;
-            event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
-            event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
-            ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
-            ChipLogProgress(DeviceLayer, "New Ip6 address set %s", address.get_ip_address());
+            if (IPAddress::FromString(address.get_ip_address(), addr) && addr != mIp4Address)
+            {
+                mIp4Address = addr;
+                ChipDeviceEvent event;
+                event.Type                            = DeviceEventType::kInternetConnectivityChange;
+                event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
+                event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+                ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
+                ChipLogProgress(DeviceLayer, "New Ip4 address set: %s", address.get_ip_address());
+            }
+        }
+        else
+        {
+            if (IPAddress::FromString(address.get_ip_address(), addr) && addr != mIp6Address)
+            {
+                mIp6Address = addr;
+                ChipDeviceEvent event;
+                event.Type                            = DeviceEventType::kInternetConnectivityChange;
+                event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
+                event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
+                ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
+                ChipLogProgress(DeviceLayer, "New Ip6 address set %s", address.get_ip_address());
+            }
         }
     }
+
     return CHIP_NO_ERROR;
 }
 

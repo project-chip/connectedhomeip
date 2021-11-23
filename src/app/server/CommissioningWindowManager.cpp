@@ -71,7 +71,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     }
 }
 
-void CommissioningWindowManager::Cleanup()
+void CommissioningWindowManager::Shutdown()
 {
     StopAdvertisement();
 
@@ -84,6 +84,11 @@ void CommissioningWindowManager::Cleanup()
 
     memset(&mECMPASEVerifier, 0, sizeof(mECMPASEVerifier));
     memset(mECMSalt, 0, sizeof(mECMSalt));
+}
+
+void CommissioningWindowManager::Cleanup()
+{
+    Shutdown();
 
     // reset all advertising
     app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kDisabled);
@@ -275,6 +280,11 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
         mAppDelegate->OnPairingWindowOpened();
     }
     mCommissioningWindowOpen = true;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
+#endif
+
     return CHIP_NO_ERROR;
 }
 
@@ -286,6 +296,10 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement()
     mPairingSession.Clear();
 
     mCommissioningWindowOpen = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
+#endif
 
     if (mIsBLE)
     {

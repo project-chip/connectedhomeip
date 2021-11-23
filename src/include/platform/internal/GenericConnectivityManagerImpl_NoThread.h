@@ -50,8 +50,9 @@ protected:
     bool _IsThreadApplicationControlled(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
-    void _GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig);
-    CHIP_ERROR _SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
+    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
     bool _IsThreadAttached(void);
     bool _IsThreadProvisioned(void);
     void _ErasePersistentInfo(void);
@@ -115,15 +116,21 @@ GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetThreadDeviceType(Connect
 }
 
 template <class ImplClass>
-inline void GenericConnectivityManagerImpl_NoThread<ImplClass>::_GetThreadPollingConfig(
-    ConnectivityManager::ThreadPollingConfig & pollingConfig)
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_NoThread<ImplClass>::_GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig)
 {
-    pollingConfig.Clear();
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetThreadPollingConfig(
-    const ConnectivityManager::ThreadPollingConfig & pollingConfig)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetSEDPollingConfig(
+    const ConnectivityManager::SEDPollingConfig & pollingConfig)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_RequestSEDFastPollingMode(bool onOff)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -136,7 +143,25 @@ template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(
     AttributeId attributeId, app::AttributeValueEncoder & encoder)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    switch (attributeId)
+    {
+    case app::Clusters::ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id:
+    case app::Clusters::ThreadNetworkDiagnostics::Attributes::RouteTableList::Id:
+    case app::Clusters::ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
+    case app::Clusters::ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
+    case app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
+        err = encoder.Encode(app::DataModel::List<EndpointId>());
+        break;
+    }
+    default: {
+        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        break;
+    }
+    }
+
+    return err;
 }
 
 } // namespace Internal

@@ -21,6 +21,7 @@ assert(chip_device_platform == "esp32")
 static_library("ESP32") {
   sources = [
     "../FreeRTOS/SystemTimeSupport.cpp",
+    "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
@@ -30,6 +31,8 @@ static_library("ESP32") {
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "ESP32Config.cpp",
     "ESP32Config.h",
     "ESP32Utils.cpp",

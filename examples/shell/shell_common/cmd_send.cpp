@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Engine.h>
@@ -232,7 +233,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     else
 #endif
     {
-        peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), Inet::InterfaceId::Null());
+        peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), chip::Inet::InterfaceId::Null());
 
         err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
         SuccessOrExit(err);

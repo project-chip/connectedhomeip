@@ -289,6 +289,27 @@ void emberAfTick(void)
 #endif
 }
 
+// Cluster init functions that don't have a cluster implementation to define
+// them in.
+void MatterBooleanStatePluginServerInitCallback() {}
+void MatterBridgedDeviceBasicPluginServerInitCallback() {}
+void MatterElectricalMeasurementPluginServerInitCallback() {}
+void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback() {}
+void MatterGroupKeyManagementPluginServerInitCallback() {}
+void MatterRelativeHumidityMeasurementPluginServerInitCallback() {}
+void MatterFixedLabelPluginServerInitCallback() {}
+void MatterSwitchPluginServerInitCallback() {}
+void MatterIlluminanceMeasurementPluginServerInitCallback() {}
+void MatterBinaryInputBasicPluginServerInitCallback() {}
+void MatterPressureMeasurementPluginServerInitCallback() {}
+void MatterTemperatureMeasurementPluginServerInitCallback() {}
+void MatterFlowMeasurementPluginServerInitCallback() {}
+void MatterWakeOnLanPluginServerInitCallback() {}
+void MatterOnOffSwitchConfigurationPluginServerInitCallback() {}
+void MatterPowerSourcePluginServerInitCallback() {}
+void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}
+void MatterBridgedDeviceBasicInformationPluginServerInitCallback() {}
+
 // ****************************************
 // This function is called by the application when the stack goes down,
 // such as after a leave network. This allows zcl utils to clear state
@@ -418,7 +439,8 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
     }
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
     else if ((cmd->type == EMBER_INCOMING_MULTICAST || cmd->type == EMBER_INCOMING_MULTICAST_LOOPBACK) &&
-             !emberAfGroupsClusterEndpointInGroupCallback(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->groupId))
+             !emberAfGroupsClusterEndpointInGroupCallback(cmd->source->GetSessionHandle().GetFabricIndex(),
+                                                          cmd->apsFrame->destinationEndpoint, cmd->apsFrame->groupId))
     {
         emberAfDebugPrint("Drop cluster " ChipLogFormatMEI " command " ChipLogFormatMEI, ChipLogValueMEI(cmd->apsFrame->clusterId),
                           ChipLogValueMEI(cmd->commandId));

@@ -31,13 +31,45 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR ClusterBase::Associate(Device * device, EndpointId endpoint)
+CHIP_ERROR ClusterBase::Associate(DeviceProxy * device, EndpointId endpoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // TODO: Check if the device supports mCluster at the requested endpoint
 
     mDevice   = device;
     mEndpoint = endpoint;
+
+    return err;
+}
+
+CHIP_ERROR ClusterBase::AssociateWithGroup(DeviceProxy * device, GroupId groupId)
+{
+    // TODO Update this function to work in all possible conditions Issue #11850
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    mDevice = device;
+    if (mDevice->GetSecureSession().HasValue())
+    {
+        // Local copy to preserve original SessionHandle for future Unicast communication.
+        SessionHandle session = mDevice->GetSecureSession().Value();
+        session.SetGroupId(groupId);
+        mSessionHandle.SetValue(session);
+
+        // Sanity check
+        if (!mSessionHandle.Value().IsGroupSession())
+        {
+            err = CHIP_ERROR_INCORRECT_STATE;
+        }
+    }
+    else
+    {
+        // something fishy is going on
+        err = CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // Set to 0 for now.
+    mEndpoint = 0;
 
     return err;
 }

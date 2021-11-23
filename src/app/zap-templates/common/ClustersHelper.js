@@ -288,8 +288,9 @@ function handleList(item, [ atomics, enums, bitmaps, structs ])
     throw new Error(item.label, 'List[T] is missing type "T" information');
   }
 
-  item.isList = true;
-  item.type   = entryType;
+  item.isList  = true;
+  item.isArray = true;
+  item.type    = entryType;
   enhancedItem(item, [ atomics, enums, bitmaps, structs ]);
 
   return true;
@@ -448,8 +449,11 @@ function enhancedAttributes(attributes, globalAttributes, types)
       type : attribute.type,
       size : attribute.size,
       isList : attribute.isList,
+      isArray : attribute.isList,
+      isNullable : attribute.isNullable,
       chipType : attribute.chipType,
-      chipCallback : attribute.chipCallback
+      chipCallback : attribute.chipCallback,
+      label : attribute.name,
     };
     attribute.arguments = [ argument ];
     attribute.response  = { arguments : [ argument ] };

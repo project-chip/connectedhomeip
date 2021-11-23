@@ -13,11 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines ReadRequestMessage parser and builder in CHIP interaction model
- *
- */
 
 #include "ReadRequestMessage.h"
 #include "MessageDefHelper.h"
@@ -28,36 +23,15 @@
 
 #include <app/AppBuildConfig.h>
 
-using namespace chip;
-using namespace chip::TLV;
-
 namespace chip {
 namespace app {
-CHIP_ERROR ReadRequestMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // make a copy of the reader here
-    mReader.Init(aReader);
-
-    VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = mReader.EnterContainer(mOuterContainerType);
-
-exit:
-
-    return err;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    uint16_t TagPresenceMask = 0;
-    chip::TLV::TLVReader reader;
-    AttributePathList::Parser attributePathList;
-    EventPaths::Parser eventPathList;
-    AttributeDataVersionList::Parser attributeDataVersionList;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    int TagPresenceMask = 0;
+    TLV::TLVReader reader;
+
     PRETTY_PRINT("ReadRequestMessage =");
     PRETTY_PRINT("{");
 
@@ -66,211 +40,151 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        const Tag tag = reader.GetTag();
-
-        if (chip::TLV::ContextTag(kCsTag_AttributePathList) == tag)
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
+        switch (tagNum)
         {
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributePathList)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_AttributePathList);
-            VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+        case to_underlying(Tag::kAttributeRequests):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kAttributeRequests))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kAttributeRequests));
+            {
+                AttributePathIBs::Parser attributeRequests;
+                ReturnErrorOnFailure(attributeRequests.Init(reader));
 
-            attributePathList.Init(reader);
+                PRETTY_PRINT_INCDEPTH();
+                ReturnErrorOnFailure(attributeRequests.CheckSchemaValidity());
+                PRETTY_PRINT_DECDEPTH();
+            }
+            break;
+        case to_underlying(Tag::kEventRequests):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventRequests))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kEventRequests));
+            {
+                EventPaths::Parser eventRequests;
+                ReturnErrorOnFailure(eventRequests.Init(reader));
 
-            PRETTY_PRINT_INCDEPTH();
+                PRETTY_PRINT_INCDEPTH();
+                ReturnErrorOnFailure(eventRequests.CheckSchemaValidity());
+                PRETTY_PRINT_DECDEPTH();
+            }
+            break;
+        case to_underlying(Tag::kEventFilters):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventFilters))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kEventFilters));
+            {
+                EventFilters::Parser eventFilters;
+                ReturnErrorOnFailure(eventFilters.Init(reader));
 
-            err = attributePathList.CheckSchemaValidity();
-            SuccessOrExit(err);
-
-            PRETTY_PRINT_DECDEPTH();
-        }
-        else if (chip::TLV::ContextTag(kCsTag_EventPaths) == tag)
-        {
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EventPaths)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_EventPaths);
-            VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-            eventPathList.Init(reader);
-
-            PRETTY_PRINT_INCDEPTH();
-
-            err = eventPathList.CheckSchemaValidity();
-            SuccessOrExit(err);
-
-            PRETTY_PRINT_DECDEPTH();
-        }
-        else if (chip::TLV::ContextTag(kCsTag_AttributeDataVersionList) == tag)
-        {
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributeDataVersionList)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_AttributeDataVersionList);
-            VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-            attributeDataVersionList.Init(reader);
-
-            PRETTY_PRINT_INCDEPTH();
-
-            err = attributeDataVersionList.CheckSchemaValidity();
-            SuccessOrExit(err);
-
-            PRETTY_PRINT_DECDEPTH();
-        }
-        else if (chip::TLV::ContextTag(kCsTag_AttributePathList) == tag)
-        {
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributePathList)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_AttributePathList);
-            VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-            attributePathList.Init(reader);
-
-            PRETTY_PRINT_INCDEPTH();
-
-            err = attributePathList.CheckSchemaValidity();
-            SuccessOrExit(err);
-
-            PRETTY_PRINT_DECDEPTH();
-        }
-        else if (chip::TLV::ContextTag(kCsTag_EventNumber) == tag)
-        {
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EventNumber)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_EventNumber);
-            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+                PRETTY_PRINT_INCDEPTH();
+                ReturnErrorOnFailure(eventFilters.CheckSchemaValidity());
+                PRETTY_PRINT_DECDEPTH();
+            }
+            break;
+        case to_underlying(Tag::kIsFabricFiltered):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kIsFabricFiltered))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kIsFabricFiltered));
 #if CHIP_DETAIL_LOGGING
             {
-                uint64_t eventNumber;
-                err = reader.Get(eventNumber);
-                SuccessOrExit(err);
-                PRETTY_PRINT("\tEventNumber = 0x%" PRIx64 ",", eventNumber);
+                bool isFabricFiltered;
+                ReturnErrorOnFailure(reader.Get(isFabricFiltered));
+                PRETTY_PRINT("\tisFabricFiltered = %s, ", isFabricFiltered ? "true" : "false");
             }
 #endif // CHIP_DETAIL_LOGGING
+            break;
+        default:
+            PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
+            break;
         }
     }
 
-    PRETTY_PRINT("}");
+    PRETTY_PRINT("},");
     PRETTY_PRINT("");
 
-    // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        err = CHIP_NO_ERROR;
+        const int RequiredFields = (1 << to_underlying(Tag::kIsFabricFiltered));
+
+        if ((TagPresenceMask & RequiredFields) == RequiredFields)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else
+        {
+            err = CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE;
+        }
     }
-    SuccessOrExit(err);
-    err = reader.ExitContainer(mOuterContainerType);
 
-exit:
-
-    return err;
+    ReturnErrorOnFailure(err);
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR ReadRequestMessage::Parser::GetAttributePathList(AttributePathList::Parser * const apAttributePathList) const
+CHIP_ERROR ReadRequestMessage::Parser::GetAttributeRequests(AttributePathIBs::Parser * const apAttributeRequests) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
-
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributePathList), reader);
-    SuccessOrExit(err);
-
-    VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = apAttributePathList->Init(reader);
-    SuccessOrExit(err);
-
-exit:
-    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
-
-    return err;
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kAttributeRequests)), reader));
+    return apAttributeRequests->Init(reader);
 }
 
-CHIP_ERROR ReadRequestMessage::Parser::GetEventPaths(EventPaths::Parser * const apEventPaths) const
+CHIP_ERROR ReadRequestMessage::Parser::GetEventRequests(EventPaths::Parser * const apEventRequests) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
-
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_EventPaths), reader);
-    SuccessOrExit(err);
-
-    VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = apEventPaths->Init(reader);
-    SuccessOrExit(err);
-
-exit:
-    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
-
-    return err;
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventRequests)), reader));
+    return apEventRequests->Init(reader);
 }
 
-CHIP_ERROR
-ReadRequestMessage::Parser::GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
+CHIP_ERROR ReadRequestMessage::Parser::GetEventFilters(EventFilters::Parser * const apEventFilters) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
-
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributeDataVersionList), reader);
-    SuccessOrExit(err);
-
-    VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = apAttributeDataVersionList->Init(reader);
-    SuccessOrExit(err);
-
-exit:
-    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
-
-    return err;
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventFilters)), reader));
+    return apEventFilters->Init(reader);
 }
 
-CHIP_ERROR ReadRequestMessage::Parser::GetEventNumber(uint64_t * const apEventNumber) const
+CHIP_ERROR ReadRequestMessage::Parser::GetIsFabricFiltered(bool * const apIsFabricFiltered) const
 {
-    return GetUnsignedInteger(kCsTag_EventNumber, apEventNumber);
+    return GetSimpleValue(to_underlying(Tag::kIsFabricFiltered), TLV::kTLVType_Boolean, apIsFabricFiltered);
 }
 
-CHIP_ERROR ReadRequestMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
-}
-
-AttributePathList::Builder & ReadRequestMessage::Builder::CreateAttributePathListBuilder()
-{
-    // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributePathListBuilder.ResetError(mError));
-
-    mError = mAttributePathListBuilder.Init(mpWriter, kCsTag_AttributePathList);
-
-exit:
-    // on error, mAttributePathListBuilder would be un-/partial initialized and cannot be used to write anything
-    return mAttributePathListBuilder;
-}
-
-EventPaths::Builder & ReadRequestMessage::Builder::CreateEventPathsBuilder()
-{
-    // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mEventPathsBuilder.ResetError(mError));
-
-    mError = mEventPathsBuilder.Init(mpWriter, kCsTag_EventPaths);
-
-exit:
-    // on error, mEventPathsBuilder would be un-/partial initialized and cannot be used to write anything
-    return mEventPathsBuilder;
-}
-
-AttributeDataVersionList::Builder & ReadRequestMessage::Builder::CreateAttributeDataVersionListBuilder()
-{
-    // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeDataVersionListBuilder.ResetError(mError));
-
-    mError = mAttributeDataVersionListBuilder.Init(mpWriter, kCsTag_AttributeDataVersionList);
-
-exit:
-    // on error, mAttributeDataVersionListBuilder would be un-/partial initialized and cannot be used to write anything
-    return mAttributeDataVersionListBuilder;
-}
-
-ReadRequestMessage::Builder & ReadRequestMessage::Builder::EventNumber(const uint64_t aEventNumber)
+AttributePathIBs::Builder & ReadRequestMessage::Builder::CreateAttributeRequests()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventNumber), aEventNumber);
+        mError = mAttributeRequests.Init(mpWriter, to_underlying(Tag::kAttributeRequests));
+    }
+    return mAttributeRequests;
+}
+
+EventPaths::Builder & ReadRequestMessage::Builder::CreateEventRequests()
+{
+    // skip if error has already been set
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mEventRequests.Init(mpWriter, to_underlying(Tag::kEventRequests));
+    }
+    return mEventRequests;
+}
+
+EventFilters::Builder & ReadRequestMessage::Builder::CreateEventFilters()
+{
+    // skip if error has already been set
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mEventFilters.Init(mpWriter, to_underlying(Tag::kEventFilters));
+    }
+    return mEventFilters;
+}
+
+ReadRequestMessage::Builder & ReadRequestMessage::Builder::IsFabricFiltered(const bool aIsFabricFiltered)
+{
+    // skip if error has already been set
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kIsFabricFiltered)), aIsFabricFiltered);
     }
     return *this;
 }
@@ -280,5 +194,5 @@ ReadRequestMessage::Builder & ReadRequestMessage::Builder::EndOfReadRequestMessa
     EndOfContainer();
     return *this;
 }
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

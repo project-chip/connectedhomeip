@@ -17,36 +17,57 @@
  */
 
 /**
- * @file
- *   Defines a memory pool class BitMapObjectPool.
+ * Defines memory pool classes.
  */
 
 #pragma once
 
-#include <array>
+#include <lib/support/CodeUtils.h>
+
 #include <assert.h>
 #include <atomic>
 #include <limits>
 #include <new>
 #include <stddef.h>
+#include <utility>
 
 namespace chip {
 
-class StaticAllocatorBase
+namespace internal {
+
+class Statistics
 {
 public:
-    StaticAllocatorBase(size_t capacity) : mAllocated(0), mCapacity(capacity) {}
+    Statistics() : mAllocated(0), mHighWaterMark(0) {}
 
-    size_t Capacity() const { return mCapacity; }
     size_t Allocated() const { return mAllocated; }
-    bool Exhausted() const { return mAllocated == mCapacity; }
+    size_t HighWaterMark() const { return mHighWaterMark; }
+    void IncreaseUsage()
+    {
+        if (++mAllocated > mHighWaterMark)
+        {
+            mHighWaterMark = mAllocated;
+        }
+    }
+    void DecreaseUsage() { --mAllocated; }
 
 protected:
     size_t mAllocated;
+    size_t mHighWaterMark;
+};
+
+class StaticAllocatorBase : public Statistics
+{
+public:
+    StaticAllocatorBase(size_t capacity) : mCapacity(capacity) {}
+    size_t Capacity() const { return mCapacity; }
+    bool Exhausted() const { return mAllocated == mCapacity; }
+
+protected:
     const size_t mCapacity;
 };
 
-class StaticAllocatorBitmap : public StaticAllocatorBase
+class StaticAllocatorBitmap : public internal::StaticAllocatorBase
 {
 protected:
     /**
@@ -67,8 +88,7 @@ protected:
     void * At(size_t index) { return static_cast<uint8_t *>(mElements) + mElementSize * index; }
     size_t IndexOf(void * element);
 
-    using Lambda = bool (*)(void *, void *);
-    bool ForEachActiveObjectInner(void * context, Lambda lambda);
+    bool ForEachActiveObjectInner(void * context, bool lambda(void * context, void * object));
 
 private:
     void * mElements;
@@ -76,20 +96,111 @@ private:
     std::atomic<tBitChunkType> * mUsage;
 };
 
+template <class T>
+class PoolCommon
+{
+public:
+    template <typename... Args>
+    void ResetObject(T * element, Args &&... args)
+    {
+        element->~T();
+        new (element) T(std::forward<Args>(args)...);
+    }
+};
+
+template <typename T, typename Function>
+class LambdaProxy
+{
+public:
+    LambdaProxy(Function && function) : mFunction(std::move(function)) {}
+    static bool Call(void * context, void * target)
+    {
+        return static_cast<LambdaProxy *>(context)->mFunction(static_cast<T *>(target));
+    }
+
+private:
+    Function mFunction;
+};
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+struct HeapObjectListNode
+{
+    void Remove()
+    {
+        mNext->mPrev = mPrev;
+        mPrev->mNext = mNext;
+    }
+
+    void * mObject;
+    HeapObjectListNode * mNext;
+    HeapObjectListNode * mPrev;
+};
+
+struct HeapObjectList : HeapObjectListNode
+{
+    HeapObjectList() : mIterationDepth(0) { mNext = mPrev = this; }
+
+    void Append(HeapObjectListNode * node)
+    {
+        node->mNext  = this;
+        node->mPrev  = mPrev;
+        mPrev->mNext = node;
+        mPrev        = node;
+    }
+
+    HeapObjectListNode * FindNode(void * object) const;
+
+    bool ForEachNode(void * context, bool lambda(void * context, void * object));
+
+    size_t mIterationDepth;
+};
+
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+} // namespace internal
+
 /**
- *  @brief
- *   A class template used for allocating Objects.
+ * @class ObjectPool
  *
- *  @tparam     T   a subclass of element to be allocated.
+ * Depending on build configuration, ObjectPool is either a fixed-size static pool or a heap-allocated pool.
+ *
+ * @tparam T    Type of element to be allocated.
+ * @tparam N    Number of elements in the pool, in the fixed-size case.
+ *
+ * @fn CreateObject
+ * @memberof ObjectPool
+ *
+ * Create an object from the pool. Forwards its arguments to construct a T.
+ *
+ * @fn ReleaseObject
+ * @memberof ObjectPool
+ * @param object   Pointer to object to release (or return to the pool). Its destructor runs.
+ *
+ * @fn ForEachActiveObject
+ * @memberof ObjectPool
+ * @param visitor   A function that takes a T* and returns true to continue iterating or false to stop iterating.
+ * @returns false if a visitor call returned false, true otherwise.
+ *
+ * Iteration may be nested. ReleaseObject() can be called during iteration, on the current object or any other.
+ * CreateObject() can be called, but it is undefined whether or not a newly created object will be visited.
+ */
+
+/**
+ * A class template used for allocating objects from a fixed-size static pool.
+ *
+ *  @tparam     T   type of element to be allocated.
  *  @tparam     N   a positive integer max number of elements the pool provides.
  */
 template <class T, size_t N>
-class BitMapObjectPool : public StaticAllocatorBitmap
+class BitMapObjectPool : public internal::StaticAllocatorBitmap, public internal::PoolCommon<T>
 {
 public:
     BitMapObjectPool() : StaticAllocatorBitmap(mData.mMemory, mUsage, N, sizeof(T)) {}
-
-    static size_t Size() { return N; }
+    ~BitMapObjectPool()
+    {
+        // ReleaseAll();
+    }
 
     template <typename... Args>
     T * CreateObject(Args &&... args)
@@ -110,12 +221,7 @@ public:
         Deallocate(element);
     }
 
-    template <typename... Args>
-    void ResetObject(T * element, Args &&... args)
-    {
-        element->~T();
-        new (element) T(std::forward<Args>(args)...);
-    }
+    void ReleaseAll() { ForEachActiveObjectInner(this, ReleaseObject); }
 
     /**
      * @brief
@@ -131,24 +237,16 @@ public:
     template <typename Function>
     bool ForEachActiveObject(Function && function)
     {
-        LambdaProxy<Function> proxy(std::forward<Function>(function));
-        return ForEachActiveObjectInner(&proxy, &LambdaProxy<Function>::Call);
+        internal::LambdaProxy<T, Function> proxy(std::forward<Function>(function));
+        return ForEachActiveObjectInner(&proxy, &internal::LambdaProxy<T, Function>::Call);
     }
 
 private:
-    template <typename Function>
-    class LambdaProxy
+    static bool ReleaseObject(void * context, void * object)
     {
-    public:
-        LambdaProxy(Function && function) : mFunction(std::move(function)) {}
-        static bool Call(void * context, void * target)
-        {
-            return static_cast<LambdaProxy *>(context)->mFunction(static_cast<T *>(target));
-        }
-
-    private:
-        Function mFunction;
-    };
+        static_cast<BitMapObjectPool *>(context)->ReleaseObject(static_cast<T *>(object));
+        return true;
+    }
 
     std::atomic<tBitChunkType> mUsage[(N + kBitChunkSize - 1) / kBitChunkSize];
     union Data
@@ -159,5 +257,116 @@ private:
         T mMemoryViewForDebug[N]; // Just for debugger
     } mData;
 };
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+/**
+ * A class template used for allocating objects from the heap.
+ *
+ *  @tparam     T   type to be allocated.
+ */
+template <class T>
+class HeapObjectPool : public internal::Statistics, public internal::PoolCommon<T>
+{
+public:
+    HeapObjectPool() {}
+    ~HeapObjectPool()
+    {
+        // TODO(#11880): Release all active objects (or verify that none are active) when destroying the pool.
+        // ReleaseAll();
+    }
+
+    template <typename... Args>
+    T * CreateObject(Args &&... args)
+    {
+        T * object = new T(std::forward<Args>(args)...);
+        if (object != nullptr)
+        {
+            auto node = new internal::HeapObjectListNode();
+            if (node != nullptr)
+            {
+                node->mObject = object;
+                mObjects.Append(node);
+                IncreaseUsage();
+                return object;
+            }
+        }
+        return nullptr;
+    }
+
+    void ReleaseObject(T * object)
+    {
+        if (object != nullptr)
+        {
+            internal::HeapObjectListNode * node = mObjects.FindNode(object);
+            if (node != nullptr)
+            {
+                // Note that the node is not removed here; that is deferred until the end of the next pool iteration.
+                node->mObject = nullptr;
+                delete object;
+                DecreaseUsage();
+            }
+        }
+    }
+
+    void ReleaseAll() { mObjects.ForEachNode(this, ReleaseObject); }
+
+    /**
+     * @brief
+     *   Run a functor for each active object in the pool
+     *
+     *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
+     *  @return    bool     Returns false if broke during iteration
+     */
+    template <typename Function>
+    bool ForEachActiveObject(Function && function)
+    {
+        // return ForEachNode([function](void *object) { return function(static_cast<T*>(object)); });
+        internal::LambdaProxy<T, Function> proxy(std::forward<Function>(function));
+        return mObjects.ForEachNode(&proxy, &internal::LambdaProxy<T, Function>::Call);
+    }
+
+private:
+    static bool ReleaseObject(void * context, void * object)
+    {
+        static_cast<HeapObjectPool *>(context)->ReleaseObject(static_cast<T *>(object));
+        return true;
+    }
+
+    internal::HeapObjectList mObjects;
+};
+
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+template <typename T, unsigned int N>
+using ObjectPool = HeapObjectPool<T>;
+#else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+template <typename T, unsigned int N>
+using ObjectPool = BitMapObjectPool<T, N>;
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+enum class ObjectPoolMem
+{
+    kStatic,
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    kDynamic
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+};
+
+template <typename T, size_t N, ObjectPoolMem P>
+class MemTypeObjectPool;
+
+template <typename T, size_t N>
+class MemTypeObjectPool<T, N, ObjectPoolMem::kStatic> : public BitMapObjectPool<T, N>
+{
+};
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+template <typename T, size_t N>
+class MemTypeObjectPool<T, N, ObjectPoolMem::kDynamic> : public HeapObjectPool<T>
+{
+};
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 } // namespace chip

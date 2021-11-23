@@ -32,11 +32,11 @@
 
 // Include dependent headers
 #include <lib/support/DLLUtil.h>
+#include <lib/support/Pool.h>
 
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
 #include <system/SystemMutex.h>
-#include <system/SystemObject.h>
 #include <system/SystemStats.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -50,6 +50,8 @@
 namespace chip {
 namespace System {
 
+class Layer;
+
 using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
 
 #if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
@@ -57,7 +59,7 @@ using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
 /**
  * This is an Object-pool based class that System::Layer implementations can use to assist in providing timer functions.
  */
-class DLL_EXPORT Timer : public Object
+class DLL_EXPORT Timer
 {
 public:
     /**
@@ -185,10 +187,15 @@ public:
     Timer() = default;
 
     /**
-     * Obtain a new timer from the system object pool.
+     * Obtain a new timer from the object pool.
      */
     static Timer * New(System::Layer & systemLayer, System::Clock::Timeout delay, TimerCompleteCallback onComplete,
                        void * appState);
+
+    /**
+     * Return a timer to the object pool.
+     */
+    void Release();
 
     /**
      * Return the expiration time.
@@ -215,20 +222,24 @@ public:
     /**
      * Read timer pool statistics.
      */
-    static void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark)
+    static void GetStatistics(Stats::count_t & aNumInUse, Stats::count_t & aHighWatermark)
     {
-        sPool.GetStatistics(aNumInUse, aHighWatermark);
+        aNumInUse      = mNumInUse;
+        aHighWatermark = mHighWatermark;
     }
 
 private:
     friend class LayerImplLwIP;
-    static ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
+    static chip::ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
+    static Stats::count_t mNumInUse;
+    static Stats::count_t mHighWatermark;
 
     TimerCompleteCallback mOnComplete;
     Clock::Timestamp mAwakenTime;
     Timer * mNextTimer;
 
     Layer * mSystemLayer;
+    void * mAppState;
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     friend class LayerImplSelect;

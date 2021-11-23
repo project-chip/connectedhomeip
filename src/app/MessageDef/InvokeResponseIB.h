@@ -71,7 +71,7 @@ public:
     /**
      *  @brief Get a parser for a Status.
      *
-     *  @param [in] apCommand    A pointer to the CommandStatusIB parser.
+     *  @param [in] apStatus    A pointer to the CommandStatusIB parser.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element

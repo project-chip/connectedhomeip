@@ -97,12 +97,12 @@ public:
 
     static void RunConfigUnitTest();
 
+    static void InitializeWithObject(jobject managerObject);
+
 protected:
     // NVS Namespace helper functions.
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
-
-    static void InitializeWithObject(jobject managerObject);
 };
 
 struct AndroidConfig::Key

@@ -36,6 +36,7 @@ static_library("Linux") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
@@ -54,6 +55,8 @@ static_library("Linux") {
     "ConnectivityUtils.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",

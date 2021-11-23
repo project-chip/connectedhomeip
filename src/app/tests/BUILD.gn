@@ -41,26 +41,30 @@ chip_test_suite("tests") {
   output_name = "libAppTests"
 
   test_sources = [
+    "TestAttributePathExpandIterator.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBuilderParser.cpp",
     "TestCHIPDeviceCallbacksMgr.cpp",
     "TestClusterInfo.cpp",
+    "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
     "TestDataModelSerialization.cpp",
     "TestEventLogging.cpp",
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
+    "TestReadInteraction.cpp",
+    "TestReportingEngine.cpp",
     "TestStatusResponseMessage.cpp",
+    "TestWriteInteraction.cpp",
   ]
 
-  if (chip_device_platform != "efr32") {
-    test_sources += [
-      "TestCommandInteraction.cpp",
-      "TestReadInteraction.cpp",
-      "TestReportingEngine.cpp",
-      "TestWriteInteraction.cpp",
-    ]
+  #
+  # On NRF platforms, the allocation of a large number of pbufs in this test
+  # to exercise chunking causes it to run out of memory. For now, disable it there.
+  #
+  if (chip_device_platform != "nrfconnect") {
+    test_sources += [ "TestBufferedReadCallback.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]
@@ -70,6 +74,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util:device_callbacks_manager",
+    "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${nlunit_test_root}:nlunit-test",
   ]

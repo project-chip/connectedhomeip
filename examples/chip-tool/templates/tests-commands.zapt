@@ -3,6 +3,7 @@
 #pragma once
 
 #include <commands/tests/TestCommand.h>
+#include <commands/common/CommandInvoker.h>
 
 {{>test_cluster tests=(getTests)}}
 

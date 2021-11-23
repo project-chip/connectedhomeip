@@ -25,11 +25,8 @@
 
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
+#include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <system/LwIPEventSupport.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
 
@@ -69,23 +66,6 @@ template <class>
 class GenericThreadStackManagerImpl_OpenThread_LwIP;
 } // namespace Internal
 
-class PlatformManager;
-
-/**
- * Defines the delegate class of Platform Manager to notify platform updates.
- */
-class PlatformManagerDelegate
-{
-public:
-    virtual ~PlatformManagerDelegate() {}
-
-    /**
-     * @brief
-     *   Called after the current device is rebooted
-     */
-    virtual void OnDeviceRebooted() {}
-};
-
 /**
  * Provides features for initializing and interacting with the chip network
  * stack on a chip-enabled device.
@@ -108,8 +88,6 @@ public:
     CHIP_ERROR InitChipStack();
     CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
-    void SetDelegate(PlatformManagerDelegate * delegate) { mDelegate = delegate; }
-    PlatformManagerDelegate * GetDelegate() const { return mDelegate; }
 
     /**
      * ScheduleWork can be called after InitChipStack has been called.  Calls
@@ -173,28 +151,12 @@ public:
     void UnlockChipStack();
     CHIP_ERROR Shutdown();
 
-    /**
-     * Software Diagnostics methods.
-     */
-    CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree);
-    CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed);
-    CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
-
-    /**
-     * General Diagnostics methods.
-     */
-    CHIP_ERROR GetRebootCount(uint16_t & rebootCount);
-    CHIP_ERROR GetUpTime(uint64_t & upTime);
-    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR GetBootReasons(uint8_t & bootReasons);
-
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool IsChipStackLockedByCurrentThread() const;
 #endif
 
 private:
-    bool mInitialized                   = false;
-    PlatformManagerDelegate * mDelegate = nullptr;
+    bool mInitialized = false;
 
     // ===== Members for internal use by the following friends.
 
@@ -225,9 +187,7 @@ private:
     friend class Internal::GenericThreadStackManagerImpl_OpenThread_LwIP;
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
     friend class System::PlatformEventing;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     /*
      * PostEvent can be called safely on any thread without locking the stack.
@@ -393,8 +353,10 @@ inline CHIP_ERROR PlatformManager::StopEventLoopTask()
  */
 inline CHIP_ERROR PlatformManager::Shutdown()
 {
-    mInitialized = false;
-    return static_cast<ImplClass *>(this)->_Shutdown();
+    CHIP_ERROR err = static_cast<ImplClass *>(this)->_Shutdown();
+    if (err == CHIP_NO_ERROR)
+        mInitialized = false;
+    return err;
 }
 
 inline void PlatformManager::LockChipStack()
@@ -432,41 +394,6 @@ inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)
 inline CHIP_ERROR PlatformManager::StartChipTimer(System::Clock::Timeout duration)
 {
     return static_cast<ImplClass *>(this)->_StartChipTimer(duration);
-}
-
-inline CHIP_ERROR PlatformManager::GetCurrentHeapFree(uint64_t & currentHeapFree)
-{
-    return static_cast<ImplClass *>(this)->_GetCurrentHeapFree(currentHeapFree);
-}
-
-inline CHIP_ERROR PlatformManager::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
-{
-    return static_cast<ImplClass *>(this)->_GetCurrentHeapUsed(currentHeapUsed);
-}
-
-inline CHIP_ERROR PlatformManager::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
-{
-    return static_cast<ImplClass *>(this)->_GetCurrentHeapHighWatermark(currentHeapHighWatermark);
-}
-
-inline CHIP_ERROR PlatformManager::GetRebootCount(uint16_t & rebootCount)
-{
-    return static_cast<ImplClass *>(this)->_GetRebootCount(rebootCount);
-}
-
-inline CHIP_ERROR PlatformManager::GetUpTime(uint64_t & upTime)
-{
-    return static_cast<ImplClass *>(this)->_GetUpTime(upTime);
-}
-
-inline CHIP_ERROR PlatformManager::GetTotalOperationalHours(uint32_t & totalOperationalHours)
-{
-    return static_cast<ImplClass *>(this)->_GetTotalOperationalHours(totalOperationalHours);
-}
-
-inline CHIP_ERROR PlatformManager::GetBootReasons(uint8_t & bootReasons)
-{
-    return static_cast<ImplClass *>(this)->_GetBootReasons(bootReasons);
 }
 
 } // namespace DeviceLayer

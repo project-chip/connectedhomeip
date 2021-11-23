@@ -124,7 +124,7 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
 
     // Expire the session this exchange is supposedly on.
-    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSessionHandle());
+    ctx.GetExchangeManager().ExpireExchangesForSession(ec1->GetSessionHandle());
 
     MockAppDelegate receiveDelegate;
     CHIP_ERROR err =
@@ -154,7 +154,7 @@ void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
 
     // Expire the session this exchange is supposedly on.  This should close the
     // exchange.
-    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSessionHandle());
+    ctx.GetExchangeManager().ExpireExchangesForSession(ec1->GetSessionHandle());
     NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
 }
 

@@ -183,7 +183,7 @@ typedef struct _EndpointListStruct
     uint16_t EndpointListID;
     chip::CharSpan Name;
     uint8_t Type;
-    chip::ByteSpan Endpoints;
+    /* TYPE WARNING: array array defaults to */ uint8_t * Endpoints;
 } EndpointListStruct;
 
 // Struct for FabricDescriptor
@@ -397,6 +397,14 @@ typedef struct _SemanticTag
     uint16_t MfgCode;
     uint16_t Value;
 } SemanticTag;
+
+// Struct for SoftwareFault
+typedef struct _SoftwareFault
+{
+    uint64_t Id;
+    chip::CharSpan Name;
+    chip::ByteSpan FaultRecording;
+} SoftwareFault;
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet

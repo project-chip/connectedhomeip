@@ -44,10 +44,9 @@ namespace Internal {
  *
  * This template contains implementations of select features from the ConfigurationManager abstract
  * interface that are suitable for use on all platforms.  It is intended to be inherited (directly
- * or indirectly) by the ConfigurationManagerImpl class, which also appears as the template's ImplClass
- * parameter.
+ * or indirectly) by the ConfigurationManagerImpl class.
  */
-template <class ImplClass>
+template <class ConfigClass>
 class GenericConfigurationManagerImpl : public ConfigurationManager
 {
 public:
@@ -63,7 +62,7 @@ public:
     CHIP_ERROR StoreProductRevision(uint16_t productRev) override;
     CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev) override;
-    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen) override;
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
@@ -76,10 +75,8 @@ public:
     CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode) override;
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) override;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override;
     CHIP_ERROR _IncrementLifetimeCounter();
-#endif
     CHIP_ERROR GetFailSafeArmed(bool & val) override;
     CHIP_ERROR SetFailSafeArmed(bool val) override;
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
@@ -97,9 +94,13 @@ public:
     CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override;
     CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) override;
     CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb) override;
-#if !defined(NDEBUG)
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
+    CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
     CHIP_ERROR RunUnitTests(void) override;
-#endif
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;
     void LogDeviceConfig() override;
@@ -112,50 +113,59 @@ protected:
 #endif
     CHIP_ERROR PersistProvisioningData(ProvisioningDataSet & provData);
 
-private:
-    ImplClass * Impl() { return static_cast<ImplClass *>(this); }
+    // Methods to read and write configuration values, as well as run the configuration unit test.
+    typedef typename ConfigClass::Key Key;
+    virtual CHIP_ERROR ReadConfigValue(Key key, bool & val)                                        = 0;
+    virtual CHIP_ERROR ReadConfigValue(Key key, uint32_t & val)                                    = 0;
+    virtual CHIP_ERROR ReadConfigValue(Key key, uint64_t & val)                                    = 0;
+    virtual CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)    = 0;
+    virtual CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen) = 0;
+    virtual CHIP_ERROR WriteConfigValue(Key key, bool val)                                         = 0;
+    virtual CHIP_ERROR WriteConfigValue(Key key, uint32_t val)                                     = 0;
+    virtual CHIP_ERROR WriteConfigValue(Key key, uint64_t val)                                     = 0;
+    virtual CHIP_ERROR WriteConfigValueStr(Key key, const char * str)                              = 0;
+    virtual CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen)               = 0;
+    virtual CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)          = 0;
+    virtual void RunConfigUnitTest(void)                                                           = 0;
 };
 
-// Instruct the compiler to instantiate the template only when explicitly told to do so.
-extern template class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetVendorId(uint16_t & vendorId)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetVendorId(uint16_t & vendorId)
 {
     vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetProductId(uint16_t & productId)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductId(uint16_t & productId)
 {
     productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetFirmwareRevision(uint16_t & firmwareRev)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareRevision(uint16_t & firmwareRev)
 {
     firmwareRev = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetDeviceTypeId(uint16_t & deviceType)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceTypeId(uint16_t & deviceType)
 {
     deviceType = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetInitialPairingHint(uint16_t & pairingHint)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingHint(uint16_t & pairingHint)
 {
     pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT);
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSecondaryPairingHint(uint16_t & pairingHint)
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingHint(uint16_t & pairingHint)
 {
     pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT);
     return CHIP_NO_ERROR;

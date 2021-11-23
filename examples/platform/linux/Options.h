@@ -33,11 +33,13 @@ struct LinuxDeviceOptions
 {
     chip::SetupPayload payload;
     uint32_t mBleDevice                = 0;
-    bool mWiFi                         = false;
+    bool mWiFi                         = true;
     bool mThread                       = false;
     uint32_t securedDevicePort         = CHIP_PORT;
     uint32_t securedCommissionerPort   = CHIP_PORT + 2;
     uint32_t unsecuredCommissionerPort = CHIP_UDC_PORT;
+    const char * command               = nullptr;
+    const char * PICS                  = nullptr;
 
     static LinuxDeviceOptions & GetInstance();
 };

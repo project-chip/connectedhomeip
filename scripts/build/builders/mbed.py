@@ -56,7 +56,7 @@ class MbedApp(Enum):
         elif self == MbedApp.PIGWEED:
             return 'chip-mbed-pigweed-app-example'
         elif self == MbedApp.SHELL:
-            return 'shell'
+            return 'chip-mbed-shell-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 

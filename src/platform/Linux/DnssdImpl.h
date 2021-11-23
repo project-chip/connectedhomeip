@@ -111,7 +111,8 @@ public:
     CHIP_ERROR Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                       chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context);
     CHIP_ERROR Resolve(const char * name, const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                       chip::Inet::InterfaceId interface, DnssdResolveCallback callback, void * context);
+                       chip::Inet::IPAddressType transportType, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
+                       void * context);
 
     Poller & GetPoller() { return mPoller; }
 
@@ -123,6 +124,7 @@ private:
         MdnsAvahi * mInstance;
         DnssdBrowseCallback mCallback;
         void * mContext;
+        Inet::IPAddressType mAddressType;
         std::vector<DnssdService> mServices;
     };
 

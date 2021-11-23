@@ -43,6 +43,10 @@
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
+
 using namespace chip::Encoding;
 using namespace chip::Inet;
 using namespace chip::System;
@@ -79,6 +83,23 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
     mResponseTimeout = timeout;
 }
 
+#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
+void ExchangeContext::UpdateSEDPollingMode()
+{
+    if (GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager())->GetTransportType() != Transport::Type::kBle)
+    {
+        if (!IsResponseExpected() && !IsSendExpected() && (mExchangeMgr->GetNumActiveExchanges() == 1))
+        {
+            chip::DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
+        }
+        else
+        {
+            chip::DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
+        }
+    }
+}
+#endif
+
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
 {
@@ -103,16 +124,13 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // an error arising below. at the end, we have to close it.
     ExchangeHandle ref(*this);
 
-    // If sending via UDP and NoAutoRequestAck send flag is not specificed,
-    // request reliable transmission.
-    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
-    // Treat unknown peer address as "not UDP", because we have no idea whether
-    // it's safe to do MRP there.
-    bool isUDPTransport                = peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
+    bool isUDPTransport = IsUDPTransport();
+
+    // this check is ignored by the ExchangeMsgDispatch if !AutoRequestAck()
     bool reliableTransmissionRequested = isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
 
     // If a response message is expected...
-    if (sendFlags.Has(SendMessageFlags::kExpectResponse))
+    if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
     {
         // Only one 'response expected' message can be outstanding at a time.
         if (IsResponseExpected())
@@ -136,6 +154,12 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     }
 
     {
+        // ExchangeContext for group are supposed to always be Initiator
+        if (IsGroupExchangeContext() && !IsInitiator())
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+
         // Create a new scope for `err`, to avoid shadowing warning previous `err`.
         CHIP_ERROR err = mDispatch->SendMessage(mSession.Value(), mExchangeId, IsInitiator(), GetReliableMessageContext(),
                                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
@@ -254,7 +278,9 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Sess
     SetDropAckDebug(false);
     SetAckPending(false);
     SetMsgRcvdFromPeer(false);
-    SetAutoRequestAck(true);
+
+    // Do not request Ack for multicast
+    SetAutoRequestAck(!session.IsGroupSession());
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogDetail(ExchangeManager, "ec++ id: " ChipLogFormatExchange, ChipLogValueExchange(this));
@@ -420,8 +446,12 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         MessageHandled();
     });
 
-    ReturnErrorOnFailure(
-        mDispatch->OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
+    // TODO : Remove this bypass for group as to perform the MessagePermitted function Issue # 12101
+    if (!IsGroupExchangeContext())
+    {
+        ReturnErrorOnFailure(
+            mDispatch->OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
+    }
 
     if (IsAckPending() && !mDelegate)
     {
@@ -464,6 +494,10 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 
 void ExchangeContext::MessageHandled()
 {
+#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
+    UpdateSEDPollingMode();
+#endif
+
     if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected())
     {
         return;
@@ -472,5 +506,38 @@ void ExchangeContext::MessageHandled()
     Close();
 }
 
+bool ExchangeContext::IsUDPTransport()
+{
+    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
+}
+
+bool ExchangeContext::IsTCPTransport()
+{
+    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kTcp;
+}
+
+bool ExchangeContext::IsBLETransport()
+{
+    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kBle;
+}
+
+System::Clock::Milliseconds32 ExchangeContext::GetAckTimeout()
+{
+    System::Clock::Timeout timeout;
+    if (IsUDPTransport())
+    {
+        timeout = System::Clock::Milliseconds32((CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1) *
+                                                (GetIdleRetransmitTimeoutTick() << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT));
+    }
+    else if (IsTCPTransport())
+    {
+        // TODO: issue 12009, need actual tcp margin value considering restransmission
+        timeout = System::Clock::Seconds16(30);
+    }
+    return timeout;
+}
 } // namespace Messaging
 } // namespace chip

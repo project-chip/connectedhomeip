@@ -52,8 +52,6 @@ public class ChipDeviceController {
   /**
    * Pair a device connected through BLE.
    *
-   * <p>TODO(#7985): Annotate csrNonce as Nullable.
-   *
    * @param bleServer the BluetoothGatt representing the BLE connection to the device
    * @param connId the BluetoothGatt Id representing the BLE connection to the device
    * @param deviceId the node ID to assign to the device
@@ -98,6 +96,14 @@ public class ChipDeviceController {
 
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
+  }
+
+  /**
+   * Returns a pointer to a device currently being commissioned. This should be used before the
+   * device is operationally available.
+   */
+  public long getDeviceBeingCommissionedPointer(long nodeId) {
+    return getDeviceBeingCommissionedPointer(deviceControllerPtr, nodeId);
   }
 
   /**
@@ -210,6 +216,11 @@ public class ChipDeviceController {
     return isActive(deviceControllerPtr, deviceId);
   }
 
+  /* Shutdown all cluster attribute subscriptions for a given device */
+  public void shutdownSubscriptions(long devicePtr) {
+    shutdownSubscriptions(deviceControllerPtr, devicePtr);
+  }
+
   /**
    * Generates a new PASE verifier and passcode ID for the given setup PIN code.
    *
@@ -246,6 +257,8 @@ public class ChipDeviceController {
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
 
+  private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
+
   private native void getConnectedDevicePointer(
       long deviceControllerPtr, long deviceId, long callbackHandle);
 
@@ -270,6 +283,8 @@ public class ChipDeviceController {
       long setupPinCode);
 
   private native boolean isActive(long deviceControllerPtr, long deviceId);
+
+  private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 
   static {
     System.loadLibrary("CHIPController");

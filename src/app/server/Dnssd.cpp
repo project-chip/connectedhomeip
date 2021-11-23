@@ -32,8 +32,8 @@
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
+#include <credentials/FabricTable.h>
 #include <system/TimeSource.h>
-#include <transport/FabricTable.h>
 
 #include <app/server/Server.h>
 
@@ -58,7 +58,11 @@ bool HaveOperationalCredentials()
 
 void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
-    if (event->Type == DeviceLayer::DeviceEventType::kDnssdPlatformInitialized)
+    if (event->Type == DeviceLayer::DeviceEventType::kDnssdPlatformInitialized
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+        || event->Type == DeviceLayer::DeviceEventType::kSEDPollingIntervalChange
+#endif
+    )
     {
         app::DnssdServer::Instance().StartServer();
     }
@@ -71,6 +75,8 @@ void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t
 }
 
 } // namespace
+
+constexpr System::Clock::Timestamp DnssdServer::kTimeoutCleared;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
@@ -106,7 +112,7 @@ void HandleExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aApp
 
 void DnssdServer::OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
 {
-    if (!DnssdServer::OnExpiration(mExtendedDiscoveryExpirationMs))
+    if (!DnssdServer::OnExpiration(mExtendedDiscoveryExpiration))
     {
         ChipLogDetail(Discovery, "OnExtendedDiscoveryExpiration callback for cleared session");
         return;
@@ -114,7 +120,7 @@ void DnssdServer::OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, vo
 
     ChipLogDetail(Discovery, "OnExtendedDiscoveryExpiration callback for valid session");
 
-    mExtendedDiscoveryExpirationMs = TIMEOUT_CLEARED;
+    mExtendedDiscoveryExpiration = kTimeoutCleared;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
@@ -124,14 +130,14 @@ void HandleDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
     DnssdServer::Instance().OnDiscoveryExpiration(aSystemLayer, aAppState);
 }
 
-bool DnssdServer::OnExpiration(uint64_t expirationMs)
+bool DnssdServer::OnExpiration(System::Clock::Timestamp expirationMs)
 {
-    if (expirationMs == TIMEOUT_CLEARED)
+    if (expirationMs == kTimeoutCleared)
     {
         ChipLogDetail(Discovery, "OnExpiration callback for cleared session");
         return false;
     }
-    uint64_t now = mTimeSource.GetCurrentMonotonicTimeMs();
+    System::Clock::Timestamp now = mTimeSource.GetMonotonicTimestamp();
     if (expirationMs > now)
     {
         ChipLogDetail(Discovery, "OnExpiration callback for reset session");
@@ -179,7 +185,7 @@ bool DnssdServer::OnExpiration(uint64_t expirationMs)
 
 void DnssdServer::OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
 {
-    if (!DnssdServer::OnExpiration(mDiscoveryExpirationMs))
+    if (!DnssdServer::OnExpiration(mDiscoveryExpiration))
     {
         ChipLogDetail(Discovery, "OnDiscoveryExpiration callback for cleared session");
         return;
@@ -201,7 +207,7 @@ void DnssdServer::OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAp
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
-    mDiscoveryExpirationMs = TIMEOUT_CLEARED;
+    mDiscoveryExpiration = kTimeoutCleared;
 }
 
 CHIP_ERROR DnssdServer::ScheduleDiscoveryExpiration()
@@ -212,7 +218,7 @@ CHIP_ERROR DnssdServer::ScheduleDiscoveryExpiration()
     }
     ChipLogDetail(Discovery, "Scheduling Discovery timeout in secs=%d", mDiscoveryTimeoutSecs);
 
-    mDiscoveryExpirationMs = mTimeSource.GetCurrentMonotonicTimeMs() + static_cast<uint64_t>(mDiscoveryTimeoutSecs) * 1000;
+    mDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds16(mDiscoveryTimeoutSecs);
 
     return DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(mDiscoveryTimeoutSecs), HandleDiscoveryExpiration,
                                                  nullptr);
@@ -228,8 +234,7 @@ CHIP_ERROR DnssdServer::ScheduleExtendedDiscoveryExpiration()
     }
     ChipLogDetail(Discovery, "Scheduling Extended Discovery timeout in secs=%d", extendedDiscoveryTimeoutSecs);
 
-    mExtendedDiscoveryExpirationMs =
-        mTimeSource.GetCurrentMonotonicTimeMs() + static_cast<uint64_t>(extendedDiscoveryTimeoutSecs) * 1000;
+    mExtendedDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds16(extendedDiscoveryTimeoutSecs);
 
     return DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(extendedDiscoveryTimeoutSecs),
                                                  HandleExtendedDiscoveryExpiration, nullptr);
@@ -258,7 +263,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                     .SetPeerId(fabricInfo.GetPeerId())
                     .SetMac(mac)
                     .SetPort(GetSecuredPort())
-                    .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
+                    .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL),
                                           Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
                     .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
                     .EnableIpV4(true);
@@ -339,7 +344,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 #endif
 
     advertiseParameters
-        .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
+        .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL),
                               Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
         .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
 
@@ -486,15 +491,13 @@ void DnssdServer::StartServer(chip::Dnssd::CommissioningMode mode)
 CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
 {
     char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
-    size_t serialNumberSize                = 0;
     uint16_t lifetimeCounter               = 0;
     size_t rotatingDeviceIdValueOutputSize = 0;
 
-    ReturnErrorOnFailure(
-        chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
+    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber)));
     ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
     return AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
-        lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+        lifetimeCounter, serialNumber, strlen(serialNumber), rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
         rotatingDeviceIdValueOutputSize);
 }
 #endif

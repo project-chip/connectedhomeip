@@ -61,8 +61,8 @@ CHIP_ERROR CHIPCommand::Run()
     // TODO - OpCreds should only be generated for pairing command
     //        store the credentials in persistent storage, and
     //        generate when not available in the storage.
-    ReturnLogErrorOnFailure(mOpCredsIssuer.GenerateNOCChainAfterValidation(mStorage.GetLocalNodeId(), 0, ephemeralKey.Pubkey(),
-                                                                           rcacSpan, icacSpan, nocSpan));
+    ReturnLogErrorOnFailure(mOpCredsIssuer.GenerateNOCChainAfterValidation(mStorage.GetLocalNodeId(), mStorage.GetFabricId(),
+                                                                           ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     chip::Controller::FactoryInitParams factoryInitParams;
     factoryInitParams.fabricStorage = &mFabricStorage;

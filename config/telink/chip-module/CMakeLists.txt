@@ -198,7 +198,6 @@ chip_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_NET_IPV4)
 chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
-chip_gn_arg_bool  ("chip_build_pw_rpc_lib"                  CONFIG_CHIP_PW_RPC)
 
 if (BOARD STREQUAL "native_posix")
     chip_gn_arg_string("target_cpu" "x86")
@@ -246,6 +245,9 @@ target_include_directories(chip INTERFACE
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
+if (CONFIG_CHIP_LIB_SHELL)
+    target_link_options(chip INTERFACE -Wl,--whole-archive -lCHIPShell -Wl,--no-whole-archive)
+endif()
 target_link_libraries(chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
 add_dependencies(chip chip-gn)
 

@@ -46,36 +46,41 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     auto & salt                 = commandData.salt;
     auto & passcodeID           = commandData.passcodeID;
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Optional<StatusCode> status = Optional<StatusCode>::Missing();
     PASEVerifier verifier;
     const uint8_t * verifierData = pakeVerifier.data();
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
 
     VerifyOrExit(!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen(),
-                 status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(sizeof(verifier) == pakeVerifier.size(), status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(iterations >= kPBKDFMinimumIterations, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(iterations <= kPBKDFMaximumIterations, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(salt.size() >= kPBKDFMinimumSaltLen, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(salt.size() <= kPBKDFMaximumSaltLen, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(discriminator <= kMaxDiscriminatorValue, status = EMBER_ZCL_STATUS_FAILURE);
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
+    VerifyOrExit(sizeof(verifier) == pakeVerifier.size(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(iterations >= kPBKDFMinimumIterations, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(iterations <= kPBKDFMaximumIterations, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(salt.size() >= kPBKDFMinimumSaltLen, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(salt.size() <= kPBKDFMaximumSaltLen, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(discriminator <= kMaxDiscriminatorValue, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
 
     memcpy(verifier.mW0, &verifierData[0], kSpake2p_WS_Length);
     memcpy(verifier.mL, &verifierData[kSpake2p_WS_Length], kSpake2p_WS_Length);
 
     VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenEnhancedCommissioningWindow(
                      commissioningTimeout, discriminator, verifier, iterations, salt, passcodeID) == CHIP_NO_ERROR,
-                 status = EMBER_ZCL_STATUS_FAILURE);
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     ChipLogProgress(Zcl, "Commissioning window is now open");
 
 exit:
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status.HasValue())
     {
-        ChipLogError(Zcl, "Failed to open commissioning window. Status %d", status);
+        ChipLogError(Zcl, "Failed to open commissioning window. Status %d", status.Value());
+        commandObj->AddClusterSpecificFailure(commandPath, status.Value());
     }
-    emberAfSendImmediateDefaultResponse(status);
+    else
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    }
     return true;
 }
 
@@ -85,22 +90,27 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
 {
     auto & commissioningTimeout = commandData.commissioningTimeout;
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Optional<StatusCode> status = Optional<StatusCode>::Missing();
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
     VerifyOrExit(!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen(),
-                 status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds, status = EMBER_ZCL_STATUS_FAILURE);
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
+    VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(commissioningTimeout) ==
                      CHIP_NO_ERROR,
-                 status = EMBER_ZCL_STATUS_FAILURE);
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     ChipLogProgress(Zcl, "Commissioning window is now open");
 
 exit:
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status.HasValue())
     {
-        ChipLogError(Zcl, "Failed to open commissioning window. Status %d", status);
+        ChipLogError(Zcl, "Failed to open commissioning window. Status %d", status.Value());
+        commandObj->AddClusterSpecificFailure(commandPath, status.Value());
     }
-    emberAfSendImmediateDefaultResponse(status);
+    else
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    }
     return true;
 }
 
@@ -109,8 +119,19 @@ bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
     const Commands::RevokeCommissioning::DecodableType & commandData)
 {
     ChipLogProgress(Zcl, "Received command to close commissioning window");
-    Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-    ChipLogProgress(Zcl, "Commissioning window is now closed");
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+
+    if (!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
+    {
+        ChipLogError(Zcl, "Commissioning window is currently not open");
+        commandObj->AddClusterSpecificFailure(commandPath, StatusCode::EMBER_ZCL_STATUS_CODE_WINDOW_NOT_OPEN);
+    }
+    else
+    {
+        Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+        ChipLogProgress(Zcl, "Commissioning window is now closed");
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    }
     return true;
 }
+
+void MatterAdministratorCommissioningPluginServerInitCallback() {}

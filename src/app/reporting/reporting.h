@@ -47,14 +47,6 @@
  * framework changes.  The application should call this function when an
  * externally-managed attribute changes.  The application should use the change
  * notification to inform its reporting decisions.
- *
- * @param endpoint
- * @param clusterId
- * @param attributeId
- * @param mask
- * @param manufacturerCode
- * @param type
- * @param data
  */
 void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                             uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data);

@@ -65,25 +65,19 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
 CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                                   System::PacketBufferHandle && payload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
-
     VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
 
     // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
     // Exchange Manager for unsolicited InvokeCommand Requests.
-
     mpExchangeCtx = ec;
 
-    err = ProcessInvokeRequest(std::move(payload));
-    SuccessOrExit(err);
+    // Use the RAII feature, if this is the only Handle when this function returns, DecrementHoldOff will trigger sending response.
+    Handle workHandle(this);
+    mpExchangeCtx->WillSendMessage();
+    ReturnErrorOnFailure(ProcessInvokeRequest(std::move(payload)));
 
-    err = SendCommandResponse();
-    SuccessOrExit(err);
-
-exit:
-    Close();
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payload)
@@ -125,18 +119,51 @@ void CommandHandler::Close()
     mSuppressResponse = false;
     MoveToState(CommandState::AwaitingDestruction);
 
+    // We must finish all async work before we can shut down a CommandHandler. The actual CommandHandler MUST finish their work
+    // in reasonable time or there is a bug. The only case for releasing CommandHandler without CommandHandler::Handle releasing its
+    // reference is the stack shutting down, in which case Close() is not called. So the below check should always pass.
+    VerifyOrDieWithMsg(mPendingWork == 0, DataManagement, "CommandHandler::Close() called with %zu unfinished async work items",
+                       mPendingWork);
+
     Command::Close();
 
     if (mpCallback)
     {
-        mpCallback->OnDone(this);
+        mpCallback->OnDone(*this);
     }
+}
+
+void CommandHandler::IncrementHoldOff()
+{
+    mPendingWork++;
+}
+
+void CommandHandler::DecrementHoldOff()
+{
+    mPendingWork--;
+    ChipLogDetail(DataManagement, "Decreasing reference count for CommandHandler, remaining %zu", mPendingWork);
+    if (mPendingWork != 0)
+    {
+        return;
+    }
+    CHIP_ERROR err = SendCommandResponse();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
+        // We marked the exchange as "WillSendMessage", need to shutdown the exchange manually to avoid leaking exchanges.
+        if (mpExchangeCtx != nullptr)
+        {
+            mpExchangeCtx->Close();
+        }
+    }
+    Close();
 }
 
 CHIP_ERROR CommandHandler::SendCommandResponse()
 {
     System::PacketBufferHandle commandPacket;
 
+    VerifyOrReturnError(mPendingWork == 0, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == CommandState::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -171,7 +198,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 
     err = commandPath.GetEndpointId(&endpointId);
     SuccessOrExit(err);
-    VerifyOrExit(ServerClusterCommandExists(ConcreteCommandPath(endpointId, clusterId, commandId)),
+    VerifyOrExit(mpCallback->CommandExists(ConcreteCommandPath(endpointId, clusterId, commandId)),
                  err = CHIP_ERROR_INVALID_PROFILE_ID);
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
@@ -189,7 +216,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
                       endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
         const ConcreteCommandPath concretePath(endpointId, clusterId, commandId);
         SuccessOrExit(MatterPreCommandReceivedCallback(concretePath));
-        DispatchSingleClusterCommand(concretePath, commandDataReader, this);
+        mpCallback->DispatchCommand(*this, ConcreteCommandPath(endpointId, clusterId, commandId), commandDataReader);
         MatterPostCommandReceivedCallback(concretePath);
     }
 
@@ -340,6 +367,39 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
     else
     {
         return mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetCommand().GetWriter();
+    }
+}
+
+FabricIndex CommandHandler::GetAccessingFabricIndex() const
+{
+    return mpExchangeCtx->GetSessionHandle().GetFabricIndex();
+}
+
+CommandHandler * CommandHandler::Handle::Get()
+{
+    return (mMagic == InteractionModelEngine::GetInstance()->GetMagicNumber()) ? mpHandler : nullptr;
+}
+
+void CommandHandler::Handle::Release()
+{
+    if (mpHandler != nullptr)
+    {
+        if (mMagic == InteractionModelEngine::GetInstance()->GetMagicNumber())
+        {
+            mpHandler->DecrementHoldOff();
+        }
+        mpHandler = nullptr;
+        mMagic    = 0;
+    }
+}
+
+CommandHandler::Handle::Handle(CommandHandler * handle)
+{
+    if (handle != nullptr)
+    {
+        handle->IncrementHoldOff();
+        mpHandler = handle;
+        mMagic    = InteractionModelEngine::GetInstance()->GetMagicNumber();
     }
 }
 

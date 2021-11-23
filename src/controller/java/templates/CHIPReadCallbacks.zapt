@@ -9,6 +9,8 @@ class CHIP{{chipCallback.name}}AttributeCallback : public chip::Callback::Callba
 public:
     CHIP{{chipCallback.name}}AttributeCallback(jobject javaCallback, bool keepAlive = false);
 
+    ~CHIP{{chipCallback.name}}AttributeCallback();
+
     static void maybeDestroy(CHIP{{chipCallback.name}}AttributeCallback * callback) {
         if (!callback->keepAlive) {
             callback->Cancel();
@@ -32,6 +34,8 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
 {
 public:
     CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback);
+
+    ~CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback();
 
     static void CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list);
 

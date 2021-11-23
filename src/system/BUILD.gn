@@ -123,6 +123,7 @@ static_library("system") {
   output_name = "libSystemLayer"
 
   sources = [
+    "PlatformEventSupport.h",
     "SystemAlignSize.h",
     "SystemClock.cpp",
     "SystemClock.h",
@@ -131,14 +132,13 @@ static_library("system") {
     "SystemError.h",
     "SystemEvent.h",
     "SystemFaultInjection.h",
+    "SystemLayer.cpp",
     "SystemLayer.h",
     "SystemLayerImpl${chip_system_config_event_loop}.cpp",
     "SystemLayerImpl${chip_system_config_event_loop}.h",
     "SystemLayerImpl.h",
     "SystemMutex.cpp",
     "SystemMutex.h",
-    "SystemObject.cpp",
-    "SystemObject.h",
     "SystemPacketBuffer.cpp",
     "SystemPacketBuffer.h",
     "SystemStats.cpp",
@@ -167,10 +167,6 @@ static_library("system") {
     if (chip_system_config_event_loop == "Libevent") {
       libs = [ "event" ]
     }
-  }
-
-  if (chip_system_config_use_lwip) {
-    sources += [ "LwIPEventSupport.h" ]
   }
 
   if (chip_with_nlfaultinjection) {
