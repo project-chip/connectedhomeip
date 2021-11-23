@@ -55,8 +55,9 @@ using namespace chip::app::Clusters::OperationalCredentials;
 
 namespace {
 
-constexpr uint8_t kDACCertificate = 1;
-constexpr uint8_t kPAICertificate = 2;
+constexpr uint8_t kDACCertificate   = 1;
+constexpr uint8_t kPAICertificate   = 2;
+constexpr size_t kExpectedNonceSize = 32;
 
 class OperationalCredentialsAttrAccess : public AttributeAccessInterface
 {
@@ -159,6 +160,43 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePat
 
     return CHIP_NO_ERROR;
 }
+
+// Utility to compute Attestation signature for NOCSRResponse and AttestationResponse
+CHIP_ERROR ComputeAttestationSignature(app::CommandHandler * commandObj, Credentials::DeviceAttestationCredentialsProvider * dacProvider, const ByteSpan &payload, MutableByteSpan & signatureSpan)
+{
+    uint8_t md[Crypto::kSHA256_Hash_Length];
+    MutableByteSpan messageDigestSpan(md);
+
+    VerifyOrReturnError(signatureSpan.size() >= Crypto::P256ECDSASignature::Capacity(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
+    // Retrieve attestation challenge
+    ByteSpan attestationChallenge = commandObj->GetExchangeContext()
+                                        ->GetExchangeMgr()
+                                        ->GetSessionManager()
+                                        ->GetSecureSession(commandObj->GetExchangeContext()->GetSessionHandle())
+                                        ->GetCryptoContext()
+                                        .GetAttestationChallenge();
+
+    Hash_SHA256_stream hashStream;
+    ReturnErrorOnFailure(hashStream.Begin());
+    ReturnErrorOnFailure(hashStream.AddData(payload));
+    ReturnErrorOnFailure(hashStream.AddData(attestationChallenge));
+    ReturnErrorOnFailure(hashStream.Finish(messageDigestSpan));
+
+    ReturnErrorOnFailure(dacProvider->SignWithDeviceAttestationKey(messageDigestSpan, signatureSpan));
+    VerifyOrReturnError(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
+FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
+{
+    FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
+    return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
+}
+
 } // anonymous namespace
 
 // As per specifications section 11.22.5.1. Constant RESP_MAX
@@ -173,13 +211,6 @@ void fabricListChanged()
     MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::FabricsList::Id);
     MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
                                            OperationalCredentials::Attributes::CommissionedFabrics::Id);
-}
-
-static FabricInfo * retrieveCurrentFabric(CommandHandler * aCommandHandler)
-{
-    FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
-    return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
 
 // TODO: The code currently has two sources of truths for fabrics, the fabricInfo table + the attributes. There should only be one,
@@ -272,6 +303,7 @@ exit:
     emberAfSendImmediateDefaultResponse(status);
     if (err == CHIP_NO_ERROR)
     {
+        // Use a more direct getter for FabricIndex from commandObj
         chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
         FabricIndex currentFabricIndex        = commandObj->GetAccessingFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
@@ -304,7 +336,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
     CHIP_ERROR err;
 
     // Fetch current fabric
-    FabricInfo * fabric = retrieveCurrentFabric(commandObj);
+    FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
     VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
     // Set Label on fabric
@@ -323,6 +355,7 @@ exit:
 
 namespace {
 
+// TODO: Manage ephemeral RCAC/ICAC/NOC storage to avoid a full FabricInfo being needed here.
 FabricInfo gFabricBeingCommissioned;
 
 CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, EmberAfNodeOperationalCertStatus status, uint8_t index,
@@ -390,7 +423,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added an Op Cert");
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a NOC");
 
     err = gFabricBeingCommissioned.SetNOCCert(NOCValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
@@ -418,6 +451,10 @@ exit:
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddNOC request. Status %d", nocResponse);
     }
+    else
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: successfully added an NOC");
+    }
 
     return true;
 }
@@ -434,10 +471,10 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: an administrator has updated the Op Cert");
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: an administrator requested an update to the NOC");
 
     // Fetch current fabric
-    FabricInfo * fabric = retrieveCurrentFabric(commandObj);
+    FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
     VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_ID));
 
     err = fabric->SetNOCCert(NOCValue);
@@ -462,6 +499,10 @@ exit:
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed UpdateNOC request. Status %d", nocResponse);
     }
+    else
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateNOC successful.");
+    }
 
     return true;
 }
@@ -474,8 +515,6 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Device Attestation Credentials");
-
     uint8_t derBuf[Credentials::kMaxDERCertLength];
     MutableByteSpan derBufSpan(derBuf);
 
@@ -487,23 +526,18 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
 
     if (certificateType == kDACCertificate)
     {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Certificate Chain request received for DAC");
         SuccessOrExit(err = dacProvider->GetDeviceAttestationCert(derBufSpan));
     }
     else if (certificateType == kPAICertificate)
     {
-        err = dacProvider->GetProductAttestationIntermediateCert(derBufSpan);
-        if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE) // If Node does not have a PAI Certificate
-        {
-            // Send an empty octet string
-            derBufSpan = MutableByteSpan();
-        }
-        else
-        {
-            SuccessOrExit(err);
-        }
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Certificate Chain request received for PAI");
+        SuccessOrExit(err = dacProvider->GetProductAttestationIntermediateCert(derBufSpan));
     }
     else
     {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Certificate Chain request received for unknown type: %d",
+            static_cast<int>(certificateType));
         SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -528,66 +562,44 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
-    size_t attestationElementsLen;
-    Crypto::P256ECDSASignature signature;
-
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Attestation");
-
-    Commands::AttestationResponse::Type response;
-
+    size_t attestationElementsLen = 0;
+    MutableByteSpan attestationElementsSpan;
+    uint8_t certDeclBuf[512];
+    MutableByteSpan certDeclSpan(certDeclBuf);
     Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
 
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: received an AttestationRequest");
+
+    // TODO: retrieve vendor information to populate the fields below.
+    uint32_t timestamp = 0;
+    // TODO: Also retrieve and use firmware Information
+    const ByteSpan kEmptyFirmwareInfo;
+    Credentials::DeviceAttestationVendorReservedConstructor emptyVendorReserved(nullptr, 0);
+
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(attestationNonce.size() == 32, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(attestationNonce.size() == kExpectedNonceSize, err = CHIP_ERROR_INVALID_ARGUMENT);
 
+    SuccessOrExit(err = dacProvider->GetCertificationDeclaration(certDeclSpan));
+
+    attestationElementsLen = TLV::EstimateStructOverhead(certDeclSpan.size(), attestationNonce.size(), sizeof(uint64_t) * 8);
+
+    VerifyOrExit(attestationElements.Alloc(attestationElementsLen), err = CHIP_ERROR_NO_MEMORY);
+    attestationElementsSpan = MutableByteSpan{attestationElements.Get(), attestationElementsLen};
+    SuccessOrExit(err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, timestamp, kEmptyFirmwareInfo,
+                                                                  emptyVendorReserved, attestationElementsSpan));
+
+    // Prepare response payload with signature
     {
-        uint8_t certDeclBuf[512];
-        MutableByteSpan certDeclSpan(certDeclBuf);
+        Commands::AttestationResponse::Type response;
 
-        // TODO: retrieve vendor information to populate the fields below.
-        uint32_t timestamp = 0;
-        ByteSpan firmwareInfo;
-        Credentials::DeviceAttestationVendorReservedConstructor emptyVendorReserved(nullptr, 0);
+        Crypto::P256ECDSASignature signature;
+        MutableByteSpan signatureSpan{signature.Bytes(), signature.Capacity()};
+        SuccessOrExit(err = ComputeAttestationSignature(commandObj, dacProvider, attestationElementsSpan, signatureSpan));
 
-        SuccessOrExit(err = dacProvider->GetCertificationDeclaration(certDeclSpan));
-        // TODO: Retrieve firmware Information
-
-        attestationElementsLen = certDeclSpan.size() + attestationNonce.size() + sizeof(uint64_t) * 8;
-        VerifyOrExit(attestationElements.Alloc(attestationElementsLen), err = CHIP_ERROR_NO_MEMORY);
-
-        MutableByteSpan attestationElementsSpan(attestationElements.Get(), attestationElementsLen);
-        SuccessOrExit(err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, timestamp, firmwareInfo,
-                                                                      emptyVendorReserved, attestationElementsSpan));
-        attestationElementsLen = attestationElementsSpan.size();
+        response.attestationElements = attestationElementsSpan;
+        response.signature           = signatureSpan;
+        SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
     }
-
-    {
-        uint8_t md[Crypto::kSHA256_Hash_Length];
-        MutableByteSpan messageDigestSpan(md);
-
-        // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
-        // Retrieve attestation challenge
-        ByteSpan attestationChallenge = commandObj->GetExchangeContext()
-                                            ->GetExchangeMgr()
-                                            ->GetSessionManager()
-                                            ->GetSecureSession(commandObj->GetExchangeContext()->GetSessionHandle())
-                                            ->GetCryptoContext()
-                                            .GetAttestationChallenge();
-
-        Hash_SHA256_stream hashStream;
-        SuccessOrExit(err = hashStream.Begin());
-        SuccessOrExit(err = hashStream.AddData(ByteSpan(attestationElements.Get(), attestationElementsLen)));
-        SuccessOrExit(err = hashStream.AddData(attestationChallenge));
-        SuccessOrExit(err = hashStream.Finish(messageDigestSpan));
-
-        MutableByteSpan signatureSpan(signature, signature.Capacity());
-        SuccessOrExit(err = dacProvider->SignWithDeviceAttestationKey(messageDigestSpan, signatureSpan));
-        SuccessOrExit(err = signature.SetLength(signatureSpan.size()));
-    }
-
-    response.attestationElements = ByteSpan(attestationElements.Get(), attestationElementsLen);
-    response.signature           = ByteSpan(signature, signature.Length());
-    SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -603,55 +615,71 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
                                                               const app::ConcreteCommandPath & commandPath,
                                                               const Commands::OpCSRRequest::DecodableType & commandData)
 {
-    auto & CSRNonce = commandData.CSRNonce;
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    Platform::ScopedMemoryBuffer<uint8_t> csr;
-    size_t csrLength = Crypto::kMAX_CSR_Length;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> csrElements;
-
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested an OpCSR");
 
-    Commands::OpCSRResponse::Type response;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    Platform::ScopedMemoryBuffer<uint8_t> csr;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
+    MutableByteSpan nocsrElementsSpan;
 
-    TLV::TLVWriter csrElementWriter;
-    TLV::TLVType containerType;
-
-    VerifyOrExit(csr.Alloc(Crypto::kMAX_CSR_Length), err = CHIP_ERROR_NO_MEMORY);
-
-    if (gFabricBeingCommissioned.GetOperationalKey() == nullptr)
-    {
-        Crypto::P256Keypair keypair;
-        keypair.Initialize();
-        SuccessOrExit(err = gFabricBeingCommissioned.SetEphemeralKey(&keypair));
-    }
-
-    err = gFabricBeingCommissioned.GetOperationalKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: NewCertificateSigningRequest returned %" CHIP_ERROR_FORMAT, err.Format());
-    SuccessOrExit(err);
-    VerifyOrExit(csrLength < UINT8_MAX, err = CHIP_ERROR_INTERNAL);
-
-    VerifyOrExit(csrElements.Alloc(kMaxRspLen), err = CHIP_ERROR_NO_MEMORY);
-    csrElementWriter.Init(csrElements.Get(), kMaxRspLen);
-
-    SuccessOrExit(err = csrElementWriter.StartContainer(TLV::AnonymousTag, TLV::TLVType::kTLVType_Structure, containerType));
-    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(1), ByteSpan(csr.Get(), csrLength)));
-    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(2), CSRNonce));
-    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(3), ByteSpan()));
-    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(4), ByteSpan()));
-    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(5), ByteSpan()));
-    SuccessOrExit(err = csrElementWriter.EndContainer(containerType));
-    SuccessOrExit(err = csrElementWriter.Finalize());
+    auto & CSRNonce = commandData.CSRNonce;
 
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(CSRNonce.size() == kExpectedNonceSize, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Write CSR Elements
-    response.NOCSRElements = ByteSpan(csrElements.Get(), csrElementWriter.GetLengthWritten());
-    // TODO - Write attestation signature using attestation key
-    response.attestationSignature = ByteSpan();
-    SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
+    // Prepare NOCSRElements structure
+    {
+        Crypto::P256Keypair keypair;
+        size_t csrLength = Crypto::kMAX_CSR_Length;
+        size_t nocsrLengthEstimate = 0;
+        ByteSpan kNoVendorReserved;
+
+        // Always generate a new operational keypair for any new CSRRequest
+        if (gFabricBeingCommissioned.GetOperationalKey() != nullptr)
+        {
+            gFabricBeingCommissioned.GetOperationalKey()->Clear();
+        }
+
+        keypair.Initialize();
+        SuccessOrExit(err = gFabricBeingCommissioned.SetEphemeralKey(&keypair));
+
+        // Generate the actual CSR from the ephemeral key
+        VerifyOrExit(csr.Alloc(csrLength), err = CHIP_ERROR_NO_MEMORY);
+
+        err = gFabricBeingCommissioned.GetOperationalKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: NewCertificateSigningRequest returned %" CHIP_ERROR_FORMAT, err.Format());
+        SuccessOrExit(err);
+        VerifyOrExit(csrLength <= Crypto::kMAX_CSR_Length, err = CHIP_ERROR_INTERNAL);
+
+        // Encode the NOCSR elements with the CSR and Nonce
+        nocsrLengthEstimate =
+            TLV::EstimateStructOverhead(
+                csrLength,  // CSR buffer
+                kExpectedNonceSize,  // CSR Nonce
+                0 // no vendor reserved data
+            );
+
+        VerifyOrExit(nocsrElements.Alloc(nocsrLengthEstimate), err = CHIP_ERROR_NO_MEMORY);
+
+        nocsrElementsSpan = MutableByteSpan{nocsrElements.Get(), nocsrLengthEstimate};
+        SuccessOrExit(err = Credentials::ConstructNOCSRElements(ByteSpan{csr.Get(), csrLength}, CSRNonce, kNoVendorReserved, kNoVendorReserved, kNoVendorReserved,
+           nocsrElementsSpan));
+    }
+
+    // Prepare response payload with signature
+    {
+        Commands::OpCSRResponse::Type response;
+
+        Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
+
+        Crypto::P256ECDSASignature signature;
+        MutableByteSpan signatureSpan{signature.Bytes(), signature.Capacity()};
+        SuccessOrExit(err = ComputeAttestationSignature(commandObj, dacProvider, nocsrElementsSpan, signatureSpan));
+
+        response.NOCSRElements = nocsrElementsSpan;
+        response.attestationSignature = signatureSpan;
+        SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -674,6 +702,8 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
 
+    // TODO: Ensure we do not duplicate roots in storage, and detect "same key, different cert" errors
+    // TODO: Validate cert signature prior to setting.
     VerifyOrExit(gFabricBeingCommissioned.SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_INVALID_FIELD);
 
 exit:
@@ -696,6 +726,7 @@ bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::RemoveTrustedRootCertificate::DecodableType & commandData)
 {
+    // TODO: Implement the logic for RemoveTrustedRootCertificate
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
 

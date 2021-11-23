@@ -64,5 +64,21 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
  */
 CHIP_ERROR CountVendorReservedElementsInDA(const ByteSpan & attestationElements, size_t & numElements);
 
+/**
+ *  @brief Take each component separately and form the CSRElements buffer.
+ *
+ *  @param[in]  csr Certificate Signing Request body
+ *  @param[in]  csrNonce CSR Nonce - 32 octets required.
+ *  @param[in]  vendor_reserved1 Optional vendor_reserved1 blob, can be empty to omit
+ *  @param[in]  vendor_reserved2 Optional vendor_reserved2 blob, can be empty to omit
+ *  @param[in]  vendor_reserved3 Optional vendor_reserved3 blob, can be empty to omit
+ *  @param[out] nocsrElements Buffer used to write all nocsrElements data, formed with all the data fields above.
+ *                            Provided buffer needs to be capable to handle all data fields + tags.
+ */
+CHIP_ERROR ConstructNOCSRElements(const ByteSpan & csr, const ByteSpan & csrNonce,
+                                  const ByteSpan & vendor_reserved1, const ByteSpan & vendor_reserved2,
+                                  const ByteSpan & vendor_reserved3,
+                                  MutableByteSpan & nocsrElements);
+
 } // namespace Credentials
 } // namespace chip

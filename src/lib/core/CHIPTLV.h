@@ -2727,5 +2727,20 @@ public:
     virtual CHIP_ERROR FinalizeBuffer(TLVWriter & writer, uint8_t * bufStart, uint32_t bufLen) = 0;
 };
 
+constexpr size_t EstimateStructOverhead()
+{
+    // The struct itself has a control byte and an end-of-struct marker.
+    return 2;
+}
+
+template <typename... FieldSizes>
+constexpr size_t EstimateStructOverhead(size_t firstFieldSize, FieldSizes... otherFields)
+{
+    // Estimate 4 bytes of overhead per field.  This can happen for a large
+    // octet string field: 1 byte control, 1 byte context tag, 2 bytes
+    // length.
+    return firstFieldSize + 4 + EstimateStructOverhead(otherFields...);
+}
+
 } // namespace TLV
 } // namespace chip
