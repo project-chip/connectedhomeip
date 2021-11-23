@@ -185,11 +185,15 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Pairing Success");
-        UpdateNetworkAddress();
     }
     else
     {
         ChipLogProgress(chipTool, "Pairing Failure: %s", ErrorStr(err));
+        // For some devices, it may take more time to appear on the network and become discoverable
+        // over DNS-SD, so don't give up on failure and restart the address update. Note that this
+        // will not be repeated endlessly as each chip-tool command has a timeout (in the case of
+        // the `pairing` command it equals 120s).
+        // UpdateNetworkAddress();
     }
 }
 
