@@ -28,8 +28,8 @@ from dataclasses import dataclass
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-import chiptest
-from chiptest.glob_matcher import GlobMatcher
+import chiptest  # noqa: E402
+from chiptest.glob_matcher import GlobMatcher  # noqa: E402
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))

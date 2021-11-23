@@ -56,24 +56,24 @@ class ExecutionCapture:
 
     def Log(self, source, line):
         with self.lock:
-          self.captures.append(CaptureLine(
-              when=datetime.now(),
-              source=source,
-              line=line.strip('\n')
-          ))
+            self.captures.append(CaptureLine(
+                when=datetime.now(),
+                source=source,
+                line=line.strip('\n')
+            ))
 
     def LogContents(self):
         logging.error('================ CAPTURED LOG START ==================')
         with self.lock:
-          for entry in self.captures:
-              logging.error('%02d:%02d:%02d.%03d - %-10s: %s',
-                            entry.when.hour,
-                            entry.when.minute,
-                            entry.when.second,
-                            entry.when.microsecond/1000,
-                            entry.source,
-                            entry.line
-                            )
+            for entry in self.captures:
+                logging.error('%02d:%02d:%02d.%03d - %-10s: %s',
+                              entry.when.hour,
+                              entry.when.minute,
+                              entry.when.second,
+                              entry.when.microsecond/1000,
+                              entry.source,
+                              entry.line
+                              )
         logging.error('================ CAPTURED LOG END ====================')
 
 
