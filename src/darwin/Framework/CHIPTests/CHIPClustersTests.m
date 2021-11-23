@@ -16502,7 +16502,7 @@ CHIPDevice * GetConnectedDevice()
 
 - (void)testSendClusterTest_TC_WNCV_1_1_000000_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"2: read the global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16510,14 +16510,12 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"2: read the global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedShortValue], 5U);
-        }
+        XCTAssertGreaterThanOrEqual([values[@"value"] unsignedShortValue], 5);
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 200);
 
         [expectation fulfill];
     }];
@@ -16527,7 +16525,7 @@ CHIPDevice * GetConnectedDevice()
 - (void)testSendClusterTest_TC_WNCV_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default value to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"3a: write a value into the RO mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16535,11 +16533,12 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:5U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:201U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                                responseHandler:^(NSError * err, NSDictionary * values) {
-                                   NSLog(@"write the default value to mandatory global attribute: ClusterRevision Error: %@", err);
+                                   NSLog(
+                                       @"3a: write a value into the RO mandatory global attribute: ClusterRevision Error: %@", err);
 
                                    XCTAssertEqual(err.code, 1);
                                    [expectation fulfill];
@@ -16549,7 +16548,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_WNCV_1_1_000002_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3b: reads back global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16557,14 +16556,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"3b: reads back global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedShortValue], 5U);
-        }
+        XCTAssertNotEqual([values[@"value"] unsignedShortValue], 201);
 
         [expectation fulfill];
     }];
@@ -16573,7 +16569,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_WNCV_1_1_000003_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: FeatureMap"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"2: read the global attribute: FeatureMap"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16581,23 +16577,42 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeFeatureMapWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"read the global attribute: FeatureMap Error: %@", err);
+        NSLog(@"2: read the global attribute: FeatureMap Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
-        }
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedIntValue], 32768);
 
         [expectation fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_1_1_000004_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_1_1_000004_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: FeatureMap"];
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: write the default value to optional global attribute: FeatureMap"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id featureMapArgument;
+    featureMapArgument = [NSNumber numberWithUnsignedInt:32769UL];
+    [cluster writeAttributeFeatureMapWithValue:featureMapArgument
+                               responseHandler:^(NSError * err, NSDictionary * values) {
+                                   NSLog(@"3a: write the default value to optional global attribute: FeatureMap Error: %@", err);
+
+                                   XCTAssertEqual(err.code, 1);
+                                   [expectation fulfill];
+                               }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_1_1_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3b: reads back global attribute: FeatureMap"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16605,14 +16620,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeFeatureMapWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"reads back global attribute: FeatureMap Error: %@", err);
+        NSLog(@"3b: reads back global attribute: FeatureMap Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
-        }
+        XCTAssertNotEqual([values[@"value"] unsignedIntValue], 32769);
 
         [expectation fulfill];
     }];
@@ -16622,7 +16634,7 @@ CHIPDevice * GetConnectedDevice()
 
 - (void)testSendClusterTest_TC_WNCV_2_1_000000_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the RO mandatory attribute default: Type"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"2: read the RO mandatory attribute default: Type"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16630,62 +16642,53 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"read the RO mandatory attribute default: Type Error: %@", err);
+        NSLog(@"2: read the RO mandatory attribute default: Type Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 9);
 
         [expectation fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000001_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000001_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back the RO mandatory attribute: Type"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3a: write a value into the RO mandatory attribute: Type"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"reads back the RO mandatory attribute: Type Error: %@", err);
+    id typeArgument;
+    typeArgument = [NSNumber numberWithUnsignedChar:250];
+    [cluster writeAttributeTypeWithValue:typeArgument
+                         responseHandler:^(NSError * err, NSDictionary * values) {
+                             NSLog(@"3a: write a value into the RO mandatory attribute: Type Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
-
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
+                             XCTAssertEqual(err.code, 1);
+                             [expectation fulfill];
+                         }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_2_1_000002_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the RO mandatory attribute default: ConfigStatus"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3b: reads back the RO mandatory attribute: Type"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeConfigStatusWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"read the RO mandatory attribute default: ConfigStatus Error: %@", err);
+    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"3b: reads back the RO mandatory attribute: Type Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedCharValue], 3);
-        }
+        XCTAssertNotEqual([values[@"value"] unsignedCharValue], 250);
 
         [expectation fulfill];
     }];
@@ -16694,7 +16697,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_WNCV_2_1_000003_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back the RO mandatory attribute: ConfigStatus"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"2: read the RO mandatory attribute default: ConfigStatus"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16702,63 +16705,54 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeConfigStatusWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"reads back the RO mandatory attribute: ConfigStatus Error: %@", err);
+        NSLog(@"2: read the RO mandatory attribute default: ConfigStatus Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedCharValue], 3);
-        }
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 63);
 
         [expectation fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000004_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000004_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"read the RO mandatory attribute default: OperationalStatus"];
+        [self expectationWithDescription:@"3a: write a value into the RO mandatory attribute: ConfigStatus"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeOperationalStatusWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"read the RO mandatory attribute default: OperationalStatus Error: %@", err);
+    id configStatusArgument;
+    configStatusArgument = [NSNumber numberWithUnsignedChar:128];
+    [cluster writeAttributeConfigStatusWithValue:configStatusArgument
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"3a: write a value into the RO mandatory attribute: ConfigStatus Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
-
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
+                                     XCTAssertEqual(err.code, 1);
+                                     [expectation fulfill];
+                                 }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_2_1_000005_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back the RO mandatory attribute: OperationalStatus"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3b: reads back the RO mandatory attribute: ConfigStatus"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeOperationalStatusWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"reads back the RO mandatory attribute: OperationalStatus Error: %@", err);
+    [cluster readAttributeConfigStatusWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"3b: reads back the RO mandatory attribute: ConfigStatus Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
+        XCTAssertNotEqual([values[@"value"] unsignedCharValue], 128);
 
         [expectation fulfill];
     }];
@@ -16767,55 +16761,140 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_WNCV_2_1_000006_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the RO mandatory attribute default: EndProductType"];
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2: read the RO mandatory attribute default: OperationalStatus"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeEndProductTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"read the RO mandatory attribute default: EndProductType Error: %@", err);
+    [cluster readAttributeOperationalStatusWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"2: read the RO mandatory attribute default: OperationalStatus Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 63);
 
         [expectation fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000007_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000007_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back the RO mandatory attribute: EndProductType"];
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: write a value into the RO mandatory attribute: OperationalStatus"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeEndProductTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"reads back the RO mandatory attribute: EndProductType Error: %@", err);
+    id operationalStatusArgument;
+    operationalStatusArgument = [NSNumber numberWithUnsignedChar:128];
+    [cluster
+        writeAttributeOperationalStatusWithValue:operationalStatusArgument
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"3a: write a value into the RO mandatory attribute: OperationalStatus Error: %@", err);
 
-        XCTAssertEqual(err.code, 0);
-
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
+                                     XCTAssertEqual(err.code, 1);
+                                     [expectation fulfill];
+                                 }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_2_1_000008_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the RW mandatory attribute default: Mode"];
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3b: reads back the RO mandatory attribute: OperationalStatus"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOperationalStatusWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"3b: reads back the RO mandatory attribute: OperationalStatus Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertNotEqual([values[@"value"] unsignedCharValue], 128);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000009_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2: read the RO mandatory attribute default: EndProductType"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEndProductTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"2: read the RO mandatory attribute default: EndProductType Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 23);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000010_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: write a value into the RO mandatory attribute: EndProductType"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id endProductTypeArgument;
+    endProductTypeArgument = [NSNumber numberWithUnsignedChar:250];
+    [cluster writeAttributeEndProductTypeWithValue:endProductTypeArgument
+                                   responseHandler:^(NSError * err, NSDictionary * values) {
+                                       NSLog(@"3a: write a value into the RO mandatory attribute: EndProductType Error: %@", err);
+
+                                       XCTAssertEqual(err.code, 1);
+                                       [expectation fulfill];
+                                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000011_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3b: reads back the RO mandatory attribute: EndProductType"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEndProductTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"3b: reads back the RO mandatory attribute: EndProductType Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertNotEqual([values[@"value"] unsignedCharValue], 250);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000012_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"2: read the RW mandatory attribute default: Mode"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16823,23 +16902,20 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeModeWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"read the RW mandatory attribute default: Mode Error: %@", err);
+        NSLog(@"2: read the RW mandatory attribute default: Mode Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 15);
 
         [expectation fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000009_WriteAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000013_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"write a value into the RW mandatory attribute:: Mode"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3a: write a value into the RW mandatory attribute:: Mode"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16847,10 +16923,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id modeArgument;
-    modeArgument = [NSNumber numberWithUnsignedChar:7];
+    modeArgument = [NSNumber numberWithUnsignedChar:8];
     [cluster writeAttributeModeWithValue:modeArgument
                          responseHandler:^(NSError * err, NSDictionary * values) {
-                             NSLog(@"write a value into the RW mandatory attribute:: Mode Error: %@", err);
+                             NSLog(@"3a: write a value into the RW mandatory attribute:: Mode Error: %@", err);
 
                              XCTAssertEqual(err.code, 0);
 
@@ -16859,9 +16935,9 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000010_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000014_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back the RW mandatory attribute: Mode"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3b: reads back the RW mandatory attribute: Mode"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16869,14 +16945,896 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeModeWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"reads back the RW mandatory attribute: Mode Error: %@", err);
+        NSLog(@"3b: reads back the RW mandatory attribute: Mode Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
         {
             id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedCharValue], 7);
+            XCTAssertEqual([actualValue unsignedCharValue], 8);
         }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000015_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2: read the RO optional attribute default: TargetPositionLiftPercent100ths"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTargetPositionLiftPercent100thsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"2: read the RO optional attribute default: TargetPositionLiftPercent100ths Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 10000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000016_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: write a value into the RO optional attribute: TargetPositionLiftPercent100ths"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id targetPositionLiftPercent100thsArgument;
+    targetPositionLiftPercent100thsArgument = [NSNumber numberWithUnsignedShort:20000U];
+    [cluster writeAttributeTargetPositionLiftPercent100thsWithValue:targetPositionLiftPercent100thsArgument
+                                                    responseHandler:^(NSError * err, NSDictionary * values) {
+                                                        NSLog(@"3a: write a value into the RO optional attribute: "
+                                                              @"TargetPositionLiftPercent100ths Error: %@",
+                                                            err);
+
+                                                        XCTAssertEqual(err.code, 1);
+                                                        [expectation fulfill];
+                                                    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000017_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3b: reads back the RO optional attribute: TargetPositionLiftPercent100ths"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTargetPositionLiftPercent100thsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"3b: reads back the RO optional attribute: TargetPositionLiftPercent100ths Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertNotEqual([values[@"value"] unsignedShortValue], 20000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000018_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2: read the RO optional attribute default: TargetPositionTiltPercent100ths"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTargetPositionTiltPercent100thsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"2: read the RO optional attribute default: TargetPositionTiltPercent100ths Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 10000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000019_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: write a value into the RO optional attribute: TargetPositionTiltPercent100ths"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id targetPositionTiltPercent100thsArgument;
+    targetPositionTiltPercent100thsArgument = [NSNumber numberWithUnsignedShort:20000U];
+    [cluster writeAttributeTargetPositionTiltPercent100thsWithValue:targetPositionTiltPercent100thsArgument
+                                                    responseHandler:^(NSError * err, NSDictionary * values) {
+                                                        NSLog(@"3a: write a value into the RO optional attribute: "
+                                                              @"TargetPositionTiltPercent100ths Error: %@",
+                                                            err);
+
+                                                        XCTAssertEqual(err.code, 1);
+                                                        [expectation fulfill];
+                                                    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000020_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3b: reads back the RO optional attribute: TargetPositionTiltPercent100ths"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTargetPositionTiltPercent100thsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"3b: reads back the RO optional attribute: TargetPositionTiltPercent100ths Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertNotEqual([values[@"value"] unsignedShortValue], 20000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000021_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2: read the RO optional attribute default: CurrentPositionLiftPercent100ths"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentPositionLiftPercent100thsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"2: read the RO optional attribute default: CurrentPositionLiftPercent100ths Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 10000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000022_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: write a value into the RO optional attribute: CurrentPositionLiftPercent100ths"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id currentPositionLiftPercent100thsArgument;
+    currentPositionLiftPercent100thsArgument = [NSNumber numberWithUnsignedShort:20000U];
+    [cluster writeAttributeCurrentPositionLiftPercent100thsWithValue:currentPositionLiftPercent100thsArgument
+                                                     responseHandler:^(NSError * err, NSDictionary * values) {
+                                                         NSLog(@"3a: write a value into the RO optional attribute: "
+                                                               @"CurrentPositionLiftPercent100ths Error: %@",
+                                                             err);
+
+                                                         XCTAssertEqual(err.code, 1);
+                                                         [expectation fulfill];
+                                                     }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000023_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3b: reads back the RO optional attribute: CurrentPositionLiftPercent100ths"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentPositionLiftPercent100thsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"3b: reads back the RO optional attribute: CurrentPositionLiftPercent100ths Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertNotEqual([values[@"value"] unsignedShortValue], 20000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000024_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2: read the RO optional attribute default: CurrentPositionTiltPercent100ths"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentPositionTiltPercent100thsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"2: read the RO optional attribute default: CurrentPositionTiltPercent100ths Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 10000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000025_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: write a value into the RO optional attribute: CurrentPositionTiltPercent100ths"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id currentPositionTiltPercent100thsArgument;
+    currentPositionTiltPercent100thsArgument = [NSNumber numberWithUnsignedShort:20000U];
+    [cluster writeAttributeCurrentPositionTiltPercent100thsWithValue:currentPositionTiltPercent100thsArgument
+                                                     responseHandler:^(NSError * err, NSDictionary * values) {
+                                                         NSLog(@"3a: write a value into the RO optional attribute: "
+                                                               @"CurrentPositionTiltPercent100ths Error: %@",
+                                                             err);
+
+                                                         XCTAssertEqual(err.code, 1);
+                                                         [expectation fulfill];
+                                                     }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000026_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3b: reads back the RO optional attribute: CurrentPositionTiltPercent100ths"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentPositionTiltPercent100thsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"3b: reads back the RO optional attribute: CurrentPositionTiltPercent100ths Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertNotEqual([values[@"value"] unsignedShortValue], 20000);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000027_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2: read the RO optional attribute default: InstalledOpenLimitLift"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeInstalledOpenLimitLiftWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"2: read the RO optional attribute default: InstalledOpenLimitLift Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65535);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000028_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: write a value into the RO optional attribute: InstalledOpenLimitLift"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id installedOpenLimitLiftArgument;
+    installedOpenLimitLiftArgument = [NSNumber numberWithUnsignedShort:255U];
+    [cluster
+        writeAttributeInstalledOpenLimitLiftWithValue:installedOpenLimitLiftArgument
+                                      responseHandler:^(NSError * err, NSDictionary * values) {
+                                          NSLog(
+                                              @"3a: write a value into the RO optional attribute: InstalledOpenLimitLift Error: %@",
+                                              err);
+
+                                          XCTAssertEqual(err.code, 1);
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000029_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3b: reads back the RO optional attribute: InstalledOpenLimitLift"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeInstalledOpenLimitLiftWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"3b: reads back the RO optional attribute: InstalledOpenLimitLift Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65535);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000030_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2: read the RO optional attribute default: InstalledClosedLimitLift"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeInstalledClosedLimitLiftWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"2: read the RO optional attribute default: InstalledClosedLimitLift Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65535);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000031_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: write a value into the RO optional attribute: InstalledClosedLimitLift"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id installedClosedLimitLiftArgument;
+    installedClosedLimitLiftArgument = [NSNumber numberWithUnsignedShort:255U];
+    [cluster writeAttributeInstalledClosedLimitLiftWithValue:installedClosedLimitLiftArgument
+                                             responseHandler:^(NSError * err, NSDictionary * values) {
+                                                 NSLog(@"3a: write a value into the RO optional attribute: "
+                                                       @"InstalledClosedLimitLift Error: %@",
+                                                     err);
+
+                                                 XCTAssertEqual(err.code, 1);
+                                                 [expectation fulfill];
+                                             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000032_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3b: reads back the RO optional attribute: InstalledClosedLimitLift"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeInstalledClosedLimitLiftWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"3b: reads back the RO optional attribute: InstalledClosedLimitLift Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65535);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000033_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2: read the RO optional attribute default: InstalledOpenLimitTilt"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeInstalledOpenLimitTiltWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"2: read the RO optional attribute default: InstalledOpenLimitTilt Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65535);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000034_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: write a value into the RO optional attribute: InstalledOpenLimitTilt"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id installedOpenLimitTiltArgument;
+    installedOpenLimitTiltArgument = [NSNumber numberWithUnsignedShort:255U];
+    [cluster
+        writeAttributeInstalledOpenLimitTiltWithValue:installedOpenLimitTiltArgument
+                                      responseHandler:^(NSError * err, NSDictionary * values) {
+                                          NSLog(
+                                              @"3a: write a value into the RO optional attribute: InstalledOpenLimitTilt Error: %@",
+                                              err);
+
+                                          XCTAssertEqual(err.code, 1);
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000035_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3b: reads back the RO optional attribute: InstalledOpenLimitTilt"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeInstalledOpenLimitTiltWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"3b: reads back the RO optional attribute: InstalledOpenLimitTilt Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65535);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000036_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2: read the RO optional attribute default: InstalledClosedLimitTilt"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeInstalledClosedLimitTiltWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"2: read the RO optional attribute default: InstalledClosedLimitTilt Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65535);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000037_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: write a value into the RO optional attribute: InstalledClosedLimitTilt"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id installedClosedLimitTiltArgument;
+    installedClosedLimitTiltArgument = [NSNumber numberWithUnsignedShort:255U];
+    [cluster writeAttributeInstalledClosedLimitTiltWithValue:installedClosedLimitTiltArgument
+                                             responseHandler:^(NSError * err, NSDictionary * values) {
+                                                 NSLog(@"3a: write a value into the RO optional attribute: "
+                                                       @"InstalledClosedLimitTilt Error: %@",
+                                                     err);
+
+                                                 XCTAssertEqual(err.code, 1);
+                                                 [expectation fulfill];
+                                             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000038_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3b: reads back the RO optional attribute: InstalledClosedLimitTilt"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeInstalledClosedLimitTiltWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"3b: reads back the RO optional attribute: InstalledClosedLimitTilt Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65535);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000039_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"4: read the RO mandatory attribute default: SafetyStatus"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeSafetyStatusWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"4: read the RO mandatory attribute default: SafetyStatus Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 2047);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000040_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"5a: write a value into the RO mandatory attribute: SafetyStatus"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id safetyStatusArgument;
+    safetyStatusArgument = [NSNumber numberWithUnsignedShort:4096U];
+    [cluster writeAttributeSafetyStatusWithValue:safetyStatusArgument
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"5a: write a value into the RO mandatory attribute: SafetyStatus Error: %@", err);
+
+                                     XCTAssertEqual(err.code, 1);
+                                     [expectation fulfill];
+                                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000041_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"5b: reads back the RO mandatory attribute: SafetyStatus"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeSafetyStatusWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"5b: reads back the RO mandatory attribute: SafetyStatus Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertNotEqual([values[@"value"] unsignedShortValue], 4096);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000042_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"4: read the RO optional attribute default: CurrentPositionLift"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentPositionLiftWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"4: read the RO optional attribute default: CurrentPositionLift Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65535);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000043_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"5a: write a value into the RO optional attribute: CurrentPositionLift"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id currentPositionLiftArgument;
+    currentPositionLiftArgument = [NSNumber numberWithUnsignedShort:255U];
+    [cluster
+        writeAttributeCurrentPositionLiftWithValue:currentPositionLiftArgument
+                                   responseHandler:^(NSError * err, NSDictionary * values) {
+                                       NSLog(
+                                           @"5a: write a value into the RO optional attribute: CurrentPositionLift Error: %@", err);
+
+                                       XCTAssertEqual(err.code, 1);
+                                       [expectation fulfill];
+                                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000044_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"5b: reads back the RO optional attribute: CurrentPositionLift"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentPositionLiftWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"5b: reads back the RO optional attribute: CurrentPositionLift Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65535);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000045_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"4: read the RO optional attribute default: CurrentPositionTilt"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentPositionTiltWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"4: read the RO optional attribute default: CurrentPositionTilt Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65535);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000046_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"5a: write a value into the RO optional attribute: CurrentPositionTilt"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id currentPositionTiltArgument;
+    currentPositionTiltArgument = [NSNumber numberWithUnsignedShort:255U];
+    [cluster
+        writeAttributeCurrentPositionTiltWithValue:currentPositionTiltArgument
+                                   responseHandler:^(NSError * err, NSDictionary * values) {
+                                       NSLog(
+                                           @"5a: write a value into the RO optional attribute: CurrentPositionTilt Error: %@", err);
+
+                                       XCTAssertEqual(err.code, 1);
+                                       [expectation fulfill];
+                                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000047_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"5b: reads back the RO optional attribute: CurrentPositionTilt"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentPositionTiltWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"5b: reads back the RO optional attribute: CurrentPositionTilt Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedShortValue], 65535);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000048_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"4: read the RO optional attribute default: CurrentPositionLiftPercentage"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentPositionLiftPercentageWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"4: read the RO optional attribute default: CurrentPositionLiftPercentage Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 100);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000049_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"5a: write a value into the RO optional attribute: CurrentPositionLiftPercentage"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id currentPositionLiftPercentageArgument;
+    currentPositionLiftPercentageArgument = [NSNumber numberWithUnsignedChar:200];
+    [cluster writeAttributeCurrentPositionLiftPercentageWithValue:currentPositionLiftPercentageArgument
+                                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                                      NSLog(@"5a: write a value into the RO optional attribute: "
+                                                            @"CurrentPositionLiftPercentage Error: %@",
+                                                          err);
+
+                                                      XCTAssertEqual(err.code, 1);
+                                                      [expectation fulfill];
+                                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000050_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"5b: reads back the RO optional attribute: CurrentPositionLiftPercentage"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentPositionLiftPercentageWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"5b: reads back the RO optional attribute: CurrentPositionLiftPercentage Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertNotEqual([values[@"value"] unsignedCharValue], 200);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000051_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"4: read the RO optional attribute default: CurrentPositionTiltPercentage"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentPositionTiltPercentageWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"4: read the RO optional attribute default: CurrentPositionTiltPercentage Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 100);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000052_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"5a: write a value into the RO optional attribute: CurrentPositionTiltPercentage"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id currentPositionTiltPercentageArgument;
+    currentPositionTiltPercentageArgument = [NSNumber numberWithUnsignedChar:200];
+    [cluster writeAttributeCurrentPositionTiltPercentageWithValue:currentPositionTiltPercentageArgument
+                                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                                      NSLog(@"5a: write a value into the RO optional attribute: "
+                                                            @"CurrentPositionTiltPercentage Error: %@",
+                                                          err);
+
+                                                      XCTAssertEqual(err.code, 1);
+                                                      [expectation fulfill];
+                                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000053_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"5b: reads back the RO optional attribute: CurrentPositionTiltPercentage"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentPositionTiltPercentageWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"5b: reads back the RO optional attribute: CurrentPositionTiltPercentage Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertNotEqual([values[@"value"] unsignedCharValue], 200);
 
         [expectation fulfill];
     }];
