@@ -184,6 +184,45 @@ public:
      * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
      */
     virtual Milliseconds64 GetMonotonicMilliseconds64() = 0;
+
+    virtual CHIP_ERROR GetClock_RealTime(uint64_t & curTime)   = 0;
+    virtual CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTime) = 0;
+
+    /**
+     * @brief
+     *   Platform-specific function for setting the current real (civil) time.
+     *
+     * This function set the local platform's notion of current real time.  The new current
+     * time is expressed as a Unix time value scaled to microseconds.
+     *
+     * Once set, underlying platform clock is expected to track real time with a granularity of at least whole
+     * seconds.
+     *
+     * On platforms that support tracking real time, the SetClock_RealTime() function must return the error
+     * CHIP_SYSTEM_ERROR_ACCESS_DENIED if the calling application does not have the privilege to set the
+     * current time.
+     *
+     * Platforms that are incapable of tracking real time, or do not offer the ability to set real time,
+     * should not implement the SetClock_RealTime() function, thereby forcing link-time failures of features
+     * that depend on setting real time.  Alternatively, such platforms may supply an implementation of
+     * SetClock_RealTime() that returns the error CHIP_SYSTEM_ERROR_NOT_SUPPORTED.
+     *
+     * This function is expected to be thread-safe on any platform that employs threading.
+     *
+     * @note
+     *   This function is reserved for internal use by the System Layer.  Users of the System
+     *   Layer should call System::Layer::GetClock_RealTimeMS().
+     *
+     * @param[in] newCurTime                The new current time, expressed as Unix time scaled to microseconds.
+     *
+     * @retval #CHIP_NO_ERROR       If the method succeeded.
+     * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
+     *                                      If the platform is incapable of tracking real time.
+     * @retval #CHIP_SYSTEM_ERROR_ACCESS_DENIED
+     *                                      If the calling application does not have the privilege to set the
+     *                                      current time.
+     */
+    virtual CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)  = 0;
 };
 
 // Currently we have a single implementation class, ClockImpl, whose members are implemented in build-specific files.
@@ -193,6 +232,9 @@ public:
     ~ClockImpl() = default;
     Microseconds64 GetMonotonicMicroseconds64() override;
     Milliseconds64 GetMonotonicMilliseconds64() override;
+    CHIP_ERROR GetClock_RealTime(uint64_t & curTime) override;
+    CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTime) override;
+    CHIP_ERROR SetClock_RealTime(uint64_t newCurTime) override;
 };
 
 namespace Internal {

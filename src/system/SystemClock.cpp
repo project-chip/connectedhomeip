@@ -82,6 +82,21 @@ ClockBase * gClockBase = &gClockImpl;
 #define MONOTONIC_CLOCK_ID CLOCK_MONOTONIC
 #endif
 
+CHIP_ERROR ClockImpl::GetClock_RealTime(uint64_t & curTime)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(uint64_t & curTime)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(uint64_t newCurTime)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
 {
     struct timespec ts;
@@ -120,6 +135,21 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 #if CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
 // -------------------- Default Get/SetClock Functions for LwIP Systems --------------------
+
+CHIP_ERROR ClockImpl::GetClock_RealTime(uint64_t & curTime)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(uint64_t & curTime)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(uint64_t newCurTime)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
 
 Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
