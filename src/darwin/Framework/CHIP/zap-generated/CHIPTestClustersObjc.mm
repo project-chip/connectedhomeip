@@ -845,7 +845,28 @@ using namespace chip::app::Clusters;
                     listHolder_0->mList[i].name = [self asCharSpan:element_0.name];
                     listHolder_0->mList[i].type = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i].type)>>(
                         element_0.type.unsignedCharValue);
-                    listHolder_0->mList[i].endpoints = [self asByteSpan:element_0.endpoints];
+                    {
+                        using ListType = std::remove_reference_t<decltype(listHolder_0->mList[i].endpoints)>;
+                        using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+                        if (element_0.endpoints.count != 0) {
+                            auto * listHolder_2 = new ListHolder<ListMemberType>(element_0.endpoints.count);
+                            if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            listFreer.add(listHolder_2);
+                            for (size_t i = 0; i < element_0.endpoints.count; ++i) {
+                                if (![element_0.endpoints[i] isKindOfClass:[NSNumber class]]) {
+                                    // Wrong kind of value.
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                auto element_2 = (NSNumber *) element_0.endpoints[i];
+                                listHolder_2->mList[i] = element_2.unsignedShortValue;
+                            }
+                            listHolder_0->mList[i].endpoints = ListType(listHolder_2->mList, element_0.endpoints.count);
+                        } else {
+                            listHolder_0->mList[i].endpoints = ListType();
+                        }
+                    }
                 }
                 cppValue = ListType(listHolder_0->mList, value.count);
             } else {

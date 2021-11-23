@@ -5960,13 +5960,20 @@ public:
     uint16_t endpointListID;
     chip::CharSpan name;
     EndpointListTypeEnum type;
-    chip::ByteSpan endpoints;
+    DataModel::List<const chip::EndpointId> endpoints;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-using DecodableType = Type;
+struct DecodableType
+{
+public:
+    uint16_t endpointListID;
+    chip::CharSpan name;
+    EndpointListTypeEnum type;
+    DataModel::DecodableList<chip::EndpointId> endpoints;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
 
 } // namespace EndpointListStruct
 } // namespace Structs

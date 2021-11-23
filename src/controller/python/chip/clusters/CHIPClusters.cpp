@@ -281,7 +281,7 @@ static void OnBridgedActionsEndpointListListAttributeResponse(
         ChipLogProgress(Zcl, "      EndpointListID: %" PRIu16 ",", entry.endpointListID);
         ChipLogProgress(Zcl, "      Name: %.*s,", static_cast<int>(entry.name.size()), entry.name.data());
         ChipLogProgress(Zcl, "      Type: %" PRIu8 ",", entry.type);
-        ChipLogProgress(Zcl, "      Endpoints: %s,", ByteSpanToString(entry.endpoints).c_str());
+        ChipLogProgress(chipTool, "  Endpoints: list member of struct element of list attribute printing not supported yet");
         ChipLogProgress(Zcl, "    },");
 #endif // CHIP_PROGRESS_LOGGING
     }
