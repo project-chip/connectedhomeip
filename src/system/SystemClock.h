@@ -184,6 +184,11 @@ public:
      * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
      */
     virtual Milliseconds64 GetMonotonicMilliseconds64() = 0;
+
+    virtual CHIP_ERROR GetClock_RealTime(uint64_t & curTime) = 0;
+    virtual CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTime) = 0;
+    virtual CHIP_ERROR SetClock_RealTime(uint64_t newCurTime) = 0;
+
 };
 
 // Currently we have a single implementation class, ClockImpl, whose members are implemented in build-specific files.
@@ -193,6 +198,9 @@ public:
     ~ClockImpl() = default;
     Microseconds64 GetMonotonicMicroseconds64() override;
     Milliseconds64 GetMonotonicMilliseconds64() override;
+    CHIP_ERROR GetClock_RealTime(uint64_t & curTime) override { return CHIP_ERROR_NOT_IMPLEMENTED};
+    CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTime) override { return CHIP_ERROR_NOT_IMPLEMENTED};
+    CHIP_ERROR SetClock_RealTime(uint64_t newCurTime) override { return CHIP_ERROR_NOT_IMPLEMENTED};
 };
 
 namespace Internal {
