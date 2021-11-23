@@ -288,7 +288,7 @@ void ConnectDeviceAsync(intptr_t)
     VerifyOrReturn(deviceProxy != nullptr);
 
     deviceProxy->UpdateDeviceData(sOtaContext.providerAddress, deviceProxy->GetMRPConfig())
-    deviceProxy->Connect(&successCallback, &failureCallback);
+        deviceProxy->Connect(&successCallback, &failureCallback);
 }
 
 template <OnDeviceConnected OnConnected>
