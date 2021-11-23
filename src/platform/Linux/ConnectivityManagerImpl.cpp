@@ -19,6 +19,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/ConnectivityUtils.h>
 #include <platform/internal/BLEManager.h>
 
@@ -1264,7 +1265,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetEthFullDuplex(bool & fullDuplex)
 
 CHIP_ERROR ConnectivityManagerImpl::_GetEthTimeSinceReset(uint64_t & timeSinceReset)
 {
-    return PlatformMgr().GetUpTime(timeSinceReset);
+    return GetDiagnosticDataProvider().GetUpTime(timeSinceReset);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetEthPacketRxCount(uint64_t & packetRxCount)

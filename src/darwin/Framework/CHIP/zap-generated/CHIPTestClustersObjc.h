@@ -120,6 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeProductLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeSerialNumberWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeReachableWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeUniqueIDWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -170,24 +171,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Bridged Device Basic
+ * Cluster Bridged Device Basic Information
  *
  */
-@interface CHIPTestBridgedDeviceBasic : CHIPBridgedDeviceBasic
+@interface CHIPTestBridgedDeviceBasicInformation : CHIPBridgedDeviceBasicInformation
 
-- (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeVendorIDWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeProductNameWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeHardwareVersionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeHardwareVersionStringWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeSoftwareVersionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeSoftwareVersionStringWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeManufacturingDateWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributePartNumberWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeProductURLWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeProductLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeSerialNumberWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeReachableWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -910,6 +898,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributePacketUnicastTxCountWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeCurrentMaxRateWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOverrunCountWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 
 @end

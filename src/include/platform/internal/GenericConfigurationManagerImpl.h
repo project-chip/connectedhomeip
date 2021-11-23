@@ -98,8 +98,8 @@ public:
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
-    CHIP_ERROR GetBootReasons(uint32_t & bootReasons) override;
-    CHIP_ERROR StoreBootReasons(uint32_t bootReasons) override;
+    CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
+    CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
     CHIP_ERROR RunUnitTests(void) override;
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;

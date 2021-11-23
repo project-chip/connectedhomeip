@@ -763,6 +763,20 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace Descriptor
 
+namespace Acl {
+namespace Attributes {
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace Acl
+
 namespace PollControl {
 namespace Attributes {
 
@@ -854,9 +868,9 @@ namespace ProductID {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace ProductID
 
-namespace UserLabel {
+namespace NodeLabel {
 static constexpr AttributeId Id = 0x00000005;
-} // namespace UserLabel
+} // namespace NodeLabel
 
 namespace Location {
 static constexpr AttributeId Id = 0x00000006;
@@ -906,6 +920,10 @@ namespace Reachable {
 static constexpr AttributeId Id = 0x00000011;
 } // namespace Reachable
 
+namespace UniqueID {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace UniqueID
+
 namespace FeatureMap {
 static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
 } // namespace FeatureMap
@@ -952,6 +970,62 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace OtaSoftwareUpdateRequestor
+
+namespace LocalizationConfiguration {
+namespace Attributes {
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace LocalizationConfiguration
+
+namespace LocalizationTimeFormat {
+namespace Attributes {
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace LocalizationTimeFormat
+
+namespace LocalizationUnit {
+namespace Attributes {
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace LocalizationUnit
+
+namespace PowerSourceConfiguration {
+namespace Attributes {
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace PowerSourceConfiguration
 
 namespace PowerSource {
 namespace Attributes {
@@ -1607,6 +1681,34 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace EthernetNetworkDiagnostics
 
+namespace TimeSynchronization {
+namespace Attributes {
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TimeSynchronization
+
+namespace BridgedDeviceBasicInformation {
+namespace Attributes {
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace BridgedDeviceBasicInformation
+
 namespace BridgedDeviceBasic {
 namespace Attributes {
 
@@ -1622,9 +1724,9 @@ namespace ProductName {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace ProductName
 
-namespace UserLabel {
+namespace NodeLabel {
 static constexpr AttributeId Id = 0x00000005;
-} // namespace UserLabel
+} // namespace NodeLabel
 
 namespace HardwareVersion {
 static constexpr AttributeId Id = 0x00000007;
@@ -1665,6 +1767,10 @@ static constexpr AttributeId Id = 0x0000000F;
 namespace Reachable {
 static constexpr AttributeId Id = 0x00000011;
 } // namespace Reachable
+
+namespace UniqueID {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace UniqueID
 
 namespace FeatureMap {
 static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;

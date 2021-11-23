@@ -23,6 +23,8 @@ static_library("nrfconnect") {
     "../SingletonConfigurationManager.cpp",
     "../Zephyr/BLEManagerImpl.cpp",
     "../Zephyr/ConfigurationManagerImpl.cpp",
+    "../Zephyr/DiagnosticDataProviderImpl.cpp",
+    "../Zephyr/DiagnosticDataProviderImpl.h",
     "../Zephyr/KeyValueStoreManagerImpl.cpp",
     "../Zephyr/Logging.cpp",
     "../Zephyr/PlatformManagerImpl.cpp",

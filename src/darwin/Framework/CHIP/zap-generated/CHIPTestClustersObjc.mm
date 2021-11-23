@@ -649,6 +649,19 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)writeAttributeUniqueIDWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        ListFreer listFreer;
+        using TypeInfo = Basic::Attributes::UniqueID::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = [self asCharSpan:value];
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -845,7 +858,28 @@ using namespace chip::app::Clusters;
                     listHolder_0->mList[i].name = [self asCharSpan:element_0.name];
                     listHolder_0->mList[i].type = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i].type)>>(
                         element_0.type.unsignedCharValue);
-                    listHolder_0->mList[i].endpoints = [self asByteSpan:element_0.endpoints];
+                    {
+                        using ListType = std::remove_reference_t<decltype(listHolder_0->mList[i].endpoints)>;
+                        using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+                        if (element_0.endpoints.count != 0) {
+                            auto * listHolder_2 = new ListHolder<ListMemberType>(element_0.endpoints.count);
+                            if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            listFreer.add(listHolder_2);
+                            for (size_t i = 0; i < element_0.endpoints.count; ++i) {
+                                if (![element_0.endpoints[i] isKindOfClass:[NSNumber class]]) {
+                                    // Wrong kind of value.
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                auto element_2 = (NSNumber *) element_0.endpoints[i];
+                                listHolder_2->mList[i] = element_2.unsignedShortValue;
+                            }
+                            listHolder_0->mList[i].endpoints = ListType(listHolder_2->mList, element_0.endpoints.count);
+                        } else {
+                            listHolder_0->mList[i].endpoints = ListType();
+                        }
+                    }
                 }
                 cppValue = ListType(listHolder_0->mList, value.count);
             } else {
@@ -886,191 +920,22 @@ using namespace chip::app::Clusters;
 
 @end
 
-@interface CHIPTestBridgedDeviceBasic ()
-@property (readonly) chip::Controller::BridgedDeviceBasicClusterTest cppCluster;
+@interface CHIPTestBridgedDeviceBasicInformation ()
+@property (readonly) chip::Controller::BridgedDeviceBasicInformationClusterTest cppCluster;
 @end
 
-@implementation CHIPTestBridgedDeviceBasic
+@implementation CHIPTestBridgedDeviceBasicInformation
 
 - (chip::Controller::ClusterBase *)getCluster
 {
     return &_cppCluster;
 }
 
-- (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::VendorName::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = [self asCharSpan:value];
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)writeAttributeVendorIDWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::VendorID::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = value.unsignedShortValue;
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)writeAttributeProductNameWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::ProductName::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = [self asCharSpan:value];
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)writeAttributeHardwareVersionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::HardwareVersion::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = value.unsignedShortValue;
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)writeAttributeHardwareVersionStringWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::HardwareVersionString::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = [self asCharSpan:value];
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)writeAttributeSoftwareVersionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::SoftwareVersion::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = value.unsignedIntValue;
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)writeAttributeSoftwareVersionStringWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::SoftwareVersionString::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = [self asCharSpan:value];
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)writeAttributeManufacturingDateWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::ManufacturingDate::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = [self asCharSpan:value];
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)writeAttributePartNumberWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::PartNumber::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = [self asCharSpan:value];
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)writeAttributeProductURLWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::ProductURL::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = [self asCharSpan:value];
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)writeAttributeProductLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::ProductLabel::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = [self asCharSpan:value];
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)writeAttributeSerialNumberWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::SerialNumber::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = [self asCharSpan:value];
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)writeAttributeReachableWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::Reachable::TypeInfo;
-        TypeInfo::Type cppValue;
-        cppValue = value.boolValue;
-        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         ListFreer listFreer;
-        using TypeInfo = BridgedDeviceBasic::Attributes::ClusterRevision::TypeInfo;
+        using TypeInfo = BridgedDeviceBasicInformation::Attributes::ClusterRevision::TypeInfo;
         TypeInfo::Type cppValue;
         cppValue = value.unsignedShortValue;
         auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
@@ -6578,6 +6443,19 @@ using namespace chip::app::Clusters;
         using TypeInfo = WiFiNetworkDiagnostics::Attributes::OverrunCount::TypeInfo;
         TypeInfo::Type cppValue;
         cppValue = value.unsignedLongLongValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        ListFreer listFreer;
+        using TypeInfo = WiFiNetworkDiagnostics::Attributes::FeatureMap::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedIntValue;
         auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);

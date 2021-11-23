@@ -224,6 +224,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_{{asUpperCamelCase parent.na
 }
 
 {{#if isReportableAttribute}}
+{{#unless isList}}
 chip::ChipError::StorageType chip_ime_SubscribeAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
@@ -236,6 +237,7 @@ chip::ChipError::StorageType chip_ime_SubscribeAttribute_{{asUpperCamelCase pare
     return cluster.SubscribeAttribute{{asUpperCamelCase name}}(g{{chipCallback.name}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval).AsInteger();
 {{/if}}
 }
+{{/unless}}
 {{/if}}
 
 {{/chip_server_cluster_attributes}}

@@ -12550,8 +12550,8 @@ public:
             err = TestQueryProductID_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Query User Label\n");
-            err = TestQueryUserLabel_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Query Node Label\n");
+            err = TestQueryNodeLabel_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Query User Location\n");
@@ -12601,6 +12601,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 17 : Query Reachable\n");
             err = TestQueryReachable_17();
             break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Query UniqueID\n");
+            err = TestQueryUniqueID_18();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -12612,7 +12616,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 18;
+    const uint16_t mTestCount = 19;
 
     static void OnFailureCallback_0(void * context, EmberAfStatus status)
     {
@@ -12669,9 +12673,9 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_5(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_5(void * context, chip::CharSpan userLabel)
+    static void OnSuccessCallback_5(void * context, chip::CharSpan nodeLabel)
     {
-        (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_5(userLabel);
+        (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_5(nodeLabel);
     }
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
@@ -12794,6 +12798,16 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_17(reachable);
     }
 
+    static void OnFailureCallback_18(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_18(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_18(void * context, chip::CharSpan uniqueID)
+    {
+        (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_18(uniqueID);
+    }
+
     //
     // Tests methods
     //
@@ -12890,22 +12904,22 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestQueryUserLabel_5()
+    CHIP_ERROR TestQueryNodeLabel_5()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::UserLabel::TypeInfo>(this, OnSuccessCallback_5,
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::NodeLabel::TypeInfo>(this, OnSuccessCallback_5,
                                                                                                   OnFailureCallback_5);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(chip::CharSpan userLabel)
+    void OnSuccessResponse_5(chip::CharSpan nodeLabel)
     {
-        VerifyOrReturn(CheckConstraintType("userLabel", "", "string"));
-        VerifyOrReturn(CheckConstraintMaxLength("userLabel", userLabel.size(), 32));
+        VerifyOrReturn(CheckConstraintType("nodeLabel", "", "string"));
+        VerifyOrReturn(CheckConstraintMaxLength("nodeLabel", nodeLabel.size(), 32));
         NextTest();
     }
 
@@ -13158,6 +13172,28 @@ private:
     void OnSuccessResponse_17(bool reachable)
     {
         VerifyOrReturn(CheckConstraintType("reachable", "", "boolean"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestQueryUniqueID_18()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::UniqueID::TypeInfo>(this, OnSuccessCallback_18,
+                                                                                                 OnFailureCallback_18);
+    }
+
+    void OnFailureResponse_18(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_18(chip::CharSpan uniqueID)
+    {
+        VerifyOrReturn(CheckConstraintType("uniqueID", "", "string"));
+        VerifyOrReturn(CheckConstraintMaxLength("uniqueID", uniqueID.size(), 32));
         NextTest();
     }
 };
@@ -23068,6 +23104,1549 @@ private:
     void OnSuccessResponse_59() { ThrowSuccessResponse(); }
 };
 
+class Test_TC_TSTAT_2_2 : public TestCommand
+{
+public:
+    Test_TC_TSTAT_2_2() : TestCommand("Test_TC_TSTAT_2_2"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_TSTAT_2_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_TSTAT_2_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 0 : Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies that the "
+                            "value is within range\n");
+            err = TestReadsOccupiedCoolingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_0();
+            break;
+        case 1:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 1 : Writes a value back that is different but valid for OccupiedCoolingSetpoint attribute\n");
+            err = TestWritesAValueBackThatIsDifferentButValidForOccupiedCoolingSetpointAttribute_1();
+            break;
+        case 2:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 2 : Reads it back again to confirm the successful write of OccupiedCoolingSetpoint attribute\n");
+            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedCoolingSetpointAttribute_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint attribute\n");
+            err = TestWritesTheLimitOfMinCoolSetpointLimitToOccupiedCoolingSetpointAttribute_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 4 : Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute\n");
+            err = TestWritesTheLimitOfMaxCoolSetpointLimitToOccupiedCoolingSetpointAttribute_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 5 : Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies that the "
+                            "value is within range\n");
+            err = TestReadsOccupiedHeatingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_5();
+            break;
+        case 6:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 6 : Writes a value back that is different but valid for OccupiedHeatingSetpoint attribute\n");
+            err = TestWritesAValueBackThatIsDifferentButValidForOccupiedHeatingSetpointAttribute_6();
+            break;
+        case 7:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 7 : Reads it back again to confirm the successful write of OccupiedHeatingSetpoint attribute\n");
+            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedHeatingSetpointAttribute_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 8 : Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint attribute\n");
+            err = TestWritesTheLimitOfMinHeatSetpointLimitToOccupiedHeatingSetpointAttribute_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 9 : Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint attribute\n");
+            err = TestWritesTheLimitOfMaxHeatSetpointLimitToOccupiedHeatingSetpointAttribute_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 10 : Reads MinHeatSetpointLimit attribute from Server DUT and verifies that the "
+                            "value is within range\n");
+            err = TestReadsMinHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_10();
+            break;
+        case 11:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 11 : Writes a value back that is different but valid for MinHeatSetpointLimit attribute\n");
+            err = TestWritesAValueBackThatIsDifferentButValidForMinHeatSetpointLimitAttribute_11();
+            break;
+        case 12:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 12 : Reads it back again to confirm the successful write of MinHeatSetpointLimit attribute\n");
+            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinHeatSetpointLimitAttribute_12();
+            break;
+        case 13:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 13 : Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit attribute\n");
+            err = TestWritesTheLimitOfAbsMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_13();
+            break;
+        case 14:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 14 : Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit attribute\n");
+            err = TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 15 : Reads MaxHeatSetpointLimit attribute from Server DUT and verifies that the "
+                            "value is within range\n");
+            err = TestReadsMaxHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_15();
+            break;
+        case 16:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 16 : Writes a value back that is different but valid for MaxHeatSetpointLimit attribute\n");
+            err = TestWritesAValueBackThatIsDifferentButValidForMaxHeatSetpointLimitAttribute_16();
+            break;
+        case 17:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 17 : Reads it back again to confirm the successful write of MaxHeatSetpointLimit attribute\n");
+            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxHeatSetpointLimitAttribute_17();
+            break;
+        case 18:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 18 : Writes the limit of AbsMinHeatSetpointLimit to MaxHeatSetpointLimit attribute\n");
+            err = TestWritesTheLimitOfAbsMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_18();
+            break;
+        case 19:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 19 : Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit attribute\n");
+            err = TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 20 : Reads MinCoolSetpointLimit attribute from Server DUT and verifies that the "
+                            "value is within range\n");
+            err = TestReadsMinCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_20();
+            break;
+        case 21:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 21 : Writes a value back that is different but valid for MinCoolSetpointLimit attribute\n");
+            err = TestWritesAValueBackThatIsDifferentButValidForMinCoolSetpointLimitAttribute_21();
+            break;
+        case 22:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 22 : Reads it back again to confirm the successful write of MinCoolSetpointLimit attribute\n");
+            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinCoolSetpointLimitAttribute_22();
+            break;
+        case 23:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 23 : Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit attribute\n");
+            err = TestWritesTheLimitOfAbsMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 24 : Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute\n");
+            err = TestWritesTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 25 : Reads MaxCoolSetpointLimit attribute from Server DUT and verifies that the "
+                            "value is within range\n");
+            err = TestReadsMaxCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_25();
+            break;
+        case 26:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 26 : Writes a value back that is different but valid for MaxCoolSetpointLimit attribute\n");
+            err = TestWritesAValueBackThatIsDifferentButValidForMaxCoolSetpointLimitAttribute_26();
+            break;
+        case 27:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 27 : Reads it back again to confirm the successful write of MaxCoolSetpointLimit attribute\n");
+            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxCoolSetpointLimitAttribute_27();
+            break;
+        case 28:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 28 : Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit attribute\n");
+            err = TestWritesTheLimitOfAbsMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_28();
+            break;
+        case 29:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 29 : Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute\n");
+            err = TestWritesTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_29();
+            break;
+        case 30:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 30 : Writes (sets back) the limit of MinHeatSetpointLimit to MinHeatSetpointLimit attribute\n");
+            err = TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_30();
+            break;
+        case 31:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 31 : Writes (sets back) the limit of MaxHeatSetpointLimit to MinHeatSetpointLimit attribute\n");
+            err = TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_31();
+            break;
+        case 32:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 32 : Writes (sets back) the limit of MinHeatSetpointLimit to MaxHeatSetpointLimit attribute\n");
+            err = TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_32();
+            break;
+        case 33:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 33 : Writes (sets back) the limit of MaxHeatSetpointLimit to MaxHeatSetpointLimit attribute\n");
+            err = TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_33();
+            break;
+        case 34:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 34 : Writes (sets back) the limit of MinCoolSetpointLimit to MinCoolSetpointLimit attribute\n");
+            err = TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_34();
+            break;
+        case 35:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 35 : Writes (sets back) the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute\n");
+            err = TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_35();
+            break;
+        case 36:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 36 : Writes (sets back) the limit of MinCoolSetpointLimit to MaxCoolSetpointLimit attribute\n");
+            err = TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_36();
+            break;
+        case 37:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 37 : Writes (sets back) the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute\n");
+            err = TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_37();
+            break;
+        case 38:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 38 : Reads ControlSequenceOfOperation from Server DUT and verifies that the value is valid\n");
+            err = TestReadsControlSequenceOfOperationFromServerDutAndVerifiesThatTheValueIsValid_38();
+            break;
+        case 39:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 39 : Write Attribute command for ControlSequenceOfOperation with a new valid value\n");
+            err = TestWriteAttributeCommandForControlSequenceOfOperationWithANewValidValue_39();
+            break;
+        case 40:
+            ChipLogProgress(chipTool, " ***** Test Step 40 : Read it back again to confirm the successful write\n");
+            err = TestReadItBackAgainToConfirmTheSuccessfulWrite_40();
+            break;
+        case 41:
+            ChipLogProgress(chipTool, " ***** Test Step 41 : Sets OccupiedHeatingSetpoint to default value\n");
+            err = TestSetsOccupiedHeatingSetpointToDefaultValue_41();
+            break;
+        case 42:
+            ChipLogProgress(chipTool, " ***** Test Step 42 : Sets OccupiedHeatingSetpoint to default value\n");
+            err = TestSetsOccupiedHeatingSetpointToDefaultValue_42();
+            break;
+        case 43:
+            ChipLogProgress(chipTool, " ***** Test Step 43 : Sets OccupiedCoolingSetpoint to default value\n");
+            err = TestSetsOccupiedCoolingSetpointToDefaultValue_43();
+            break;
+        case 44:
+            ChipLogProgress(chipTool, " ***** Test Step 44 : Sets OccupiedCoolingSetpoint to default value\n");
+            err = TestSetsOccupiedCoolingSetpointToDefaultValue_44();
+            break;
+        case 45:
+            ChipLogProgress(chipTool, " ***** Test Step 45 : Sets OccupiedCoolingSetpoint to default value\n");
+            err = TestSetsOccupiedCoolingSetpointToDefaultValue_45();
+            break;
+        case 46:
+            ChipLogProgress(chipTool, " ***** Test Step 46 : Sets OccupiedHeatingSetpoint to default value\n");
+            err = TestSetsOccupiedHeatingSetpointToDefaultValue_46();
+            break;
+        case 47:
+            ChipLogProgress(chipTool, " ***** Test Step 47 : Sets OccupiedCoolingSetpoint to default value\n");
+            err = TestSetsOccupiedCoolingSetpointToDefaultValue_47();
+            break;
+        case 48:
+            ChipLogProgress(chipTool, " ***** Test Step 48 : Sets OccupiedHeatingSetpoint to default value\n");
+            err = TestSetsOccupiedHeatingSetpointToDefaultValue_48();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 49;
+
+    static void OnFailureCallback_0(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_0(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_0(void * context, int16_t occupiedCoolingSetpoint)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_0(occupiedCoolingSetpoint);
+    }
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_1(); }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context, int16_t occupiedCoolingSetpoint)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_2(occupiedCoolingSetpoint);
+    }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_4(); }
+
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_5(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_5(void * context, int16_t occupiedHeatingSetpoint)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_5(occupiedHeatingSetpoint);
+    }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_6(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_6(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_6(); }
+
+    static void OnFailureCallback_7(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_7(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_7(void * context, int16_t occupiedHeatingSetpoint)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_7(occupiedHeatingSetpoint);
+    }
+
+    static void OnFailureCallback_8(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_8(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_8(); }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_9(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_9(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_9(); }
+
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_10(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_10(void * context, int16_t minHeatSetpointLimit)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_10(minHeatSetpointLimit);
+    }
+
+    static void OnFailureCallback_11(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_11(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_11(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_11(); }
+
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_12(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_12(void * context, int16_t minHeatSetpointLimit)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_12(minHeatSetpointLimit);
+    }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_13(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_13(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_13(); }
+
+    static void OnFailureCallback_14(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_14(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_14(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_14(); }
+
+    static void OnFailureCallback_15(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_15(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_15(void * context, int16_t maxHeatSetpointLimit)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_15(maxHeatSetpointLimit);
+    }
+
+    static void OnFailureCallback_16(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_16(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_16(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_16(); }
+
+    static void OnFailureCallback_17(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_17(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_17(void * context, int16_t maxHeatSetpointLimit)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_17(maxHeatSetpointLimit);
+    }
+
+    static void OnFailureCallback_18(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_18(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_18(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_18(); }
+
+    static void OnFailureCallback_19(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_19(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_19(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_19(); }
+
+    static void OnFailureCallback_20(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_20(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_20(void * context, int16_t minCoolSetpointLimit)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_20(minCoolSetpointLimit);
+    }
+
+    static void OnFailureCallback_21(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_21(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_21(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_21(); }
+
+    static void OnFailureCallback_22(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_22(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_22(void * context, int16_t minCoolSetpointLimit)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_22(minCoolSetpointLimit);
+    }
+
+    static void OnFailureCallback_23(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_23(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_23(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_23(); }
+
+    static void OnFailureCallback_24(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_24(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_24(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_24(); }
+
+    static void OnFailureCallback_25(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_25(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_25(void * context, int16_t maxCoolSetpointLimit)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_25(maxCoolSetpointLimit);
+    }
+
+    static void OnFailureCallback_26(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_26(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_26(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_26(); }
+
+    static void OnFailureCallback_27(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_27(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_27(void * context, int16_t maxCoolSetpointLimit)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_27(maxCoolSetpointLimit);
+    }
+
+    static void OnFailureCallback_28(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_28(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_28(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_28(); }
+
+    static void OnFailureCallback_29(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_29(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_29(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_29(); }
+
+    static void OnFailureCallback_30(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_30(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_30(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_30(); }
+
+    static void OnFailureCallback_31(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_31(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_31(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_31(); }
+
+    static void OnFailureCallback_32(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_32(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_32(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_32(); }
+
+    static void OnFailureCallback_33(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_33(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_33(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_33(); }
+
+    static void OnFailureCallback_34(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_34(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_34(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_34(); }
+
+    static void OnFailureCallback_35(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_35(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_35(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_35(); }
+
+    static void OnFailureCallback_36(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_36(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_36(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_36(); }
+
+    static void OnFailureCallback_37(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_37(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_37(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_37(); }
+
+    static void OnFailureCallback_38(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_38(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_38(void * context, uint8_t controlSequenceOfOperation)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_38(controlSequenceOfOperation);
+    }
+
+    static void OnFailureCallback_39(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_39(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_39(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_39(); }
+
+    static void OnFailureCallback_40(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_40(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_40(void * context, uint8_t controlSequenceOfOperation)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_40(controlSequenceOfOperation);
+    }
+
+    static void OnFailureCallback_41(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_41(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_41(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_41(); }
+
+    static void OnFailureCallback_42(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_42(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_42(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_42(); }
+
+    static void OnFailureCallback_43(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_43(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_43(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_43(); }
+
+    static void OnFailureCallback_44(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_44(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_44(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_44(); }
+
+    static void OnFailureCallback_45(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_45(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_45(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_45(); }
+
+    static void OnFailureCallback_46(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_46(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_46(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_46(); }
+
+    static void OnFailureCallback_47(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_47(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_47(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_47(); }
+
+    static void OnFailureCallback_48(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnFailureResponse_48(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_48(void * context) { (static_cast<Test_TC_TSTAT_2_2 *>(context))->OnSuccessResponse_48(); }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadsOccupiedCoolingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_0()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            this, OnSuccessCallback_0, OnFailureCallback_0);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(int16_t occupiedCoolingSetpoint)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 2600));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesAValueBackThatIsDifferentButValidForOccupiedCoolingSetpointAttribute_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedCoolingSetpointArgument;
+        occupiedCoolingSetpointArgument = 2000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedCoolingSetpointAttribute_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(int16_t occupiedCoolingSetpoint)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 2000));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesTheLimitOfMinCoolSetpointLimitToOccupiedCoolingSetpointAttribute_3()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedCoolingSetpointArgument;
+        occupiedCoolingSetpointArgument = 1600;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3() { NextTest(); }
+
+    CHIP_ERROR TestWritesTheLimitOfMaxCoolSetpointLimitToOccupiedCoolingSetpointAttribute_4()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedCoolingSetpointArgument;
+        occupiedCoolingSetpointArgument = 2600;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_4, OnFailureCallback_4);
+    }
+
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR TestReadsOccupiedHeatingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_5()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5);
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(int16_t occupiedHeatingSetpoint)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 2000));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesAValueBackThatIsDifferentButValidForOccupiedHeatingSetpointAttribute_6()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedHeatingSetpointArgument;
+        occupiedHeatingSetpointArgument = 2100;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_6, OnFailureCallback_6);
+    }
+
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6() { NextTest(); }
+
+    CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedHeatingSetpointAttribute_7()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7);
+    }
+
+    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(int16_t occupiedHeatingSetpoint)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 2100));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesTheLimitOfMinHeatSetpointLimitToOccupiedHeatingSetpointAttribute_8()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedHeatingSetpointArgument;
+        occupiedHeatingSetpointArgument = 700;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_8, OnFailureCallback_8);
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8() { NextTest(); }
+
+    CHIP_ERROR TestWritesTheLimitOfMaxHeatSetpointLimitToOccupiedHeatingSetpointAttribute_9()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedHeatingSetpointArgument;
+        occupiedHeatingSetpointArgument = 3000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_9, OnFailureCallback_9);
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9() { NextTest(); }
+
+    CHIP_ERROR TestReadsMinHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_10()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_10, OnFailureCallback_10);
+    }
+
+    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10(int16_t minHeatSetpointLimit)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("minHeatSetpointLimit", minHeatSetpointLimit, 700));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesAValueBackThatIsDifferentButValidForMinHeatSetpointLimitAttribute_11()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t minHeatSetpointLimitArgument;
+        minHeatSetpointLimitArgument = 2000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            minHeatSetpointLimitArgument, this, OnSuccessCallback_11, OnFailureCallback_11);
+    }
+
+    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinHeatSetpointLimitAttribute_12()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_12, OnFailureCallback_12);
+    }
+
+    void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12(int16_t minHeatSetpointLimit)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("minHeatSetpointLimit", minHeatSetpointLimit, 2000));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesTheLimitOfAbsMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_13()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t minHeatSetpointLimitArgument;
+        minHeatSetpointLimitArgument = 700;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            minHeatSetpointLimitArgument, this, OnSuccessCallback_13, OnFailureCallback_13);
+    }
+
+    void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13() { NextTest(); }
+
+    CHIP_ERROR TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_14()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t minHeatSetpointLimitArgument;
+        minHeatSetpointLimitArgument = 3000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            minHeatSetpointLimitArgument, this, OnSuccessCallback_14, OnFailureCallback_14);
+    }
+
+    void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_14() { NextTest(); }
+
+    CHIP_ERROR TestReadsMaxHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_15()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_15, OnFailureCallback_15);
+    }
+
+    void OnFailureResponse_15(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_15(int16_t maxHeatSetpointLimit)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("maxHeatSetpointLimit", maxHeatSetpointLimit, 3000));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesAValueBackThatIsDifferentButValidForMaxHeatSetpointLimitAttribute_16()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t maxHeatSetpointLimitArgument;
+        maxHeatSetpointLimitArgument = 2000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            maxHeatSetpointLimitArgument, this, OnSuccessCallback_16, OnFailureCallback_16);
+    }
+
+    void OnFailureResponse_16(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_16() { NextTest(); }
+
+    CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxHeatSetpointLimitAttribute_17()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_17, OnFailureCallback_17);
+    }
+
+    void OnFailureResponse_17(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_17(int16_t maxHeatSetpointLimit)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("maxHeatSetpointLimit", maxHeatSetpointLimit, 2000));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesTheLimitOfAbsMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_18()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t maxHeatSetpointLimitArgument;
+        maxHeatSetpointLimitArgument = 700;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            maxHeatSetpointLimitArgument, this, OnSuccessCallback_18, OnFailureCallback_18);
+    }
+
+    void OnFailureResponse_18(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_18() { NextTest(); }
+
+    CHIP_ERROR TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_19()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t maxHeatSetpointLimitArgument;
+        maxHeatSetpointLimitArgument = 3000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            maxHeatSetpointLimitArgument, this, OnSuccessCallback_19, OnFailureCallback_19);
+    }
+
+    void OnFailureResponse_19(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_19() { NextTest(); }
+
+    CHIP_ERROR TestReadsMinCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_20()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_20, OnFailureCallback_20);
+    }
+
+    void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_20(int16_t minCoolSetpointLimit)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("minCoolSetpointLimit", minCoolSetpointLimit, 1600));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesAValueBackThatIsDifferentButValidForMinCoolSetpointLimitAttribute_21()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t minCoolSetpointLimitArgument;
+        minCoolSetpointLimitArgument = 2000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            minCoolSetpointLimitArgument, this, OnSuccessCallback_21, OnFailureCallback_21);
+    }
+
+    void OnFailureResponse_21(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_21() { NextTest(); }
+
+    CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinCoolSetpointLimitAttribute_22()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_22, OnFailureCallback_22);
+    }
+
+    void OnFailureResponse_22(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_22(int16_t minCoolSetpointLimit)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("minCoolSetpointLimit", minCoolSetpointLimit, 2000));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesTheLimitOfAbsMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_23()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t minCoolSetpointLimitArgument;
+        minCoolSetpointLimitArgument = 1600;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            minCoolSetpointLimitArgument, this, OnSuccessCallback_23, OnFailureCallback_23);
+    }
+
+    void OnFailureResponse_23(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_23() { NextTest(); }
+
+    CHIP_ERROR TestWritesTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_24()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t minCoolSetpointLimitArgument;
+        minCoolSetpointLimitArgument = 3200;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            minCoolSetpointLimitArgument, this, OnSuccessCallback_24, OnFailureCallback_24);
+    }
+
+    void OnFailureResponse_24(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_24() { NextTest(); }
+
+    CHIP_ERROR TestReadsMaxCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_25()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_25, OnFailureCallback_25);
+    }
+
+    void OnFailureResponse_25(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_25(int16_t maxCoolSetpointLimit)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("maxCoolSetpointLimit", maxCoolSetpointLimit, 3200));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesAValueBackThatIsDifferentButValidForMaxCoolSetpointLimitAttribute_26()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t maxCoolSetpointLimitArgument;
+        maxCoolSetpointLimitArgument = 2000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            maxCoolSetpointLimitArgument, this, OnSuccessCallback_26, OnFailureCallback_26);
+    }
+
+    void OnFailureResponse_26(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_26() { NextTest(); }
+
+    CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxCoolSetpointLimitAttribute_27()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            this, OnSuccessCallback_27, OnFailureCallback_27);
+    }
+
+    void OnFailureResponse_27(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_27(int16_t maxCoolSetpointLimit)
+    {
+        VerifyOrReturn(CheckValue<int16_t>("maxCoolSetpointLimit", maxCoolSetpointLimit, 2000));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesTheLimitOfAbsMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_28()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t maxCoolSetpointLimitArgument;
+        maxCoolSetpointLimitArgument = 1600;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            maxCoolSetpointLimitArgument, this, OnSuccessCallback_28, OnFailureCallback_28);
+    }
+
+    void OnFailureResponse_28(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_28() { NextTest(); }
+
+    CHIP_ERROR TestWritesTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_29()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t maxCoolSetpointLimitArgument;
+        maxCoolSetpointLimitArgument = 3200;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            maxCoolSetpointLimitArgument, this, OnSuccessCallback_29, OnFailureCallback_29);
+    }
+
+    void OnFailureResponse_29(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_29() { NextTest(); }
+
+    CHIP_ERROR TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_30()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t minHeatSetpointLimitArgument;
+        minHeatSetpointLimitArgument = 700;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            minHeatSetpointLimitArgument, this, OnSuccessCallback_30, OnFailureCallback_30);
+    }
+
+    void OnFailureResponse_30(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_30() { NextTest(); }
+
+    CHIP_ERROR TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_31()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t minHeatSetpointLimitArgument;
+        minHeatSetpointLimitArgument = 3000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            minHeatSetpointLimitArgument, this, OnSuccessCallback_31, OnFailureCallback_31);
+    }
+
+    void OnFailureResponse_31(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_31() { NextTest(); }
+
+    CHIP_ERROR TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_32()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t maxHeatSetpointLimitArgument;
+        maxHeatSetpointLimitArgument = 700;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            maxHeatSetpointLimitArgument, this, OnSuccessCallback_32, OnFailureCallback_32);
+    }
+
+    void OnFailureResponse_32(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_32() { NextTest(); }
+
+    CHIP_ERROR TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_33()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t maxHeatSetpointLimitArgument;
+        maxHeatSetpointLimitArgument = 3000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            maxHeatSetpointLimitArgument, this, OnSuccessCallback_33, OnFailureCallback_33);
+    }
+
+    void OnFailureResponse_33(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_33() { NextTest(); }
+
+    CHIP_ERROR TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_34()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t minCoolSetpointLimitArgument;
+        minCoolSetpointLimitArgument = 1600;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            minCoolSetpointLimitArgument, this, OnSuccessCallback_34, OnFailureCallback_34);
+    }
+
+    void OnFailureResponse_34(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_34() { NextTest(); }
+
+    CHIP_ERROR TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_35()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t minCoolSetpointLimitArgument;
+        minCoolSetpointLimitArgument = 3200;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            minCoolSetpointLimitArgument, this, OnSuccessCallback_35, OnFailureCallback_35);
+    }
+
+    void OnFailureResponse_35(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_35() { NextTest(); }
+
+    CHIP_ERROR TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_36()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t maxCoolSetpointLimitArgument;
+        maxCoolSetpointLimitArgument = 1600;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            maxCoolSetpointLimitArgument, this, OnSuccessCallback_36, OnFailureCallback_36);
+    }
+
+    void OnFailureResponse_36(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_36() { NextTest(); }
+
+    CHIP_ERROR TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_37()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t maxCoolSetpointLimitArgument;
+        maxCoolSetpointLimitArgument = 3200;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            maxCoolSetpointLimitArgument, this, OnSuccessCallback_37, OnFailureCallback_37);
+    }
+
+    void OnFailureResponse_37(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_37() { NextTest(); }
+
+    CHIP_ERROR TestReadsControlSequenceOfOperationFromServerDutAndVerifiesThatTheValueIsValid_38()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
+            this, OnSuccessCallback_38, OnFailureCallback_38);
+    }
+
+    void OnFailureResponse_38(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_38(uint8_t controlSequenceOfOperation)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 4));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCommandForControlSequenceOfOperationWithANewValidValue_39()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint8_t controlSequenceOfOperationArgument;
+        controlSequenceOfOperationArgument = static_cast<uint8_t>(2);
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
+            controlSequenceOfOperationArgument, this, OnSuccessCallback_39, OnFailureCallback_39);
+    }
+
+    void OnFailureResponse_39(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_39() { NextTest(); }
+
+    CHIP_ERROR TestReadItBackAgainToConfirmTheSuccessfulWrite_40()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
+            this, OnSuccessCallback_40, OnFailureCallback_40);
+    }
+
+    void OnFailureResponse_40(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_40(uint8_t controlSequenceOfOperation)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 2));
+        NextTest();
+    }
+
+    CHIP_ERROR TestSetsOccupiedHeatingSetpointToDefaultValue_41()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedHeatingSetpointArgument;
+        occupiedHeatingSetpointArgument = 2000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_41, OnFailureCallback_41);
+    }
+
+    void OnFailureResponse_41(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_41() { NextTest(); }
+
+    CHIP_ERROR TestSetsOccupiedHeatingSetpointToDefaultValue_42()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedHeatingSetpointArgument;
+        occupiedHeatingSetpointArgument = 2000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_42, OnFailureCallback_42);
+    }
+
+    void OnFailureResponse_42(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_42() { NextTest(); }
+
+    CHIP_ERROR TestSetsOccupiedCoolingSetpointToDefaultValue_43()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedCoolingSetpointArgument;
+        occupiedCoolingSetpointArgument = 2600;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_43, OnFailureCallback_43);
+    }
+
+    void OnFailureResponse_43(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_43() { NextTest(); }
+
+    CHIP_ERROR TestSetsOccupiedCoolingSetpointToDefaultValue_44()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedCoolingSetpointArgument;
+        occupiedCoolingSetpointArgument = 2600;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_44, OnFailureCallback_44);
+    }
+
+    void OnFailureResponse_44(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_44() { NextTest(); }
+
+    CHIP_ERROR TestSetsOccupiedCoolingSetpointToDefaultValue_45()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedCoolingSetpointArgument;
+        occupiedCoolingSetpointArgument = 2600;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_45, OnFailureCallback_45);
+    }
+
+    void OnFailureResponse_45(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_45() { NextTest(); }
+
+    CHIP_ERROR TestSetsOccupiedHeatingSetpointToDefaultValue_46()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedHeatingSetpointArgument;
+        occupiedHeatingSetpointArgument = 2000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_46, OnFailureCallback_46);
+    }
+
+    void OnFailureResponse_46(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_46() { NextTest(); }
+
+    CHIP_ERROR TestSetsOccupiedCoolingSetpointToDefaultValue_47()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedCoolingSetpointArgument;
+        occupiedCoolingSetpointArgument = 2600;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_47, OnFailureCallback_47);
+    }
+
+    void OnFailureResponse_47(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_47() { NextTest(); }
+
+    CHIP_ERROR TestSetsOccupiedHeatingSetpointToDefaultValue_48()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        int16_t occupiedHeatingSetpointArgument;
+        occupiedHeatingSetpointArgument = 2000;
+
+        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_48, OnFailureCallback_48);
+    }
+
+    void OnFailureResponse_48(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_48() { NextTest(); }
+};
+
 class Test_TC_TSUIC_1_1 : public TestCommand
 {
 public:
@@ -24158,54 +25737,6 @@ private:
     }
 };
 
-class Test_TC_DIAGSW_3_2 : public TestCommand
-{
-public:
-    Test_TC_DIAGSW_3_2() : TestCommand("Test_TC_DIAGSW_3_2"), mTestIndex(0) {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAGSW_3_2\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAGSW_3_2\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 0;
-
-    //
-    // Tests methods
-    //
-};
-
 class Test_TC_WNCV_1_1 : public TestCommand
 {
 public:
@@ -24237,25 +25768,30 @@ public:
         switch (mTestIndex++)
         {
         case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : read the global attribute: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeClusterRevision_0();
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 2: read the global attribute: ClusterRevision\n");
+            err = Test2ReadTheGlobalAttributeClusterRevision_0();
             break;
         case 1:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 1 : write the default value to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValueToMandatoryGlobalAttributeClusterRevision_1();
+                            " ***** Test Step 1 : 3a: write a value into the RO mandatory global attribute: ClusterRevision\n");
+            err = Test3aWriteAValueIntoTheRoMandatoryGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : 3b: reads back global attribute: ClusterRevision\n");
+            err = Test3bReadsBackGlobalAttributeClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : read the global attribute: FeatureMap\n");
-            err = TestReadTheGlobalAttributeFeatureMap_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : 2: read the global attribute: FeatureMap\n");
+            err = Test2ReadTheGlobalAttributeFeatureMap_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: FeatureMap\n");
-            err = TestReadsBackGlobalAttributeFeatureMap_4();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 4 : 3a: write the default value to optional global attribute: FeatureMap\n");
+            err = Test3aWriteTheDefaultValueToOptionalGlobalAttributeFeatureMap_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : 3b: reads back global attribute: FeatureMap\n");
+            err = Test3bReadsBackGlobalAttributeFeatureMap_5();
             break;
         }
 
@@ -24268,7 +25804,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 6;
 
     static void OnFailureCallback_0(void * context, EmberAfStatus status)
     {
@@ -24312,16 +25848,23 @@ private:
         (static_cast<Test_TC_WNCV_1_1 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_4(void * context, uint32_t featureMap)
+    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_4(); }
+
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_4(featureMap);
+        (static_cast<Test_TC_WNCV_1_1 *>(context))->OnFailureResponse_5(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_5(void * context, uint32_t featureMap)
+    {
+        (static_cast<Test_TC_WNCV_1_1 *>(context))->OnSuccessResponse_5(featureMap);
     }
 
     //
     // Tests methods
     //
 
-    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
+    CHIP_ERROR Test2ReadTheGlobalAttributeClusterRevision_0()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
@@ -24335,18 +25878,20 @@ private:
 
     void OnSuccessResponse_0(uint16_t clusterRevision)
     {
-        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 5U));
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("clusterRevision", clusterRevision, 5));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("clusterRevision", clusterRevision, 200));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValueToMandatoryGlobalAttributeClusterRevision_1()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
         uint16_t clusterRevisionArgument;
-        clusterRevisionArgument = 5U;
+        clusterRevisionArgument = 201U;
 
         return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::ClusterRevision::TypeInfo>(
             clusterRevisionArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -24356,7 +25901,7 @@ private:
 
     void OnSuccessResponse_1() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
+    CHIP_ERROR Test3bReadsBackGlobalAttributeClusterRevision_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
@@ -24370,11 +25915,12 @@ private:
 
     void OnSuccessResponse_2(uint16_t clusterRevision)
     {
-        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 5U));
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+        VerifyOrReturn(CheckConstraintNotValue<uint16_t>("clusterRevision", clusterRevision, 201));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeFeatureMap_3()
+    CHIP_ERROR Test2ReadTheGlobalAttributeFeatureMap_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
@@ -24388,25 +25934,44 @@ private:
 
     void OnSuccessResponse_3(uint32_t featureMap)
     {
-        VerifyOrReturn(CheckValue<uint32_t>("featureMap", featureMap, 0UL));
+        VerifyOrReturn(CheckConstraintType("featureMap", "", "uint32"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("featureMap", featureMap, 32768));
         NextTest();
     }
 
-    CHIP_ERROR TestReadsBackGlobalAttributeFeatureMap_4()
+    CHIP_ERROR Test3aWriteTheDefaultValueToOptionalGlobalAttributeFeatureMap_4()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint32_t featureMapArgument;
+        featureMapArgument = 32769UL;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::FeatureMap::TypeInfo>(
+            featureMapArgument, this, OnSuccessCallback_4, OnFailureCallback_4);
+    }
+
+    void OnFailureResponse_4(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_4() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3bReadsBackGlobalAttributeFeatureMap_5()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::FeatureMap::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4);
+            this, OnSuccessCallback_5, OnFailureCallback_5);
     }
 
-    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(uint32_t featureMap)
+    void OnSuccessResponse_5(uint32_t featureMap)
     {
-        VerifyOrReturn(CheckValue<uint32_t>("featureMap", featureMap, 0UL));
+        VerifyOrReturn(CheckConstraintType("featureMap", "", "uint32"));
+        VerifyOrReturn(CheckConstraintNotValue<uint32_t>("featureMap", featureMap, 32769));
         NextTest();
     }
 };
@@ -24442,48 +26007,253 @@ public:
         switch (mTestIndex++)
         {
         case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : read the RO mandatory attribute default: Type\n");
-            err = TestReadTheRoMandatoryAttributeDefaultType_0();
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 2: read the RO mandatory attribute default: Type\n");
+            err = Test2ReadTheRoMandatoryAttributeDefaultType_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : reads back the RO mandatory attribute: Type\n");
-            err = TestReadsBackTheRoMandatoryAttributeType_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : 3a: write a value into the RO mandatory attribute: Type\n");
+            err = Test3aWriteAValueIntoTheRoMandatoryAttributeType_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : read the RO mandatory attribute default: ConfigStatus\n");
-            err = TestReadTheRoMandatoryAttributeDefaultConfigStatus_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : 3b: reads back the RO mandatory attribute: Type\n");
+            err = Test3bReadsBackTheRoMandatoryAttributeType_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : reads back the RO mandatory attribute: ConfigStatus\n");
-            err = TestReadsBackTheRoMandatoryAttributeConfigStatus_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : 2: read the RO mandatory attribute default: ConfigStatus\n");
+            err = Test2ReadTheRoMandatoryAttributeDefaultConfigStatus_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : read the RO mandatory attribute default: OperationalStatus\n");
-            err = TestReadTheRoMandatoryAttributeDefaultOperationalStatus_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : 3a: write a value into the RO mandatory attribute: ConfigStatus\n");
+            err = Test3aWriteAValueIntoTheRoMandatoryAttributeConfigStatus_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : reads back the RO mandatory attribute: OperationalStatus\n");
-            err = TestReadsBackTheRoMandatoryAttributeOperationalStatus_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : 3b: reads back the RO mandatory attribute: ConfigStatus\n");
+            err = Test3bReadsBackTheRoMandatoryAttributeConfigStatus_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : read the RO mandatory attribute default: EndProductType\n");
-            err = TestReadTheRoMandatoryAttributeDefaultEndProductType_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : 2: read the RO mandatory attribute default: OperationalStatus\n");
+            err = Test2ReadTheRoMandatoryAttributeDefaultOperationalStatus_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : reads back the RO mandatory attribute: EndProductType\n");
-            err = TestReadsBackTheRoMandatoryAttributeEndProductType_7();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 7 : 3a: write a value into the RO mandatory attribute: OperationalStatus\n");
+            err = Test3aWriteAValueIntoTheRoMandatoryAttributeOperationalStatus_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : read the RW mandatory attribute default: Mode\n");
-            err = TestReadTheRwMandatoryAttributeDefaultMode_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : 3b: reads back the RO mandatory attribute: OperationalStatus\n");
+            err = Test3bReadsBackTheRoMandatoryAttributeOperationalStatus_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : write a value into the RW mandatory attribute:: Mode\n");
-            err = TestWriteAValueIntoTheRwMandatoryAttributeMode_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : 2: read the RO mandatory attribute default: EndProductType\n");
+            err = Test2ReadTheRoMandatoryAttributeDefaultEndProductType_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : reads back the RW mandatory attribute: Mode\n");
-            err = TestReadsBackTheRwMandatoryAttributeMode_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : 3a: write a value into the RO mandatory attribute: EndProductType\n");
+            err = Test3aWriteAValueIntoTheRoMandatoryAttributeEndProductType_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : 3b: reads back the RO mandatory attribute: EndProductType\n");
+            err = Test3bReadsBackTheRoMandatoryAttributeEndProductType_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : 2: read the RW mandatory attribute default: Mode\n");
+            err = Test2ReadTheRwMandatoryAttributeDefaultMode_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : 3a: write a value into the RW mandatory attribute:: Mode\n");
+            err = Test3aWriteAValueIntoTheRwMandatoryAttributeMode_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : 3b: reads back the RW mandatory attribute: Mode\n");
+            err = Test3bReadsBackTheRwMandatoryAttributeMode_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 15 : 2: read the RO optional attribute default: TargetPositionLiftPercent100ths\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultTargetPositionLiftPercent100ths_15();
+            break;
+        case 16:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 16 : 3a: write a value into the RO optional attribute: TargetPositionLiftPercent100ths\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionLiftPercent100ths_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 17 : 3b: reads back the RO optional attribute: TargetPositionLiftPercent100ths\n");
+            err = Test3bReadsBackTheRoOptionalAttributeTargetPositionLiftPercent100ths_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 18 : 2: read the RO optional attribute default: TargetPositionTiltPercent100ths\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultTargetPositionTiltPercent100ths_18();
+            break;
+        case 19:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 19 : 3a: write a value into the RO optional attribute: TargetPositionTiltPercent100ths\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionTiltPercent100ths_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 20 : 3b: reads back the RO optional attribute: TargetPositionTiltPercent100ths\n");
+            err = Test3bReadsBackTheRoOptionalAttributeTargetPositionTiltPercent100ths_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 21 : 2: read the RO optional attribute default: CurrentPositionLiftPercent100ths\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercent100ths_21();
+            break;
+        case 22:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 22 : 3a: write a value into the RO optional attribute: CurrentPositionLiftPercent100ths\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercent100ths_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 23 : 3b: reads back the RO optional attribute: CurrentPositionLiftPercent100ths\n");
+            err = Test3bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercent100ths_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 24 : 2: read the RO optional attribute default: CurrentPositionTiltPercent100ths\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercent100ths_24();
+            break;
+        case 25:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 25 : 3a: write a value into the RO optional attribute: CurrentPositionTiltPercent100ths\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercent100ths_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 26 : 3b: reads back the RO optional attribute: CurrentPositionTiltPercent100ths\n");
+            err = Test3bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercent100ths_26();
+            break;
+        case 27:
+            ChipLogProgress(chipTool, " ***** Test Step 27 : 2: read the RO optional attribute default: InstalledOpenLimitLift\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitLift_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 28 : 3a: write a value into the RO optional attribute: InstalledOpenLimitLift\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitLift_28();
+            break;
+        case 29:
+            ChipLogProgress(chipTool, " ***** Test Step 29 : 3b: reads back the RO optional attribute: InstalledOpenLimitLift\n");
+            err = Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitLift_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 30 : 2: read the RO optional attribute default: InstalledClosedLimitLift\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitLift_30();
+            break;
+        case 31:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 31 : 3a: write a value into the RO optional attribute: InstalledClosedLimitLift\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitLift_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : 3b: reads back the RO optional attribute: InstalledClosedLimitLift\n");
+            err = Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitLift_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : 2: read the RO optional attribute default: InstalledOpenLimitTilt\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitTilt_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 34 : 3a: write a value into the RO optional attribute: InstalledOpenLimitTilt\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitTilt_34();
+            break;
+        case 35:
+            ChipLogProgress(chipTool, " ***** Test Step 35 : 3b: reads back the RO optional attribute: InstalledOpenLimitTilt\n");
+            err = Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitTilt_35();
+            break;
+        case 36:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 36 : 2: read the RO optional attribute default: InstalledClosedLimitTilt\n");
+            err = Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitTilt_36();
+            break;
+        case 37:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 37 : 3a: write a value into the RO optional attribute: InstalledClosedLimitTilt\n");
+            err = Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitTilt_37();
+            break;
+        case 38:
+            ChipLogProgress(chipTool, " ***** Test Step 38 : 3b: reads back the RO optional attribute: InstalledClosedLimitTilt\n");
+            err = Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitTilt_38();
+            break;
+        case 39:
+            ChipLogProgress(chipTool, " ***** Test Step 39 : 4: read the RO mandatory attribute default: SafetyStatus\n");
+            err = Test4ReadTheRoMandatoryAttributeDefaultSafetyStatus_39();
+            break;
+        case 40:
+            ChipLogProgress(chipTool, " ***** Test Step 40 : 5a: write a value into the RO mandatory attribute: SafetyStatus\n");
+            err = Test5aWriteAValueIntoTheRoMandatoryAttributeSafetyStatus_40();
+            break;
+        case 41:
+            ChipLogProgress(chipTool, " ***** Test Step 41 : 5b: reads back the RO mandatory attribute: SafetyStatus\n");
+            err = Test5bReadsBackTheRoMandatoryAttributeSafetyStatus_41();
+            break;
+        case 42:
+            ChipLogProgress(chipTool, " ***** Test Step 42 : 4: read the RO optional attribute default: CurrentPositionLift\n");
+            err = Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLift_42();
+            break;
+        case 43:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 43 : 5a: write a value into the RO optional attribute: CurrentPositionLift\n");
+            err = Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLift_43();
+            break;
+        case 44:
+            ChipLogProgress(chipTool, " ***** Test Step 44 : 5b: reads back the RO optional attribute: CurrentPositionLift\n");
+            err = Test5bReadsBackTheRoOptionalAttributeCurrentPositionLift_44();
+            break;
+        case 45:
+            ChipLogProgress(chipTool, " ***** Test Step 45 : 4: read the RO optional attribute default: CurrentPositionTilt\n");
+            err = Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTilt_45();
+            break;
+        case 46:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 46 : 5a: write a value into the RO optional attribute: CurrentPositionTilt\n");
+            err = Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTilt_46();
+            break;
+        case 47:
+            ChipLogProgress(chipTool, " ***** Test Step 47 : 5b: reads back the RO optional attribute: CurrentPositionTilt\n");
+            err = Test5bReadsBackTheRoOptionalAttributeCurrentPositionTilt_47();
+            break;
+        case 48:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 48 : 4: read the RO optional attribute default: CurrentPositionLiftPercentage\n");
+            err = Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercentage_48();
+            break;
+        case 49:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 49 : 5a: write a value into the RO optional attribute: CurrentPositionLiftPercentage\n");
+            err = Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercentage_49();
+            break;
+        case 50:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 50 : 5b: reads back the RO optional attribute: CurrentPositionLiftPercentage\n");
+            err = Test5bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercentage_50();
+            break;
+        case 51:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 51 : 4: read the RO optional attribute default: CurrentPositionTiltPercentage\n");
+            err = Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercentage_51();
+            break;
+        case 52:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 52 : 5a: write a value into the RO optional attribute: CurrentPositionTiltPercentage\n");
+            err = Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercentage_52();
+            break;
+        case 53:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 53 : 5b: reads back the RO optional attribute: CurrentPositionTiltPercentage\n");
+            err = Test5bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercentage_53();
             break;
         }
 
@@ -24496,7 +26266,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 11;
+    const uint16_t mTestCount = 54;
 
     static void OnFailureCallback_0(void * context, EmberAfStatus status)
     {
@@ -24513,19 +26283,16 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_1(void * context, uint8_t type)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_1(type);
-    }
+    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_1(); }
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_2(void * context, uint8_t configStatus)
+    static void OnSuccessCallback_2(void * context, uint8_t type)
     {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_2(configStatus);
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_2(type);
     }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
@@ -24543,19 +26310,16 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_4(void * context, uint8_t operationalStatus)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_4(operationalStatus);
-    }
+    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_4(); }
 
     static void OnFailureCallback_5(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_5(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_5(void * context, uint8_t operationalStatus)
+    static void OnSuccessCallback_5(void * context, uint8_t configStatus)
     {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_5(operationalStatus);
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_5(configStatus);
     }
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
@@ -24563,9 +26327,9 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_6(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_6(void * context, uint8_t endProductType)
+    static void OnSuccessCallback_6(void * context, uint8_t operationalStatus)
     {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_6(endProductType);
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_6(operationalStatus);
     }
 
     static void OnFailureCallback_7(void * context, EmberAfStatus status)
@@ -24573,19 +26337,16 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_7(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_7(void * context, uint8_t endProductType)
-    {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_7(endProductType);
-    }
+    static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_7(); }
 
     static void OnFailureCallback_8(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_8(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_8(void * context, uint8_t mode)
+    static void OnSuccessCallback_8(void * context, uint8_t operationalStatus)
     {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_8(mode);
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_8(operationalStatus);
     }
 
     static void OnFailureCallback_9(void * context, EmberAfStatus status)
@@ -24593,23 +26354,411 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_9(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_9(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_9(); }
+    static void OnSuccessCallback_9(void * context, uint8_t endProductType)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_9(endProductType);
+    }
 
     static void OnFailureCallback_10(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_10(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_10(void * context, uint8_t mode)
+    static void OnSuccessCallback_10(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_10(); }
+
+    static void OnFailureCallback_11(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_10(mode);
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_11(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_11(void * context, uint8_t endProductType)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_11(endProductType);
+    }
+
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_12(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_12(void * context, uint8_t mode)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_12(mode);
+    }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_13(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_13(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_13(); }
+
+    static void OnFailureCallback_14(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_14(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_14(void * context, uint8_t mode)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_14(mode);
+    }
+
+    static void OnFailureCallback_15(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_15(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_15(void * context, uint16_t targetPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_15(targetPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_16(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_16(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_16(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_16(); }
+
+    static void OnFailureCallback_17(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_17(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_17(void * context, uint16_t targetPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_17(targetPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_18(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_18(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_18(void * context, uint16_t targetPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_18(targetPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_19(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_19(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_19(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_19(); }
+
+    static void OnFailureCallback_20(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_20(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_20(void * context, uint16_t targetPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_20(targetPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_21(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_21(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_21(void * context, uint16_t currentPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_21(currentPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_22(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_22(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_22(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_22(); }
+
+    static void OnFailureCallback_23(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_23(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_23(void * context, uint16_t currentPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_23(currentPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_24(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_24(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_24(void * context, uint16_t currentPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_24(currentPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_25(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_25(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_25(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_25(); }
+
+    static void OnFailureCallback_26(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_26(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_26(void * context, uint16_t currentPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_26(currentPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_27(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_27(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_27(void * context, uint16_t installedOpenLimitLift)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_27(installedOpenLimitLift);
+    }
+
+    static void OnFailureCallback_28(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_28(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_28(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_28(); }
+
+    static void OnFailureCallback_29(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_29(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_29(void * context, uint16_t installedOpenLimitLift)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_29(installedOpenLimitLift);
+    }
+
+    static void OnFailureCallback_30(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_30(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_30(void * context, uint16_t installedClosedLimitLift)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_30(installedClosedLimitLift);
+    }
+
+    static void OnFailureCallback_31(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_31(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_31(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_31(); }
+
+    static void OnFailureCallback_32(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_32(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_32(void * context, uint16_t installedClosedLimitLift)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_32(installedClosedLimitLift);
+    }
+
+    static void OnFailureCallback_33(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_33(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_33(void * context, uint16_t installedOpenLimitTilt)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_33(installedOpenLimitTilt);
+    }
+
+    static void OnFailureCallback_34(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_34(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_34(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_34(); }
+
+    static void OnFailureCallback_35(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_35(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_35(void * context, uint16_t installedOpenLimitTilt)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_35(installedOpenLimitTilt);
+    }
+
+    static void OnFailureCallback_36(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_36(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_36(void * context, uint16_t installedClosedLimitTilt)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_36(installedClosedLimitTilt);
+    }
+
+    static void OnFailureCallback_37(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_37(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_37(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_37(); }
+
+    static void OnFailureCallback_38(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_38(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_38(void * context, uint16_t installedClosedLimitTilt)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_38(installedClosedLimitTilt);
+    }
+
+    static void OnFailureCallback_39(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_39(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_39(void * context, uint16_t safetyStatus)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_39(safetyStatus);
+    }
+
+    static void OnFailureCallback_40(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_40(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_40(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_40(); }
+
+    static void OnFailureCallback_41(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_41(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_41(void * context, uint16_t safetyStatus)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_41(safetyStatus);
+    }
+
+    static void OnFailureCallback_42(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_42(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_42(void * context, uint16_t currentPositionLift)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_42(currentPositionLift);
+    }
+
+    static void OnFailureCallback_43(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_43(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_43(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_43(); }
+
+    static void OnFailureCallback_44(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_44(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_44(void * context, uint16_t currentPositionLift)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_44(currentPositionLift);
+    }
+
+    static void OnFailureCallback_45(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_45(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_45(void * context, uint16_t currentPositionTilt)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_45(currentPositionTilt);
+    }
+
+    static void OnFailureCallback_46(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_46(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_46(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_46(); }
+
+    static void OnFailureCallback_47(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_47(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_47(void * context, uint16_t currentPositionTilt)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_47(currentPositionTilt);
+    }
+
+    static void OnFailureCallback_48(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_48(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_48(void * context, uint8_t currentPositionLiftPercentage)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_48(currentPositionLiftPercentage);
+    }
+
+    static void OnFailureCallback_49(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_49(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_49(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_49(); }
+
+    static void OnFailureCallback_50(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_50(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_50(void * context, uint8_t currentPositionLiftPercentage)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_50(currentPositionLiftPercentage);
+    }
+
+    static void OnFailureCallback_51(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_51(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_51(void * context, uint8_t currentPositionTiltPercentage)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_51(currentPositionTiltPercentage);
+    }
+
+    static void OnFailureCallback_52(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_52(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_52(void * context) { (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_52(); }
+
+    static void OnFailureCallback_53(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_53(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_53(void * context, uint8_t currentPositionTiltPercentage)
+    {
+        (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_53(currentPositionTiltPercentage);
     }
 
     //
     // Tests methods
     //
 
-    CHIP_ERROR TestReadTheRoMandatoryAttributeDefaultType_0()
+    CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultType_0()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
@@ -24623,47 +26772,48 @@ private:
 
     void OnSuccessResponse_0(uint8_t type)
     {
-        VerifyOrReturn(CheckValue<uint8_t>("type", type, 0));
+        VerifyOrReturn(CheckConstraintType("type", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("type", type, 9));
         NextTest();
     }
 
-    CHIP_ERROR TestReadsBackTheRoMandatoryAttributeType_1()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeType_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(this, OnSuccessCallback_1,
-                                                                                                      OnFailureCallback_1);
+        uint8_t typeArgument;
+        typeArgument = static_cast<uint8_t>(250);
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(
+            typeArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
     }
 
-    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_1(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_1(uint8_t type)
-    {
-        VerifyOrReturn(CheckValue<uint8_t>("type", type, 0));
-        NextTest();
-    }
+    void OnSuccessResponse_1() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadTheRoMandatoryAttributeDefaultConfigStatus_2()
+    CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeType_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2);
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(this, OnSuccessCallback_2,
+                                                                                                      OnFailureCallback_2);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(uint8_t configStatus)
+    void OnSuccessResponse_2(uint8_t type)
     {
-        VerifyOrReturn(CheckValue<uint8_t>("configStatus", configStatus, 3));
+        VerifyOrReturn(CheckConstraintType("type", "", "enum8"));
+        VerifyOrReturn(CheckConstraintNotValue<uint8_t>("type", type, 250));
         NextTest();
     }
 
-    CHIP_ERROR TestReadsBackTheRoMandatoryAttributeConfigStatus_3()
+    CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultConfigStatus_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
@@ -24677,132 +26827,931 @@ private:
 
     void OnSuccessResponse_3(uint8_t configStatus)
     {
-        VerifyOrReturn(CheckValue<uint8_t>("configStatus", configStatus, 3));
+        VerifyOrReturn(CheckConstraintType("configStatus", "", "map8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", configStatus, 63));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheRoMandatoryAttributeDefaultOperationalStatus_4()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeConfigStatus_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4);
+        uint8_t configStatusArgument;
+        configStatusArgument = 128;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo>(
+            configStatusArgument, this, OnSuccessCallback_4, OnFailureCallback_4);
     }
 
-    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_4(uint8_t operationalStatus)
-    {
-        VerifyOrReturn(CheckValue<uint8_t>("operationalStatus", operationalStatus, 0));
-        NextTest();
-    }
+    void OnSuccessResponse_4() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadsBackTheRoMandatoryAttributeOperationalStatus_5()
+    CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeConfigStatus_5()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5);
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(uint8_t operationalStatus)
+    void OnSuccessResponse_5(uint8_t configStatus)
     {
-        VerifyOrReturn(CheckValue<uint8_t>("operationalStatus", operationalStatus, 0));
+        VerifyOrReturn(CheckConstraintType("configStatus", "", "map8"));
+        VerifyOrReturn(CheckConstraintNotValue<uint8_t>("configStatus", configStatus, 128));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheRoMandatoryAttributeDefaultEndProductType_6()
+    CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultOperationalStatus_6()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(uint8_t endProductType)
+    void OnSuccessResponse_6(uint8_t operationalStatus)
     {
-        VerifyOrReturn(CheckValue<uint8_t>("endProductType", endProductType, 0));
+        VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("operationalStatus", operationalStatus, 63));
         NextTest();
     }
 
-    CHIP_ERROR TestReadsBackTheRoMandatoryAttributeEndProductType_7()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeOperationalStatus_7()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint8_t operationalStatusArgument;
+        operationalStatusArgument = 128;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            operationalStatusArgument, this, OnSuccessCallback_7, OnFailureCallback_7);
+    }
+
+    void OnFailureResponse_7(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_7() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeOperationalStatus_8()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8);
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(uint8_t operationalStatus)
+    {
+        VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
+        VerifyOrReturn(CheckConstraintNotValue<uint8_t>("operationalStatus", operationalStatus, 128));
+        NextTest();
+    }
+
+    CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultEndProductType_9()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7);
+            this, OnSuccessCallback_9, OnFailureCallback_9);
     }
 
-    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(uint8_t endProductType)
+    void OnSuccessResponse_9(uint8_t endProductType)
     {
-        VerifyOrReturn(CheckValue<uint8_t>("endProductType", endProductType, 0));
+        VerifyOrReturn(CheckConstraintType("endProductType", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("endProductType", endProductType, 23));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheRwMandatoryAttributeDefaultMode_8()
+    CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeEndProductType_10()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(this, OnSuccessCallback_8,
-                                                                                                      OnFailureCallback_8);
+        uint8_t endProductTypeArgument;
+        endProductTypeArgument = static_cast<uint8_t>(250);
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
+            endProductTypeArgument, this, OnSuccessCallback_10, OnFailureCallback_10);
     }
 
-    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_10(uint8_t status) { NextTest(); }
 
-    void OnSuccessResponse_8(uint8_t mode)
+    void OnSuccessResponse_10() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeEndProductType_11()
     {
-        VerifyOrReturn(CheckValue<uint8_t>("mode", mode, 0));
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
+            this, OnSuccessCallback_11, OnFailureCallback_11);
+    }
+
+    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11(uint8_t endProductType)
+    {
+        VerifyOrReturn(CheckConstraintType("endProductType", "", "enum8"));
+        VerifyOrReturn(CheckConstraintNotValue<uint8_t>("endProductType", endProductType, 250));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAValueIntoTheRwMandatoryAttributeMode_9()
+    CHIP_ERROR Test2ReadTheRwMandatoryAttributeDefaultMode_12()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(this, OnSuccessCallback_12,
+                                                                                                      OnFailureCallback_12);
+    }
+
+    void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12(uint8_t mode)
+    {
+        VerifyOrReturn(CheckConstraintType("mode", "", "map8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("mode", mode, 15));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3aWriteAValueIntoTheRwMandatoryAttributeMode_13()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
         uint8_t modeArgument;
-        modeArgument = 7;
+        modeArgument = 8;
 
         return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(
-            modeArgument, this, OnSuccessCallback_9, OnFailureCallback_9);
+            modeArgument, this, OnSuccessCallback_13, OnFailureCallback_13);
     }
 
-    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9() { NextTest(); }
+    void OnSuccessResponse_13() { NextTest(); }
 
-    CHIP_ERROR TestReadsBackTheRwMandatoryAttributeMode_10()
+    CHIP_ERROR Test3bReadsBackTheRwMandatoryAttributeMode_14()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(this, OnSuccessCallback_10,
-                                                                                                      OnFailureCallback_10);
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(this, OnSuccessCallback_14,
+                                                                                                      OnFailureCallback_14);
     }
 
-    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(uint8_t mode)
+    void OnSuccessResponse_14(uint8_t mode)
     {
-        VerifyOrReturn(CheckValue<uint8_t>("mode", mode, 7));
+        VerifyOrReturn(CheckValue<uint8_t>("mode", mode, 8));
+        NextTest();
+    }
+
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultTargetPositionLiftPercent100ths_15()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
+            this, OnSuccessCallback_15, OnFailureCallback_15);
+    }
+
+    void OnFailureResponse_15(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_15(uint16_t targetPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMaxValue<uint16_t>("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 10000));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionLiftPercent100ths_16()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint16_t targetPositionLiftPercent100thsArgument;
+        targetPositionLiftPercent100thsArgument = 20000U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
+            targetPositionLiftPercent100thsArgument, this, OnSuccessCallback_16, OnFailureCallback_16);
+    }
+
+    void OnFailureResponse_16(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_16() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeTargetPositionLiftPercent100ths_17()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
+            this, OnSuccessCallback_17, OnFailureCallback_17);
+    }
+
+    void OnFailureResponse_17(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_17(uint16_t targetPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintNotValue<uint16_t>("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 20000));
+        NextTest();
+    }
+
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultTargetPositionTiltPercent100ths_18()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
+            this, OnSuccessCallback_18, OnFailureCallback_18);
+    }
+
+    void OnFailureResponse_18(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_18(uint16_t targetPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMaxValue<uint16_t>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 10000));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionTiltPercent100ths_19()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint16_t targetPositionTiltPercent100thsArgument;
+        targetPositionTiltPercent100thsArgument = 20000U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
+            targetPositionTiltPercent100thsArgument, this, OnSuccessCallback_19, OnFailureCallback_19);
+    }
+
+    void OnFailureResponse_19(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_19() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeTargetPositionTiltPercent100ths_20()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
+            this, OnSuccessCallback_20, OnFailureCallback_20);
+    }
+
+    void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_20(uint16_t targetPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintNotValue<uint16_t>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 20000));
+        NextTest();
+    }
+
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercent100ths_21()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+            this, OnSuccessCallback_21, OnFailureCallback_21);
+    }
+
+    void OnFailureResponse_21(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_21(uint16_t currentPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMaxValue<uint16_t>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 10000));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercent100ths_22()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint16_t currentPositionLiftPercent100thsArgument;
+        currentPositionLiftPercent100thsArgument = 20000U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+            currentPositionLiftPercent100thsArgument, this, OnSuccessCallback_22, OnFailureCallback_22);
+    }
+
+    void OnFailureResponse_22(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_22() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercent100ths_23()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+            this, OnSuccessCallback_23, OnFailureCallback_23);
+    }
+
+    void OnFailureResponse_23(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_23(uint16_t currentPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintNotValue<uint16_t>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 20000));
+        NextTest();
+    }
+
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercent100ths_24()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+            this, OnSuccessCallback_24, OnFailureCallback_24);
+    }
+
+    void OnFailureResponse_24(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_24(uint16_t currentPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMaxValue<uint16_t>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 10000));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercent100ths_25()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint16_t currentPositionTiltPercent100thsArgument;
+        currentPositionTiltPercent100thsArgument = 20000U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+            currentPositionTiltPercent100thsArgument, this, OnSuccessCallback_25, OnFailureCallback_25);
+    }
+
+    void OnFailureResponse_25(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_25() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercent100ths_26()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+            this, OnSuccessCallback_26, OnFailureCallback_26);
+    }
+
+    void OnFailureResponse_26(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_26(uint16_t currentPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintNotValue<uint16_t>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 20000));
+        NextTest();
+    }
+
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitLift_27()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo>(
+            this, OnSuccessCallback_27, OnFailureCallback_27);
+    }
+
+    void OnFailureResponse_27(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_27(uint16_t installedOpenLimitLift)
+    {
+        VerifyOrReturn(CheckConstraintType("installedOpenLimitLift", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 65535));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitLift_28()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint16_t installedOpenLimitLiftArgument;
+        installedOpenLimitLiftArgument = 255U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo>(
+            installedOpenLimitLiftArgument, this, OnSuccessCallback_28, OnFailureCallback_28);
+    }
+
+    void OnFailureResponse_28(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_28() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitLift_29()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo>(
+            this, OnSuccessCallback_29, OnFailureCallback_29);
+    }
+
+    void OnFailureResponse_29(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_29(uint16_t installedOpenLimitLift)
+    {
+        VerifyOrReturn(CheckConstraintType("installedOpenLimitLift", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 65535));
+        NextTest();
+    }
+
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitLift_30()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo>(
+            this, OnSuccessCallback_30, OnFailureCallback_30);
+    }
+
+    void OnFailureResponse_30(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_30(uint16_t installedClosedLimitLift)
+    {
+        VerifyOrReturn(CheckConstraintType("installedClosedLimitLift", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 65535));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitLift_31()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint16_t installedClosedLimitLiftArgument;
+        installedClosedLimitLiftArgument = 255U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo>(
+            installedClosedLimitLiftArgument, this, OnSuccessCallback_31, OnFailureCallback_31);
+    }
+
+    void OnFailureResponse_31(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_31() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitLift_32()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo>(
+            this, OnSuccessCallback_32, OnFailureCallback_32);
+    }
+
+    void OnFailureResponse_32(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_32(uint16_t installedClosedLimitLift)
+    {
+        VerifyOrReturn(CheckConstraintType("installedClosedLimitLift", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 65535));
+        NextTest();
+    }
+
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitTilt_33()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo>(
+            this, OnSuccessCallback_33, OnFailureCallback_33);
+    }
+
+    void OnFailureResponse_33(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_33(uint16_t installedOpenLimitTilt)
+    {
+        VerifyOrReturn(CheckConstraintType("installedOpenLimitTilt", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 65535));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitTilt_34()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint16_t installedOpenLimitTiltArgument;
+        installedOpenLimitTiltArgument = 255U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo>(
+            installedOpenLimitTiltArgument, this, OnSuccessCallback_34, OnFailureCallback_34);
+    }
+
+    void OnFailureResponse_34(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_34() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitTilt_35()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo>(
+            this, OnSuccessCallback_35, OnFailureCallback_35);
+    }
+
+    void OnFailureResponse_35(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_35(uint16_t installedOpenLimitTilt)
+    {
+        VerifyOrReturn(CheckConstraintType("installedOpenLimitTilt", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 65535));
+        NextTest();
+    }
+
+    CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitTilt_36()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo>(
+            this, OnSuccessCallback_36, OnFailureCallback_36);
+    }
+
+    void OnFailureResponse_36(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_36(uint16_t installedClosedLimitTilt)
+    {
+        VerifyOrReturn(CheckConstraintType("installedClosedLimitTilt", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 65535));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitTilt_37()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint16_t installedClosedLimitTiltArgument;
+        installedClosedLimitTiltArgument = 255U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo>(
+            installedClosedLimitTiltArgument, this, OnSuccessCallback_37, OnFailureCallback_37);
+    }
+
+    void OnFailureResponse_37(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_37() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitTilt_38()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo>(
+            this, OnSuccessCallback_38, OnFailureCallback_38);
+    }
+
+    void OnFailureResponse_38(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_38(uint16_t installedClosedLimitTilt)
+    {
+        VerifyOrReturn(CheckConstraintType("installedClosedLimitTilt", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 65535));
+        NextTest();
+    }
+
+    CHIP_ERROR Test4ReadTheRoMandatoryAttributeDefaultSafetyStatus_39()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::TypeInfo>(
+            this, OnSuccessCallback_39, OnFailureCallback_39);
+    }
+
+    void OnFailureResponse_39(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_39(uint16_t safetyStatus)
+    {
+        VerifyOrReturn(CheckConstraintType("safetyStatus", "", "map16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("safetyStatus", safetyStatus, 2047));
+        NextTest();
+    }
+
+    CHIP_ERROR Test5aWriteAValueIntoTheRoMandatoryAttributeSafetyStatus_40()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint16_t safetyStatusArgument;
+        safetyStatusArgument = 4096U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::TypeInfo>(
+            safetyStatusArgument, this, OnSuccessCallback_40, OnFailureCallback_40);
+    }
+
+    void OnFailureResponse_40(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_40() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test5bReadsBackTheRoMandatoryAttributeSafetyStatus_41()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::TypeInfo>(
+            this, OnSuccessCallback_41, OnFailureCallback_41);
+    }
+
+    void OnFailureResponse_41(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_41(uint16_t safetyStatus)
+    {
+        VerifyOrReturn(CheckConstraintType("safetyStatus", "", "map16"));
+        VerifyOrReturn(CheckConstraintNotValue<uint16_t>("safetyStatus", safetyStatus, 4096));
+        NextTest();
+    }
+
+    CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLift_42()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo>(
+            this, OnSuccessCallback_42, OnFailureCallback_42);
+    }
+
+    void OnFailureResponse_42(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_42(uint16_t currentPositionLift)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLift", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionLift", currentPositionLift, 65535));
+        NextTest();
+    }
+
+    CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLift_43()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint16_t currentPositionLiftArgument;
+        currentPositionLiftArgument = 255U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo>(
+            currentPositionLiftArgument, this, OnSuccessCallback_43, OnFailureCallback_43);
+    }
+
+    void OnFailureResponse_43(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_43() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionLift_44()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo>(
+            this, OnSuccessCallback_44, OnFailureCallback_44);
+    }
+
+    void OnFailureResponse_44(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_44(uint16_t currentPositionLift)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLift", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionLift", currentPositionLift, 65535));
+        NextTest();
+    }
+
+    CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTilt_45()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo>(
+            this, OnSuccessCallback_45, OnFailureCallback_45);
+    }
+
+    void OnFailureResponse_45(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_45(uint16_t currentPositionTilt)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTilt", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionTilt", currentPositionTilt, 65535));
+        NextTest();
+    }
+
+    CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTilt_46()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint16_t currentPositionTiltArgument;
+        currentPositionTiltArgument = 255U;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo>(
+            currentPositionTiltArgument, this, OnSuccessCallback_46, OnFailureCallback_46);
+    }
+
+    void OnFailureResponse_46(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_46() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionTilt_47()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo>(
+            this, OnSuccessCallback_47, OnFailureCallback_47);
+    }
+
+    void OnFailureResponse_47(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_47(uint16_t currentPositionTilt)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTilt", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionTilt", currentPositionTilt, 65535));
+        NextTest();
+    }
+
+    CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercentage_48()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
+            this, OnSuccessCallback_48, OnFailureCallback_48);
+    }
+
+    void OnFailureResponse_48(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_48(uint8_t currentPositionLiftPercentage)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
+        NextTest();
+    }
+
+    CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercentage_49()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint8_t currentPositionLiftPercentageArgument;
+        currentPositionLiftPercentageArgument = 200;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
+            currentPositionLiftPercentageArgument, this, OnSuccessCallback_49, OnFailureCallback_49);
+    }
+
+    void OnFailureResponse_49(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_49() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercentage_50()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
+            this, OnSuccessCallback_50, OnFailureCallback_50);
+    }
+
+    void OnFailureResponse_50(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_50(uint8_t currentPositionLiftPercentage)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintNotValue<uint8_t>("currentPositionLiftPercentage", currentPositionLiftPercentage, 200));
+        NextTest();
+    }
+
+    CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercentage_51()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
+            this, OnSuccessCallback_51, OnFailureCallback_51);
+    }
+
+    void OnFailureResponse_51(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_51(uint8_t currentPositionTiltPercentage)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
+        NextTest();
+    }
+
+    CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercentage_52()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        uint8_t currentPositionTiltPercentageArgument;
+        currentPositionTiltPercentageArgument = 200;
+
+        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
+            currentPositionTiltPercentageArgument, this, OnSuccessCallback_52, OnFailureCallback_52);
+    }
+
+    void OnFailureResponse_52(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_52() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercentage_53()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
+            this, OnSuccessCallback_53, OnFailureCallback_53);
+    }
+
+    void OnFailureResponse_53(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_53(uint8_t currentPositionTiltPercentage)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintNotValue<uint8_t>("currentPositionTiltPercentage", currentPositionTiltPercentage, 200));
         NextTest();
     }
 };
@@ -24853,6 +27802,119 @@ private:
     //
     // Tests methods
     //
+};
+
+class Test_TC_WNCV_2_4 : public TestCommand
+{
+public:
+    Test_TC_WNCV_2_4() : TestCommand("Test_TC_WNCV_2_4"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WNCV_2_4\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WNCV_2_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Reads Type attribute from DUT\n");
+            err = TestReadsTypeAttributeFromDut_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads Type attribute constraints\n");
+            err = TestReadsTypeAttributeConstraints_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    static void OnFailureCallback_0(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_4 *>(context))->OnFailureResponse_0(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_0(void * context, uint8_t type)
+    {
+        (static_cast<Test_TC_WNCV_2_4 *>(context))->OnSuccessResponse_0(type);
+    }
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_WNCV_2_4 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t type)
+    {
+        (static_cast<Test_TC_WNCV_2_4 *>(context))->OnSuccessResponse_1(type);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadsTypeAttributeFromDut_0()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(this, OnSuccessCallback_0,
+                                                                                                      OnFailureCallback_0);
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint8_t type)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("type", type, 0));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTypeAttributeConstraints_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(this, OnSuccessCallback_1,
+                                                                                                      OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t type)
+    {
+        VerifyOrReturn(CheckConstraintType("type", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("type", type, 9));
+        NextTest();
+    }
 };
 
 class Test_TC_WNCV_2_5 : public TestCommand
@@ -35635,6 +38697,572 @@ private:
     void OnSuccessResponse_0() { NextTest(); }
 };
 
+class TestGroupsCluster : public TestCommand
+{
+public:
+    TestGroupsCluster() : TestCommand("TestGroupsCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestGroupsCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestGroupsCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : View Group 0 (invalid)\n");
+            err = TestViewGroup0Invalid_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : View Group 1 (not found)\n");
+            err = TestViewGroup1NotFound_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Add Group 1 (new)\n");
+            err = TestAddGroup1New_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : View Group 1 (new)\n");
+            err = TestViewGroup1New_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : View Group 2 (not found)\n");
+            err = TestViewGroup2NotFound_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : View Group 3 (not found)\n");
+            err = TestViewGroup3NotFound_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : View Group 1 (existing)\n");
+            err = TestViewGroup1Existing_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Remove Group 0 (invalid)\n");
+            err = TestRemoveGroup0Invalid_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Remove Group 4 (not found)\n");
+            err = TestRemoveGroup4NotFound_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : View Group 1 (not removed)\n");
+            err = TestViewGroup1NotRemoved_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : View Group 2 (removed)\n");
+            err = TestViewGroup2Removed_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Remove All\n");
+            err = TestRemoveAll_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : View Group 1 (removed)\n");
+            err = TestViewGroup1Removed_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : View Group 2 (still removed)\n");
+            err = TestViewGroup2StillRemoved_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : View Group 3 (removed)\n");
+            err = TestViewGroup3Removed_14();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 15;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestViewGroup0Invalid_0()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_0(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_0(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 135));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup1NotFound_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_1(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_1(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestAddGroup1New_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+
+        RequestType request;
+        request.groupId   = 1U;
+        request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_2(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_2(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup1New_3()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_3(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_3(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #1", 8)));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup2NotFound_4()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 4369U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_4(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_4(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup3NotFound_5()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 32767U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_5(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_5(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 32767U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup1Existing_6()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_6(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_6(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #1", 8)));
+        NextTest();
+    }
+
+    CHIP_ERROR TestRemoveGroup0Invalid_7()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
+
+        RequestType request;
+        request.groupId = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_7(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_7(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 135));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 0U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestRemoveGroup4NotFound_8()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
+
+        RequestType request;
+        request.groupId = 4U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_8(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_8(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup1NotRemoved_9()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_9(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_9(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 0));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #1", 8)));
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup2Removed_10()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 4369U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_10(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_10(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestRemoveAll_11()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_11();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_11(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestViewGroup1Removed_12()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_12(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_12(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 1U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup2StillRemoved_13()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 4369U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_13(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_13(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 4369U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup3Removed_14()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 32767U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_14(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_14(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_14(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue<uint8_t>("status", status, 139));
+
+        VerifyOrReturn(CheckValue<uint16_t>("groupId", groupId, 32767U));
+
+        NextTest();
+    }
+};
+
 class TestOperationalCredentialsCluster : public TestCommand
 {
 public:
@@ -36130,6 +39758,18 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 0 : Group Write Attribute\n");
             err = TestGroupWriteAttribute_0();
             break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read back Attribute\n");
+            err = TestReadBackAttribute_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Restore initial location value\n");
+            err = TestRestoreInitialLocationValue_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read back Attribute\n");
+            err = TestReadBackAttribute_3();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -36141,7 +39781,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 1;
+    const uint16_t mTestCount = 4;
 
     static void OnFailureCallback_0(void * context, EmberAfStatus status)
     {
@@ -36149,6 +39789,33 @@ private:
     }
 
     static void OnSuccessCallback_0(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_0(); }
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_1(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_1(void * context, chip::CharSpan location)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_1(location);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_2(); }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_3(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_3(void * context, chip::CharSpan location)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_3(location);
+    }
 
     //
     // Tests methods
@@ -36170,6 +39837,59 @@ private:
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_0() { NextTest(); }
+
+    CHIP_ERROR TestReadBackAttribute_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(this, OnSuccessCallback_1,
+                                                                                                 OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(chip::CharSpan location)
+    {
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("us", 2)));
+        NextTest();
+    }
+
+    CHIP_ERROR TestRestoreInitialLocationValue_2()
+    {
+        const chip::GroupId groupId = 1234;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.AssociateWithGroup(mDevice, groupId);
+
+        chip::CharSpan locationArgument;
+        locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
+
+        return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            locationArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2() { NextTest(); }
+
+    CHIP_ERROR TestReadBackAttribute_3()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(this, OnSuccessCallback_3,
+                                                                                                 OnFailureCallback_3);
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(chip::CharSpan location)
+    {
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("", 0)));
+        NextTest();
+    }
 };
 
 class Test_TC_DIAGSW_1_1 : public TestCommand
@@ -36323,6 +40043,102 @@ private:
         VerifyOrReturn(CheckConstraintType("currentHeapHighWatermark", "", "uint64"));
         NextTest();
     }
+};
+
+class Test_TC_DIAGSW_2_1 : public TestCommand
+{
+public:
+    Test_TC_DIAGSW_2_1() : TestCommand("Test_TC_DIAGSW_2_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAGSW_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAGSW_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DIAGSW_3_2 : public TestCommand
+{
+public:
+    Test_TC_DIAGSW_3_2() : TestCommand("Test_TC_DIAGSW_3_2"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAGSW_3_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAGSW_3_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    //
+    // Tests methods
+    //
 };
 
 class TestSubscribe_OnOff : public TestCommand
@@ -36690,14 +40506,15 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_TM_2_2>(),
         make_unique<Test_TC_TSTAT_1_1>(),
         make_unique<Test_TC_TSTAT_2_1>(),
+        make_unique<Test_TC_TSTAT_2_2>(),
         make_unique<Test_TC_TSUIC_1_1>(),
         make_unique<Test_TC_TSUIC_2_1>(),
         make_unique<Test_TC_TSUIC_2_2>(),
         make_unique<Test_TC_DIAGTH_1_1>(),
-        make_unique<Test_TC_DIAGSW_3_2>(),
         make_unique<Test_TC_WNCV_1_1>(),
         make_unique<Test_TC_WNCV_2_1>(),
         make_unique<Test_TC_WNCV_2_2>(),
+        make_unique<Test_TC_WNCV_2_4>(),
         make_unique<Test_TC_WNCV_2_5>(),
         make_unique<Test_TC_WNCV_3_1>(),
         make_unique<Test_TC_WNCV_3_2>(),
@@ -36721,10 +40538,13 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestDescriptorCluster>(),
         make_unique<TestBasicInformation>(),
         make_unique<TestIdentifyCluster>(),
+        make_unique<TestGroupsCluster>(),
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<TestModeSelectCluster>(),
         make_unique<TestGroupMessaging>(),
         make_unique<Test_TC_DIAGSW_1_1>(),
+        make_unique<Test_TC_DIAGSW_2_1>(),
+        make_unique<Test_TC_DIAGSW_3_2>(),
         make_unique<TestSubscribe_OnOff>(),
     };
 

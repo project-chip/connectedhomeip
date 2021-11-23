@@ -65,8 +65,8 @@
 @property (readonly) chip::Controller::BridgedActionsCluster cppCluster;
 @end
 
-@interface CHIPBridgedDeviceBasic ()
-@property (readonly) chip::Controller::BridgedDeviceBasicCluster cppCluster;
+@interface CHIPBridgedDeviceBasicInformation ()
+@property (readonly) chip::Controller::BridgedDeviceBasicInformationCluster cppCluster;
 @end
 
 @interface CHIPColorControl ()

@@ -47,7 +47,7 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
-    mInitialReport             = true;
+    mIsPrimingReports          = true;
     MoveToState(HandlerState::Initialized);
     mpDelegate          = apDelegate;
     mSubscriptionId     = 0;
@@ -103,7 +103,7 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
-    mInitialReport             = false;
+    mIsPrimingReports          = false;
     mpDelegate                 = nullptr;
     mHoldReport                = false;
     mDirty                     = false;
@@ -156,7 +156,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
         else if (IsSubscriptionType())
         {
             InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
-            if (IsInitialReport())
+            if (IsPriming())
             {
                 err           = SendSubscribeResponse();
                 mpExchangeCtx = nullptr;
@@ -192,7 +192,7 @@ exit:
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks)
 {
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
-    if (IsInitialReport() || IsChunkedReport())
+    if (IsPriming() || IsChunkedReport())
     {
         mSessionHandle.SetValue(mpExchangeCtx->GetSessionHandle());
     }
@@ -203,13 +203,25 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mIsChunkedReport = aMoreChunks;
-    MoveToState(HandlerState::AwaitingReportResponse);
-    CHIP_ERROR err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
-                                                Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+    mIsChunkedReport        = aMoreChunks;
+    bool noResponseExpected = IsReadType() && !mIsChunkedReport;
+    if (!noResponseExpected)
+    {
+        MoveToState(HandlerState::AwaitingReportResponse);
+    }
+    CHIP_ERROR err =
+        mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
+                                   Messaging::SendFlags(noResponseExpected ? Messaging::SendMessageFlags::kNone
+                                                                           : Messaging::SendMessageFlags::kExpectResponse));
+    if (err == CHIP_NO_ERROR && noResponseExpected)
+    {
+        mpExchangeCtx = nullptr;
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
+
     if (err == CHIP_NO_ERROR)
     {
-        if (IsSubscriptionType() && !IsInitialReport())
+        if (IsSubscriptionType() && !IsPriming())
         {
             err = RefreshSubscribeSyncTimer();
         }
@@ -384,7 +396,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
         SuccessOrExit(err);
         err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
         SuccessOrExit(err);
-        mInitialReport = true;
+        mIsPrimingReports = true;
     }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
@@ -527,7 +539,7 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(RefreshSubscribeSyncTimer());
-    mInitialReport = false;
+    mIsPrimingReports = false;
     MoveToState(HandlerState::GeneratingReports);
     if (mpDelegate != nullptr)
     {
@@ -590,21 +602,40 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     return CHIP_NO_ERROR;
 }
 
+void ReadHandler::OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState)
+{
+    VerifyOrReturn(apAppState != nullptr);
+    ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
+    ChipLogProgress(DataManagement, "Unblock report hold after min %d seconds", readHandler->mMinIntervalFloorSeconds);
+    readHandler->mHoldReport = false;
+    if (readHandler->mDirty)
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    }
+    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+        System::Clock::Seconds16(readHandler->mMaxIntervalCeilingSeconds - readHandler->mMinIntervalFloorSeconds),
+        OnRefreshSubscribeTimerSyncCallback, readHandler);
+}
+
 void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState)
 {
-    ReadHandler * aReadHandler = static_cast<ReadHandler *>(apAppState);
-    aReadHandler->mHoldReport  = false;
+    VerifyOrReturn(apAppState != nullptr);
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
 
 CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 {
-    ChipLogProgress(DataManagement, "ReadHandler::Refresh Subscribe Sync Timer with %d seconds", mMinIntervalFloorSeconds);
+    ChipLogProgress(DataManagement, "ReadHandler::Refresh Subscribe Sync Timer with %d seconds", mMaxIntervalCeilingSeconds);
+    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
+        OnUnblockHoldReportCallback, this);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnRefreshSubscribeTimerSyncCallback, this);
     mHoldReport = true;
-    return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        System::Clock::Seconds16(mMinIntervalFloorSeconds), OnRefreshSubscribeTimerSyncCallback, this);
+    ReturnErrorOnFailure(
+        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+            System::Clock::Seconds16(mMinIntervalFloorSeconds), OnUnblockHoldReportCallback, this));
+
+    return CHIP_NO_ERROR;
 }
 } // namespace app
 } // namespace chip

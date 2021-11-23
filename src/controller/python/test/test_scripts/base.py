@@ -248,7 +248,7 @@ class BaseTestHelper:
             "VendorID": 9050,
             "ProductName": "TEST_PRODUCT",
             "ProductID": 65279,
-            "UserLabel": "Test",
+            "NodeLabel": "Test",
             "Location": "",
             "HardwareVersion": 0,
             "HardwareVersionString": "TEST_VERSION",
@@ -281,7 +281,7 @@ class BaseTestHelper:
             expected_status: IM.Status = IM.Status.Success
 
         requests = [
-            AttributeWriteRequest("Basic", "UserLabel", "Test"),
+            AttributeWriteRequest("Basic", "NodeLabel", "Test"),
             AttributeWriteRequest("Basic", "Location",
                                   "a pretty loooooooooooooog string", IM.Status.InvalidValue),
         ]

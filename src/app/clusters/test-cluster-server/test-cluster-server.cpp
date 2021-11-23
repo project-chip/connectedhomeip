@@ -66,8 +66,8 @@ public:
     // Register for the Test Cluster cluster on all endpoints.
     TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id) {}
 
-    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
     CHIP_ERROR ReadListInt8uAttribute(AttributeValueEncoder & aEncoder);
@@ -86,7 +86,7 @@ OctetStringData gListOctetStringData[kAttributeListLength];
 OctetStringData gListOperationalCert[kAttributeListLength];
 Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLength];
 
-CHIP_ERROR TestAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
     {
@@ -110,7 +110,7 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeVa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TestAttrAccess::Write(const ConcreteAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     switch (aPath.mAttributeId)
     {

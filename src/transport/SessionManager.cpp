@@ -131,6 +131,8 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHe
             {
                 return CHIP_ERROR_INTERNAL;
             }
+            // TODO #11911 Update SecureMessageCodec::Encrypt for Group
+            ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
 
 #if CHIP_PROGRESS_LOGGING
             destination = sessionHandle.GetPeerNodeId();
@@ -414,7 +416,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     if (msg.IsNull())
     {
-        ChipLogError(Inet, "Secure transport received NULL packet, discarding");
+        ChipLogError(Inet, "Secure transport received Unicast NULL packet, discarding");
         return;
     }
 
@@ -485,9 +487,9 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     FabricIndex fabricIndex = 0; // TODO : remove initialization once GroupDataProvider->Decrypt is implemented
     // Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
 
-    if (!msg.IsNull())
+    if (msg.IsNull())
     {
-        ChipLogError(Inet, "Secure transport received NULL packet, discarding");
+        ChipLogError(Inet, "Secure transport received Groupcast NULL packet, discarding");
         return;
     }
 
@@ -502,6 +504,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     // TODO retrieve also the fabricIndex with the GroupDataProvider.
     // VerifyOrExit(CHIP_NO_ERROR == groups->DecryptMessage(packetHeader, payloadHeader, msg),
     //     ChipLogError(Inet, "Secure transport received group message, but failed to decode it, discarding"));
+
+    ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
     // MCSP check
     if (packetHeader.IsValidMCSPMsg())

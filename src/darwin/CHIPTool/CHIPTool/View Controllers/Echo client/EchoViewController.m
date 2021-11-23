@@ -116,13 +116,11 @@
                 CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
                 [self updateResult:@"MfgSpecificPing command sent..."];
 
-                [cluster mfgSpecificPing:[[CHIPBasicClusterMfgSpecificPingPayload alloc] init]
-                         responseHandler:^(NSError * error, NSDictionary * values) {
-                             NSString * resultString = (error == nil)
-                                 ? @"MfgSpecificPing command: success!"
-                                 : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
-                             [self updateResult:resultString];
-                         }];
+                [cluster mfgSpecificPingWithCompletionHandler:^(NSError * error, NSDictionary * values) {
+                    NSString * resultString = (error == nil) ? @"MfgSpecificPing command: success!"
+                                                             : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
+                    [self updateResult:resultString];
+                }];
             } else {
                 [self updateResult:@"Failed to establish a connection with the device"];
             }

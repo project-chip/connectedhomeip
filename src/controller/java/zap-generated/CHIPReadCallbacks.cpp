@@ -1046,7 +1046,7 @@ void CHIPBridgedActionsEndpointListAttributeCallback::CallbackFn(
         ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$BridgedActionsCluster$EndpointListAttribute"));
     chip::JniClass attributeJniClass(attributeClass);
     jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;[B)V");
+        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;)V");
     VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find EndpointListAttribute constructor"));
 
     auto iter = list.begin();
@@ -1096,19 +1096,7 @@ void CHIPBridgedActionsEndpointListAttributeCallback::CallbackFn(
             type                        = env->NewObject(typeEntryCls, typeEntryTypeCtor, typeValue);
         }
 
-        bool endpointsNull     = false;
-        bool endpointsHasValue = true;
-
-        chip::ByteSpan endpointsValue = entry.endpoints;
-
-        jbyteArray endpoints = nullptr;
-        if (!endpointsNull && endpointsHasValue)
-        {
-            endpoints = env->NewByteArray(endpointsValue.size());
-            env->SetByteArrayRegion(endpoints, 0, endpointsValue.size(), reinterpret_cast<const jbyte *>(endpointsValue.data()));
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, endpointListID, name, type, endpoints);
+        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, endpointListID, name, type);
         VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create EndpointListAttribute object"));
 
         env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);

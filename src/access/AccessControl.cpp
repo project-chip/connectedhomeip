@@ -83,6 +83,9 @@ CHIP_ERROR AccessControl::Finish()
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {
+    // During development, allow access if delegate is transitional
+    ReturnErrorCodeIf(mDelegate.IsTransitional(), CHIP_NO_ERROR);
+
     EntryIterator iterator;
     ReturnErrorOnFailure(Entries(iterator, &subjectDescriptor.fabricIndex));
 

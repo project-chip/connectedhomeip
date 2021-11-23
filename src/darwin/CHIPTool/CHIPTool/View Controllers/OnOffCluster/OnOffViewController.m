@@ -242,13 +242,12 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
                     CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice
                                                                  endpoint:endpoint
                                                                     queue:dispatch_get_main_queue()];
-                    [onOff on:[[CHIPOnOffClusterOnPayload alloc] init]
-                        responseHandler:^(NSError * error, NSDictionary * values) {
-                            NSString * resultString = (error != nil)
-                                ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
-                                : @"On command success";
-                            [self updateResult:resultString];
-                        }];
+                    [onOff onWithCompletionHandler:^(NSError * error, NSDictionary * values) {
+                        NSString * resultString = (error != nil)
+                            ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                            : @"On command success";
+                        [self updateResult:resultString];
+                    }];
                 } else {
                     [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];
                 }
@@ -272,13 +271,12 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
                     CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice
                                                                  endpoint:endpoint
                                                                     queue:dispatch_get_main_queue()];
-                    [onOff off:[[CHIPOnOffClusterOffPayload alloc] init]
-                        responseHandler:^(NSError * error, NSDictionary * values) {
-                            NSString * resultString = (error != nil)
-                                ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
-                                : @"Off command success";
-                            [self updateResult:resultString];
-                        }];
+                    [onOff offWithCompletionHandler:^(NSError * error, NSDictionary * values) {
+                        NSString * resultString = (error != nil)
+                            ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                            : @"Off command success";
+                        [self updateResult:resultString];
+                    }];
                 } else {
                     [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];
                 }
@@ -302,13 +300,12 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
                     CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice
                                                                  endpoint:endpoint
                                                                     queue:dispatch_get_main_queue()];
-                    [onOff toggle:[[CHIPOnOffClusterTogglePayload alloc] init]
-                        responseHandler:^(NSError * error, NSDictionary * values) {
-                            NSString * resultString = (error != nil)
-                                ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
-                                : @"Toggle command success";
-                            [self updateResult:resultString];
-                        }];
+                    [onOff toggleWithCompletionHandler:^(NSError * error, NSDictionary * values) {
+                        NSString * resultString = (error != nil)
+                            ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                            : @"Toggle command success";
+                        [self updateResult:resultString];
+                    }];
                 } else {
                     [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]];
                 }

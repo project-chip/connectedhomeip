@@ -188,6 +188,11 @@ function asGetterName(prop)
   return propName;
 }
 
+function commandHasRequiredField(command)
+{
+  return command.arguments.some(arg => !arg.isOptional);
+}
+
 //
 // Module exports
 //
@@ -202,3 +207,4 @@ exports.arrayElementObjectiveCClass  = arrayElementObjectiveCClass;
 exports.incrementDepth               = incrementDepth;
 exports.asStructPropertyName         = asStructPropertyName;
 exports.asGetterName                 = asGetterName;
+exports.commandHasRequiredField      = commandHasRequiredField;

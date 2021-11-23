@@ -59,7 +59,7 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIB::Builder & aAttributeReport)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

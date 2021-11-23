@@ -28,15 +28,34 @@ using namespace chip::app::Clusters;
 
 {{#chip_cluster_commands}}
 {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
-- (void){{asLowerCamelCase name}}:(CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Payload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler
+{{! zcl_command_arguments_count is unreliable when used in a conditional.  As
+    a workaround, just use iteration over the arguments directly to see if we
+    have any. }}
+{{#chip_cluster_command_arguments}}
+{{#first}}
+- (void){{asLowerCamelCase parent.name}}WithParams:(CHIP{{asUpperCamelCase parent.parent.name}}Cluster{{asUpperCamelCase parent.name}}Params * {{#unless (commandHasRequiredField parent)}}_Nullable{{/unless}})params completionHandler:(CompletionHandler)completionHandler
+{{/first}}
+{{else}}
+- (void){{asLowerCamelCase parent.name}}WithCompletionHandler:(CompletionHandler)completionHandler
+{{/chip_cluster_command_arguments}}
 {
     ListFreer listFreer;
     {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
     {{#chip_cluster_command_arguments}}
-    {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "payload." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return;" depth=0}}
+      {{#first}}
+        {{#unless (commandHasRequiredField parent)}}
+        if (params != nil) {
+        {{/unless}}
+      {{/first}}
+      {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "params." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return;" depth=0}}
+      {{#last}}
+        {{#unless (commandHasRequiredField parent)}}
+        }
+       {{/unless}}
+      {{/last}}
     {{/chip_cluster_command_arguments}}
 
-    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
         auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -71,6 +90,7 @@ using namespace chip::app::Clusters;
 
 {{/if}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
 {{#*inline "callbackParams"}}, minInterval, maxInterval{{#if isAnalog}}, change{{/if}}{{/inline}}
 - (void) subscribe{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval responseHandler:(ResponseHandler)responseHandler
@@ -87,6 +107,7 @@ using namespace chip::app::Clusters;
     }, true);
 }
 
+{{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 

@@ -210,7 +210,7 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIB::Builder & aAttributeReport)
 {
     ChipLogDetail(DataManagement,
@@ -575,7 +575,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 
     // Named aPath for now to reduce the amount of code change that needs to
     // happen when the above TODO is resolved.
-    ConcreteAttributePath aPath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
+    ConcreteDataAttributePath aPath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
 
@@ -592,7 +592,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
     if (attrOverride != nullptr)
     {
-        AttributeValueDecoder valueDecoder(aReader);
+        AttributeValueDecoder valueDecoder(aReader, apWriteHandler->GetAccessingFabricIndex());
         ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
 
         if (valueDecoder.TriedDecode())

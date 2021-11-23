@@ -162,7 +162,7 @@ void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void
             @"endpointListID" : [NSNumber numberWithUnsignedShort:entry.endpointListID],
             @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
             @"type" : [NSNumber numberWithUnsignedChar:entry.type],
-            @"endpoints" : [NSData dataWithBytes:entry.endpoints.data() length:entry.endpoints.size()],
+            @"endpoints" : [[NSMutableArray alloc] init],
         }];
     }
     if (iter.GetStatus() != CHIP_NO_ERROR) {
@@ -1430,11 +1430,6 @@ void CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
         id value;
         value = [NSNumber numberWithUnsignedChar:data.capacity];
         response[@"capacity"] = value;
-    }
-    {
-        id value;
-        value = [NSNumber numberWithUnsignedChar:data.groupCount];
-        response[@"groupCount"] = value;
     }
     {
         id value;

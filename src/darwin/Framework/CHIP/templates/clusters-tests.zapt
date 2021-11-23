@@ -139,7 +139,7 @@ CHIPDevice * GetConnectedDevice()
     CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster test:[[CHIPTestClusterClusterTestPayload alloc] init] responseHandler:^(NSError * err, NSDictionary * values) {
+    [cluster testWithCompletionHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
@@ -151,7 +151,7 @@ CHIPDevice * GetConnectedDevice()
 
     // Reuse the CHIPCluster Object for multiple times.
 
-    [cluster test:[[CHIPTestClusterClusterTestPayload alloc] init] responseHandler:^(NSError * err, NSDictionary * values) {
+    [cluster testWithCompletionHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
