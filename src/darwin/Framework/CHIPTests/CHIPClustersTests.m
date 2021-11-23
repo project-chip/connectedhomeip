@@ -25437,6 +25437,27 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterEthernetNetworkDiagnosticsReadAttributeFeatureMapWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"EthernetNetworkDiagnosticsReadAttributeFeatureMapWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"EthernetNetworkDiagnostics FeatureMap Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterEthernetNetworkDiagnosticsReadAttributeClusterRevisionWithResponseHandler
 {
     XCTestExpectation * expectation =
@@ -28503,6 +28524,25 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 
     [cluster readAttributeCurrentHeapHighWatermarkWithResponseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"SoftwareDiagnostics CurrentHeapHighWatermark Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterSoftwareDiagnosticsReadAttributeFeatureMapWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"SoftwareDiagnosticsReadAttributeFeatureMapWithResponseHandler"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPSoftwareDiagnostics * cluster = [[CHIPSoftwareDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"SoftwareDiagnostics FeatureMap Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

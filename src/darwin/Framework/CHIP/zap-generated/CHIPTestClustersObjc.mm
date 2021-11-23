@@ -2114,6 +2114,19 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        ListFreer listFreer;
+        using TypeInfo = EthernetNetworkDiagnostics::Attributes::FeatureMap::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedIntValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4520,6 +4533,19 @@ using namespace chip::app::Clusters;
         using TypeInfo = SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo;
         TypeInfo::Type cppValue;
         cppValue = value.unsignedLongLongValue;
+        auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        ListFreer listFreer;
+        using TypeInfo = SoftwareDiagnostics::Attributes::FeatureMap::TypeInfo;
+        TypeInfo::Type cppValue;
+        cppValue = value.unsignedIntValue;
         auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);

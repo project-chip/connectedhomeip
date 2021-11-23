@@ -1667,6 +1667,11 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -3357,6 +3362,11 @@ class ChipClusters:
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
@@ -5822,6 +5832,9 @@ class ChipClusters:
     def ClusterEthernetNetworkDiagnostics_SubscribeAttributeTimeSinceReset(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_EthernetNetworkDiagnostics_TimeSinceReset(device, ZCLendpoint, minInterval, maxInterval)
 
+    def ClusterEthernetNetworkDiagnostics_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FeatureMap(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterEthernetNetworkDiagnostics_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -6673,6 +6686,9 @@ class ChipClusters:
 
     def ClusterSoftwareDiagnostics_SubscribeAttributeCurrentHeapHighWatermark(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_SoftwareDiagnostics_CurrentHeapHighWatermark(device, ZCLendpoint, minInterval, maxInterval)
+
+    def ClusterSoftwareDiagnostics_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_FeatureMap(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterSoftwareDiagnostics_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -8860,6 +8876,10 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_EthernetNetworkDiagnostics_TimeSinceReset.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_EthernetNetworkDiagnostics_TimeSinceReset.restype = ctypes.c_uint32
+        # Cluster EthernetNetworkDiagnostics ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FeatureMap.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FeatureMap.restype = ctypes.c_uint32
         # Cluster EthernetNetworkDiagnostics ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -10023,6 +10043,10 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_SoftwareDiagnostics_CurrentHeapHighWatermark.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_SoftwareDiagnostics_CurrentHeapHighWatermark.restype = ctypes.c_uint32
+        # Cluster SoftwareDiagnostics ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_FeatureMap.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_FeatureMap.restype = ctypes.c_uint32
         # Cluster SoftwareDiagnostics ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

@@ -7240,6 +7240,17 @@ CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReportAttributeTimeSinceReset(Call
                                      BasicAttributeFilter<Int64uAttributeCallback>);
 }
 
+CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
+                                                                      Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000FFFC;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
 CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback)
 {
@@ -14538,6 +14549,17 @@ CHIP_ERROR SoftwareDiagnosticsCluster::ReportAttributeCurrentHeapHighWatermark(C
 {
     return RequestAttributeReporting(SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id, onReportCallback,
                                      BasicAttributeFilter<Int64uAttributeCallback>);
+}
+
+CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000FFFC;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int32uAttributeCallback>);
 }
 
 CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
