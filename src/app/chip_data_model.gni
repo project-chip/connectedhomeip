@@ -186,8 +186,8 @@ template("chip_data_model") {
 
     public_deps += [
       "${chip_root}/src/app",
-      "${chip_root}/src/app/server",
       "${chip_root}/src/app/common:cluster-objects",
+      "${chip_root}/src/app/server",
       "${chip_root}/src/controller",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
