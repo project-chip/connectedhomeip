@@ -344,7 +344,7 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
     }
     // TODO: (#11423) Attribute paths has a pattern of invalid paths, should add a function for checking invalid paths here.
     // NOTE: We don't support wildcard write for now, reject all wildcard paths.
-    VerifyOrExit(!attributePathParams.HasWildcard() && attributePathParams.IsValidAttributePath(),
+    VerifyOrExit(!attributePathParams.HasAttributeWildcard() && attributePathParams.IsValidAttributePath(),
                  err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
     err = aAttributeStatusIB.GetErrorStatus(&(StatusIBParser));

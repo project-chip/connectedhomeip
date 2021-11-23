@@ -165,7 +165,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         }
 
         // We do not support Wildcard writes for now, reject all wildcard write requests.
-        VerifyOrExit(clusterInfo.IsValidAttributePath() && !clusterInfo.HasWildcard(),
+        VerifyOrExit(clusterInfo.IsValidAttributePath() && !clusterInfo.HasAttributeWildcard(),
                      err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
         err = element.GetData(&dataReader);

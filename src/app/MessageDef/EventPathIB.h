@@ -27,6 +27,7 @@
 #include "ListParser.h"
 
 #include <app/AppBuildConfig.h>
+#include <app/EventPathParams.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -175,6 +176,8 @@ public:
      *  @return A reference to *this
      */
     EventPathIB::Builder & EndOfEventPathIB();
+
+    CHIP_ERROR Encode(const EventPathParams & aEventPathParams);
 };
 } // namespace EventPathIB
 } // namespace app

@@ -216,6 +216,27 @@ EventPathIB::Builder & EventPathIB::Builder::IsUrgent(const bool aIsUrgent)
     return *this;
 }
 
+CHIP_ERROR EventPathIB::Builder::Encode(const EventPathParams & aEventPathParams)
+{
+    if (!(aEventPathParams.HasWildcardEndpointId()))
+    {
+        Endpoint(aEventPathParams.mEndpointId);
+    }
+
+    if (!(aEventPathParams.HasWildcardClusterId()))
+    {
+        Cluster(aEventPathParams.mClusterId);
+    }
+
+    if (!(aEventPathParams.HasWildcardEventId()))
+    {
+        Event(aEventPathParams.mEventId);
+    }
+
+    EndOfEventPathIB();
+    return GetError();
+}
+
 EventPathIB::Builder & EventPathIB::Builder::EndOfEventPathIB()
 {
     EndOfContainer();

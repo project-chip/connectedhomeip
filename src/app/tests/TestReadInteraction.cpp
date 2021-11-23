@@ -576,7 +576,6 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSu
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     chip::app::EventPathParams eventPathParams[2];
-    eventPathParams[0].mNodeId     = 1;
     eventPathParams[0].mEndpointId = 2;
     eventPathParams[0].mClusterId  = 3;
     eventPathParams[0].mEventId    = 4;
@@ -625,12 +624,10 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSu
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     chip::app::EventPathParams eventPathParams[2];
-    eventPathParams[0].mNodeId     = 1;
     eventPathParams[0].mEndpointId = 2;
     eventPathParams[0].mClusterId  = 3;
     eventPathParams[0].mEventId    = 4;
 
-    eventPathParams[1].mNodeId     = 1;
     eventPathParams[1].mEndpointId = 2;
     eventPathParams[1].mClusterId  = 3;
     eventPathParams[1].mEventId    = 5;
@@ -677,16 +674,9 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
-    chip::app::EventPathParams eventPathParams[2];
-    eventPathParams[0].mNodeId     = kTestNodeId;
+    chip::app::EventPathParams eventPathParams[1];
     eventPathParams[0].mEndpointId = kTestEndpointId;
     eventPathParams[0].mClusterId  = kTestClusterId;
-    eventPathParams[0].mEventId    = kTestEventIdDebug;
-
-    eventPathParams[1].mNodeId     = kTestNodeId;
-    eventPathParams[1].mEndpointId = kTestEndpointId;
-    eventPathParams[1].mClusterId  = kTestClusterId;
-    eventPathParams[1].mEventId    = kTestEventIdCritical;
 
     chip::app::AttributePathParams attributePathParams[2];
     attributePathParams[0].mEndpointId  = kTestEndpointId;
@@ -700,7 +690,7 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     readPrepareParams.mpEventPathParamsList        = eventPathParams;
-    readPrepareParams.mEventPathParamsListSize     = 2;
+    readPrepareParams.mEventPathParamsListSize     = 3;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 2;
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &delegate);
