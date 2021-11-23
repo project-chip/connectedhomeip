@@ -124,12 +124,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // an error arising below. at the end, we have to close it.
     ExchangeHandle ref(*this);
 
-    // If sending via UDP and NoAutoRequestAck send flag is not specificed,
-    // request reliable transmission.
-    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
-    // Treat unknown peer address as "not UDP", because we have no idea whether
-    // it's safe to do MRP there.
-    bool isUDPTransport = peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
+    bool isUDPTransport = IsUDPTransport();
 
     // this check is ignored by the ExchangeMsgDispatch if !AutoRequestAck()
     bool reliableTransmissionRequested = isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
@@ -511,5 +506,38 @@ void ExchangeContext::MessageHandled()
     Close();
 }
 
+bool ExchangeContext::IsUDPTransport()
+{
+    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
+}
+
+bool ExchangeContext::IsTCPTransport()
+{
+    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kTcp;
+}
+
+bool ExchangeContext::IsBLETransport()
+{
+    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kBle;
+}
+
+System::Clock::Milliseconds32 ExchangeContext::GetAckTimeout()
+{
+    System::Clock::Timeout timeout;
+    if (IsUDPTransport())
+    {
+        timeout = System::Clock::Milliseconds32((CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1) *
+                                                (GetIdleRetransmitTimeoutTick() << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT));
+    }
+    else if (IsTCPTransport())
+    {
+        // TODO: issue 12009, need actual tcp margin value considering restransmission
+        timeout = System::Clock::Seconds16(30);
+    }
+    return timeout;
+}
 } // namespace Messaging
 } // namespace chip
