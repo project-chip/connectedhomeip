@@ -21,8 +21,8 @@
 #include <controller/CHIPCommissionableNodeController.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
