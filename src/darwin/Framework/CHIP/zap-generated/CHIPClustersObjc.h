@@ -41,11 +41,13 @@ NS_ASSUME_NONNULL_BEGIN
                                   NSError * _Nullable error))completionHandler;
 - (void)loginWithParams:(CHIPAccountLoginClusterLoginParams *)params completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -61,11 +63,13 @@ NS_ASSUME_NONNULL_BEGIN
                         completionHandler:(StatusCompletion)completionHandler;
 - (void)revokeCommissioningWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -78,53 +82,68 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)changeStatusWithParams:(CHIPApplicationBasicClusterChangeStatusParams *)params
              completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeVendorNameWithCompletionHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeVendorNameWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeVendorNameWithResponseHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeVendorIdWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeVendorIdWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeVendorIdWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeApplicationNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeApplicationNameWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeApplicationNameWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeApplicationNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeApplicationNameWithResponseHandler:(void (^)(NSString * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeProductIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeProductIdWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductIdWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeProductIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeProductIdWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeApplicationIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeApplicationIdWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeApplicationIdWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeApplicationIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeApplicationIdWithResponseHandler:(void (^)(
+                                                            NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCatalogVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCatalogVendorIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCatalogVendorIdWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCatalogVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCatalogVendorIdWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeApplicationStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeApplicationStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeApplicationStatusWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeApplicationStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeApplicationStatusWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -138,25 +157,32 @@ NS_ASSUME_NONNULL_BEGIN
           completionHandler:(void (^)(CHIPApplicationLauncherClusterLaunchAppResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeApplicationLauncherListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeApplicationLauncherListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeCatalogVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCatalogVendorIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCatalogVendorIdWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCatalogVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCatalogVendorIdWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeApplicationIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeApplicationIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeApplicationIdWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeApplicationIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeApplicationIdWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -171,19 +197,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)selectOutputWithParams:(CHIPAudioOutputClusterSelectOutputParams *)params
              completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeAudioOutputListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAudioOutputListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeCurrentAudioOutputWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentAudioOutputWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentAudioOutputWithMinInterval:(uint16_t)minInterval
                                                 maxInterval:(uint16_t)maxInterval
                                             responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentAudioOutputWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentAudioOutputWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -197,35 +228,45 @@ NS_ASSUME_NONNULL_BEGIN
                           completionHandler:(StatusCompletion)completionHandler;
 - (void)barrierControlStopWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeBarrierMovingStateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBarrierMovingStateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBarrierMovingStateWithMinInterval:(uint16_t)minInterval
                                                 maxInterval:(uint16_t)maxInterval
                                             responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBarrierMovingStateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBarrierMovingStateWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBarrierSafetyStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBarrierSafetyStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBarrierSafetyStatusWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBarrierSafetyStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBarrierSafetyStatusWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBarrierCapabilitiesWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBarrierCapabilitiesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBarrierCapabilitiesWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBarrierCapabilitiesWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBarrierCapabilitiesWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBarrierPositionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBarrierPositionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBarrierPositionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBarrierPositionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBarrierPositionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -237,122 +278,158 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)mfgSpecificPingWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeInteractionModelVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInteractionModelVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeInteractionModelVersionWithMinInterval:(uint16_t)minInterval
                                                      maxInterval:(uint16_t)maxInterval
                                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInteractionModelVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInteractionModelVersionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeVendorNameWithCompletionHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeVendorNameWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeVendorNameWithResponseHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeVendorIDWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeVendorIDWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeVendorIDWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeVendorIDWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeVendorIDWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeProductNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeProductNameWithCompletionHandler:(void (^)(
+                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductNameWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeProductNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeProductNameWithResponseHandler:(void (^)(
+                                                          NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeProductIDWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeProductIDWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductIDWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeProductIDWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeProductIDWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeUserLabelWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeUserLabelWithCompletionHandler:(void (^)(
+                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeUserLabelWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeUserLabelWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeUserLabelWithResponseHandler:(void (^)(
+                                                        NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeLocationWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeLocationWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLocationWithCompletionHandler:(void (^)(
+                                                       NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLocationWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLocationWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLocationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLocationWithResponseHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeHardwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeHardwareVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeHardwareVersionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeHardwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeHardwareVersionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeHardwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeHardwareVersionStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeHardwareVersionStringWithMinInterval:(uint16_t)minInterval
                                                    maxInterval:(uint16_t)maxInterval
                                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeHardwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeHardwareVersionStringWithResponseHandler:(void (^)(NSString * _Nullable value,
+                                                                    NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSoftwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSoftwareVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSoftwareVersionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSoftwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSoftwareVersionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSoftwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSoftwareVersionStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSoftwareVersionStringWithMinInterval:(uint16_t)minInterval
                                                    maxInterval:(uint16_t)maxInterval
                                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSoftwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSoftwareVersionStringWithResponseHandler:(void (^)(NSString * _Nullable value,
+                                                                    NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeManufacturingDateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeManufacturingDateWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeManufacturingDateWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeManufacturingDateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeManufacturingDateWithResponseHandler:(void (^)(NSString * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePartNumberWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePartNumberWithCompletionHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePartNumberWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePartNumberWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePartNumberWithResponseHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeProductURLWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeProductURLWithCompletionHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductURLWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeProductURLWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeProductURLWithResponseHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeProductLabelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeProductLabelWithCompletionHandler:(void (^)(
+                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductLabelWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeProductLabelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeProductLabelWithResponseHandler:(void (^)(
+                                                           NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSerialNumberWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSerialNumberWithCompletionHandler:(void (^)(
+                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSerialNumberWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSerialNumberWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSerialNumberWithResponseHandler:(void (^)(
+                                                           NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeLocalConfigDisabledWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeLocalConfigDisabledWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLocalConfigDisabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLocalConfigDisabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLocalConfigDisabledWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLocalConfigDisabledWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLocalConfigDisabledWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeReachableWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeReachableWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeReachableWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -362,31 +439,39 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBinaryInputBasic : CHIPCluster
 
-- (void)readAttributeOutOfServiceWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOutOfServiceWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOutOfServiceWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOutOfServiceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOutOfServiceWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOutOfServiceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOutOfServiceWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePresentValueWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributePresentValueWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePresentValueWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributePresentValueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributePresentValueWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePresentValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePresentValueWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeStatusFlagsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStatusFlagsWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStatusFlagsWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeStatusFlagsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStatusFlagsWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -399,11 +484,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)bindWithParams:(CHIPBindingClusterBindParams *)params completionHandler:(StatusCompletion)completionHandler;
 - (void)unbindWithParams:(CHIPBindingClusterUnbindParams *)params completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -413,17 +500,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBooleanState : CHIPCluster
 
-- (void)readAttributeStateValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStateValueWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStateValueWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeStateValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStateValueWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -458,21 +549,26 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stopActionWithParams:(CHIPBridgedActionsClusterStopActionParams *)params
            completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeActionListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActionListWithCompletionHandler:(void (^)(
+                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeEndpointListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEndpointListWithCompletionHandler:(void (^)(
+                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeSetupUrlWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSetupUrlWithCompletionHandler:(void (^)(
+                                                       NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSetupUrlWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSetupUrlWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSetupUrlWithResponseHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -482,11 +578,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBridgedDeviceBasicInformation : CHIPCluster
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -530,337 +628,444 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stopMoveStepWithParams:(CHIPColorControlClusterStopMoveStepParams *)params
              completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeCurrentHueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentHueWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentHueWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentHueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentHueWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentSaturationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentSaturationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentSaturationWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentSaturationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentSaturationWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRemainingTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRemainingTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRemainingTimeWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRemainingTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRemainingTimeWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentXWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentXWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentXWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentXWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentXWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentYWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentYWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentYWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentYWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentYWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeDriftCompensationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDriftCompensationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDriftCompensationWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeDriftCompensationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeDriftCompensationWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCompensationTextWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCompensationTextWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCompensationTextWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCompensationTextWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCompensationTextWithResponseHandler:(void (^)(NSString * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorTemperatureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorTemperatureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorTemperatureWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorTemperatureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorTemperatureWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorModeWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorModeWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorModeWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorControlOptionsWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeColorControlOptionsWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorControlOptionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeColorControlOptionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorControlOptionsWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorControlOptionsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorControlOptionsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNumberOfPrimariesWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNumberOfPrimariesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfPrimariesWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNumberOfPrimariesWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNumberOfPrimariesWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary1XWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary1XWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary1XWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary1XWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary1XWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary1YWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary1YWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary1YWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary1YWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary1YWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary1IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary1IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary1IntensityWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary1IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary1IntensityWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary2XWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary2XWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary2XWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary2XWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary2XWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary2YWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary2YWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary2YWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary2YWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary2YWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary2IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary2IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary2IntensityWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary2IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary2IntensityWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary3XWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary3XWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary3XWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary3XWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary3XWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary3YWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary3YWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary3YWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary3YWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary3YWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary3IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary3IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary3IntensityWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary3IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary3IntensityWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary4XWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary4XWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary4XWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary4XWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary4XWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary4YWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary4YWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary4YWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary4YWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary4YWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary4IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary4IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary4IntensityWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary4IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary4IntensityWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary5XWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary5XWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary5XWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary5XWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary5XWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary5YWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary5YWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary5YWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary5YWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary5YWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary5IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary5IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary5IntensityWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary5IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary5IntensityWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary6XWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary6XWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary6XWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary6XWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary6XWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary6YWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary6YWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary6YWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary6YWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary6YWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePrimary6IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePrimary6IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary6IntensityWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePrimary6IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePrimary6IntensityWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeWhitePointXWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWhitePointXWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeWhitePointXWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeWhitePointXWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeWhitePointXWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeWhitePointYWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWhitePointYWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeWhitePointYWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeWhitePointYWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeWhitePointYWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorPointRXWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorPointRXWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointRXWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorPointRXWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorPointRXWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorPointRYWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorPointRYWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointRYWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorPointRYWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorPointRYWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorPointRIntensityWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorPointRIntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+- (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nonnull)value
+                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointRIntensityWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorPointRIntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorPointRIntensityWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorPointGXWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorPointGXWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointGXWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorPointGXWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorPointGXWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorPointGYWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorPointGYWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointGYWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorPointGYWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorPointGYWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorPointGIntensityWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorPointGIntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+- (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nonnull)value
+                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointGIntensityWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorPointGIntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorPointGIntensityWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorPointBXWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorPointBXWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointBXWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorPointBXWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorPointBXWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorPointBYWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorPointBYWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointBYWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorPointBYWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorPointBYWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorPointBIntensityWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorPointBIntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+- (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nonnull)value
+                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointBIntensityWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorPointBIntensityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorPointBIntensityWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeEnhancedCurrentHueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEnhancedCurrentHueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeEnhancedCurrentHueWithMinInterval:(uint16_t)minInterval
                                                 maxInterval:(uint16_t)maxInterval
                                             responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeEnhancedCurrentHueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeEnhancedCurrentHueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeEnhancedColorModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEnhancedColorModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeEnhancedColorModeWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeEnhancedColorModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeEnhancedColorModeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorLoopActiveWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorLoopActiveWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorLoopActiveWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorLoopActiveWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorLoopActiveWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorLoopDirectionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorLoopDirectionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorLoopDirectionWithMinInterval:(uint16_t)minInterval
                                                 maxInterval:(uint16_t)maxInterval
                                             responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorLoopDirectionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorLoopDirectionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorLoopTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorLoopTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorLoopTimeWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorLoopTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorLoopTimeWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorLoopStartEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorLoopStartEnhancedHueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorLoopStartEnhancedHueWithMinInterval:(uint16_t)minInterval
                                                        maxInterval:(uint16_t)maxInterval
                                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorLoopStartEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorLoopStartEnhancedHueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorLoopStoredEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorLoopStoredEnhancedHueWithMinInterval:(uint16_t)minInterval
                                                         maxInterval:(uint16_t)maxInterval
                                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorLoopStoredEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorLoopStoredEnhancedHueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorCapabilitiesWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorCapabilitiesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorCapabilitiesWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorCapabilitiesWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorCapabilitiesWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorTempPhysicalMinWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorTempPhysicalMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorTempPhysicalMinWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorTempPhysicalMinWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorTempPhysicalMinWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeColorTempPhysicalMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorTempPhysicalMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorTempPhysicalMaxWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeColorTempPhysicalMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeColorTempPhysicalMaxWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCoupleColorTempToLevelMinMiredsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCoupleColorTempToLevelMinMiredsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCoupleColorTempToLevelMinMiredsWithMinInterval:(uint16_t)minInterval
                                                              maxInterval:(uint16_t)maxInterval
                                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCoupleColorTempToLevelMinMiredsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCoupleColorTempToLevelMinMiredsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeStartUpColorTemperatureMiredsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStartUpColorTemperatureMiredsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))completionHandler;
 - (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(NSNumber * _Nonnull)value
-                                             responseHandler:(ResponseHandler)responseHandler;
+                                           completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeStartUpColorTemperatureMiredsWithMinInterval:(uint16_t)minInterval
                                                            maxInterval:(uint16_t)maxInterval
                                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeStartUpColorTemperatureMiredsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStartUpColorTemperatureMiredsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -877,15 +1082,19 @@ NS_ASSUME_NONNULL_BEGIN
           completionHandler:(void (^)(CHIPContentLauncherClusterLaunchURLResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeAcceptsHeaderListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAcceptsHeaderListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeSupportedStreamingTypesWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSupportedStreamingTypesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -895,19 +1104,25 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPDescriptor : CHIPCluster
 
-- (void)readAttributeDeviceListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDeviceListWithCompletionHandler:(void (^)(
+                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeServerListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeServerListWithCompletionHandler:(void (^)(
+                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeClientListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClientListWithCompletionHandler:(void (^)(
+                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributePartsListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePartsListWithCompletionHandler:(void (^)(
+                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -997,29 +1212,36 @@ NS_ASSUME_NONNULL_BEGIN
                   completionHandler:(void (^)(CHIPDoorLockClusterUnlockWithTimeoutResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeLockStateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLockStateWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLockStateWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLockStateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLockStateWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeLockTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLockTypeWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLockTypeWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLockTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLockTypeWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeActuatorEnabledWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActuatorEnabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActuatorEnabledWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeActuatorEnabledWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeActuatorEnabledWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1029,77 +1251,101 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPElectricalMeasurement : CHIPCluster
 
-- (void)readAttributeMeasurementTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMeasurementTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeasurementTypeWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMeasurementTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMeasurementTypeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTotalActivePowerWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTotalActivePowerWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTotalActivePowerWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTotalActivePowerWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTotalActivePowerWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRmsVoltageWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRmsVoltageWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRmsVoltageWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRmsVoltageWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRmsVoltageWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRmsVoltageMinWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRmsVoltageMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRmsVoltageMinWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRmsVoltageMinWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRmsVoltageMinWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRmsVoltageMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRmsVoltageMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRmsVoltageMaxWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRmsVoltageMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRmsVoltageMaxWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRmsCurrentWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRmsCurrentWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRmsCurrentWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRmsCurrentWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRmsCurrentWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRmsCurrentMinWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRmsCurrentMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRmsCurrentMinWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRmsCurrentMinWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRmsCurrentMinWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRmsCurrentMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRmsCurrentMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRmsCurrentMaxWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRmsCurrentMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRmsCurrentMaxWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeActivePowerWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActivePowerWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActivePowerWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeActivePowerWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeActivePowerWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeActivePowerMinWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActivePowerMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActivePowerMinWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeActivePowerMinWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeActivePowerMinWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeActivePowerMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActivePowerMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActivePowerMaxWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeActivePowerMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeActivePowerMaxWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1111,65 +1357,84 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resetCountsWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributePHYRateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePHYRateWithCompletionHandler:(void (^)(
+                                                      NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePHYRateWithMinInterval:(uint16_t)minInterval
                                      maxInterval:(uint16_t)maxInterval
                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePHYRateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePHYRateWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeFullDuplexWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFullDuplexWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFullDuplexWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeFullDuplexWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeFullDuplexWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePacketRxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePacketRxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePacketRxCountWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePacketRxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePacketRxCountWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePacketTxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePacketTxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePacketTxCountWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePacketTxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePacketTxCountWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxErrCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxErrCountWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxErrCountWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxErrCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxErrCountWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCollisionCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCollisionCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCollisionCountWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCollisionCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCollisionCountWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOverrunCountWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOverrunCountWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOverrunCountWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCarrierDetectWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCarrierDetectWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCarrierDetectWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCarrierDetectWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCarrierDetectWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTimeSinceResetWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTimeSinceResetWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTimeSinceResetWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTimeSinceResetWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTimeSinceResetWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1179,13 +1444,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPFixedLabel : CHIPCluster
 
-- (void)readAttributeLabelListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLabelListWithCompletionHandler:(void (^)(
+                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1195,35 +1463,45 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPFlowMeasurement : CHIPCluster
 
-- (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMeasuredValueWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeToleranceWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeToleranceWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeToleranceWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1243,20 +1521,25 @@ NS_ASSUME_NONNULL_BEGIN
                     completionHandler:(void (^)(CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeBreadcrumbWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeBreadcrumbWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBreadcrumbWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeBreadcrumbWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBreadcrumbWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBreadcrumbWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBreadcrumbWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBasicCommissioningInfoListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBasicCommissioningInfoListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1266,43 +1549,55 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGeneralDiagnostics : CHIPCluster
 
-- (void)readAttributeNetworkInterfacesWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNetworkInterfacesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeRebootCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRebootCountWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRebootCountWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRebootCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRebootCountWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeUpTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeUpTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeUpTimeWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeUpTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeUpTimeWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTotalOperationalHoursWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTotalOperationalHoursWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTotalOperationalHoursWithMinInterval:(uint16_t)minInterval
                                                    maxInterval:(uint16_t)maxInterval
                                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTotalOperationalHoursWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTotalOperationalHoursWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBootReasonsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBootReasonsWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBootReasonsWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBootReasonsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBootReasonsWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeActiveHardwareFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActiveHardwareFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeActiveRadioFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActiveRadioFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeActiveNetworkFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActiveNetworkFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1312,15 +1607,18 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGroupKeyManagement : CHIPCluster
 
-- (void)readAttributeGroupsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeGroupsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeGroupKeysWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeGroupKeysWithCompletionHandler:(void (^)(
+                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1346,17 +1644,21 @@ NS_ASSUME_NONNULL_BEGIN
           completionHandler:
               (void (^)(CHIPGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeNameSupportWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNameSupportWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNameSupportWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNameSupportWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNameSupportWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1372,24 +1674,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)triggerEffectWithParams:(CHIPIdentifyClusterTriggerEffectParams *)params
               completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeIdentifyTimeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeIdentifyTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeIdentifyTimeWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeIdentifyTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeIdentifyTimeWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeIdentifyTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeIdentifyTimeWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeIdentifyTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeIdentifyTypeWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeIdentifyTypeWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeIdentifyTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeIdentifyTypeWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1399,41 +1707,53 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPIlluminanceMeasurement : CHIPCluster
 
-- (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMeasuredValueWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeToleranceWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeToleranceWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeToleranceWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeLightSensorTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLightSensorTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLightSensorTypeWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLightSensorTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLightSensorTypeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1447,11 +1767,13 @@ NS_ASSUME_NONNULL_BEGIN
         completionHandler:
             (void (^)(CHIPKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1474,102 +1796,128 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stopWithParams:(CHIPLevelControlClusterStopParams *)params completionHandler:(StatusCompletion)completionHandler;
 - (void)stopWithOnOffWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeCurrentLevelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentLevelWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentLevelWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentLevelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentLevelWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRemainingTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRemainingTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRemainingTimeWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRemainingTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRemainingTimeWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinLevelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinLevelWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinLevelWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinLevelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinLevelWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxLevelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxLevelWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxLevelWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxLevelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxLevelWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentFrequencyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentFrequencyWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentFrequencyWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentFrequencyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentFrequencyWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinFrequencyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinFrequencyWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinFrequencyWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinFrequencyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinFrequencyWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxFrequencyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxFrequencyWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxFrequencyWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxFrequencyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxFrequencyWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOptionsWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOptionsWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOptionsWithCompletionHandler:(void (^)(
+                                                      NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOptionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOptionsWithMinInterval:(uint16_t)minInterval
                                      maxInterval:(uint16_t)maxInterval
                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOptionsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOptionsWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOnOffTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOnOffTransitionTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOnOffTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOnOffTransitionTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOnOffTransitionTimeWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOnOffTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOnOffTransitionTimeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOnLevelWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOnLevelWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOnLevelWithCompletionHandler:(void (^)(
+                                                      NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOnLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOnLevelWithMinInterval:(uint16_t)minInterval
                                      maxInterval:(uint16_t)maxInterval
                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOnLevelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOnLevelWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOnTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOnTransitionTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOnTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOnTransitionTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOnTransitionTimeWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOnTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOnTransitionTimeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOffTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOffTransitionTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOffTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOffTransitionTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOffTransitionTimeWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOffTransitionTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOffTransitionTimeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeDefaultMoveRateWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeDefaultMoveRateWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDefaultMoveRateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)writeAttributeDefaultMoveRateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeDefaultMoveRateWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeDefaultMoveRateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeDefaultMoveRateWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeStartUpCurrentLevelWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeStartUpCurrentLevelWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStartUpCurrentLevelWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeStartUpCurrentLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeStartUpCurrentLevelWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeStartUpCurrentLevelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStartUpCurrentLevelWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1581,11 +1929,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)sleepWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1602,19 +1952,24 @@ NS_ASSUME_NONNULL_BEGIN
             completionHandler:(StatusCompletion)completionHandler;
 - (void)showInputStatusWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeMediaInputListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMediaInputListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeCurrentMediaInputWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentMediaInputWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentMediaInputWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentMediaInputWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentMediaInputWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1650,59 +2005,75 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mediaStopWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterMediaStopResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler;
 
-- (void)readAttributePlaybackStateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePlaybackStateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePlaybackStateWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePlaybackStateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePlaybackStateWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeStartTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStartTimeWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStartTimeWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeStartTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStartTimeWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeDurationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDurationWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDurationWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeDurationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeDurationWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePositionUpdatedAtWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePositionUpdatedAtWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePositionUpdatedAtWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePositionUpdatedAtWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePositionUpdatedAtWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePositionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePositionWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePositionWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePositionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePositionWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePlaybackSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePlaybackSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePlaybackSpeedWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePlaybackSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePlaybackSpeedWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSeekRangeEndWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSeekRangeEndWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSeekRangeEndWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSeekRangeEndWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSeekRangeEndWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSeekRangeStartWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSeekRangeStartWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSeekRangeStartWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSeekRangeStartWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSeekRangeStartWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1715,38 +2086,47 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)changeToModeWithParams:(CHIPModeSelectClusterChangeToModeParams *)params
              completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeCurrentModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentModeWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentModeWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentModeWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSupportedModesWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSupportedModesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeOnModeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOnModeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOnModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOnModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOnModeWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOnModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOnModeWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeStartUpModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStartUpModeWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStartUpModeWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeStartUpModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStartUpModeWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDescriptionWithCompletionHandler:(void (^)(
+                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDescriptionWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeDescriptionWithResponseHandler:(void (^)(
+                                                          NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1781,17 +2161,21 @@ NS_ASSUME_NONNULL_BEGIN
                   completionHandler:(void (^)(CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeFeatureMapWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1810,11 +2194,13 @@ NS_ASSUME_NONNULL_BEGIN
            completionHandler:(void (^)(CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                  NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1827,24 +2213,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)announceOtaProviderWithParams:(CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
                     completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeDefaultOtaProviderWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeDefaultOtaProviderWithValue:(NSData * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDefaultOtaProviderWithCompletionHandler:(void (^)(NSData * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
+- (void)writeAttributeDefaultOtaProviderWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeDefaultOtaProviderWithMinInterval:(uint16_t)minInterval
                                                 maxInterval:(uint16_t)maxInterval
                                             responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeDefaultOtaProviderWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeDefaultOtaProviderWithResponseHandler:(void (^)(NSData * _Nullable value,
+                                                                 NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeUpdatePossibleWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeUpdatePossibleWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeUpdatePossibleWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeUpdatePossibleWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeUpdatePossibleWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1854,29 +2246,37 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOccupancySensing : CHIPCluster
 
-- (void)readAttributeOccupancyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOccupancyWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOccupancyWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOccupancyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOccupancyWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOccupancySensorTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOccupancySensorTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOccupancySensorTypeWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOccupancySensorTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOccupancySensorTypeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOccupancySensorTypeBitmapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOccupancySensorTypeBitmapWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOccupancySensorTypeBitmapWithMinInterval:(uint16_t)minInterval
                                                        maxInterval:(uint16_t)maxInterval
                                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOccupancySensorTypeBitmapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOccupancySensorTypeBitmapWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1894,50 +2294,60 @@ NS_ASSUME_NONNULL_BEGIN
                completionHandler:(StatusCompletion)completionHandler;
 - (void)toggleWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeOnOffWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOnOffWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOnOffWithMinInterval:(uint16_t)minInterval
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOnOffWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOnOffWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeGlobalSceneControlWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeGlobalSceneControlWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeGlobalSceneControlWithMinInterval:(uint16_t)minInterval
                                                 maxInterval:(uint16_t)maxInterval
                                             responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeGlobalSceneControlWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeGlobalSceneControlWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOnTimeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOnTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOnTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOnTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOnTimeWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOnTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOnTimeWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOffWaitTimeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOffWaitTimeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOffWaitTimeWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOffWaitTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOffWaitTimeWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOffWaitTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOffWaitTimeWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeStartUpOnOffWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeStartUpOnOffWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStartUpOnOffWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeStartUpOnOffWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeStartUpOnOffWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeStartUpOnOffWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStartUpOnOffWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeFeatureMapWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -1947,24 +2357,30 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOnOffSwitchConfiguration : CHIPCluster
 
-- (void)readAttributeSwitchTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSwitchTypeWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSwitchTypeWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSwitchTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSwitchTypeWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSwitchActionsWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeSwitchActionsWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSwitchActionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)writeAttributeSwitchActionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeSwitchActionsWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSwitchActionsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSwitchActionsWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2001,33 +2417,43 @@ NS_ASSUME_NONNULL_BEGIN
           completionHandler:(void (^)(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeFabricsListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFabricsListWithCompletionHandler:(void (^)(
+                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeSupportedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSupportedFabricsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSupportedFabricsWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSupportedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSupportedFabricsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCommissionedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCommissionedFabricsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCommissionedFabricsWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCommissionedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCommissionedFabricsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTrustedRootCertificatesWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTrustedRootCertificatesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeCurrentFabricIndexWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentFabricIndexWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentFabricIndexWithMinInterval:(uint16_t)minInterval
                                                 maxInterval:(uint16_t)maxInterval
                                             responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentFabricIndexWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentFabricIndexWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2037,67 +2463,84 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPPowerSource : CHIPCluster
 
-- (void)readAttributeStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStatusWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStatusWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOrderWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOrderWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOrderWithMinInterval:(uint16_t)minInterval
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOrderWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOrderWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDescriptionWithCompletionHandler:(void (^)(
+                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDescriptionWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeDescriptionWithResponseHandler:(void (^)(
+                                                          NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBatteryVoltageWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryVoltageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBatteryVoltageWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBatteryVoltageWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBatteryVoltageWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBatteryPercentRemainingWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryPercentRemainingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBatteryPercentRemainingWithMinInterval:(uint16_t)minInterval
                                                      maxInterval:(uint16_t)maxInterval
                                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBatteryPercentRemainingWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBatteryPercentRemainingWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBatteryTimeRemainingWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryTimeRemainingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBatteryTimeRemainingWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBatteryTimeRemainingWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBatteryTimeRemainingWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBatteryChargeLevelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryChargeLevelWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBatteryChargeLevelWithMinInterval:(uint16_t)minInterval
                                                 maxInterval:(uint16_t)maxInterval
                                             responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBatteryChargeLevelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBatteryChargeLevelWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeActiveBatteryFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActiveBatteryFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeBatteryChargeStateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryChargeStateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBatteryChargeStateWithMinInterval:(uint16_t)minInterval
                                                 maxInterval:(uint16_t)maxInterval
                                             responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBatteryChargeStateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBatteryChargeStateWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeFeatureMapWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2107,29 +2550,37 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPPressureMeasurement : CHIPCluster
 
-- (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMeasuredValueWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2139,151 +2590,194 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPPumpConfigurationAndControl : CHIPCluster
 
-- (void)readAttributeMaxPressureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxPressureWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxPressureWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxPressureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxPressureWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxSpeedWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxSpeedWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxSpeedWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxFlowWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxFlowWithCompletionHandler:(void (^)(
+                                                      NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxFlowWithMinInterval:(uint16_t)minInterval
                                      maxInterval:(uint16_t)maxInterval
                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxFlowWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxFlowWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinConstPressureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinConstPressureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinConstPressureWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinConstPressureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinConstPressureWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxConstPressureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxConstPressureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxConstPressureWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxConstPressureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxConstPressureWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinCompPressureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinCompPressureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinCompPressureWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinCompPressureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinCompPressureWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxCompPressureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxCompPressureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxCompPressureWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxCompPressureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxCompPressureWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinConstSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinConstSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinConstSpeedWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinConstSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinConstSpeedWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxConstSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxConstSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxConstSpeedWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxConstSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxConstSpeedWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinConstFlowWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinConstFlowWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinConstFlowWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinConstFlowWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinConstFlowWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxConstFlowWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxConstFlowWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxConstFlowWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxConstFlowWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxConstFlowWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinConstTempWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinConstTempWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinConstTempWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinConstTempWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinConstTempWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxConstTempWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxConstTempWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxConstTempWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxConstTempWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxConstTempWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePumpStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePumpStatusWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePumpStatusWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePumpStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePumpStatusWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeEffectiveOperationModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEffectiveOperationModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeEffectiveOperationModeWithMinInterval:(uint16_t)minInterval
                                                     maxInterval:(uint16_t)maxInterval
                                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeEffectiveOperationModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeEffectiveOperationModeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeEffectiveControlModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEffectiveControlModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeEffectiveControlModeWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeEffectiveControlModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeEffectiveControlModeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCapacityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCapacityWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCapacityWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCapacityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCapacityWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSpeedWithMinInterval:(uint16_t)minInterval
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSpeedWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeLifetimeEnergyConsumedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLifetimeEnergyConsumedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLifetimeEnergyConsumedWithMinInterval:(uint16_t)minInterval
                                                     maxInterval:(uint16_t)maxInterval
                                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLifetimeEnergyConsumedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLifetimeEnergyConsumedWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOperationModeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOperationModeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOperationModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOperationModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOperationModeWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOperationModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOperationModeWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeControlModeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeControlModeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeControlModeWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeControlModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeControlModeWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeControlModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeControlModeWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeAlarmMaskWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAlarmMaskWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAlarmMaskWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeAlarmMaskWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeAlarmMaskWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeFeatureMapWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2293,35 +2787,45 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPRelativeHumidityMeasurement : CHIPCluster
 
-- (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMeasuredValueWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeToleranceWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeToleranceWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeToleranceWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2351,41 +2855,53 @@ NS_ASSUME_NONNULL_BEGIN
           completionHandler:
               (void (^)(CHIPScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeSceneCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSceneCountWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSceneCountWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSceneCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSceneCountWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentSceneWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentSceneWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentSceneWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentSceneWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentSceneWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentGroupWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentGroupWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentGroupWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentGroupWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentGroupWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSceneValidWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSceneValidWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSceneValidWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSceneValidWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSceneValidWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNameSupportWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNameSupportWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNameSupportWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNameSupportWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNameSupportWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2397,31 +2913,40 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resetWatermarksWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeThreadMetricsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeThreadMetricsWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeCurrentHeapFreeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentHeapFreeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentHeapFreeWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentHeapFreeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentHeapFreeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentHeapUsedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentHeapUsedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentHeapUsedWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentHeapUsedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentHeapUsedWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentHeapHighWatermarkWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentHeapHighWatermarkWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentHeapHighWatermarkWithMinInterval:(uint16_t)minInterval
                                                       maxInterval:(uint16_t)maxInterval
                                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentHeapHighWatermarkWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentHeapHighWatermarkWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2431,35 +2956,45 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPSwitch : CHIPCluster
 
-- (void)readAttributeNumberOfPositionsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNumberOfPositionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfPositionsWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNumberOfPositionsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNumberOfPositionsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentPositionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentPositionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentPositionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentPositionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMultiPressMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMultiPressMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMultiPressMaxWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMultiPressMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMultiPressMaxWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeFeatureMapWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2476,25 +3011,32 @@ NS_ASSUME_NONNULL_BEGIN
                       completionHandler:(StatusCompletion)completionHandler;
 - (void)skipChannelWithParams:(CHIPTvChannelClusterSkipChannelParams *)params completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeTvChannelListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTvChannelListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeTvChannelLineupWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTvChannelLineupWithCompletionHandler:(void (^)(NSData * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTvChannelLineupWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTvChannelLineupWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTvChannelLineupWithResponseHandler:(void (^)(
+                                                              NSData * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentTvChannelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentTvChannelWithCompletionHandler:(void (^)(NSData * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentTvChannelWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentTvChannelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentTvChannelWithResponseHandler:(void (^)(
+                                                               NSData * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2508,13 +3050,16 @@ NS_ASSUME_NONNULL_BEGIN
                completionHandler:(void (^)(CHIPTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeTargetNavigatorListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTargetNavigatorListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2524,35 +3069,45 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTemperatureMeasurement : CHIPCluster
 
-- (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMeasuredValueWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeToleranceWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeToleranceWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeToleranceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeToleranceWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2589,302 +3144,360 @@ NS_ASSUME_NONNULL_BEGIN
                                                 NSError * _Nullable error))completionHandler;
 - (void)testUnknownCommandWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeBooleanWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeBooleanWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBooleanWithCompletionHandler:(void (^)(
+                                                      NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBooleanWithMinInterval:(uint16_t)minInterval
                                      maxInterval:(uint16_t)maxInterval
                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBooleanWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBooleanWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBitmap8WithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeBitmap8WithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBitmap8WithCompletionHandler:(void (^)(
+                                                      NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeBitmap8WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBitmap8WithMinInterval:(uint16_t)minInterval
                                      maxInterval:(uint16_t)maxInterval
                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBitmap8WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBitmap8WithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBitmap16WithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeBitmap16WithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBitmap16WithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeBitmap16WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBitmap16WithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBitmap16WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBitmap16WithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBitmap32WithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeBitmap32WithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBitmap32WithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeBitmap32WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBitmap32WithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBitmap32WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBitmap32WithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBitmap64WithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeBitmap64WithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBitmap64WithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeBitmap64WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBitmap64WithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBitmap64WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBitmap64WithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeInt8uWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeInt8uWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt8uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt8uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt8uWithMinInterval:(uint16_t)minInterval
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInt8uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt8uWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeInt16uWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeInt16uWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt16uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt16uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt16uWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInt16uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt16uWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeInt32uWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeInt32uWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt32uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt32uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt32uWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInt32uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt32uWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeInt64uWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeInt64uWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt64uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt64uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt64uWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInt64uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt64uWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeInt8sWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeInt8sWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt8sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt8sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt8sWithMinInterval:(uint16_t)minInterval
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInt8sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt8sWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeInt16sWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeInt16sWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt16sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt16sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt16sWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInt16sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt16sWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeInt32sWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeInt32sWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt32sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt32sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt32sWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInt32sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt32sWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeInt64sWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeInt64sWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt64sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt64sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt64sWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInt64sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt64sWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeEnum8WithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeEnum8WithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEnum8WithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeEnum8WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeEnum8WithMinInterval:(uint16_t)minInterval
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeEnum8WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeEnum8WithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeEnum16WithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeEnum16WithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEnum16WithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeEnum16WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeEnum16WithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeEnum16WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeEnum16WithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOctetStringWithValue:(NSData * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOctetStringWithCompletionHandler:(void (^)(
+                                                          NSData * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOctetStringWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOctetStringWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOctetStringWithResponseHandler:(void (^)(
+                                                          NSData * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeListInt8uWithValue:(NSArray * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeListInt8uWithCompletionHandler:(void (^)(
+                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeListInt8uWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeListOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeListOctetStringWithValue:(NSArray * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeListOctetStringWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)writeAttributeListOctetStringWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeListStructOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeListStructOctetStringWithValue:(NSArray * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeListStructOctetStringWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
+- (void)writeAttributeListStructOctetStringWithValue:(NSArray * _Nonnull)value
+                                   completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeLongOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeLongOctetStringWithValue:(NSData * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLongOctetStringWithCompletionHandler:(void (^)(NSData * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLongOctetStringWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLongOctetStringWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLongOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLongOctetStringWithResponseHandler:(void (^)(
+                                                              NSData * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCharStringWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeCharStringWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCharStringWithCompletionHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeCharStringWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeCharStringWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCharStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCharStringWithResponseHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeLongCharStringWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeLongCharStringWithValue:(NSString * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLongCharStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLongCharStringWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLongCharStringWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLongCharStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLongCharStringWithResponseHandler:(void (^)(
+                                                             NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeEpochUsWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeEpochUsWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEpochUsWithCompletionHandler:(void (^)(
+                                                      NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeEpochUsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeEpochUsWithMinInterval:(uint16_t)minInterval
                                      maxInterval:(uint16_t)maxInterval
                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeEpochUsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeEpochUsWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeEpochSWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeEpochSWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEpochSWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeEpochSWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeEpochSWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeEpochSWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeEpochSWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeVendorIdWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeVendorIdWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeVendorIdWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeVendorIdWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeVendorIdWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeListNullablesAndOptionalsStructWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeListNullablesAndOptionalsStructWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                              NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeUnsupportedWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeUnsupportedWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeUnsupportedWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeUnsupportedWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeUnsupportedWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableBooleanWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableBooleanWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableBooleanWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableBooleanWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableBooleanWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableBooleanWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableBitmap8WithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableBitmap8WithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableBitmap8WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableBitmap8WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableBitmap8WithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableBitmap8WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableBitmap8WithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableBitmap16WithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableBitmap16WithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableBitmap16WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableBitmap16WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableBitmap16WithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableBitmap16WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableBitmap16WithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableBitmap32WithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableBitmap32WithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableBitmap32WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableBitmap32WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableBitmap32WithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableBitmap32WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableBitmap32WithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableBitmap64WithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableBitmap64WithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableBitmap64WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableBitmap64WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableBitmap64WithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableBitmap64WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableBitmap64WithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableInt8uWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableInt8uWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableInt8uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt8uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt8uWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableInt8uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt8uWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableInt16uWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableInt16uWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableInt16uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt16uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt16uWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableInt16uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt16uWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableInt32uWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableInt32uWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableInt32uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt32uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt32uWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableInt32uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt32uWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableInt64uWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableInt64uWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableInt64uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt64uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt64uWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableInt64uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt64uWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableInt8sWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableInt8sWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableInt8sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt8sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt8sWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableInt8sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt8sWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableInt16sWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableInt16sWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableInt16sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt16sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt16sWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableInt16sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt16sWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableInt32sWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableInt32sWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableInt32sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt32sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt32sWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableInt32sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt32sWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableInt64sWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableInt64sWithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableInt64sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt64sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt64sWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableInt64sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt64sWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableEnum8WithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableEnum8WithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableEnum8WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableEnum8WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableEnum8WithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableEnum8WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableEnum8WithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableEnum16WithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableEnum16WithValue:(NSNumber * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableEnum16WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableEnum16WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableEnum16WithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableEnum16WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableEnum16WithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableOctetStringWithValue:(NSData * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableOctetStringWithCompletionHandler:(void (^)(NSData * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableOctetStringWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableOctetStringWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableOctetStringWithResponseHandler:(void (^)(NSData * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNullableCharStringWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeNullableCharStringWithValue:(NSString * _Nullable)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNullableCharStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableCharStringWithValue:(NSString * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableCharStringWithMinInterval:(uint16_t)minInterval
                                                 maxInterval:(uint16_t)maxInterval
                                             responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNullableCharStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableCharStringWithResponseHandler:(void (^)(NSString * _Nullable value,
+                                                                 NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -2903,129 +3516,173 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setpointRaiseLowerWithParams:(CHIPThermostatClusterSetpointRaiseLowerParams *)params
                    completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeLocalTemperatureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLocalTemperatureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLocalTemperatureWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLocalTemperatureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLocalTemperatureWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeAbsMinHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAbsMinHeatSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAbsMinHeatSetpointLimitWithMinInterval:(uint16_t)minInterval
                                                      maxInterval:(uint16_t)maxInterval
                                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeAbsMinHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeAbsMinHeatSetpointLimitWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeAbsMaxHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAbsMaxHeatSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAbsMaxHeatSetpointLimitWithMinInterval:(uint16_t)minInterval
                                                      maxInterval:(uint16_t)maxInterval
                                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeAbsMaxHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeAbsMaxHeatSetpointLimitWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeAbsMinCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAbsMinCoolSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAbsMinCoolSetpointLimitWithMinInterval:(uint16_t)minInterval
                                                      maxInterval:(uint16_t)maxInterval
                                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeAbsMinCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeAbsMinCoolSetpointLimitWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeAbsMaxCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAbsMaxCoolSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAbsMaxCoolSetpointLimitWithMinInterval:(uint16_t)minInterval
                                                      maxInterval:(uint16_t)maxInterval
                                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeAbsMaxCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeAbsMaxCoolSetpointLimitWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOccupiedCoolingSetpointWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOccupiedCoolingSetpointWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOccupiedCoolingSetpointWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOccupiedCoolingSetpointWithValue:(NSNumber * _Nonnull)value
+                                     completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOccupiedCoolingSetpointWithMinInterval:(uint16_t)minInterval
                                                      maxInterval:(uint16_t)maxInterval
                                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOccupiedCoolingSetpointWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOccupiedCoolingSetpointWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOccupiedHeatingSetpointWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOccupiedHeatingSetpointWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOccupiedHeatingSetpointWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOccupiedHeatingSetpointWithValue:(NSNumber * _Nonnull)value
+                                     completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOccupiedHeatingSetpointWithMinInterval:(uint16_t)minInterval
                                                      maxInterval:(uint16_t)maxInterval
                                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOccupiedHeatingSetpointWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOccupiedHeatingSetpointWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeMinHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinHeatSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+- (void)writeAttributeMinHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value
+                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeMinHeatSetpointLimitWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinHeatSetpointLimitWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeMaxHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxHeatSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+- (void)writeAttributeMaxHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value
+                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeMaxHeatSetpointLimitWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxHeatSetpointLimitWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeMinCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinCoolSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+- (void)writeAttributeMinCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value
+                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeMinCoolSetpointLimitWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinCoolSetpointLimitWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMaxCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeMaxCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxCoolSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+- (void)writeAttributeMaxCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value
+                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeMaxCoolSetpointLimitWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMaxCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMaxCoolSetpointLimitWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMinSetpointDeadBandWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeMinSetpointDeadBandWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinSetpointDeadBandWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeMinSetpointDeadBandWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeMinSetpointDeadBandWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMinSetpointDeadBandWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMinSetpointDeadBandWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeControlSequenceOfOperationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeControlSequenceOfOperationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
 - (void)writeAttributeControlSequenceOfOperationWithValue:(NSNumber * _Nonnull)value
-                                          responseHandler:(ResponseHandler)responseHandler;
+                                        completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeControlSequenceOfOperationWithMinInterval:(uint16_t)minInterval
                                                         maxInterval:(uint16_t)maxInterval
                                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeControlSequenceOfOperationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeControlSequenceOfOperationWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSystemModeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeSystemModeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSystemModeWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeSystemModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeSystemModeWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSystemModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSystemModeWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeStartOfWeekWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStartOfWeekWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStartOfWeekWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeStartOfWeekWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStartOfWeekWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNumberOfWeeklyTransitionsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNumberOfWeeklyTransitionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfWeeklyTransitionsWithMinInterval:(uint16_t)minInterval
                                                        maxInterval:(uint16_t)maxInterval
                                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNumberOfWeeklyTransitionsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNumberOfWeeklyTransitionsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNumberOfDailyTransitionsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNumberOfDailyTransitionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfDailyTransitionsWithMinInterval:(uint16_t)minInterval
                                                       maxInterval:(uint16_t)maxInterval
                                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNumberOfDailyTransitionsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNumberOfDailyTransitionsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeFeatureMapWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -3035,33 +3692,42 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPThermostatUserInterfaceConfiguration : CHIPCluster
 
-- (void)readAttributeTemperatureDisplayModeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeTemperatureDisplayModeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTemperatureDisplayModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
+- (void)writeAttributeTemperatureDisplayModeWithValue:(NSNumber * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeTemperatureDisplayModeWithMinInterval:(uint16_t)minInterval
                                                     maxInterval:(uint16_t)maxInterval
                                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTemperatureDisplayModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTemperatureDisplayModeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeKeypadLockoutWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeKeypadLockoutWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeKeypadLockoutWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)writeAttributeKeypadLockoutWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeKeypadLockoutWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeKeypadLockoutWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeKeypadLockoutWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeScheduleProgrammingVisibilityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeScheduleProgrammingVisibilityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))completionHandler;
 - (void)writeAttributeScheduleProgrammingVisibilityWithValue:(NSNumber * _Nonnull)value
-                                             responseHandler:(ResponseHandler)responseHandler;
+                                           completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeScheduleProgrammingVisibilityWithMinInterval:(uint16_t)minInterval
                                                            maxInterval:(uint16_t)maxInterval
                                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeScheduleProgrammingVisibilityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeScheduleProgrammingVisibilityWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -3073,369 +3739,487 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resetCountsWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeChannelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeChannelWithCompletionHandler:(void (^)(
+                                                      NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeChannelWithMinInterval:(uint16_t)minInterval
                                      maxInterval:(uint16_t)maxInterval
                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeChannelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeChannelWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRoutingRoleWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRoutingRoleWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRoutingRoleWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRoutingRoleWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRoutingRoleWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNetworkNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNetworkNameWithCompletionHandler:(void (^)(
+                                                          NSData * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNetworkNameWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeNetworkNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNetworkNameWithResponseHandler:(void (^)(
+                                                          NSData * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePanIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePanIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePanIdWithMinInterval:(uint16_t)minInterval
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePanIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePanIdWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeExtendedPanIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeExtendedPanIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeExtendedPanIdWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeExtendedPanIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeExtendedPanIdWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeMeshLocalPrefixWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMeshLocalPrefixWithCompletionHandler:(void (^)(NSData * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeshLocalPrefixWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeMeshLocalPrefixWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMeshLocalPrefixWithResponseHandler:(void (^)(
+                                                              NSData * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOverrunCountWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOverrunCountWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOverrunCountWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeNeighborTableListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNeighborTableListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeRouteTableListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRouteTableListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 
-- (void)readAttributePartitionIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePartitionIdWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePartitionIdWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePartitionIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePartitionIdWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeWeightingWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWeightingWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeWeightingWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeWeightingWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeWeightingWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeDataVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDataVersionWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDataVersionWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeDataVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeDataVersionWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeStableDataVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStableDataVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStableDataVersionWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeStableDataVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStableDataVersionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeLeaderRouterIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLeaderRouterIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLeaderRouterIdWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLeaderRouterIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLeaderRouterIdWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeDetachedRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDetachedRoleCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDetachedRoleCountWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeDetachedRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeDetachedRoleCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeChildRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeChildRoleCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeChildRoleCountWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeChildRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeChildRoleCountWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRouterRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRouterRoleCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRouterRoleCountWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRouterRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRouterRoleCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeLeaderRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLeaderRoleCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLeaderRoleCountWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLeaderRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLeaderRoleCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeAttachAttemptCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAttachAttemptCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttachAttemptCountWithMinInterval:(uint16_t)minInterval
                                                 maxInterval:(uint16_t)maxInterval
                                             responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeAttachAttemptCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeAttachAttemptCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePartitionIdChangeCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePartitionIdChangeCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePartitionIdChangeCountWithMinInterval:(uint16_t)minInterval
                                                     maxInterval:(uint16_t)maxInterval
                                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePartitionIdChangeCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePartitionIdChangeCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBetterPartitionAttachAttemptCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBetterPartitionAttachAttemptCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBetterPartitionAttachAttemptCountWithMinInterval:(uint16_t)minInterval
                                                                maxInterval:(uint16_t)maxInterval
                                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBetterPartitionAttachAttemptCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBetterPartitionAttachAttemptCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeParentChangeCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeParentChangeCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeParentChangeCountWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeParentChangeCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeParentChangeCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxTotalCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxTotalCountWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxTotalCountWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxTotalCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxTotalCountWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxUnicastCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxUnicastCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxUnicastCountWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxUnicastCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxUnicastCountWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxBroadcastCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxBroadcastCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxBroadcastCountWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxBroadcastCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxBroadcastCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxAckRequestedCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxAckRequestedCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxAckRequestedCountWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxAckRequestedCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxAckRequestedCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxAckedCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxAckedCountWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxAckedCountWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxAckedCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxAckedCountWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxNoAckRequestedCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxNoAckRequestedCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxNoAckRequestedCountWithMinInterval:(uint16_t)minInterval
                                                    maxInterval:(uint16_t)maxInterval
                                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxNoAckRequestedCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxNoAckRequestedCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxDataCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxDataCountWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxDataCountWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxDataCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxDataCountWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxDataPollCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxDataPollCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxDataPollCountWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxDataPollCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxDataPollCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxBeaconCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxBeaconCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxBeaconCountWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxBeaconCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxBeaconCountWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxBeaconRequestCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxBeaconRequestCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxBeaconRequestCountWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxBeaconRequestCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxBeaconRequestCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxOtherCountWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxOtherCountWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxOtherCountWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxRetryCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxRetryCountWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxRetryCountWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxRetryCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxRetryCountWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxDirectMaxRetryExpiryCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxDirectMaxRetryExpiryCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxDirectMaxRetryExpiryCountWithMinInterval:(uint16_t)minInterval
                                                          maxInterval:(uint16_t)maxInterval
                                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxDirectMaxRetryExpiryCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxDirectMaxRetryExpiryCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                          NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxIndirectMaxRetryExpiryCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxIndirectMaxRetryExpiryCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxIndirectMaxRetryExpiryCountWithMinInterval:(uint16_t)minInterval
                                                            maxInterval:(uint16_t)maxInterval
                                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxIndirectMaxRetryExpiryCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxIndirectMaxRetryExpiryCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxErrCcaCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxErrCcaCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxErrCcaCountWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxErrCcaCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxErrCcaCountWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxErrAbortCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxErrAbortCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxErrAbortCountWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxErrAbortCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxErrAbortCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTxErrBusyChannelCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxErrBusyChannelCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxErrBusyChannelCountWithMinInterval:(uint16_t)minInterval
                                                    maxInterval:(uint16_t)maxInterval
                                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTxErrBusyChannelCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTxErrBusyChannelCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxTotalCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxTotalCountWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxTotalCountWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxTotalCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxTotalCountWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxUnicastCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxUnicastCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxUnicastCountWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxUnicastCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxUnicastCountWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxBroadcastCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxBroadcastCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxBroadcastCountWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxBroadcastCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxBroadcastCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxDataCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxDataCountWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxDataCountWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxDataCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxDataCountWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxDataPollCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxDataPollCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxDataPollCountWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxDataPollCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxDataPollCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxBeaconCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxBeaconCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxBeaconCountWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxBeaconCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxBeaconCountWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxBeaconRequestCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxBeaconRequestCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxBeaconRequestCountWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxBeaconRequestCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxBeaconRequestCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxOtherCountWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxOtherCountWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxOtherCountWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxAddressFilteredCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxAddressFilteredCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxAddressFilteredCountWithMinInterval:(uint16_t)minInterval
                                                     maxInterval:(uint16_t)maxInterval
                                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxAddressFilteredCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxAddressFilteredCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxDestAddrFilteredCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxDestAddrFilteredCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxDestAddrFilteredCountWithMinInterval:(uint16_t)minInterval
                                                      maxInterval:(uint16_t)maxInterval
                                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxDestAddrFilteredCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxDestAddrFilteredCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxDuplicatedCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxDuplicatedCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxDuplicatedCountWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxDuplicatedCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxDuplicatedCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxErrNoFrameCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxErrNoFrameCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxErrNoFrameCountWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxErrNoFrameCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxErrNoFrameCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxErrUnknownNeighborCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxErrUnknownNeighborCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxErrUnknownNeighborCountWithMinInterval:(uint16_t)minInterval
                                                        maxInterval:(uint16_t)maxInterval
                                                    responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxErrUnknownNeighborCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxErrUnknownNeighborCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxErrInvalidSrcAddrCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxErrInvalidSrcAddrCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxErrInvalidSrcAddrCountWithMinInterval:(uint16_t)minInterval
                                                       maxInterval:(uint16_t)maxInterval
                                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxErrInvalidSrcAddrCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxErrInvalidSrcAddrCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxErrSecCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxErrSecCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxErrSecCountWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxErrSecCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxErrSecCountWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxErrFcsCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxErrFcsCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxErrFcsCountWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxErrFcsCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxErrFcsCountWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRxErrOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxErrOtherCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxErrOtherCountWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRxErrOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRxErrOtherCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeActiveTimestampWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActiveTimestampWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActiveTimestampWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeActiveTimestampWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeActiveTimestampWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePendingTimestampWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePendingTimestampWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePendingTimestampWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePendingTimestampWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePendingTimestampWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeDelayWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDelayWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDelayWithMinInterval:(uint16_t)minInterval
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeDelayWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeDelayWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSecurityPolicyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSecurityPolicyWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeChannelMaskWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeChannelMaskWithCompletionHandler:(void (^)(
+                                                          NSData * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeChannelMaskWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeChannelMaskWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeChannelMaskWithResponseHandler:(void (^)(
+                                                          NSData * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOperationalDatasetComponentsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOperationalDatasetComponentsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                           NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeActiveNetworkFaultsListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActiveNetworkFaultsListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -3445,17 +4229,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPWakeOnLan : CHIPCluster
 
-- (void)readAttributeWakeOnLanMacAddressWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWakeOnLanMacAddressWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeWakeOnLanMacAddressWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeWakeOnLanMacAddressWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeWakeOnLanMacAddressWithResponseHandler:(void (^)(NSString * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -3467,91 +4255,116 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resetCountsWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeBssidWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBssidWithCompletionHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBssidWithMinInterval:(uint16_t)minInterval
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBssidWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBssidWithResponseHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSecurityTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSecurityTypeWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSecurityTypeWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSecurityTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSecurityTypeWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeWiFiVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWiFiVersionWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeWiFiVersionWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeWiFiVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeWiFiVersionWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeChannelNumberWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeChannelNumberWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeChannelNumberWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeChannelNumberWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeChannelNumberWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeRssiWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRssiWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRssiWithMinInterval:(uint16_t)minInterval
                                   maxInterval:(uint16_t)maxInterval
                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeRssiWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRssiWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBeaconLostCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBeaconLostCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBeaconLostCountWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBeaconLostCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBeaconLostCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeBeaconRxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBeaconRxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBeaconRxCountWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeBeaconRxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeBeaconRxCountWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePacketMulticastRxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePacketMulticastRxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePacketMulticastRxCountWithMinInterval:(uint16_t)minInterval
                                                     maxInterval:(uint16_t)maxInterval
                                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePacketMulticastRxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePacketMulticastRxCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePacketMulticastTxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePacketMulticastTxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePacketMulticastTxCountWithMinInterval:(uint16_t)minInterval
                                                     maxInterval:(uint16_t)maxInterval
                                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePacketMulticastTxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePacketMulticastTxCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePacketUnicastRxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePacketUnicastRxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePacketUnicastRxCountWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePacketUnicastRxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePacketUnicastRxCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributePacketUnicastTxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePacketUnicastTxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePacketUnicastTxCountWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributePacketUnicastTxCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePacketUnicastTxCountWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentMaxRateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentMaxRateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentMaxRateWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentMaxRateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentMaxRateWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOverrunCountWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOverrunCountWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOverrunCountWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 
@@ -3573,126 +4386,162 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stopMotionWithCompletionHandler:(StatusCompletion)completionHandler;
 - (void)upOrOpenWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTypeWithMinInterval:(uint16_t)minInterval
                                   maxInterval:(uint16_t)maxInterval
                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTypeWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentPositionLiftWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentPositionLiftWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionLiftWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentPositionLiftWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentPositionLiftWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentPositionTiltWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentPositionTiltWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionTiltWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentPositionTiltWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentPositionTiltWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeConfigStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeConfigStatusWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeConfigStatusWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeConfigStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeConfigStatusWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentPositionLiftPercentageWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentPositionLiftPercentageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionLiftPercentageWithMinInterval:(uint16_t)minInterval
                                                            maxInterval:(uint16_t)maxInterval
                                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentPositionLiftPercentageWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentPositionLiftPercentageWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentPositionTiltPercentageWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentPositionTiltPercentageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionTiltPercentageWithMinInterval:(uint16_t)minInterval
                                                            maxInterval:(uint16_t)maxInterval
                                                        responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentPositionTiltPercentageWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentPositionTiltPercentageWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeOperationalStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOperationalStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOperationalStatusWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeOperationalStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOperationalStatusWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTargetPositionLiftPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTargetPositionLiftPercent100thsWithMinInterval:(uint16_t)minInterval
                                                              maxInterval:(uint16_t)maxInterval
                                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTargetPositionLiftPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTargetPositionLiftPercent100thsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeTargetPositionTiltPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTargetPositionTiltPercent100thsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTargetPositionTiltPercent100thsWithMinInterval:(uint16_t)minInterval
                                                              maxInterval:(uint16_t)maxInterval
                                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeTargetPositionTiltPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTargetPositionTiltPercent100thsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                              NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeEndProductTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEndProductTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeEndProductTypeWithMinInterval:(uint16_t)minInterval
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeEndProductTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeEndProductTypeWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentPositionLiftPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionLiftPercent100thsWithMinInterval:(uint16_t)minInterval
                                                               maxInterval:(uint16_t)maxInterval
                                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentPositionLiftPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentPositionLiftPercent100thsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeCurrentPositionTiltPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionTiltPercent100thsWithMinInterval:(uint16_t)minInterval
                                                               maxInterval:(uint16_t)maxInterval
                                                           responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeCurrentPositionTiltPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCurrentPositionTiltPercent100thsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                               NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeInstalledOpenLimitLiftWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInstalledOpenLimitLiftWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeInstalledOpenLimitLiftWithMinInterval:(uint16_t)minInterval
                                                     maxInterval:(uint16_t)maxInterval
                                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInstalledOpenLimitLiftWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInstalledOpenLimitLiftWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeInstalledClosedLimitLiftWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInstalledClosedLimitLiftWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeInstalledClosedLimitLiftWithMinInterval:(uint16_t)minInterval
                                                       maxInterval:(uint16_t)maxInterval
                                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInstalledClosedLimitLiftWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInstalledClosedLimitLiftWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeInstalledOpenLimitTiltWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInstalledOpenLimitTiltWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeInstalledOpenLimitTiltWithMinInterval:(uint16_t)minInterval
                                                     maxInterval:(uint16_t)maxInterval
                                                 responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInstalledOpenLimitTiltWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInstalledOpenLimitTiltWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeInstalledClosedLimitTiltWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInstalledClosedLimitTiltWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeInstalledClosedLimitTiltWithMinInterval:(uint16_t)minInterval
                                                       maxInterval:(uint16_t)maxInterval
                                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeInstalledClosedLimitTiltWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInstalledClosedLimitTiltWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeModeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeModeWithMinInterval:(uint16_t)minInterval
                                   maxInterval:(uint16_t)maxInterval
                               responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeModeWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeSafetyStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSafetyStatusWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSafetyStatusWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeSafetyStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSafetyStatusWithResponseHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
                                     responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeFeatureMapWithResponseHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))responseHandler;
 
 @end
 

@@ -121,7 +121,7 @@ async function asObjectiveCClassHelper(type, cluster, options, mutable)
   let pkgId    = await templateUtil.ensureZclPackageId(this);
   let isStruct = await zclHelper.isStruct(this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
-  if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
+  if ((this.isList || this.isArray || this.entryType || options.hash.forceList) && !options.hash.forceNotList) {
     if (mutable) {
       return 'NSMutableArray';
     }
@@ -163,12 +163,6 @@ async function asObjectiveCType(type, cluster, options)
   }
 
   return typeStr;
-}
-
-async function arrayElementObjectiveCClass(type, cluster, options)
-{
-  options.hash.forceNotList = true;
-  return asObjectiveCClass.call(this, type, cluster, options);
 }
 
 function incrementDepth(depth)
@@ -217,7 +211,6 @@ exports.asTestValue                  = asTestValue;
 exports.asObjectiveCClass            = asObjectiveCClass;
 exports.asObjectiveCMutableClass     = asObjectiveCMutableClass;
 exports.asObjectiveCType             = asObjectiveCType;
-exports.arrayElementObjectiveCClass  = arrayElementObjectiveCClass;
 exports.incrementDepth               = incrementDepth;
 exports.asStructPropertyName         = asStructPropertyName;
 exports.asGetterName                 = asGetterName;

@@ -173,13 +173,11 @@
                 CHIPTemperatureMeasurement * cluster =
                     [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
 
-                [cluster
-                    readAttributeMeasuredValueWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                        if (error != nil)
-                            return;
-                        NSNumber * value = values[@"value"];
-                        [self updateTempInUI:value.shortValue];
-                    }];
+                [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                    if (error != nil)
+                        return;
+                    [self updateTempInUI:value.shortValue];
+                }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }

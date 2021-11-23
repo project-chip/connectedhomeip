@@ -79,18 +79,32 @@ using namespace chip::app::Clusters;
 {{#chip_server_cluster_attributes}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 {{#*inline "callbackName"}}{{#if isList}}{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}List{{else}}{{chipCallback.name}}{{/if}}Attribute{{/inline}}
-- (void)read{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler
+- (void)read{{>attribute}}WithCompletionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.Read{{>attribute}}(success, failure);
-    });
+    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
+      {{! For now, don't change the bridge API; instead just use an adapter
+          to invoke our completion handler. This is not great from a
+          type-safety perspective, of course. }}
+      ^(NSError * _Nullable error, id _Nullable value) {
+        completionHandler(value, error);
+      },
+      ^(Cancelable * success, Cancelable * failure) {
+          return self.cppCluster.Read{{>attribute}}(success, failure);
+      });
 }
 
 {{#if isWritableAttribute}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value responseHandler:(ResponseHandler)responseHandler
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
+      {{! For now, don't change the bridge API; instead just use an adapter
+          to invoke our completion handler. This is not great from a
+          type-safety perspective, of course. }}
+      ^(NSError * _Nullable error, id _Nullable ignored) {
+        completionHandler(error);
+      },
+      ^(Cancelable * success, Cancelable * failure) {
         ListFreer listFreer;
         using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
         TypeInfo::Type cppValue;
@@ -114,10 +128,17 @@ using namespace chip::app::Clusters;
 }
 
 {{#*inline "callbackName"}}{{chipCallback.name}}Attribute{{/inline}}
-- (void) report{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler {
-    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+- (void) report{{>attribute}}WithResponseHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))responseHandler {
+    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
+      {{! For now, don't change the bridge API; instead just use an adapter
+          to invoke our response handler. This is not great from a
+          type-safety perspective, of course. }}
+      ^(NSError * _Nullable error, id _Nullable value) {
+        responseHandler(value, error);
+      },
+      ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.Report{{>attribute}}(success);
-    }, true);
+      }, true);
 }
 
 {{/unless}}
