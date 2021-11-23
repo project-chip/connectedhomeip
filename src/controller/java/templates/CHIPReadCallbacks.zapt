@@ -1,8 +1,9 @@
 {{> header}}
 {{#if (chip_has_client_clusters)}}
-#include <zap-generated/CHIPClientCallbacks.h>
+#include "CHIPCallbackTypes.h"
 
 #include <jni.h>
+#include <zap-generated/CHIPClientCallbacks.h>
 
 {{#chip_server_global_responses}}
 class CHIP{{chipCallback.name}}AttributeCallback : public chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> {
@@ -14,7 +15,7 @@ public:
     static void maybeDestroy(CHIP{{chipCallback.name}}AttributeCallback * callback) {
         if (!callback->keepAlive) {
             callback->Cancel();
-            delete callback;
+            chip::Platform::Delete<CHIP{{chipCallback.name}}AttributeCallback>(callback);
         }
     }
 
@@ -24,26 +25,34 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-
 {{/chip_server_global_responses}}
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
-{{#if isList}}
-class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback : public chip::Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>
+{{#if_in_global_responses}}
+{{else}}
+class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback : public chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>
 {
 public:
-    CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback);
+    CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback, bool keepAlive = false);
 
     ~CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback();
 
-    static void CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list);
+    static void maybeDestroy(CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback * callback) {
+        if (!callback->keepAlive) {
+            callback->Cancel();
+            chip::Platform::Delete<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} {{#if isList}}list{{else}}value{{/if}});
 
 private:
     jobject javaCallbackRef;
+    bool keepAlive;
 };
+{{/if_in_global_responses}}
 
-{{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 
