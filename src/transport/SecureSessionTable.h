@@ -55,9 +55,11 @@ public:
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    SecureSession * CreateNewSecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric)
+    SecureSession * CreateNewSecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric,
+                                           const ReliableMessageProtocolConfig & config)
     {
-        return mEntries.CreateObject(localSessionId, peerNodeId, peerSessionId, fabric, mTimeSource.GetMonotonicTimestamp());
+        return mEntries.CreateObject(localSessionId, peerNodeId, peerSessionId, fabric, config,
+                                     mTimeSource.GetMonotonicTimestamp());
     }
 
     void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }

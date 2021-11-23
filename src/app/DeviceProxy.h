@@ -81,13 +81,7 @@ public:
 
     virtual bool IsActive() const { return true; }
 
-    uint32_t GetMRPIdleInterval() const { return mMrpIdleInterval; }
-    uint32_t GetMRPActiveInterval() const { return mMrpActiveInterval; }
-    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval) const
-    {
-        idleInterval   = mMrpIdleInterval;
-        activeInterval = mMrpActiveInterval;
-    }
+    const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
 
 protected:
     virtual bool IsSecureConnected() const = 0;
@@ -96,8 +90,7 @@ protected:
 
     app::CHIPDeviceCallbacksMgr & mCallbacksMgr = app::CHIPDeviceCallbacksMgr::GetInstance();
 
-    uint32_t mMrpIdleInterval   = CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL;
-    uint32_t mMrpActiveInterval = CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL;
+    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 };
 
 } // namespace chip
