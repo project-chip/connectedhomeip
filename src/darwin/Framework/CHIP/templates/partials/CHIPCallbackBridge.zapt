@@ -1,5 +1,15 @@
 {{#if header}}
-{{#*inline "callbackType"}}{{#if (isStrEqual partial-type "Command")}}CHIP{{> @partial-block}}Type{{else}}{{> @partial-block}}{{/if}}{{/inline}}
+{{#*inline "callbackType"}}
+  {{#if partial-type}}
+    {{#if (isStrEqual partial-type "Command")}}
+      CHIP{{> @partial-block}}Type
+    {{else}}
+      {{> @partial-block}}
+    {{/if}}
+  {{else}}
+    {{> @partial-block}}
+  {{/if}}
+{{/inline}}
 class CHIP{{> @partial-block}}Bridge : public CHIPCallbackBridge<{{>callbackType}}>
 {
 public:
@@ -8,59 +18,60 @@ public:
       {};
     
     static void OnSuccessFn(void * context
-      {{#if (isStrEqual partial-type "Command")}}
-      , const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data
-      {{else if (isStrEqual partial-type "CommandStatus")}}
-      , const chip::app::DataModel::NullObjectType &
-      {{else if (isStrEqual partial-type "List")}}
-      , {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list
-      {{else if partial-type}}
-      , {{asUnderlyingZclType partial-type}} value
+      {{#if partial-type}}
+        {{#if (isStrEqual partial-type "Status")}}
+        {{! No more args in this case }}
+        {{else if (isStrEqual partial-type "Command")}}
+        , const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data
+        {{else if (isStrEqual partial-type "CommandStatus")}}
+        , const chip::app::DataModel::NullObjectType &
+        {{else}}
+        UNEXPECTED PARTIAL TYPE
+        {{/if}}
       {{else}}
+      , {{zapTypeToDecodableClusterObjectType type ns=ns isArgument=true}} value
       {{/if}}
     );
 };
 {{else}}
 void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
-  {{#if (isStrEqual partial-type "Command")}}
-  , const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data
-  {{else if (isStrEqual partial-type "CommandStatus")}}
-  , const chip::app::DataModel::NullObjectType &
-  {{else if (isStrEqual partial-type "List")}}
-  , {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} value
-  {{else if partial-type}}
-  , {{asUnderlyingZclType partial-type}} value
+  {{#if partial-type}}
+    {{#if (isStrEqual partial-type "Status")}}
+    {{! No more args in this case }}
+    {{else if (isStrEqual partial-type "Command")}}
+    , const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data
+    {{else if (isStrEqual partial-type "CommandStatus")}}
+    , const chip::app::DataModel::NullObjectType &
+    {{else}}
+    UNEXPECTED PARTIAL TYPE
+    {{/if}}
   {{else}}
+  , {{zapTypeToDecodableClusterObjectType type ns=ns isArgument=true}} value
   {{/if}}
 )
 {
-    {{#if (isStrEqual partial-type "Command")}}
-    auto * response = [CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params new];
-    {{#chip_cluster_response_arguments}}
-    {
-      {{asObjectiveCMutableClass type parent.parent.name}} * value;
-      {{>decode_value target="value" source=(concat "data." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE); return;" depth=0}}
-      response.{{asStructPropertyName label}} = value;
-    }
-    {{/chip_cluster_response_arguments}}
-    DispatchSuccess(context, response);
-    {{else if (isStrEqual partial-type "List")}}
-    id objCValue;
-    {{>decode_value target="objCValue" source="value" cluster=parent.name errorCode="OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE); return;" depth=0}}
-    DispatchSuccess(context, objCValue);
-    {{else if (isOctetString partial-type)}}
-    id objCValue = [NSData dataWithBytes: value.data() length: value.size()];
-    DispatchSuccess(context, objCValue);
-    {{else if (isCharString partial-type)}}
-    id objCValue = [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding];
-    DispatchSuccess(context, objCValue);
-    {{else if (isStrEqual partial-type "CommandStatus")}}
-    DispatchSuccess(context, nil);
-    {{else if partial-type}}
-    id objCValue = [NSNumber numberWith{{asObjectiveCNumberType name partial-type false}}:value];
-    DispatchSuccess(context, objCValue);
+    {{#if partial-type}}
+      {{#if (isStrEqual partial-type "Status")}}
+      DispatchSuccess(context, nil);
+      {{else if (isStrEqual partial-type "Command")}}
+      auto * response = [CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params new];
+      {{#chip_cluster_response_arguments}}
+      {
+        {{asObjectiveCMutableClass type parent.parent.name}} * value;
+        {{>decode_value target="value" source=(concat "data." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE); return;" depth=0}}
+        response.{{asStructPropertyName label}} = value;
+      }
+      {{/chip_cluster_response_arguments}}
+      DispatchSuccess(context, response);
+      {{else if (isStrEqual partial-type "CommandStatus")}}
+      DispatchSuccess(context, nil);
+      {{else}}
+      UNEXPECTED PARTIAL TYPE
+      {{/if}}
     {{else}}
-    DispatchSuccess(context, nil);
+    {{asObjectiveCType type ns}} objCValue;
+    {{>decode_value target="objCValue" source="value" cluster=ns errorCode="OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE); return;" depth=0}}
+    DispatchSuccess(context, objCValue);
     {{/if}}
 };
 {{/if}}

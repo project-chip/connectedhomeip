@@ -78,7 +78,19 @@ using namespace chip::app::Clusters;
 
 {{#chip_server_cluster_attributes}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
-{{#*inline "callbackName"}}{{#if isList}}{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}List{{else}}{{chipCallback.name}}{{/if}}Attribute{{/inline}}
+{{#*inline "callbackName"}}
+  {{~#if isList~}}
+    {{asUpperCamelCase ../name}}{{asUpperCamelCase name}}List
+  {{~else~}}
+    {{~#if isNullable}}Nullable{{/if~}}
+    {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
+      VendorId
+    {{~else~}}
+      {{chipCallback.name}}
+    {{~/if~}}
+  {{~/if~}}
+  Attribute
+{{~/inline}}
 - (void)read{{>attribute}}WithCompletionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
@@ -89,7 +101,10 @@ using namespace chip::app::Clusters;
         completionHandler(value, error);
       },
       ^(Cancelable * success, Cancelable * failure) {
-          return self.cppCluster.Read{{>attribute}}(success, failure);
+          using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+          auto successFn = Callback<{{>callbackName}}Callback>::FromCancelable(success);
+          auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+          return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
       });
 }
 
@@ -127,7 +142,7 @@ using namespace chip::app::Clusters;
     });
 }
 
-{{#*inline "callbackName"}}{{chipCallback.name}}Attribute{{/inline}}
+{{#*inline "callbackName"}}{{#if isNullable}}Nullable{{/if}}{{chipCallback.name}}Attribute{{/inline}}
 - (void) report{{>attribute}}WithResponseHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))responseHandler {
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
       {{! For now, don't change the bridge API; instead just use an adapter
