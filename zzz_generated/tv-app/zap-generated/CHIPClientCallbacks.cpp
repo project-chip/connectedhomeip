@@ -134,30 +134,6 @@ namespace {
 // Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
-void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TLV::TLVReader * tlvData,
-                                                                              Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback)
-{
-    chip::app::DataModel::DecodableList<
-        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType>
-        list;
-    CHIP_ERROR err = Decode(*tlvData, list);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (onFailureCallback != nullptr)
-        {
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-        }
-        return;
-    }
-
-    Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback> * cb =
-        Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, list);
-}
-
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
@@ -199,51 +175,6 @@ void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV
     Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback> * cb =
         Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
-}
-
-bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                   uint8_t errorCode, chip::CharSpan debugText)
-{
-    ChipLogProgress(Zcl, "ArmFailSafeResponse:");
-    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("GeneralCommissioningClusterArmFailSafeResponseCallback");
-
-    Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback> * cb =
-        Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, errorCode, debugText);
-    return true;
-}
-
-bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                             uint8_t errorCode, chip::CharSpan debugText)
-{
-    ChipLogProgress(Zcl, "CommissioningCompleteResponse:");
-    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("GeneralCommissioningClusterCommissioningCompleteResponseCallback");
-
-    Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback> * cb =
-        Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, errorCode, debugText);
-    return true;
-}
-
-bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                           uint8_t errorCode, chip::CharSpan debugText)
-{
-    ChipLogProgress(Zcl, "SetRegulatoryConfigResponse:");
-    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetRegulatoryConfigResponseCallback");
-
-    Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback> * cb =
-        Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, errorCode, debugText);
-    return true;
 }
 
 bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,

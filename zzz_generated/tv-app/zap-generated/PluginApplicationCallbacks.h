@@ -33,7 +33,6 @@
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
-    MatterGeneralCommissioningPluginClientInitCallback();                                                                          \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
     MatterGroupKeyManagementPluginServerInitCallback();                                                                            \

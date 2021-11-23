@@ -36,11 +36,6 @@
 // #6308 should handle IM error code on the application side, either modify this function or remove this.
 
 // Cluster Specific Response Callbacks
-typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallback)(void * context, uint8_t errorCode, chip::CharSpan debugText);
-typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)(void * context, uint8_t errorCode,
-                                                                                 chip::CharSpan debugText);
-typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallback)(void * context, uint8_t errorCode,
-                                                                               chip::CharSpan debugText);
 typedef void (*NetworkCommissioningClusterAddThreadNetworkResponseCallback)(void * context, uint8_t errorCode,
                                                                             chip::CharSpan debugText);
 typedef void (*NetworkCommissioningClusterAddWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
@@ -68,13 +63,6 @@ typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * contex
                                                                    chip::ByteSpan AttestationSignature);
 
 // List specific responses
-void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                                              chip::Callback::Cancelable * onSuccessCallback,
-                                                                              chip::Callback::Cancelable * onFailureCallback);
-typedef void (*GeneralCommissioningBasicCommissioningInfoListListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & data);
 void OperationalCredentialsClusterFabricsListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                  chip::Callback::Cancelable * onSuccessCallback,
                                                                  chip::Callback::Cancelable * onFailureCallback);

@@ -30,36 +30,6 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
-{
-public:
-    GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
-    ~GeneralCommissioningCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ArmFailSafe(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                           uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR CommissioningComplete(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SetRegulatoryConfig(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t location, chip::CharSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
-
-    // Cluster Attributes
-    CHIP_ERROR ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeBasicCommissioningInfoList(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint64_t value);
-    CHIP_ERROR SubscribeAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeBreadcrumb(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
-
-private:
-};
-
 class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
 {
 public:
