@@ -96,7 +96,7 @@ CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan
     (void) info;
     (void) infoLen;
 
-#warning                                                                                                                    \
+#warning                                                                                                                           \
     "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key.  Node can only communicate with other nodes built with this flag set."
     ChipLogError(SecureChannel,
                  "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key.  "
