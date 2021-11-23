@@ -905,7 +905,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
-        err = encoder.EncodeList([this](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        err = encoder.EncodeList([this](const TagBoundEncoder & aEncoder) -> CHIP_ERROR {
             otNeighborInfo neighInfo;
             otNeighborInfoIterator iterator = OT_NEIGHBOR_INFO_ITERATOR_INIT;
 
@@ -928,7 +928,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                 neighborTable.fullNetworkData  = neighInfo.mFullNetworkData;
                 neighborTable.isChild          = neighInfo.mIsChild;
 
-                ReturnErrorOnFailure(encoder.Encode(neighborTable));
+                ReturnErrorOnFailure(aEncoder.Encode(neighborTable));
             }
 
             return CHIP_NO_ERROR;
@@ -937,7 +937,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
-        err = encoder.EncodeList([this](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        err = encoder.EncodeList([this](const TagBoundEncoder & aEncoder) -> CHIP_ERROR {
             otRouterInfo routerInfo;
             uint8_t maxRouterId = otThreadGetMaxRouterId(mOTInst);
 
@@ -958,7 +958,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                     routeTable.allocated       = routerInfo.mAllocated;
                     routeTable.linkEstablished = routerInfo.mLinkEstablished;
 
-                    ReturnErrorOnFailure(encoder.Encode(routeTable));
+                    ReturnErrorOnFailure(aEncoder.Encode(routeTable));
                 }
             }
             return CHIP_NO_ERROR;
@@ -1301,8 +1301,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                           "securityPolicy Struct do not match otSecurityPolicy");
             memcpy(&securityPolicy, &activeDataset.mSecurityPolicy, sizeof(securityPolicy));
 
-            err = encoder.EncodeList([securityPolicy](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-                ReturnErrorOnFailure(encoder.Encode(securityPolicy));
+            err = encoder.EncodeList([securityPolicy](const TagBoundEncoder & aEncoder) -> CHIP_ERROR {
+                ReturnErrorOnFailure(aEncoder.Encode(securityPolicy));
                 return CHIP_NO_ERROR;
             });
         }
@@ -1354,8 +1354,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             OpDatasetComponents.securityPolicyPresent   = activeDataset.mComponents.mIsSecurityPolicyPresent;
             OpDatasetComponents.channelMaskPresent      = activeDataset.mComponents.mIsChannelMaskPresent;
 
-            err = encoder.EncodeList([OpDatasetComponents](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-                ReturnErrorOnFailure(encoder.Encode(OpDatasetComponents));
+            err = encoder.EncodeList([OpDatasetComponents](const TagBoundEncoder & aEncoder) -> CHIP_ERROR {
+                ReturnErrorOnFailure(aEncoder.Encode(OpDatasetComponents));
                 return CHIP_NO_ERROR;
             });
         }
@@ -1363,12 +1363,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
-        err = encoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        err = encoder.EncodeList([](const TagBoundEncoder & aEncoder) -> CHIP_ERROR {
             // TODO activeNetworkFaultsList isn't tracked. Encode the list of 4 entries at 0 none the less
             ThreadNetworkDiagnostics::NetworkFault activeNetworkFaultsList[4] = { ThreadNetworkDiagnostics::NetworkFault(0) };
             for (auto fault : activeNetworkFaultsList)
             {
-                ReturnErrorOnFailure(encoder.Encode(fault));
+                ReturnErrorOnFailure(aEncoder.Encode(fault));
             }
 
             return CHIP_NO_ERROR;
