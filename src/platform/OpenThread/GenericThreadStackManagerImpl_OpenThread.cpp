@@ -1971,8 +1971,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
         return;
     }
 
-    ThreadStackMgrImpl().LockThreadStack();
-
     VerifyOrExit(aError == OT_ERROR_NONE, error = MapOpenThreadError(aError));
 
     error = MapOpenThreadError(otDnsBrowseResponseGetServiceName(aResponse, type, sizeof(type)));
@@ -2004,8 +2002,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
     }
 
 exit:
-
-    ThreadStackMgrImpl().UnlockThreadStack();
 
     // In case no service was found invoke callback to notify about failure. In other case it was already called before.
     if (!wasAnythingBrowsed)
@@ -2059,8 +2055,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
         return;
     }
 
-    ThreadStackMgrImpl().LockThreadStack();
-
     VerifyOrExit(aError == OT_ERROR_NONE, error = MapOpenThreadError(aError));
 
     error = MapOpenThreadError(otDnsServiceResponseGetServiceName(aResponse, resolveResult.mMdnsService.mName,
@@ -2081,7 +2075,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
 
 exit:
 
-    ThreadStackMgrImpl().UnlockThreadStack();
     ThreadStackMgrImpl().mDnsResolveCallback(aContext, &(resolveResult.mMdnsService), error);
 }
 
