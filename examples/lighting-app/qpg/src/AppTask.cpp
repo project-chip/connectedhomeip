@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "qvCHIP.h"
+#include "qvIO.h"
 
 #include "AppConfig.h"
 #include "AppEvent.h"
@@ -96,7 +96,7 @@ CHIP_ERROR AppTask::Init()
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Subscribe with our button callback to the qvCHIP button handler.
-    qvCHIP_SetBtnCallback(ButtonEventHandler);
+    qvIO_SetBtnCallback(ButtonEventHandler);
 
     // Init ZCL Data Model
     chip::Server::GetInstance().Init();
@@ -167,15 +167,15 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             if (sIsThreadProvisioned && sIsThreadEnabled)
             {
-                qvCHIP_LedBlink(SYSTEM_STATE_LED, 950, 50);
+                qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
             }
             else if (sHaveBLEConnections)
             {
-                qvCHIP_LedBlink(SYSTEM_STATE_LED, 100, 100);
+                qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
             }
             else
             {
-                qvCHIP_LedBlink(SYSTEM_STATE_LED, 50, 950);
+                qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
             }
         }
     }
@@ -290,9 +290,9 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
-        qvCHIP_LedSet(SYSTEM_STATE_LED, false);
+        qvIO_LedSet(SYSTEM_STATE_LED, false);
 
-        qvCHIP_LedBlink(SYSTEM_STATE_LED, 500, 500);
+        qvIO_LedBlink(SYSTEM_STATE_LED, 500, 500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {

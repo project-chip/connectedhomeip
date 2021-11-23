@@ -17,7 +17,7 @@
  *    limitations under the License.
  */
 
-#include "qvCHIP.h"
+#include "qvIO.h"
 
 #include "AppConfig.h"
 #include "AppEvent.h"
@@ -97,9 +97,9 @@ CHIP_ERROR AppTask::Init()
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Subscribe with our button callback to the qvCHIP button handler.
-    qvCHIP_SetBtnCallback(ButtonEventHandler);
+    qvIO_SetBtnCallback(ButtonEventHandler);
 
-    qvCHIP_LedSet(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
+    qvIO_LedSet(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
 
     // Init ZCL Data Model
     chip::Server::GetInstance().Init();
@@ -166,15 +166,15 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             if (sIsThreadProvisioned && sIsThreadEnabled)
             {
-                qvCHIP_LedBlink(SYSTEM_STATE_LED, 950, 50);
+                qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
             }
             else if (sHaveBLEConnections)
             {
-                qvCHIP_LedBlink(SYSTEM_STATE_LED, 100, 100);
+                qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
             }
             else
             {
-                qvCHIP_LedBlink(SYSTEM_STATE_LED, 50, 950);
+                qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
             }
         }
     }
@@ -284,11 +284,11 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
-        qvCHIP_LedSet(SYSTEM_STATE_LED, false);
-        qvCHIP_LedSet(LOCK_STATE_LED, false);
+        qvIO_LedSet(SYSTEM_STATE_LED, false);
+        qvIO_LedSet(LOCK_STATE_LED, false);
 
-        qvCHIP_LedBlink(SYSTEM_STATE_LED, 500, 500);
-        qvCHIP_LedBlink(LOCK_STATE_LED, 500, 500);
+        qvIO_LedBlink(SYSTEM_STATE_LED, 500, 500);
+        qvIO_LedBlink(LOCK_STATE_LED, 500, 500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -366,7 +366,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
             // Set lock status LED back to show state of lock.
-            qvCHIP_LedSet(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
+            qvIO_LedSet(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
 
             sAppTask.CancelTimer();
 
@@ -419,7 +419,7 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
         sAppTask.mSyncClusterToButtonAction = true;
     }
 
-    qvCHIP_LedBlink(LOCK_STATE_LED, 50, 50);
+    qvIO_LedBlink(LOCK_STATE_LED, 50, 50);
 }
 
 void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
@@ -431,13 +431,13 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     {
         ChipLogProgress(NotSpecified, "Lock Action has been completed");
 
-        qvCHIP_LedSet(LOCK_STATE_LED, true);
+        qvIO_LedSet(LOCK_STATE_LED, true);
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
         ChipLogProgress(NotSpecified, "Unlock Action has been completed");
 
-        qvCHIP_LedSet(LOCK_STATE_LED, false);
+        qvIO_LedSet(LOCK_STATE_LED, false);
     }
 
     if (sAppTask.mSyncClusterToButtonAction)

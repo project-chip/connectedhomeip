@@ -25,7 +25,7 @@
 #define APP_FUNCTION_BUTTON BTN_SW5
 
 #define SYSTEM_STATE_LED LED_GREEN
-#define LOCK_STATE_LED LED_RED
+#define LOCK_STATE_LED LED_WHITE
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
