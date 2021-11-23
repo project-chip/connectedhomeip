@@ -1029,7 +1029,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test_UINT56_BE",Test_UINT56_BE),
     NL_TEST_DEF("Test_SINT56_BE",Test_SINT56_BE),
 
-    NL_TEST_SENTINEL() 
+    NL_TEST_SENTINEL()
 };
 // clang-format on
 
