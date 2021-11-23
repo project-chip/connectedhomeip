@@ -252,7 +252,9 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
 
         // This attribute (or even this cluster) is not actually supported
         // on this endpoint.
-        return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, writer);
+        ReturnErrorOnFailure(
+            SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, writer));
+        return attributeReport.EndOfAttributeReportIB().GetError();
     }
 
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
@@ -293,6 +295,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     TLV::TLVWriter * writer = nullptr;
     TLV::TLVWriter backup;
 
+    ReturnErrorOnFailure(aAttributeReports.GetError());
     attributeReport.Checkpoint(backup);
 
     // We have verified that the attribute exists.
@@ -300,6 +303,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
+    ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     attributePathIBBuilder.Endpoint(aPath.mEndpointId)
         .Cluster(aPath.mClusterId)
@@ -541,7 +545,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         ReturnErrorOnFailure(SendFailureStatus(aPath, attributeReport, imStatus, backup));
     }
 
-    return CHIP_NO_ERROR;
+    return attributeReport.EndOfAttributeReportIB().GetError();
 }
 
 namespace {
