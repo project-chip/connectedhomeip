@@ -103,6 +103,6 @@ tests:
       wait: "readAttribute"
       attribute: "Reachable"
 
-    - label: "Query UniqueId"
+    - label: "Query UniqueID"
       wait: "readAttribute"
-      attribute: "UniqueId"
+      attribute: "UniqueID"

@@ -1172,7 +1172,7 @@
               "reportableChange": 0
             },
             {
-              "name": "UniqueId",
+              "name": "UniqueID",
               "code": 18,
               "mfgCode": null,
               "side": "server",
