@@ -3791,6 +3791,11 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000024: {
+                "attributeName": "ListLongOctetString",
+                "attributeId": 0x00000024,
+                "type": "bytes",
+            },
             0x000000FF: {
                 "attributeName": "Unsupported",
                 "attributeId": 0x000000FF,
@@ -6905,6 +6910,9 @@ class ChipClusters:
 
     def ClusterTestCluster_ReadAttributeListNullablesAndOptionalsStruct(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterTestCluster_ReadAttributeListLongOctetString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_ListLongOctetString(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterTestCluster_ReadAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported(device, ZCLendpoint, ZCLgroupid)
@@ -10336,6 +10344,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_ListNullablesAndOptionalsStruct.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute ListLongOctetString
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_ListLongOctetString.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_ListLongOctetString.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Unsupported
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

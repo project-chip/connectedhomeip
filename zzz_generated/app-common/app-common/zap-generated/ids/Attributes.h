@@ -4610,6 +4610,10 @@ namespace ListNullablesAndOptionalsStruct {
 static constexpr AttributeId Id = 0x00000023;
 } // namespace ListNullablesAndOptionalsStruct
 
+namespace ListLongOctetString {
+static constexpr AttributeId Id = 0x00000024;
+} // namespace ListLongOctetString
+
 namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported

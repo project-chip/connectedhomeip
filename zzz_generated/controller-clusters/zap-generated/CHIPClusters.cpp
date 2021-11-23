@@ -16524,6 +16524,17 @@ CHIP_ERROR TestClusterCluster::ReadAttributeListNullablesAndOptionalsStruct(Call
                                              TestClusterClusterListNullablesAndOptionalsStructListAttributeFilter);
 }
 
+CHIP_ERROR TestClusterCluster::ReadAttributeListLongOctetString(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000024;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             TestClusterClusterListLongOctetStringListAttributeFilter);
+}
+
 CHIP_ERROR TestClusterCluster::ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {

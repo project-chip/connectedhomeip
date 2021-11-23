@@ -2241,6 +2241,7 @@ public:
     CHIP_ERROR ReadAttributeVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeListNullablesAndOptionalsStruct(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeListLongOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeNullableBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeNullableBitmap8(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);

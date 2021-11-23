@@ -727,6 +727,20 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPTestClusterListLongOctetStringAttributeCallback
+    : public chip::Callback::Callback<TestClusterListLongOctetStringListAttributeCallback>
+{
+public:
+    CHIPTestClusterListLongOctetStringAttributeCallback(jobject javaCallback);
+
+    ~CHIPTestClusterListLongOctetStringAttributeCallback();
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback
     : public chip::Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>
 {

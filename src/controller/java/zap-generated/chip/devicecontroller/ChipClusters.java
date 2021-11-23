@@ -10495,6 +10495,12 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
+    public interface ListLongOctetStringAttributeCallback {
+      void onSuccess(List<byte[]> valueList);
+
+      void onError(Exception ex);
+    }
+
     public void readBooleanAttribute(BooleanAttributeCallback callback) {
       readBooleanAttribute(chipClusterPtr, callback);
     }
@@ -10885,6 +10891,10 @@ public class ChipClusters {
     public void readListNullablesAndOptionalsStructAttribute(
         ListNullablesAndOptionalsStructAttributeCallback callback) {
       readListNullablesAndOptionalsStructAttribute(chipClusterPtr, callback);
+    }
+
+    public void readListLongOctetStringAttribute(ListLongOctetStringAttributeCallback callback) {
+      readListLongOctetStringAttribute(chipClusterPtr, callback);
     }
 
     public void readUnsupportedAttribute(BooleanAttributeCallback callback) {
@@ -11461,6 +11471,9 @@ public class ChipClusters {
 
     private native void readListNullablesAndOptionalsStructAttribute(
         long chipClusterPtr, ListNullablesAndOptionalsStructAttributeCallback callback);
+
+    private native void readListLongOctetStringAttribute(
+        long chipClusterPtr, ListLongOctetStringAttributeCallback callback);
 
     private native void readUnsupportedAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);

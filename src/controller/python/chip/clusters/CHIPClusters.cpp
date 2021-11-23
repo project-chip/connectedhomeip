@@ -1654,6 +1654,51 @@ chip::Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttribute
     gTestClusterListNullablesAndOptionalsStructListAttributeCallback{
         OnTestClusterListNullablesAndOptionalsStructListAttributeResponse, nullptr
     };
+static void OnTestClusterListLongOctetStringListAttributeResponse(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+{
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  [");
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+        ChipLogProgress(Zcl, "    %s,", ByteSpanToString(entry).c_str());
+#endif // CHIP_PROGRESS_LOGGING
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  ]");
+
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<TestClusterListLongOctetStringListAttributeCallback> gTestClusterListLongOctetStringListAttributeCallback{
+    OnTestClusterListLongOctetStringListAttributeResponse, nullptr
+};
 static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<
@@ -9390,6 +9435,19 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_ListNullablesAnd
     return cluster
         .ReadAttributeListNullablesAndOptionalsStruct(gTestClusterListNullablesAndOptionalsStructListAttributeCallback.Cancel(),
                                                       gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_ListLongOctetString(chip::DeviceProxy * device,
+                                                                                    chip::EndpointId ZCLendpointId,
+                                                                                    chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .ReadAttributeListLongOctetString(gTestClusterListLongOctetStringListAttributeCallback.Cancel(),
+                                          gDefaultFailureCallback.Cancel())
         .AsInteger();
 }
 

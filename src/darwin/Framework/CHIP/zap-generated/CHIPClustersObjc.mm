@@ -12055,6 +12055,14 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)readAttributeListLongOctetStringWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPTestClusterListLongOctetStringListAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReadAttributeListLongOctetString(success, failure);
+        });
+}
+
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {

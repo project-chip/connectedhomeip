@@ -2658,6 +2658,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeListNullablesAndOptionalsStructWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeListLongOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeUnsupportedWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeUnsupportedWithMinInterval:(uint16_t)minInterval

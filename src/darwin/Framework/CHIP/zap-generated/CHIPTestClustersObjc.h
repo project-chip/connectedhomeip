@@ -755,6 +755,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)writeAttributeListNullablesAndOptionalsStructWithValue:(NSArray * _Nonnull)value
                                                responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeListLongOctetStringWithValue:(NSArray * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 
 @end
