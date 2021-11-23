@@ -67,6 +67,8 @@ enum class AttestationVerificationResult : uint16_t
 
     kNoMemory = 700,
 
+    kInvalidArgument = 800,
+
     kNotImplemented = 0xFFFFU,
 
     // TODO: Add more attestation verification errors

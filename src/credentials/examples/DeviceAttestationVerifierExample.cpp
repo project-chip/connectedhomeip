@@ -213,25 +213,24 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
                                                                                const ByteSpan & dacCertDerBuffer,
                                                                                const ByteSpan & attestationNonce)
 {
+    VerifyOrReturnError(!attestationInfoBuffer.empty() && !attestationChallengeBuffer.empty() &&
+                            !attestationSignatureBuffer.empty() && !paiCertDerBuffer.empty() && !dacCertDerBuffer.empty() &&
+                            !attestationNonce.empty(),
+                        AttestationVerificationResult::kInvalidArgument);
+
     VendorId dacVendorId = VendorId::NotSpecified;
     // match DAC and PAI VIDs
-    if (!paiCertDerBuffer.empty())
     {
         uint16_t paiVid = VendorId::NotSpecified;
         uint16_t dacVid = VendorId::NotSpecified;
 
-        CHIP_ERROR error     = ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, paiCertDerBuffer, paiVid);
-        const bool paiHasVid = error != CHIP_ERROR_KEY_NOT_FOUND;
-        VerifyOrReturnError(error == CHIP_NO_ERROR || paiHasVid == false, AttestationVerificationResult::kPaiFormatInvalid);
+        VerifyOrReturnError(ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, paiCertDerBuffer, paiVid) == CHIP_NO_ERROR,
+                            AttestationVerificationResult::kPaiFormatInvalid);
+        VerifyOrReturnError(ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, dacCertDerBuffer, dacVid) == CHIP_NO_ERROR,
+                            AttestationVerificationResult::kDacFormatInvalid);
 
-        if (paiHasVid)
-        {
-            VerifyOrReturnError(ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, dacCertDerBuffer, dacVid) == CHIP_NO_ERROR,
-                                AttestationVerificationResult::kDacFormatInvalid);
-
-            VerifyOrReturnError(paiVid == dacVid, AttestationVerificationResult::kDacVendorIdMismatch);
-            dacVendorId = static_cast<VendorId>(dacVid);
-        }
+        VerifyOrReturnError(paiVid == dacVid, AttestationVerificationResult::kDacVendorIdMismatch);
+        dacVendorId = static_cast<VendorId>(dacVid);
     }
 
     P256PublicKey remoteManufacturerPubkey;
@@ -250,7 +249,7 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
 
     uint8_t akidBuf[Credentials::kKeyIdentifierLength];
     MutableByteSpan akid(akidBuf);
-    ExtractAKIDFromX509Cert(paiCertDerBuffer.empty() ? dacCertDerBuffer : paiCertDerBuffer, akid);
+    ExtractAKIDFromX509Cert(paiCertDerBuffer, akid);
 
     constexpr size_t paaCertAllocatedLen = kMaxDERCertLength;
     chip::Platform::ScopedMemoryBuffer<uint8_t> paaCert;
