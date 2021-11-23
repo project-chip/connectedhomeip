@@ -49,7 +49,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     uint32_t rebootCount;
     bool failSafeArmed;
 
-
     if (ConfigValueExists(kCounterKey_RebootCount))
     {
         err = GetRebootCount(rebootCount);
@@ -108,7 +107,6 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
 {
     return WriteConfigValue(kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
-
 
 bool ConfigurationManagerImpl::CanFactoryReset()
 {
