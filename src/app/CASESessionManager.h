@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/CASEClientPool.h>
 #include <app/OperationalDeviceProxy.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
@@ -50,7 +51,7 @@ public:
 
     CASESessionManager(CASESessionManagerConfig & params)
     {
-        VerifyOrReturn(params.sessionInitParams.Validate() == CHIP_NO_ERROR);
+        VerifyOrDie(params.sessionInitParams.Validate() == CHIP_NO_ERROR);
 
         mConfig = params;
     }

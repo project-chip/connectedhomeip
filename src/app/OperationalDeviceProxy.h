@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <app/CASEClient.h>
+#include <app/CASEClientPool.h>
 #include <app/DeviceProxy.h>
 #include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
@@ -35,6 +37,7 @@
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
+#include <system/SystemLayer.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -50,6 +53,7 @@ struct DeviceProxyInitParams
     Messaging::ExchangeManager * exchangeMgr = nullptr;
     SessionIDAllocator * idAllocator         = nullptr;
     FabricInfo * fabricInfo                  = nullptr;
+    CASEClientPool * clientPool              = nullptr;
 
     Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 
@@ -59,6 +63,7 @@ struct DeviceProxyInitParams
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(idAllocator == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(clientPool == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         return CHIP_NO_ERROR;
     }
@@ -77,8 +82,9 @@ public:
     {
         VerifyOrReturn(params.Validate() == CHIP_NO_ERROR);
 
-        mInitParams = params;
-        mPeerId     = peerId;
+        mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
+        mInitParams  = params;
+        mPeerId      = peerId;
 
         mState = State::NeedsAddress;
     }
@@ -150,12 +156,6 @@ public:
 
     CHIP_ERROR ShutdownSubscriptions() override;
 
-    //////////// SessionEstablishmentDelegate Implementation ///////////////
-    void OnSessionEstablishmentError(CHIP_ERROR error) override;
-    void OnSessionEstablished() override;
-
-    CASESession & GetCASESession() { return mCASESession; }
-
     Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mInitParams.imDelegate; }
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
@@ -194,8 +194,9 @@ private:
     };
 
     DeviceProxyInitParams mInitParams;
+    System::Layer * mSystemLayer;
 
-    CASESession mCASESession;
+    CASEClient * mCASEClient = nullptr;
 
     PeerId mPeerId;
 
@@ -213,6 +214,13 @@ private:
     CHIP_ERROR EstablishConnection();
 
     bool IsSecureConnected() const override { return mState == State::SecureConnected; }
+
+    static void HandleCASEConnected(void * context, CASEClient * client);
+    static void HandleCASEConnectionFailure(void * context, CASEClient * client, CHIP_ERROR error);
+
+    static void CloseCASESessionTask(System::Layer * layer, void * context);
+
+    void DeferCloseCASESession();
 
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);
