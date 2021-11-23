@@ -17,16 +17,12 @@
  */
 package com.tcl.chip.tvapp;
 
-public class TvApp {
-  public TvApp() {}
+public interface WakeOnLanManager {
 
-  public native void setKeypadInputManager(KeypadInputManager manager);
-
-  public native void setWakeOnLanManager(WakeOnLanManager manager);
-
-  public native void setMediaInputManager(MediaInputManager manager);
-
-  static {
-    System.loadLibrary("TvApp");
-  }
+    /**
+     * Get Wake On Lan Mac address for endpoint
+     *
+     * @return Mac address in AA:BB:CC:DD:EE
+     */
+    String getMac(int endpoint);
 }

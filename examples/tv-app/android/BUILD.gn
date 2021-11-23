@@ -40,18 +40,18 @@ shared_library("jni") {
     "include/endpoint-configuration/EndpointConfigurationStorage.h",
     "include/low-power/LowPowerManager.cpp",
     "include/low-power/LowPowerManager.h",
-    "include/media-input/MediaInputManager.cpp",
-    "include/media-input/MediaInputManager.h",
     "include/media-playback/MediaPlaybackManager.cpp",
     "include/media-playback/MediaPlaybackManager.h",
     "include/target-navigator/TargetNavigatorManager.cpp",
     "include/target-navigator/TargetNavigatorManager.h",
     "include/tv-channel/TvChannelManager.cpp",
     "include/tv-channel/TvChannelManager.h",
-    "include/wake-on-lan/WakeOnLanManager.cpp",
-    "include/wake-on-lan/WakeOnLanManager.h",
     "java/KeypadInputManager.cpp",
     "java/KeypadInputManager.h",
+    "java/WakeOnLanManager.cpp",
+    "java/WakeOnLanManager.h",
+    "java/MediaInputManager.cpp",
+    "java/MediaInputManager.h",
     "java/TVApp-JNI.cpp",
   ]
 
@@ -85,6 +85,11 @@ android_library("java") {
   sources = [
     "java/src/com/tcl/chip/tvapp/KeypadInputManager.java",
     "java/src/com/tcl/chip/tvapp/KeypadInputManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/MediaInputInfo.java",
+    "java/src/com/tcl/chip/tvapp/MediaInputManager.java",
+    "java/src/com/tcl/chip/tvapp/MediaInputManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",
+    "java/src/com/tcl/chip/tvapp/WakeOnLanManagerStub.java",
     "java/src/com/tcl/chip/tvapp/TvApp.java",
   ]
 
