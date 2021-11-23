@@ -22,7 +22,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -45,7 +45,7 @@ CHIP_ERROR CHIPCommand::Run()
     chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
 
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
-    chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::Examples::GetExampleDACVerifier());
+    chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier());
 
     VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);

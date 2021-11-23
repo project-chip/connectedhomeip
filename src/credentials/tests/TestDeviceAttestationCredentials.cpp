@@ -22,7 +22,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
@@ -196,7 +196,7 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
     NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kNotImplemented);
 
     // Replace default verifier with example verifier
-    DeviceAttestationVerifier * example_dac_verifier = Examples::GetExampleDACVerifier();
+    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier();
     NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
     NL_TEST_ASSERT(inSuite, default_verifier != example_dac_verifier);
 
@@ -252,7 +252,7 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Replace default verifier with example verifier
-    DeviceAttestationVerifier * example_dac_verifier = Examples::GetExampleDACVerifier();
+    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier();
     NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
 
     SetDeviceAttestationVerifier(example_dac_verifier);

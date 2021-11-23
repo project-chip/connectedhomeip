@@ -36,7 +36,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -190,7 +190,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         }
 
         // Initialize device attestation verifier
-        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::Examples::GetExampleDACVerifier());
+        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier());
 
         params.fabricStorage = _fabricStorage;
         commissionerParams.storageDelegate = _persistentStorageDelegateBridge;

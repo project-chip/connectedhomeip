@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "DeviceAttestationVerifierExample.h"
+#include "DefaultDeviceAttestationVerifier.h"
 
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
@@ -31,7 +31,6 @@ using namespace chip::Crypto;
 
 namespace chip {
 namespace Credentials {
-namespace Examples {
 
 namespace {
 
@@ -189,7 +188,7 @@ CHIP_ERROR GetCertificationDeclarationCertificate(const ByteSpan & skid, Mutable
     return CopySpanToMutableSpan(ByteSpan{ sCertChainLookupTable[certChainLookupTableIdx].mCertificate }, outCertificate);
 }
 
-class ExampleDACVerifier : public DeviceAttestationVerifier
+class DefaultDACVerifier : public DeviceAttestationVerifier
 {
 public:
     AttestationVerificationResult VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
@@ -206,7 +205,7 @@ public:
                                                                         const DeviceInfoForAttestation & deviceInfo) override;
 };
 
-AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
+AttestationVerificationResult DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
                                                                                const ByteSpan & attestationChallengeBuffer,
                                                                                const ByteSpan & attestationSignatureBuffer,
                                                                                const ByteSpan & paiCertDerBuffer,
@@ -310,7 +309,7 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
     return ValidateCertificateDeclarationPayload(certificationDeclarationPayload, firmwareInfoSpan, deviceInfo);
 }
 
-AttestationVerificationResult ExampleDACVerifier::ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
+AttestationVerificationResult DefaultDACVerifier::ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
                                                                                             ByteSpan & certDeclBuffer)
 {
     uint8_t certificate[Credentials::kMaxDERCertLength];
@@ -329,7 +328,7 @@ AttestationVerificationResult ExampleDACVerifier::ValidateCertificationDeclarati
     return AttestationVerificationResult::kSuccess;
 }
 
-AttestationVerificationResult ExampleDACVerifier::ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
+AttestationVerificationResult DefaultDACVerifier::ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
                                                                                         const ByteSpan & firmwareInfo,
                                                                                         const DeviceInfoForAttestation & deviceInfo)
 {
@@ -398,13 +397,12 @@ AttestationVerificationResult ExampleDACVerifier::ValidateCertificateDeclaration
 
 } // namespace
 
-DeviceAttestationVerifier * GetExampleDACVerifier()
+DeviceAttestationVerifier * GetDefaultDACVerifier()
 {
-    static ExampleDACVerifier exampleDacVerifier;
+    static DefaultDACVerifier defaultDACVerifier;
 
-    return &exampleDacVerifier;
+    return &defaultDACVerifier;
 }
 
-} // namespace Examples
 } // namespace Credentials
 } // namespace chip

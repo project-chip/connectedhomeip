@@ -20,7 +20,6 @@
 
 namespace chip {
 namespace Credentials {
-namespace Examples {
 
 /**
  * @brief Get implementation of a sample DAC verifier to validate device
@@ -29,8 +28,7 @@ namespace Examples {
  * @returns a singleton DeviceAttestationVerifier that relies on no
  *          storage abstractions.
  */
-DeviceAttestationVerifier * GetExampleDACVerifier();
+DeviceAttestationVerifier * GetDefaultDACVerifier();
 
-} // namespace Examples
 } // namespace Credentials
 } // namespace chip
