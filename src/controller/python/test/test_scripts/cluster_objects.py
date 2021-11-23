@@ -169,6 +169,11 @@ class ClusterObjectTests:
         ]
         await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
 
+        logger.info("7: Reading Chunked List")
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListLongOctetString)])
+        if res[0].Data != [b'0123456789abcdef' * 32] * 4:
+            raise AssertionError("Unexpected read result")
+
     @classmethod
     async def RunTest(cls, devCtrl):
         try:
