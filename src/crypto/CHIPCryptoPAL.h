@@ -61,7 +61,7 @@ constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 
 // Max CSR length should be relatively small since it's a single P256 key and
 // no metadata is expected to be honored by the CA.
-constexpr size_t kMAX_CSR_Length             = 255;
+constexpr size_t kMAX_CSR_Length = 255;
 
 constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
 

@@ -162,7 +162,9 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePat
 }
 
 // Utility to compute Attestation signature for NOCSRResponse and AttestationResponse
-CHIP_ERROR ComputeAttestationSignature(app::CommandHandler * commandObj, Credentials::DeviceAttestationCredentialsProvider * dacProvider, const ByteSpan &payload, MutableByteSpan & signatureSpan)
+CHIP_ERROR ComputeAttestationSignature(app::CommandHandler * commandObj,
+                                       Credentials::DeviceAttestationCredentialsProvider * dacProvider, const ByteSpan & payload,
+                                       MutableByteSpan & signatureSpan)
 {
     uint8_t md[Crypto::kSHA256_Hash_Length];
     MutableByteSpan messageDigestSpan(md);
@@ -537,7 +539,7 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
     else
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Certificate Chain request received for unknown type: %d",
-            static_cast<int>(certificateType));
+                       static_cast<int>(certificateType));
         SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -584,7 +586,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     attestationElementsLen = TLV::EstimateStructOverhead(certDeclSpan.size(), attestationNonce.size(), sizeof(uint64_t) * 8);
 
     VerifyOrExit(attestationElements.Alloc(attestationElementsLen), err = CHIP_ERROR_NO_MEMORY);
-    attestationElementsSpan = MutableByteSpan{attestationElements.Get(), attestationElementsLen};
+    attestationElementsSpan = MutableByteSpan{ attestationElements.Get(), attestationElementsLen };
     SuccessOrExit(err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, timestamp, kEmptyFirmwareInfo,
                                                                   emptyVendorReserved, attestationElementsSpan));
 
@@ -593,7 +595,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
         Commands::AttestationResponse::Type response;
 
         Crypto::P256ECDSASignature signature;
-        MutableByteSpan signatureSpan{signature.Bytes(), signature.Capacity()};
+        MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
         SuccessOrExit(err = ComputeAttestationSignature(commandObj, dacProvider, attestationElementsSpan, signatureSpan));
 
         response.attestationElements = attestationElementsSpan;
@@ -630,7 +632,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
     // Prepare NOCSRElements structure
     {
         Crypto::P256Keypair keypair;
-        size_t csrLength = Crypto::kMAX_CSR_Length;
+        size_t csrLength           = Crypto::kMAX_CSR_Length;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
 
@@ -652,18 +654,16 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
         VerifyOrExit(csrLength <= Crypto::kMAX_CSR_Length, err = CHIP_ERROR_INTERNAL);
 
         // Encode the NOCSR elements with the CSR and Nonce
-        nocsrLengthEstimate =
-            TLV::EstimateStructOverhead(
-                csrLength,  // CSR buffer
-                kExpectedNonceSize,  // CSR Nonce
-                0 // no vendor reserved data
-            );
+        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrLength,          // CSR buffer
+                                                          kExpectedNonceSize, // CSR Nonce
+                                                          0                   // no vendor reserved data
+        );
 
         VerifyOrExit(nocsrElements.Alloc(nocsrLengthEstimate), err = CHIP_ERROR_NO_MEMORY);
 
-        nocsrElementsSpan = MutableByteSpan{nocsrElements.Get(), nocsrLengthEstimate};
-        SuccessOrExit(err = Credentials::ConstructNOCSRElements(ByteSpan{csr.Get(), csrLength}, CSRNonce, kNoVendorReserved, kNoVendorReserved, kNoVendorReserved,
-           nocsrElementsSpan));
+        nocsrElementsSpan = MutableByteSpan{ nocsrElements.Get(), nocsrLengthEstimate };
+        SuccessOrExit(err = Credentials::ConstructNOCSRElements(ByteSpan{ csr.Get(), csrLength }, CSRNonce, kNoVendorReserved,
+                                                                kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan));
     }
 
     // Prepare response payload with signature
@@ -673,10 +673,10 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
         Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
 
         Crypto::P256ECDSASignature signature;
-        MutableByteSpan signatureSpan{signature.Bytes(), signature.Capacity()};
+        MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
         SuccessOrExit(err = ComputeAttestationSignature(commandObj, dacProvider, nocsrElementsSpan, signatureSpan));
 
-        response.NOCSRElements = nocsrElementsSpan;
+        response.NOCSRElements        = nocsrElementsSpan;
         response.attestationSignature = signatureSpan;
         SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
     }

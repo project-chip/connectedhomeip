@@ -179,9 +179,8 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConstructNOCSRElements(const ByteSpan & csr, const ByteSpan & csrNonce,
-                                  const ByteSpan & vendor_reserved1, const ByteSpan & vendor_reserved2,
-                                  const ByteSpan & vendor_reserved3,
+CHIP_ERROR ConstructNOCSRElements(const ByteSpan & csr, const ByteSpan & csrNonce, const ByteSpan & vendor_reserved1,
+                                  const ByteSpan & vendor_reserved2, const ByteSpan & vendor_reserved3,
                                   MutableByteSpan & nocsrElements)
 {
     TLV::TLVWriter tlvWriter;

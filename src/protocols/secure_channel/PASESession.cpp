@@ -353,11 +353,11 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
     const size_t max_msg_len       = TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize, // initiatorRandom,
-                                                         sizeof(uint16_t),            // initiatorSessionId
-                                                         sizeof(uint16_t),            // passcodeId,
-                                                         sizeof(uint8_t)              // hasPBKDFParameters
-                                                         /* TLV::TLV::EstimateStructOverhead(sizeof(uint16_t),
-                                                            sizeof(uint16)_t), // initiatorMRPParams */
+                                                           sizeof(uint16_t),            // initiatorSessionId
+                                                           sizeof(uint16_t),            // passcodeId,
+                                                           sizeof(uint8_t)              // hasPBKDFParameters
+                                                           /* TLV::TLV::EstimateStructOverhead(sizeof(uint16_t),
+                                                              sizeof(uint16)_t), // initiatorMRPParams */
     );
     System::PacketBufferHandle req = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!req.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -451,12 +451,12 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
     const size_t max_msg_len =
-        TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize,                                  // initiatorRandom
-                                       kPBKDFParamRandomNumberSize,                               // responderRandom
-                                       sizeof(uint16_t),                                          // responderSessionId
-                                       TLV::EstimateStructOverhead(sizeof(uint32_t), mSaltLength) // pbkdf_parameters
-                                      /* TLV::EstimateStructOverhead(sizeof(uint16_t),
-                                          sizeof(uint16)_t), // responderMRPParams */
+        TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize,                               // initiatorRandom
+                                    kPBKDFParamRandomNumberSize,                               // responderRandom
+                                    sizeof(uint16_t),                                          // responderSessionId
+                                    TLV::EstimateStructOverhead(sizeof(uint32_t), mSaltLength) // pbkdf_parameters
+                                    /* TLV::EstimateStructOverhead(sizeof(uint16_t),
+                                        sizeof(uint16)_t), // responderMRPParams */
         );
     System::PacketBufferHandle resp = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!resp.IsNull(), CHIP_ERROR_NO_MEMORY);

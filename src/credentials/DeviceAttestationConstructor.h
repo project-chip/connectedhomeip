@@ -75,9 +75,8 @@ CHIP_ERROR CountVendorReservedElementsInDA(const ByteSpan & attestationElements,
  *  @param[out] nocsrElements Buffer used to write all nocsrElements data, formed with all the data fields above.
  *                            Provided buffer needs to be capable to handle all data fields + tags.
  */
-CHIP_ERROR ConstructNOCSRElements(const ByteSpan & csr, const ByteSpan & csrNonce,
-                                  const ByteSpan & vendor_reserved1, const ByteSpan & vendor_reserved2,
-                                  const ByteSpan & vendor_reserved3,
+CHIP_ERROR ConstructNOCSRElements(const ByteSpan & csr, const ByteSpan & csrNonce, const ByteSpan & vendor_reserved1,
+                                  const ByteSpan & vendor_reserved2, const ByteSpan & vendor_reserved3,
                                   MutableByteSpan & nocsrElements);
 
 } // namespace Credentials
