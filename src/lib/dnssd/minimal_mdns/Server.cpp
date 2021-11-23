@@ -198,7 +198,8 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
         }
 
         ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->query_udp));
-        ReturnErrorOnFailure(info->listen_udp->Bind(addressType, chip::Inet::IPAddress::Any, kPickRandomBindPort, interfaceId));
+        ReturnErrorOnFailure(info->query_udp->Bind(addressType, chip::Inet::IPAddress::Any, kPickRandomBindPort, interfaceId));
+        ReturnErrorOnFailure(info->query_udp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
     }
 
     return autoShutdown.ReturnSuccess();
