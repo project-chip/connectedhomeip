@@ -19,9 +19,8 @@
 #pragma once
 
 #include <app/AttributeAccessInterface.h>
-#include <lib/core/CHIPError.h>
 #include <jni.h>
-
+#include <lib/core/CHIPError.h>
 
 class MediaInputManager
 {
@@ -40,11 +39,11 @@ private:
     static MediaInputManager sInstance;
     jobject mMediaInputManagerObject = nullptr;
     jmethodID mGetInputListMethod    = nullptr;
-    jmethodID mGetCurrentInputMethod    = nullptr;
-    jmethodID mSelectInputMethod    = nullptr;
-    jmethodID mShowInputStatusMethod    = nullptr;
-    jmethodID mHideInputStatusMethod    = nullptr;
-    jmethodID mRenameInputMethod    = nullptr;
+    jmethodID mGetCurrentInputMethod = nullptr;
+    jmethodID mSelectInputMethod     = nullptr;
+    jmethodID mShowInputStatusMethod = nullptr;
+    jmethodID mHideInputStatusMethod = nullptr;
+    jmethodID mRenameInputMethod     = nullptr;
 };
 
 inline class MediaInputManager & MediaInputMgr()

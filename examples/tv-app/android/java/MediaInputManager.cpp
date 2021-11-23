@@ -16,18 +16,17 @@
  */
 
 #include "MediaInputManager.h"
-#include <cstdlib>
-#include <string>
-#include <jni.h>
-#include <lib/support/CHIPJNIError.h>
-#include <lib/support/JniReferences.h>
-#include <lib/support/JniTypeWrappers.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
-
+#include <cstdlib>
+#include <jni.h>
+#include <lib/support/CHIPJNIError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <string>
 
 using namespace chip;
 
@@ -104,8 +103,8 @@ CHIP_ERROR MediaInputManager::GetInputList(app::AttributeValueEncoder & aEncoder
     VerifyOrExit(mGetInputListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    return aEncoder.EncodeList([this,env](const app::TagBoundEncoder & encoder) -> CHIP_ERROR {
-        jobjectArray inputArray = (jobjectArray) env->CallObjectMethod(mMediaInputManagerObject,mGetInputListMethod);
+    return aEncoder.EncodeList([this, env](const app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+        jobjectArray inputArray = (jobjectArray) env->CallObjectMethod(mMediaInputManagerObject, mGetInputListMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(AppServer, "Java exception in MediaInputManager::GetInputList");
@@ -115,36 +114,36 @@ CHIP_ERROR MediaInputManager::GetInputList(app::AttributeValueEncoder & aEncoder
         }
 
         jint size = env->GetArrayLength(inputArray);
-        for (int i=0;i<size;i++)
+        for (int i = 0; i < size; i++)
         {
             app::Clusters::MediaInput::Structs::MediaInputInfo::Type mediaInput;
 
-            jobject inputObj = env->GetObjectArrayElement(inputArray, i);
+            jobject inputObj  = env->GetObjectArrayElement(inputArray, i);
             jclass inputClass = env->GetObjectClass(inputObj);
 
-            jfieldID indexId = env->GetFieldID(inputClass,"index","I");
-            jint index = env->GetIntField(inputObj,indexId);
+            jfieldID indexId = env->GetFieldID(inputClass, "index", "I");
+            jint index       = env->GetIntField(inputObj, indexId);
             mediaInput.index = static_cast<uint8_t>(index);
 
-            jfieldID typeId = env->GetFieldID(inputClass,"type","I");
-            jint type = env->GetIntField(inputObj,typeId);
-            mediaInput.inputType   = static_cast<app::Clusters::MediaInput::MediaInputType>(type);
+            jfieldID typeId      = env->GetFieldID(inputClass, "type", "I");
+            jint type            = env->GetIntField(inputObj, typeId);
+            mediaInput.inputType = static_cast<app::Clusters::MediaInput::MediaInputType>(type);
 
-            jfieldID nameId = env->GetFieldID(inputClass,"name","Ljava/lang/String;");
-            jstring jname = static_cast<jstring> (env->GetObjectField(inputObj,nameId));
+            jfieldID nameId = env->GetFieldID(inputClass, "name", "Ljava/lang/String;");
+            jstring jname   = static_cast<jstring>(env->GetObjectField(inputObj, nameId));
 
             if (jname != NULL)
             {
-                JniUtfString name(env,jname);
+                JniUtfString name(env, jname);
                 mediaInput.name = name.charSpan();
             }
 
-            jfieldID descriptionId = env->GetFieldID(inputClass,"description","Ljava/lang/String;");
-            jstring jdescription =static_cast<jstring>(env->GetObjectField(inputObj,descriptionId));
+            jfieldID descriptionId = env->GetFieldID(inputClass, "description", "Ljava/lang/String;");
+            jstring jdescription   = static_cast<jstring>(env->GetObjectField(inputObj, descriptionId));
 
             if (jdescription != NULL)
             {
-                JniUtfString description(env,jdescription);
+                JniUtfString description(env, jdescription);
                 mediaInput.description = description.charSpan();
             }
 
@@ -157,7 +156,7 @@ CHIP_ERROR MediaInputManager::GetInputList(app::AttributeValueEncoder & aEncoder
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "MediaInputManager::GetInputList status error: %s",err.AsString());
+        ChipLogError(Zcl, "MediaInputManager::GetInputList status error: %s", err.AsString());
     }
 
     return err;
@@ -166,7 +165,7 @@ exit:
 CHIP_ERROR MediaInputManager::GetCurrentInput(chip::app::AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    jint index = -1;
+    jint index     = -1;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received MediaInputManager::GetInputList");
@@ -174,7 +173,7 @@ CHIP_ERROR MediaInputManager::GetCurrentInput(chip::app::AttributeValueEncoder &
     VerifyOrExit(mGetCurrentInputMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    index = env->CallIntMethod(mMediaInputManagerObject,mGetCurrentInputMethod);
+    index = env->CallIntMethod(mMediaInputManagerObject, mGetCurrentInputMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in MediaInputManager::GetCurrentInput");
@@ -192,7 +191,7 @@ CHIP_ERROR MediaInputManager::GetCurrentInput(chip::app::AttributeValueEncoder &
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "MediaInputManager::GetCurrentInput status error: %s",err.AsString());
+        ChipLogError(Zcl, "MediaInputManager::GetCurrentInput status error: %s", err.AsString());
     }
 
     return err;
@@ -201,7 +200,7 @@ exit:
 bool MediaInputManager::SelectInput(uint8_t index)
 {
     jboolean ret = JNI_FALSE;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received MediaInputManager::SelectInput %d", index);
     VerifyOrExit(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "mMediaInputManagerObject null"));
@@ -225,7 +224,7 @@ exit:
 bool MediaInputManager::ShowInputStatus()
 {
     jboolean ret = JNI_FALSE;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received MediaInputManager::ShowInputStatus");
     VerifyOrExit(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "mMediaInputManagerObject null"));
@@ -249,7 +248,7 @@ exit:
 bool MediaInputManager::HideInputStatus()
 {
     jboolean ret = JNI_FALSE;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HideInputStatus");
     VerifyOrExit(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "mMediaInputManagerObject null"));
@@ -273,9 +272,9 @@ exit:
 bool MediaInputManager::RenameInput(uint8_t index, std::string name)
 {
     jboolean ret = JNI_FALSE;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogProgress(Zcl, "Received MediaInputManager::RenameInput %d to %s",index, name.c_str());
+    ChipLogProgress(Zcl, "Received MediaInputManager::RenameInput %d to %s", index, name.c_str());
     VerifyOrExit(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "mMediaInputManagerObject null"));
     VerifyOrExit(mRenameInputMethod != nullptr, ChipLogError(Zcl, "mHideInputStatusMethod null"));
     VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
@@ -283,7 +282,8 @@ bool MediaInputManager::RenameInput(uint8_t index, std::string name)
     {
         UtfString jniInputname(env, name.c_str());
         env->ExceptionClear();
-        ret = env->CallBooleanMethod(mMediaInputManagerObject, mRenameInputMethod,static_cast<jint>(index),jniInputname.jniValue());
+        ret =
+            env->CallBooleanMethod(mMediaInputManagerObject, mRenameInputMethod, static_cast<jint>(index), jniInputname.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in MediaInputManager::RenameInput");
@@ -302,7 +302,7 @@ void MediaInputManager::InitializeWithObjects(jobject managerObject)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for MediaInputManager"));
 
-    mMediaInputManagerObject  = env->NewGlobalRef(managerObject);
+    mMediaInputManagerObject = env->NewGlobalRef(managerObject);
     VerifyOrReturn(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef MediaInputManager"));
 
     jclass MediaInputManagerClass = env->GetObjectClass(managerObject);

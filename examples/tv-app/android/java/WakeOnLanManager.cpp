@@ -30,8 +30,8 @@
 
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/JniTypeWrappers.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -54,7 +54,7 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
 
 void WakeOnLanManager::InitWakeOnLanCluster(chip::EndpointId endpoint)
 {
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received WakeOnLanManager::InitWakeOnLanCluster %d", endpoint);
     VerifyOrReturn(mWakeOnLanManagerObject != nullptr, ChipLogError(Zcl, "mWakeOnLanManagerObject null"));

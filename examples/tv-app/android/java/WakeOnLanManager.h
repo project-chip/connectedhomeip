@@ -33,7 +33,7 @@ private:
 
     static WakeOnLanManager sInstance;
     jobject mWakeOnLanManagerObject = nullptr;
-    jmethodID mGetMacMethod = nullptr;
+    jmethodID mGetMacMethod         = nullptr;
 };
 
 inline WakeOnLanManager & WakeOnLanMgr()
