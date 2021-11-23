@@ -45,7 +45,7 @@ K_TIMER_DEFINE(reboot_timer, reboot_timer_handler, NULL);
 class NrfButton final : public Button
 {
 public:
-    pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
+    pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
         GetAppTask().ButtonEventHandler(request.pushed << request.idx /* button_state */, 1 << request.idx /* has_changed */);
         return pw::OkStatus();
@@ -55,7 +55,7 @@ public:
 class NrfDevice final : public Device
 {
 public:
-    pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
         k_timer_start(&reboot_timer, K_SECONDS(1), K_FOREVER);
         return pw::OkStatus();
