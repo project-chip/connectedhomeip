@@ -32,7 +32,7 @@
   "endpointTypes": [
     {
       "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "CHIP-All-Clusters-Server",
+      "deviceTypeName": "MA-all-clusters-app",
       "deviceTypeCode": 0,
       "deviceTypeProfileId": 259,
       "clusters": [
@@ -1303,7 +1303,7 @@
           "mfgCode": null,
           "define": "GENERAL_COMMISSIONING_CLUSTER",
           "side": "client",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "ArmFailSafe",
@@ -1410,6 +1410,21 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "6",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -6410,9 +6425,9 @@
     },
     {
       "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "Video Player",
-      "deviceTypeCode": 35,
-      "deviceTypeProfileId": 2457,
+      "deviceTypeName": null,
+      "deviceTypeCode": null,
+      "deviceTypeProfileId": null,
       "clusters": [
         {
           "name": "On/Off",
@@ -7783,9 +7798,9 @@
     },
     {
       "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "Speaker",
-      "deviceTypeCode": 34,
-      "deviceTypeProfileId": 2457,
+      "deviceTypeName": null,
+      "deviceTypeCode": null,
+      "deviceTypeProfileId": null,
       "clusters": [
         {
           "name": "On/Off",
@@ -8421,9 +8436,9 @@
     },
     {
       "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "Content Application",
-      "deviceTypeCode": 36,
-      "deviceTypeProfileId": 2457,
+      "deviceTypeName": null,
+      "deviceTypeCode": null,
+      "deviceTypeProfileId": null,
       "clusters": [
         {
           "name": "Descriptor",
@@ -9243,9 +9258,9 @@
     },
     {
       "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "Content Application",
-      "deviceTypeCode": 36,
-      "deviceTypeProfileId": 2457,
+      "deviceTypeName": null,
+      "deviceTypeCode": null,
+      "deviceTypeProfileId": null,
       "clusters": [
         {
           "name": "Descriptor",
@@ -9636,9 +9651,9 @@
     },
     {
       "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "Content Application",
-      "deviceTypeCode": 36,
-      "deviceTypeProfileId": 2457,
+      "deviceTypeName": null,
+      "deviceTypeCode": null,
+      "deviceTypeProfileId": null,
       "clusters": [
         {
           "name": "Descriptor",
