@@ -38,14 +38,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#chip_server_cluster_attributes}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
-- (void)read{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)read{{>attribute}}WithCompletionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler;
 {{#if isWritableAttribute}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value responseHandler:(ResponseHandler)responseHandler;
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler;
 {{/if}}
 {{#if isReportableAttribute}}
 {{#unless isList}}
 - (void) subscribe{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval responseHandler:(ResponseHandler)responseHandler;
-- (void) report{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler;
+- (void) report{{>attribute}}WithResponseHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))responseHandler;
 {{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
