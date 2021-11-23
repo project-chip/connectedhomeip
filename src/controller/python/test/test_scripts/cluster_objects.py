@@ -76,10 +76,10 @@ class ClusterObjectTests:
     async def SendWriteRequest(cls, devCtrl):
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
-                                               Clusters.Attribute.AttributeWriteRequest(
-                                                   EndpointId=0, Attribute=Clusters.Basic.Attributes.UserLabel, Data="Test"),
-                                               Clusters.Attribute.AttributeWriteRequest(
-                                                   EndpointId=0, Attribute=Clusters.Basic.Attributes.Location, Data="A loooong string")
+                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                                   "Test")),
+                                               (0, Clusters.Basic.Attributes.Location(
+                                                   "A loooong string"))
                                            ])
         expectedRes = [
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
@@ -102,7 +102,7 @@ class ClusterObjectTests:
             (0, Clusters.Basic.Attributes.VendorID),
             (0, Clusters.Basic.Attributes.ProductName),
             (0, Clusters.Basic.Attributes.ProductID),
-            (0, Clusters.Basic.Attributes.UserLabel),
+            (0, Clusters.Basic.Attributes.NodeLabel),
             (0, Clusters.Basic.Attributes.Location),
             (0, Clusters.Basic.Attributes.HardwareVersion),
             (0, Clusters.Basic.Attributes.HardwareVersionString),

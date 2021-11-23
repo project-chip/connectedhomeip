@@ -173,7 +173,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         case 0x0001: // endpoint list
         {
-            entryLength = 295;
+            entryLength = 39;
             if (((index - 1) * entryLength) > (am->size - entryLength))
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
@@ -194,16 +194,9 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             }
             entryOffset = static_cast<uint16_t>(entryOffset + 34);
             copyListMember(write ? dest : (uint8_t *) &entry->Type, write ? (uint8_t *) &entry->Type : src, write, &entryOffset,
-                           sizeof(entry->Type));          // EndpointListTypeEnum
-            ByteSpan * EndpointsSpan = &entry->Endpoints; // OCTET_STRING
-            if (CHIP_NO_ERROR !=
-                (write ? WriteByteSpan(dest + entryOffset, 258, EndpointsSpan)
-                       : ReadByteSpan(src + entryOffset, 258, EndpointsSpan)))
-            {
-                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
-                return 0;
-            }
-            entryOffset = static_cast<uint16_t>(entryOffset + 258);
+                           sizeof(entry->Type)); // EndpointListTypeEnum
+            copyListMember(write ? dest : (uint8_t *) &entry->Endpoints, write ? (uint8_t *) &entry->Endpoints : src, write,
+                           &entryOffset, sizeof(entry->Endpoints)); // ENDPOINT_NO
             break;
         }
         }
@@ -424,6 +417,42 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             entryOffset = static_cast<uint16_t>(entryOffset + 10);
             copyListMember(write ? dest : (uint8_t *) &entry->Type, write ? (uint8_t *) &entry->Type : src, write, &entryOffset,
                            sizeof(entry->Type)); // InterfaceType
+            break;
+        }
+        case 0x0005: // ActiveHardwareFaults
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ENUM8
+            break;
+        }
+        case 0x0006: // ActiveRadioFaults
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ENUM8
+            break;
+        }
+        case 0x0007: // ActiveNetworkFaults
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ENUM8
             break;
         }
         }
@@ -1124,7 +1153,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
             break;
         case 0x0001: // endpoint list
             // Struct _EndpointListStruct
-            entryLength = 295;
+            entryLength = 39;
             break;
         }
         break;
@@ -1186,6 +1215,18 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0000: // NetworkInterfaces
             // Struct _NetworkInterfaceType
             entryLength = 48;
+            break;
+        case 0x0005: // ActiveHardwareFaults
+            // uint8_t
+            entryLength = 1;
+            break;
+        case 0x0006: // ActiveRadioFaults
+            // uint8_t
+            entryLength = 1;
+            break;
+        case 0x0007: // ActiveNetworkFaults
+            // uint8_t
+            entryLength = 1;
             break;
         }
         break;

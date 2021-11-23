@@ -319,6 +319,9 @@ public:
             return CHIP_ERROR_NOT_IMPLEMENTED;
         }
 
+        // Transitional (during development, will be removed later)
+        virtual bool IsTransitional() const { return true; }
+
         // Listening
         virtual void SetListener(Listener & listener) { mListener = &listener; }
         virtual void ClearListener() { mListener = nullptr; }

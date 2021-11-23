@@ -19,1136 +19,4396 @@
 
 #import "CHIPCommandPayloadsObjc.h"
 
-@implementation CHIPIdentifyClusterIdentifyPayload
+NS_ASSUME_NONNULL_BEGIN
+
+@implementation CHIPIdentifyClusterIdentifyParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _identifyTime = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPIdentifyClusterIdentifyQueryResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeout = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPIdentifyClusterTriggerEffectParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _effectIdentifier = @(0);
+
+        _effectVariant = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupsClusterAddGroupParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+
+        _groupName = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupsClusterAddGroupResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupsClusterViewGroupParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupsClusterViewGroupResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupId = @(0);
+
+        _groupName = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupsClusterGetGroupMembershipParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupList = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupsClusterGetGroupMembershipResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _capacity = @(0);
+
+        _groupList = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupsClusterRemoveGroupParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupsClusterRemoveGroupResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupsClusterAddGroupIfIdentifyingParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+
+        _groupName = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterAddSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+
+        _transitionTime = @(0);
+
+        _sceneName = @"";
+
+        _extensionFieldSets = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterAddSceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterViewSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterViewSceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+
+        _transitionTime = @(0);
+
+        _sceneName = @"";
+
+        _extensionFieldSets = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterRemoveSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterRemoveSceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterRemoveAllScenesParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterRemoveAllScenesResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterStoreSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterStoreSceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterRecallSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+
+        _transitionTime = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterGetSceneMembershipParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterGetSceneMembershipResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _capacity = @(0);
+
+        _groupId = @(0);
+
+        _sceneCount = @(0);
+
+        _sceneList = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterEnhancedAddSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+
+        _transitionTime = @(0);
+
+        _sceneName = @"";
+
+        _extensionFieldSets = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterEnhancedAddSceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterEnhancedViewSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterEnhancedViewSceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupId = @(0);
+
+        _sceneId = @(0);
+
+        _transitionTime = @(0);
+
+        _sceneName = @"";
+
+        _extensionFieldSets = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterCopySceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mode = @(0);
+
+        _groupIdFrom = @(0);
+
+        _sceneIdFrom = @(0);
+
+        _groupIdTo = @(0);
+
+        _sceneIdTo = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPScenesClusterCopySceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupIdFrom = @(0);
+
+        _sceneIdFrom = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOnOffClusterOffWithEffectParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _effectId = @(0);
+
+        _effectVariant = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOnOffClusterOnWithTimedOffParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _onOffControl = @(0);
+
+        _onTime = @(0);
+
+        _offWaitTime = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPLevelControlClusterMoveToLevelParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _level = @(0);
+
+        _transitionTime = @(0);
+
+        _optionMask = @(0);
+
+        _optionOverride = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPLevelControlClusterMoveParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _moveMode = @(0);
+
+        _rate = @(0);
+
+        _optionMask = @(0);
+
+        _optionOverride = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPLevelControlClusterStepParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _stepMode = @(0);
+
+        _stepSize = @(0);
+
+        _transitionTime = @(0);
+
+        _optionMask = @(0);
+
+        _optionOverride = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPLevelControlClusterStopParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _optionMask = @(0);
+
+        _optionOverride = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPLevelControlClusterMoveToLevelWithOnOffParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _level = @(0);
+
+        _transitionTime = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPLevelControlClusterMoveWithOnOffParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _moveMode = @(0);
+
+        _rate = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPLevelControlClusterStepWithOnOffParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _stepMode = @(0);
+
+        _stepSize = @(0);
+
+        _transitionTime = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPAlarmsClusterResetAlarmParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _alarmCode = @(0);
+
+        _clusterId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPAlarmsClusterAlarmParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _alarmCode = @(0);
+
+        _clusterId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPAlarmsClusterGetAlarmResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _alarmCode = @(0);
+
+        _clusterId = @(0);
+
+        _timeStamp = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterPowerProfileRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterPowerProfileNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _totalProfileNum = @(0);
+
+        _powerProfileId = @(0);
+
+        _numOfTransferredPhases = @(0);
+
+        _transferredPhases = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterPowerProfileResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _totalProfileNum = @(0);
+
+        _powerProfileId = @(0);
+
+        _numOfTransferredPhases = @(0);
+
+        _transferredPhases = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterGetPowerProfilePriceResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+
+        _currency = @(0);
+
+        _price = @(0);
+
+        _priceTrailingDigit = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterPowerProfileStateResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileCount = @(0);
+
+        _powerProfileRecords = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterGetOverallSchedulePriceResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _currency = @(0);
+
+        _price = @(0);
+
+        _priceTrailingDigit = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterGetPowerProfilePriceParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterEnergyPhasesScheduleNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+
+        _numOfScheduledPhases = @(0);
+
+        _scheduledPhases = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterPowerProfilesStateNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileCount = @(0);
+
+        _powerProfileRecords = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterEnergyPhasesScheduleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+
+        _numOfScheduledPhases = @(0);
+
+        _scheduledPhases = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterEnergyPhasesScheduleRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+
+        _numOfScheduledPhases = @(0);
+
+        _scheduledPhases = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterGetPowerProfilePriceExtendedResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+
+        _currency = @(0);
+
+        _price = @(0);
+
+        _priceTrailingDigit = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+
+        _numOfScheduledPhases = @(0);
+
+        _scheduledPhases = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+
+        _startAfter = @(0);
+
+        _stopBefore = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerProfileId = @(0);
+
+        _startAfter = @(0);
+
+        _stopBefore = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerProfileClusterGetPowerProfilePriceExtendedParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _options = @(0);
+
+        _powerProfileId = @(0);
+
+        _powerProfileStartTime = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplianceControlClusterExecutionOfACommandParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _commandId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplianceControlClusterSignalStateResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _applianceStatus = @(0);
+
+        _remoteEnableFlagsAndDeviceStatus2 = @(0);
+
+        _applianceStatus2 = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplianceControlClusterSignalStateNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _applianceStatus = @(0);
+
+        _remoteEnableFlagsAndDeviceStatus2 = @(0);
+
+        _applianceStatus2 = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplianceControlClusterWriteFunctionsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _functionId = @(0);
+
+        _functionDataType = @(0);
+
+        _functionData = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplianceControlClusterOverloadWarningParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _warningEvent = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPollControlClusterCheckInResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startFastPolling = @(0);
+
+        _fastPollTimeout = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPollControlClusterSetLongPollIntervalParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newLongPollInterval = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPollControlClusterSetShortPollIntervalParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newShortPollInterval = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterInstantActionParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterInstantActionWithTransitionParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+
+        _transitionTime = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterStartActionParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterStartActionWithDurationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+
+        _duration = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterStopActionParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterPauseActionParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterPauseActionWithDurationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+
+        _duration = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterResumeActionParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterEnableActionParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterEnableActionWithDurationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+
+        _duration = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterDisableActionParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterDisableActionWithDurationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+
+        _duration = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _vendorId = @(0);
+
+        _productId = @(0);
+
+        _softwareVersion = @(0);
+
+        _protocolsSupported = [NSArray array];
+
+        _hardwareVersion = nil;
+
+        _location = nil;
+
+        _requestorCanConsent = nil;
+
+        _metadataForProvider = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _updateToken = [NSData data];
+
+        _newVersion = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _updateToken = [NSData data];
+
+        _softwareVersion = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _delayedActionTime = nil;
+
+        _imageURI = nil;
+
+        _softwareVersion = nil;
+
+        _softwareVersionString = nil;
+
+        _updateToken = nil;
+
+        _userConsentNeeded = nil;
+
+        _metadataForRequestor = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _action = @(0);
+
+        _delayedActionTime = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _providerLocation = @(0);
+
+        _vendorId = @(0);
+
+        _announcementReason = @(0);
+
+        _metadataForNode = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGeneralCommissioningClusterArmFailSafeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _expiryLengthSeconds = @(0);
+
+        _breadcrumb = @(0);
+
+        _timeoutMs = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGeneralCommissioningClusterArmFailSafeResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorCode = @(0);
+
+        _debugText = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGeneralCommissioningClusterSetRegulatoryConfigParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _location = @(0);
+
+        _countryCode = @"";
+
+        _breadcrumb = @(0);
+
+        _timeoutMs = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorCode = @(0);
+
+        _debugText = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGeneralCommissioningClusterCommissioningCompleteResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorCode = @(0);
+
+        _debugText = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterScanNetworksParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _ssid = [NSData data];
+
+        _breadcrumb = @(0);
+
+        _timeoutMs = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterScanNetworksResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorCode = @(0);
+
+        _debugText = @"";
+
+        _wifiScanResults = [NSArray array];
+
+        _threadScanResults = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterAddWiFiNetworkParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _ssid = [NSData data];
+
+        _credentials = [NSData data];
+
+        _breadcrumb = @(0);
+
+        _timeoutMs = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterAddWiFiNetworkResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorCode = @(0);
+
+        _debugText = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterUpdateWiFiNetworkParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _ssid = [NSData data];
+
+        _credentials = [NSData data];
+
+        _breadcrumb = @(0);
+
+        _timeoutMs = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorCode = @(0);
+
+        _debugText = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterAddThreadNetworkParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _operationalDataset = [NSData data];
+
+        _breadcrumb = @(0);
+
+        _timeoutMs = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterAddThreadNetworkResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorCode = @(0);
+
+        _debugText = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterUpdateThreadNetworkParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _operationalDataset = [NSData data];
+
+        _breadcrumb = @(0);
+
+        _timeoutMs = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorCode = @(0);
+
+        _debugText = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterRemoveNetworkParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _networkID = [NSData data];
+
+        _breadcrumb = @(0);
+
+        _timeoutMs = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterRemoveNetworkResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorCode = @(0);
+
+        _debugText = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterEnableNetworkParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _networkID = [NSData data];
+
+        _breadcrumb = @(0);
+
+        _timeoutMs = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterEnableNetworkResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorCode = @(0);
+
+        _debugText = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterDisableNetworkParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _networkID = [NSData data];
+
+        _breadcrumb = @(0);
+
+        _timeoutMs = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPNetworkCommissioningClusterDisableNetworkResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorCode = @(0);
+
+        _debugText = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDiagnosticLogsClusterRetrieveLogsRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _intent = @(0);
+
+        _requestedProtocol = @(0);
+
+        _transferFileDesignator = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDiagnosticLogsClusterRetrieveLogsResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _content = [NSData data];
+
+        _timeStamp = @(0);
+
+        _timeSinceBoot = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPAdministratorCommissioningClusterOpenCommissioningWindowParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _commissioningTimeout = @(0);
+
+        _pakeVerifier = [NSData data];
+
+        _discriminator = @(0);
+
+        _iterations = @(0);
+
+        _salt = [NSData data];
+
+        _passcodeID = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPAdministratorCommissioningClusterOpenBasicCommissioningWindowParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _commissioningTimeout = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterAttestationRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _attestationNonce = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterAttestationResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _attestationElements = [NSData data];
+
+        _signature = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterCertificateChainRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _certificateType = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterCertificateChainResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _certificate = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterOpCSRRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _csrNonce = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterOpCSRResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _nocsrElements = [NSData data];
+
+        _attestationSignature = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterAddNOCParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _nocValue = [NSData data];
+
+        _icacValue = nil;
+
+        _ipkValue = [NSData data];
+
+        _caseAdminNode = @(0);
+
+        _adminVendorId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterUpdateNOCParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _nocValue = [NSData data];
+
+        _icacValue = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterNOCResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _statusCode = @(0);
+
+        _fabricIndex = @(0);
+
+        _debugText = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterUpdateFabricLabelParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterRemoveFabricParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterAddTrustedRootCertificateParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _rootCertificate = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _trustedRootIdentifier = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPModeSelectClusterChangeToModeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newMode = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterLockDoorParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _pin = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterLockDoorResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterUnlockDoorParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _pin = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterUnlockDoorResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterToggleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _pin = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterToggleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterUnlockWithTimeoutParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeoutInSeconds = @(0);
+
+        _pin = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterUnlockWithTimeoutResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetLogRecordParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _logIndex = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetLogRecordResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _logEntryId = @(0);
+
+        _timestamp = @(0);
+
+        _eventType = @(0);
+
+        _source = @(0);
+
+        _eventIdOrAlarmCode = @(0);
+
+        _userId = @(0);
+
+        _pin = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetPinParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+
+        _userStatus = @(0);
+
+        _userType = @(0);
+
+        _pin = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetPinResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetPinParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetPinResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+
+        _userStatus = @(0);
+
+        _userType = @(0);
+
+        _pin = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearPinParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearPinResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearAllPinsResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetUserStatusParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+
+        _userStatus = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetUserStatusResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetUserStatusParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetUserStatusResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetWeekdayScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+
+        _userId = @(0);
+
+        _daysMask = @(0);
+
+        _startHour = @(0);
+
+        _startMinute = @(0);
+
+        _endHour = @(0);
+
+        _endMinute = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetWeekdayScheduleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetWeekdayScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+
+        _userId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetWeekdayScheduleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+
+        _userId = @(0);
+
+        _status = @(0);
+
+        _daysMask = @(0);
+
+        _startHour = @(0);
+
+        _startMinute = @(0);
+
+        _endHour = @(0);
+
+        _endMinute = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearWeekdayScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+
+        _userId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearWeekdayScheduleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetYeardayScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+
+        _userId = @(0);
+
+        _localStartTime = @(0);
+
+        _localEndTime = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetYeardayScheduleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetYeardayScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+
+        _userId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetYeardayScheduleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+
+        _userId = @(0);
+
+        _status = @(0);
+
+        _localStartTime = @(0);
+
+        _localEndTime = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearYeardayScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+
+        _userId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearYeardayScheduleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetHolidayScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+
+        _localStartTime = @(0);
+
+        _localEndTime = @(0);
+
+        _operatingModeDuringHoliday = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetHolidayScheduleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetHolidayScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetHolidayScheduleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+
+        _status = @(0);
+
+        _localStartTime = @(0);
+
+        _localEndTime = @(0);
+
+        _operatingModeDuringHoliday = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearHolidayScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearHolidayScheduleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetUserTypeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+
+        _userType = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetUserTypeResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetUserTypeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetUserTypeResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+
+        _userType = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetRfidParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+
+        _userStatus = @(0);
+
+        _userType = @(0);
+
+        _id = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetRfidResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetRfidParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetRfidResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+
+        _userStatus = @(0);
+
+        _userType = @(0);
+
+        _rfid = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearRfidParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearRfidResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearAllRfidsResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterOperationEventNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _source = @(0);
+
+        _eventCode = @(0);
+
+        _userId = @(0);
+
+        _pin = [NSData data];
+
+        _timeStamp = @(0);
+
+        _data = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterProgrammingEventNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _source = @(0);
+
+        _eventCode = @(0);
+
+        _userId = @(0);
+
+        _pin = [NSData data];
+
+        _userType = @(0);
+
+        _userStatus = @(0);
+
+        _timeStamp = @(0);
+
+        _data = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPWindowCoveringClusterGoToLiftValueParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _liftValue = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPWindowCoveringClusterGoToLiftPercentageParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _liftPercentageValue = @(0);
+
+        _liftPercent100thsValue = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPWindowCoveringClusterGoToTiltValueParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _tiltValue = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPWindowCoveringClusterGoToTiltPercentageParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _tiltPercentageValue = @(0);
+
+        _tiltPercent100thsValue = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBarrierControlClusterBarrierControlGoToPercentParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _percentOpen = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPThermostatClusterSetpointRaiseLowerParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mode = @(0);
+
+        _amount = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPThermostatClusterCurrentWeeklyScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _numberOfTransitionsForSequence = @(0);
+
+        _dayOfWeekForSequence = @(0);
+
+        _modeForSequence = @(0);
+
+        _payload = [NSArray array];
+    }
+    return self;
+}
 @end
+
+@implementation CHIPThermostatClusterSetWeeklyScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _numberOfTransitionsForSequence = @(0);
+
+        _dayOfWeekForSequence = @(0);
+
+        _modeForSequence = @(0);
 
-@implementation CHIPIdentifyClusterIdentifyQueryResponsePayload
+        _payload = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPIdentifyClusterIdentifyQueryPayload
+@implementation CHIPThermostatClusterRelayStatusLogParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeOfDay = @(0);
+
+        _relayStatus = @(0);
+
+        _localTemperature = @(0);
+
+        _humidityInPercentage = @(0);
+
+        _setpoint = @(0);
+
+        _unreadEntries = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPThermostatClusterGetWeeklyScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _daysToReturn = @(0);
 
-@implementation CHIPIdentifyClusterTriggerEffectPayload
+        _modeToReturn = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPGroupsClusterAddGroupPayload
+@implementation CHIPColorControlClusterMoveToHueParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _hue = @(0);
+
+        _direction = @(0);
+
+        _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterMoveHueParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _moveMode = @(0);
+
+        _rate = @(0);
 
-@implementation CHIPGroupsClusterAddGroupResponsePayload
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterStepHueParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _stepMode = @(0);
+
+        _stepSize = @(0);
 
-@implementation CHIPGroupsClusterViewGroupPayload
+        _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterMoveToSaturationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _saturation = @(0);
 
-@implementation CHIPGroupsClusterViewGroupResponsePayload
+        _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterMoveSaturationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _moveMode = @(0);
 
-@implementation CHIPGroupsClusterGetGroupMembershipPayload
+        _rate = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterStepSaturationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _stepMode = @(0);
 
-@implementation CHIPGroupsClusterGetGroupMembershipResponsePayload
+        _stepSize = @(0);
+
+        _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterMoveToHueAndSaturationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _hue = @(0);
+
+        _saturation = @(0);
+
+        _transitionTime = @(0);
+
+        _optionsMask = @(0);
 
-@implementation CHIPGroupsClusterRemoveGroupPayload
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPGroupsClusterRemoveGroupResponsePayload
+@implementation CHIPColorControlClusterMoveToColorParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _colorX = @(0);
+
+        _colorY = @(0);
+
+        _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterMoveColorParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _rateX = @(0);
+
+        _rateY = @(0);
 
-@implementation CHIPGroupsClusterRemoveAllGroupsPayload
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterStepColorParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _stepX = @(0);
+
+        _stepY = @(0);
 
-@implementation CHIPGroupsClusterAddGroupIfIdentifyingPayload
+        _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterMoveToColorTemperatureParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _colorTemperature = @(0);
 
-@implementation CHIPScenesClusterAddScenePayload
+        _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterEnhancedMoveToHueParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _enhancedHue = @(0);
 
-@implementation CHIPScenesClusterAddSceneResponsePayload
+        _direction = @(0);
+
+        _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterEnhancedMoveHueParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPScenesClusterViewScenePayload
+        _moveMode = @(0);
+
+        _rate = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterEnhancedStepHueParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _stepMode = @(0);
+
+        _stepSize = @(0);
+
+        _transitionTime = @(0);
+
+        _optionsMask = @(0);
 
-@implementation CHIPScenesClusterViewSceneResponsePayload
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPScenesClusterRemoveScenePayload
+@implementation CHIPColorControlClusterEnhancedMoveToHueAndSaturationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _enhancedHue = @(0);
+
+        _saturation = @(0);
+
+        _transitionTime = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterColorLoopSetParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _updateFlags = @(0);
+
+        _action = @(0);
 
-@implementation CHIPScenesClusterRemoveSceneResponsePayload
+        _direction = @(0);
+
+        _time = @(0);
+
+        _startHue = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPScenesClusterRemoveAllScenesPayload
+@implementation CHIPColorControlClusterStopMoveStepParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterMoveColorTemperatureParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _moveMode = @(0);
 
-@implementation CHIPScenesClusterRemoveAllScenesResponsePayload
+        _rate = @(0);
+
+        _colorTemperatureMinimum = @(0);
+
+        _colorTemperatureMaximum = @(0);
+
+        _optionsMask = @(0);
+
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
+
+@implementation CHIPColorControlClusterStepColorTemperatureParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _stepMode = @(0);
+
+        _stepSize = @(0);
+
+        _transitionTime = @(0);
+
+        _colorTemperatureMinimum = @(0);
 
-@implementation CHIPScenesClusterStoreScenePayload
-@end
+        _colorTemperatureMaximum = @(0);
 
-@implementation CHIPScenesClusterStoreSceneResponsePayload
-@end
+        _optionsMask = @(0);
 
-@implementation CHIPScenesClusterRecallScenePayload
+        _optionsOverride = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPScenesClusterGetSceneMembershipPayload
-@end
+@implementation CHIPIasZoneClusterZoneEnrollResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPScenesClusterGetSceneMembershipResponsePayload
-@end
+        _enrollResponseCode = @(0);
 
-@implementation CHIPScenesClusterEnhancedAddScenePayload
+        _zoneId = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPScenesClusterEnhancedAddSceneResponsePayload
-@end
+@implementation CHIPIasZoneClusterZoneStatusChangeNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPScenesClusterEnhancedViewScenePayload
-@end
+        _zoneStatus = @(0);
 
-@implementation CHIPScenesClusterEnhancedViewSceneResponsePayload
-@end
+        _extendedStatus = @(0);
 
-@implementation CHIPScenesClusterCopyScenePayload
-@end
+        _zoneId = @(0);
 
-@implementation CHIPScenesClusterCopySceneResponsePayload
+        _delay = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOnOffClusterOffPayload
-@end
+@implementation CHIPIasZoneClusterZoneEnrollRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPOnOffClusterSampleMfgSpecificOffWithTransitionPayload
-@end
+        _zoneType = @(0);
 
-@implementation CHIPOnOffClusterOnPayload
+        _manufacturerCode = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOnOffClusterSampleMfgSpecificOnWithTransitionPayload
-@end
+@implementation CHIPIasZoneClusterInitiateTestModeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPOnOffClusterSampleMfgSpecificOnWithTransition2Payload
-@end
+        _testModeDuration = @(0);
 
-@implementation CHIPOnOffClusterTogglePayload
+        _currentZoneSensitivityLevel = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOnOffClusterSampleMfgSpecificToggleWithTransitionPayload
-@end
+@implementation CHIPIasAceClusterArmParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPOnOffClusterSampleMfgSpecificToggleWithTransition2Payload
-@end
+        _armMode = @(0);
 
-@implementation CHIPOnOffClusterOffWithEffectPayload
-@end
+        _armDisarmCode = @"";
 
-@implementation CHIPOnOffClusterOnWithRecallGlobalScenePayload
+        _zoneId = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOnOffClusterOnWithTimedOffPayload
-@end
+@implementation CHIPIasAceClusterArmResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPLevelControlClusterMoveToLevelPayload
+        _armNotification = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPLevelControlClusterMovePayload
-@end
+@implementation CHIPIasAceClusterBypassParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPLevelControlClusterStepPayload
-@end
+        _numberOfZones = @(0);
 
-@implementation CHIPLevelControlClusterStopPayload
-@end
+        _zoneIds = [NSArray array];
 
-@implementation CHIPLevelControlClusterMoveToLevelWithOnOffPayload
+        _armDisarmCode = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPLevelControlClusterMoveWithOnOffPayload
-@end
+@implementation CHIPIasAceClusterGetZoneIdMapResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPLevelControlClusterStepWithOnOffPayload
-@end
+        _section0 = @(0);
 
-@implementation CHIPLevelControlClusterStopWithOnOffPayload
-@end
+        _section1 = @(0);
 
-@implementation CHIPAlarmsClusterResetAlarmPayload
-@end
+        _section2 = @(0);
 
-@implementation CHIPAlarmsClusterAlarmPayload
-@end
+        _section3 = @(0);
 
-@implementation CHIPAlarmsClusterResetAllAlarmsPayload
-@end
+        _section4 = @(0);
 
-@implementation CHIPAlarmsClusterGetAlarmResponsePayload
-@end
+        _section5 = @(0);
 
-@implementation CHIPAlarmsClusterGetAlarmPayload
-@end
+        _section6 = @(0);
 
-@implementation CHIPAlarmsClusterResetAlarmLogPayload
-@end
+        _section7 = @(0);
 
-@implementation CHIPPowerProfileClusterPowerProfileRequestPayload
-@end
+        _section8 = @(0);
 
-@implementation CHIPPowerProfileClusterPowerProfileNotificationPayload
-@end
+        _section9 = @(0);
 
-@implementation CHIPPowerProfileClusterPowerProfileStateRequestPayload
-@end
+        _section10 = @(0);
 
-@implementation CHIPPowerProfileClusterPowerProfileResponsePayload
-@end
+        _section11 = @(0);
 
-@implementation CHIPPowerProfileClusterGetPowerProfilePriceResponsePayload
-@end
+        _section12 = @(0);
 
-@implementation CHIPPowerProfileClusterPowerProfileStateResponsePayload
-@end
+        _section13 = @(0);
 
-@implementation CHIPPowerProfileClusterGetOverallSchedulePriceResponsePayload
-@end
+        _section14 = @(0);
 
-@implementation CHIPPowerProfileClusterGetPowerProfilePricePayload
+        _section15 = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPPowerProfileClusterEnergyPhasesScheduleNotificationPayload
-@end
+@implementation CHIPIasAceClusterGetZoneInformationResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPPowerProfileClusterPowerProfilesStateNotificationPayload
-@end
+        _zoneId = @(0);
 
-@implementation CHIPPowerProfileClusterEnergyPhasesScheduleResponsePayload
-@end
+        _zoneType = @(0);
 
-@implementation CHIPPowerProfileClusterGetOverallSchedulePricePayload
-@end
+        _ieeeAddress = @(0);
 
-@implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsRequestPayload
+        _zoneLabel = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPPowerProfileClusterEnergyPhasesScheduleRequestPayload
-@end
+@implementation CHIPIasAceClusterZoneStatusChangedParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateRequestPayload
-@end
+        _zoneId = @(0);
 
-@implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateResponsePayload
-@end
+        _zoneStatus = @(0);
 
-@implementation CHIPPowerProfileClusterGetPowerProfilePriceExtendedResponsePayload
-@end
+        _audibleNotification = @(0);
 
-@implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateNotificationPayload
+        _zoneLabel = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsNotificationPayload
-@end
+@implementation CHIPIasAceClusterPanelStatusChangedParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsResponsePayload
-@end
+        _panelStatus = @(0);
 
-@implementation CHIPPowerProfileClusterGetPowerProfilePriceExtendedPayload
-@end
+        _secondsRemaining = @(0);
 
-@implementation CHIPApplianceControlClusterExecutionOfACommandPayload
-@end
+        _audibleNotification = @(0);
 
-@implementation CHIPApplianceControlClusterSignalStateResponsePayload
+        _alarmStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPApplianceControlClusterSignalStatePayload
-@end
+@implementation CHIPIasAceClusterGetPanelStatusResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPApplianceControlClusterSignalStateNotificationPayload
-@end
+        _panelStatus = @(0);
 
-@implementation CHIPApplianceControlClusterWriteFunctionsPayload
-@end
+        _secondsRemaining = @(0);
 
-@implementation CHIPApplianceControlClusterOverloadPauseResumePayload
-@end
+        _audibleNotification = @(0);
 
-@implementation CHIPApplianceControlClusterOverloadPausePayload
+        _alarmStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPApplianceControlClusterOverloadWarningPayload
-@end
+@implementation CHIPIasAceClusterGetZoneInformationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPPollControlClusterCheckInPayload
+        _zoneId = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPPollControlClusterCheckInResponsePayload
-@end
+@implementation CHIPIasAceClusterSetBypassedZoneListParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPPollControlClusterFastPollStopPayload
-@end
+        _numberOfZones = @(0);
 
-@implementation CHIPPollControlClusterSetLongPollIntervalPayload
+        _zoneIds = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPPollControlClusterSetShortPollIntervalPayload
-@end
+@implementation CHIPIasAceClusterBypassResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPBridgedActionsClusterInstantActionPayload
-@end
+        _numberOfZones = @(0);
 
-@implementation CHIPBridgedActionsClusterInstantActionWithTransitionPayload
+        _bypassResult = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPBridgedActionsClusterStartActionPayload
-@end
+@implementation CHIPIasAceClusterGetZoneStatusResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPBridgedActionsClusterStartActionWithDurationPayload
-@end
+        _zoneStatusComplete = @(0);
 
-@implementation CHIPBridgedActionsClusterStopActionPayload
-@end
+        _numberOfZones = @(0);
 
-@implementation CHIPBridgedActionsClusterPauseActionPayload
+        _zoneStatusResult = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPBridgedActionsClusterPauseActionWithDurationPayload
-@end
+@implementation CHIPIasAceClusterGetZoneStatusParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPBridgedActionsClusterResumeActionPayload
-@end
+        _startingZoneId = @(0);
 
-@implementation CHIPBridgedActionsClusterEnableActionPayload
-@end
+        _maxNumberOfZoneIds = @(0);
 
-@implementation CHIPBridgedActionsClusterEnableActionWithDurationPayload
-@end
+        _zoneStatusMaskFlag = @(0);
 
-@implementation CHIPBridgedActionsClusterDisableActionPayload
+        _zoneStatusMask = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPBridgedActionsClusterDisableActionWithDurationPayload
-@end
+@implementation CHIPIasWdClusterStartWarningParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPBasicClusterStartUpPayload
-@end
+        _warningInfo = @(0);
 
-@implementation CHIPBasicClusterMfgSpecificPingPayload
-@end
+        _warningDuration = @(0);
 
-@implementation CHIPBasicClusterShutDownPayload
-@end
+        _strobeDutyCycle = @(0);
 
-@implementation CHIPBasicClusterLeavePayload
+        _strobeLevel = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterQueryImagePayload
-@end
+@implementation CHIPIasWdClusterSquawkParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestPayload
+        _squawkInfo = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedPayload
-@end
+@implementation CHIPTvChannelClusterChangeChannelParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageResponsePayload
+        _match = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponsePayload
-@end
+@implementation CHIPTvChannelClusterChangeChannelResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderPayload
-@end
+        _channelMatch = [NSArray array];
 
-@implementation CHIPGeneralCommissioningClusterArmFailSafePayload
+        _errorType = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPGeneralCommissioningClusterArmFailSafeResponsePayload
-@end
+@implementation CHIPTvChannelClusterChangeChannelByNumberParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPGeneralCommissioningClusterSetRegulatoryConfigPayload
-@end
+        _majorNumber = @(0);
 
-@implementation CHIPGeneralCommissioningClusterSetRegulatoryConfigResponsePayload
+        _minorNumber = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPGeneralCommissioningClusterCommissioningCompletePayload
-@end
+@implementation CHIPTvChannelClusterSkipChannelParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPGeneralCommissioningClusterCommissioningCompleteResponsePayload
+        _count = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPNetworkCommissioningClusterScanNetworksPayload
-@end
+@implementation CHIPTargetNavigatorClusterNavigateTargetParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPNetworkCommissioningClusterScanNetworksResponsePayload
-@end
+        _target = @(0);
 
-@implementation CHIPNetworkCommissioningClusterAddWiFiNetworkPayload
+        _data = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPNetworkCommissioningClusterAddWiFiNetworkResponsePayload
-@end
+@implementation CHIPTargetNavigatorClusterNavigateTargetResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPNetworkCommissioningClusterUpdateWiFiNetworkPayload
-@end
+        _status = @(0);
 
-@implementation CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponsePayload
+        _data = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPNetworkCommissioningClusterAddThreadNetworkPayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaPlayResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPNetworkCommissioningClusterAddThreadNetworkResponsePayload
+        _mediaPlaybackStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPNetworkCommissioningClusterUpdateThreadNetworkPayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaPauseResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPNetworkCommissioningClusterUpdateThreadNetworkResponsePayload
+        _mediaPlaybackStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPNetworkCommissioningClusterRemoveNetworkPayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaStopResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPNetworkCommissioningClusterRemoveNetworkResponsePayload
+        _mediaPlaybackStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPNetworkCommissioningClusterEnableNetworkPayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaStartOverResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPNetworkCommissioningClusterEnableNetworkResponsePayload
+        _mediaPlaybackStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPNetworkCommissioningClusterDisableNetworkPayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaPreviousResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPNetworkCommissioningClusterDisableNetworkResponsePayload
+        _mediaPlaybackStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDiagnosticLogsClusterRetrieveLogsRequestPayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaNextResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDiagnosticLogsClusterRetrieveLogsResponsePayload
+        _mediaPlaybackStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPSoftwareDiagnosticsClusterResetWatermarksPayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaRewindResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPThreadNetworkDiagnosticsClusterResetCountsPayload
+        _mediaPlaybackStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPWiFiNetworkDiagnosticsClusterResetCountsPayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaFastForwardResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPEthernetNetworkDiagnosticsClusterResetCountsPayload
+        _mediaPlaybackStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPBridgedDeviceBasicClusterStartUpPayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaSkipForwardParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPBridgedDeviceBasicClusterShutDownPayload
+        _deltaPositionMilliseconds = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPBridgedDeviceBasicClusterLeavePayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaSkipForwardResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPBridgedDeviceBasicClusterReachableChangedPayload
+        _mediaPlaybackStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPAdministratorCommissioningClusterOpenCommissioningWindowPayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaSkipBackwardParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPAdministratorCommissioningClusterOpenBasicCommissioningWindowPayload
+        _deltaPositionMilliseconds = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPAdministratorCommissioningClusterRevokeCommissioningPayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaSkipBackwardResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPOperationalCredentialsClusterAttestationRequestPayload
+        _mediaPlaybackStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOperationalCredentialsClusterAttestationResponsePayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaSeekParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPOperationalCredentialsClusterCertificateChainRequestPayload
+        _position = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOperationalCredentialsClusterCertificateChainResponsePayload
-@end
+@implementation CHIPMediaPlaybackClusterMediaSeekResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPOperationalCredentialsClusterOpCSRRequestPayload
+        _mediaPlaybackStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOperationalCredentialsClusterOpCSRResponsePayload
-@end
+@implementation CHIPMediaInputClusterSelectInputParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPOperationalCredentialsClusterAddNOCPayload
+        _index = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOperationalCredentialsClusterUpdateNOCPayload
-@end
+@implementation CHIPMediaInputClusterRenameInputParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPOperationalCredentialsClusterNOCResponsePayload
-@end
+        _index = @(0);
 
-@implementation CHIPOperationalCredentialsClusterUpdateFabricLabelPayload
+        _name = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOperationalCredentialsClusterRemoveFabricPayload
-@end
+@implementation CHIPKeypadInputClusterSendKeyParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPOperationalCredentialsClusterAddTrustedRootCertificatePayload
+        _keyCode = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPOperationalCredentialsClusterRemoveTrustedRootCertificatePayload
-@end
+@implementation CHIPKeypadInputClusterSendKeyResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPModeSelectClusterChangeToModePayload
+        _status = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterLockDoorPayload
-@end
+@implementation CHIPContentLauncherClusterLaunchContentParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterLockDoorResponsePayload
-@end
+        _autoPlay = @(0);
 
-@implementation CHIPDoorLockClusterUnlockDoorPayload
+        _data = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterUnlockDoorResponsePayload
-@end
+@implementation CHIPContentLauncherClusterLaunchContentResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterTogglePayload
-@end
+        _data = @"";
 
-@implementation CHIPDoorLockClusterToggleResponsePayload
+        _contentLaunchStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterUnlockWithTimeoutPayload
-@end
+@implementation CHIPContentLauncherClusterLaunchURLParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterUnlockWithTimeoutResponsePayload
-@end
+        _contentURL = @"";
 
-@implementation CHIPDoorLockClusterGetLogRecordPayload
+        _displayString = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterGetLogRecordResponsePayload
-@end
+@implementation CHIPContentLauncherClusterLaunchURLResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterSetPinPayload
-@end
+        _data = @"";
 
-@implementation CHIPDoorLockClusterSetPinResponsePayload
+        _contentLaunchStatus = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterGetPinPayload
-@end
+@implementation CHIPAudioOutputClusterSelectOutputParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterGetPinResponsePayload
+        _index = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterClearPinPayload
-@end
+@implementation CHIPAudioOutputClusterRenameOutputParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterClearPinResponsePayload
-@end
+        _index = @(0);
 
-@implementation CHIPDoorLockClusterClearAllPinsPayload
+        _name = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterClearAllPinsResponsePayload
-@end
+@implementation CHIPApplicationLauncherClusterLaunchAppParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterSetUserStatusPayload
-@end
+        _data = @"";
 
-@implementation CHIPDoorLockClusterSetUserStatusResponsePayload
-@end
+        _catalogVendorId = @(0);
 
-@implementation CHIPDoorLockClusterGetUserStatusPayload
+        _applicationId = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterGetUserStatusResponsePayload
-@end
+@implementation CHIPApplicationLauncherClusterLaunchAppResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterSetWeekdaySchedulePayload
-@end
+        _status = @(0);
 
-@implementation CHIPDoorLockClusterSetWeekdayScheduleResponsePayload
+        _data = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterGetWeekdaySchedulePayload
-@end
+@implementation CHIPApplicationBasicClusterChangeStatusParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterGetWeekdayScheduleResponsePayload
+        _status = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterClearWeekdaySchedulePayload
-@end
+@implementation CHIPAccountLoginClusterGetSetupPINParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterClearWeekdayScheduleResponsePayload
+        _tempAccountIdentifier = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterSetYeardaySchedulePayload
-@end
+@implementation CHIPAccountLoginClusterGetSetupPINResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterSetYeardayScheduleResponsePayload
+        _setupPIN = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterGetYeardaySchedulePayload
-@end
+@implementation CHIPAccountLoginClusterLoginParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterGetYeardayScheduleResponsePayload
-@end
+        _tempAccountIdentifier = @"";
 
-@implementation CHIPDoorLockClusterClearYeardaySchedulePayload
+        _setupPIN = @"";
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterClearYeardayScheduleResponsePayload
-@end
+@implementation CHIPTestClusterClusterTestSpecificResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterSetHolidaySchedulePayload
+        _returnValue = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterSetHolidayScheduleResponsePayload
-@end
+@implementation CHIPTestClusterClusterTestAddArgumentsResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterGetHolidaySchedulePayload
+        _returnValue = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterGetHolidayScheduleResponsePayload
-@end
+@implementation CHIPTestClusterClusterTestSimpleArgumentResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterClearHolidaySchedulePayload
+        _returnValue = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterClearHolidayScheduleResponsePayload
-@end
+@implementation CHIPTestClusterClusterTestStructArrayArgumentResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterSetUserTypePayload
-@end
+        _arg1 = [NSArray array];
 
-@implementation CHIPDoorLockClusterSetUserTypeResponsePayload
-@end
+        _arg2 = [NSArray array];
 
-@implementation CHIPDoorLockClusterGetUserTypePayload
-@end
+        _arg3 = [NSArray array];
 
-@implementation CHIPDoorLockClusterGetUserTypeResponsePayload
-@end
+        _arg4 = [NSArray array];
 
-@implementation CHIPDoorLockClusterSetRfidPayload
-@end
+        _arg5 = @(0);
 
-@implementation CHIPDoorLockClusterSetRfidResponsePayload
+        _arg6 = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterGetRfidPayload
-@end
+@implementation CHIPTestClusterClusterTestAddArgumentsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterGetRfidResponsePayload
-@end
+        _arg1 = @(0);
 
-@implementation CHIPDoorLockClusterClearRfidPayload
+        _arg2 = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterClearRfidResponsePayload
-@end
+@implementation CHIPTestClusterClusterTestListInt8UReverseResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterClearAllRfidsPayload
+        _arg1 = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterClearAllRfidsResponsePayload
-@end
+@implementation CHIPTestClusterClusterTestSimpleArgumentRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPDoorLockClusterOperationEventNotificationPayload
+        _arg1 = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPDoorLockClusterProgrammingEventNotificationPayload
-@end
+@implementation CHIPTestClusterClusterTestEnumsResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPWindowCoveringClusterUpOrOpenPayload
-@end
+        _arg1 = @(0);
 
-@implementation CHIPWindowCoveringClusterDownOrClosePayload
+        _arg2 = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPWindowCoveringClusterStopMotionPayload
-@end
+@implementation CHIPTestClusterClusterTestStructArrayArgumentRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPWindowCoveringClusterGoToLiftValuePayload
-@end
+        _arg1 = [NSArray array];
 
-@implementation CHIPWindowCoveringClusterGoToLiftPercentagePayload
-@end
+        _arg2 = [NSArray array];
 
-@implementation CHIPWindowCoveringClusterGoToTiltValuePayload
-@end
+        _arg3 = [NSArray array];
 
-@implementation CHIPWindowCoveringClusterGoToTiltPercentagePayload
-@end
+        _arg4 = [NSArray array];
 
-@implementation CHIPBarrierControlClusterBarrierControlGoToPercentPayload
-@end
+        _arg5 = @(0);
 
-@implementation CHIPBarrierControlClusterBarrierControlStopPayload
+        _arg6 = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPThermostatClusterSetpointRaiseLowerPayload
-@end
+@implementation CHIPTestClusterClusterTestNullableOptionalResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPThermostatClusterCurrentWeeklySchedulePayload
-@end
+        _wasPresent = @(0);
 
-@implementation CHIPThermostatClusterSetWeeklySchedulePayload
-@end
+        _wasNull = nil;
 
-@implementation CHIPThermostatClusterRelayStatusLogPayload
-@end
+        _value = nil;
 
-@implementation CHIPThermostatClusterGetWeeklySchedulePayload
+        _originalValue = nil;
+    }
+    return self;
+}
 @end
 
-@implementation CHIPThermostatClusterClearWeeklySchedulePayload
-@end
+@implementation CHIPTestClusterClusterTestStructArgumentRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPThermostatClusterGetRelayStatusLogPayload
+        _arg1 = [CHIPTestClusterClusterSimpleStruct new];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPColorControlClusterMoveToHuePayload
-@end
+@implementation CHIPTestClusterClusterTestComplexNullableOptionalResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPColorControlClusterMoveHuePayload
-@end
+        _nullableIntWasNull = @(0);
 
-@implementation CHIPColorControlClusterStepHuePayload
-@end
+        _nullableIntValue = nil;
 
-@implementation CHIPColorControlClusterMoveToSaturationPayload
-@end
+        _optionalIntWasPresent = @(0);
 
-@implementation CHIPColorControlClusterMoveSaturationPayload
-@end
+        _optionalIntValue = nil;
 
-@implementation CHIPColorControlClusterStepSaturationPayload
-@end
+        _nullableOptionalIntWasPresent = @(0);
 
-@implementation CHIPColorControlClusterMoveToHueAndSaturationPayload
-@end
+        _nullableOptionalIntWasNull = nil;
 
-@implementation CHIPColorControlClusterMoveToColorPayload
-@end
+        _nullableOptionalIntValue = nil;
 
-@implementation CHIPColorControlClusterMoveColorPayload
-@end
+        _nullableStringWasNull = @(0);
 
-@implementation CHIPColorControlClusterStepColorPayload
-@end
+        _nullableStringValue = nil;
 
-@implementation CHIPColorControlClusterMoveToColorTemperaturePayload
-@end
+        _optionalStringWasPresent = @(0);
 
-@implementation CHIPColorControlClusterEnhancedMoveToHuePayload
-@end
+        _optionalStringValue = nil;
 
-@implementation CHIPColorControlClusterEnhancedMoveHuePayload
-@end
+        _nullableOptionalStringWasPresent = @(0);
 
-@implementation CHIPColorControlClusterEnhancedStepHuePayload
-@end
+        _nullableOptionalStringWasNull = nil;
 
-@implementation CHIPColorControlClusterEnhancedMoveToHueAndSaturationPayload
-@end
+        _nullableOptionalStringValue = nil;
 
-@implementation CHIPColorControlClusterColorLoopSetPayload
-@end
+        _nullableStructWasNull = @(0);
 
-@implementation CHIPColorControlClusterStopMoveStepPayload
-@end
+        _nullableStructValue = nil;
 
-@implementation CHIPColorControlClusterMoveColorTemperaturePayload
-@end
+        _optionalStructWasPresent = @(0);
 
-@implementation CHIPColorControlClusterStepColorTemperaturePayload
-@end
+        _optionalStructValue = nil;
 
-@implementation CHIPIasZoneClusterZoneEnrollResponsePayload
-@end
+        _nullableOptionalStructWasPresent = @(0);
 
-@implementation CHIPIasZoneClusterZoneStatusChangeNotificationPayload
-@end
+        _nullableOptionalStructWasNull = nil;
 
-@implementation CHIPIasZoneClusterInitiateNormalOperationModePayload
-@end
+        _nullableOptionalStructValue = nil;
 
-@implementation CHIPIasZoneClusterZoneEnrollRequestPayload
-@end
+        _nullableListWasNull = @(0);
 
-@implementation CHIPIasZoneClusterInitiateTestModePayload
-@end
+        _nullableListValue = nil;
 
-@implementation CHIPIasZoneClusterInitiateNormalOperationModeResponsePayload
-@end
+        _optionalListWasPresent = @(0);
 
-@implementation CHIPIasZoneClusterInitiateTestModeResponsePayload
-@end
+        _optionalListValue = nil;
 
-@implementation CHIPIasAceClusterArmPayload
-@end
+        _nullableOptionalListWasPresent = @(0);
 
-@implementation CHIPIasAceClusterArmResponsePayload
-@end
+        _nullableOptionalListWasNull = nil;
 
-@implementation CHIPIasAceClusterBypassPayload
+        _nullableOptionalListValue = nil;
+    }
+    return self;
+}
 @end
 
-@implementation CHIPIasAceClusterGetZoneIdMapResponsePayload
-@end
+@implementation CHIPTestClusterClusterTestNestedStructArgumentRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPIasAceClusterEmergencyPayload
+        _arg1 = [CHIPTestClusterClusterNestedStruct new];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPIasAceClusterGetZoneInformationResponsePayload
-@end
+@implementation CHIPTestClusterClusterBooleanResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPIasAceClusterFirePayload
+        _value = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPIasAceClusterZoneStatusChangedPayload
-@end
+@implementation CHIPTestClusterClusterTestListStructArgumentRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPIasAceClusterPanicPayload
+        _arg1 = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPIasAceClusterPanelStatusChangedPayload
-@end
+@implementation CHIPTestClusterClusterTestListInt8UArgumentRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPIasAceClusterGetZoneIdMapPayload
+        _arg1 = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPIasAceClusterGetPanelStatusResponsePayload
-@end
+@implementation CHIPTestClusterClusterTestNestedStructListArgumentRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPIasAceClusterGetZoneInformationPayload
+        _arg1 = [CHIPTestClusterClusterNestedStructList new];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPIasAceClusterSetBypassedZoneListPayload
-@end
+@implementation CHIPTestClusterClusterTestListNestedStructListArgumentRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPIasAceClusterGetPanelStatusPayload
+        _arg1 = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPIasAceClusterBypassResponsePayload
-@end
+@implementation CHIPTestClusterClusterTestListInt8UReverseRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPIasAceClusterGetBypassedZoneListPayload
+        _arg1 = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPIasAceClusterGetZoneStatusResponsePayload
-@end
+@implementation CHIPTestClusterClusterTestEnumsRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPIasAceClusterGetZoneStatusPayload
-@end
+        _arg1 = @(0);
 
-@implementation CHIPIasWdClusterStartWarningPayload
+        _arg2 = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPIasWdClusterSquawkPayload
-@end
+@implementation CHIPTestClusterClusterTestNullableOptionalRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPTvChannelClusterChangeChannelPayload
+        _arg1 = nil;
+    }
+    return self;
+}
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelResponsePayload
-@end
+@implementation CHIPTestClusterClusterTestComplexNullableOptionalRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPTvChannelClusterChangeChannelByNumberPayload
-@end
+        _nullableInt = nil;
 
-@implementation CHIPTvChannelClusterSkipChannelPayload
-@end
+        _optionalInt = nil;
 
-@implementation CHIPTargetNavigatorClusterNavigateTargetPayload
-@end
+        _nullableOptionalInt = nil;
 
-@implementation CHIPTargetNavigatorClusterNavigateTargetResponsePayload
-@end
+        _nullableString = nil;
 
-@implementation CHIPMediaPlaybackClusterMediaPlayPayload
-@end
+        _optionalString = nil;
 
-@implementation CHIPMediaPlaybackClusterMediaPlayResponsePayload
-@end
+        _nullableOptionalString = nil;
 
-@implementation CHIPMediaPlaybackClusterMediaPausePayload
-@end
+        _nullableStruct = nil;
 
-@implementation CHIPMediaPlaybackClusterMediaPauseResponsePayload
-@end
+        _optionalStruct = nil;
 
-@implementation CHIPMediaPlaybackClusterMediaStopPayload
-@end
+        _nullableOptionalStruct = nil;
 
-@implementation CHIPMediaPlaybackClusterMediaStopResponsePayload
-@end
+        _nullableList = nil;
 
-@implementation CHIPMediaPlaybackClusterMediaStartOverPayload
-@end
+        _optionalList = nil;
 
-@implementation CHIPMediaPlaybackClusterMediaStartOverResponsePayload
+        _nullableOptionalList = nil;
+    }
+    return self;
+}
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaPreviousPayload
-@end
+@implementation CHIPMessagingClusterDisplayMessageParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPMediaPlaybackClusterMediaPreviousResponsePayload
-@end
+        _messageId = @(0);
 
-@implementation CHIPMediaPlaybackClusterMediaNextPayload
-@end
+        _messageControl = @(0);
 
-@implementation CHIPMediaPlaybackClusterMediaNextResponsePayload
-@end
+        _startTime = @(0);
 
-@implementation CHIPMediaPlaybackClusterMediaRewindPayload
-@end
+        _durationInMinutes = @(0);
 
-@implementation CHIPMediaPlaybackClusterMediaRewindResponsePayload
-@end
+        _message = @"";
 
-@implementation CHIPMediaPlaybackClusterMediaFastForwardPayload
+        _optionalExtendedMessageControl = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaFastForwardResponsePayload
-@end
+@implementation CHIPMessagingClusterCancelMessageParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPMediaPlaybackClusterMediaSkipForwardPayload
-@end
+        _messageId = @(0);
 
-@implementation CHIPMediaPlaybackClusterMediaSkipForwardResponsePayload
+        _messageControl = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSkipBackwardPayload
-@end
+@implementation CHIPMessagingClusterMessageConfirmationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPMediaPlaybackClusterMediaSkipBackwardResponsePayload
-@end
+        _messageId = @(0);
 
-@implementation CHIPMediaPlaybackClusterMediaSeekPayload
-@end
+        _confirmationTime = @(0);
 
-@implementation CHIPMediaPlaybackClusterMediaSeekResponsePayload
-@end
+        _messageConfirmationControl = @(0);
 
-@implementation CHIPMediaInputClusterSelectInputPayload
+        _messageResponse = [NSData data];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPMediaInputClusterShowInputStatusPayload
-@end
+@implementation CHIPMessagingClusterDisplayProtectedMessageParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPMediaInputClusterHideInputStatusPayload
-@end
+        _messageId = @(0);
 
-@implementation CHIPMediaInputClusterRenameInputPayload
-@end
+        _messageControl = @(0);
 
-@implementation CHIPLowPowerClusterSleepPayload
-@end
+        _startTime = @(0);
 
-@implementation CHIPKeypadInputClusterSendKeyPayload
-@end
+        _durationInMinutes = @(0);
 
-@implementation CHIPKeypadInputClusterSendKeyResponsePayload
-@end
+        _message = @"";
 
-@implementation CHIPContentLauncherClusterLaunchContentPayload
+        _optionalExtendedMessageControl = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPContentLauncherClusterLaunchContentResponsePayload
-@end
+@implementation CHIPMessagingClusterGetMessageCancellationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPContentLauncherClusterLaunchURLPayload
+        _earliestImplementationTime = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPContentLauncherClusterLaunchURLResponsePayload
-@end
+@implementation CHIPMessagingClusterCancelAllMessagesParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPAudioOutputClusterSelectOutputPayload
+        _implementationDateTime = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPAudioOutputClusterRenameOutputPayload
-@end
+@implementation CHIPApplianceEventsAndAlertClusterGetAlertsResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPApplicationLauncherClusterLaunchAppPayload
-@end
+        _alertsCount = @(0);
 
-@implementation CHIPApplicationLauncherClusterLaunchAppResponsePayload
+        _alertStructures = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPApplicationBasicClusterChangeStatusPayload
-@end
+@implementation CHIPApplianceEventsAndAlertClusterAlertsNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPAccountLoginClusterGetSetupPINPayload
-@end
+        _alertsCount = @(0);
 
-@implementation CHIPAccountLoginClusterGetSetupPINResponsePayload
+        _alertStructures = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPAccountLoginClusterLoginPayload
-@end
+@implementation CHIPApplianceEventsAndAlertClusterEventsNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPTestClusterClusterTestPayload
-@end
+        _eventHeader = @(0);
 
-@implementation CHIPTestClusterClusterTestSpecificResponsePayload
+        _eventId = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPTestClusterClusterTestNotHandledPayload
-@end
+@implementation CHIPApplianceStatisticsClusterLogNotificationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPTestClusterClusterTestAddArgumentsResponsePayload
-@end
+        _timeStamp = @(0);
 
-@implementation CHIPTestClusterClusterTestSpecificPayload
-@end
+        _logId = @(0);
 
-@implementation CHIPTestClusterClusterTestSimpleArgumentResponsePayload
-@end
+        _logLength = @(0);
 
-@implementation CHIPTestClusterClusterTestUnknownCommandPayload
+        _logPayload = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPTestClusterClusterTestStructArrayArgumentResponsePayload
-@end
+@implementation CHIPApplianceStatisticsClusterLogRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPTestClusterClusterTestAddArgumentsPayload
+        _logId = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPTestClusterClusterTestListInt8UReverseResponsePayload
-@end
+@implementation CHIPApplianceStatisticsClusterLogResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPTestClusterClusterTestSimpleArgumentRequestPayload
-@end
+        _timeStamp = @(0);
 
-@implementation CHIPTestClusterClusterTestEnumsResponsePayload
-@end
+        _logId = @(0);
 
-@implementation CHIPTestClusterClusterTestStructArrayArgumentRequestPayload
-@end
+        _logLength = @(0);
 
-@implementation CHIPTestClusterClusterTestNullableOptionalResponsePayload
+        _logPayload = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPTestClusterClusterTestStructArgumentRequestPayload
-@end
+@implementation CHIPApplianceStatisticsClusterLogQueueResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPTestClusterClusterTestComplexNullableOptionalResponsePayload
-@end
+        _logQueueSize = @(0);
 
-@implementation CHIPTestClusterClusterTestNestedStructArgumentRequestPayload
+        _logIds = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPTestClusterClusterBooleanResponsePayload
-@end
+@implementation CHIPApplianceStatisticsClusterStatisticsAvailableParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPTestClusterClusterTestListStructArgumentRequestPayload
-@end
+        _logQueueSize = @(0);
 
-@implementation CHIPTestClusterClusterTestListInt8UArgumentRequestPayload
+        _logIds = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPTestClusterClusterTestNestedStructListArgumentRequestPayload
-@end
+@implementation CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPTestClusterClusterTestListNestedStructListArgumentRequestPayload
-@end
+        _profileCount = @(0);
 
-@implementation CHIPTestClusterClusterTestListInt8UReverseRequestPayload
-@end
+        _profileIntervalPeriod = @(0);
 
-@implementation CHIPTestClusterClusterTestEnumsRequestPayload
-@end
+        _maxNumberOfIntervals = @(0);
 
-@implementation CHIPTestClusterClusterTestNullableOptionalRequestPayload
+        _listOfAttributes = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPTestClusterClusterTestComplexNullableOptionalRequestPayload
-@end
+@implementation CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPMessagingClusterDisplayMessagePayload
-@end
+        _startTime = @(0);
 
-@implementation CHIPMessagingClusterGetLastMessagePayload
-@end
+        _status = @(0);
 
-@implementation CHIPMessagingClusterCancelMessagePayload
-@end
+        _profileIntervalPeriod = @(0);
 
-@implementation CHIPMessagingClusterMessageConfirmationPayload
-@end
+        _numberOfIntervalsDelivered = @(0);
 
-@implementation CHIPMessagingClusterDisplayProtectedMessagePayload
-@end
+        _attributeId = @(0);
 
-@implementation CHIPMessagingClusterGetMessageCancellationPayload
+        _intervals = [NSArray array];
+    }
+    return self;
+}
 @end
 
-@implementation CHIPMessagingClusterCancelAllMessagesPayload
-@end
+@implementation CHIPElectricalMeasurementClusterGetMeasurementProfileCommandParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPApplianceEventsAndAlertClusterGetAlertsPayload
-@end
+        _attributeId = @(0);
 
-@implementation CHIPApplianceEventsAndAlertClusterGetAlertsResponsePayload
-@end
+        _startTime = @(0);
 
-@implementation CHIPApplianceEventsAndAlertClusterAlertsNotificationPayload
+        _numberOfIntervals = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPApplianceEventsAndAlertClusterEventsNotificationPayload
-@end
+@implementation CHIPBindingClusterBindParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPApplianceStatisticsClusterLogNotificationPayload
-@end
+        _nodeId = @(0);
 
-@implementation CHIPApplianceStatisticsClusterLogRequestPayload
-@end
+        _groupId = @(0);
 
-@implementation CHIPApplianceStatisticsClusterLogResponsePayload
-@end
+        _endpointId = @(0);
 
-@implementation CHIPApplianceStatisticsClusterLogQueueRequestPayload
+        _clusterId = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPApplianceStatisticsClusterLogQueueResponsePayload
-@end
+@implementation CHIPBindingClusterUnbindParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPApplianceStatisticsClusterStatisticsAvailablePayload
-@end
+        _nodeId = @(0);
 
-@implementation CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandPayload
-@end
+        _groupId = @(0);
 
-@implementation CHIPElectricalMeasurementClusterGetProfileInfoCommandPayload
-@end
+        _endpointId = @(0);
 
-@implementation CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandPayload
+        _clusterId = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPElectricalMeasurementClusterGetMeasurementProfileCommandPayload
-@end
+@implementation CHIPSampleMfgSpecificClusterClusterCommandOneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPBindingClusterBindPayload
+        _argOne = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPBindingClusterUnbindPayload
-@end
+@implementation CHIPSampleMfgSpecificCluster2ClusterCommandTwoParams
+- (instancetype)init
+{
+    if (self = [super init]) {
 
-@implementation CHIPSampleMfgSpecificClusterClusterCommandOnePayload
+        _argOne = @(0);
+    }
+    return self;
+}
 @end
 
-@implementation CHIPSampleMfgSpecificCluster2ClusterCommandTwoPayload
-@end
+NS_ASSUME_NONNULL_END

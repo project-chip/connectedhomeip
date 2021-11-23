@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <app/AttributePathExpandIterator.h>
 #include <app/ClusterInfo.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelDelegate.h>
@@ -97,12 +98,13 @@ public:
      *  Send ReportData to initiator
      *
      *  @param[in]    aPayload             A payload that has read request data
+     *  @param[in]    aMoreChunks          A flags indicating there will be more chunks expected to be sent for this read request
      *
      *  @retval #Others If fails to send report data
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool mMoreChunks);
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
     bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport; }
@@ -126,15 +128,23 @@ public:
 
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() { return mInteractionType == InteractionType::Subscribe; }
-    bool IsInitialReport() { return mInitialReport; }
+    bool IsChunkedReport() { return mIsChunkedReport; }
+    bool IsPriming() { return mIsPrimingReports; }
     bool IsActiveSubscription() const { return mActiveSubscription; }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     void GetSubscriptionId(uint64_t & aSubscriptionId) { aSubscriptionId = mSubscriptionId; }
-    void SetDirty() { mDirty = true; }
+    AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
+    void SetDirty()
+    {
+        mDirty = true;
+        // If the contents of the global dirty set have changed, we need to reset the iterator since the paths
+        // we've sent up till now are no longer valid and need to be invalidated.
+        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
+    }
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
-    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+    FabricIndex GetAccessingFabricIndex() const { return mFabricIndex; }
 
 private:
     friend class TestReadInteraction;
@@ -147,6 +157,7 @@ private:
         AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
     };
 
+    static void OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState);
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
     CHIP_ERROR RefreshSubscribeSyncTimer();
     CHIP_ERROR SendSubscribeResponse();
@@ -183,17 +194,26 @@ private:
     EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
-    bool mInitialReport                        = false;
-    InteractionType mInteractionType           = InteractionType::Read;
-    uint64_t mSubscriptionId                   = 0;
-    uint16_t mMinIntervalFloorSeconds          = 0;
-    uint16_t mMaxIntervalCeilingSeconds        = 0;
+
+    // Tracks whether we're in the initial phase of receiving priming
+    // reports, which is always true for reads and true for subscriptions
+    // prior to receiving a subscribe response.
+    bool mIsPrimingReports              = false;
+    InteractionType mInteractionType    = InteractionType::Read;
+    uint64_t mSubscriptionId            = 0;
+    uint16_t mMinIntervalFloorSeconds   = 0;
+    uint16_t mMaxIntervalCeilingSeconds = 0;
     Optional<SessionHandle> mSessionHandle;
     bool mHoldReport         = false;
     bool mDirty              = false;
     bool mActiveSubscription = false;
-    NodeId mInitiatorNodeId  = kUndefinedNodeId;
-    FabricIndex mFabricIndex = 0;
+    // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during sending
+    // last chunked message.
+    bool mIsChunkedReport                                    = false;
+    NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
+    FabricIndex mFabricIndex                                 = 0;
+    AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
+    bool mIsFabricFiltered                                   = false;
 };
 } // namespace app
 } // namespace chip

@@ -36,6 +36,7 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/FabricTable.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
@@ -44,7 +45,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <string.h>
-#include <transport/FabricTable.h>
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -66,7 +66,7 @@ public:
         AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::OperationalCredentials::Id)
     {}
 
-    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadSupportedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder);
@@ -132,7 +132,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId end
 
 OperationalCredentialsAttrAccess gAttrAccess;
 
-CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Clusters::OperationalCredentials::Id);
 
@@ -175,14 +175,9 @@ void fabricListChanged()
                                            OperationalCredentials::Attributes::CommissionedFabrics::Id);
 }
 
-static FabricInfo * retrieveCurrentFabric()
+static FabricInfo * retrieveCurrentFabric(CommandHandler * aCommandHandler)
 {
-    if (emberAfCurrentCommand()->source == nullptr)
-    {
-        return nullptr;
-    }
-
-    FabricIndex index = emberAfCurrentCommand()->source->GetSessionHandle().GetFabricIndex();
+    FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
@@ -278,7 +273,7 @@ exit:
     if (err == CHIP_NO_ERROR)
     {
         chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
-        FabricIndex currentFabricIndex        = ec->GetSessionHandle().GetFabricIndex();
+        FabricIndex currentFabricIndex        = commandObj->GetAccessingFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
         {
             // If the current fabric is being removed, expiring all the secure sessions causes crashes as
@@ -309,7 +304,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
     CHIP_ERROR err;
 
     // Fetch current fabric
-    FabricInfo * fabric = retrieveCurrentFabric();
+    FabricInfo * fabric = retrieveCurrentFabric(commandObj);
     VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
     // Set Label on fabric
@@ -442,7 +437,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: an administrator has updated the Op Cert");
 
     // Fetch current fabric
-    FabricInfo * fabric = retrieveCurrentFabric();
+    FabricInfo * fabric = retrieveCurrentFabric(commandObj);
     VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_ID));
 
     err = fabric->SetNOCCert(NOCValue);
@@ -679,11 +674,11 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
 
-    VerifyOrExit(gFabricBeingCommissioned.SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(gFabricBeingCommissioned.SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_INVALID_FIELD);
 
 exit:
     emberAfSendImmediateDefaultResponse(status);
-    if (status == EMBER_ZCL_STATUS_FAILURE)
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         gFabricBeingCommissioned.Reset();
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddTrustedRootCert request.");

@@ -166,6 +166,15 @@ public:
 
     void SetResponseTimeout(Timeout timeout);
 
+    /*
+     * Get the overall acknowledge timeout period for the underneath transport(MRP+UDP/TCP)
+     */
+    System::Clock::Milliseconds32 GetAckTimeout();
+
+    bool IsUDPTransport();
+    bool IsTCPTransport();
+    bool IsBLETransport();
+
 private:
     Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;

@@ -374,13 +374,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
 #define emberAfClusterIsManufacturerSpecific(cluster) ((cluster)->clusterId >= 0xFC00)
 
 /**
- * @brief macro that returns true if attribute is read only.
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsReadOnly(metadata) (((metadata)->mask & ATTRIBUTE_MASK_WRITABLE) == 0)
-
-/**
  * @brief macro that returns true if client attribute, and false if server.
  *
  * @param metadata EmberAfAttributeMetadata* to consider.

@@ -23,8 +23,9 @@
  */
 
 #pragma once
-
 #include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/EventHeader.h>
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequestMessage.h>
@@ -32,6 +33,7 @@
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
 #include <app/ReadPrepareParams.h>
+#include <app/data-model/Decode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -59,17 +61,32 @@ public:
     {
     public:
         virtual ~Callback() = default;
+
         /**
-         * Notification that a list of events is received on the given read client.
+         * Used to signal the commencement of processing of the first attribute report received in a given exchange.
+         */
+        virtual void OnReportBegin(const ReadClient * apReadClient) {}
+
+        /**
+         * Used to signal the completion of processing of the last attribute report in a given exchange.
+         */
+        virtual void OnReportEnd(const ReadClient * apReadClient) {}
+
+        /**
          * The ReadClient object MUST continue to exist after this call is completed.
          *
-         * @param[in]  apReadClient         The read client which initialized the read transaction.
-         * @param[in]  apEventReportsReader TLV reader positioned at the list that contains the events.  The
-         *                                  implementation of EventStreamReceived is expected to call Next() on the reader to
-         *                                  advance it to the first element of the list, then process the elements from beginning to
-         *                                  the end. The callee is expected to consume all events.
+         * This callback will be called when receiving event data received in the Read and Subscribe interactions
+         *
+         * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
+         * @param[in] aEventHeader: The event header in report response.
+         * @param[in] apData: A TLVReader positioned right on the payload of the event. This will be set to null if the apStatus is
+         * not null.
+         * @param[in] apStatus: Event-specific status, containing an InteractionModel::Status code as well as an optional
+         *                     cluster-specific status code.
          */
-        virtual void OnEventData(const ReadClient * apReadClient, TLV::TLVReader & aEventReports) {}
+        virtual void OnEventData(const ReadClient * apReadClient, const EventHeader & aEventHeader, TLV::TLVReader * apData,
+                                 const StatusIB * apStatus)
+        {}
 
         /**
          * OnResponse will be called when a report data response has been received and processed for the given path.
@@ -87,8 +104,8 @@ public:
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
-        virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, TLV::TLVReader * apData,
-                                     const StatusIB & aStatus)
+        virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath,
+                                     TLV::TLVReader * apData, const StatusIB & aStatus)
         {}
 
         /**
@@ -179,7 +196,6 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
-    CHIP_ERROR SendStatusResponse(CHIP_ERROR aError);
 
 private:
     friend class TestReadInteraction;
@@ -215,7 +231,7 @@ private:
      *      - SubscribeResponseProcessed
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
+     *  @param[in]    apCallback       InteractionModelDelegate set by application.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
@@ -234,7 +250,7 @@ private:
      *
      */
     bool IsFree() const { return mState == ClientState::Uninitialized; }
-    bool IsSubscriptionTypeIdle() const { return mState == ClientState::SubscriptionActive; }
+    bool IsSubscriptionIdle() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 
@@ -243,6 +259,7 @@ private:
     CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
+    CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
     void ClearExchangeContext() { mpExchangeCtx = nullptr; }
     static void OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState);
@@ -256,6 +273,23 @@ private:
     const char * GetStateStr() const;
 
     /**
+     * Validate that the Event ID and Cluster ID in the header match that of the type information present in the object and
+     * decode the data. The template parameter T is generally expected to be a ClusterName::Events::EventName::Type struct
+     *
+     * @param [in] aEventHeader  The header of the event being validated.
+     * @param [in] aEvent        The event data.
+     * @param [in] aReader       The tlv reader.
+     */
+    template <typename EventDataT>
+    CHIP_ERROR DecodeEvent(const EventHeader & aEventHeader, const EventDataT & aEvent, TLV::TLVReader & aReader)
+    {
+        VerifyOrReturnError((aEventHeader.mPath.mEventId == aEvent.GetEventId()) &&
+                                (aEventHeader.mPath.mClusterId == aEvent.GetClusterId()),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        return DataModel::Decode(aReader, aEvent);
+    }
+
+    /**
      * Internal shutdown method that we use when we know what's going on with
      * our exchange and don't need to manually close it.
      */
@@ -266,12 +300,14 @@ private:
     Callback * mpCallback                      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
     bool mInitialReport                        = true;
+    bool mPendingMoreChunks                    = false;
     uint16_t mMinIntervalFloorSeconds          = 0;
     uint16_t mMaxIntervalCeilingSeconds        = 0;
     uint64_t mSubscriptionId                   = 0;
     NodeId mPeerNodeId                         = kUndefinedNodeId;
     FabricIndex mFabricIndex                   = kUndefinedFabricIndex;
     InteractionType mInteractionType           = InteractionType::Read;
+    Timestamp mEventTimestamp;
 };
 
 }; // namespace app

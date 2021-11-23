@@ -30,6 +30,7 @@
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/Base64.h>
 #include <messaging/ExchangeContext.h>
@@ -39,7 +40,6 @@
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/CryptoContext.h>
-#include <transport/FabricTable.h>
 #include <transport/PairingSession.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>

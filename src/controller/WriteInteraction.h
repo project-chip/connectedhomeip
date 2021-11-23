@@ -97,11 +97,28 @@ CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpoint
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, callback.get()));
-    ReturnErrorOnFailure(
-        handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
+    if (sessionHandle.IsGroupSession())
+    {
+        ReturnErrorOnFailure(
+            handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));
+    }
+    else
+    {
+        ReturnErrorOnFailure(
+            handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
+    }
+
     ReturnErrorOnFailure(handle.SendWriteRequest(sessionHandle));
 
     callback.release();
+
+    if (sessionHandle.IsGroupSession())
+    {
+        // Manually call success callback since OnReponse won't be called in WriteClient for group
+        app::ConcreteAttributePath aPath;
+        onSuccessCb(aPath);
+    }
+
     return CHIP_NO_ERROR;
 }
 

@@ -24,7 +24,6 @@ chip_test_suite("tests") {
   test_sources = [
     "TestSystemClock.cpp",
     "TestSystemErrorStr.cpp",
-    "TestSystemObject.cpp",
     "TestSystemPacketBuffer.cpp",
     "TestSystemScheduleLambda.cpp",
     "TestSystemTimer.cpp",

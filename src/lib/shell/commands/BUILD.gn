@@ -25,6 +25,8 @@ source_set("commands") {
     "Meta.cpp",
   ]
 
+  public_deps = [ "${chip_root}/src/lib/shell:shell_core" ]
+
   if (chip_device_platform != "none") {
     sources += [
       "Config.cpp",
@@ -49,7 +51,14 @@ source_set("commands") {
     sources += [ "Dns.cpp" ]
   }
 
-  public_deps = [ "${chip_root}/src/lib/shell:shell_core" ]
+  if (chip_enable_ota_requestor && chip_device_platform != "none") {
+    sources += [ "Ota.cpp" ]
+    configs += [ "${chip_root}/src/controller:config" ]
+
+    if (chip_device_platform == "nrfconnect") {
+      sources += [ "DFUManager_nrfconnect.h" ]
+    }
+  }
 
   if (chip_device_platform != "none") {
     public_deps += [ "${chip_root}/src/app/server" ]

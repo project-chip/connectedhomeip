@@ -259,6 +259,16 @@ enum EmberAfCecedSpecificationVersion : uint8_t
     EMBER_ZCL_CECED_SPECIFICATION_VERSION_COMPLIANT_WITH_V10_CERTIFIED     = 26,
 };
 
+// Enum for ChangeReasonEnum
+enum EmberAfChangeReasonEnum : uint8_t
+{
+    EMBER_ZCL_CHANGE_REASON_ENUM_UNKNOWN           = 0,
+    EMBER_ZCL_CHANGE_REASON_ENUM_SUCCESS           = 1,
+    EMBER_ZCL_CHANGE_REASON_ENUM_FAILURE           = 2,
+    EMBER_ZCL_CHANGE_REASON_ENUM_TIME_OUT          = 3,
+    EMBER_ZCL_CHANGE_REASON_ENUM_DELAY_BY_PROVIDER = 4,
+};
+
 // Enum for ColorControlOptions
 enum EmberAfColorControlOptions : uint8_t
 {
@@ -1497,9 +1507,9 @@ enum EmberAfStartUpOnOffValue : uint8_t
 // Enum for StatusCode
 enum EmberAfStatusCode : uint8_t
 {
-    EMBER_ZCL_STATUS_CODE_SUCCESS       = 0,
-    EMBER_ZCL_STATUS_CODE_BUSY          = 1,
-    EMBER_ZCL_STATUS_CODE_GENERAL_ERROR = 2,
+    EMBER_ZCL_STATUS_CODE_BUSY                 = 1,
+    EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR = 2,
+    EMBER_ZCL_STATUS_CODE_WINDOW_NOT_OPEN      = 3,
 };
 
 // Enum for StepMode
@@ -1595,6 +1605,20 @@ enum EmberAfTvChannelErrorType : uint8_t
 enum EmberAfTvChannelLineupInfoType : uint8_t
 {
     EMBER_ZCL_TV_CHANNEL_LINEUP_INFO_TYPE_MSO = 0,
+};
+
+// Enum for UpdateStateEnum
+enum EmberAfUpdateStateEnum : uint8_t
+{
+    EMBER_ZCL_UPDATE_STATE_ENUM_UNKNOWN                 = 0,
+    EMBER_ZCL_UPDATE_STATE_ENUM_IDLE                    = 1,
+    EMBER_ZCL_UPDATE_STATE_ENUM_QUERYING                = 2,
+    EMBER_ZCL_UPDATE_STATE_ENUM_DELAYED_ON_QUERY        = 3,
+    EMBER_ZCL_UPDATE_STATE_ENUM_DOWNLOADING             = 4,
+    EMBER_ZCL_UPDATE_STATE_ENUM_APPLYING                = 5,
+    EMBER_ZCL_UPDATE_STATE_ENUM_DELAYED_ON_APPLY        = 6,
+    EMBER_ZCL_UPDATE_STATE_ENUM_ROLLING_BACK            = 7,
+    EMBER_ZCL_UPDATE_STATE_ENUM_DELAYED_ON_USER_CONSENT = 8,
 };
 
 // Enum for WarningEvent
@@ -2037,3 +2061,7 @@ enum EmberAfWiredFaultType : uint8_t
 #define EMBER_AF_WC_SAFETY_STATUS_MANUAL_OPERATION_OFFSET (10)
 #define EMBER_AF_WC_SAFETY_STATUS_PROTECTION (2048)
 #define EMBER_AF_WC_SAFETY_STATUS_PROTECTION_OFFSET (11)
+#define EMBER_AF_WI_FI_NETWORK_DIAGNOSTICS_FEATURE_PACKET_COUNTS (1)
+#define EMBER_AF_WI_FI_NETWORK_DIAGNOSTICS_FEATURE_PACKET_COUNTS_OFFSET (0)
+#define EMBER_AF_WI_FI_NETWORK_DIAGNOSTICS_FEATURE_ERROR_COUNTS (2)
+#define EMBER_AF_WI_FI_NETWORK_DIAGNOSTICS_FEATURE_ERROR_COUNTS_OFFSET (1)

@@ -9,7 +9,11 @@
 #include <CHIP/CHIPCluster.h>
 #include <CHIP/CHIPCommandPayloadsObjc.h>
 
+/* We need to sort out our handlers, but for now just define both
+   ResponseHandler and CompletionHandler to look the same way.  Eventually we
+   will want different completion handlers for different return types. */
 typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
+typedef void (^CompletionHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,7 +27,16 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIP{{asUpperCamelCase name}} : CHIPCluster
 
 {{#chip_cluster_commands}}
-- (void){{asLowerCamelCase name}}:(CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Payload * _Nonnull)payload responseHandler:(ResponseHandler)responseHandler;
+{{! zcl_command_arguments_count is unreliable when used in a conditional.  As
+    a workaround, just use iteration over the arguments directly to see if we
+    have any. }}
+{{#chip_cluster_command_arguments}}
+{{#first}}
+- (void){{asLowerCamelCase parent.name}}WithParams:(CHIP{{asUpperCamelCase parent.parent.name}}Cluster{{asUpperCamelCase parent.name}}Params * {{#unless (commandHasRequiredField parent)}}_Nullable{{/unless}})params completionHandler:(CompletionHandler)completionHandler;
+{{/first}}
+{{else}}
+- (void){{asLowerCamelCase parent.name}}WithCompletionHandler:(CompletionHandler)completionHandler;
+{{/chip_cluster_command_arguments}}
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
@@ -33,8 +46,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value responseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
 - (void) subscribe{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval responseHandler:(ResponseHandler)responseHandler;
 - (void) report{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler;
+{{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 

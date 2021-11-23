@@ -84,6 +84,8 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
+    FabricIndex GetAccessingFabricIndex() const;
+
 private:
     enum class State
     {
@@ -109,7 +111,9 @@ private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;
-    State mState = State::Uninitialized;
+    State mState           = State::Uninitialized;
+    bool mIsTimedRequest   = false;
+    bool mIsFabricFiltered = false;
 };
 } // namespace app
 } // namespace chip

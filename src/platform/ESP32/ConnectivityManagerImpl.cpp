@@ -42,6 +42,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::TLV;
+using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
 namespace chip {
 namespace DeviceLayer {
@@ -70,92 +71,62 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #endif
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiSecurityType(uint8_t & securityType)
+static InterfaceType GetInterfaceType(const char * if_desc)
 {
-    securityType = 0;
-    wifi_ap_record_t ap_info;
-    esp_err_t err;
+    if (strncmp(if_desc, "ap", strnlen(if_desc, 2)) == 0 || strncmp(if_desc, "sta", strnlen(if_desc, 3)) == 0)
+        return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+    if (strncmp(if_desc, "openthread", strnlen(if_desc, 10)) == 0)
+        return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
+    if (strncmp(if_desc, "eth", strnlen(if_desc, 3)) == 0)
+        return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+    return InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+}
 
-    err = esp_wifi_sta_get_ap_info(&ap_info);
-    if (err == ESP_OK)
+CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+    esp_netif_t * netif     = esp_netif_next(NULL);
+    NetworkInterface * head = NULL;
+    if (netif == NULL)
     {
-        securityType = ap_info.authmode;
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
     }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiChannelNumber(uint16_t & channelNumber)
-{
-    channelNumber = 0;
-    wifi_ap_record_t ap_info;
-    esp_err_t err;
-
-    err = esp_wifi_sta_get_ap_info(&ap_info);
-    if (err == ESP_OK)
+    else
     {
-        channelNumber = ap_info.primary;
+        for (esp_netif_t * ifa = netif; ifa != NULL; ifa = esp_netif_next(ifa))
+        {
+            NetworkInterface * ifp = new NetworkInterface();
+            strncpy(ifp->Name, esp_netif_get_ifkey(ifa), Inet::InterfaceId::kMaxIfNameLength);
+            ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
+            ifp->name                                          = CharSpan(ifp->Name, strlen(ifp->Name));
+            ifp->fabricConnected                               = true;
+            ifp->type                                          = GetInterfaceType(esp_netif_get_desc(ifa));
+            ifp->offPremiseServicesReachableIPv4               = false;
+            ifp->offPremiseServicesReachableIPv6               = false;
+            if (esp_netif_get_mac(ifa, ifp->MacAddress) != ESP_OK)
+            {
+                ChipLogError(DeviceLayer, "Failed to get network hardware address");
+            }
+            else
+            {
+                ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
+            }
+            ifp->Next = head;
+            head      = ifp;
+        }
     }
+    *netifpp = head;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiRssi(int8_t & rssi)
+void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(NetworkInterface * netifp)
 {
-    rssi = 0;
-    wifi_ap_record_t ap_info;
-    esp_err_t err;
-
-    err = esp_wifi_sta_get_ap_info(&ap_info);
-
-    if (err == ESP_OK)
+    while (netifp)
     {
-        rssi = ap_info.rssi;
+        NetworkInterface * del = netifp;
+        netifp                 = netifp->Next;
+        delete del;
     }
-    return CHIP_NO_ERROR;
 }
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
-{
-    beaconLostCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
-{
-    currentMaxRate = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
-{
-    packetMulticastRxCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
-{
-    packetMulticastTxCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
-{
-    packetUnicastRxCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
-{
-    packetUnicastTxCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiOverrunCount(uint64_t & overrunCount)
-{
-    overrunCount = 0;
-    return CHIP_NO_ERROR;
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace DeviceLayer
 } // namespace chip

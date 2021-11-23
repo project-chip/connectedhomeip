@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <app/CASESessionManager.h>
 #include <app/DeviceControllerInteractionModelDelegate.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/OperationalDeviceProxy.h>
@@ -38,6 +39,7 @@
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
 #include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -47,11 +49,9 @@
 #include <lib/support/SerializableIntegerSet.h>
 #include <lib/support/Span.h>
 #include <messaging/ExchangeMgr.h>
-#include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
-#include <transport/FabricTable.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
@@ -186,7 +186,7 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public Messaging::ExchangeMgrDelegate,
+class DLL_EXPORT DeviceController : public SessionReleaseDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
                                     public AbstractDnssdDiscoveryController,
 #endif
@@ -216,17 +216,6 @@ public:
      */
     virtual CHIP_ERROR Shutdown();
 
-    CHIP_ERROR GetOperationalDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                    Callback::Callback<OnDeviceConnectionFailure> * onFailure)
-    {
-        return GetOperationalDeviceWithAddress(deviceId, Transport::PeerAddress::UDP(Inet::IPAddress::Any), onConnection,
-                                               onFailure);
-    }
-
-    CHIP_ERROR GetOperationalDeviceWithAddress(NodeId deviceId, const Transport::PeerAddress & addr,
-                                               Callback::Callback<OnDeviceConnected> * onConnection,
-                                               Callback::Callback<OnDeviceConnectionFailure> * onFailure);
-
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**
@@ -243,8 +232,8 @@ public:
     virtual CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
-        return GetOperationalDeviceWithAddress(deviceId, Transport::PeerAddress::UDP(Inet::IPAddress::Any), onConnection,
-                                               onFailure);
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        return mCASESessionManager->FindOrEstablishSession(deviceId, onConnection, onFailure);
     }
 
     /**
@@ -255,7 +244,11 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR UpdateDevice(NodeId deviceId);
+    CHIP_ERROR UpdateDevice(NodeId deviceId)
+    {
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        return mCASESessionManager->ResolveDeviceAddress(deviceId);
+    }
 
     /**
      * @brief
@@ -336,15 +329,6 @@ public:
      */
     uint64_t GetFabricId() const { return mFabricId; }
 
-    DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate()
-    {
-        if (mSystemState != nullptr)
-        {
-            return mSystemState->IMDelegate();
-        }
-        return nullptr;
-    }
-
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
 
 protected:
@@ -356,7 +340,9 @@ protected:
 
     State mState;
 
-    BitMapObjectPool<OperationalDeviceProxy, kNumMaxActiveDevices> mOperationalDevices;
+    CASESessionManager * mCASESessionManager = nullptr;
+
+    Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> mDNSCache;
 
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
@@ -389,9 +375,8 @@ protected:
 
     uint16_t mVendorId;
 
-    //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
-    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    //////////// SessionReleaseDelegate Implementation ///////////////
+    void OnSessionReleased(SessionHandle session) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     //////////// ResolverDelegate Implementation ///////////////
@@ -401,11 +386,7 @@ protected:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 private:
-    OperationalDeviceProxy * FindOperationalDevice(SessionHandle session);
-    OperationalDeviceProxy * FindOperationalDevice(NodeId id);
     void ReleaseOperationalDevice(OperationalDeviceProxy * device);
-
-    void ReleaseAllDevices();
 
     Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
     Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
@@ -429,12 +410,12 @@ private:
  *   will be stored.
  */
 class DLL_EXPORT DeviceCommissioner : public DeviceController,
+                                      public SessionCreationDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
                                       public Protocols::UserDirectedCommissioning::UserConfirmationProvider,
 #endif
                                       public SessionEstablishmentDelegate
-
 {
 public:
     DeviceCommissioner();
@@ -641,9 +622,10 @@ private:
 
     void OnSessionEstablishmentTimeout();
 
-    //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
-    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    //////////// SessionCreationDelegate Implementation ///////////////
+    void OnNewSession(SessionHandle session) override;
+    //////////// SessionReleaseDelegate Implementation ///////////////
+    void OnSessionReleased(SessionHandle session) override;
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 

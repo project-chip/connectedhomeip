@@ -225,10 +225,4 @@ extern "C" void app_main()
         ChipLogError(BDX, "Failed to init BDX server: %s", chip::ErrorStr(error));
         return;
     }
-
-    // Run the UI Loop
-    while (true)
-    {
-        vTaskDelay(50 / portTICK_PERIOD_MS);
-    }
 }

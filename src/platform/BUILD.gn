@@ -115,6 +115,10 @@ if (chip_device_platform != "none") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_NFC=1" ]
     }
 
+    if (chip_enable_ota_requestor) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR=1" ]
+    }
+
     if (chip_device_project_config_include != "") {
       defines += [ "CHIP_DEVICE_PROJECT_CONFIG_INCLUDE=${chip_device_project_config_include}" ]
     }
@@ -279,6 +283,7 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "DeviceControlServer.cpp",
+      "DiagnosticDataProvider.cpp",
       "Entropy.cpp",
       "GeneralUtils.cpp",
       "Globals.cpp",

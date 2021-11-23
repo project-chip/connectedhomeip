@@ -23,6 +23,7 @@ const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 
 const ChipTypesHelper = require('../../../../../src/app/zap-templates/common/ChipTypesHelper.js');
 const StringHelper    = require('../../../../../src/app/zap-templates/common/StringHelper.js');
+const appHelper       = require('../../../../../src/app/zap-templates/templates/app/helper.js');
 
 // Ideally those clusters clusters endpoints should be retrieved from the
 // descriptor cluster.
@@ -115,12 +116,6 @@ function asTestIndex(index)
   return index.toString().padStart(6, 0);
 }
 
-function asUpperCamelCase(label)
-{
-  let str = string.toCamelCase(label, false);
-  return str.replace(/[\.:]/g, '');
-}
-
 async function asObjectiveCClass(type, cluster, options)
 {
   let pkgId    = await templateUtil.ensureZclPackageId(this);
@@ -139,7 +134,7 @@ async function asObjectiveCClass(type, cluster, options)
   }
 
   if (isStruct) {
-    return `CHIP${asUpperCamelCase(cluster)}Cluster${asUpperCamelCase(type)}`;
+    return `CHIP${appHelper.asUpperCamelCase(cluster)}Cluster${appHelper.asUpperCamelCase(type)}`;
   }
 
   return 'NSNumber';
@@ -168,6 +163,36 @@ function incrementDepth(depth)
   return depth + 1;
 }
 
+function asStructPropertyName(prop)
+{
+  prop = appHelper.asLowerCamelCase(prop);
+
+  // If prop is now "description", we need to rename it, because that's
+  // reserved.
+  if (prop == "description") {
+    return "descriptionString";
+  }
+
+  // If prop starts with a sequence of capital letters (which can happen for
+  // output of asLowerCamelCase if the original string started that way,
+  // lowercase all but the last one.
+  return prop.replace(/^([A-Z]+)([A-Z])/, (match, p1, p2) => { return p1.toLowerCase() + p2 });
+}
+
+function asGetterName(prop)
+{
+  let propName = asStructPropertyName(prop);
+  if (propName.match(/^new[A-Z]/) || propName == "count") {
+    return "get" + appHelper.asUpperCamelCase(prop);
+  }
+  return propName;
+}
+
+function commandHasRequiredField(command)
+{
+  return command.arguments.some(arg => !arg.isOptional);
+}
+
 //
 // Module exports
 //
@@ -180,3 +205,6 @@ exports.asObjectiveCClass            = asObjectiveCClass;
 exports.asObjectiveCType             = asObjectiveCType;
 exports.arrayElementObjectiveCClass  = arrayElementObjectiveCClass;
 exports.incrementDepth               = incrementDepth;
+exports.asStructPropertyName         = asStructPropertyName;
+exports.asGetterName                 = asGetterName;
+exports.commandHasRequiredField      = commandHasRequiredField;

@@ -459,6 +459,9 @@ private:
 };
 
 {{#if isWritableAttribute}}
+{{! No list support for writing yet.  Need to figure out how to represent the
+    values. }}
+{{#unless isList}}
 class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
@@ -494,8 +497,10 @@ private:
     {{chipType}} mValue;
 };
 
+{{/unless}}
 {{/if}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
 class Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
@@ -544,6 +549,7 @@ private:
     bool mWait;
 };
 
+{{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
@@ -563,10 +569,16 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#chip_server_cluster_attributes}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{#if isWritableAttribute}}
+        {{! No list support for writing yet.  Need to figure out how to
+            represent the values. }}
+        {{#unless isList}}
         make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        {{/unless}}
         {{/if}}
         {{#if isReportableAttribute}}
+        {{#unless isList}}
         make_unique<Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        {{/unless}}
         {{/if}}
         {{/chip_server_cluster_attributes}}
     };

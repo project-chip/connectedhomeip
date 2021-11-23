@@ -2584,6 +2584,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_GROUP_NAME_LENGTH
+ *
+ * @brief Defines the maximum length of the group names
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_NAME_LENGTH
+#define CHIP_CONFIG_MAX_GROUP_NAME_LENGTH 16
+#endif
+
+/**
  * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC
  *
  * Defines the number of access control entries supported per fabric in the
@@ -2671,6 +2680,24 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #if !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT && !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
 #error                                                                                                                             \
     "Please enable at least one of CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT or CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT"
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES
+ *
+ * @brief Defines the max number of SessionCreationDelegates
+ */
+#ifndef CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES
+#define CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
+ *
+ * @brief Defines the max number of SessionReleaseDelegate
+ */
+#ifndef CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
+#define CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES 2
 #endif
 
 /**

@@ -57,7 +57,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "$dir_pw_watch/py",
       "integrations/mobly:chip_mobly",
       "scripts:requirements",
-      "third_party/happy",
     ]
   }
 
@@ -161,15 +160,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//scripts/build:build_examples.tests",
         "//src:tests_run",
       ]
-    }
-  }
-
-  # We don't always want to run happy tests, make them a seperate group.
-  if (chip_enable_happy_tests) {
-    group("happy_tests") {
-      if (chip_link_tests) {
-        deps = [ "//src:happy_tests" ]
-      }
     }
   }
 } else {
@@ -315,7 +305,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_fake_tests) {
     chip_build("fake_platform") {
-      toolchain = "${build_root}/toolchain/host:fake_${host_cpu}_gcc"
+      toolchain = "${build_root}/toolchain/fake:fake_${host_cpu}_gcc"
     }
   }
 

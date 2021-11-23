@@ -43,12 +43,6 @@ public:
     DeviceProxy() {}
 
     /**
-     *   Called when a connection is closing.
-     *   The object releases all resources associated with the connection.
-     */
-    virtual void OnConnectionExpired(SessionHandle session) = 0;
-
-    /**
      *  Mark any open session with the device as expired.
      */
     virtual CHIP_ERROR Disconnect() = 0;
@@ -87,6 +81,8 @@ public:
 
     virtual bool IsActive() const { return true; }
 
+    uint32_t GetMRPIdleInterval() const { return mMrpIdleInterval; }
+    uint32_t GetMRPActiveInterval() const { return mMrpActiveInterval; }
     void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval) const
     {
         idleInterval   = mMrpIdleInterval;

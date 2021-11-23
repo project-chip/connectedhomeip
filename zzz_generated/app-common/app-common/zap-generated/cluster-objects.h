@@ -1249,8 +1249,7 @@ public:
 namespace GetGroupMembership {
 enum class Fields
 {
-    kGroupCount = 0,
-    kGroupList  = 1,
+    kGroupList = 0,
 };
 
 struct Type
@@ -1260,7 +1259,6 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembership::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t groupCount;
     DataModel::List<const uint16_t> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1274,7 +1272,6 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembership::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t groupCount;
     DataModel::DecodableList<uint16_t> groupList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1282,9 +1279,8 @@ public:
 namespace GetGroupMembershipResponse {
 enum class Fields
 {
-    kCapacity   = 0,
-    kGroupCount = 1,
-    kGroupList  = 2,
+    kCapacity  = 0,
+    kGroupList = 1,
 };
 
 struct Type
@@ -1295,7 +1291,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t capacity;
-    uint8_t groupCount;
     DataModel::List<const uint16_t> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1310,7 +1305,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t capacity;
-    uint8_t groupCount;
     DataModel::DecodableList<uint16_t> groupList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1480,7 +1474,7 @@ namespace Scenes {
 // Bitmap for ScenesCopyMode
 enum class ScenesCopyMode : uint8_t
 {
-    kCopyAllScenes = 0,
+    kCopyAllScenes = 0x1,
 };
 
 namespace Structs {
@@ -2442,7 +2436,7 @@ using OnOffEffectIdentifier                = EmberAfOnOffEffectIdentifier;
 // Bitmap for OnOffControl
 enum class OnOffControl : uint8_t
 {
-    kAcceptOnlyWhenOn = 0,
+    kAcceptOnlyWhenOn = 0x1,
 };
 
 namespace Commands {
@@ -5088,8 +5082,8 @@ using WarningEvent                         = EmberAfWarningEvent;
 // Bitmap for RemoteEnableFlagsAndDeviceStatus2
 enum class RemoteEnableFlagsAndDeviceStatus2 : uint8_t
 {
-    kRemoteEnableFlags      = 0,
-    kDeviceStatus2Structure = 4,
+    kRemoteEnableFlags      = 0xF,
+    kDeviceStatus2Structure = 0xF0,
 };
 
 namespace Commands {
@@ -5538,6 +5532,33 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace Descriptor
+namespace Acl {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Acl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Acl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace Acl
 namespace PollControl {
 
 namespace Commands {
@@ -5881,18 +5902,18 @@ using EndpointListTypeEnum                 = EmberAfEndpointListTypeEnum;
 // Bitmap for CommandBits
 enum class CommandBits : uint16_t
 {
-    kInstantAction               = 0,
-    kInstantActionWithTransition = 1,
-    kStartAction                 = 2,
-    kStartActionWithDuration     = 3,
-    kStopAction                  = 4,
-    kPauseAction                 = 5,
-    kPauseActionWithDuration     = 6,
-    kResumeAction                = 7,
-    kEnableAction                = 8,
-    kEnableActionWithDuration    = 9,
-    kDisableAction               = 10,
-    kDisableActionWithDuration   = 11,
+    kInstantAction               = 0x1,
+    kInstantActionWithTransition = 0x2,
+    kStartAction                 = 0x4,
+    kStartActionWithDuration     = 0x8,
+    kStopAction                  = 0x10,
+    kPauseAction                 = 0x20,
+    kPauseActionWithDuration     = 0x40,
+    kResumeAction                = 0x80,
+    kEnableAction                = 0x100,
+    kEnableActionWithDuration    = 0x200,
+    kDisableAction               = 0x400,
+    kDisableActionWithDuration   = 0x800,
 };
 
 namespace Structs {
@@ -5939,13 +5960,20 @@ public:
     uint16_t endpointListID;
     chip::CharSpan name;
     EndpointListTypeEnum type;
-    chip::ByteSpan endpoints;
+    DataModel::List<const chip::EndpointId> endpoints;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-using DecodableType = Type;
+struct DecodableType
+{
+public:
+    uint16_t endpointListID;
+    chip::CharSpan name;
+    EndpointListTypeEnum type;
+    DataModel::DecodableList<chip::EndpointId> endpoints;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
 
 } // namespace EndpointListStruct
 } // namespace Structs
@@ -6677,7 +6705,7 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductID::Id; }
 };
 } // namespace ProductID
-namespace UserLabel {
+namespace NodeLabel {
 struct TypeInfo
 {
     using Type             = chip::CharSpan;
@@ -6685,9 +6713,9 @@ struct TypeInfo
     using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NodeLabel::Id; }
 };
-} // namespace UserLabel
+} // namespace NodeLabel
 namespace Location {
 struct TypeInfo
 {
@@ -6820,6 +6848,17 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
 };
 } // namespace Reachable
+namespace UniqueID {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UniqueID::Id; }
+};
+} // namespace UniqueID
 namespace FeatureMap {
 struct TypeInfo
 {
@@ -6856,8 +6895,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     uint32_t softwareVersion;
@@ -6888,8 +6927,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000001;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -6916,8 +6955,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000002;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -6945,8 +6984,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000003;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
 
     bool reachableNewValue;
@@ -7273,6 +7312,21 @@ namespace OtaSoftwareUpdateRequestor {
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ChangeReasonEnum
+enum class ChangeReasonEnum : uint8_t
+{
+    kUnknown         = 0x00,
+    kSuccess         = 0x01,
+    kFailure         = 0x02,
+    kTimeOut         = 0x03,
+    kDelayByProvider = 0x04,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ChangeReasonEnum                     = EmberAfChangeReasonEnum;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAAnnouncementReason
 enum class OTAAnnouncementReason : uint8_t
 {
@@ -7282,6 +7336,25 @@ enum class OTAAnnouncementReason : uint8_t
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OTAAnnouncementReason                = EmberAfOTAAnnouncementReason;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for UpdateStateEnum
+enum class UpdateStateEnum : uint8_t
+{
+    kUnknown              = 0x00,
+    kIdle                 = 0x01,
+    kQuerying             = 0x02,
+    kDelayedOnQuery       = 0x03,
+    kDownloading          = 0x04,
+    kApplying             = 0x05,
+    kDelayedOnApply       = 0x06,
+    kRollingBack          = 0x07,
+    kDelayedOnUserConsent = 0x08,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using UpdateStateEnum                      = EmberAfUpdateStateEnum;
 #endif
 
 namespace Commands {
@@ -7382,7 +7455,237 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace StateTransition {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kPreviousState         = 0,
+    kNewState              = 1,
+    kReason                = 2,
+    kTargetSoftwareVersion = 3,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    UpdateStateEnum previousState;
+    UpdateStateEnum newState;
+    ChangeReasonEnum reason;
+    uint32_t targetSoftwareVersion;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    UpdateStateEnum previousState;
+    UpdateStateEnum newState;
+    ChangeReasonEnum reason;
+    uint32_t targetSoftwareVersion;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace StateTransition
+namespace VersionApplied {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kSoftwareVersion = 0,
+    kProductID       = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    uint32_t softwareVersion;
+    uint16_t productID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    uint32_t softwareVersion;
+    uint16_t productID;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace VersionApplied
+namespace DownloadError {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000002;
+
+enum class Fields
+{
+    kSoftwareVersion = 0,
+    kBytesDownloaded = 1,
+    kProgressPercent = 2,
+    kPlatformCode    = 3,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    uint32_t softwareVersion;
+    uint64_t bytesDownloaded;
+    uint8_t progressPercent;
+    int64_t platformCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    uint32_t softwareVersion;
+    uint64_t bytesDownloaded;
+    uint8_t progressPercent;
+    int64_t platformCode;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace DownloadError
+} // namespace Events
 } // namespace OtaSoftwareUpdateRequestor
+namespace LocalizationConfiguration {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace LocalizationConfiguration
+namespace LocalizationTimeFormat {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace LocalizationTimeFormat
+namespace LocalizationUnit {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace LocalizationUnit
+namespace PowerSourceConfiguration {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace PowerSourceConfiguration
 namespace PowerSource {
 
 namespace Attributes {
@@ -9266,8 +9569,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     DataModel::List<const HardwareFaultType> current;
@@ -9302,8 +9605,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000001;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     DataModel::List<const RadioFaultType> current;
@@ -9338,8 +9641,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000002;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     DataModel::List<const NetworkFaultType> current;
@@ -9373,8 +9676,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000003;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     BootReasonType bootReason;
@@ -9569,8 +9872,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
 
     Structs::SoftwareFault::Type softwareFault;
@@ -10549,8 +10852,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
 
     ThreadConnectionStatus connectionStatus;
@@ -10851,8 +11154,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     uint16_t reasonCode;
@@ -10885,8 +11188,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000001;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     AssociationFailureCause associationFailure;
@@ -10920,8 +11223,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000002;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
     WiFiConnectionStatus connectionStatus;
@@ -11128,6 +11431,60 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace EthernetNetworkDiagnostics
+namespace TimeSynchronization {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace TimeSynchronization
+namespace BridgedDeviceBasicInformation {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace BridgedDeviceBasicInformation
 namespace BridgedDeviceBasic {
 
 namespace Commands {
@@ -11296,7 +11653,7 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
 };
 } // namespace ProductName
-namespace UserLabel {
+namespace NodeLabel {
 struct TypeInfo
 {
     using Type             = chip::CharSpan;
@@ -11304,9 +11661,9 @@ struct TypeInfo
     using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NodeLabel::Id; }
 };
-} // namespace UserLabel
+} // namespace NodeLabel
 namespace HardwareVersion {
 struct TypeInfo
 {
@@ -11417,6 +11774,17 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
 };
 } // namespace Reachable
+namespace UniqueID {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UniqueID::Id; }
+};
+} // namespace UniqueID
 namespace FeatureMap {
 struct TypeInfo
 {
@@ -11508,9 +11876,9 @@ namespace AdministratorCommissioning {
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
-    kSuccess      = 0x00,
-    kBusy         = 0x01,
-    kGeneralError = 0x02,
+    kBusy               = 0x01,
+    kPAKEParameterError = 0x02,
+    kWindowNotOpen      = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using StatusCode                           = EmberAfStatusCode;
@@ -12419,8 +12787,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
 
     bool stateValue;
@@ -12785,13 +13153,13 @@ using DoorLockUserType                     = EmberAfDoorLockUserType;
 // Bitmap for DoorLockDayOfWeek
 enum class DoorLockDayOfWeek : uint8_t
 {
-    kSunday    = 0,
-    kMonday    = 1,
-    kTuesday   = 2,
-    kWednesday = 3,
-    kThursday  = 4,
-    kFriday    = 5,
-    kSaturday  = 6,
+    kSunday    = 0x1,
+    kMonday    = 0x2,
+    kTuesday   = 0x4,
+    kWednesday = 0x8,
+    kThursday  = 0x10,
+    kFriday    = 0x20,
+    kSaturday  = 0x40,
 };
 
 namespace Commands {
@@ -15385,47 +15753,47 @@ namespace WindowCovering {
 // Bitmap for WcConfigStatus
 enum class WcConfigStatus : uint8_t
 {
-    kOperational               = 0,
-    kOnline                    = 1,
-    kOpenAndUpCommandsReversed = 2,
-    kLiftPositionAware         = 3,
-    kTiltPositionAware         = 4,
-    kLiftEncoderControlled     = 5,
-    kTiltEncoderControlled     = 6,
+    kOperational               = 0x1,
+    kOnline                    = 0x2,
+    kOpenAndUpCommandsReversed = 0x4,
+    kLiftPositionAware         = 0x8,
+    kTiltPositionAware         = 0x10,
+    kLiftEncoderControlled     = 0x20,
+    kTiltEncoderControlled     = 0x40,
 };
 
 // Bitmap for WcMode
 enum class WcMode : uint8_t
 {
-    kMotorDirectionReversed = 0,
-    kCalibrationMode        = 1,
-    kMaintenanceMode        = 2,
-    kLEDFeedback            = 3,
+    kMotorDirectionReversed = 0x1,
+    kCalibrationMode        = 0x2,
+    kMaintenanceMode        = 0x4,
+    kLEDFeedback            = 0x8,
 };
 
 // Bitmap for WcOperationalStatus
 enum class WcOperationalStatus : uint8_t
 {
-    kGlobal = 0,
-    kLift   = 2,
-    kTilt   = 4,
+    kGlobal = 0x3,
+    kLift   = 0xC,
+    kTilt   = 0x30,
 };
 
 // Bitmap for WcSafetyStatus
 enum class WcSafetyStatus : uint16_t
 {
-    kRemoteLockout       = 0,
-    kTamperDetection     = 1,
-    kFailedCommunication = 2,
-    kPositionFailure     = 3,
-    kThermalProtection   = 4,
-    kObstacleDetected    = 5,
-    kPower               = 6,
-    kStopInput           = 7,
-    kMotorJammed         = 8,
-    kHardwareFailure     = 9,
-    kManualOperation     = 10,
-    kProtection          = 11,
+    kRemoteLockout       = 0x1,
+    kTamperDetection     = 0x2,
+    kFailedCommunication = 0x4,
+    kPositionFailure     = 0x8,
+    kThermalProtection   = 0x10,
+    kObstacleDetected    = 0x20,
+    kPower               = 0x40,
+    kStopInput           = 0x80,
+    kMotorJammed         = 0x100,
+    kHardwareFailure     = 0x200,
+    kManualOperation     = 0x400,
+    kProtection          = 0x800,
 };
 
 namespace Commands {
@@ -16243,15 +16611,15 @@ using PumpOperationMode                    = EmberAfPumpOperationMode;
 // Bitmap for PumpStatus
 enum class PumpStatus : uint16_t
 {
-    kDeviceFault       = 0,
-    kSupplyfault       = 1,
-    kSpeedLow          = 2,
-    kSpeedHigh         = 3,
-    kLocalOverride     = 4,
-    kRunning           = 5,
-    kRemotePressure    = 6,
-    kRemoteFlow        = 7,
-    kRemoteTemperature = 8,
+    kDeviceFault       = 0x1,
+    kSupplyfault       = 0x2,
+    kSpeedLow          = 0x4,
+    kSpeedHigh         = 0x8,
+    kLocalOverride     = 0x10,
+    kRunning           = 0x20,
+    kRemotePressure    = 0x40,
+    kRemoteFlow        = 0x80,
+    kRemoteTemperature = 0x100,
 };
 
 namespace Attributes {
@@ -16554,8 +16922,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000000;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16582,8 +16950,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000001;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16610,8 +16978,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000002;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16638,8 +17006,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000003;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16666,8 +17034,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000004;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16694,8 +17062,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000005;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16722,8 +17090,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000006;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16750,8 +17118,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000007;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16778,8 +17146,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000008;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16806,8 +17174,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x00000009;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16834,8 +17202,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000A;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16862,8 +17230,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000B;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16890,8 +17258,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Critical;
-    static constexpr EventId eventId             = 0x0000000C;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16918,8 +17286,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000D;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16946,8 +17314,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000E;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16974,8 +17342,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x0000000F;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -17002,8 +17370,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000010;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -17039,21 +17407,21 @@ using SetpointAdjustMode                   = EmberAfSetpointAdjustMode;
 // Bitmap for DayOfWeek
 enum class DayOfWeek : uint8_t
 {
-    kSunday         = 0,
-    kMonday         = 1,
-    kTuesday        = 2,
-    kWednesday      = 3,
-    kThursday       = 4,
-    kFriday         = 5,
-    kSaturday       = 6,
-    kAwayOrVacation = 7,
+    kSunday         = 0x1,
+    kMonday         = 0x2,
+    kTuesday        = 0x4,
+    kWednesday      = 0x8,
+    kThursday       = 0x10,
+    kFriday         = 0x20,
+    kSaturday       = 0x40,
+    kAwayOrVacation = 0x80,
 };
 
 // Bitmap for ModeForSequence
 enum class ModeForSequence : uint8_t
 {
-    kHeatSetpointFieldPresent = 0,
-    kCoolSetpointFieldPresent = 1,
+    kHeatSetpointFieldPresent = 0x1,
+    kCoolSetpointFieldPresent = 0x2,
 };
 
 namespace Commands {
@@ -18169,20 +18537,20 @@ using SaturationStepMode                   = EmberAfSaturationStepMode;
 // Bitmap for ColorCapabilities
 enum class ColorCapabilities : uint16_t
 {
-    kHueSaturationSupported    = 0,
-    kEnhancedHueSupported      = 1,
-    kColorLoopSupported        = 2,
-    kXYAttributesSupported     = 3,
-    kColorTemperatureSupported = 4,
+    kHueSaturationSupported    = 0x1,
+    kEnhancedHueSupported      = 0x2,
+    kColorLoopSupported        = 0x4,
+    kXYAttributesSupported     = 0x8,
+    kColorTemperatureSupported = 0x10,
 };
 
 // Bitmap for ColorLoopUpdateFlags
 enum class ColorLoopUpdateFlags : uint8_t
 {
-    kUpdateAction    = 0,
-    kUpdateDirection = 1,
-    kUpdateTime      = 2,
-    kUpdateStartHue  = 3,
+    kUpdateAction    = 0x1,
+    kUpdateDirection = 0x2,
+    kUpdateTime      = 0x4,
+    kUpdateStartHue  = 0x8,
 };
 
 namespace Commands {
@@ -22641,16 +23009,16 @@ using IasZoneType                          = EmberAfIasZoneType;
 // Bitmap for IasZoneStatus
 enum class IasZoneStatus : uint16_t
 {
-    kAlarm1             = 0,
-    kAlarm2             = 1,
-    kTamper             = 2,
-    kBattery            = 3,
-    kSupervisionReports = 4,
-    kRestoreReports     = 5,
-    kTrouble            = 6,
-    kAc                 = 7,
-    kTest               = 8,
-    kBatteryDefect      = 9,
+    kAlarm1             = 0x1,
+    kAlarm2             = 0x2,
+    kTamper             = 0x4,
+    kBattery            = 0x8,
+    kSupervisionReports = 0x10,
+    kRestoreReports     = 0x20,
+    kTrouble            = 0x40,
+    kAc                 = 0x80,
+    kTest               = 0x100,
+    kBatteryDefect      = 0x200,
 };
 
 namespace Commands {
@@ -23142,16 +23510,16 @@ using IasZoneType                          = EmberAfIasZoneType;
 // Bitmap for IasZoneStatus
 enum class IasZoneStatus : uint16_t
 {
-    kAlarm1             = 0,
-    kAlarm2             = 1,
-    kTamper             = 2,
-    kBattery            = 3,
-    kSupervisionReports = 4,
-    kRestoreReports     = 5,
-    kTrouble            = 6,
-    kAc                 = 7,
-    kTest               = 8,
-    kBatteryDefect      = 9,
+    kAlarm1             = 0x1,
+    kAlarm2             = 0x2,
+    kTamper             = 0x4,
+    kBattery            = 0x8,
+    kSupervisionReports = 0x10,
+    kRestoreReports     = 0x20,
+    kTrouble            = 0x40,
+    kAc                 = 0x80,
+    kTest               = 0x100,
+    kBatteryDefect      = 0x200,
 };
 
 namespace Structs {
@@ -23970,17 +24338,17 @@ namespace IasWd {
 // Bitmap for SquawkInfo
 enum class SquawkInfo : uint8_t
 {
-    kMode   = 4,
-    kStrobe = 3,
-    kLevel  = 0,
+    kMode   = 0xF0,
+    kStrobe = 0x8,
+    kLevel  = 0x3,
 };
 
 // Bitmap for WarningInfo
 enum class WarningInfo : uint8_t
 {
-    kMode       = 4,
-    kStrobe     = 2,
-    kSirenLevel = 0,
+    kMode       = 0xF0,
+    kStrobe     = 0xC,
+    kSirenLevel = 0x3,
 };
 
 namespace Commands {
@@ -27105,9 +27473,9 @@ using SimpleEnum                           = EmberAfSimpleEnum;
 // Bitmap for SimpleBitmap
 enum class SimpleBitmap : uint8_t
 {
-    kValueA = 0,
-    kValueB = 1,
-    kValueC = 2,
+    kValueA = 0x1,
+    kValueB = 0x2,
+    kValueC = 0x4,
 };
 
 namespace Structs {
@@ -28890,8 +29258,8 @@ enum class Fields
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::Info;
-    static constexpr EventId eventId             = 0x00000001;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1;
@@ -29071,23 +29439,23 @@ using MessagingControlTransmission         = EmberAfMessagingControlTransmission
 // Bitmap for MessagingConfirmationControl
 enum class MessagingConfirmationControl : uint8_t
 {
-    kNoReturned  = 0,
-    kYesReturned = 1,
+    kNoReturned  = 0x1,
+    kYesReturned = 0x2,
 };
 
 // Bitmap for MessagingControlMask
 enum class MessagingControlMask : uint8_t
 {
-    kTransMechanism              = 0,
-    kMessageUrgency              = 2,
-    kEnhancedConfirmationRequest = 5,
-    kMessageConfirmation         = 7,
+    kTransMechanism              = 0x3,
+    kMessageUrgency              = 0xC,
+    kEnhancedConfirmationRequest = 0x20,
+    kMessageConfirmation         = 0x80,
 };
 
 // Bitmap for MessagingExtendedControlMask
 enum class MessagingExtendedControlMask : uint8_t
 {
-    kMessageConfirmationStatus = 0,
+    kMessageConfirmationStatus = 0x1,
 };
 
 namespace Commands {
@@ -29744,16 +30112,16 @@ using EventIdentification                  = EmberAfEventIdentification;
 // Bitmap for AlertCount
 enum class AlertCount : uint8_t
 {
-    kNumberOfAlerts = 0,
-    kTypeOfAlert    = 4,
+    kNumberOfAlerts = 0xF,
+    kTypeOfAlert    = 0xF0,
 };
 
 // Bitmap for AlertStructure
 enum class AlertStructure : uint32_t
 {
-    kAlertId          = 0,
-    kCategory         = 8,
-    kPresenceRecovery = 12,
+    kAlertId          = 0xFF,
+    kCategory         = 0xF00,
+    kPresenceRecovery = 0x3000,
 };
 
 namespace Commands {

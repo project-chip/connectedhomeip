@@ -47,6 +47,7 @@
 #include <app/InteractionModelDelegate.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
+#include <app/StatusResponse.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
@@ -54,9 +55,6 @@
 
 namespace chip {
 namespace app {
-
-static constexpr size_t kMaxSecureSduLengthBytes = 1024;
-
 /**
  * @class InteractionModelEngine
  *
@@ -202,28 +200,34 @@ private:
 
     void OnDone(CommandHandler & apCommandObj) override;
 
-    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                System::PacketBufferHandle && aPayload);
+    /**
+     * Called when Interaction Model receives a Command Request message.  Errors processing
+     * the Command Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
+     * expected to set it to success if it does not want an automatic status response message to be sent.
+     */
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                      System::PacketBufferHandle && aPayload);
+                                      System::PacketBufferHandle && aPayload, Protocols::InteractionModel::Status & aStatus);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
-     * the Read Request are handled entirely within this function.
+     * the Read Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
+     * expected to set it to success if it does not want an automatic status response message to be sent.
      */
 
     CHIP_ERROR OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                    System::PacketBufferHandle && aPayload, ReadHandler::InteractionType aInteractionType);
+                                    System::PacketBufferHandle && aPayload, ReadHandler::InteractionType aInteractionType,
+                                    Protocols::InteractionModel::Status & aStatus);
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
-     * the Write Request are handled entirely within this function.
+     * the Write Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
+     * expected to set it to success if it does not want an automatic status response message to be sent.
      */
     CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                              System::PacketBufferHandle && aPayload);
+                              System::PacketBufferHandle && aPayload, Protocols::InteractionModel::Status & aStatus);
 
     /**This function handles processing of un-solicited ReportData messages on the client, which can
      * only occur post subscription establishment
@@ -289,7 +293,7 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *
  *  @retval  CHIP_NO_ERROR on success
  */
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIB::Builder & aAttributeReport);
 
 /**
