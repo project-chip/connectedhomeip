@@ -131,11 +131,13 @@ bool emAfMatchCluster(EmberAfCluster * cluster, EmberAfAttributeSearchRecord * a
 bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am, EmberAfAttributeSearchRecord * attRecord);
 
 EmberAfCluster * emberAfFindClusterInTypeWithMfgCode(EmberAfEndpointType * endpointType, chip::ClusterId clusterId,
-                                                     EmberAfClusterMask mask, uint16_t manufacturerCode);
+                                                     EmberAfClusterMask mask, uint16_t manufacturerCode, uint8_t * index = nullptr);
 
 EmberAfCluster * emberAfFindClusterInType(EmberAfEndpointType * endpointType, chip::ClusterId clusterId, EmberAfClusterMask mask);
 
-// This function returns the index of cluster for the particular endpoint.
+// For a given cluster and mask, retrieves the list of endpoints that contain the matching cluster and returns the index
+// within that list that matches the given endpoint.
+//
 // Mask is either CLUSTER_MASK_CLIENT or CLUSTER_MASK_SERVER
 // For example, if you have 3 endpoints, 10, 11, 12, and cluster X server is
 // located on 11 and 12, and cluster Y server is located only on 10 then
@@ -145,6 +147,13 @@ EmberAfCluster * emberAfFindClusterInType(EmberAfEndpointType * endpointType, ch
 //    clusterIndex(Y,10,CLUSTER_MASK_SERVER) returns 0
 //    clusterIndex(Y,11,CLUSTER_MASK_SERVER) returns 0xFF
 //    clusterIndex(Y,12,CLUSTER_MASK_SERVER) returns 0xFF
+uint8_t emberAfClusterIndexInMatchingEndpoints(chip::EndpointId endpoint, chip::ClusterId clusterId, EmberAfClusterMask mask);
+
+//
+// Given a cluster ID, endpoint ID and a cluster mask, finds a matching cluster within that endpoint
+// with a matching mask. If one is found, the relative index of that cluster within the list of clusters on that
+// endpoint is returned. Otherwise, 0xFF is returned.
+//
 uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId clusterId, EmberAfClusterMask mask);
 
 // If server == true, returns the number of server clusters,
