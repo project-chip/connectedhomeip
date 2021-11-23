@@ -108,8 +108,9 @@ private:
 
 void PacketDataReporter::OnQuery(const QueryData & data)
 {
-    ChipLogError(Discovery, "Unexpected query packet being parsed as a response");
-    mValid = false;
+    // Ignore queries:
+    //   - unicast answers will include the corresponding query in the answer
+    //     packet, however that is not interesting for the resolver.
 }
 
 void PacketDataReporter::OnHeader(ConstHeaderRef & header)
