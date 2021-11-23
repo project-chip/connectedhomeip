@@ -34,6 +34,8 @@
 
 #include <openthread/platform/entropy.h>
 
+#include "K32W061.h"
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -59,6 +61,15 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Initialize the configuration system.
     err = Internal::K32WConfig::Init();
     SuccessOrExit(err);
+
+    if (Chip_GetType() != CHIP_K32W061)
+    {
+        err = CHIP_ERROR_INTERNAL;
+        ChipLogError(DeviceLayer, "Invalid chip type, expected K32W061");
+
+        goto exit;
+    }
+
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
