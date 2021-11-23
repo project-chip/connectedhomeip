@@ -12133,6 +12133,21 @@
               "reportableChange": 0
             },
             {
+              "name": "list_long_octet_string",
+              "code": 42,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "timed_write_boolean",
               "code": 48,
               "mfgCode": null,
