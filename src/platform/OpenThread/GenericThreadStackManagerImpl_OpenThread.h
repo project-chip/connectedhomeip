@@ -67,6 +67,7 @@ public:
 
     otInstance * OTInstance() const;
     static void OnOpenThreadStateChange(uint32_t flags, void * context);
+    inline void OverrunErrorTally(void);
 
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
@@ -257,6 +258,12 @@ template <class ImplClass>
 inline otInstance * GenericThreadStackManagerImpl_OpenThread<ImplClass>::OTInstance() const
 {
     return mOTInst;
+}
+
+template <class ImplClass>
+inline void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OverrunErrorTally(void)
+{
+    mOverrunCount++;
 }
 
 template <class ImplClass>
