@@ -30,13 +30,6 @@ chip_data_model("ota-requestor-common") {
 
   deps = [ "${chip_root}/src/lib" ]
 
-  sources = [
-    "BDXDownloader.cpp",
-    "BDXDownloader.h",
-    "ExampleOTARequestor.cpp",
-    "ExampleOTARequestor.h",
-  ]
-
   is_server = true
 
   public_configs = [ ":config" ]

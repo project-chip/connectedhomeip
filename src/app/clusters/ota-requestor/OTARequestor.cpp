@@ -15,12 +15,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+ 
 #include "ota-requestor.h"
 
 #include <app/util/util.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <lib/core/CHIPEncoding.h>
+
 #include "BDXDownloader.h"
 
 #include <controller/CHIPDeviceControllerFactory.h>

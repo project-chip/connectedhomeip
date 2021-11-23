@@ -76,6 +76,8 @@ template("chip_data_model") {
 
     sources += [
       "${_app_root}/clusters/ota-requestor/OTARequestor.cpp",
+      "${_app_root}/clusters/ota-requestor/BDXDownloader.h",
+      "${_app_root}/clusters/ota-requestor/BDXDownloader.cpp",
       "${_app_root}/clusters/ota-requestor/cluster-interface.cpp",
       "${_app_root}/clusters/barrier-control-server/barrier-control-server.h",
       "${_app_root}/clusters/basic/basic.h",
@@ -188,6 +190,7 @@ template("chip_data_model") {
 
     public_deps += [
       "${chip_root}/src/app",
+      "${chip_root}/src/app/server",
       "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/controller",
       "${chip_root}/src/lib/core",
