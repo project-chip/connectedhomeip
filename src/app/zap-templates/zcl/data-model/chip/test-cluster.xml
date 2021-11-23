@@ -77,20 +77,16 @@ limitations under the License.
     <cluster code="0x050F"/>
     <item name="NullableInt" type="INT16U" isNullable="true"/>
     <item name="OptionalInt" type="INT16U" optional="true"/>
-    <item name="NullableOptionalInt" type="INT16U" isNullable="true"
-          optional="true"/>
+    <item name="NullableOptionalInt" type="INT16U" isNullable="true" optional="true"/>
     <item name="NullableString" type="CHAR_STRING" isNullable="true"/>
     <item name="OptionalString" type="CHAR_STRING" optional="true"/>
-    <item name="NullableOptionalString" type="CHAR_STRING" isNullable="true"
-          optional="true"/>
+    <item name="NullableOptionalString" type="CHAR_STRING" isNullable="true" optional="true"/>
     <item name="NullableStruct" type="SimpleStruct" isNullable="true"/>
     <item name="OptionalStruct" type="SimpleStruct" optional="true"/>
-    <item name="NullableOptionalStruct" type="SimpleStruct" isNullable="true"
-          optional="true"/>
+    <item name="NullableOptionalStruct" type="SimpleStruct" isNullable="true" optional="true"/>
     <item name="NullableList" type="SimpleEnum" isNullable="true" array="true"/>
     <item name="OptionalList" type="SimpleEnum" optional="true" array="true"/>
-    <item name="NullableOptionalList" type="SimpleEnum" isNullable="true"
-          array="true" optional="true"/>
+    <item name="NullableOptionalList" type="SimpleEnum" isNullable="true" array="true" optional="true"/>
   </struct>
 
   <cluster>
@@ -134,18 +130,16 @@ limitations under the License.
     <attribute side="server" code="0x001F" define="LONG_CHAR_STRING" type="LONG_CHAR_STRING" length="1000" writable="true" optional="false">long_char_string</attribute>
     <attribute side="server" code="0x0020" define="EPOCH_US" type="EPOCH_US" writable="true" optional="false">epoch_us</attribute>
     <attribute side="server" code="0x0021" define="EPOCH_S" type="EPOCH_S" writable="true" optional="false">epoch_s</attribute>
-    <attribute side="server" code="0x0022" define="TEST_VENDOR_ID" type="vendor_id"
-               writable="true" optional="false" default="0">vendor_id</attribute>
-    <attribute side="server" code="0x0023" define="LIST_OF_STRUCTS_WITH_OPTIONALS" type="ARRAY" entryType="NullablesAndOptionalsStruct"
-               writable="false" optional="false">list_nullables_and_optionals_struct</attribute>
+    <attribute side="server" code="0x0022" define="TEST_VENDOR_ID" type="vendor_id" writable="true" optional="false" default="0">vendor_id</attribute>
+    <attribute side="server" code="0x0023" define="LIST_OF_STRUCTS_WITH_OPTIONALS" type="ARRAY" entryType="NullablesAndOptionalsStruct" writable="false" optional="false">list_nullables_and_optionals_struct</attribute>
     <attribute side="server" code="0x0024" define="SIMPLE_ENUM" type="SimpleEnum" writable="true" optional="false">enum_attr</attribute>
     <attribute side="server" code="0x0025" define="STRUCT" type="SimpleStruct" writable="true" optional="false">struct</attribute>
     <attribute side="server" code="0x0026" define="RANGE_RESTRICTED_INT8U" type="int8u" min="20" max="100" writable="true" optional="false" default="70">range_restricted_int8u</attribute>
     <attribute side="server" code="0x0027" define="RANGE_RESTRICTED_INT8s" type="int8s" min="-40" max="50" writable="true" optional="false" default="-5">range_restricted_int8s</attribute>
     <attribute side="server" code="0x0028" define="RANGE_RESTRICTED_INT16U" type="int16u" min="100" max="1000" writable="true" optional="false" default="200">range_restricted_int16u</attribute>
     <attribute side="server" code="0x0029" define="RANGE_RESTRICTED_INT16s" type="int16s" min="-150" max="200" writable="true" optional="false" default="-5">range_restricted_int16s</attribute>
-    <attribute side="server" code="0x0030" define="TIMED_WRITE_BOOLEAN"
-               type="BOOLEAN" writable="true" mustUseTimedWrite="true">timed_write_boolean</attribute>
+    <attribute side="server" code="0x002A" define="LIST_LONG_OCTET_STRING" type="ARRAY" entryType="LONG_OCTET_STRING" length="1000" writable="false" optional="false">list_long_octet_string</attribute>
+    <attribute side="server" code="0x0030" define="TIMED_WRITE_BOOLEAN" type="BOOLEAN" writable="true" mustUseTimedWrite="true">timed_write_boolean</attribute>
 
     <attribute side="server" code="0x8000" define="NULLABLE_BOOLEAN" type="BOOLEAN" writable="true" default="false" isNullable="true" optional="false">nullable_boolean</attribute>
     <attribute side="server" code="0x8001" define="NULLABLE_BITMAP8" type="BITMAP8" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap8</attribute>
@@ -236,8 +230,7 @@ limitations under the License.
       <arg name="arg6" type="BOOLEAN"/>
     </command>
 
-    <command source="client" code="0x07" name="TestStructArgumentRequest"
-             response="BooleanResponse" optional="false">
+    <command source="client" code="0x07" name="TestStructArgumentRequest" response="BooleanResponse" optional="false">
       <description>
         Command that takes an argument which is struct.  The response echoes the
         'b' field of the single arg.
@@ -245,8 +238,7 @@ limitations under the License.
       <arg name="arg1" type="SimpleStruct"/>
     </command>
 
-    <command source="client" code="0x08" name="TestNestedStructArgumentRequest"
-             response="BooleanResponse" optional="false">
+    <command source="client" code="0x08" name="TestNestedStructArgumentRequest" response="BooleanResponse" optional="false">
       <description>
         Command that takes an argument which is nested struct.  The response
         echoes the 'b' field of ar1.c.
@@ -309,8 +301,7 @@ limitations under the License.
       <arg name="arg2" type="SimpleEnum"/>
     </command>
 
-    <command source="client" code="0x0F" name="TestNullableOptionalRequest"
-             optional="false" response="TestNullableOptionalResponse">
+    <command source="client" code="0x0F" name="TestNullableOptionalRequest" optional="false" response="TestNullableOptionalResponse">
       <description>
         Command that takes an argument which is nullable and optional.  The
         response returns a boolean indicating whether the argument was present,
@@ -320,8 +311,7 @@ limitations under the License.
       <arg name="arg1" type="INT8U" optional="true" isNullable="true"/>
     </command>
 
-    <command source="client" code="0x10" name="TestComplexNullableOptionalRequest"
-             optional="false" response="TestComplexNullableOptionalResponse">
+    <command source="client" code="0x10" name="TestComplexNullableOptionalRequest" optional="false" response="TestComplexNullableOptionalResponse">
       <description>
         Command that takes various arguments which can be nullable and/or optional.  The
         response returns information about which things were received and what
@@ -329,24 +319,19 @@ limitations under the License.
       </description>
       <arg name="NullableInt" type="INT16U" isNullable="true"/>
       <arg name="OptionalInt" type="INT16U" optional="true"/>
-      <arg name="NullableOptionalInt" type="INT16U" isNullable="true"
-           optional="true"/>
+      <arg name="NullableOptionalInt" type="INT16U" isNullable="true" optional="true"/>
       <arg name="NullableString" type="CHAR_STRING" isNullable="true"/>
       <arg name="OptionalString" type="CHAR_STRING" optional="true"/>
-      <arg name="NullableOptionalString" type="CHAR_STRING" isNullable="true"
-           optional="true"/>
+      <arg name="NullableOptionalString" type="CHAR_STRING" isNullable="true" optional="true"/>
       <arg name="NullableStruct" type="SimpleStruct" isNullable="true"/>
       <arg name="OptionalStruct" type="SimpleStruct" optional="true"/>
-      <arg name="NullableOptionalStruct" type="SimpleStruct" isNullable="true"
-           optional="true"/>
+      <arg name="NullableOptionalStruct" type="SimpleStruct" isNullable="true" optional="true"/>
       <arg name="NullableList" type="SimpleEnum" isNullable="true" array="true"/>
       <arg name="OptionalList" type="SimpleEnum" optional="true" array="true"/>
-      <arg name="NullableOptionalList" type="SimpleEnum" isNullable="true"
-           array="true" optional="true"/>
+      <arg name="NullableOptionalList" type="SimpleEnum" isNullable="true" array="true" optional="true"/>
     </command>
 
-    <command source="client" code="0x11" name="SimpleStructEchoRequest"
-             response="SimpleStructResponse" optional="false">
+    <command source="client" code="0x11" name="SimpleStructEchoRequest" response="SimpleStructResponse" optional="false">
       <description>
         Command that takes an argument which is a struct.  The response echoes
         the struct back.
@@ -354,8 +339,7 @@ limitations under the License.
       <arg name="arg1" type="SimpleStruct"/>
     </command>
 
-    <command source="client" code="0x12" name="TimedInvokeRequest"
-             mustUseTimedInvoke="true" optional="false">
+    <command source="client" code="0x12" name="TimedInvokeRequest" mustUseTimedInvoke="true" optional="false">
       <description>
         Command that just responds with a success status if the timed invoke
         conditions are met.
@@ -454,15 +438,12 @@ limitations under the License.
       <arg name="NullableOptionalStructWasNull" type="BOOLEAN" optional="true"/>
       <arg name="NullableOptionalStructValue" type="SimpleStruct" optional="true"/>
       <arg name="NullableListWasNull" type="BOOLEAN"/>
-      <arg name="NullableListValue" type="SimpleEnum" array="true"
-           optional="true"/>
+      <arg name="NullableListValue" type="SimpleEnum" array="true" optional="true"/>
       <arg name="OptionalListWasPresent" type="BOOLEAN"/>
-      <arg name="OptionalListValue" type="SimpleEnum" array="true"
-           optional="true"/>
+      <arg name="OptionalListValue" type="SimpleEnum" array="true" optional="true"/>
       <arg name="NullableOptionalListWasPresent" type="BOOLEAN"/>
       <arg name="NullableOptionalListWasNull" type="BOOLEAN" optional="true"/>
-      <arg name="NullableOptionalListValue" type="SimpleEnum" array="true"
-           optional="true"/>
+      <arg name="NullableOptionalListValue" type="SimpleEnum" array="true" optional="true"/>
     </command>
 
     <command source="server" code="0x08" name="BooleanResponse" optional="false" disableDefaultResponse="true">
