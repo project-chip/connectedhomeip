@@ -166,8 +166,6 @@ CHIPDevice * GetConnectedDevice()
 {{#unless (isStrEqual "Test Cluster" name)}}
 {{#unless (isStrEqual "Basic" name)}}
 {{#unless (isStrEqual "Thermostat" name)}}
-{{! TODO: Re-enable Illuminance Measurement once Darwin tests can deal with actual null values being delivered for TLV null. }}
-{{#unless (isStrEqual "Illuminance Measurement" name)}}
 {{#chip_server_cluster_attributes}}
 - (void)testSendCluster{{asUpperCamelCase parent.name}}ReadAttribute{{asUpperCamelCase name}}WithCompletionHandler
 {
@@ -208,7 +206,6 @@ CHIPDevice * GetConnectedDevice()
 }
 {{/if}}
 {{/chip_server_cluster_attributes}}
-{{/unless}}
 {{/unless}}
 {{/unless}}
 {{/unless}}

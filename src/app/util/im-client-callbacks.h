@@ -19,6 +19,7 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app/Command.h>
+#include <app/data-model/Nullable.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/af-enums.h>
 #include <inttypes.h>
@@ -40,15 +41,26 @@ void LogStatus(uint8_t status);
 typedef void (*DefaultSuccessCallback)(void * context);
 typedef void (*DefaultFailureCallback)(void * context, uint8_t status);
 typedef void (*BooleanAttributeCallback)(void * context, bool value);
+typedef void (*NullableBooleanAttributeCallback)(void * context, const chip::app::DataModel::Nullable<bool> & value);
 typedef void (*Int8uAttributeCallback)(void * context, uint8_t value);
+typedef void (*NullableInt8uAttributeCallback)(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 typedef void (*Int8sAttributeCallback)(void * context, int8_t value);
+typedef void (*NullableInt8sAttributeCallback)(void * context, const chip::app::DataModel::Nullable<int8_t> & value);
 typedef void (*Int16uAttributeCallback)(void * context, uint16_t value);
+typedef void (*NullableInt16uAttributeCallback)(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
 typedef void (*Int16sAttributeCallback)(void * context, int16_t value);
+typedef void (*NullableInt16sAttributeCallback)(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
 typedef void (*Int32uAttributeCallback)(void * context, uint32_t value);
+typedef void (*NullableInt32uAttributeCallback)(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
 typedef void (*Int32sAttributeCallback)(void * context, int32_t value);
+typedef void (*NullableInt32sAttributeCallback)(void * context, const chip::app::DataModel::Nullable<int32_t> & value);
 typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
+typedef void (*NullableInt64uAttributeCallback)(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
 typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
+typedef void (*NullableInt64sAttributeCallback)(void * context, const chip::app::DataModel::Nullable<int64_t> & value);
 typedef void (*OctetStringAttributeCallback)(void * context, const chip::ByteSpan value);
+typedef void (*NullableOctetStringAttributeCallback)(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
 typedef void (*CharStringAttributeCallback)(void * context, const chip::CharSpan value);
+typedef void (*NullableCharStringAttributeCallback)(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value);
 typedef void (*AttributeResponseFilter)(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
                                         chip::Callback::Cancelable * onFailure);

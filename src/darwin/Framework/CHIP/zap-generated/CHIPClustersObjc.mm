@@ -89,7 +89,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = AccountLogin::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -194,7 +197,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = AdministratorCommissioning::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -258,7 +264,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeVendorName(success, failure);
+            using TypeInfo = ApplicationBasic::Attributes::VendorName::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -294,7 +303,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeVendorId(success, failure);
+            using TypeInfo = ApplicationBasic::Attributes::VendorId::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -329,7 +341,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeApplicationName(success, failure);
+            using TypeInfo = ApplicationBasic::Attributes::ApplicationName::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -365,7 +380,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeProductId(success, failure);
+            using TypeInfo = ApplicationBasic::Attributes::ProductId::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -400,7 +418,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeApplicationId(success, failure);
+            using TypeInfo = ApplicationBasic::Attributes::ApplicationId::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -436,7 +457,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCatalogVendorId(success, failure);
+            using TypeInfo = ApplicationBasic::Attributes::CatalogVendorId::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -472,7 +496,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeApplicationStatus(success, failure);
+            using TypeInfo = ApplicationBasic::Attributes::ApplicationStatus::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -508,7 +535,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = ApplicationBasic::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -575,7 +605,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeApplicationLauncherList(success, failure);
+            using TypeInfo = ApplicationLauncher::Attributes::ApplicationLauncherList::TypeInfo;
+            auto successFn = Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -588,7 +621,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCatalogVendorId(success, failure);
+            using TypeInfo = ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -624,7 +660,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeApplicationId(success, failure);
+            using TypeInfo = ApplicationLauncher::Attributes::ApplicationId::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -660,7 +699,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = ApplicationLauncher::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -744,7 +786,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeAudioOutputList(success, failure);
+            using TypeInfo = AudioOutput::Attributes::AudioOutputList::TypeInfo;
+            auto successFn = Callback<AudioOutputAudioOutputListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -757,7 +802,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentAudioOutput(success, failure);
+            using TypeInfo = AudioOutput::Attributes::CurrentAudioOutput::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -793,7 +841,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = AudioOutput::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -874,7 +925,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBarrierMovingState(success, failure);
+            using TypeInfo = BarrierControl::Attributes::BarrierMovingState::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -910,7 +964,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBarrierSafetyStatus(success, failure);
+            using TypeInfo = BarrierControl::Attributes::BarrierSafetyStatus::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -946,7 +1003,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBarrierCapabilities(success, failure);
+            using TypeInfo = BarrierControl::Attributes::BarrierCapabilities::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -982,7 +1042,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBarrierPosition(success, failure);
+            using TypeInfo = BarrierControl::Attributes::BarrierPosition::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1018,7 +1081,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = BarrierControl::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1080,7 +1146,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInteractionModelVersion(success, failure);
+            using TypeInfo = Basic::Attributes::InteractionModelVersion::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1116,7 +1185,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeVendorName(success, failure);
+            using TypeInfo = Basic::Attributes::VendorName::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1152,7 +1224,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeVendorID(success, failure);
+            using TypeInfo = Basic::Attributes::VendorID::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1187,7 +1262,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeProductName(success, failure);
+            using TypeInfo = Basic::Attributes::ProductName::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1223,7 +1301,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeProductID(success, failure);
+            using TypeInfo = Basic::Attributes::ProductID::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1258,7 +1339,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeUserLabel(success, failure);
+            using TypeInfo = Basic::Attributes::UserLabel::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1311,7 +1395,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeLocation(success, failure);
+            using TypeInfo = Basic::Attributes::Location::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1364,7 +1451,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeHardwareVersion(success, failure);
+            using TypeInfo = Basic::Attributes::HardwareVersion::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1400,7 +1490,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeHardwareVersionString(success, failure);
+            using TypeInfo = Basic::Attributes::HardwareVersionString::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1436,7 +1529,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSoftwareVersion(success, failure);
+            using TypeInfo = Basic::Attributes::SoftwareVersion::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1472,7 +1568,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSoftwareVersionString(success, failure);
+            using TypeInfo = Basic::Attributes::SoftwareVersionString::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1508,7 +1607,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeManufacturingDate(success, failure);
+            using TypeInfo = Basic::Attributes::ManufacturingDate::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1544,7 +1646,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePartNumber(success, failure);
+            using TypeInfo = Basic::Attributes::PartNumber::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1580,7 +1685,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeProductURL(success, failure);
+            using TypeInfo = Basic::Attributes::ProductURL::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1616,7 +1724,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeProductLabel(success, failure);
+            using TypeInfo = Basic::Attributes::ProductLabel::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1652,7 +1763,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSerialNumber(success, failure);
+            using TypeInfo = Basic::Attributes::SerialNumber::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1688,7 +1802,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeLocalConfigDisabled(success, failure);
+            using TypeInfo = Basic::Attributes::LocalConfigDisabled::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1742,7 +1859,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeReachable(success, failure);
+            using TypeInfo = Basic::Attributes::Reachable::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1777,7 +1897,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = Basic::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1822,7 +1945,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOutOfService(success, failure);
+            using TypeInfo = BinaryInputBasic::Attributes::OutOfService::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1876,7 +2002,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePresentValue(success, failure);
+            using TypeInfo = BinaryInputBasic::Attributes::PresentValue::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1930,7 +2059,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeStatusFlags(success, failure);
+            using TypeInfo = BinaryInputBasic::Attributes::StatusFlags::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -1966,7 +2098,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = BinaryInputBasic::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2053,7 +2188,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = Binding::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2098,7 +2236,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeStateValue(success, failure);
+            using TypeInfo = BooleanState::Attributes::StateValue::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2134,7 +2275,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = BooleanState::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2460,7 +2604,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActionList(success, failure);
+            using TypeInfo = BridgedActions::Attributes::ActionList::TypeInfo;
+            auto successFn = Callback<BridgedActionsActionListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2473,7 +2620,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeEndpointList(success, failure);
+            using TypeInfo = BridgedActions::Attributes::EndpointList::TypeInfo;
+            auto successFn = Callback<BridgedActionsEndpointListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2486,7 +2636,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSetupUrl(success, failure);
+            using TypeInfo = BridgedActions::Attributes::SetupUrl::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2521,7 +2674,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = BridgedActions::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -2566,7 +2722,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = BridgedDeviceBasicInformation::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3039,7 +3198,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentHue(success, failure);
+            using TypeInfo = ColorControl::Attributes::CurrentHue::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3075,7 +3237,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentSaturation(success, failure);
+            using TypeInfo = ColorControl::Attributes::CurrentSaturation::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3111,7 +3276,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRemainingTime(success, failure);
+            using TypeInfo = ColorControl::Attributes::RemainingTime::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3147,7 +3315,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentX(success, failure);
+            using TypeInfo = ColorControl::Attributes::CurrentX::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3182,7 +3353,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentY(success, failure);
+            using TypeInfo = ColorControl::Attributes::CurrentY::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3217,7 +3391,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeDriftCompensation(success, failure);
+            using TypeInfo = ColorControl::Attributes::DriftCompensation::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3253,7 +3430,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCompensationText(success, failure);
+            using TypeInfo = ColorControl::Attributes::CompensationText::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3289,7 +3469,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorTemperature(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorTemperature::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3325,7 +3508,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorMode(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorMode::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3360,7 +3546,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorControlOptions(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorControlOptions::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3414,7 +3603,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNumberOfPrimaries(success, failure);
+            using TypeInfo = ColorControl::Attributes::NumberOfPrimaries::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3450,7 +3642,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary1X(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary1X::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3485,7 +3680,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary1Y(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary1Y::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3520,7 +3718,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary1Intensity(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary1Intensity::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3556,7 +3757,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary2X(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary2X::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3591,7 +3795,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary2Y(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary2Y::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3626,7 +3833,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary2Intensity(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary2Intensity::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3662,7 +3872,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary3X(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary3X::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3697,7 +3910,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary3Y(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary3Y::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3732,7 +3948,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary3Intensity(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary3Intensity::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3768,7 +3987,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary4X(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary4X::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3803,7 +4025,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary4Y(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary4Y::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3838,7 +4063,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary4Intensity(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary4Intensity::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3874,7 +4102,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary5X(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary5X::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3909,7 +4140,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary5Y(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary5Y::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3944,7 +4178,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary5Intensity(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary5Intensity::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -3980,7 +4217,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary6X(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary6X::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4015,7 +4255,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary6Y(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary6Y::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4050,7 +4293,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePrimary6Intensity(success, failure);
+            using TypeInfo = ColorControl::Attributes::Primary6Intensity::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4086,7 +4332,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeWhitePointX(success, failure);
+            using TypeInfo = ColorControl::Attributes::WhitePointX::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4140,7 +4389,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeWhitePointY(success, failure);
+            using TypeInfo = ColorControl::Attributes::WhitePointY::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4194,7 +4446,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorPointRX(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorPointRX::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4248,7 +4503,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorPointRY(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorPointRY::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4302,7 +4560,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorPointRIntensity(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorPointRIntensity::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4356,7 +4617,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorPointGX(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorPointGX::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4410,7 +4674,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorPointGY(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorPointGY::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4464,7 +4731,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorPointGIntensity(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorPointGIntensity::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4518,7 +4788,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorPointBX(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorPointBX::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4572,7 +4845,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorPointBY(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorPointBY::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4626,7 +4902,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorPointBIntensity(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorPointBIntensity::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4680,7 +4959,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeEnhancedCurrentHue(success, failure);
+            using TypeInfo = ColorControl::Attributes::EnhancedCurrentHue::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4716,7 +4998,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeEnhancedColorMode(success, failure);
+            using TypeInfo = ColorControl::Attributes::EnhancedColorMode::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4752,7 +5037,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorLoopActive(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorLoopActive::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4788,7 +5076,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorLoopDirection(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorLoopDirection::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4824,7 +5115,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorLoopTime(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorLoopTime::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4860,7 +5154,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorLoopStartEnhancedHue(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4896,7 +5193,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorLoopStoredEnhancedHue(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4932,7 +5232,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorCapabilities(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorCapabilities::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -4968,7 +5271,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorTempPhysicalMin(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5004,7 +5310,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeColorTempPhysicalMax(success, failure);
+            using TypeInfo = ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5040,7 +5349,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCoupleColorTempToLevelMinMireds(success, failure);
+            using TypeInfo = ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5076,7 +5388,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeStartUpColorTemperatureMireds(success, failure);
+            using TypeInfo = ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5131,7 +5446,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = ColorControl::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5218,7 +5536,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeAcceptsHeaderList(success, failure);
+            using TypeInfo = ContentLauncher::Attributes::AcceptsHeaderList::TypeInfo;
+            auto successFn = Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5231,7 +5552,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSupportedStreamingTypes(success, failure);
+            using TypeInfo = ContentLauncher::Attributes::SupportedStreamingTypes::TypeInfo;
+            auto successFn = Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5244,7 +5568,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = ContentLauncher::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5289,7 +5616,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeDeviceList(success, failure);
+            using TypeInfo = Descriptor::Attributes::DeviceList::TypeInfo;
+            auto successFn = Callback<DescriptorDeviceListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5302,7 +5632,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeServerList(success, failure);
+            using TypeInfo = Descriptor::Attributes::ServerList::TypeInfo;
+            auto successFn = Callback<DescriptorServerListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5315,7 +5648,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClientList(success, failure);
+            using TypeInfo = Descriptor::Attributes::ClientList::TypeInfo;
+            auto successFn = Callback<DescriptorClientListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5328,7 +5664,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePartsList(success, failure);
+            using TypeInfo = Descriptor::Attributes::PartsList::TypeInfo;
+            auto successFn = Callback<DescriptorPartsListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5341,7 +5680,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = Descriptor::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5898,7 +6240,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeLockState(success, failure);
+            using TypeInfo = DoorLock::Attributes::LockState::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5933,7 +6278,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeLockType(success, failure);
+            using TypeInfo = DoorLock::Attributes::LockType::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -5968,7 +6316,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActuatorEnabled(success, failure);
+            using TypeInfo = DoorLock::Attributes::ActuatorEnabled::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6004,7 +6355,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = DoorLock::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6049,7 +6403,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMeasurementType(success, failure);
+            using TypeInfo = ElectricalMeasurement::Attributes::MeasurementType::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6085,7 +6442,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTotalActivePower(success, failure);
+            using TypeInfo = ElectricalMeasurement::Attributes::TotalActivePower::TypeInfo;
+            auto successFn = Callback<Int32sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6121,7 +6481,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRmsVoltage(success, failure);
+            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltage::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6157,7 +6520,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRmsVoltageMin(success, failure);
+            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMin::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6193,7 +6559,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRmsVoltageMax(success, failure);
+            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMax::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6229,7 +6598,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRmsCurrent(success, failure);
+            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrent::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6265,7 +6637,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRmsCurrentMin(success, failure);
+            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMin::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6301,7 +6676,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRmsCurrentMax(success, failure);
+            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMax::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6337,7 +6715,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActivePower(success, failure);
+            using TypeInfo = ElectricalMeasurement::Attributes::ActivePower::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6373,7 +6754,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActivePowerMin(success, failure);
+            using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMin::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6409,7 +6793,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActivePowerMax(success, failure);
+            using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMax::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6445,7 +6832,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6506,7 +6896,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePHYRate(success, failure);
+            using TypeInfo = EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6541,7 +6934,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeFullDuplex(success, failure);
+            using TypeInfo = EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6577,7 +6973,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePacketRxCount(success, failure);
+            using TypeInfo = EthernetNetworkDiagnostics::Attributes::PacketRxCount::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6613,7 +7012,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePacketTxCount(success, failure);
+            using TypeInfo = EthernetNetworkDiagnostics::Attributes::PacketTxCount::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6649,7 +7051,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxErrCount(success, failure);
+            using TypeInfo = EthernetNetworkDiagnostics::Attributes::TxErrCount::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6685,7 +7090,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCollisionCount(success, failure);
+            using TypeInfo = EthernetNetworkDiagnostics::Attributes::CollisionCount::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6721,7 +7129,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOverrunCount(success, failure);
+            using TypeInfo = EthernetNetworkDiagnostics::Attributes::OverrunCount::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6757,7 +7168,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCarrierDetect(success, failure);
+            using TypeInfo = EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6793,7 +7207,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTimeSinceReset(success, failure);
+            using TypeInfo = EthernetNetworkDiagnostics::Attributes::TimeSinceReset::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6829,7 +7246,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = EthernetNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6874,7 +7294,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeLabelList(success, failure);
+            using TypeInfo = FixedLabel::Attributes::LabelList::TypeInfo;
+            auto successFn = Callback<FixedLabelLabelListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6887,7 +7310,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = FixedLabel::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6932,7 +7358,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMeasuredValue(success, failure);
+            using TypeInfo = FlowMeasurement::Attributes::MeasuredValue::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6968,7 +7397,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinMeasuredValue(success, failure);
+            using TypeInfo = FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7004,7 +7436,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxMeasuredValue(success, failure);
+            using TypeInfo = FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7040,7 +7475,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTolerance(success, failure);
+            using TypeInfo = FlowMeasurement::Attributes::Tolerance::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7075,7 +7513,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = FlowMeasurement::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7186,7 +7627,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBreadcrumb(success, failure);
+            using TypeInfo = GeneralCommissioning::Attributes::Breadcrumb::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7240,7 +7684,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBasicCommissioningInfoList(success, failure);
+            using TypeInfo = GeneralCommissioning::Attributes::BasicCommissioningInfoList::TypeInfo;
+            auto successFn = Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7253,7 +7700,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = GeneralCommissioning::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7298,7 +7748,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNetworkInterfaces(success, failure);
+            using TypeInfo = GeneralDiagnostics::Attributes::NetworkInterfaces::TypeInfo;
+            auto successFn = Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7311,7 +7764,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRebootCount(success, failure);
+            using TypeInfo = GeneralDiagnostics::Attributes::RebootCount::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7346,7 +7802,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeUpTime(success, failure);
+            using TypeInfo = GeneralDiagnostics::Attributes::UpTime::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7381,7 +7840,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTotalOperationalHours(success, failure);
+            using TypeInfo = GeneralDiagnostics::Attributes::TotalOperationalHours::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7417,7 +7879,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBootReasons(success, failure);
+            using TypeInfo = GeneralDiagnostics::Attributes::BootReasons::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7453,7 +7918,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActiveHardwareFaults(success, failure);
+            using TypeInfo = GeneralDiagnostics::Attributes::ActiveHardwareFaults::TypeInfo;
+            auto successFn = Callback<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7466,7 +7934,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActiveRadioFaults(success, failure);
+            using TypeInfo = GeneralDiagnostics::Attributes::ActiveRadioFaults::TypeInfo;
+            auto successFn = Callback<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7479,7 +7950,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActiveNetworkFaults(success, failure);
+            using TypeInfo = GeneralDiagnostics::Attributes::ActiveNetworkFaults::TypeInfo;
+            auto successFn = Callback<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7492,7 +7966,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = GeneralDiagnostics::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7536,7 +8013,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeGroups(success, failure);
+            using TypeInfo = GroupKeyManagement::Attributes::Groups::TypeInfo;
+            auto successFn = Callback<GroupKeyManagementGroupsListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7549,7 +8029,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeGroupKeys(success, failure);
+            using TypeInfo = GroupKeyManagement::Attributes::GroupKeys::TypeInfo;
+            auto successFn = Callback<GroupKeyManagementGroupKeysListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7562,7 +8045,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = GroupKeyManagement::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7746,7 +8232,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNameSupport(success, failure);
+            using TypeInfo = Groups::Attributes::NameSupport::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7782,7 +8271,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = Groups::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7885,7 +8377,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeIdentifyTime(success, failure);
+            using TypeInfo = Identify::Attributes::IdentifyTime::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7939,7 +8434,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeIdentifyType(success, failure);
+            using TypeInfo = Identify::Attributes::IdentifyType::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -7975,7 +8473,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = Identify::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8014,13 +8515,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMeasuredValue(success, failure);
+            using TypeInfo = IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo;
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8028,15 +8532,16 @@ using namespace chip::app::Clusters;
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeMeasuredValue(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeMeasuredValue(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeMeasuredValueWithResponseHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -8050,13 +8555,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinMeasuredValue(success, failure);
+            using TypeInfo = IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo;
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8064,15 +8572,16 @@ using namespace chip::app::Clusters;
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeMinMeasuredValue(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeMinMeasuredValue(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeMinMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -8086,13 +8595,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxMeasuredValue(success, failure);
+            using TypeInfo = IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo;
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8100,15 +8612,16 @@ using namespace chip::app::Clusters;
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeMaxMeasuredValue(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeMaxMeasuredValue(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeMaxMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -8128,7 +8641,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTolerance(success, failure);
+            using TypeInfo = IlluminanceMeasurement::Attributes::Tolerance::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8157,13 +8673,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeLightSensorTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
+    new CHIPNullableInt8uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeLightSensorType(success, failure);
+            using TypeInfo = IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo;
+            auto successFn = Callback<NullableInt8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8171,15 +8690,16 @@ using namespace chip::app::Clusters;
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeLightSensorType(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeLightSensorType(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeLightSensorTypeWithResponseHandler:(void (^)(
                                                               NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
+    new CHIPNullableInt8uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -8199,7 +8719,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8264,7 +8787,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = KeypadInput::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8471,7 +8997,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentLevel(success, failure);
+            using TypeInfo = LevelControl::Attributes::CurrentLevel::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8507,7 +9036,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRemainingTime(success, failure);
+            using TypeInfo = LevelControl::Attributes::RemainingTime::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8543,7 +9075,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinLevel(success, failure);
+            using TypeInfo = LevelControl::Attributes::MinLevel::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8578,7 +9113,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxLevel(success, failure);
+            using TypeInfo = LevelControl::Attributes::MaxLevel::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8613,7 +9151,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentFrequency(success, failure);
+            using TypeInfo = LevelControl::Attributes::CurrentFrequency::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8649,7 +9190,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinFrequency(success, failure);
+            using TypeInfo = LevelControl::Attributes::MinFrequency::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8685,7 +9229,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxFrequency(success, failure);
+            using TypeInfo = LevelControl::Attributes::MaxFrequency::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8720,7 +9267,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOptions(success, failure);
+            using TypeInfo = LevelControl::Attributes::Options::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8773,7 +9323,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOnOffTransitionTime(success, failure);
+            using TypeInfo = LevelControl::Attributes::OnOffTransitionTime::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8826,7 +9379,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOnLevel(success, failure);
+            using TypeInfo = LevelControl::Attributes::OnLevel::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8879,7 +9435,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOnTransitionTime(success, failure);
+            using TypeInfo = LevelControl::Attributes::OnTransitionTime::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8933,7 +9492,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOffTransitionTime(success, failure);
+            using TypeInfo = LevelControl::Attributes::OffTransitionTime::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -8987,7 +9549,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeDefaultMoveRate(success, failure);
+            using TypeInfo = LevelControl::Attributes::DefaultMoveRate::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9041,7 +9606,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeStartUpCurrentLevel(success, failure);
+            using TypeInfo = LevelControl::Attributes::StartUpCurrentLevel::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9095,7 +9663,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = LevelControl::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9157,7 +9728,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = LowPower::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9273,7 +9847,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMediaInputList(success, failure);
+            using TypeInfo = MediaInput::Attributes::MediaInputList::TypeInfo;
+            auto successFn = Callback<MediaInputMediaInputListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9286,7 +9863,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentMediaInput(success, failure);
+            using TypeInfo = MediaInput::Attributes::CurrentMediaInput::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9322,7 +9902,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = MediaInput::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9571,7 +10154,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePlaybackState(success, failure);
+            using TypeInfo = MediaPlayback::Attributes::PlaybackState::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9607,7 +10193,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeStartTime(success, failure);
+            using TypeInfo = MediaPlayback::Attributes::StartTime::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9642,7 +10231,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeDuration(success, failure);
+            using TypeInfo = MediaPlayback::Attributes::Duration::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9677,7 +10269,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePositionUpdatedAt(success, failure);
+            using TypeInfo = MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9713,7 +10308,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePosition(success, failure);
+            using TypeInfo = MediaPlayback::Attributes::Position::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9748,7 +10346,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePlaybackSpeed(success, failure);
+            using TypeInfo = MediaPlayback::Attributes::PlaybackSpeed::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9784,7 +10385,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSeekRangeEnd(success, failure);
+            using TypeInfo = MediaPlayback::Attributes::SeekRangeEnd::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9820,7 +10424,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSeekRangeStart(success, failure);
+            using TypeInfo = MediaPlayback::Attributes::SeekRangeStart::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9856,7 +10463,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = MediaPlayback::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9920,7 +10530,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentMode(success, failure);
+            using TypeInfo = ModeSelect::Attributes::CurrentMode::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9956,7 +10569,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSupportedModes(success, failure);
+            using TypeInfo = ModeSelect::Attributes::SupportedModes::TypeInfo;
+            auto successFn = Callback<ModeSelectSupportedModesListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -9968,7 +10584,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOnMode(success, failure);
+            using TypeInfo = ModeSelect::Attributes::OnMode::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10021,7 +10640,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeStartUpMode(success, failure);
+            using TypeInfo = ModeSelect::Attributes::StartUpMode::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10057,7 +10679,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeDescription(success, failure);
+            using TypeInfo = ModeSelect::Attributes::Description::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10093,7 +10718,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = ModeSelect::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10318,7 +10946,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeFeatureMap(success, failure);
+            using TypeInfo = NetworkCommissioning::Attributes::FeatureMap::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10354,7 +10985,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = NetworkCommissioning::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10501,7 +11135,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = OtaSoftwareUpdateProvider::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10572,7 +11209,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeDefaultOtaProvider(success, failure);
+            using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo;
+            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10626,7 +11266,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeUpdatePossible(success, failure);
+            using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10662,7 +11305,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10707,7 +11353,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOccupancy(success, failure);
+            using TypeInfo = OccupancySensing::Attributes::Occupancy::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10742,7 +11391,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOccupancySensorType(success, failure);
+            using TypeInfo = OccupancySensing::Attributes::OccupancySensorType::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10778,7 +11430,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOccupancySensorTypeBitmap(success, failure);
+            using TypeInfo = OccupancySensing::Attributes::OccupancySensorTypeBitmap::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10814,7 +11469,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = OccupancySensing::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -10968,7 +11626,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOnOff(success, failure);
+            using TypeInfo = OnOff::Attributes::OnOff::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11003,7 +11664,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeGlobalSceneControl(success, failure);
+            using TypeInfo = OnOff::Attributes::GlobalSceneControl::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11038,7 +11702,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOnTime(success, failure);
+            using TypeInfo = OnOff::Attributes::OnTime::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11091,7 +11758,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOffWaitTime(success, failure);
+            using TypeInfo = OnOff::Attributes::OffWaitTime::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11145,7 +11815,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeStartUpOnOff(success, failure);
+            using TypeInfo = OnOff::Attributes::StartUpOnOff::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11199,7 +11872,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeFeatureMap(success, failure);
+            using TypeInfo = OnOff::Attributes::FeatureMap::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11235,7 +11911,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = OnOff::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11280,7 +11959,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSwitchType(success, failure);
+            using TypeInfo = OnOffSwitchConfiguration::Attributes::SwitchType::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11316,7 +11998,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSwitchActions(success, failure);
+            using TypeInfo = OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11370,7 +12055,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = OnOffSwitchConfiguration::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11606,7 +12294,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeFabricsList(success, failure);
+            using TypeInfo = OperationalCredentials::Attributes::FabricsList::TypeInfo;
+            auto successFn = Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11619,7 +12310,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSupportedFabrics(success, failure);
+            using TypeInfo = OperationalCredentials::Attributes::SupportedFabrics::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11655,7 +12349,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCommissionedFabrics(success, failure);
+            using TypeInfo = OperationalCredentials::Attributes::CommissionedFabrics::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11691,7 +12388,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTrustedRootCertificates(success, failure);
+            using TypeInfo = OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo;
+            auto successFn = Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11704,7 +12404,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentFabricIndex(success, failure);
+            using TypeInfo = OperationalCredentials::Attributes::CurrentFabricIndex::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11740,7 +12443,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = OperationalCredentials::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11784,7 +12490,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeStatus(success, failure);
+            using TypeInfo = PowerSource::Attributes::Status::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11818,7 +12527,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOrder(success, failure);
+            using TypeInfo = PowerSource::Attributes::Order::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11853,7 +12565,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeDescription(success, failure);
+            using TypeInfo = PowerSource::Attributes::Description::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11889,7 +12604,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBatteryVoltage(success, failure);
+            using TypeInfo = PowerSource::Attributes::BatteryVoltage::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11925,7 +12643,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBatteryPercentRemaining(success, failure);
+            using TypeInfo = PowerSource::Attributes::BatteryPercentRemaining::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11961,7 +12682,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBatteryTimeRemaining(success, failure);
+            using TypeInfo = PowerSource::Attributes::BatteryTimeRemaining::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -11997,7 +12721,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBatteryChargeLevel(success, failure);
+            using TypeInfo = PowerSource::Attributes::BatteryChargeLevel::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12033,7 +12760,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActiveBatteryFaults(success, failure);
+            using TypeInfo = PowerSource::Attributes::ActiveBatteryFaults::TypeInfo;
+            auto successFn = Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12046,7 +12776,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBatteryChargeState(success, failure);
+            using TypeInfo = PowerSource::Attributes::BatteryChargeState::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12082,7 +12815,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeFeatureMap(success, failure);
+            using TypeInfo = PowerSource::Attributes::FeatureMap::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12118,7 +12854,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = PowerSource::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12163,7 +12902,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMeasuredValue(success, failure);
+            using TypeInfo = PressureMeasurement::Attributes::MeasuredValue::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12199,7 +12941,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinMeasuredValue(success, failure);
+            using TypeInfo = PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12235,7 +12980,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxMeasuredValue(success, failure);
+            using TypeInfo = PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12271,7 +13019,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = PressureMeasurement::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12316,7 +13067,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxPressure(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MaxPressure::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12352,7 +13106,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxSpeed(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MaxSpeed::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12386,7 +13143,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxFlow(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MaxFlow::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12421,7 +13181,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinConstPressure(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MinConstPressure::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12457,7 +13220,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxConstPressure(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MaxConstPressure::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12493,7 +13259,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinCompPressure(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MinCompPressure::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12529,7 +13298,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxCompPressure(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MaxCompPressure::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12565,7 +13337,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinConstSpeed(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MinConstSpeed::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12601,7 +13376,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxConstSpeed(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MaxConstSpeed::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12637,7 +13415,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinConstFlow(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MinConstFlow::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12673,7 +13454,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxConstFlow(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MaxConstFlow::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12709,7 +13493,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinConstTemp(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MinConstTemp::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12745,7 +13532,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxConstTemp(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::MaxConstTemp::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12781,7 +13571,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePumpStatus(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12817,7 +13610,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeEffectiveOperationMode(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12853,7 +13649,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeEffectiveControlMode(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12889,7 +13688,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCapacity(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::Capacity::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12923,7 +13725,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSpeed(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::Speed::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12958,7 +13763,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeLifetimeEnergyConsumed(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -12994,7 +13802,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOperationMode(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13048,7 +13859,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeControlMode(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13102,7 +13916,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeAlarmMask(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::AlarmMask::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13137,7 +13954,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeFeatureMap(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::FeatureMap::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13173,7 +13993,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = PumpConfigurationAndControl::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13218,7 +14041,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMeasuredValue(success, failure);
+            using TypeInfo = RelativeHumidityMeasurement::Attributes::MeasuredValue::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13254,7 +14080,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinMeasuredValue(success, failure);
+            using TypeInfo = RelativeHumidityMeasurement::Attributes::MinMeasuredValue::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13290,7 +14119,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxMeasuredValue(success, failure);
+            using TypeInfo = RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13326,7 +14158,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTolerance(success, failure);
+            using TypeInfo = RelativeHumidityMeasurement::Attributes::Tolerance::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13361,7 +14196,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = RelativeHumidityMeasurement::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13576,7 +14414,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSceneCount(success, failure);
+            using TypeInfo = Scenes::Attributes::SceneCount::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13612,7 +14453,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentScene(success, failure);
+            using TypeInfo = Scenes::Attributes::CurrentScene::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13648,7 +14492,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentGroup(success, failure);
+            using TypeInfo = Scenes::Attributes::CurrentGroup::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13684,7 +14531,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSceneValid(success, failure);
+            using TypeInfo = Scenes::Attributes::SceneValid::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13720,7 +14570,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNameSupport(success, failure);
+            using TypeInfo = Scenes::Attributes::NameSupport::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13756,7 +14609,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = Scenes::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13818,7 +14674,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeThreadMetrics(success, failure);
+            using TypeInfo = SoftwareDiagnostics::Attributes::ThreadMetrics::TypeInfo;
+            auto successFn = Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13831,7 +14690,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentHeapFree(success, failure);
+            using TypeInfo = SoftwareDiagnostics::Attributes::CurrentHeapFree::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13867,7 +14729,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentHeapUsed(success, failure);
+            using TypeInfo = SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13903,7 +14768,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentHeapHighWatermark(success, failure);
+            using TypeInfo = SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13939,7 +14807,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = SoftwareDiagnostics::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -13984,7 +14855,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNumberOfPositions(success, failure);
+            using TypeInfo = Switch::Attributes::NumberOfPositions::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14020,7 +14894,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentPosition(success, failure);
+            using TypeInfo = Switch::Attributes::CurrentPosition::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14056,7 +14933,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMultiPressMax(success, failure);
+            using TypeInfo = Switch::Attributes::MultiPressMax::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14092,7 +14972,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeFeatureMap(success, failure);
+            using TypeInfo = Switch::Attributes::FeatureMap::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14128,7 +15011,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = Switch::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14231,7 +15117,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTvChannelList(success, failure);
+            using TypeInfo = TvChannel::Attributes::TvChannelList::TypeInfo;
+            auto successFn = Callback<TvChannelTvChannelListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14244,7 +15133,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTvChannelLineup(success, failure);
+            using TypeInfo = TvChannel::Attributes::TvChannelLineup::TypeInfo;
+            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14280,7 +15172,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentTvChannel(success, failure);
+            using TypeInfo = TvChannel::Attributes::CurrentTvChannel::TypeInfo;
+            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14316,7 +15211,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = TvChannel::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14382,7 +15280,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTargetNavigatorList(success, failure);
+            using TypeInfo = TargetNavigator::Attributes::TargetNavigatorList::TypeInfo;
+            auto successFn = Callback<TargetNavigatorTargetNavigatorListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14395,7 +15296,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = TargetNavigator::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14440,7 +15344,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMeasuredValue(success, failure);
+            using TypeInfo = TemperatureMeasurement::Attributes::MeasuredValue::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14476,7 +15383,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinMeasuredValue(success, failure);
+            using TypeInfo = TemperatureMeasurement::Attributes::MinMeasuredValue::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14512,7 +15422,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxMeasuredValue(success, failure);
+            using TypeInfo = TemperatureMeasurement::Attributes::MaxMeasuredValue::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14548,7 +15461,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTolerance(success, failure);
+            using TypeInfo = TemperatureMeasurement::Attributes::Tolerance::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14583,7 +15499,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14923,7 +15842,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBoolean(success, failure);
+            using TypeInfo = TestCluster::Attributes::Boolean::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14975,7 +15897,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBitmap8(success, failure);
+            using TypeInfo = TestCluster::Attributes::Bitmap8::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15028,7 +15953,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBitmap16(success, failure);
+            using TypeInfo = TestCluster::Attributes::Bitmap16::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15081,7 +16009,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBitmap32(success, failure);
+            using TypeInfo = TestCluster::Attributes::Bitmap32::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15134,7 +16065,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBitmap64(success, failure);
+            using TypeInfo = TestCluster::Attributes::Bitmap64::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15186,7 +16120,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInt8u(success, failure);
+            using TypeInfo = TestCluster::Attributes::Int8u::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15238,7 +16175,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInt16u(success, failure);
+            using TypeInfo = TestCluster::Attributes::Int16u::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15290,7 +16230,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInt32u(success, failure);
+            using TypeInfo = TestCluster::Attributes::Int32u::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15342,7 +16285,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInt64u(success, failure);
+            using TypeInfo = TestCluster::Attributes::Int64u::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15394,7 +16340,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInt8s(success, failure);
+            using TypeInfo = TestCluster::Attributes::Int8s::TypeInfo;
+            auto successFn = Callback<Int8sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15446,7 +16395,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInt16s(success, failure);
+            using TypeInfo = TestCluster::Attributes::Int16s::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15498,7 +16450,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInt32s(success, failure);
+            using TypeInfo = TestCluster::Attributes::Int32s::TypeInfo;
+            auto successFn = Callback<Int32sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15550,7 +16505,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInt64s(success, failure);
+            using TypeInfo = TestCluster::Attributes::Int64s::TypeInfo;
+            auto successFn = Callback<Int64sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15602,7 +16560,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeEnum8(success, failure);
+            using TypeInfo = TestCluster::Attributes::Enum8::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15654,7 +16615,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeEnum16(success, failure);
+            using TypeInfo = TestCluster::Attributes::Enum16::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15707,7 +16671,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOctetString(success, failure);
+            using TypeInfo = TestCluster::Attributes::OctetString::TypeInfo;
+            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15760,7 +16727,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeListInt8u(success, failure);
+            using TypeInfo = TestCluster::Attributes::ListInt8u::TypeInfo;
+            auto successFn = Callback<TestClusterListInt8uListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15812,7 +16782,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeListOctetString(success, failure);
+            using TypeInfo = TestCluster::Attributes::ListOctetString::TypeInfo;
+            auto successFn = Callback<TestClusterListOctetStringListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15864,7 +16837,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeListStructOctetString(success, failure);
+            using TypeInfo = TestCluster::Attributes::ListStructOctetString::TypeInfo;
+            auto successFn = Callback<TestClusterListStructOctetStringListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15917,7 +16893,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeLongOctetString(success, failure);
+            using TypeInfo = TestCluster::Attributes::LongOctetString::TypeInfo;
+            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -15971,7 +16950,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCharString(success, failure);
+            using TypeInfo = TestCluster::Attributes::CharString::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16025,7 +17007,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeLongCharString(success, failure);
+            using TypeInfo = TestCluster::Attributes::LongCharString::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16078,7 +17063,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeEpochUs(success, failure);
+            using TypeInfo = TestCluster::Attributes::EpochUs::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16130,7 +17118,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeEpochS(success, failure);
+            using TypeInfo = TestCluster::Attributes::EpochS::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16177,13 +17168,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeVendorIdWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPVendorIdAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeVendorId(success, failure);
+            using TypeInfo = TestCluster::Attributes::VendorId::TypeInfo;
+            auto successFn = Callback<VendorIdAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16236,7 +17230,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeListNullablesAndOptionalsStruct(success, failure);
+            using TypeInfo = TestCluster::Attributes::ListNullablesAndOptionalsStruct::TypeInfo;
+            auto successFn = Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16249,7 +17246,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeUnsupported(success, failure);
+            using TypeInfo = TestCluster::Attributes::Unsupported::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16297,13 +17297,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler
 {
-    new CHIPBooleanAttributeCallbackBridge(
+    new CHIPNullableBooleanAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableBoolean(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableBoolean::TypeInfo;
+            auto successFn = Callback<NullableBooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16334,15 +17337,16 @@ using namespace chip::app::Clusters;
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableBoolean(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableBooleanAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableBoolean(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableBooleanWithResponseHandler:(void (^)(
                                                               NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPBooleanAttributeCallbackBridge(
+    new CHIPNullableBooleanAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -16356,13 +17360,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableBitmap8WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
+    new CHIPNullableInt8uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableBitmap8(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableBitmap8::TypeInfo;
+            auto successFn = Callback<NullableInt8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16393,15 +17400,16 @@ using namespace chip::app::Clusters;
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableBitmap8(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableBitmap8(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableBitmap8WithResponseHandler:(void (^)(
                                                               NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
+    new CHIPNullableInt8uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -16415,13 +17423,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableBitmap16WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableBitmap16(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableBitmap16::TypeInfo;
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16452,15 +17463,16 @@ using namespace chip::app::Clusters;
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableBitmap16(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableBitmap16(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableBitmap16WithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -16474,13 +17486,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableBitmap32WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(
+    new CHIPNullableInt32uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableBitmap32(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableBitmap32::TypeInfo;
+            auto successFn = Callback<NullableInt32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16511,15 +17526,16 @@ using namespace chip::app::Clusters;
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableBitmap32(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableBitmap32(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableBitmap32WithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))responseHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(
+    new CHIPNullableInt32uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -16533,13 +17549,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableBitmap64WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler
 {
-    new CHIPInt64uAttributeCallbackBridge(
+    new CHIPNullableInt64uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableBitmap64(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableBitmap64::TypeInfo;
+            auto successFn = Callback<NullableInt64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16570,15 +17589,16 @@ using namespace chip::app::Clusters;
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableBitmap64(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableBitmap64(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableBitmap64WithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))responseHandler
 {
-    new CHIPInt64uAttributeCallbackBridge(
+    new CHIPNullableInt64uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -16592,13 +17612,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableInt8uWithCompletionHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
+    new CHIPNullableInt8uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableInt8u(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableInt8u::TypeInfo;
+            auto successFn = Callback<NullableInt8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16629,15 +17652,16 @@ using namespace chip::app::Clusters;
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableInt8u(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableInt8u(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableInt8uWithResponseHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
+    new CHIPNullableInt8uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -16651,13 +17675,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableInt16uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableInt16u(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableInt16u::TypeInfo;
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16688,15 +17715,16 @@ using namespace chip::app::Clusters;
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableInt16u(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableInt16u(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableInt16uWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -16710,13 +17738,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableInt32uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(
+    new CHIPNullableInt32uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableInt32u(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableInt32u::TypeInfo;
+            auto successFn = Callback<NullableInt32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16747,15 +17778,16 @@ using namespace chip::app::Clusters;
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableInt32u(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableInt32u(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableInt32uWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(
+    new CHIPNullableInt32uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -16769,13 +17801,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableInt64uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler
 {
-    new CHIPInt64uAttributeCallbackBridge(
+    new CHIPNullableInt64uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableInt64u(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableInt64u::TypeInfo;
+            auto successFn = Callback<NullableInt64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16806,15 +17841,16 @@ using namespace chip::app::Clusters;
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableInt64u(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt64uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableInt64u(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableInt64uWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt64uAttributeCallbackBridge(
+    new CHIPNullableInt64uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -16828,13 +17864,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableInt8sWithCompletionHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8sAttributeCallbackBridge(
+    new CHIPNullableInt8sAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableInt8s(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableInt8s::TypeInfo;
+            auto successFn = Callback<NullableInt8sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16865,15 +17904,16 @@ using namespace chip::app::Clusters;
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt8sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableInt8s(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt8sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableInt8s(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableInt8sWithResponseHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt8sAttributeCallbackBridge(
+    new CHIPNullableInt8sAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -16887,13 +17927,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableInt16sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16sAttributeCallbackBridge(
+    new CHIPNullableInt16sAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableInt16s(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableInt16s::TypeInfo;
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16924,15 +17967,16 @@ using namespace chip::app::Clusters;
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableInt16s(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt16sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableInt16s(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableInt16sWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt16sAttributeCallbackBridge(
+    new CHIPNullableInt16sAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -16946,13 +17990,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableInt32sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler
 {
-    new CHIPInt32sAttributeCallbackBridge(
+    new CHIPNullableInt32sAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableInt32s(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableInt32s::TypeInfo;
+            auto successFn = Callback<NullableInt32sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -16983,15 +18030,16 @@ using namespace chip::app::Clusters;
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt32sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableInt32s(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt32sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableInt32s(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableInt32sWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt32sAttributeCallbackBridge(
+    new CHIPNullableInt32sAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -17005,13 +18053,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableInt64sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler
 {
-    new CHIPInt64sAttributeCallbackBridge(
+    new CHIPNullableInt64sAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableInt64s(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableInt64s::TypeInfo;
+            auto successFn = Callback<NullableInt64sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17042,15 +18093,16 @@ using namespace chip::app::Clusters;
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt64sAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableInt64s(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt64sAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableInt64s(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableInt64sWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt64sAttributeCallbackBridge(
+    new CHIPNullableInt64sAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -17064,13 +18116,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableEnum8WithCompletionHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
+    new CHIPNullableInt8uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableEnum8(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableEnum8::TypeInfo;
+            auto successFn = Callback<NullableInt8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17101,15 +18156,16 @@ using namespace chip::app::Clusters;
                                            maxInterval:(uint16_t)maxInterval
                                        responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableEnum8(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableEnum8(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableEnum8WithResponseHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
+    new CHIPNullableInt8uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -17123,13 +18179,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableEnum16WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableEnum16(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableEnum16::TypeInfo;
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17160,15 +18219,16 @@ using namespace chip::app::Clusters;
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableEnum16(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableEnum16(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableEnum16WithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -17182,13 +18242,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableOctetStringWithCompletionHandler:(void (^)(NSData * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler
 {
-    new CHIPOctetStringAttributeCallbackBridge(
+    new CHIPNullableOctetStringAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableOctetString(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableOctetString::TypeInfo;
+            auto successFn = Callback<NullableOctetStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17219,15 +18282,16 @@ using namespace chip::app::Clusters;
                                                  maxInterval:(uint16_t)maxInterval
                                              responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableOctetString(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableOctetStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableOctetString(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableOctetStringWithResponseHandler:(void (^)(NSData * _Nullable value,
                                                                   NSError * _Nullable error))responseHandler
 {
-    new CHIPOctetStringAttributeCallbackBridge(
+    new CHIPNullableOctetStringAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -17241,13 +18305,16 @@ using namespace chip::app::Clusters;
 - (void)readAttributeNullableCharStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler
 {
-    new CHIPCharStringAttributeCallbackBridge(
+    new CHIPNullableCharStringAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNullableCharString(success, failure);
+            using TypeInfo = TestCluster::Attributes::NullableCharString::TypeInfo;
+            auto successFn = Callback<NullableCharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17278,15 +18345,16 @@ using namespace chip::app::Clusters;
                                                 maxInterval:(uint16_t)maxInterval
                                             responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeNullableCharString(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableCharStringAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableCharString(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeNullableCharStringWithResponseHandler:(void (^)(NSString * _Nullable value,
                                                                  NSError * _Nullable error))responseHandler
 {
-    new CHIPCharStringAttributeCallbackBridge(
+    new CHIPNullableCharStringAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -17306,7 +18374,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = TestCluster::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17472,7 +18543,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeLocalTemperature(success, failure);
+            using TypeInfo = Thermostat::Attributes::LocalTemperature::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17508,7 +18582,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeAbsMinHeatSetpointLimit(success, failure);
+            using TypeInfo = Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17544,7 +18621,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeAbsMaxHeatSetpointLimit(success, failure);
+            using TypeInfo = Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17580,7 +18660,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeAbsMinCoolSetpointLimit(success, failure);
+            using TypeInfo = Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17616,7 +18699,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeAbsMaxCoolSetpointLimit(success, failure);
+            using TypeInfo = Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17652,7 +18738,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOccupiedCoolingSetpoint(success, failure);
+            using TypeInfo = Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17707,7 +18796,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOccupiedHeatingSetpoint(success, failure);
+            using TypeInfo = Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17762,7 +18854,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinHeatSetpointLimit(success, failure);
+            using TypeInfo = Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17816,7 +18911,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxHeatSetpointLimit(success, failure);
+            using TypeInfo = Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17870,7 +18968,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinCoolSetpointLimit(success, failure);
+            using TypeInfo = Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17924,7 +19025,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMaxCoolSetpointLimit(success, failure);
+            using TypeInfo = Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo;
+            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -17978,7 +19082,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMinSetpointDeadBand(success, failure);
+            using TypeInfo = Thermostat::Attributes::MinSetpointDeadBand::TypeInfo;
+            auto successFn = Callback<Int8sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18032,7 +19139,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeControlSequenceOfOperation(success, failure);
+            using TypeInfo = Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18087,7 +19197,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSystemMode(success, failure);
+            using TypeInfo = Thermostat::Attributes::SystemMode::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18141,7 +19254,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeStartOfWeek(success, failure);
+            using TypeInfo = Thermostat::Attributes::StartOfWeek::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18177,7 +19293,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNumberOfWeeklyTransitions(success, failure);
+            using TypeInfo = Thermostat::Attributes::NumberOfWeeklyTransitions::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18213,7 +19332,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNumberOfDailyTransitions(success, failure);
+            using TypeInfo = Thermostat::Attributes::NumberOfDailyTransitions::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18249,7 +19371,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeFeatureMap(success, failure);
+            using TypeInfo = Thermostat::Attributes::FeatureMap::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18285,7 +19410,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = Thermostat::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18330,7 +19458,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTemperatureDisplayMode(success, failure);
+            using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18385,7 +19516,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeKeypadLockout(success, failure);
+            using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18439,7 +19573,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeScheduleProgrammingVisibility(success, failure);
+            using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18494,7 +19631,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18555,7 +19695,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeChannel(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::Channel::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18590,7 +19733,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRoutingRole(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RoutingRole::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18626,7 +19772,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNetworkName(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::NetworkName::TypeInfo;
+            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18660,7 +19809,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePanId(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::PanId::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18695,7 +19847,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeExtendedPanId(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ExtendedPanId::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18731,7 +19886,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMeshLocalPrefix(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::TypeInfo;
+            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18767,7 +19925,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOverrunCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::OverrunCount::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18803,7 +19964,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeNeighborTableList(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::NeighborTableList::TypeInfo;
+            auto successFn = Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18816,7 +19980,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRouteTableList(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RouteTableList::TypeInfo;
+            auto successFn = Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18829,7 +19996,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePartitionId(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::PartitionId::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18865,7 +20035,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeWeighting(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::Weighting::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18900,7 +20073,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeDataVersion(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::DataVersion::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18936,7 +20112,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeStableDataVersion(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::StableDataVersion::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -18972,7 +20151,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeLeaderRouterId(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::LeaderRouterId::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19008,7 +20190,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeDetachedRoleCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19044,7 +20229,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeChildRoleCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ChildRoleCount::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19080,7 +20268,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRouterRoleCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RouterRoleCount::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19116,7 +20307,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeLeaderRoleCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19152,7 +20346,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeAttachAttemptCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19188,7 +20385,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePartitionIdChangeCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19224,7 +20424,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBetterPartitionAttachAttemptCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19260,7 +20463,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeParentChangeCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ParentChangeCount::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19296,7 +20502,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxTotalCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxTotalCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19332,7 +20541,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxUnicastCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxUnicastCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19368,7 +20580,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxBroadcastCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19404,7 +20619,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxAckRequestedCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxAckRequestedCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19440,7 +20658,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxAckedCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxAckedCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19476,7 +20697,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxNoAckRequestedCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19512,7 +20736,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxDataCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxDataCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19548,7 +20775,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxDataPollCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxDataPollCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19584,7 +20814,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxBeaconCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxBeaconCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19620,7 +20853,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxBeaconRequestCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19656,7 +20892,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxOtherCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxOtherCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19692,7 +20931,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxRetryCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxRetryCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19728,7 +20970,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxDirectMaxRetryExpiryCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19764,7 +21009,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxIndirectMaxRetryExpiryCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19800,7 +21048,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxErrCcaCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19836,7 +21087,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxErrAbortCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19872,7 +21126,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTxErrBusyChannelCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19908,7 +21165,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxTotalCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxTotalCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19944,7 +21204,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxUnicastCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxUnicastCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -19980,7 +21243,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxBroadcastCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20016,7 +21282,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxDataCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxDataCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20052,7 +21321,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxDataPollCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxDataPollCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20088,7 +21360,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxBeaconCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxBeaconCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20124,7 +21399,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxBeaconRequestCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20160,7 +21438,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxOtherCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxOtherCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20196,7 +21477,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxAddressFilteredCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20232,7 +21516,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxDestAddrFilteredCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20268,7 +21555,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxDuplicatedCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20304,7 +21594,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxErrNoFrameCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20340,7 +21633,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxErrUnknownNeighborCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20376,7 +21672,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxErrInvalidSrcAddrCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20412,7 +21711,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxErrSecCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxErrSecCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20448,7 +21750,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxErrFcsCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20484,7 +21789,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRxErrOtherCount(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20520,7 +21828,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActiveTimestamp(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20556,7 +21867,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePendingTimestamp(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::PendingTimestamp::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20591,7 +21905,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeDelay(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::Delay::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20626,7 +21943,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSecurityPolicy(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::SecurityPolicy::TypeInfo;
+            auto successFn = Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20639,7 +21959,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeChannelMask(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ChannelMask::TypeInfo;
+            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20674,7 +21997,11 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOperationalDatasetComponents(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::TypeInfo;
+            auto successFn
+                = Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20687,7 +22014,11 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActiveNetworkFaultsList(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::TypeInfo;
+            auto successFn
+                = Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20700,7 +22031,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20745,7 +22079,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeWakeOnLanMacAddress(success, failure);
+            using TypeInfo = WakeOnLan::Attributes::WakeOnLanMacAddress::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20781,7 +22118,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = WakeOnLan::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20842,7 +22182,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBssid(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::Bssid::TypeInfo;
+            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20877,7 +22220,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSecurityType(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::SecurityType::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20913,7 +22259,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeWiFiVersion(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::WiFiVersion::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20949,7 +22298,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeChannelNumber(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::ChannelNumber::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -20984,7 +22336,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeRssi(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::Rssi::TypeInfo;
+            auto successFn = Callback<Int8sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21019,7 +22374,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBeaconLostCount(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::BeaconLostCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21055,7 +22413,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeBeaconRxCount(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::BeaconRxCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21091,7 +22452,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePacketMulticastRxCount(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21127,7 +22491,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePacketMulticastTxCount(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21163,7 +22530,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePacketUnicastRxCount(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21199,7 +22569,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributePacketUnicastTxCount(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21235,7 +22608,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentMaxRate(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21271,7 +22647,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOverrunCount(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::OverrunCount::TypeInfo;
+            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21307,7 +22686,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeFeatureMap(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::FeatureMap::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21320,7 +22702,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = WiFiNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21493,7 +22878,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeType(success, failure);
+            using TypeInfo = WindowCovering::Attributes::Type::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21528,7 +22916,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentPositionLift(success, failure);
+            using TypeInfo = WindowCovering::Attributes::CurrentPositionLift::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21564,7 +22955,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentPositionTilt(success, failure);
+            using TypeInfo = WindowCovering::Attributes::CurrentPositionTilt::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21600,7 +22994,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeConfigStatus(success, failure);
+            using TypeInfo = WindowCovering::Attributes::ConfigStatus::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21636,7 +23033,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentPositionLiftPercentage(success, failure);
+            using TypeInfo = WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21672,7 +23072,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentPositionTiltPercentage(success, failure);
+            using TypeInfo = WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21708,7 +23111,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeOperationalStatus(success, failure);
+            using TypeInfo = WindowCovering::Attributes::OperationalStatus::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21744,7 +23150,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTargetPositionLiftPercent100ths(success, failure);
+            using TypeInfo = WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21780,7 +23189,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeTargetPositionTiltPercent100ths(success, failure);
+            using TypeInfo = WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21816,7 +23228,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeEndProductType(success, failure);
+            using TypeInfo = WindowCovering::Attributes::EndProductType::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21852,7 +23267,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentPositionLiftPercent100ths(success, failure);
+            using TypeInfo = WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21888,7 +23306,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeCurrentPositionTiltPercent100ths(success, failure);
+            using TypeInfo = WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21924,7 +23345,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInstalledOpenLimitLift(success, failure);
+            using TypeInfo = WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21960,7 +23384,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInstalledClosedLimitLift(success, failure);
+            using TypeInfo = WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -21996,7 +23423,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInstalledOpenLimitTilt(success, failure);
+            using TypeInfo = WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -22032,7 +23462,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeInstalledClosedLimitTilt(success, failure);
+            using TypeInfo = WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -22067,7 +23500,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeMode(success, failure);
+            using TypeInfo = WindowCovering::Attributes::Mode::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -22120,7 +23556,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeSafetyStatus(success, failure);
+            using TypeInfo = WindowCovering::Attributes::SafetyStatus::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -22156,7 +23595,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeFeatureMap(success, failure);
+            using TypeInfo = WindowCovering::Attributes::FeatureMap::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -22192,7 +23634,10 @@ using namespace chip::app::Clusters;
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+            using TypeInfo = WindowCovering::Attributes::ClusterRevision::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 

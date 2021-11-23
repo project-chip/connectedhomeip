@@ -30,74 +30,227 @@ void CHIPCommandSuccessCallbackBridge::OnSuccessFn(void * context, const chip::a
 
 void CHIPOctetStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::ByteSpan value)
 {
-    id objCValue = [NSData dataWithBytes:value.data() length:value.size()];
+    NSData * _Nonnull objCValue;
+    objCValue = [NSData dataWithBytes:value.data() length:value.size()];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOctetStringAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
+{
+    NSData * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSData dataWithBytes:value.Value().data() length:value.Value().size()];
+    }
     DispatchSuccess(context, objCValue);
 };
 
 void CHIPCharStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::CharSpan value)
 {
-    id objCValue = [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding];
+    NSString * _Nonnull objCValue;
+    objCValue = [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableCharStringAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
+{
+    NSString * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [[NSString alloc] initWithBytes:value.Value().data() length:value.Value().size() encoding:NSUTF8StringEncoding];
+    }
     DispatchSuccess(context, objCValue);
 };
 
 void CHIPBooleanAttributeCallbackBridge::OnSuccessFn(void * context, bool value)
 {
-    id objCValue = [NSNumber numberWithBool:value];
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithBool:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableBooleanAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<bool> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithBool:value.Value()];
+    }
     DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt8uAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
-    id objCValue = [NSNumber numberWithUnsignedChar:value];
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt8uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:value.Value()];
+    }
     DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt8sAttributeCallbackBridge::OnSuccessFn(void * context, int8_t value)
 {
-    id objCValue = [NSNumber numberWithChar:value];
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithChar:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt8sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int8_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithChar:value.Value()];
+    }
     DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt16uAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
-    id objCValue = [NSNumber numberWithUnsignedShort:value];
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedShort:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt16uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedShort:value.Value()];
+    }
     DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt16sAttributeCallbackBridge::OnSuccessFn(void * context, int16_t value)
 {
-    id objCValue = [NSNumber numberWithShort:value];
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithShort:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt16sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithShort:value.Value()];
+    }
     DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt32uAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
-    id objCValue = [NSNumber numberWithUnsignedInt:value];
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedInt:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt32uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedInt:value.Value()];
+    }
     DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt32sAttributeCallbackBridge::OnSuccessFn(void * context, int32_t value)
 {
-    id objCValue = [NSNumber numberWithInt:value];
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithInt:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt32sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int32_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithInt:value.Value()];
+    }
     DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt64uAttributeCallbackBridge::OnSuccessFn(void * context, uint64_t value)
 {
-    id objCValue = [NSNumber numberWithUnsignedLongLong:value];
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedLongLong:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt64uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedLongLong:value.Value()];
+    }
     DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt64sAttributeCallbackBridge::OnSuccessFn(void * context, int64_t value)
 {
-    id objCValue = [NSNumber numberWithLongLong:value];
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithLongLong:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt64sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithLongLong:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPVendorIdAttributeCallbackBridge::OnSuccessFn(void * context, chip::VendorId value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedShort:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::VendorId> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedShort:value.Value()];
+    }
     DispatchSuccess(context, objCValue);
 };
 
 void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -117,7 +270,7 @@ void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge::
 void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -142,7 +295,7 @@ void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void
 void CHIPBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -171,7 +324,7 @@ void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void
     const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
         value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -207,7 +360,7 @@ void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void
 void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -227,7 +380,7 @@ void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessF
 void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -247,7 +400,7 @@ void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge::OnSu
 void CHIPDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -269,7 +422,7 @@ void CHIPDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * con
 void CHIPDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -289,7 +442,7 @@ void CHIPDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(
 void CHIPDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -309,7 +462,7 @@ void CHIPDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(
 void CHIPDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -329,7 +482,7 @@ void CHIPDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(
 void CHIPFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -356,7 +509,7 @@ void CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBrid
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -378,7 +531,7 @@ void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucce
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -406,7 +559,7 @@ void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucce
 void CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -426,7 +579,7 @@ void CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSu
 void CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -446,7 +599,7 @@ void CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSucce
 void CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -466,7 +619,7 @@ void CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSuc
 void CHIPGroupKeyManagementGroupsListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -489,7 +642,7 @@ void CHIPGroupKeyManagementGroupsListAttributeCallbackBridge::OnSuccessFn(void *
 void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -514,7 +667,7 @@ void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(voi
 void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -542,7 +695,7 @@ void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void *
 void CHIPModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -568,7 +721,7 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -596,7 +749,7 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
 void CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -616,7 +769,7 @@ void CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridg
 void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -637,7 +790,7 @@ void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessF
     const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
         value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -664,7 +817,7 @@ void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessF
 void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -696,7 +849,7 @@ void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge::OnSucces
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -720,7 +873,7 @@ void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge::OnSucces
 void CHIPTestClusterListInt8uListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -740,7 +893,7 @@ void CHIPTestClusterListInt8uListAttributeCallbackBridge::OnSuccessFn(
 void CHIPTestClusterListOctetStringListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -761,7 +914,7 @@ void CHIPTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessF
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
         value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -784,7 +937,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -950,7 +1103,7 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::O
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -985,7 +1138,7 @@ void CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSu
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
         value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -1016,7 +1169,7 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSu
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -1039,7 +1192,7 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallba
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
@@ -1071,7 +1224,7 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallba
 void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
 {
-    id objCValue;
+    NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
