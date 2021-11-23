@@ -51,6 +51,7 @@ armeabi
 ARMmbed
 armv
 asdk
+AssertionError
 ASYNC
 att
 attId
@@ -387,6 +388,7 @@ FOTA
 FreeRTOS
 FreeRTOSConfig
 fsl
+fstab
 fsync
 fullclean
 gcloud
@@ -769,6 +771,7 @@ PyFunction
 pylint
 PyObject
 PyRun
+pytest
 QEMU
 Qorvo
 QPG
@@ -782,6 +785,7 @@ qvCHIP
 RADVD
 raspberryPi
 RasPi
+rAv
 RCP
 ReadConfigValue
 readelf
@@ -867,6 +871,7 @@ SLAAC
 SLTB
 SLWSTK
 SmartThings
+smoketest
 SMP
 socat
 socio
