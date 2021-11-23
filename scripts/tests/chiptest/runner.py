@@ -18,6 +18,7 @@ import subprocess
 import sys
 import threading
 import time
+import pty
 
 from dataclasses import dataclass
 
@@ -33,7 +34,7 @@ class LogPipe(threading.Thread):
 
         self.daemon = False
         self.level = level
-        self.fd_read, self.fd_write = os.pipe()
+        self.fd_read, self.fd_write = pty.openpty()
         self.pipeReader = os.fdopen(self.fd_read)
         self.captured_logs = []
         self.capture_delegate = capture_delegate

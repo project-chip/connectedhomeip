@@ -55,7 +55,6 @@ class ExecutionCapture:
         self.captures = []
 
     def Log(self, source, line):
-        logging.warn("CAPTURE LOG: %s/%s" % (source, line))
         with self.lock:
           self.captures.append(CaptureLine(
               when=datetime.now(),
