@@ -53,7 +53,7 @@ namespace {
 void Test_UINT24_LE(nlTestSuite * apSuite, void * apContext)
 {
     // Unsigned 24-bit Integer : 3 bytes - little-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<3, false>, false>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<3, false>, false>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -61,7 +61,7 @@ void Test_UINT24_LE(nlTestSuite * apSuite, void * apContext)
     WorkingType wValue;
     StorageType sNullValue;
     WorkingType wNullValue;
-    const StorageType storageTestData = {0x56,0x34,0x12};
+    const StorageType storageTestData              = { 0x56, 0x34, 0x12 };
     const WorkingType workingTestUnsignedNullValue = 16777215; // 0xFFFFFF
 
     // 1) Verify the size of the types
@@ -101,7 +101,7 @@ void Test_UINT24_LE(nlTestSuite * apSuite, void * apContext)
 void Test_UINT24_BE(nlTestSuite * apSuite, void * apContext)
 {
     // Unsigned 24-bit Integer : 3 bytes - big-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<3, false>, true>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<3, false>, true>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -109,7 +109,7 @@ void Test_UINT24_BE(nlTestSuite * apSuite, void * apContext)
     WorkingType wValue;
     StorageType sNullValue;
     WorkingType wNullValue;
-    const StorageType storageTestData = {0x12,0x34,0x56};
+    const StorageType storageTestData              = { 0x12, 0x34, 0x56 };
     const WorkingType workingTestUnsignedNullValue = 16777215; // 0xFFFFFF
 
     // 1) Verify the size of the types
@@ -149,7 +149,7 @@ void Test_UINT24_BE(nlTestSuite * apSuite, void * apContext)
 void Test_SINT24_LE(nlTestSuite * apSuite, void * apContext)
 {
     // Signed 24-bit Integer : 3 bytes - little-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<3, true>, false>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<3, true>, false>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -158,11 +158,11 @@ void Test_SINT24_LE(nlTestSuite * apSuite, void * apContext)
     StorageType sValueNeg;
     WorkingType wValueNeg;
 
-    const StorageType storageTestDataPos = {0xEF,0xFE,0x7F}; //  8388335
-    const StorageType storageTestDataNeg = {0x11,0x22,0x80}; // -8379887
-    const WorkingType workingDataPos =  8388335; // 0x7FFEEF
-    const WorkingType workingDataNeg = -8379887; // INV(0x802211) = 0x7FDDEE + 1 => -0x7FDDEF
-    const WorkingType workingTestSignedNullValue = -8388608; // -0x800000
+    const StorageType storageTestDataPos         = { 0xEF, 0xFE, 0x7F }; //  8388335
+    const StorageType storageTestDataNeg         = { 0x11, 0x22, 0x80 }; // -8379887
+    const WorkingType workingDataPos             = 8388335;              // 0x7FFEEF
+    const WorkingType workingDataNeg             = -8379887;             // INV(0x802211) = 0x7FDDEE + 1 => -0x7FDDEF
+    const WorkingType workingTestSignedNullValue = -8388608;             // -0x800000
 
     // 1) Verify the size of the types
     NL_TEST_ASSERT(apSuite, sizeof(sValuePos) == 3);
@@ -214,7 +214,7 @@ void Test_SINT24_LE(nlTestSuite * apSuite, void * apContext)
 void Test_SINT24_BE(nlTestSuite * apSuite, void * apContext)
 {
     // Signed 24-bit Integer : 3 bytes - big-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<3, true>, true>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<3, true>, true>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -223,11 +223,11 @@ void Test_SINT24_BE(nlTestSuite * apSuite, void * apContext)
     StorageType sValueNeg;
     WorkingType wValueNeg;
 
-    const StorageType storageTestDataPos = {0x7F,0xFE,0xEF}; //  8388335
-    const StorageType storageTestDataNeg = {0x80,0x22,0x11}; // -8379887
-    const WorkingType workingDataPos =  8388335; // 0x7FFEEF
-    const WorkingType workingDataNeg = -8379887; // INV(0x802211) = 0x7FDDEE + 1 => -0x7FDDEF
-    const WorkingType workingTestSignedNullValue = -8388608; // -0x800000
+    const StorageType storageTestDataPos         = { 0x7F, 0xFE, 0xEF }; //  8388335
+    const StorageType storageTestDataNeg         = { 0x80, 0x22, 0x11 }; // -8379887
+    const WorkingType workingDataPos             = 8388335;              // 0x7FFEEF
+    const WorkingType workingDataNeg             = -8379887;             // INV(0x802211) = 0x7FDDEE + 1 => -0x7FDDEF
+    const WorkingType workingTestSignedNullValue = -8388608;             // -0x800000
 
     // 1) Verify the size of the types
     NL_TEST_ASSERT(apSuite, sizeof(sValuePos) == 3);
@@ -291,7 +291,7 @@ void Test_SINT24_BE(nlTestSuite * apSuite, void * apContext)
 void Test_UINT40_LE(nlTestSuite * apSuite, void * apContext)
 {
     // Unsigned 40-bit Integer : 5 bytes - little-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<5, false>, false>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<5, false>, false>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -299,7 +299,7 @@ void Test_UINT40_LE(nlTestSuite * apSuite, void * apContext)
     WorkingType wValue;
     StorageType sNullValue;
     WorkingType wNullValue;
-    const StorageType storageTestData = {0x9A,0x78,0x56,0x34,0x12};
+    const StorageType storageTestData              = { 0x9A, 0x78, 0x56, 0x34, 0x12 };
     const WorkingType workingTestUnsignedNullValue = 1099511627775; // 0xFFFFFFFFFF
 
     // 1) Verify the size of the types
@@ -339,7 +339,7 @@ void Test_UINT40_LE(nlTestSuite * apSuite, void * apContext)
 void Test_UINT40_BE(nlTestSuite * apSuite, void * apContext)
 {
     // Unsigned 40-bit Integer : 5 bytes - big-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<5, false>, true>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<5, false>, true>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -347,7 +347,7 @@ void Test_UINT40_BE(nlTestSuite * apSuite, void * apContext)
     WorkingType wValue;
     StorageType sNullValue;
     WorkingType wNullValue;
-    const StorageType storageTestData = {0x12,0x34,0x56,0x78,0x9A};
+    const StorageType storageTestData              = { 0x12, 0x34, 0x56, 0x78, 0x9A };
     const WorkingType workingTestUnsignedNullValue = 1099511627775; // 0xFFFFFFFFFF
     // 1) Verify the size of the types
     NL_TEST_ASSERT(apSuite, sizeof(sValue) == 5);
@@ -386,7 +386,7 @@ void Test_UINT40_BE(nlTestSuite * apSuite, void * apContext)
 void Test_SINT40_LE(nlTestSuite * apSuite, void * apContext)
 {
     // Signed 40-bit Integer : 5 bytes - little-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<5, true>, false>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<5, true>, false>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -395,10 +395,10 @@ void Test_SINT40_LE(nlTestSuite * apSuite, void * apContext)
     StorageType sValueNeg;
     WorkingType wValueNeg;
 
-    const StorageType storageTestDataPos = {0xEF,0xFE,0xEE,0xFF,0x7F}; //  549754699503
-    const StorageType storageTestDataNeg = {0x11,0x22,0x33,0x44,0x80}; // -548611612143
-    const WorkingType workingDataPos =  549754699503; // 0x7FFFEEFEEF
-    const WorkingType workingDataNeg = -548611612143; // INV(0x8044332211) = 0x7FBBCCDDEE + 1 => -0x7FBBCCDDEF
+    const StorageType storageTestDataPos         = { 0xEF, 0xFE, 0xEE, 0xFF, 0x7F }; //  549754699503
+    const StorageType storageTestDataNeg         = { 0x11, 0x22, 0x33, 0x44, 0x80 }; // -548611612143
+    const WorkingType workingDataPos             = 549754699503;                     // 0x7FFFEEFEEF
+    const WorkingType workingDataNeg             = -548611612143; // INV(0x8044332211) = 0x7FBBCCDDEE + 1 => -0x7FBBCCDDEF
     const WorkingType workingTestSignedNullValue = -549755813888; // -0x8000000000
 
     // 1) Verify the size of the types
@@ -451,7 +451,7 @@ void Test_SINT40_LE(nlTestSuite * apSuite, void * apContext)
 void Test_SINT40_BE(nlTestSuite * apSuite, void * apContext)
 {
     // Signed 40-bit Integer : 5 bytes - big-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<5, true>, true>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<5, true>, true>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -460,10 +460,10 @@ void Test_SINT40_BE(nlTestSuite * apSuite, void * apContext)
     StorageType sValueNeg;
     WorkingType wValueNeg;
 
-    const StorageType storageTestDataPos = {0x7F,0xFF,0xEE,0xFE,0xEF}; //  549754699503
-    const StorageType storageTestDataNeg = {0x80,0x44,0x33,0x22,0x11}; // -548611612143
-    const WorkingType workingDataPos =  549754699503; // 0x7FFFEEFEEF
-    const WorkingType workingDataNeg = -548611612143; // INV(0x8044332211) = 0x7FBBCCDDEE + 1 => -0x7FBBCCDDEF
+    const StorageType storageTestDataPos         = { 0x7F, 0xFF, 0xEE, 0xFE, 0xEF }; //  549754699503
+    const StorageType storageTestDataNeg         = { 0x80, 0x44, 0x33, 0x22, 0x11 }; // -548611612143
+    const WorkingType workingDataPos             = 549754699503;                     // 0x7FFFEEFEEF
+    const WorkingType workingDataNeg             = -548611612143; // INV(0x8044332211) = 0x7FBBCCDDEE + 1 => -0x7FBBCCDDEF
     const WorkingType workingTestSignedNullValue = -549755813888; // -0x8000000000
 
     // 1) Verify the size of the types
@@ -528,7 +528,7 @@ void Test_SINT40_BE(nlTestSuite * apSuite, void * apContext)
 void Test_UINT48_LE(nlTestSuite * apSuite, void * apContext)
 {
     // Unsigned 48-bit Integer : 6 bytes - little-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<6, false>, false>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<6, false>, false>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -536,7 +536,7 @@ void Test_UINT48_LE(nlTestSuite * apSuite, void * apContext)
     WorkingType wValue;
     StorageType sNullValue;
     WorkingType wNullValue;
-    const StorageType storageTestData = {0xBC,0x9A,0x78,0x56,0x34,0x12};
+    const StorageType storageTestData              = { 0xBC, 0x9A, 0x78, 0x56, 0x34, 0x12 };
     const WorkingType workingTestUnsignedNullValue = 281474976710655; // 0xFFFFFFFFFFFF
 
     // 1) Verify the size of the types
@@ -576,7 +576,7 @@ void Test_UINT48_LE(nlTestSuite * apSuite, void * apContext)
 void Test_UINT48_BE(nlTestSuite * apSuite, void * apContext)
 {
     // Unsigned 48-bit Integer : 6 bytes - big-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<6, false>, true>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<6, false>, true>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -584,7 +584,7 @@ void Test_UINT48_BE(nlTestSuite * apSuite, void * apContext)
     WorkingType wValue;
     StorageType sNullValue;
     WorkingType wNullValue;
-    const StorageType storageTestData = {0x12,0x34,0x56,0x78,0x9A,0xBC};
+    const StorageType storageTestData              = { 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC };
     const WorkingType workingTestUnsignedNullValue = 281474976710655; // 0xFFFFFFFFFFFF
 
     // 1) Verify the size of the types
@@ -624,7 +624,7 @@ void Test_UINT48_BE(nlTestSuite * apSuite, void * apContext)
 void Test_SINT48_LE(nlTestSuite * apSuite, void * apContext)
 {
     // Signed 48-bit Integer : 6 bytes - little-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<6, true>, false>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<6, true>, false>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -633,10 +633,10 @@ void Test_SINT48_LE(nlTestSuite * apSuite, void * apContext)
     StorageType sValueNeg;
     WorkingType wValueNeg;
 
-    const StorageType storageTestDataPos = {0xEF,0xFE,0xEE,0xFF,0x00,0x7F}; //  139642270580463
-    const StorageType storageTestDataNeg = {0x11,0x22,0x33,0x44,0x55,0x80}; // -140371271933423
-    const WorkingType workingDataPos =  139642270580463; // 0x7F00FFEEFEEF
-    const WorkingType workingDataNeg = -140371271933423; // INV(0x805544332211) = 0x7FAABBCCDDEE + 1 => -0x7FAABBCCDDEF
+    const StorageType storageTestDataPos         = { 0xEF, 0xFE, 0xEE, 0xFF, 0x00, 0x7F }; //  139642270580463
+    const StorageType storageTestDataNeg         = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x80 }; // -140371271933423
+    const WorkingType workingDataPos             = 139642270580463;                        // 0x7F00FFEEFEEF
+    const WorkingType workingDataNeg             = -140371271933423; // INV(0x805544332211) = 0x7FAABBCCDDEE + 1 => -0x7FAABBCCDDEF
     const WorkingType workingTestSignedNullValue = -140737488355328; // -0x800000000000
 
     // 1) Verify the size of the types
@@ -689,7 +689,7 @@ void Test_SINT48_LE(nlTestSuite * apSuite, void * apContext)
 void Test_SINT48_BE(nlTestSuite * apSuite, void * apContext)
 {
     // Signed 48-bit Integer : 6 bytes - big-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<6, true>, true>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<6, true>, true>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -698,10 +698,10 @@ void Test_SINT48_BE(nlTestSuite * apSuite, void * apContext)
     StorageType sValueNeg;
     WorkingType wValueNeg;
 
-    const StorageType storageTestDataPos = {0x7F,0x00,0xFF,0xEE,0xFE,0xEF}; //  139642270580463
-    const StorageType storageTestDataNeg = {0x80,0x55,0x44,0x33,0x22,0x11}; // -140371271933423
-    const WorkingType workingDataPos =  139642270580463; // 0x7F00FFEEFEEF
-    const WorkingType workingDataNeg = -140371271933423; // INV(0x805544332211) = 0x7FAABBCCDDEE + 1 => -0x7FAABBCCDDEF
+    const StorageType storageTestDataPos         = { 0x7F, 0x00, 0xFF, 0xEE, 0xFE, 0xEF }; //  139642270580463
+    const StorageType storageTestDataNeg         = { 0x80, 0x55, 0x44, 0x33, 0x22, 0x11 }; // -140371271933423
+    const WorkingType workingDataPos             = 139642270580463;                        // 0x7F00FFEEFEEF
+    const WorkingType workingDataNeg             = -140371271933423; // INV(0x805544332211) = 0x7FAABBCCDDEE + 1 => -0x7FAABBCCDDEF
     const WorkingType workingTestSignedNullValue = -140737488355328; // -0x800000000000
 
     // 1) Verify the size of the types
@@ -766,7 +766,7 @@ void Test_SINT48_BE(nlTestSuite * apSuite, void * apContext)
 void Test_UINT56_LE(nlTestSuite * apSuite, void * apContext)
 {
     // Unsigned 56-bit Integer : 7 bytes - little-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<7, false>, false>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<7, false>, false>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -774,7 +774,7 @@ void Test_UINT56_LE(nlTestSuite * apSuite, void * apContext)
     WorkingType wValue;
     StorageType sNullValue;
     WorkingType wNullValue;
-    const StorageType storageTestData = {0xDE,0xBC,0x9A,0x78,0x56,0x34,0x12};
+    const StorageType storageTestData              = { 0xDE, 0xBC, 0x9A, 0x78, 0x56, 0x34, 0x12 };
     const WorkingType workingTestUnsignedNullValue = 72057594037927935; // 0xFFFFFFFFFFFFFF
 
     // 1) Verify the size of the types
@@ -814,7 +814,7 @@ void Test_UINT56_LE(nlTestSuite * apSuite, void * apContext)
 void Test_UINT56_BE(nlTestSuite * apSuite, void * apContext)
 {
     // Unsigned 56-bit Integer : 7 bytes - big-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<7, false>, true>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<7, false>, true>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -822,7 +822,7 @@ void Test_UINT56_BE(nlTestSuite * apSuite, void * apContext)
     WorkingType wValue;
     StorageType sNullValue;
     WorkingType wNullValue;
-    const StorageType storageTestData = {0x12,0x34,0x56,0x78,0x9A,0xBC,0xDE};
+    const StorageType storageTestData              = { 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE };
     const WorkingType workingTestUnsignedNullValue = 72057594037927935; // 0xFFFFFFFFFFFFFF
 
     // 1) Verify the size of the types
@@ -862,7 +862,7 @@ void Test_UINT56_BE(nlTestSuite * apSuite, void * apContext)
 void Test_SINT56_LE(nlTestSuite * apSuite, void * apContext)
 {
     // Signed 56-bit Integer : 6 bytes - little-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<7, true>, false>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<7, true>, false>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -871,10 +871,10 @@ void Test_SINT56_LE(nlTestSuite * apSuite, void * apContext)
     StorageType sValueNeg;
     WorkingType wValueNeg;
 
-    const StorageType storageTestDataPos = {0xEF,0xFE,0xEE,0xFF,0x00,0x11,0x7F}; //  35766018033778415
-    const StorageType storageTestDataNeg = {0x11,0x22,0x33,0x44,0x55,0x66,0x80}; // -35916280616508911
-    const WorkingType workingDataPos =  35766018033778415; // 0x7F1100FFEEFEEF
-    const WorkingType workingDataNeg = -35916280616508911; // INV(0x80665544332211) = 0x7F99AABBCCDDEE + 1 => 0x7F99AABBCCDDEF
+    const StorageType storageTestDataPos = { 0xEF, 0xFE, 0xEE, 0xFF, 0x00, 0x11, 0x7F }; //  35766018033778415
+    const StorageType storageTestDataNeg = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x80 }; // -35916280616508911
+    const WorkingType workingDataPos     = 35766018033778415;                            // 0x7F1100FFEEFEEF
+    const WorkingType workingDataNeg     = -35916280616508911; // INV(0x80665544332211) = 0x7F99AABBCCDDEE + 1 => 0x7F99AABBCCDDEF
     const WorkingType workingTestSignedNullValue = -36028797018963968; // -0x80000000000000
 
     // 1) Verify the size of the types
@@ -927,7 +927,7 @@ void Test_SINT56_LE(nlTestSuite * apSuite, void * apContext)
 void Test_SINT56_BE(nlTestSuite * apSuite, void * apContext)
 {
     // Signed 56-bit Integer : 7 bytes - big-endian
-    using IntType = NumericAttributeTraits<OddSizedInteger<7, true>, true>;
+    using IntType     = NumericAttributeTraits<OddSizedInteger<7, true>, true>;
     using StorageType = typename IntType::StorageType;
     using WorkingType = typename IntType::WorkingType;
 
@@ -936,10 +936,10 @@ void Test_SINT56_BE(nlTestSuite * apSuite, void * apContext)
     StorageType sValueNeg;
     WorkingType wValueNeg;
 
-    const StorageType storageTestDataPos = {0x7F,0x11,0x00,0xFF,0xEE,0xFE,0xEF}; //  35766018033778415
-    const StorageType storageTestDataNeg = {0x80,0x66,0x55,0x44,0x33,0x22,0x11}; // -35916280616508911
-    const WorkingType workingDataPos =  35766018033778415; // 0x7F1100FFEEFEEF
-    const WorkingType workingDataNeg = -35916280616508911; // INV(0x80665544332211) = 0x7F99AABBCCDDEE + 1 => 0x7F99AABBCCDDEF
+    const StorageType storageTestDataPos = { 0x7F, 0x11, 0x00, 0xFF, 0xEE, 0xFE, 0xEF }; //  35766018033778415
+    const StorageType storageTestDataNeg = { 0x80, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11 }; // -35916280616508911
+    const WorkingType workingDataPos     = 35766018033778415;                            // 0x7F1100FFEEFEEF
+    const WorkingType workingDataNeg     = -35916280616508911; // INV(0x80665544332211) = 0x7F99AABBCCDDEE + 1 => 0x7F99AABBCCDDEF
     const WorkingType workingTestSignedNullValue = -36028797018963968; // -0x80000000000000
 
     // 1) Verify the size of the types
