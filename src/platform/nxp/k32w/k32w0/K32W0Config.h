@@ -89,9 +89,9 @@ public:
     static constexpr Key kConfigKey_Breadcrumb         = K32WConfigKey(kPDMId_ChipConfig, 0x09);
 
     // CHIP Counter Keys
-    static constexpr Key kCounterKey_RebootCount            = K32WConfigKey(kPDMId_ChipConfig, 0x0A);
-    static constexpr Key kCounterKey_UpTime                 = K32WConfigKey(kPDMId_ChipConfig, 0x0B);
-    static constexpr Key kCounterKey_TotalOperationalHours  = K32WConfigKey(kPDMId_ChipConfig, 0x0C);
+    static constexpr Key kCounterKey_RebootCount           = K32WConfigKey(kPDMId_ChipConfig, 0x0A);
+    static constexpr Key kCounterKey_UpTime                = K32WConfigKey(kPDMId_ChipConfig, 0x0B);
+    static constexpr Key kCounterKey_TotalOperationalHours = K32WConfigKey(kPDMId_ChipConfig, 0x0C);
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = K32WConfigKey(kPDMId_ChipFactory, 0x00);
