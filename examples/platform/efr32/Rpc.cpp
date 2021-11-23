@@ -50,7 +50,7 @@ namespace rpc {
 class Efr32Button final : public Button
 {
 public:
-    pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
+    pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
         GetAppTask().ButtonEventHandler(SL_SIMPLE_BUTTON_INSTANCE(request.idx) /* PB 0 or PB 1 */, request.pushed);
         return pw::OkStatus();
@@ -62,7 +62,7 @@ public:
 class Efr32Device final : public Device
 {
 public:
-    pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
         mRebootTimer = xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
         xTimerStart(mRebootTimer, 0);

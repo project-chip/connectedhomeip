@@ -59,7 +59,7 @@ namespace rpc {
 class Esp32Button final : public Button
 {
 public:
-    pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
+    pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
 #if CONFIG_DEVICE_TYPE_M5STACK
         if (request.pushed)
@@ -78,7 +78,7 @@ public:
 class Esp32Device final : public Device
 {
 public:
-    pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
         mRebootTimer = xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
         xTimerStart(mRebootTimer, 0);
