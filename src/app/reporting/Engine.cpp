@@ -130,10 +130,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     continue;
                 }
             }
-<<<<<<< HEAD
 
-=======
->>>>>>> 731bf6d2f (Update AttributeValueEncoder)
             // If we are processing a read request, or the initial report of a subscription, just regard all paths as dirty paths.
             TLV::TLVWriter attributeBackup;
             attributeReportIBs.Checkpoint(attributeBackup);
@@ -382,7 +379,6 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     SuccessOrExit(err);
 
     SuccessOrExit(reportDataBuilder.GetError());
-
     SuccessOrExit(err = reportDataWriter.UnreserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfReportMessage));
     if (hasMoreChunks)
     {
@@ -416,7 +412,10 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         err = report.Init(reader);
         SuccessOrExit(err);
 
-        err = report.CheckSchemaValidity();
+        if ((err = report.CheckSchemaValidity()) != CHIP_NO_ERROR)
+        {
+            ChipLogError(DataManagement, "<RE> Schema check failed: %s", chip::ErrorStr(err));
+        }
         SuccessOrExit(err);
     }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK

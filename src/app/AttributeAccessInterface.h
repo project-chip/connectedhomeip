@@ -43,6 +43,45 @@ namespace chip {
 namespace app {
 
 /**
+ * The AttributeValueEncoder is a helper class for filling a single report in AttributeReportIBs.
+ *
+ * Possible usage of AttributeReportBuilder might be:
+ *
+ * AttributeReportBuilder builder;
+ * ReturnErrorOnFailure(builder.PrepareAttribute(...));
+ * ReturnErrorOnFailure(builder.Encode(...));
+ * ReturnErrorOnFailure(builder.FinishAttribute());
+ */
+class AttributeReportBuilder
+{
+public:
+    /**
+     * PrepareAttribute encodes the "header" part of an attribute report including the path and data version.
+     * Path will be encoded according to section 10.5.4.3.1 in the spec.
+     * Note: Only append is supported currently (encode a null list index), other operations won't encode a list index in the
+     * attribute path field.
+     */
+    CHIP_ERROR PrepareAttribute(AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteDataAttributePath & aPath,
+                                DataVersion aDataVersion);
+
+    /**
+     * FinishAttribute encodes the "footer" part of an attribute report (it closes the containers opened in PrepareAttribute)
+     */
+    CHIP_ERROR FinishAttribute();
+
+    template <typename... Ts>
+    CHIP_ERROR Encode(Ts... aArgs)
+    {
+        return DataModel::Encode(*mAttributeDataIBBuilder.GetWriter(), TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),
+                                 std::forward<Ts>(aArgs)...);
+    }
+
+private:
+    AttributeReportIB::Builder mAttributeReportIBBuilder;
+    AttributeDataIB::Builder mAttributeDataIBBuilder;
+};
+
+/**
  * The AttributeValueEncoder is a helper class for filling report payloads into AttributeReportIBs.
  * The attribute value encoder can be initialized with a AttributeEncodeState for saving and recovering its state between encode
  * sessions (chunkings).
@@ -81,6 +120,9 @@ public:
         ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
     };
 
+    /**
+     * AttributeReportBuilder offleads some code in AttributeValueEncoder::Encode to keep its content small.
+     */
     AttributeValueEncoder(AttributeReportIBs::Builder & aAttributeReportIBsBuilder, FabricIndex aAccessingFabricIndex,
                           const ConcreteAttributePath & aPath, DataVersion aDataVersion,
                           const AttributeEncodeState & aState = AttributeEncodeState()) :
@@ -92,20 +134,20 @@ public:
     CHIP_ERROR Encode(Ts... aArgs)
     {
         mTriedEncode = true;
+        AttributeReportBuilder builder;
 
-        AttributeReportIB::Builder attributeReportIBBuilder = mAttributeReportIBsBuilder.CreateAttributeReport();
-        AttributeDataIB::Builder attributeDataIBBuilder     = attributeReportIBBuilder.CreateAttributeData();
-        AttributePathIB::Builder attributePathIBBuilder     = attributeDataIBBuilder.CreatePath();
+        ReturnErrorOnFailure(builder.PrepareAttribute(
+            mAttributeReportIBsBuilder,
+            ConcreteDataAttributePath(mPath.mEndpointId, mPath.mClusterId, mPath.mAttributeId,
+                                      // We only use the two operations here to indicate if we need to encode a null list index
+                                      mCurrentEncodingListIndex == kInvalidListIndex
+                                          ? ConcreteDataAttributePath::ListOperation::NotList
+                                          : ConcreteDataAttributePath::ListOperation::AppendItem,
+                                      mCurrentEncodingListIndex),
+            mDataVersion));
+        ReturnErrorOnFailure(builder.Encode(std::forward<Ts>(aArgs)...));
 
-        ReturnErrorOnFailure(EncodeAttributePathIB(attributePathIBBuilder));
-        ReturnErrorOnFailure(DataModel::Encode(*attributeDataIBBuilder.GetWriter(),
-                                               TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),
-                                               std::forward<Ts>(aArgs)...));
-
-        attributeDataIBBuilder.DataVersion(mDataVersion);
-
-        ReturnErrorOnFailure(attributeDataIBBuilder.EndOfAttributeDataIB().GetError());
-        return attributeReportIBBuilder.EndOfAttributeReportIB().GetError();
+        return builder.FinishAttribute();
     }
 
     template <typename... Ts>
@@ -178,8 +220,6 @@ private:
      * If internal state indicates we have already encoded the empty list, this function will do nothing and return CHIP_NO_ERROR.
      */
     CHIP_ERROR EncodeEmptyList();
-
-    CHIP_ERROR EncodeAttributePathIB(AttributePathIB::Builder &);
 
     bool mTriedEncode = false;
     AttributeReportIBs::Builder & mAttributeReportIBsBuilder;
