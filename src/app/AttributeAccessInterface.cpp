@@ -20,18 +20,36 @@
 
 namespace chip {
 namespace app {
-CHIP_ERROR AttributeValueEncoder::EncodeAttributePathIB(AttributePathIB::Builder & aAttributePathIBBuilder)
+
+CHIP_ERROR AttributeReportBuilder::PrepareAttribute(AttributeReportIBs::Builder & aAttributeReportIBsBuilder,
+                                                    const ConcreteDataAttributePath & aPath, DataVersion aDataVersion)
 {
-    aAttributePathIBBuilder.Endpoint(mPath.mEndpointId).Cluster(mPath.mClusterId).Attribute(mPath.mAttributeId);
+    mAttributeReportIBBuilder   = aAttributeReportIBsBuilder.CreateAttributeReport();
+    mAttributeDataIBBuilder     = mAttributeReportIBBuilder.CreateAttributeData();
+    auto attributePathIBBuilder = mAttributeDataIBBuilder.CreatePath();
+
+    ReturnErrorOnFailure(mAttributeReportIBBuilder.GetError());
+    ReturnErrorOnFailure(mAttributeDataIBBuilder.GetError());
+
+    attributePathIBBuilder.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId);
 
     // Encode the list index field if we are encoding a single element in an list.
-    if (mCurrentEncodingListIndex != kInvalidListIndex)
+    if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         // The Null ListIndex (append operation)
-        aAttributePathIBBuilder.ListIndex(DataModel::Nullable<ListIndex>());
+        attributePathIBBuilder.ListIndex(DataModel::Nullable<ListIndex>());
     }
 
-    return aAttributePathIBBuilder.EndOfAttributePathIB().GetError();
+    ReturnErrorOnFailure(attributePathIBBuilder.EndOfAttributePathIB().GetError());
+    mAttributeDataIBBuilder.DataVersion(aDataVersion);
+
+    return mAttributeDataIBBuilder.GetError();
+}
+
+CHIP_ERROR AttributeReportBuilder::FinishAttribute()
+{
+    ReturnErrorOnFailure(mAttributeDataIBBuilder.EndOfAttributeDataIB().GetError());
+    return mAttributeReportIBBuilder.EndOfAttributeReportIB().GetError();
 }
 
 CHIP_ERROR AttributeValueEncoder::EncodeEmptyList()
@@ -46,20 +64,14 @@ CHIP_ERROR AttributeValueEncoder::EncodeEmptyList()
             mEncodeState.mAllowPartialData = false;
             // Spec 10.5.4.3.1, 10.5.4.6 (Replace a list w/ Multiple IBs)
             // Put an empty array before encoding the first array element for list chunking.
-            AttributeReportIB::Builder attributeReportIBBuilder = mAttributeReportIBsBuilder.CreateAttributeReport();
-            AttributeDataIB::Builder attributeDataIBBuilder     = attributeReportIBBuilder.CreateAttributeData();
+            AttributeReportBuilder builder;
 
-            // mCurrentEncodingListIndex is an invalid list index now, thus EncodeAttributePathIB won't encode it in the
-            // AttributePathIB.
-            ReturnErrorOnFailure(EncodeAttributePathIB(attributeDataIBBuilder.CreatePath()));
+            ReturnErrorOnFailure(builder.PrepareAttribute(
+                mAttributeReportIBsBuilder, ConcreteDataAttributePath(mPath.mEndpointId, mPath.mClusterId, mPath.mAttributeId),
+                mDataVersion));
+            ReturnErrorOnFailure(builder.Encode(DataModel::List<uint8_t>()));
 
-            ReturnErrorOnFailure(
-                TagBoundEncoder(attributeDataIBBuilder.GetWriter(), TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)))
-                    .EncodeList([](const TagBoundEncoder &) -> CHIP_ERROR { return CHIP_NO_ERROR; }));
-
-            attributeDataIBBuilder.DataVersion(mDataVersion).EndOfAttributeDataIB();
-            ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
-            ReturnErrorOnFailure(attributeReportIBBuilder.EndOfAttributeReportIB().GetError());
+            ReturnErrorOnFailure(builder.FinishAttribute());
             mEncodeState.mCurrentEncodingListIndex = 0;
         }
         mCurrentEncodingListIndex = 0;
