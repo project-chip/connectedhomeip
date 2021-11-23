@@ -727,7 +727,7 @@ bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, cons
     {
         const ServerBase::EndpointInfo & info = server.GetEndpoints()[i];
 
-        if (info.udp == nullptr)
+        if (info.listen_udp == nullptr)
         {
             continue;
         }
