@@ -37,7 +37,7 @@ class MediaInputAttrAccess : public app::AttributeAccessInterface
 public:
     MediaInputAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::MediaInput::Id) {}
 
-    CHIP_ERROR Read(const app::ConcreteAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
     {
         if (aPath.mAttributeId == app::Clusters::MediaInput::Attributes::MediaInputList::Id)
         {
@@ -60,7 +60,7 @@ MediaInputAttrAccess gMediaInputAttrAccess;
  * application an opportunity to take care of cluster initialization procedures.
  * It is called exactly once for each endpoint where cluster is present.
  *
- * @param endpoint   Ver.: always
+ * @param endpoint   Ver: always
  *
  */
 void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
