@@ -145,7 +145,7 @@
                 params.endpointId = @(endpointId);
                 params.clusterId = @(clusterId);
                 [cluster bindWithParams:params
-                      completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                      completionHandler:^(NSError * _Nullable error) {
                           NSString * resultString = (error == nil)
                               ? @"Bind command: success!"
                               : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
@@ -177,7 +177,7 @@
                 params.endpointId = @(endpointId);
                 params.clusterId = @(clusterId);
                 [cluster unbindWithParams:params
-                        completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                        completionHandler:^(NSError * _Nullable error) {
                             NSString * resultString = (error == nil)
                                 ? @"Unbind command: success!"
                                 : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
