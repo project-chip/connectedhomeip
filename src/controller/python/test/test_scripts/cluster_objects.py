@@ -76,10 +76,10 @@ class ClusterObjectTests:
     async def SendWriteRequest(cls, devCtrl):
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
-                                               Clusters.Attribute.AttributeWriteRequest(
-                                                   EndpointId=0, Attribute=Clusters.Basic.Attributes.UserLabel, Data="Test"),
-                                               Clusters.Attribute.AttributeWriteRequest(
-                                                   EndpointId=0, Attribute=Clusters.Basic.Attributes.Location, Data="A loooong string")
+                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                                   "Test")),
+                                               (0, Clusters.Basic.Attributes.Location(
+                                                   "A loooong string"))
                                            ])
         expectedRes = [
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
@@ -97,40 +97,45 @@ class ClusterObjectTests:
 
     @classmethod
     async def SendReadRequest(cls, devCtrl):
-        res = await devCtrl.ReadAttribute(nodeid=NODE_ID,
-                                          attributes=[
-                                              (0, Clusters.Basic.Attributes.VendorName),
-                                              (0, Clusters.Basic.Attributes.VendorID),
-                                              (0, Clusters.Basic.Attributes.ProductName),
-                                              (0, Clusters.Basic.Attributes.ProductID),
-                                              (0, Clusters.Basic.Attributes.UserLabel),
-                                              (0, Clusters.Basic.Attributes.Location),
-                                              (0, Clusters.Basic.Attributes.HardwareVersion),
-                                              (0, Clusters.Basic.Attributes.HardwareVersionString),
-                                              (0, Clusters.Basic.Attributes.SoftwareVersion),
-                                              (0, Clusters.Basic.Attributes.SoftwareVersionString),
-                                          ])
+        req = [
+            (0, Clusters.Basic.Attributes.VendorName),
+            (0, Clusters.Basic.Attributes.VendorID),
+            (0, Clusters.Basic.Attributes.ProductName),
+            (0, Clusters.Basic.Attributes.ProductID),
+            (0, Clusters.Basic.Attributes.NodeLabel),
+            (0, Clusters.Basic.Attributes.Location),
+            (0, Clusters.Basic.Attributes.HardwareVersion),
+            (0, Clusters.Basic.Attributes.HardwareVersionString),
+            (0, Clusters.Basic.Attributes.SoftwareVersion),
+            (0, Clusters.Basic.Attributes.SoftwareVersionString),
+        ]
+
+        # Note: The server might be too small to handle reading lots of attributes at the same time.
+        res = [
+            await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[r]) for r in req
+        ]
+
         expectedRes = [
-            AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=1), Status=0, Data='TEST_VENDOR'),
-            AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=2), Status=0, Data=9050),
-            AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=3), Status=0, Data='TEST_PRODUCT'),
-            AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=4), Status=0, Data=65279),
-            AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=5), Status=0, Data='Test'),
-            AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=6), Status=0, Data=''),
-            AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=7), Status=0, Data=0),
-            AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=8), Status=0, Data='TEST_VERSION'),
-            AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=9), Status=0, Data=0),
-            AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=10), Status=0, Data='prerelease')
+            [AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=1), Status=chip.interaction_model.Status.Success, Data='TEST_VENDOR'), ],
+            [AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=2), Status=chip.interaction_model.Status.Success, Data=9050), ],
+            [AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=3), Status=chip.interaction_model.Status.Success, Data='TEST_PRODUCT'), ],
+            [AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=4), Status=chip.interaction_model.Status.Success, Data=65279), ],
+            [AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=5), Status=chip.interaction_model.Status.Success, Data='Test'), ],
+            [AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=6), Status=chip.interaction_model.Status.Success, Data=''), ],
+            [AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=7), Status=chip.interaction_model.Status.Success, Data=0), ],
+            [AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=8), Status=chip.interaction_model.Status.Success, Data='TEST_VERSION'), ],
+            [AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=9), Status=chip.interaction_model.Status.Success, Data=0), ],
+            [AttributeReadResult(Path=AttributePath(
+                EndpointId=0, ClusterId=40, AttributeId=10), Status=chip.interaction_model.Status.Success, Data='prerelease')],
         ]
 
         if res != expectedRes:

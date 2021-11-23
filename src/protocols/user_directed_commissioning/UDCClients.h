@@ -87,7 +87,7 @@ public:
     /**
      * Get a UDC Client state given a Peer address.
      *
-     * @param address is the connection to find (based on address)
+     * @param index is the index of the connection to find
      *
      * @return the state found, nullptr if not found
      */

@@ -74,7 +74,7 @@ namespace System {
  *******************************************************************************
  */
 
-BitMapObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
+chip::ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
 Stats::count_t Timer::mNumInUse      = 0;
 Stats::count_t Timer::mHighWatermark = 0;
 

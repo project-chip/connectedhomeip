@@ -34,7 +34,6 @@ using chip::Server;
 
 // Mock function for linking
 void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeMgr) {}
-void HandleDataModelMessage(chip::Messaging::ExchangeContext * exchange, chip::System::PacketBufferHandle && buffer) {}
 
 namespace {
 
@@ -139,7 +138,6 @@ void CheckCommissioningWindowManagerEnhancedWindow(nlTestSuite * suite, void *)
 void TearDownTask(intptr_t context)
 {
     chip::Server::GetInstance().Shutdown();
-    chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
 const nlTest sTests[] = {
@@ -168,6 +166,8 @@ int TestCommissioningWindowManager()
     // TODO: The platform memory was intentionally left not deinitialized so that minimal mdns can destruct
     chip::DeviceLayer::PlatformMgr().ScheduleWork(TearDownTask, 0);
     sleep(kTestTaskWaitSeconds);
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
 
     return (nlTestRunnerStats(&theSuite));
 }

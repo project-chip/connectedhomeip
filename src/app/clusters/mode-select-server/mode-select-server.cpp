@@ -25,7 +25,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/mode-select-server/static-supported-modes-manager.h>
+#include <app/clusters/mode-select-server/supported-modes-manager.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
@@ -42,34 +42,31 @@ class ModeSelectAttrAccess : public AttributeAccessInterface
 public:
     ModeSelectAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ModeSelect::Id) {}
 
-    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
 ModeSelectAttrAccess gModeSelectAttrAccess;
 
-CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == ModeSelect::Id);
 
-    const ModeSelect::StaticSupportedModesManager & gSupportedModeManager =
-        ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
+    const ModeSelect::SupportedModesManager * gSupportedModeManager = ModeSelect::getSupportedModesManager();
 
     if (ModeSelect::Attributes::SupportedModes::Id == aPath.mAttributeId)
     {
-        const ModeSelect::StaticSupportedModesManager::IteratorFactory * iteratorFactory =
-            gSupportedModeManager.getIteratorFactory(aPath.mEndpointId);
-        if (iteratorFactory == nullptr)
+        const ModeSelect::SupportedModesManager::ModeOptionsProvider modeOptionsProvider =
+            gSupportedModeManager->getModeOptionsProvider(aPath.mEndpointId);
+        if (modeOptionsProvider.begin() == nullptr)
         {
             aEncoder.Encode(DataModel::List<ModeSelect::Structs::ModeOptionStruct::Type>());
             return CHIP_NO_ERROR;
         }
         CHIP_ERROR err;
-        err = aEncoder.EncodeList([iteratorFactory](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-            const auto & end = *(iteratorFactory->end());
-            for (auto it = *(iteratorFactory->begin()); it != end; ++it)
+        err = aEncoder.EncodeList([modeOptionsProvider](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+            const auto * end = modeOptionsProvider.end();
+            for (auto * it = modeOptionsProvider.begin(); it != end; ++it)
             {
-                emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: dereferencing it");
-                emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: it= %p", (void *) it.operator->());
                 auto & modeOption = *it;
                 ReturnErrorOnFailure(encoder.Encode(modeOption));
             }
@@ -90,9 +87,8 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
     uint8_t newMode       = commandData.newMode;
     // Check that the newMode matches one of the supported options
     const ModeSelect::Structs::ModeOptionStruct::Type * modeOptionPtr;
-    const ModeSelect::StaticSupportedModesManager & gSupportedModeManager =
-        ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
-    EmberAfStatus checkSupportedModeStatus = gSupportedModeManager.getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
+    EmberAfStatus checkSupportedModeStatus =
+        ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
     if (EMBER_ZCL_STATUS_SUCCESS != checkSupportedModeStatus)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %" PRIu8, newMode);

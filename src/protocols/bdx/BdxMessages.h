@@ -120,6 +120,14 @@ struct BdxMessage
      */
     virtual size_t MessageSize() const = 0;
 
+#if CHIP_AUTOMATION_LOGGING
+    /**
+     * @brief
+     * Log all parameters for this message.
+     */
+    virtual void LogMessage(bdx::MessageType messageType) const = 0;
+#endif // CHIP_AUTOMATION_LOGGING
+
     virtual ~BdxMessage() = default;
 };
 
@@ -138,6 +146,9 @@ struct TransferInit : public BdxMessage
     // Proposed Transfer Control (required)
     BitFlags<TransferControlFlags> TransferCtlOptions;
     uint8_t Version = 0; ///< The highest version supported by the sender
+
+    // Range Control
+    BitFlags<RangeControlFlags> mRangeCtlFlags;
 
     // All required
     uint16_t MaxBlockSize = 0; ///< Proposed max block size to use in transfer
@@ -158,6 +169,9 @@ struct TransferInit : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+#if CHIP_AUTOMATION_LOGGING
+    void LogMessage(bdx::MessageType messageType) const override;
+#endif // CHIP_AUTOMATION_LOGGING
 };
 
 using SendInit    = TransferInit;
@@ -192,6 +206,9 @@ struct SendAccept : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+#if CHIP_AUTOMATION_LOGGING
+    void LogMessage(bdx::MessageType messageType) const override;
+#endif // CHIP_AUTOMATION_LOGGING
 };
 
 /**
@@ -207,6 +224,9 @@ struct ReceiveAccept : public BdxMessage
 
     // Transfer Control (required, only one should be set)
     BitFlags<TransferControlFlags> TransferCtlFlags;
+
+    // Range Control
+    BitFlags<RangeControlFlags> mRangeCtlFlags;
 
     // All required
     uint8_t Version       = 0; ///< The agreed upon version for the transfer
@@ -226,6 +246,9 @@ struct ReceiveAccept : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+#if CHIP_AUTOMATION_LOGGING
+    void LogMessage(bdx::MessageType messageType) const override;
+#endif // CHIP_AUTOMATION_LOGGING
 };
 
 /**
@@ -245,6 +268,9 @@ struct CounterMessage : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+#if CHIP_AUTOMATION_LOGGING
+    void LogMessage(bdx::MessageType messageType) const override;
+#endif // CHIP_AUTOMATION_LOGGING
 };
 
 using BlockQuery  = CounterMessage;
@@ -275,6 +301,9 @@ struct DataBlock : public BdxMessage
     CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
     Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
     size_t MessageSize() const override;
+#if CHIP_AUTOMATION_LOGGING
+    void LogMessage(bdx::MessageType messageType) const override;
+#endif // CHIP_AUTOMATION_LOGGING
 };
 
 using Block    = DataBlock;

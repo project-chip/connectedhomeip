@@ -24,13 +24,40 @@ from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint32,  c_uint16,
 from .ClusterObjects import ClusterAttributeDescriptor
 import chip.exceptions
 import chip.interaction_model
+import chip.tlv
+
+import inspect
+import sys
+import logging
 
 
 @dataclass
 class AttributePath:
-    EndpointId: int
-    ClusterId: int
-    AttributeId: int
+    EndpointId: int = None
+    ClusterId: int = None
+    AttributeId: int = None
+
+    def __init__(self, EndpointId: int = None, Cluster=None, Attribute=None, ClusterId=None, AttributeId=None):
+        self.EndpointId = EndpointId
+        if Cluster is not None:
+            # Wildcard read for a specific cluster
+            if (Attribute is not None) or (ClusterId is not None) or (AttributeId is not None):
+                raise Warning(
+                    "Attribute, ClusterId and AttributeId is ignored when Cluster is specified")
+            self.ClusterId = Cluster.id
+            return
+        if Attribute is not None:
+            if (ClusterId is not None) or (AttributeId is not None):
+                raise Warning(
+                    "ClusterId and AttributeId is ignored when Attribute is specified")
+            self.ClusterId = Attribute.cluster_id
+            self.AttributeId = Attribute.attribute_id
+            return
+        self.ClusterId = ClusterId
+        self.AttributeId = AttributeId
+
+    def __str__(self) -> str:
+        return f"{self.EndpointId}/{self.ClusterId}/{self.AttributeId}"
 
 
 @dataclass
@@ -59,6 +86,79 @@ AttributeReadRequest = AttributeDescriptorWithEndpoint
 @dataclass
 class AttributeReadResult(AttributeStatus):
     Data: Any = None
+
+
+_AttributeIndex = {}
+
+
+def _BuildAttributeIndex():
+    ''' Build internal attribute index for locating the corresponding cluster object by path in the future.
+    We do this because this operation will take a long time when there are lots of attributes, it takes about 300ms for a single query.
+    This is acceptable during init, but unacceptable when the server returns lots of attributes at the same time.
+    '''
+    for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
+        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+            for objName, subclass in inspect.getmembers(obj):
+                if inspect.isclass(subclass) and (('Attributes') in str(subclass)):
+                    for attributeName, attribute in inspect.getmembers(subclass):
+                        if inspect.isclass(attribute):
+                            base_classes = inspect.getmro(attribute)
+
+                            # Only match on classes that extend the ClusterAttributeDescriptor class
+                            matched = [
+                                value for value in base_classes if 'ClusterAttributeDescriptor' in str(value)]
+                            if (matched == []):
+                                continue
+
+                            _AttributeIndex[str(AttributePath(ClusterId=attribute.cluster_id, AttributeId=attribute.attribute_id))] = eval(
+                                'chip.clusters.Objects.' + clusterName + '.Attributes.' + attributeName)
+
+
+class AsyncReadTransaction:
+    def __init__(self, future: Future, eventLoop):
+        self._event_loop = eventLoop
+        self._future = future
+        self._res = []
+
+    def _handleAttributeData(self, path: AttributePath, status: int, data: bytes):
+        try:
+            imStatus = status
+            try:
+                imStatus = chip.interaction_model.Status(status)
+            except:
+                pass
+            attributeType = _AttributeIndex.get(str(AttributePath(
+                ClusterId=path.ClusterId, AttributeId=path.AttributeId)), None)
+            attributeValue = None
+            if attributeType is None:
+                attributeValue = chip.tlv.TLVReader(data).get().get("Any", {})
+            else:
+                attributeValue = attributeType.FromTLV(data)
+
+            self._res.append(AttributeReadResult(
+                Path=path, Status=imStatus, Data=attributeValue))
+        except Exception as ex:
+            logging.exception(ex)
+
+    def handleAttributeData(self, path: AttributePath, status: int, data: bytes):
+        self._event_loop.call_soon_threadsafe(
+            self._handleAttributeData, path, status, data)
+
+    def _handleError(self, chipError: int):
+        self._future.set_exception(
+            chip.exceptions.ChipStackError(chipError))
+
+    def handleError(self, chipError: int):
+        self._event_loop.call_soon_threadsafe(
+            self._handleError, chipError
+        )
+
+    def _handleDone(self, asd):
+        if not self._future.done():
+            self._future.set_result(self._res)
+
+    def handleDone(self):
+        self._event_loop.call_soon_threadsafe(self._handleDone, "asdasa")
 
 
 class AsyncWriteTransaction:
@@ -95,6 +195,32 @@ class AsyncWriteTransaction:
         self._event_loop.call_soon_threadsafe(self._handleDone)
 
 
+_OnReadAttributeDataCallbackFunct = CFUNCTYPE(
+    None, py_object, c_uint16, c_uint32, c_uint32, c_uint16, c_void_p, c_size_t)
+_OnReadErrorCallbackFunct = CFUNCTYPE(
+    None, py_object, c_uint32)
+_OnReadDoneCallbackFunct = CFUNCTYPE(
+    None, py_object)
+
+
+@_OnReadAttributeDataCallbackFunct
+def _OnReadAttributeDataCallback(closure, endpoint: int, cluster: int, attribute: int, status, data, len):
+    dataBytes = ctypes.string_at(data, len)
+    closure.handleAttributeData(AttributePath(
+        EndpointId=endpoint, ClusterId=cluster, AttributeId=attribute), status, dataBytes[:])
+
+
+@_OnReadErrorCallbackFunct
+def _OnReadErrorCallback(closure, chiperror: int):
+    closure.handleError(chiperror)
+
+
+@_OnReadDoneCallbackFunct
+def _OnReadDoneCallback(closure):
+    closure.handleDone()
+    ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
+
+
 _OnWriteResponseCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint32, c_uint32, c_uint16)
 _OnWriteErrorCallbackFunct = CFUNCTYPE(
@@ -105,7 +231,8 @@ _OnWriteDoneCallbackFunct = CFUNCTYPE(
 
 @_OnWriteResponseCallbackFunct
 def _OnWriteResponseCallback(closure, endpoint: int, cluster: int, attribute: int, status):
-    closure.handleResponse(AttributePath(endpoint, cluster, attribute), status)
+    closure.handleResponse(AttributePath(
+        EndpointId=endpoint, ClusterId=cluster, AttributeId=attribute), status)
 
 
 @_OnWriteErrorCallbackFunct
@@ -144,6 +271,31 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
     return res
 
 
+def ReadAttributes(future: Future, eventLoop, device, attributes: List[AttributePath]) -> int:
+    handle = chip.native.GetLibraryHandle()
+    transaction = AsyncReadTransaction(future, eventLoop)
+
+    readargs = []
+    for attr in attributes:
+        path = chip.interaction_model.AttributePathIBstruct.parse(
+            b'\xff' * chip.interaction_model.AttributePathIBstruct.sizeof())
+        if attr.EndpointId is not None:
+            path.EndpointId = attr.EndpointId
+        if attr.ClusterId is not None:
+            path.ClusterId = attr.ClusterId
+        if attr.AttributeId is not None:
+            path.AttributeId = attr.AttributeId
+        path = chip.interaction_model.AttributePathIBstruct.build(path)
+        readargs.append(ctypes.c_char_p(path))
+
+    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
+    res = handle.pychip_ReadClient_ReadAttributes(
+        ctypes.py_object(transaction), device, ctypes.c_size_t(len(attributes)), *readargs)
+    if res != 0:
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
+    return res
+
+
 def Init():
     handle = chip.native.GetLibraryHandle()
 
@@ -155,6 +307,13 @@ def Init():
         handle.pychip_WriteClient_WriteAttributes.restype = c_uint32
         setter.Set('pychip_WriteClient_InitCallbacks', None, [
                    _OnWriteResponseCallbackFunct, _OnWriteErrorCallbackFunct, _OnWriteDoneCallbackFunct])
+        handle.pychip_ReadClient_ReadAttributes.restype = c_uint32
+        setter.Set('pychip_ReadClient_InitCallbacks', None, [
+                   _OnReadAttributeDataCallbackFunct, _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct])
 
     handle.pychip_WriteClient_InitCallbacks(
         _OnWriteResponseCallback, _OnWriteErrorCallback, _OnWriteDoneCallback)
+    handle.pychip_ReadClient_InitCallbacks(
+        _OnReadAttributeDataCallback, _OnReadErrorCallback, _OnReadDoneCallback)
+
+    _BuildAttributeIndex()

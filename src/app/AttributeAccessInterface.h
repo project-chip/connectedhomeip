@@ -20,6 +20,7 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeDataIB.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h> // So we can encode lists
 #include <app/data-model/TagBoundEncoder.h>
@@ -101,6 +102,33 @@ private:
     const FabricIndex mAccessingFabricIndex;
 };
 
+class AttributeValueDecoder
+{
+public:
+    AttributeValueDecoder(TLV::TLVReader & aReader, FabricIndex aAccessingFabricIndex) :
+        mReader(aReader), mAccessingFabricIndex(aAccessingFabricIndex)
+    {}
+
+    template <typename T>
+    CHIP_ERROR Decode(T & aArg)
+    {
+        mTriedDecode = true;
+        return DataModel::Decode(mReader, aArg);
+    }
+
+    bool TriedDecode() const { return mTriedDecode; }
+
+    /**
+     * The accessing fabric index for this write interaction.
+     */
+    FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
+
+private:
+    TLV::TLVReader & mReader;
+    bool mTriedDecode = false;
+    const FabricIndex mAccessingFabricIndex;
+};
+
 class AttributeAccessInterface
 {
 public:
@@ -125,7 +153,21 @@ public:
      *             This may involve reading from the attribute store or external
      *             attribute callbacks.
      */
-    virtual CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) = 0;
+    virtual CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) = 0;
+
+    /**
+     * Callback for writing attributes.
+     *
+     * @param [in] aPath indicates which exact data is being written.
+     * @param [in] aDecoder the AttributeValueDecoder to use for decoding the
+     *             data.  If this function returns scucess and no attempt is
+     *             made to decode data using aDecoder, the
+     *             AttributeAccessInterface did not try to write any data.  In
+     *             this case, normal attribute access will happen for the write.
+     *             This may involve writing to the attribute store or external
+     *             attribute callbacks.
+     */
+    virtual CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) { return CHIP_NO_ERROR; }
 
     /**
      * Mechanism for keeping track of a chain of AttributeAccessInterfaces.
@@ -149,7 +191,7 @@ public:
      * specific endpoint.  This is used to clean up overrides registered for an
      * endpoint that becomes disabled.
      */
-    bool MatchesExactly(EndpointId aEndpointId) const { return mEndpointId.HasValue() && mEndpointId.Value() == aEndpointId; }
+    bool MatchesEndpoint(EndpointId aEndpointId) const { return mEndpointId.HasValue() && mEndpointId.Value() == aEndpointId; }
 
     /**
      * Check whether another AttributeAccessInterface wants to handle the same set of

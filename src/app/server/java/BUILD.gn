@@ -20,18 +20,16 @@ import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/lib.gni")
 
-shared_library("jni") {
-  output_name = "libCHIPAppServer"
+static_library("jni") {
+  output_name = "libCHIPAppServerJni"
 
   sources = [
-    "AppMain.cpp",
-    "AppMain.h",
+    "AndroidAppServerWrapper.cpp",
+    "AndroidAppServerWrapper.h",
     "CHIPAppServer-JNI.cpp",
   ]
 
   deps = [
-    "${chip_root}/examples/tv-app/android:android-tv-app",
-    "${chip_root}/examples/tv-app/tv-common",
     "${chip_root}/src/app/server",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib",
@@ -41,10 +39,6 @@ shared_library("jni") {
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
-
-  output_dir = "${root_out_dir}/lib/jni/${android_abi}"
-
-  ldflags = [ "-Wl,--gc-sections" ]
 }
 
 android_library("java") {

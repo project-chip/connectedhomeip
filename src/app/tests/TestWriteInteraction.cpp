@@ -44,6 +44,7 @@ class TestWriteInteraction
 {
 public:
     static void TestWriteClient(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteClientGroup(nlTestSuite * apSuite, void * apContext);
     static void TestWriteHandler(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext);
@@ -123,7 +124,7 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     WriteRequestMessage::Builder writeRequestBuilder;
     err = writeRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    AttributeDataIBs::Builder attributeDataIBsBuilder = writeRequestBuilder.CreateAttributeDataIBsBuilder();
+    AttributeDataIBs::Builder attributeDataIBsBuilder = writeRequestBuilder.CreateWriteRequests();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
     AttributeDataIB::Builder attributeDataIBBuilder = attributeDataIBsBuilder.CreateAttributeDataIBBuilder();
     NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
@@ -154,7 +155,7 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
 
     attributeDataIBsBuilder.EndOfAttributeDataIBs();
     NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
-    writeRequestBuilder.EndOfWriteRequestMessage();
+    writeRequestBuilder.TimedRequest(false).IsFabricFiltered(false).EndOfWriteRequestMessage();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
@@ -231,6 +232,33 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
 
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+}
+
+void TestWriteInteraction::TestWriteClientGroup(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    app::WriteClient writeClient;
+    app::WriteClientHandle writeClientHandle;
+    writeClientHandle.SetWriteClient(&writeClient);
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    TestWriteClientCallback callback;
+    err = writeClient.Init(&ctx.GetExchangeManager(), &callback);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    AddAttributeDataIB(apSuite, apContext, writeClientHandle);
+
+    SessionHandle groupSession = ctx.GetSessionBobToFriends();
+    NL_TEST_ASSERT(apSuite, groupSession.IsGroupSession());
+
+    err = writeClientHandle.SendWriteRequest(groupSession);
+
+    // Write will fail until issue #11078 is completed
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
+    // The internal WriteClient should be shutdown once we SendWriteRequest for group.
+    NL_TEST_ASSERT(apSuite, nullptr == writeClientHandle.mpWriteClient);
 }
 
 void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apContext)
@@ -384,6 +412,7 @@ namespace {
 const nlTest sTests[] =
 {
         NL_TEST_DEF("CheckWriteClient", chip::app::TestWriteInteraction::TestWriteClient),
+        NL_TEST_DEF("CheckWriteClientGroup", chip::app::TestWriteInteraction::TestWriteClientGroup),
         NL_TEST_DEF("CheckWriteHandler", chip::app::TestWriteInteraction::TestWriteHandler),
         NL_TEST_DEF("CheckWriteRoundtrip", chip::app::TestWriteInteraction::TestWriteRoundtrip),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjects", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjects),

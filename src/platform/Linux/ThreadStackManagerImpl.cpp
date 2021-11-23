@@ -24,6 +24,9 @@
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
 
+using namespace ::chip::app;
+using namespace ::chip::app::Clusters;
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -474,7 +477,25 @@ void ThreadStackManagerImpl::_ResetThreadNetworkDiagnosticsCounts() {}
 CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
                                                                                app::AttributeValueEncoder & encoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    switch (attributeId)
+    {
+    case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id:
+    case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id:
+    case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
+    case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
+    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
+        err = encoder.Encode(DataModel::List<EndpointId>());
+        break;
+    }
+    default: {
+        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        break;
+    }
+    }
+
+    return err;
 }
 
 ThreadStackManager & ThreadStackMgr()

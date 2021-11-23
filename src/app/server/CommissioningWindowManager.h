@@ -65,6 +65,7 @@ public:
     void OnSessionEstablishmentStarted() override;
     void OnSessionEstablished() override;
 
+    void Shutdown();
     void Cleanup();
 
     void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event);

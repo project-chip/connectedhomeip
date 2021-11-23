@@ -42,13 +42,6 @@ configuration.
 To initiate a client commissioning request to a device, run the built executable
 and choose the pairing mode.
 
-##### Commission a device configured to bypass Rendezvous
-
-The command below commissions a device with the provided IP address and port of
-the server to talk to.
-
-    $ chip-tool pairing bypass ${NODE_ID_TO_ASSIGN} 192.168.0.30 5540
-
 #### Commission a device over BLE
 
 Run the built executable and pass it the discriminator and pairing code of the
@@ -433,7 +426,6 @@ Usage:
   | Commands:                                                                           |
   +-------------------------------------------------------------------------------------+
   | * unpair                                                                            |
-  | * bypass                                                                            |
   | * ble                                                                               |
   | * softap                                                                            |
   +-------------------------------------------------------------------------------------+

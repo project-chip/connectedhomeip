@@ -25,6 +25,7 @@ if (chip_enable_openthread) {
 static_library("k32w0") {
   sources = [
     "../../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
@@ -35,6 +36,8 @@ static_library("k32w0") {
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "K32W0Config.cpp",
     "K32W0Config.h",
     "KeyValueStoreManagerImpl.cpp",

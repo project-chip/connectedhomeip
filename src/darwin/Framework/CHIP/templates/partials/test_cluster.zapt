@@ -18,11 +18,44 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     CHIPTest{{asUpperCamelCase cluster}} * cluster = [[CHIPTest{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:queue];
     XCTAssertNotNil(cluster);
 
+    {{#if isCommand}}
+      {{! We need a way to easily do something based on whether the command has
+          fields. There are cases when chip_tests_item_parameters has nothing
+          in it even when the command does have fields (e.g. if they are all
+          optional and we are not sending any of them) but the name of our
+          command depends on whether it _could_ have fields. }}
+      {{#*inline "checkForFields"}}
+        {{~#chip_client_clusters}}
+          {{~#if (isStrEqual (asUpperCamelCase name) (asUpperCamelCase ../clusterName))}}
+            {{~#chip_cluster_commands}}
+              {{~#if (isStrEqual (asUpperCamelCase name) (asUpperCamelCase ../../commandName))}}
+                {{~#chip_cluster_command_arguments}}
+                {{~#first}}
+                  {{~../../../textIfFields}}
+                {{/first}}
+                {{else}}
+                  {{~../../../textIfNoFields}}
+                {{/chip_cluster_command_arguments}}
+              {{/if}}
+            {{/chip_cluster_commands}}
+          {{/if}}
+        {{/chip_client_clusters}}
+      {{/inline}}
+      {{> checkForFields clusterName=cluster commandName=command
+          textIfFields=(concat "__auto_type * params = [[CHIP" (asUpperCamelCase cluster) "Cluster" (asUpperCamelCase command) "Params alloc] init];")
+          textIfNoFields=""}}
+      {{#chip_tests_item_parameters}}
+        {{>test_value target=(concat "params." (asStructPropertyName label)) definedValue=definedValue cluster=parent.cluster}}
+      {{/chip_tests_item_parameters}}
+      [cluster {{asLowerCamelCase command}}With
+      {{~> checkForFields clusterName=cluster commandName=command
+           textIfFields="Params:params completionHandler"
+           textIfNoFields="CompletionHandler"}}:^(NSError * err, NSDictionary * values) {
+    {{else if isSubscribeAttribute}}
     {{#chip_tests_item_parameters}}
     {{#if (isString type)}}
     {{#if (isOctetString type)}}
-    NSString * {{asLowerCamelCase name}}ArgumentString= @"{{definedValue}}";
-    NSData * {{asLowerCamelCase name}}Argument = [{{asLowerCamelCase name}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    NSData * {{asLowerCamelCase name}}Argument = [[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral definedValue}}" length:{{definedValue.length}}];
     {{else}}
     NSString * {{asLowerCamelCase name}}Argument= @"{{definedValue}}";
     {{/if}}
@@ -30,9 +63,6 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{definedValue}}{{asTypeLiteralSuffix type}};
     {{/if}}
     {{/chip_tests_item_parameters}}
-    {{#if isCommand}}
-    [cluster {{asLowerCamelCase command}}:{{#chip_tests_item_parameters}}{{#not_first}}{{asLowerCamelCase name}}:{{/not_first}}{{asLowerCamelCase name}}Argument {{#last}}responseHandler:{{/last}}{{/chip_tests_item_parameters}}^(NSError * err, NSDictionary * values) {
-    {{else if isSubscribeAttribute}}
     [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:minIntervalArgument
                                                                  maxInterval:maxIntervalArgument
                                                              responseHandler:^(NSError * err, NSDictionary * values) {
@@ -41,6 +71,10 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     {{else if isReadAttribute}}
     [cluster readAttribute{{asUpperCamelCase attribute}}WithResponseHandler:^(NSError * err, NSDictionary * values) {
     {{else if isWriteAttribute}}
+    {{#chip_tests_item_parameters}}
+    id {{asLowerCamelCase name}}Argument;
+    {{>test_value target=(concat (asLowerCamelCase name) "Argument") definedValue=definedValue cluster=parent.cluster}}
+    {{/chip_tests_item_parameters}}
     [cluster writeAttribute{{asUpperCamelCase attribute}}WithValue:{{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}} responseHandler:^(NSError * err, NSDictionary * values) {
     {{/if}}
         NSLog(@"{{label}} Error: %@", err);
@@ -60,24 +94,10 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
 
         {{#chip_tests_item_response_parameters}}
         {{#if hasExpectedValue}}
-        {{#if isList}}
-        XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
-        {{else if isArray}}
-        XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
-        {{else}}
-        {{#if (isString type)}}
-        {{#if (isOctetString type)}}
-        NSString * {{asLowerCamelCase name}}ArgumentString= @"{{expectedValue}}";
-        NSData * {{asLowerCamelCase name}}Argument = [{{asLowerCamelCase name}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
-        XCTAssertTrue([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToData:{{asLowerCamelCase name}}Argument]);
-        {{else}}
-        NSString * {{asLowerCamelCase name}}Argument= @"{{expectedValue}}";
-        XCTAssertTrue([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToString:{{asLowerCamelCase name}}Argument]);
-        {{/if}}
-        {{else}}
-        XCTAssertEqual([values[@"{{#if parent.isAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{asTypeLiteralSuffix type}});
-        {{/if}}
-        {{/if}}
+        {
+          id actualValue = values[@"{{#if parent.isAttribute}}value{{else}}{{asStructPropertyName name}}{{/if}}"];
+          {{>check_test_value actual="actualValue" expected=expectedValue cluster=../cluster}}
+        }
         {{/if}}
         {{#if hasExpectedConstraints}}
         {{#if expectedConstraints.minLength}}

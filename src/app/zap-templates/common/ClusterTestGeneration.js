@@ -33,6 +33,7 @@ const { asUpperCamelCase }              = require(basePath + 'src/app/zap-templa
 
 const kClusterName       = 'cluster';
 const kEndpointName      = 'endpoint';
+const kGroupId           = 'groupId';
 const kCommandName       = 'command';
 const kWaitCommandName   = 'wait';
 const kIndexName         = 'index';
@@ -117,6 +118,10 @@ function setDefaultTypeForCommand(test)
     test.commandName      = 'Write';
     test.isAttribute      = true;
     test.isWriteAttribute = true;
+    if ((kGroupId in test)) {
+      test.isGroupCommand = true;
+      test.groupId        = parseInt(test[kGroupId], 10);
+    }
     break;
 
   case 'subscribeAttribute':
@@ -149,10 +154,13 @@ function setDefaultPICS(test)
     return;
   }
 
-  if (!PICS.has(test[kPICSName])) {
-    const errorStr = 'PICS database does not contains any defined value for: ' + test[kPICSName];
-    throwError(test, errorStr);
-  }
+  const items = test[kPICSName].split(/[&|() !]+/g).filter(item => item.length);
+  items.forEach(key => {
+    if (!PICS.has(key)) {
+      const errorStr = 'PICS database does not contains any defined value for: ' + key;
+      throwError(test, errorStr);
+    }
+  })
 }
 
 function setDefaultArguments(test)
@@ -309,9 +317,6 @@ function parse(filename)
   // Filter disabled tests
   yaml.tests = yaml.tests.filter(test => !test.disabled);
 
-  // Filter tests based on PICS
-  yaml.tests = yaml.tests.filter(test => test[kPICSName] == '' || PICS.get(test[kPICSName]).value == true);
-
   yaml.tests.forEach((test, index) => {
     setDefault(test, kIndexName, index);
   });
@@ -453,18 +458,40 @@ function isTestOnlyCluster(name)
   return testOnlyClusters.includes(name);
 }
 
-function chip_tests_item_response_type(options)
+// test_cluster_command_value and test_cluster_value-equals are recursive partials using #each. At some point the |global|
+// context is lost and it fails. Make sure to attach the global context as a property of the | value |
+// that is evaluated.
+function attachGlobal(global, value)
 {
-  const promise = assertCommandOrAttribute(this).then(item => {
-    if (item.hasSpecificResponse) {
-      return 'Clusters::' + asUpperCamelCase(this.cluster) + '::Commands::' + asUpperCamelCase(item.response.name)
-          + '::DecodableType';
+  if (Array.isArray(value)) {
+    value = value.map(v => attachGlobal(global, v));
+  } else if (value instanceof Object) {
+    for (key in value) {
+      if (key == "global") {
+        continue;
+      }
+      value[key] = attachGlobal(global, value[key]);
     }
+  } else if (value === null) {
+    value = new NullObject();
+  } else {
+    switch (typeof value) {
+    case 'number':
+      value = new Number(value);
+      break;
+    case 'string':
+      value = new String(value);
+      break;
+    case 'boolean':
+      value = new Boolean(value);
+      break;
+    default:
+      throw new Error('Unsupported value: ' + JSON.stringify(value));
+    }
+  }
 
-    return 'DataModel::NullObjectType';
-  });
-
-  return asPromise.call(this, promise, options);
+  value.global = global;
+  return value;
 }
 
 function chip_tests_item_parameters(options)
@@ -493,41 +520,6 @@ function chip_tests_item_parameters(options)
         printErrorAndExit(this,
             'Missing "' + commandArg.name + '" in arguments list: \n\t* '
                 + commandValues.map(command => command.name).join('\n\t* '));
-      }
-      // test_cluster_command_value is a recursive partial using #each. At some point the |global|
-      // context is lost and it fails. Make sure to attach the global context as a property of the | value |
-      // that is evaluated.
-      function attachGlobal(global, value)
-      {
-        if (Array.isArray(value)) {
-          value = value.map(v => attachGlobal(global, v));
-        } else if (value instanceof Object) {
-          for (key in value) {
-            if (key == "global") {
-              continue;
-            }
-            value[key] = attachGlobal(global, value[key]);
-          }
-        } else if (value === null) {
-          value = new NullObject();
-        } else {
-          switch (typeof value) {
-          case 'number':
-            value = new Number(value);
-            break;
-          case 'string':
-            value = new String(value);
-            break;
-          case 'boolean':
-            value = new Boolean(value);
-            break;
-          default:
-            throw new Error('Unsupported value: ' + JSON.stringify(value));
-          }
-        }
-
-        value.global = global;
-        return value;
       }
       commandArg.definedValue = attachGlobal(this.global, expected.value);
 
@@ -558,7 +550,7 @@ function chip_tests_item_response_parameters(options)
         const expected = responseValues.splice(expectedIndex, 1)[0];
         if ('value' in expected) {
           responseArg.hasExpectedValue = true;
-          responseArg.expectedValue    = expected.value;
+          responseArg.expectedValue    = attachGlobal(this.global, expected.value);
         }
 
         if ('constraints' in expected) {
@@ -590,14 +582,32 @@ function isLiteralNull(value, options)
   return (value === null) || (value instanceof NullObject);
 }
 
+function expectedValueHasProp(value, name)
+{
+  return name in value;
+}
+
+function octetStringEscapedForCLiteral(value)
+{
+  return value.replace(/\p{Control}/gu, ch => {
+    let code = ch.charCodeAt(0);
+    code     = code.toString();
+    if (code.length == 1) {
+      code = "0" + code;
+    }
+    return "\\x" + code;
+  });
+}
+
 //
 // Module exports
 //
 exports.chip_tests                          = chip_tests;
 exports.chip_tests_items                    = chip_tests_items;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
-exports.chip_tests_item_response_type       = chip_tests_item_response_type;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
 exports.chip_tests_pics                     = chip_tests_pics;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
+exports.expectedValueHasProp                = expectedValueHasProp;
+exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;

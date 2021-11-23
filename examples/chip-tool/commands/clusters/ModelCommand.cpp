@@ -36,7 +36,7 @@ exit:
     return err;
 }
 
-void ModelCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+void ModelCommand::OnDeviceConnectedFn(void * context, ChipDevice * device)
 {
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     VerifyOrReturn(command != nullptr,

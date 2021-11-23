@@ -76,6 +76,8 @@ public:
 
     bool IsEncryptionRequired() const { return mDispatch->IsEncryptionRequired(); }
 
+    bool IsGroupExchangeContext() const { return (mSession.HasValue() && mSession.Value().IsGroupSession()); }
+
     /**
      *  Send a CHIP message on this exchange.
      *
@@ -149,7 +151,7 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    SessionHandle GetSessionHandle() { return mSession.Value(); }
+    SessionHandle GetSessionHandle() const { return mSession.Value(); }
     bool HasSessionHandle() const { return mSession.HasValue(); }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
@@ -163,6 +165,18 @@ public:
     void Abort();
 
     void SetResponseTimeout(Timeout timeout);
+
+    // TODO: move following 5 functions into SessionHandle once we can access session vars w/o using a SessionManager
+    /*
+     * Get the overall acknowledge timeout period for the underneath transport(MRP+UDP/TCP)
+     */
+    System::Clock::Milliseconds32 GetAckTimeout();
+
+    bool IsUDPTransport();
+    bool IsTCPTransport();
+    bool IsBLETransport();
+    // Helper function for easily accessing MRP config
+    const ReliableMessageProtocolConfig & GetMRPConfig() const;
 
 private:
     Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
@@ -244,15 +258,11 @@ private:
      * - set IDLE polling mode if all conditions are met:
      *   - device doesn't expect getting response nor sending message
      *   - there is no other active exchange than the current one
-     *   - active state is not forced (commissioning window is not opened)
      * - set ACTIVE polling mode if any of the conditions is met:
      *   - device expects getting response or sending message
      *   - there is another active exchange
-     *   - active state is forced (commissioning window is currently open)
-     *
-     * @param[in]  transportType  transport used by the exchange
      */
-    void UpdateSEDPollingMode(Transport::Type transportType);
+    void UpdateSEDPollingMode();
 };
 
 } // namespace Messaging

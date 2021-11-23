@@ -43,5 +43,6 @@ typedef uint16_t ListIndex;
 typedef uint32_t TransactionId;
 
 static constexpr FabricIndex kUndefinedFabricIndex = 0;
+static constexpr EndpointId kInvalidEndpointId     = 0xFFFF;
 
 } // namespace chip

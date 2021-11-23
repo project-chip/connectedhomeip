@@ -58,7 +58,7 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIB::Builder & aAttributeReport)
 {
 
@@ -83,7 +83,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
 
         ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()),
                                                chip::TLV::ContextTag(chip::to_underlying(AttributeDataIB::Tag::kData)), value));
-        attributeData.DataVersion(0);
+        attributeData.DataVersion(0).EndOfAttributeDataIB();
         return CHIP_NO_ERROR;
     }
     else
@@ -235,7 +235,7 @@ void TestReadInteraction::TestReadTimeout(nlTestSuite * apSuite, void * apContex
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 1);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
 
-    ctx.GetExchangeManager().OnConnectionExpired(ctx.GetSessionBobToAlice());
+    ctx.GetExchangeManager().ExpireExchangesForSession(ctx.GetSessionBobToAlice());
 
     ctx.DrainAndServiceIO();
 
@@ -251,7 +251,7 @@ void TestReadInteraction::TestReadTimeout(nlTestSuite * apSuite, void * apContex
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     ctx.DrainAndServiceIO();
 
-    ctx.GetExchangeManager().OnConnectionExpired(ctx.GetSessionAliceToBob());
+    ctx.GetExchangeManager().ExpireExchangesForSession(ctx.GetSessionAliceToBob());
 
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
 

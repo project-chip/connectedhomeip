@@ -23,92 +23,154 @@ namespace {
 using chip::FabricIndex;
 using namespace chip::Access;
 
-// Avoid GetAccessControl returning nullptr before SetAccessControl is called.
-class UnimplementedDataProvider : public AccessControlDataProvider
+AccessControl defaultAccessControl;
+AccessControl * globalAccessControl = &defaultAccessControl;
+
+static_assert(((unsigned(Privilege::kAdminister) & unsigned(Privilege::kManage)) == 0) &&
+                  ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kOperate)) == 0) &&
+                  ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kView)) == 0) &&
+                  ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kProxyView)) == 0) &&
+                  ((unsigned(Privilege::kManage) & unsigned(Privilege::kOperate)) == 0) &&
+                  ((unsigned(Privilege::kManage) & unsigned(Privilege::kView)) == 0) &&
+                  ((unsigned(Privilege::kManage) & unsigned(Privilege::kProxyView)) == 0) &&
+                  ((unsigned(Privilege::kOperate) & unsigned(Privilege::kView)) == 0) &&
+                  ((unsigned(Privilege::kOperate) & unsigned(Privilege::kProxyView)) == 0) &&
+                  ((unsigned(Privilege::kView) & unsigned(Privilege::kProxyView)) == 0),
+              "Privilege bits must be unique");
+
+bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Privilege entryPrivilege)
 {
-    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
-
-    void Finish() override {}
-
-    EntryIterator * Entries() const override { return nullptr; }
-
-    EntryIterator * Entries(FabricIndex fabricIndex) const override { return nullptr; }
-};
-
-// Avoid GetAccessControl returning nullptr before SetAccessControl is called.
-UnimplementedDataProvider gUnimplementedDataProvider;
-AccessControl gUnimplementedAccessControl(gUnimplementedDataProvider);
-
-AccessControl * gAccessControl = &gUnimplementedAccessControl;
+    switch (entryPrivilege)
+    {
+    case Privilege::kView:
+        return requestPrivilege == Privilege::kView;
+    case Privilege::kProxyView:
+        return requestPrivilege == Privilege::kProxyView || requestPrivilege == Privilege::kView;
+    case Privilege::kOperate:
+        return requestPrivilege == Privilege::kOperate || requestPrivilege == Privilege::kView;
+    case Privilege::kManage:
+        return requestPrivilege == Privilege::kManage || requestPrivilege == Privilege::kOperate ||
+            requestPrivilege == Privilege::kView;
+    case Privilege::kAdminister:
+        return requestPrivilege == Privilege::kAdminister || requestPrivilege == Privilege::kManage ||
+            requestPrivilege == Privilege::kOperate || requestPrivilege == Privilege::kView ||
+            requestPrivilege == Privilege::kProxyView;
+    }
+    return false;
+}
 
 } // namespace
 
 namespace chip {
 namespace Access {
 
+AccessControl::Entry::Delegate AccessControl::Entry::mDefaultDelegate;
+AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDelegate;
+AccessControl::Delegate AccessControl::mDefaultDelegate;
+
 CHIP_ERROR AccessControl::Init()
 {
-    ChipLogDetail(DataManagement, "access control: initializing");
-    // ...
-    return CHIP_NO_ERROR;
+    ChipLogDetail(DataManagement, "AccessControl::Init");
+    return mDelegate.Init();
 }
 
-void AccessControl::Finish()
+CHIP_ERROR AccessControl::Finish()
 {
-    ChipLogDetail(DataManagement, "access control: finishing");
-    // ...
+    ChipLogDetail(DataManagement, "AccessControl::Finish");
+    return mDelegate.Finish();
 }
 
-CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege privilege)
+CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                                Privilege requestPrivilege)
 {
-    CHIP_ERROR err = CHIP_ERROR_ACCESS_DENIED;
+    // During development, allow access if delegate is transitional
+    ReturnErrorCodeIf(mDelegate.IsTransitional(), CHIP_NO_ERROR);
 
-    EntryIterator * iterator = mDataProvider.Entries(subjectDescriptor.fabricIndex);
-    // TODO: check error (but can't until we have an implementation)
-#if 0
-    ReturnErrorCodeIf(iterator == nullptr, CHIP_ERROR_INTERNAL);
-#else
-    ReturnErrorCodeIf(iterator == nullptr, CHIP_NO_ERROR);
-#endif
+    EntryIterator iterator;
+    ReturnErrorOnFailure(Entries(iterator, &subjectDescriptor.fabricIndex));
 
-    // TODO: a few more cases (PASE commissioning, CASE Authenticated Tags, etc.)
-
-    while (auto entry = iterator->Next())
+    Entry entry;
+    while (iterator.Next(entry) == CHIP_NO_ERROR)
     {
-        ChipLogDetail(DataManagement, "Checking entry");
+        AuthMode authMode = AuthMode::kNone;
+        ReturnErrorOnFailure(entry.GetAuthMode(authMode));
+        if (authMode != subjectDescriptor.authMode)
+        {
+            continue;
+        }
 
-        if (!entry->MatchesPrivilege(privilege))
+        Privilege privilege = Privilege::kView;
+        ReturnErrorOnFailure(entry.GetPrivilege(privilege));
+        if (!CheckRequestPrivilegeAgainstEntryPrivilege(requestPrivilege, privilege))
+        {
             continue;
-        ChipLogDetail(DataManagement, "  --> matched privilege");
-        if (!entry->MatchesAuthMode(subjectDescriptor.authMode))
-            continue;
-        ChipLogDetail(DataManagement, "  --> matched authmode");
-        if (!entry->MatchesSubject(subjectDescriptor.subjects[0]))
-            continue;
-        ChipLogDetail(DataManagement, "  --> matched subject");
-        if (!entry->MatchesTarget(requestPath.endpoint, requestPath.cluster))
-            continue;
-        ChipLogDetail(DataManagement, "  --> matched target");
+        }
 
-        err = CHIP_NO_ERROR;
-        break;
+        size_t subjectCount = 0;
+        ReturnErrorOnFailure(entry.GetSubjectCount(subjectCount));
+        if (subjectCount > 0)
+        {
+            bool subjectMatched = false;
+            for (size_t i = 0; i < subjectCount; ++i)
+            {
+                NodeId subject = kUndefinedNodeId;
+                ReturnErrorOnFailure(entry.GetSubject(i, subject));
+                if (subject == subjectDescriptor.subjects[0])
+                {
+                    subjectMatched = true;
+                    break;
+                }
+                // TODO: check against CATs in subject descriptor
+            }
+            if (!subjectMatched)
+            {
+                continue;
+            }
+        }
+
+        size_t targetCount = 0;
+        ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
+        if (targetCount > 0)
+        {
+            bool targetMatched = false;
+            for (size_t i = 0; i < targetCount; ++i)
+            {
+                Entry::Target target;
+                ReturnErrorOnFailure(entry.GetTarget(i, target));
+                if ((target.flags & Entry::Target::kCluster) && target.cluster != requestPath.cluster)
+                {
+                    continue;
+                }
+                if ((target.flags & Entry::Target::kEndpoint) && target.endpoint != requestPath.endpoint)
+                {
+                    continue;
+                }
+                // TODO: check against target.deviceType (requires lookup)
+                targetMatched = true;
+                break;
+            }
+            if (!targetMatched)
+            {
+                continue;
+            }
+        }
+
+        // Entry passed all checks: access is allowed.
+        return CHIP_NO_ERROR;
     }
 
-    iterator->Release();
-    return err;
+    // No entry was found which passed all checks: access is denied.
+    return CHIP_ERROR_ACCESS_DENIED;
 }
 
-AccessControl * GetAccessControl()
+AccessControl & GetAccessControl()
 {
-    return gAccessControl;
+    return *globalAccessControl;
 }
 
-void SetAccessControl(AccessControl * accessControl)
+void SetAccessControl(AccessControl & accessControl)
 {
-    if (accessControl != nullptr)
-    {
-        gAccessControl = accessControl;
-    }
+    globalAccessControl = &accessControl;
 }
 
 } // namespace Access

@@ -541,19 +541,17 @@
                 self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice
                                                                        endpoint:0
                                                                           queue:dispatch_get_main_queue()];
-                NSData * networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
-                NSData * credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
-                uint64_t breadcrumb = 0;
-                uint32_t timeoutMs = 3000;
+                __auto_type * params = [[CHIPNetworkCommissioningClusterAddWiFiNetworkParams alloc] init];
+                params.ssid = [ssid dataUsingEncoding:NSUTF8StringEncoding];
+                params.credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
+                params.breadcrumb = @(0);
+                params.timeoutMs = @(3000);
 
                 __weak typeof(self) weakSelf = self;
-                [self->_cluster addWiFiNetwork:networkId
-                                   credentials:credentials
-                                    breadcrumb:breadcrumb
-                                     timeoutMs:timeoutMs
-                               responseHandler:^(NSError * error, NSDictionary * values) {
-                                   [weakSelf onAddNetworkResponse:error isWiFi:YES];
-                               }];
+                [self->_cluster addWiFiNetworkWithParams:params
+                                       completionHandler:^(NSError * error, NSDictionary * values) {
+                                           [weakSelf onAddNetworkResponse:error isWiFi:YES];
+                                       }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -571,16 +569,16 @@
                 self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice
                                                                        endpoint:0
                                                                           queue:dispatch_get_main_queue()];
-                uint64_t breadcrumb = 0;
-                uint32_t timeoutMs = 3000;
+                __auto_type * params = [[CHIPNetworkCommissioningClusterAddThreadNetworkParams alloc] init];
+                params.operationalDataset = threadDataSet;
+                params.breadcrumb = @(0);
+                params.timeoutMs = @(3000);
 
                 __weak typeof(self) weakSelf = self;
-                [self->_cluster addThreadNetwork:threadDataSet
-                                      breadcrumb:breadcrumb
-                                       timeoutMs:timeoutMs
-                                 responseHandler:^(NSError * error, NSDictionary * values) {
-                                     [weakSelf onAddNetworkResponse:error isWiFi:NO];
-                                 }];
+                [self->_cluster addThreadNetworkWithParams:params
+                                         completionHandler:^(NSError * error, NSDictionary * values) {
+                                             [weakSelf onAddNetworkResponse:error isWiFi:NO];
+                                         }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -598,24 +596,22 @@
         return;
     }
 
-    NSData * networkId;
+    __auto_type * params = [[CHIPNetworkCommissioningClusterEnableNetworkParams alloc] init];
     if (isWiFi) {
         NSString * ssid = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
-        networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
+        params.networkID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     } else {
         uint8_t tempThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
-        networkId = [NSData dataWithBytes:tempThreadNetworkId length:sizeof(tempThreadNetworkId)];
+        params.networkID = [NSData dataWithBytes:tempThreadNetworkId length:sizeof(tempThreadNetworkId)];
     }
-    uint64_t breadcrumb = 0;
-    uint32_t timeoutMs = 3000;
+    params.breadcrumb = @(0);
+    params.timeoutMs = @(3000);
 
     __weak typeof(self) weakSelf = self;
-    [_cluster enableNetwork:networkId
-                 breadcrumb:breadcrumb
-                  timeoutMs:timeoutMs
-            responseHandler:^(NSError * err, NSDictionary * values) {
-                [weakSelf onEnableNetworkResponse:err];
-            }];
+    [_cluster enableNetworkWithParams:params
+                    completionHandler:^(NSError * err, NSDictionary * values) {
+                        [weakSelf onEnableNetworkResponse:err];
+                    }];
 }
 
 - (void)onEnableNetworkResponse:(NSError *)error

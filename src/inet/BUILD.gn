@@ -66,8 +66,8 @@ static_library("inet") {
   output_name = "libInetLayer"
 
   sources = [
-    "EndPointBasis.cpp",
     "EndPointBasis.h",
+    "EndPointState${chip_system_config_inet}.h",
     "IANAConstants.h",
     "IPAddress-StringFuncts.cpp",
     "IPAddress.cpp",

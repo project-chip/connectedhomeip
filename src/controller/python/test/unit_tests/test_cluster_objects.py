@@ -35,7 +35,6 @@ def _encode_from_native_and_then_decode(data, cls: typing.Union[ClusterObjects.C
 
 
 class TestClusterObjects(unittest.TestCase):
-
     @dataclass
     class C(ClusterObjects.ClusterObject):
         @chip.ChipUtility.classproperty
@@ -67,7 +66,7 @@ class TestClusterObjects(unittest.TestCase):
             return ClusterObjects.ClusterObjectDescriptor(
                 Fields=[
                     ClusterObjects.ClusterObjectFieldDescriptor(
-                        Label="X", Tag=0, Type=uint, IsArray=True),
+                        Label="X", Tag=0, Type=typing.List[uint]),
                     ClusterObjects.ClusterObjectFieldDescriptor(
                         Label="Y", Tag=1, Type=int),
                 ])
@@ -126,14 +125,14 @@ class TestClusterObjects(unittest.TestCase):
             return ClusterObjects.ClusterObjectDescriptor(
                 Fields=[
                     ClusterObjects.ClusterObjectFieldDescriptor(
-                        Label="X", Tag=0, Type=str, IsArray=True),
+                        Label="X", Tag=0, Type=typing.List[str]),
                     ClusterObjects.ClusterObjectFieldDescriptor(
-                        Label="Y", Tag=1, Type=TestClusterObjects.C, IsArray=True),
+                        Label="Y", Tag=1, Type=typing.List[TestClusterObjects.C]),
                     ClusterObjects.ClusterObjectFieldDescriptor(
-                        Label="Z", Tag=2, Type=TestClusterObjects.StructWithArray, IsArray=True),
+                        Label="Z", Tag=2, Type=typing.List[TestClusterObjects.StructWithArray]),
                     # Recursive!
                     ClusterObjects.ClusterObjectFieldDescriptor(
-                        Label="W", Tag=3, Type=TestClusterObjects.StructWithArrayOfStructWithArray, IsArray=True),
+                        Label="W", Tag=3, Type=typing.List[TestClusterObjects.StructWithArrayOfStructWithArray]),
                 ])
 
         X: typing.List['str'] = None
@@ -221,7 +220,7 @@ class TestAttributeDescriptor(unittest.TestCase):
     class ArrayAttribute(ClusterObjects.ClusterAttributeDescriptor):
         @chip.ChipUtility.classproperty
         def attribute_type(cls) -> ClusterObjects.ClusterObjectFieldDescriptor:
-            return ClusterObjects.ClusterObjectFieldDescriptor(Type=int, IsArray=True)
+            return ClusterObjects.ClusterObjectFieldDescriptor(Type=typing.List[int])
 
     def test_array_encode(self):
         res = _encode_attribute_and_then_decode_to_native(

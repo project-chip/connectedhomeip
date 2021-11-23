@@ -30,6 +30,9 @@ declare_args() {
   # Enable detail logging.
   chip_detail_logging = chip_logging
 
+  # Enable automation logging.
+  chip_automation_logging = chip_logging
+
   # Enable short error strings.
   chip_config_short_error_str = false
 

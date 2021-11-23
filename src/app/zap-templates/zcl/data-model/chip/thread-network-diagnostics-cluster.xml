@@ -30,6 +30,11 @@ limitations under the License.
     <item name="Router" value="0x05"/>
     <item name="Leader" value="0x06"/>
   </enum>
+  <enum name="ThreadConnectionStatus" type="ENUM8">
+    <cluster code="0x0035"/>
+    <item name="Connected" value="0x00"/>
+    <item name="NotConnected" value="0x01"/>
+  </enum>  
   <struct name="NeighborTable">
     <cluster code="0x0035"/>
     <item name="ExtAddress" type="INT64U"/>
@@ -159,6 +164,10 @@ limitations under the License.
     <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFault" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
     <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip thread_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the OverrunCount attributes to 0</description>
-    </command>           
+    </command>
+    <event side="server" code="0x00" name="ConnectionStatus" priority="info" optional="true">
+      <description>Indicate that a Node’s connection status to a Thread network has changed</description>
+      <field id="0" name="ConnectionStatus" type="ThreadConnectionStatus"/>
+    </event>
   </cluster>
 </configurator>

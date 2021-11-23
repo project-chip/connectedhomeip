@@ -35,17 +35,11 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Android platform.
  */
-class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-                                       private Internal::AndroidConfig
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::AndroidConfig>
 {
-    // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
-    // defined on this class.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
-#endif
-
 public:
     void InitializeWithObject(jobject managerObject);
+    static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
@@ -64,12 +58,19 @@ private:
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
-    // ===== Members for internal use by the following friends.
-
-    friend ConfigurationManager & ConfigurationMgr();
-    friend ConfigurationManagerImpl & ConfigurationMgrImpl();
-
-    static ConfigurationManagerImpl sInstance;
+    // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
+    CHIP_ERROR ReadConfigValue(Key key, bool & val) override;
+    CHIP_ERROR ReadConfigValue(Key key, uint32_t & val) override;
+    CHIP_ERROR ReadConfigValue(Key key, uint64_t & val) override;
+    CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen) override;
+    CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen) override;
+    CHIP_ERROR WriteConfigValue(Key key, bool val) override;
+    CHIP_ERROR WriteConfigValue(Key key, uint32_t val) override;
+    CHIP_ERROR WriteConfigValue(Key key, uint64_t val) override;
+    CHIP_ERROR WriteConfigValueStr(Key key, const char * str) override;
+    CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen) override;
+    CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
+    void RunConfigUnitTest(void) override;
 
     // ===== Private members reserved for use by this class only.
 
@@ -77,28 +78,6 @@ private:
 
     jobject mConfigurationManagerObject = nullptr;
 };
-
-/**
- * Returns the public interface of the ConfigurationManager singleton object.
- *
- * chip applications should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
- */
-inline ConfigurationManager & ConfigurationMgr()
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
- *
- * chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the Android platform.
- */
-inline ConfigurationManagerImpl & ConfigurationMgrImpl()
-{
-    return ConfigurationManagerImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

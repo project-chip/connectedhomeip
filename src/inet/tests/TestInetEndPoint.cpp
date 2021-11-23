@@ -133,8 +133,11 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     IPPrefix addrWithPrefix;
     CHIP_ERROR err;
 
+#ifndef __MBED__
+    // Mbed interface name has different format
     err = InterfaceId::InterfaceNameToId("0", intId);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+#endif
 
     err = InterfaceId::Null().GetInterfaceName(intName, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -142,10 +145,10 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     err = InterfaceId::Null().GetInterfaceName(intName, sizeof(intName));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR && intName[0] == '\0');
 
-    err = gInet.GetInterfaceFromAddr(addr, intId);
+    intId = InterfaceId::FromIPAddress(addr);
     NL_TEST_ASSERT(inSuite, !intId.IsPresent());
 
-    err = gInet.GetLinkLocalAddr(intId, nullptr);
+    err = intId.GetLinkLocalAddr(nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 
     printf("    Interfaces:\n");
@@ -165,8 +168,8 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
                intName, intIterator.IsUp() ? "UP" : "DOWN", intIterator.SupportsMulticast() ? "supports" : "no",
                intIterator.HasBroadcastAddress() ? "has" : "no");
 
-        gInet.GetLinkLocalAddr(intId, &addr);
-        gInet.MatchLocalIPv6Subnet(addr);
+        intId.GetLinkLocalAddr(&addr);
+        InterfaceId::MatchLocalIPv6Subnet(addr);
     }
     NL_TEST_ASSERT(inSuite, !intIterator.Next());
     NL_TEST_ASSERT(inSuite, intIterator.GetInterfaceId() == InterfaceId::Null());
@@ -229,10 +232,10 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = gInet.NewTCPEndPoint(&testTCPEP1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = gInet.GetLinkLocalAddr(InterfaceId::Null(), &addr);
+    err = InterfaceId::Null().GetLinkLocalAddr(&addr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = gInet.GetInterfaceFromAddr(addr, intId);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    intId = InterfaceId::FromIPAddress(addr);
+    NL_TEST_ASSERT(inSuite, intId.IsPresent());
 
 #if INET_CONFIG_ENABLE_IPV4
     NL_TEST_ASSERT(inSuite, IPAddress::FromString("10.0.0.1", addr_v4));

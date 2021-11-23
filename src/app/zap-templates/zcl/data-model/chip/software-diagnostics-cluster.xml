@@ -24,6 +24,12 @@ limitations under the License.
     <item name="StackFreeMinimum" type="INT32U"/>
     <item name="StackSize" type="INT32U"/>
   </struct>
+  <struct name="SoftwareFault">
+    <cluster code="0x0034"/>
+    <item name="Id" type="INT64U"/>
+    <item name="Name" type="CHAR_STRING" length="8"/>
+    <item name="FaultRecording" type="OCTET_STRING" length="1024"/>
+  </struct>  
   <cluster>
     <domain>General</domain>
     <name>Software Diagnostics</name>
@@ -35,7 +41,14 @@ limitations under the License.
     <attribute side="server" code="0x02" define="CURRENT_HEAP_USED" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapUsed</attribute>
     <attribute side="server" code="0x03" define="CURRENT_HEAP_HIGH_WATERMARK" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="false">CurrentHeapHighWatermark</attribute>
     <command source="client" code="0x00" name="ResetWatermarks" optional="false" cli="chip software_diagnostics resetwatermarks">
-      <description>Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute</description>
+      <description>Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute.</description>
     </command>
+    <event side="server" code="0x00" name="SoftwareFault" priority="info" optional="true">
+      <description>Indicate the last software fault that has taken place on the Node.</description>
+      <field id="0" name="SoftwareFault" type="SoftwareFault"/>
+    </event>    
   </cluster>
+  <bitmap name="SoftwareDiagnosticsFeature" type="BITMAP32">
+    <field name="WaterMarks" mask="0x1"/>
+  </bitmap>   
 </configurator>

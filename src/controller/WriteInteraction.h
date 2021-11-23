@@ -78,9 +78,15 @@ private:
     OnDoneCallbackType mOnDone;
 };
 
-template <typename AttributeInfo>
-CHIP_ERROR WriteAttribute(Messaging::ExchangeManager * aExchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
-                          const typename AttributeInfo::Type & requestCommandData, WriteCallback::OnSuccessCallbackType onSuccessCb,
+/**
+ * Functions for writing attributes.  We have lots of different AttributeInfo
+ * but a fairly small set of types that get written.  So we want to keep the
+ * template on AttributeInfo very small, and put all the work in the template
+ * with a small number of instantiations (one per type).
+ */
+template <typename AttrType>
+CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
+                          const AttrType & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb)
 {
     app::WriteClientHandle handle;
@@ -91,13 +97,38 @@ CHIP_ERROR WriteAttribute(Messaging::ExchangeManager * aExchangeMgr, SessionHand
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, callback.get()));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
-        chip::app::AttributePathParams(endpointId, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId()),
-        requestCommandData));
+    if (sessionHandle.IsGroupSession())
+    {
+        ReturnErrorOnFailure(
+            handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));
+    }
+    else
+    {
+        ReturnErrorOnFailure(
+            handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
+    }
+
     ReturnErrorOnFailure(handle.SendWriteRequest(sessionHandle));
 
     callback.release();
+
+    if (sessionHandle.IsGroupSession())
+    {
+        // Manually call success callback since OnReponse won't be called in WriteClient for group
+        app::ConcreteAttributePath aPath;
+        onSuccessCb(aPath);
+    }
+
     return CHIP_NO_ERROR;
+}
+
+template <typename AttributeInfo>
+CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpointId,
+                          const typename AttributeInfo::Type & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
+                          WriteCallback::OnErrorCallbackType onErrorCb)
+{
+    return WriteAttribute(sessionHandle, endpointId, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), requestData,
+                          onSuccessCb, onErrorCb);
 }
 
 } // namespace Controller
