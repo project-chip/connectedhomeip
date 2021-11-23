@@ -8577,15 +8577,15 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_DM_1_1_000005_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Query User Label"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Query Node Label"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeUserLabelWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Query User Label Error: %@", err);
+    [cluster readAttributeNodeLabelWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Query Node Label Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -8872,6 +8872,32 @@ CHIPDevice * GetConnectedDevice()
         }
 
         XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DM_1_1_000018_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Query UniqueID"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeUniqueIDWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Query UniqueID Error: %@", err);
+
+        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] length], 32);
 
         [expectation fulfill];
     }];

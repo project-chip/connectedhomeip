@@ -1278,7 +1278,7 @@ CHIP_ERROR BasicCluster::ReportAttributeProductID(Callback::Cancelable * onRepor
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR BasicCluster::ReadAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BasicCluster::ReadAttributeNodeLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId  = mEndpoint;
@@ -1288,31 +1288,31 @@ CHIP_ERROR BasicCluster::ReadAttributeUserLabel(Callback::Cancelable * onSuccess
                                              BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
-CHIP_ERROR BasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+CHIP_ERROR BasicCluster::WriteAttributeNodeLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  chip::CharSpan value)
 {
     app::WriteClientHandle handle;
     ReturnErrorOnFailure(
         app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
     ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
-        chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::UserLabel::Id), value));
+        chip::app::AttributePathParams(mEndpoint, mClusterId, Basic::Attributes::NodeLabel::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BasicCluster::SubscribeAttributeUserLabel(Callback::Cancelable * onSuccessCallback,
+CHIP_ERROR BasicCluster::SubscribeAttributeNodeLabel(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                      uint16_t maxInterval)
 {
     chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId  = mEndpoint;
     attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::UserLabel::Id;
+    attributePath.mAttributeId = Basic::Attributes::NodeLabel::Id;
     return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BasicCluster::ReportAttributeUserLabel(Callback::Cancelable * onReportCallback)
+CHIP_ERROR BasicCluster::ReportAttributeNodeLabel(Callback::Cancelable * onReportCallback)
 {
-    return RequestAttributeReporting(Basic::Attributes::UserLabel::Id, onReportCallback,
+    return RequestAttributeReporting(Basic::Attributes::NodeLabel::Id, onReportCallback,
                                      BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
@@ -1668,6 +1668,16 @@ CHIP_ERROR BasicCluster::ReportAttributeReachable(Callback::Cancelable * onRepor
 {
     return RequestAttributeReporting(Basic::Attributes::Reachable::Id, onReportCallback,
                                      BasicAttributeFilter<BooleanAttributeCallback>);
+}
+
+CHIP_ERROR BasicCluster::ReadAttributeUniqueID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000012;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,

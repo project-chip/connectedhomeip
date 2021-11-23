@@ -55,7 +55,7 @@ public:
         delete onReportBasicVendorIDCallback;
         delete onReportBasicProductNameCallback;
         delete onReportBasicProductIDCallback;
-        delete onReportBasicUserLabelCallback;
+        delete onReportBasicNodeLabelCallback;
         delete onReportBasicLocationCallback;
         delete onReportBasicHardwareVersionCallback;
         delete onReportBasicHardwareVersionStringCallback;
@@ -538,7 +538,7 @@ public:
                                        BasicAttributeFilter<CharStringAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0004, onReportBasicProductIDCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0005, onReportBasicUserLabelCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0005, onReportBasicNodeLabelCallback->Cancel(),
                                        BasicAttributeFilter<CharStringAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0006, onReportBasicLocationCallback->Cancel(),
                                        BasicAttributeFilter<CharStringAttributeCallback>);
@@ -1686,7 +1686,7 @@ private:
         new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportBasicProductIDCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicUserLabelCallback =
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicNodeLabelCallback =
         new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
     chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicLocationCallback =
         new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);

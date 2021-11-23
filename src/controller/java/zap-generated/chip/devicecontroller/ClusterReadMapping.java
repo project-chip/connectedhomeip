@@ -391,18 +391,18 @@ public class ClusterReadMapping {
             readBasicProductIDCommandParams);
     readBasicInteractionInfo.put(
         "readProductIDAttribute", readBasicProductIDAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBasicUserLabelCommandParams =
+    Map<String, CommandParameterInfo> readBasicNodeLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBasicUserLabelAttributeInteractionInfo =
+    InteractionInfo readBasicNodeLabelAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicCluster) cluster)
-                  .readUserLabelAttribute((ChipClusters.CharStringAttributeCallback) callback);
+                  .readNodeLabelAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBasicUserLabelCommandParams);
+            readBasicNodeLabelCommandParams);
     readBasicInteractionInfo.put(
-        "readUserLabelAttribute", readBasicUserLabelAttributeInteractionInfo);
+        "readNodeLabelAttribute", readBasicNodeLabelAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readBasicLocationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readBasicLocationAttributeInteractionInfo =
@@ -553,6 +553,18 @@ public class ClusterReadMapping {
             readBasicReachableCommandParams);
     readBasicInteractionInfo.put(
         "readReachableAttribute", readBasicReachableAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBasicUniqueIDCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBasicUniqueIDAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BasicCluster) cluster)
+                  .readUniqueIDAttribute((ChipClusters.CharStringAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+            readBasicUniqueIDCommandParams);
+    readBasicInteractionInfo.put(
+        "readUniqueIDAttribute", readBasicUniqueIDAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readBasicClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readBasicClusterRevisionAttributeInteractionInfo =

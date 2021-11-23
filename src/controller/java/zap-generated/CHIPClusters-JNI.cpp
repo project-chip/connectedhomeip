@@ -1949,7 +1949,7 @@ JNI_METHOD(void, BasicCluster, reportProductIDAttribute)(JNIEnv * env, jobject s
     onReport.release();
 }
 
-JNI_METHOD(void, BasicCluster, writeUserLabelAttribute)
+JNI_METHOD(void, BasicCluster, writeNodeLabelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
 {
     chip::DeviceLayer::StackLock lock;
@@ -1972,7 +1972,7 @@ JNI_METHOD(void, BasicCluster, writeUserLabelAttribute)
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     JniUtfString valueStr(env, value);
-    err = cppCluster->WriteAttributeUserLabel(onSuccess->Cancel(), onFailure->Cancel(),
+    err = cppCluster->WriteAttributeNodeLabel(onSuccess->Cancel(), onFailure->Cancel(),
                                               chip::CharSpan(valueStr.c_str(), strlen(valueStr.c_str())));
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
@@ -1981,7 +1981,7 @@ JNI_METHOD(void, BasicCluster, writeUserLabelAttribute)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, BasicCluster, subscribeUserLabelAttribute)
+JNI_METHOD(void, BasicCluster, subscribeNodeLabelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
@@ -2003,7 +2003,7 @@ JNI_METHOD(void, BasicCluster, subscribeUserLabelAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->SubscribeAttributeUserLabel(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(minInterval),
+    err = cppCluster->SubscribeAttributeNodeLabel(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(minInterval),
                                                   static_cast<uint16_t>(maxInterval));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -2013,7 +2013,7 @@ JNI_METHOD(void, BasicCluster, subscribeUserLabelAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, BasicCluster, reportUserLabelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, BasicCluster, reportNodeLabelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPCharStringAttributeCallback, void (*)(CHIPCharStringAttributeCallback *)> onReport(
@@ -2028,7 +2028,7 @@ JNI_METHOD(void, BasicCluster, reportUserLabelAttribute)(JNIEnv * env, jobject s
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->ReportAttributeUserLabel(onReport->Cancel());
+    err = cppCluster->ReportAttributeNodeLabel(onReport->Cancel());
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error registering for attribute reporting", err));

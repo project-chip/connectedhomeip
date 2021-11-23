@@ -2585,23 +2585,23 @@ chip::ChipError::StorageType chip_ime_SubscribeAttribute_Basic_ProductID(chip::D
         .AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_UserLabel(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId,
+chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_NodeLabel(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId,
                                                                     chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::BasicCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeUserLabel(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+    return cluster.ReadAttributeNodeLabel(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_SubscribeAttribute_Basic_UserLabel(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId,
+chip::ChipError::StorageType chip_ime_SubscribeAttribute_Basic_NodeLabel(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId,
                                                                          uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::BasicCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .SubscribeAttributeUserLabel(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+        .SubscribeAttributeNodeLabel(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
                                      maxInterval)
         .AsInteger();
 }
@@ -2875,6 +2875,15 @@ chip::ChipError::StorageType chip_ime_SubscribeAttribute_Basic_Reachable(chip::D
     return cluster
         .SubscribeAttributeReachable(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
         .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_UniqueID(chip::DeviceProxy * device, chip::EndpointId ZCLendpointId,
+                                                                   chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::BasicCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeUniqueID(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_ClusterRevision(chip::DeviceProxy * device,
