@@ -93,7 +93,7 @@ wifi_ap_record_t scan_records[kScanRecordsMax];
 class Esp32Button final : public Button
 {
 public:
-    pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
+    pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
 #if CONFIG_DEVICE_TYPE_M5STACK
         if (request.pushed)
@@ -110,7 +110,7 @@ public:
 class Esp32Device final : public Device
 {
 public:
-    pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
         mRebootTimer = xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
         xTimerStart(mRebootTimer, 0);
@@ -128,7 +128,7 @@ private:
 class Wifi final : public generated::Wifi<Wifi>
 {
 public:
-    pw::Status GetChannel(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_Channel & response)
+    pw::Status GetChannel(const pw_protobuf_Empty & request, chip_rpc_Channel & response)
     {
         uint8_t channel = 0;
         wifi_second_chan_t second;
@@ -137,7 +137,7 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status GetSsid(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_Ssid & response)
+    pw::Status GetSsid(const pw_protobuf_Empty & request, chip_rpc_Ssid & response)
     {
         wifi_config_t config;
         PW_TRY(EspToPwStatus(esp_wifi_get_config(WIFI_IF_STA, &config)));
@@ -147,7 +147,7 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status GetState(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_State & response)
+    pw::Status GetState(const pw_protobuf_Empty & request, chip_rpc_State & response)
     {
         wifi_ap_record_t ap_info;
         esp_err_t err = esp_wifi_sta_get_ap_info(&ap_info);
@@ -156,7 +156,7 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status GetMacAddress(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_MacAddress & response)
+    pw::Status GetMacAddress(const pw_protobuf_Empty & request, chip_rpc_MacAddress & response)
     {
         uint8_t mac[6];
         PW_TRY(EspToPwStatus(esp_wifi_get_mac(WIFI_IF_STA, mac)));
@@ -165,7 +165,7 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status GetWiFiInterface(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_WiFiInterface & response)
+    pw::Status GetWiFiInterface(const pw_protobuf_Empty & request, chip_rpc_WiFiInterface & response)
     {
         wifi_ap_record_t ap_info;
         PW_TRY(EspToPwStatus(esp_wifi_sta_get_ap_info(&ap_info)));
@@ -173,7 +173,7 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status GetIP4Address(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_IP4Address & response)
+    pw::Status GetIP4Address(const pw_protobuf_Empty & request, chip_rpc_IP4Address & response)
     {
         esp_netif_ip_info_t ip_info;
         PW_TRY(EspToPwStatus(esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ip_info)));
@@ -181,7 +181,7 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status GetIP6Address(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_IP6Address & response)
+    pw::Status GetIP6Address(const pw_protobuf_Empty & request, chip_rpc_IP6Address & response)
     {
         esp_ip6_addr_t ip6;
         PW_TRY(EspToPwStatus(esp_netif_get_ip6_linklocal(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ip6)));
@@ -191,7 +191,7 @@ public:
 
     // NOTE: Currently this is blocking, it can be made non-blocking if needed
     //       but would require another worker thread to handle the scanning.
-    void StartScan(ServerContext &, const chip_rpc_ScanConfig & request, ServerWriter<chip_rpc_ScanResults> & writer)
+    void StartScan(const chip_rpc_ScanConfig & request, ServerWriter<chip_rpc_ScanResults> & writer)
     {
         wifi_scan_config_t scan_config;
         if (request.ssid_count != 0)
@@ -250,13 +250,13 @@ public:
         writer.Finish();
     }
 
-    pw::Status StopScan(ServerContext &, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    pw::Status StopScan(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
         esp_wifi_scan_stop();
         return pw::OkStatus();
     }
 
-    pw::Status Connect(ServerContext &, const chip_rpc_ConnectionData & request, chip_rpc_ConnectionResult & response)
+    pw::Status Connect(const chip_rpc_ConnectionData & request, chip_rpc_ConnectionResult & response)
     {
         char ssid[sizeof(wifi_config_t().sta.ssid)];
         char password[sizeof(wifi_config_t().sta.password)];
@@ -269,7 +269,7 @@ public:
         return SetWiFiStationProvisioning(ssid, password) == CHIP_NO_ERROR ? pw::OkStatus() : pw::Status::Unknown();
     }
 
-    pw::Status Disconnect(ServerContext &, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    pw::Status Disconnect(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
         chip::DeviceLayer::ConnectivityMgr().ClearWiFiStationProvision();
         chip::DeviceLayer::ConnectivityMgr().SetWiFiStationMode(chip::DeviceLayer::ConnectivityManager::kWiFiStationMode_Disabled);
