@@ -48,11 +48,11 @@ shared_library("jni") {
     "include/tv-channel/TvChannelManager.h",
     "java/KeypadInputManager.cpp",
     "java/KeypadInputManager.h",
-    "java/WakeOnLanManager.cpp",
-    "java/WakeOnLanManager.h",
     "java/MediaInputManager.cpp",
     "java/MediaInputManager.h",
     "java/TVApp-JNI.cpp",
+    "java/WakeOnLanManager.cpp",
+    "java/WakeOnLanManager.h",
   ]
 
   deps = [
@@ -88,9 +88,9 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/MediaInputInfo.java",
     "java/src/com/tcl/chip/tvapp/MediaInputManager.java",
     "java/src/com/tcl/chip/tvapp/MediaInputManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/TvApp.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManagerStub.java",
-    "java/src/com/tcl/chip/tvapp/TvApp.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
