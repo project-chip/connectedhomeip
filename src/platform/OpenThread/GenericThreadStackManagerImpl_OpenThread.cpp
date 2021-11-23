@@ -1406,8 +1406,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetSEDPollingCo
     const ConnectivityManager::SEDPollingConfig & pollingConfig)
 {
     using namespace System::Clock::Literals;
-    if ((pollingConfig.SlowPollingIntervalMS < pollingConfig.FastPollingIntervalMS) || (pollingConfig.SlowPollingIntervalMS == 0_ms32) ||
-        (pollingConfig.FastPollingIntervalMS == 0_ms32))
+    if ((pollingConfig.SlowPollingIntervalMS < pollingConfig.FastPollingIntervalMS) ||
+        (pollingConfig.SlowPollingIntervalMS == 0_ms32) || (pollingConfig.FastPollingIntervalMS == 0_ms32))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
