@@ -72,7 +72,7 @@ private:
     OTARequestorDriver * mOtaRequestorDriver;
     chip::NodeId mProviderNodeId;
     chip::FabricIndex mProviderFabricIndex;
-    uint32_t mOtaStartDelayMs;
+    uint32_t mOtaStartDelayMs = 0;
     chip::CASESessionManager * mCASESessionManager = nullptr;
     OnConnectedState onConnectedState        = kQueryImage;
     chip::Messaging::ExchangeContext * exchangeCtx            = nullptr;
