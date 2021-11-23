@@ -115,8 +115,8 @@ void TestEncodeBool(nlTestSuite * aSuite, void * aContext)
               0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
             0x18, // End of container
-            0x29, 0x02, // Tag (02) Value True (Attribute Value)
             0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
+            0x29, 0x02, // Tag (02) Value True (Attribute Value)
           0x18, // End of container
         0x18, // End of container
         // clang-format on
@@ -140,11 +140,11 @@ void TestEncodeListOfBools1(nlTestSuite * aSuite, void * aContext)
               0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
             0x18, // End of container
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
               0x09, // True
               0x08, // False
             0x18,
-            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
           0x18, // End of container
         0x18, // End of container
         // clang-format on
@@ -174,10 +174,10 @@ void TestEncodeListOfBools2(nlTestSuite * aSuite, void * aContext)
               0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
             0x18, // End of container
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             // Intended empty array
             0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
             0x18, // End of container
-            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
           0x18, // End of container
         0x18, // End of container
 
@@ -189,8 +189,8 @@ void TestEncodeListOfBools2(nlTestSuite * aSuite, void * aContext)
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
               0x34, 0x05, // Tag (05) Null
             0x18, // End of container
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             0x29, 0x02, // Tag (02) Value True (Attribute Value)
-            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
           0x18, // End of container
         0x18, // End of container
 
@@ -202,8 +202,8 @@ void TestEncodeListOfBools2(nlTestSuite * aSuite, void * aContext)
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
               0x34, 0x05, // Tag (05) Null
             0x18, // End of container
-            0x28, 0x02, // Tag (02) Value False (Attribute Value)
             0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
+            0x28, 0x02, // Tag (02) Value False (Attribute Value)
           0x18, // End of container
         0x18, // End of container
 
@@ -227,10 +227,10 @@ void TestEncodeEmptyList(nlTestSuite * aSuite, void * aContext)
               0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
             0x18, // End of container
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             // Intended empty array
             0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
             0x18, // End of container
-            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
           0x18, // End of container
         0x18, // End of container
         // clang-format on
@@ -267,10 +267,10 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
                   0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
                   0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
                 0x18, // End of container
+                0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
                 // Intended empty array
                 0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
                 0x18, // End of container
-                0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
               0x18, // End of container
             0x18, // End of container
 
@@ -282,8 +282,8 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
                   0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
                   0x34, 0x05, // Tag (05) Null
                 0x18, // End of container
-                0x29, 0x02, // Tag (02) Value True (Attribute Value)
                 0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
+                0x29, 0x02, // Tag (02) Value True (Attribute Value)
               0x18, // End of container
             0x18, // End of container
             // clang-format on
@@ -306,8 +306,8 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
                   0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
                   0x34, 0x05, // Tag (05) Null
                 0x18, // End of container
-                0x28, 0x02, // Tag (02) Value False (Attribute Value)
                 0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
+                0x28, 0x02, // Tag (02) Value False (Attribute Value)
               0x18, // End of container
             0x18, // End of container
             // clang-format on
