@@ -26,6 +26,10 @@ namespace mdns {
 namespace Minimal {
 namespace {
 
+// Port number to use t o signal 'select random unused port' during UDP sockeg
+// binding.
+constexpr uint16_t kPickRandomBindPort = 0;
+
 class ShutdownOnError
 {
 public:
@@ -130,7 +134,11 @@ void ServerBase::Shutdown()
 {
     for (size_t i = 0; i < mEndpointCount; i++)
     {
-        if (mEndpoints[i].udp != nullptr)
+        if (mEndpoints[i].listen_udp != nullptr)
+        {
+            ShutdownEndpoint(mEndpoints[i]);
+        }
+        if (mEndpoints[i].query_udp != nullptr)
         {
             ShutdownEndpoint(mEndpoints[i]);
         }
@@ -141,7 +149,7 @@ bool ServerBase::IsListening() const
 {
     for (size_t i = 0; i < mEndpointCount; i++)
     {
-        if (mEndpoints[i].udp != nullptr)
+        if (mEndpoints[i].listen_udp != nullptr)
         {
             return true;
         }
@@ -167,13 +175,13 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
         info->addressType   = addressType;
         info->interfaceId   = interfaceId;
 
-        ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->udp));
+        ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->listen_udp));
 
-        ReturnErrorOnFailure(info->udp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
+        ReturnErrorOnFailure(info->listen_udp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
 
-        ReturnErrorOnFailure(info->udp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
+        ReturnErrorOnFailure(info->listen_udp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
 
-        CHIP_ERROR err = JoinMulticastGroup(interfaceId, info->udp, addressType);
+        CHIP_ERROR err = JoinMulticastGroup(interfaceId, info->listen_udp, addressType);
         if (err != CHIP_NO_ERROR)
         {
             char interfaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
@@ -188,6 +196,9 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
         {
             endpointIndex++;
         }
+
+        ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->query_udp));
+        ReturnErrorOnFailure(info->listen_udp->Bind(addressType, chip::Inet::IPAddress::Any, kPickRandomBindPort, interfaceId));
     }
 
     return autoShutdown.ReturnSuccess();
@@ -199,7 +210,7 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, cons
     for (size_t i = 0; i < mEndpointCount; i++)
     {
         EndpointInfo * info = &mEndpoints[i];
-        if (info->udp == nullptr)
+        if (info->listen_udp == nullptr)
         {
             continue;
         }
@@ -209,14 +220,14 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, cons
             continue;
         }
 
-        chip::Inet::InterfaceId boundIf = info->udp->GetBoundInterface();
+        chip::Inet::InterfaceId boundIf = info->listen_udp->GetBoundInterface();
 
         if ((boundIf.IsPresent()) && (boundIf != interface))
         {
             continue;
         }
 
-        return info->udp->SendTo(addr, port, std::move(data));
+        return info->listen_udp->SendTo(addr, port, std::move(data));
     }
 
     return CHIP_ERROR_NOT_CONNECTED;
@@ -229,7 +240,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
     {
         EndpointInfo * info = &mEndpoints[i];
 
-        if (info->udp == nullptr)
+        if (info->listen_udp == nullptr)
         {
             continue;
         }
@@ -253,12 +264,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
         /// TODO: this wastes one copy of the data and that could be optimized away
         if (info->addressType == chip::Inet::IPAddressType::kIPv6)
         {
-            err = info->udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
+            err = info->listen_udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), info->listen_udp->GetBoundInterface());
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::IPAddressType::kIPv4)
         {
-            err = info->udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
+            err = info->listen_udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), info->listen_udp->GetBoundInterface());
         }
 #endif
         else
@@ -292,7 +303,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
     {
         EndpointInfo * info = &mEndpoints[i];
 
-        if (info->udp == nullptr)
+        if (info->listen_udp == nullptr)
         {
             continue;
         }
@@ -306,12 +317,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
         /// TODO: this wastes one copy of the data and that could be optimized away
         if (info->addressType == chip::Inet::IPAddressType::kIPv6)
         {
-            err = info->udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
+            err = info->listen_udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), info->listen_udp->GetBoundInterface());
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::IPAddressType::kIPv4)
         {
-            err = info->udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), info->udp->GetBoundInterface());
+            err = info->listen_udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), info->listen_udp->GetBoundInterface());
         }
 #endif
         else

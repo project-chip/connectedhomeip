@@ -79,7 +79,8 @@ public:
     {
         chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
         chip::Inet::IPAddressType addressType;
-        chip::Inet::UDPEndPoint * udp = nullptr;
+        chip::Inet::UDPEndPoint * listen_udp = nullptr;
+        chip::Inet::UDPEndPoint * query_udp = nullptr;
     };
 
     ServerBase(EndpointInfo * endpointStorage, size_t kStorageSize) : mEndpoints(endpointStorage), mEndpointCount(kStorageSize)
