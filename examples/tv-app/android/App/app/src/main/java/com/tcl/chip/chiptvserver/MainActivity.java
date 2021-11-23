@@ -19,7 +19,6 @@ import com.tcl.chip.tvapp.KeypadInputManagerStub;
 import com.tcl.chip.tvapp.MediaInputManagerStub;
 import com.tcl.chip.tvapp.TvApp;
 import com.tcl.chip.tvapp.WakeOnLanManagerStub;
-
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
