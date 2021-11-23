@@ -135,7 +135,7 @@ EmberAfCluster * emberAfFindClusterInTypeWithMfgCode(EmberAfEndpointType * endpo
 
 EmberAfCluster * emberAfFindClusterInType(EmberAfEndpointType * endpointType, chip::ClusterId clusterId, EmberAfClusterMask mask);
 
-// For a given cluster and mask, retrieves the list of endpoints that contain the matching cluster and returns the index
+// For a given cluster and mask, retrieves the list of endpoints sorted by endpoint that contain the matching cluster and returns the index
 // within that list that matches the given endpoint.
 //
 // Mask is either CLUSTER_MASK_CLIENT or CLUSTER_MASK_SERVER
