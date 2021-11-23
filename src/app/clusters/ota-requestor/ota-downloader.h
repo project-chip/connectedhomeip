@@ -58,7 +58,7 @@ public:
     // Destructor
     virtual ~OTADownloader() = default;
  private:
-    OTAImageProcessorDriver * mImageProcessorDelegate;   
+    OTAImageProcessorDriver * mImageProcessorDelegate;
 };
 
 
@@ -67,4 +67,3 @@ void SetDownloaderInstance(OTADownloader *instance);
 
 // Get the object implementing OTADownloaderInterface
 OTADownloader* GetDownloaderInstance();
-

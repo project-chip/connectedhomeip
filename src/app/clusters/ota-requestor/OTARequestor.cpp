@@ -60,7 +60,7 @@ OTARequestorInterface *globalOTARequestorInstance = nullptr;
 constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this value when starting OTA "immediately"
 
 constexpr uint8_t kNodeIdHexStringMaxLen = 16;
-// Callbacks for connection management 
+// Callbacks for connection management
 void OnConnected(void * context, chip::DeviceProxy * deviceProxy);
 Callback<OnDeviceConnected> mOnConnectedCallback(OnConnected, nullptr);
 
