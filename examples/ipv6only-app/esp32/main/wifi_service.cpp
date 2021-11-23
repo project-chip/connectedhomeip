@@ -218,7 +218,7 @@ pw::Status Wifi::Init()
     return pw::OkStatus();
 }
 
-pw::Status Wifi::Connect(ServerContext &, const chip_rpc_ConnectionData & request, chip_rpc_ConnectionResult & response)
+pw::Status Wifi::Connect(const chip_rpc_ConnectionData & request, chip_rpc_ConnectionResult & response)
 {
     wifi_config_t wifi_config {
         .sta = {
@@ -263,7 +263,7 @@ pw::Status Wifi::Connect(ServerContext &, const chip_rpc_ConnectionData & reques
     return pw::OkStatus();
 }
 
-void Wifi::StartScan(ServerContext &, const chip_rpc_ScanConfig & request, ServerWriter<chip_rpc_ScanResults> & writer)
+void Wifi::StartScan(const chip_rpc_ScanConfig & request, ServerWriter<chip_rpc_ScanResults> & writer)
 {
     wifi_scan_config_t scan_config{ 0 };
     if (request.ssid_count != 0)
