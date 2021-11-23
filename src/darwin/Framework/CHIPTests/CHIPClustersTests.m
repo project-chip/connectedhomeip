@@ -16933,52 +16933,6 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-
-- (void)testSendClusterTest_TC_WNCV_2_4_000000_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads Type attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Reads Type attribute from DUT Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-
-        {
-            id actualValue = values[@"value"];
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_2_4_000001_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads Type attribute constraints"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Reads Type attribute constraints Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-
-        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 9);
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
 - (void)testSendClusterTest_TC_WNCV_2_1_000015_ReadAttribute
 {
     XCTestExpectation * expectation =
@@ -17855,6 +17809,52 @@ CHIPDevice * GetConnectedDevice()
         XCTAssertEqual(err.code, 0);
 
         XCTAssertNotEqual([values[@"value"] unsignedCharValue], 200);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_WNCV_2_4_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads Type attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads Type attribute from DUT Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        {
+            id actualValue = values[@"value"];
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_4_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads Type attribute constraints"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reads Type attribute constraints Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 9);
 
         [expectation fulfill];
     }];
