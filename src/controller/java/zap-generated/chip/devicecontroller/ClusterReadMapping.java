@@ -1848,6 +1848,19 @@ public class ClusterReadMapping {
     readEthernetNetworkDiagnosticsInteractionInfo.put(
         "readTimeSinceResetAttribute",
         readEthernetNetworkDiagnosticsTimeSinceResetAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readEthernetNetworkDiagnosticsFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readEthernetNetworkDiagnosticsFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.EthernetNetworkDiagnosticsCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readEthernetNetworkDiagnosticsFeatureMapCommandParams);
+    readEthernetNetworkDiagnosticsInteractionInfo.put(
+        "readFeatureMapAttribute",
+        readEthernetNetworkDiagnosticsFeatureMapAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readEthernetNetworkDiagnosticsClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readEthernetNetworkDiagnosticsClusterRevisionAttributeInteractionInfo =
@@ -3814,6 +3827,18 @@ public class ClusterReadMapping {
     readSoftwareDiagnosticsInteractionInfo.put(
         "readCurrentHeapHighWatermarkAttribute",
         readSoftwareDiagnosticsCurrentHeapHighWatermarkAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSoftwareDiagnosticsFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSoftwareDiagnosticsFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SoftwareDiagnosticsCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readSoftwareDiagnosticsFeatureMapCommandParams);
+    readSoftwareDiagnosticsInteractionInfo.put(
+        "readFeatureMapAttribute", readSoftwareDiagnosticsFeatureMapAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readSoftwareDiagnosticsClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readSoftwareDiagnosticsClusterRevisionAttributeInteractionInfo =

@@ -1132,6 +1132,8 @@ NS_ASSUME_NONNULL_BEGIN
                                         responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeTimeSinceResetWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
@@ -2331,6 +2333,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                       maxInterval:(uint16_t)maxInterval
                                                   responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentHeapHighWatermarkWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval

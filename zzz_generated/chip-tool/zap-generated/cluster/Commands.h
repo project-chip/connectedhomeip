@@ -17541,6 +17541,7 @@ private:
 | * OverrunCount                                                      | 0x0006 |
 | * CarrierDetect                                                     | 0x0007 |
 | * TimeSinceReset                                                    | 0x0008 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -18335,6 +18336,40 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadEthernetNetworkDiagnosticsFeatureMap : public ModelCommand
+{
+public:
+    ReadEthernetNetworkDiagnosticsFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadEthernetNetworkDiagnosticsFeatureMap()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0037) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -32865,6 +32900,7 @@ private:
 | * CurrentHeapFree                                                   | 0x0001 |
 | * CurrentHeapUsed                                                   | 0x0002 |
 | * CurrentHeapHighWatermark                                          | 0x0003 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -33179,6 +33215,40 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadSoftwareDiagnosticsFeatureMap : public ModelCommand
+{
+public:
+    ReadSoftwareDiagnosticsFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadSoftwareDiagnosticsFeatureMap()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0034) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SoftwareDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -51851,6 +51921,7 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands)
         make_unique<ReportEthernetNetworkDiagnosticsCarrierDetect>(),   //
         make_unique<ReadEthernetNetworkDiagnosticsTimeSinceReset>(),    //
         make_unique<ReportEthernetNetworkDiagnosticsTimeSinceReset>(),  //
+        make_unique<ReadEthernetNetworkDiagnosticsFeatureMap>(),        //
         make_unique<ReadEthernetNetworkDiagnosticsClusterRevision>(),   //
         make_unique<ReportEthernetNetworkDiagnosticsClusterRevision>(), //
     };
@@ -52468,6 +52539,7 @@ void registerClusterSoftwareDiagnostics(Commands & commands)
         make_unique<ReportSoftwareDiagnosticsCurrentHeapUsed>(),          //
         make_unique<ReadSoftwareDiagnosticsCurrentHeapHighWatermark>(),   //
         make_unique<ReportSoftwareDiagnosticsCurrentHeapHighWatermark>(), //
+        make_unique<ReadSoftwareDiagnosticsFeatureMap>(),                 //
         make_unique<ReadSoftwareDiagnosticsClusterRevision>(),            //
         make_unique<ReportSoftwareDiagnosticsClusterRevision>(),          //
     };

@@ -315,6 +315,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOverrunCountWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeCarrierDetectWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeTimeSinceResetWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -692,6 +693,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeCurrentHeapFreeWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeCurrentHeapUsedWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeCurrentHeapHighWatermarkWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value responseHandler:(ResponseHandler)responseHandler;
 
 @end
