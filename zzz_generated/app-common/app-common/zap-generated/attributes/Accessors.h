@@ -1133,8 +1133,8 @@ namespace ThreadNetworkDiagnostics {
 namespace Attributes {
 
 namespace Channel {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Channel
 
 namespace RoutingRole {

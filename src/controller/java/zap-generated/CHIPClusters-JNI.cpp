@@ -30500,8 +30500,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, reportChannelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onReport(
-        Platform::New<CHIPInt8uAttributeCallback>(callback, true), Platform::Delete<CHIPInt8uAttributeCallback>);
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onReport(
+        Platform::New<CHIPInt16uAttributeCallback>(callback, true), Platform::Delete<CHIPInt16uAttributeCallback>);
     VerifyOrReturn(onReport.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native report callback", CHIP_ERROR_NO_MEMORY));

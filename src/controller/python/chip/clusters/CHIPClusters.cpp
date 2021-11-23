@@ -10795,7 +10795,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Cha
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeChannel(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+    return cluster.ReadAttributeChannel(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_SubscribeAttribute_ThreadNetworkDiagnostics_Channel(chip::DeviceProxy * device,
@@ -10807,7 +10807,7 @@ chip::ChipError::StorageType chip_ime_SubscribeAttribute_ThreadNetworkDiagnostic
     chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .SubscribeAttributeChannel(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
+        .SubscribeAttributeChannel(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval)
         .AsInteger();
 }
 

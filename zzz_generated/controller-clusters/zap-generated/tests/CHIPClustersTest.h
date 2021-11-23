@@ -997,7 +997,7 @@ public:
     ~ThreadNetworkDiagnosticsClusterTest() {}
 
     CHIP_ERROR WriteAttributeChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t value);
+                                     uint16_t value);
     CHIP_ERROR WriteAttributeRoutingRole(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          uint8_t value);
     CHIP_ERROR WriteAttributeNetworkName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
