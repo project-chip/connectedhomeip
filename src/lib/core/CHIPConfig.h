@@ -1403,6 +1403,8 @@
  *  @note
  *    WARNING: This option makes it possible to circumvent basic chip security functionality,
  *    including message encryption. Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+ * 
+ *    To build with this flag, pass 'treat_warnings_as_errors=false' to gn/ninja.
  */
 #ifndef CHIP_CONFIG_SECURITY_TEST_MODE
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
