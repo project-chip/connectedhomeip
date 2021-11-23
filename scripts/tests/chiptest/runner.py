@@ -34,7 +34,11 @@ class LogPipe(threading.Thread):
 
         self.daemon = False
         self.level = level
-        self.fd_read, self.fd_write = pty.openpty()
+        if sys.platform == 'darwin':
+           self.fd_read, self.fd_write = pty.openpty()
+        else:
+           self.fd_read, self.fd_write = os.pipe()
+
         self.pipeReader = os.fdopen(self.fd_read)
         self.captured_logs = []
         self.capture_delegate = capture_delegate
