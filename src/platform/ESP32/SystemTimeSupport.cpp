@@ -48,6 +48,69 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
     return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
 }
 
+CHIP_ERROR ClockImpl::GetClock_RealTime(uint64_t & aCurTime)
+{
+    struct timeval tv;
+    if (gettimeofday(&tv, nullptr) != 0)
+    {
+        return CHIP_ERROR_POSIX(errno);
+    }
+    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    if (tv.tv_usec < 0)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
+    aCurTime = (static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(uint64_t & aCurTime)
+{
+    struct timeval tv;
+    if (gettimeofday(&tv, nullptr) != 0)
+    {
+        return CHIP_ERROR_POSIX(errno);
+    }
+    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    if (tv.tv_usec < 0)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
+    aCurTime = (static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(uint64_t aNewCurTime)
+{
+    struct timeval tv;
+    tv.tv_sec  = static_cast<time_t>(aNewCurTime / UINT64_C(1000000));
+    tv.tv_usec = static_cast<long>(aNewCurTime % UINT64_C(1000000));
+    if (settimeofday(&tv, nullptr) != 0)
+    {
+        return (errno == EPERM) ? CHIP_ERROR_ACCESS_DENIED : CHIP_ERROR_POSIX(errno);
+    }
+#if CHIP_PROGRESS_LOGGING
+    {
+        const time_t timep = tv.tv_sec;
+        struct tm calendar;
+        localtime_r(&timep, &calendar);
+        ChipLogProgress(
+            DeviceLayer,
+            "Real time clock set to %ld (%04" PRId16 "/%02" PRId8 "/%02" PRId8 " %02" PRId8 ":%02" PRId8 ":%02" PRId8 " UTC)",
+            tv.tv_sec, calendar.tm_year, calendar.tm_mon, calendar.tm_mday, calendar.tm_hour, calendar.tm_min, calendar.tm_sec);
+    }
+#endif // CHIP_PROGRESS_LOGGING
+    return CHIP_NO_ERROR;
+}
+
 } // namespace Clock
 } // namespace System
 } // namespace chip

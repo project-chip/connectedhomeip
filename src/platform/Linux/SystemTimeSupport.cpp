@@ -50,6 +50,21 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
     return std::chrono::duration_cast<Milliseconds64>(std::chrono::steady_clock::now().time_since_epoch());
 }
 
+CHIP_ERROR ClockImpl::GetClock_RealTime(uint64_t & aCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(uint64_t & aCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(uint64_t aNewCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 } // namespace Clock
 } // namespace System
 } // namespace chip
