@@ -2739,7 +2739,7 @@ constexpr size_t EstimateStructOverhead(size_t firstFieldSize, FieldSizes... oth
     // Estimate 4 bytes of overhead per field.  This can happen for a large
     // octet string field: 1 byte control, 1 byte context tag, 2 bytes
     // length.
-    return firstFieldSize + 4 + EstimateStructOverhead(otherFields...);
+    return firstFieldSize + 4u + EstimateStructOverhead(otherFields...);
 }
 
 } // namespace TLV
