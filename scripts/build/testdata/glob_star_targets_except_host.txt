@@ -26,6 +26,7 @@ esp32-m5stack-all-clusters-ipv6only
 esp32-m5stack-all-clusters-rpc
 esp32-m5stack-all-clusters-rpc-ipv6only
 infineon-p6-all-clusters
+infineon-p6-light
 infineon-p6-lock
 mbed-CY8CPROTO_062_4343W-all-clusters-release
 mbed-CY8CPROTO_062_4343W-light-release
