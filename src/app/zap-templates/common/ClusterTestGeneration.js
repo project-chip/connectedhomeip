@@ -440,8 +440,8 @@ async function chip_tests(list, options)
 {
   const items = Array.isArray(list) ? list : list.split(',');
   const names = items.map(name => name.trim());
-  let tests = names.map(item => parse(item));
-  tests = await Promise.all(tests.map(async function(test) {
+  let tests   = names.map(item => parse(item));
+  tests       = await Promise.all(tests.map(async function(test) {
     test.tests = await Promise.all(test.tests.map(async function(item) {
       if (item.isCommand) {
         let command        = await assertCommandOrAttribute(item);
