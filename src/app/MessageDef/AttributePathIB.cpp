@@ -250,5 +250,32 @@ AttributePathIB::Builder & AttributePathIB::Builder::EndOfAttributePathIB()
     EndOfContainer();
     return *this;
 }
-}; // namespace app
-}; // namespace chip
+
+CHIP_ERROR AttributePathIB::Builder::Encode(const AttributePathParams & aAttributePathParams)
+{
+    if (!(aAttributePathParams.HasWildcardEndpointId()))
+    {
+        Endpoint(aAttributePathParams.mEndpointId);
+    }
+
+    if (!(aAttributePathParams.HasWildcardClusterId()))
+    {
+        Cluster(aAttributePathParams.mClusterId);
+    }
+
+    if (!(aAttributePathParams.HasWildcardAttributeId()))
+    {
+        Attribute(aAttributePathParams.mAttributeId);
+    }
+
+    if (!(aAttributePathParams.HasWildcardListIndex()))
+    {
+        ListIndex(aAttributePathParams.mListIndex);
+    }
+
+    EndOfAttributePathIB();
+    return GetError();
+}
+
+} // namespace app
+} // namespace chip

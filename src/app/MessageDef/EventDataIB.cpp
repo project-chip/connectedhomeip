@@ -392,7 +392,6 @@ CHIP_ERROR EventDataIB::Parser::ProcessEventPath(EventPathIB::Parser & aEventPat
     err = aEventPath.GetEvent(&(aConcreteEventPath.mEventId));
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
 
-    VerifyOrReturnError(aConcreteEventPath.IsValidEventPath(), CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
     return CHIP_NO_ERROR;
 }
 

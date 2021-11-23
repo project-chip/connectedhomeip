@@ -37,7 +37,6 @@ static_library("app") {
   sources = [
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
-    "AttributePathParams.cpp",
     "AttributePathParams.h",
     "BufferedReadCallback.cpp",
     "CASESessionManager.cpp",
@@ -49,6 +48,7 @@ static_library("app") {
     "DeviceProxy.cpp",
     "DeviceProxy.h",
     "EventManagement.cpp",
+    "EventPathParams.h",
     "InteractionModelEngine.cpp",
     "MessageDef/ArrayBuilder.cpp",
     "MessageDef/ArrayParser.cpp",
