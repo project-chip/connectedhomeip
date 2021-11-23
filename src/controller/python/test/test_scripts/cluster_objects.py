@@ -146,6 +146,11 @@ class ClusterObjectTests:
             raise AssertionError("Read returned unexpected result.")
 
     @classmethod
+    async def SendReadRequest(cls, devCtrl):
+        logger.info("Test ListLongOctetString for testing ListChunkingFeature")
+        await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListLongOctetString)])
+
+    @classmethod
     async def RunTest(cls, devCtrl):
         try:
             cls.TestAPI()
@@ -154,6 +159,7 @@ class ClusterObjectTests:
             await cls.SendCommandWithResponse(devCtrl)
             await cls.SendWriteRequest(devCtrl)
             await cls.SendReadRequest(devCtrl)
+            await cls.SendReadRequestListChunking(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")

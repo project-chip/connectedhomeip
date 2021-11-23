@@ -137,6 +137,7 @@ limitations under the License.
                writable="true" optional="false" default="0">vendor_id</attribute>
     <attribute side="server" code="0x0023" define="LIST_OF_STRUCTS_WITH_OPTIONALS" type="ARRAY" entryType="NullablesAndOptionalsStruct"
                writable="false" optional="false">list_nullables_and_optionals_struct</attribute>
+    <attribute side="server" code="0x0024" define="LIST_LONG_OCTET_STRING" type="ARRAY" entryType="LONG_OCTET_STRING" length="1000" writable="false" optional="false">list_long_octet_string</attribute>
     <!-- Can't enable the SimpleEnum test until we stop force-lowercasing
          attribute types in ZAP -->
     <!--<attribute side="server" code="0x0023" define="SIMPLE_ENUM" type="SimpleEnum" writable="true" optional="false">simple_enum</attribute>-->
