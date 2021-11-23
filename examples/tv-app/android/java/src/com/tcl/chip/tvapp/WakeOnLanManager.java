@@ -19,10 +19,10 @@ package com.tcl.chip.tvapp;
 
 public interface WakeOnLanManager {
 
-    /**
-     * Get Wake On Lan Mac address for endpoint
-     *
-     * @return Mac address in AA:BB:CC:DD:EE
-     */
-    String getMac(int endpoint);
+  /**
+   * Get Wake On Lan Mac address for endpoint
+   *
+   * @return Mac address in AA:BB:CC:DD:EE
+   */
+  String getMac(int endpoint);
 }
