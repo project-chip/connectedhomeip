@@ -116,6 +116,7 @@ def CreateNamespacesForAppTest():
     else:
         logging.warn("Some addresses look to still be tentative")
 
+
 def PrepareNamespacesForTestExecution(in_unshare: bool):
     if not in_unshare:
         EnsureNetworkNamespaceAvailability()
