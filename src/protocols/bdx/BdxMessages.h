@@ -34,15 +34,16 @@ namespace bdx {
 
 enum class MessageType : uint8_t
 {
-    SendInit      = 0x01,
-    SendAccept    = 0x02,
-    ReceiveInit   = 0x04,
-    ReceiveAccept = 0x05,
-    BlockQuery    = 0x10,
-    Block         = 0x11,
-    BlockEOF      = 0x12,
-    BlockAck      = 0x13,
-    BlockAckEOF   = 0x14,
+    SendInit           = 0x01,
+    SendAccept         = 0x02,
+    ReceiveInit        = 0x04,
+    ReceiveAccept      = 0x05,
+    BlockQuery         = 0x10,
+    Block              = 0x11,
+    BlockEOF           = 0x12,
+    BlockAck           = 0x13,
+    BlockAckEOF        = 0x14,
+    BlockQueryWithSkip = 0x15,
 };
 
 enum class StatusCode : uint16_t
@@ -308,6 +309,28 @@ struct DataBlock : public BdxMessage
 
 using Block    = DataBlock;
 using BlockEOF = DataBlock;
+
+/**
+ * A struct for representing BlockQueryWithSkip messages
+ */
+struct BlockQueryWithSkip : public BdxMessage
+{
+    /**
+     * @brief
+     *  Equality check method.
+     */
+    bool operator==(const BlockQueryWithSkip &) const;
+
+    uint32_t BlockCounter = 0;
+    uint64_t BytesToSkip  = 0;
+
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
+    size_t MessageSize() const override;
+#if CHIP_AUTOMATION_LOGGING
+    void LogMessage(bdx::MessageType messageType) const override;
+#endif // CHIP_AUTOMATION_LOGGING
+};
 
 } // namespace bdx
 

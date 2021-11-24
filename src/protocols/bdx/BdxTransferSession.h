@@ -34,6 +34,7 @@ public:
         kAcceptReceived,
         kBlockReceived,
         kQueryReceived,
+        kQueryWithSkipReceived,
         kAckReceived,
         kAckEOFReceived,
         kStatusReceived,
@@ -99,6 +100,11 @@ public:
         }
     };
 
+    struct TransferSkipData
+    {
+        uint64_t BytesToSkip = 0;
+    };
+
     /**
      * @brief
      *   All output data processed by the TransferSession object will be passed to the caller using this struct via PollOutput().
@@ -121,6 +127,7 @@ public:
             BlockData blockdata;
             StatusReportData statusData;
             MessageTypeData msgTypeData;
+            TransferSkipData bytesToSkip;
         };
 
         OutputEvent() : EventType(OutputEventType::kNone) { statusData = { StatusCode::kNone }; }
@@ -134,6 +141,7 @@ public:
         static OutputEvent BlockDataEvent(BlockData data, System::PacketBufferHandle msg);
         static OutputEvent StatusReportEvent(OutputEventType type, StatusReportData data);
         static OutputEvent MsgToSendEvent(MessageTypeData typeData, System::PacketBufferHandle msg);
+        static OutputEvent QueryWithSkipEvent(TransferSkipData bytesToSkip);
     };
 
     /**
@@ -314,6 +322,7 @@ private:
     void HandleReceiveAccept(System::PacketBufferHandle msgData);
     void HandleSendAccept(System::PacketBufferHandle msgData);
     void HandleBlockQuery(System::PacketBufferHandle msgData);
+    void HandleBlockQueryWithSkip(System::PacketBufferHandle msgData);
     void HandleBlock(System::PacketBufferHandle msgData);
     void HandleBlockEOF(System::PacketBufferHandle msgData);
     void HandleBlockAck(System::PacketBufferHandle msgData);
@@ -357,6 +366,7 @@ private:
     TransferAcceptData mTransferAcceptData;
     BlockData mBlockEventData;
     MessageTypeData mMsgTypeData;
+    TransferSkipData mBytesToSkip;
 
     size_t mNumBytesProcessed = 0;
 
