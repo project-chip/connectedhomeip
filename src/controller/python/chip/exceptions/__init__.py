@@ -103,3 +103,12 @@ class UnknownAttribute(ClusterError):
 
     def __str__(self):
         return "UnknownAttribute: cluster: {}, attribute: {}".format(self.cluster, self.attribute)
+
+
+class UnknownEvent(ClusterError):
+    def __init__(self, cluster: str, event: str):
+        self.cluster = cluster
+        self.event = event
+
+    def __str__(self):
+        return "UnknownEvent: cluster: {}, event: {}".format(self.cluster, self.event)

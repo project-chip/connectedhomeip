@@ -455,10 +455,7 @@ CHIP_ERROR EventDataIB::Parser::ProcessEventTimestamp(EventHeader & aEventHeader
         hasEpochTimestamp              = true;
     }
 
-    if ((hasSystemTimestamp && !hasEpochTimestamp && !hasDeltaSystemTimestamp && !hasDeltaEpochTimestamp) ||
-        (!hasSystemTimestamp && hasEpochTimestamp && !hasDeltaSystemTimestamp && !hasDeltaEpochTimestamp) ||
-        (!hasSystemTimestamp && !hasEpochTimestamp && hasDeltaSystemTimestamp && !hasDeltaEpochTimestamp) ||
-        (!hasSystemTimestamp && !hasEpochTimestamp && !hasDeltaSystemTimestamp && hasDeltaEpochTimestamp))
+    if (hasSystemTimestamp + hasEpochTimestamp + hasDeltaSystemTimestamp + hasDeltaEpochTimestamp == 1)
     {
         return CHIP_NO_ERROR;
     }
