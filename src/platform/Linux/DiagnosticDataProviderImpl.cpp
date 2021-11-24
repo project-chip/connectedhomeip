@@ -349,6 +349,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
         {
             VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
             totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
+            return CHIP_NO_ERROR;
         }
     }
 
