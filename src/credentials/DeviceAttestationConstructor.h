@@ -23,6 +23,9 @@
 namespace chip {
 namespace Credentials {
 
+// CSRNonce and AttestationNonce need to be this size
+constexpr size_t kExpectedAttestationNonceSize = 32;
+
 /**
  *  @brief Take the attestation elements buffer and return each component seperately.
  *         All output data stays valid while attestationElements buffer is valid.

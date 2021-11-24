@@ -57,7 +57,6 @@ namespace {
 
 constexpr uint8_t kDACCertificate   = 1;
 constexpr uint8_t kPAICertificate   = 2;
-constexpr size_t kExpectedNonceSize = 32;
 
 class OperationalCredentialsAttrAccess : public AttributeAccessInterface
 {
@@ -202,7 +201,7 @@ FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
 } // anonymous namespace
 
 // As per specifications section 11.22.5.1. Constant RESP_MAX
-constexpr uint16_t kMaxRspLen = 900;
+constexpr size_t kMaxRspLen = 900;
 
 void fabricListChanged()
 {
@@ -455,7 +454,7 @@ exit:
     }
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: successfully added an NOC");
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: successfully added a NOC");
     }
 
     return true;
@@ -579,7 +578,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     Credentials::DeviceAttestationVendorReservedConstructor emptyVendorReserved(nullptr, 0);
 
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(attestationNonce.size() == kExpectedNonceSize, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(attestationNonce.size() == Credentials::kExpectedAttestationNonceSize, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     SuccessOrExit(err = dacProvider->GetCertificationDeclaration(certDeclSpan));
 
@@ -589,6 +588,8 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     attestationElementsSpan = MutableByteSpan{ attestationElements.Get(), attestationElementsLen };
     SuccessOrExit(err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, timestamp, kEmptyFirmwareInfo,
                                                                   emptyVendorReserved, attestationElementsSpan));
+
+    VerifyOrExit(attestationElementsSpan.size() <= kMaxRspLen, err = CHIP_ERROR_INTERNAL);
 
     // Prepare response payload with signature
     {
@@ -627,7 +628,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
     auto & CSRNonce = commandData.CSRNonce;
 
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(CSRNonce.size() == kExpectedNonceSize, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(CSRNonce.size() == Credentials::kExpectedAttestationNonceSize, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Prepare NOCSRElements structure
     {
@@ -654,9 +655,9 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
         VerifyOrExit(csrLength <= Crypto::kMAX_CSR_Length, err = CHIP_ERROR_INTERNAL);
 
         // Encode the NOCSR elements with the CSR and Nonce
-        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrLength,          // CSR buffer
-                                                          kExpectedNonceSize, // CSR Nonce
-                                                          0u                  // no vendor reserved data
+        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrLength,        // CSR buffer
+                                                          CSRNonce.size(),  // CSR Nonce
+                                                          0u                // no vendor reserved data
         );
 
         VerifyOrExit(nocsrElements.Alloc(nocsrLengthEstimate), err = CHIP_ERROR_NO_MEMORY);
@@ -664,6 +665,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
         nocsrElementsSpan = MutableByteSpan{ nocsrElements.Get(), nocsrLengthEstimate };
         SuccessOrExit(err = Credentials::ConstructNOCSRElements(ByteSpan{ csr.Get(), csrLength }, CSRNonce, kNoVendorReserved,
                                                                 kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan));
+        VerifyOrExit(nocsrElementsSpan.size() <= kMaxRspLen, err = CHIP_ERROR_INTERNAL);
     }
 
     // Prepare response payload with signature
@@ -684,6 +686,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        // TODO: Replace this error handling with fail-safe since it's not transactional against root certs
         gFabricBeingCommissioned.Reset();
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed OpCSRRequest: %s", ErrorStr(err));
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);

@@ -152,7 +152,7 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
     VerifyOrReturnError(!certificationDeclaration.empty() && !attestationNonce.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(attestationNonce.size() == 32, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(attestationNonce.size() == kExpectedAttestationNonceSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     tlvWriter.Init(attestationElements.data(), static_cast<uint32_t>(attestationElements.size()));
     outerContainerType = TLV::kTLVType_NotSpecified;
@@ -187,7 +187,7 @@ CHIP_ERROR ConstructNOCSRElements(const ByteSpan & csr, const ByteSpan & csrNonc
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
     VerifyOrReturnError(!csr.empty() && !csrNonce.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(csrNonce.size() == 32, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(csrNonce.size() == kExpectedAttestationNonceSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     tlvWriter.Init(nocsrElements.data(), static_cast<uint32_t>(nocsrElements.size()));
     outerContainerType = TLV::kTLVType_NotSpecified;
