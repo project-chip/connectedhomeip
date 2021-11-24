@@ -847,17 +847,17 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
         {
             otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
 
-            if (linkMode.mNetworkData)
+            if (otThreadIsRouterEligible(mOTInst))
             {
                 routingRole = EMBER_ZCL_ROUTING_ROLE_REED;
             }
-            else if (!linkMode.mRxOnWhenIdle)
+            else if (linkMode.mRxOnWhenIdle)
             {
-                routingRole = EMBER_ZCL_ROUTING_ROLE_SLEEPY_END_DEVICE;
+                routingRole = EMBER_ZCL_ROUTING_ROLE_END_DEVICE;
             }
             else
             {
-                routingRole = EMBER_ZCL_ROUTING_ROLE_END_DEVICE;
+                routingRole = EMBER_ZCL_ROUTING_ROLE_SLEEPY_END_DEVICE;
             }
         }
 
