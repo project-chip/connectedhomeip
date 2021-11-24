@@ -7318,15 +7318,6 @@ namespace Events {
 } // namespace Events
 
 } // namespace TimeSynchronization
-namespace BridgedDeviceBasicInformation {
-
-namespace Commands {
-} // namespace Commands
-
-namespace Events {
-} // namespace Events
-
-} // namespace BridgedDeviceBasicInformation
 namespace BridgedDeviceBasic {
 
 namespace Commands {

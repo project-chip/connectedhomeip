@@ -127,9 +127,6 @@ static constexpr ClusterId Id = 0x00000037;
 namespace TimeSynchronization {
 static constexpr ClusterId Id = 0x00000038;
 } // namespace TimeSynchronization
-namespace BridgedDeviceBasicInformation {
-static constexpr ClusterId Id = 0x00000039;
-} // namespace BridgedDeviceBasicInformation
 namespace BridgedDeviceBasic {
 static constexpr ClusterId Id = 0x00000039;
 } // namespace BridgedDeviceBasic
