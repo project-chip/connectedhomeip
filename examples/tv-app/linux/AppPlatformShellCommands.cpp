@@ -22,6 +22,7 @@
 #include "AppPlatformShellCommands.h"
 #include "AppPlatform.h"
 #include "ControllerShellCommands.h"
+#include <AppMain.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
@@ -74,7 +75,7 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
             return CHIP_ERROR_BAD_REQUEST;
         }
 
-        return pairUDC(printHeader, pincode, index);
+        return CommissionerPairUDC(pincode, index);
     }
     return CHIP_NO_ERROR;
 }

@@ -19,6 +19,7 @@
  * @file Contains shell commands for for performing discovery (eg. of commissionable nodes) related to commissioning.
  */
 
+#include <AppMain.h>
 #include <ControllerShellCommands.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
@@ -37,13 +38,6 @@ namespace Shell {
 
 using namespace ::chip::Controller;
 
-DeviceCommissioner * gCommissioner;
-
-DeviceCommissioner * GetDeviceCommissioner()
-{
-    return gCommissioner;
-}
-
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 static CHIP_ERROR ResetUDC(bool printHeader)
 {
@@ -54,7 +48,7 @@ static CHIP_ERROR ResetUDC(bool printHeader)
         streamer_printf(sout, "udc-reset:        ");
     }
 
-    gCommissioner->GetUserDirectedCommissioningServer()->ResetUDCClientProcessingStates();
+    GetDeviceCommissioner()->GetUserDirectedCommissioningServer()->ResetUDCClientProcessingStates();
 
     streamer_printf(sout, "done\r\n");
 
@@ -70,7 +64,7 @@ static CHIP_ERROR PrintUDC(bool printHeader)
         streamer_printf(sout, "udc-print:        \r\n");
     }
 
-    gCommissioner->GetUserDirectedCommissioningServer()->PrintUDCClients();
+    GetDeviceCommissioner()->GetUserDirectedCommissioningServer()->PrintUDCClients();
 
     streamer_printf(sout, "done\r\n");
 
@@ -87,7 +81,7 @@ static CHIP_ERROR discover(bool printHeader)
     }
 
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
-    gCommissioner->DiscoverCommissionableNodes(filter);
+    GetDeviceCommissioner()->DiscoverCommissionableNodes(filter);
 
     streamer_printf(sout, "done\r\n");
 
@@ -104,7 +98,7 @@ static CHIP_ERROR discover(bool printHeader, char * instance)
     }
 
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kInstanceName, instance);
-    gCommissioner->DiscoverCommissionableNodes(filter);
+    GetDeviceCommissioner()->DiscoverCommissionableNodes(filter);
 
     streamer_printf(sout, "done\r\n");
 
@@ -122,7 +116,7 @@ static CHIP_ERROR display(bool printHeader)
 
     for (int i = 0; i < 10; i++)
     {
-        const chip::Dnssd::DiscoveredNodeData * next = gCommissioner->GetDiscoveredDevice(i);
+        const chip::Dnssd::DiscoveredNodeData * next = GetDeviceCommissioner()->GetDiscoveredDevice(i);
         if (next == nullptr)
         {
             streamer_printf(sout, "  Entry %d null\r\n", i);
@@ -139,88 +133,6 @@ static CHIP_ERROR display(bool printHeader)
     return CHIP_NO_ERROR;
 }
 
-class PairingCommand : public chip::Controller::DevicePairingDelegate, public chip::Controller::DeviceAddressUpdateDelegate
-{
-    /////////// DevicePairingDelegate Interface /////////
-    void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
-    void OnPairingComplete(CHIP_ERROR error) override;
-    void OnPairingDeleted(CHIP_ERROR error) override;
-    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
-
-    /////////// DeviceAddressUpdateDelegate Interface /////////
-    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
-
-    CHIP_ERROR UpdateNetworkAddress();
-};
-
-NodeId gRemoteId = kTestDeviceNodeId;
-PairingCommand gPairingCommand;
-
-CHIP_ERROR PairingCommand::UpdateNetworkAddress()
-{
-    ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " ...", gRemoteId);
-    return gCommissioner->UpdateDevice(gRemoteId);
-}
-
-void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
-{
-    ChipLogProgress(chipTool, "OnAddressUpdateComplete: %s", ErrorStr(err));
-}
-
-void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
-{
-    switch (status)
-    {
-    case DevicePairingDelegate::Status::SecurePairingSuccess:
-        ChipLogProgress(chipTool, "Secure Pairing Success");
-        break;
-    case DevicePairingDelegate::Status::SecurePairingFailed:
-        ChipLogError(chipTool, "Secure Pairing Failed");
-        break;
-    }
-}
-
-void PairingCommand::OnPairingComplete(CHIP_ERROR err)
-{
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(chipTool, "Pairing Success");
-    }
-    else
-    {
-        ChipLogProgress(chipTool, "Pairing Failure: %s", ErrorStr(err));
-        // For some devices, it may take more time to appear on the network and become discoverable
-        // over DNS-SD, so don't give up on failure and restart the address update. Note that this
-        // will not be repeated endlessly as each chip-tool command has a timeout (in the case of
-        // the `pairing` command it equals 120s).
-        // UpdateNetworkAddress();
-    }
-}
-
-void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
-{
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(chipTool, "Pairing Deleted Success");
-    }
-    else
-    {
-        ChipLogProgress(chipTool, "Pairing Deleted Failure: %s", ErrorStr(err));
-    }
-}
-
-void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
-{
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(chipTool, "Device commissioning completed with success");
-    }
-    else
-    {
-        ChipLogProgress(chipTool, "Device commissioning Failure: %s", ErrorStr(err));
-    }
-}
-
 static CHIP_ERROR pairOnNetwork(bool printHeader, uint32_t pincode, uint16_t disc, chip::Transport::PeerAddress address)
 {
     streamer_t * sout = streamer_get();
@@ -230,15 +142,11 @@ static CHIP_ERROR pairOnNetwork(bool printHeader, uint32_t pincode, uint16_t dis
         streamer_printf(sout, "onnetwork \r\n");
     }
 
-    RendezvousParameters params = RendezvousParameters().SetSetupPINCode(pincode).SetDiscriminator(disc).SetPeerAddress(address);
-
-    gCommissioner->RegisterDeviceAddressUpdateDelegate(&gPairingCommand);
-    gCommissioner->RegisterPairingDelegate(&gPairingCommand);
-    gCommissioner->PairDevice(gRemoteId, params);
+    CHIP_ERROR err = CommissionerPairOnNetwork(pincode, disc, address);
 
     streamer_printf(sout, "done\r\n");
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR pairUDC(bool printHeader, uint32_t pincode, size_t index)
@@ -250,29 +158,10 @@ CHIP_ERROR pairUDC(bool printHeader, uint32_t pincode, size_t index)
         streamer_printf(sout, "udc-commission %ld %ld\r\n", pincode, index);
     }
 
-    UDCClientState * state = gCommissioner->GetUserDirectedCommissioningServer()->GetUDCClients().GetUDCClientState(index);
-    if (state == nullptr)
-    {
-        streamer_printf(sout, "udc client[%d] null \r\n", index);
-    }
-    else
-    {
-        Transport::PeerAddress peerAddress = state->GetPeerAddress();
+    CHIP_ERROR err = CommissionerPairUDC(pincode, index);
+    streamer_printf(sout, "done\r\n");
 
-        state->SetUDCClientProcessingState(UDCClientProcessingState::kCommissioningNode);
-
-        RendezvousParameters params = RendezvousParameters()
-                                          .SetSetupPINCode(pincode)
-                                          .SetDiscriminator(state->GetLongDiscriminator())
-                                          .SetPeerAddress(peerAddress);
-
-        gCommissioner->RegisterDeviceAddressUpdateDelegate(&gPairingCommand);
-        gCommissioner->RegisterPairingDelegate(&gPairingCommand);
-        gCommissioner->PairDevice(gRemoteId, params);
-
-        streamer_printf(sout, "done\r\n");
-    }
-    return CHIP_NO_ERROR;
+    return err;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
@@ -378,9 +267,8 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
     return error;
 }
 
-void RegisterControllerCommands(chip::Controller::DeviceCommissioner * commissioner)
+void RegisterControllerCommands()
 {
-    gCommissioner                              = commissioner;
     static const shell_command_t sDeviceComand = { &ControllerHandler, "controller",
                                                    "Controller commands. Usage: controller [command_name]" };
 
