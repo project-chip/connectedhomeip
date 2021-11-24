@@ -60,6 +60,7 @@
 		51B22C222740CB1D008D5055 /* CHIPCommandPayloadsObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 51B22C212740CB1D008D5055 /* CHIPCommandPayloadsObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51B22C262740CB32008D5055 /* CHIPStructsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B22C252740CB32008D5055 /* CHIPStructsObjc.mm */; };
 		51B22C2A2740CB47008D5055 /* CHIPCommandPayloadsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B22C292740CB47008D5055 /* CHIPCommandPayloadsObjc.mm */; };
+		51E24E73274E0DAC007CCF6E /* CHIPErrorTestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51E24E72274E0DAC007CCF6E /* CHIPErrorTestUtils.mm */; };
 		991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0822475F45400C13860 /* CHIPDeviceController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 991DC0872475F47D00C13860 /* CHIPDeviceController.mm */; };
 		991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC08A247704DC00C13860 /* CHIPLogging.h */; };
@@ -151,6 +152,7 @@
 		51B22C212740CB1D008D5055 /* CHIPCommandPayloadsObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPCommandPayloadsObjc.h; path = "zap-generated/CHIPCommandPayloadsObjc.h"; sourceTree = "<group>"; };
 		51B22C252740CB32008D5055 /* CHIPStructsObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPStructsObjc.mm; path = "zap-generated/CHIPStructsObjc.mm"; sourceTree = "<group>"; };
 		51B22C292740CB47008D5055 /* CHIPCommandPayloadsObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPCommandPayloadsObjc.mm; path = "zap-generated/CHIPCommandPayloadsObjc.mm"; sourceTree = "<group>"; };
+		51E24E72274E0DAC007CCF6E /* CHIPErrorTestUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPErrorTestUtils.mm; sourceTree = "<group>"; };
 		991DC0822475F45400C13860 /* CHIPDeviceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceController.h; sourceTree = "<group>"; };
 		991DC0872475F47D00C13860 /* CHIPDeviceController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceController.mm; sourceTree = "<group>"; };
 		991DC08A247704DC00C13860 /* CHIPLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPLogging.h; sourceTree = "<group>"; };
@@ -321,6 +323,7 @@
 		B202529A2459E34F00F97062 /* CHIPTests */ = {
 			isa = PBXGroup;
 			children = (
+				51E24E72274E0DAC007CCF6E /* CHIPErrorTestUtils.mm */,
 				1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */,
 				99C65E0F267282F1003402F6 /* CHIPControllerTests.m */,
 				B2F53AF1245B0DCF0010745E /* CHIPSetupPayloadParserTests.m */,
@@ -551,6 +554,7 @@
 				997DED1A26955D0200975E97 /* CHIPThreadOperationalDatasetTests.mm in Sources */,
 				99C65E10267282F1003402F6 /* CHIPControllerTests.m in Sources */,
 				B2F53AF2245B0DCF0010745E /* CHIPSetupPayloadParserTests.m in Sources */,
+				51E24E73274E0DAC007CCF6E /* CHIPErrorTestUtils.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -691,6 +695,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
 				INFOPLIST_FILE = CHIPTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -814,6 +819,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
+				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
 				INFOPLIST_FILE = CHIPTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

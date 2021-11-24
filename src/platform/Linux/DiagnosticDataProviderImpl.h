@@ -53,6 +53,54 @@ public:
     CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults) override;
     CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults) override;
     CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults) override;
+
+    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
+    void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
+
+    CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate) override;
+    CHIP_ERROR GetEthFullDuplex(bool & fullDuplex) override;
+    CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset) override;
+    CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount) override;
+    CHIP_ERROR GetEthPacketTxCount(uint64_t & packetTxCount) override;
+    CHIP_ERROR GetEthTxErrCount(uint64_t & txErrCount) override;
+    CHIP_ERROR GetEthCollisionCount(uint64_t & collisionCount) override;
+    CHIP_ERROR GetEthOverrunCount(uint64_t & overrunCount) override;
+    CHIP_ERROR ResetEthNetworkDiagnosticsCounts() override;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
+    CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
+    CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount) override;
+    CHIP_ERROR GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount) override;
+    CHIP_ERROR GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount) override;
+    CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount) override;
+    CHIP_ERROR GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount) override;
+    CHIP_ERROR GetWiFiCurrentMaxRate(uint64_t & currentMaxRate) override;
+    CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
+    CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion) override;
+    CHIP_ERROR GetWiFiBssId(ByteSpan & value) override;
+    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType) override;
+#endif
+
+private:
+    uint64_t mEthPacketRxCount  = 0;
+    uint64_t mEthPacketTxCount  = 0;
+    uint64_t mEthTxErrCount     = 0;
+    uint64_t mEthCollisionCount = 0;
+    uint64_t mEthOverrunCount   = 0;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    uint32_t mBeaconLostCount        = 0;
+    uint32_t mPacketMulticastRxCount = 0;
+    uint32_t mPacketMulticastTxCount = 0;
+    uint32_t mPacketUnicastRxCount   = 0;
+    uint32_t mPacketUnicastTxCount   = 0;
+    uint64_t mOverrunCount           = 0;
+#endif
 };
 
 } // namespace DeviceLayer

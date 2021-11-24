@@ -231,8 +231,8 @@
                 CHIPOperationalCredentials * cluster =
                     [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command sent."] isError:NO];
-                [cluster readAttributeCommissionedFabricsWithResponseHandler:^(
-                    NSError * _Nullable error, NSDictionary * _Nullable values) {
+                [cluster readAttributeCommissionedFabricsWithCompletionHandler:^(
+                    NSNumber * _Nullable commissionedFabrics, NSError * _Nullable error) {
                     if (error) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [self updateResult:[NSString
@@ -244,7 +244,6 @@
                             [self updateResult:[NSString
                                                    stringWithFormat:@"Command readAttributeCommissionedFabrics command succeeded."]
                                        isError:NO];
-                            NSNumber * commissionedFabrics = [values objectForKey:@"value"];
                             NSString * stringResult =
                                 [NSString stringWithFormat:@"# commissioned fabrics: %@", commissionedFabrics];
                             self->_commissionedFabricsLabel.text = stringResult;
@@ -270,8 +269,8 @@
                 CHIPOperationalCredentials * cluster =
                     [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command sent."] isError:NO];
-                [cluster readAttributeFabricsListWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                    NSArray * fabricsList = [values objectForKey:@"value"];
+                [cluster readAttributeFabricsListWithCompletionHandler:^(
+                    NSArray * _Nullable fabricsList, NSError * _Nullable error) {
                     if (error) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command failed: %@.", error]
@@ -283,7 +282,7 @@
                                        isError:NO];
                         });
                     }
-                    NSLog(@"Got back fabrics list: %@ error %@", values, error);
+                    NSLog(@"Got back fabrics list: %@ error %@", fabricsList, error);
                     [self updateFabricsListUIWithFabrics:fabricsList error:error];
                 }];
             } else {
@@ -353,7 +352,12 @@
 
                 [cluster
                     updateFabricLabelWithParams:params
-                              completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                              completionHandler:^(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable response,
+                                  NSError * _Nullable error) {
+                                  // TODO: UpdateFabricLabel can return errors
+                                  // via the NOCResponse response, but that
+                                  // seems like a spec bug that should be fixed
+                                  // in the spec.
                                   dispatch_async(dispatch_get_main_queue(), ^{
                                       if (error) {
                                           NSLog(@"Got back error trying to updateFabricLabel %@", error);
@@ -365,7 +369,7 @@
                                                          isError:YES];
                                           });
                                       } else {
-                                          NSLog(@"Successfully updated the label: %@", values);
+                                          NSLog(@"Successfully updated the label: %@", response);
                                           dispatch_async(dispatch_get_main_queue(), ^{
                                               self->_updateFabricLabelTextField.text = @"";
                                               [self

@@ -287,8 +287,7 @@ void ConnectDeviceAsync(intptr_t)
     OperationalDeviceProxy * deviceProxy = sOtaContext.deviceProxy;
     VerifyOrReturn(deviceProxy != nullptr);
 
-    deviceProxy->UpdateDeviceData(sOtaContext.providerAddress, deviceProxy->GetMRPIdleInterval(),
-                                  deviceProxy->GetMRPActiveInterval());
+    deviceProxy->UpdateDeviceData(sOtaContext.providerAddress, deviceProxy->GetMRPConfig());
     deviceProxy->Connect(&successCallback, &failureCallback);
 }
 

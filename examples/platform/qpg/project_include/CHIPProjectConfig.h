@@ -146,7 +146,6 @@
  *    The following definitions sets the maximum number of corresponding interaction model object pool size.
  *
  *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
- *      * #CHIP_IM_MAX_NUM_COMMAND_SENDER
  *      * #CHIP_IM_MAX_NUM_READ_HANDLER
  *      * #CHIP_IM_MAX_NUM_READ_CLIENT
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
@@ -163,13 +162,6 @@
  * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
  */
 #define CHIP_IM_MAX_NUM_COMMAND_HANDLER 2
-
-/**
- * @def CHIP_IM_MAX_NUM_COMMAND_SENDER
- *
- * @brief Defines the maximum number of CommandSender, limits the number of active command transactions on client.
- */
-#define CHIP_IM_MAX_NUM_COMMAND_SENDER 2
 
 /**
  * @def CHIP_IM_MAX_NUM_READ_HANDLER

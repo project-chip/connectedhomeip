@@ -18,15 +18,25 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
-
+#include <app/util/af-types.h>
+#include <jni.h>
 #include <lib/core/CHIPError.h>
-#include <string>
-#include <vector>
 
-class MediaInputManager
+class WakeOnLanManager
 {
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR proxyGetInputList(chip::app::AttributeValueEncoder & aEncoder);
+    void InitializeWithObjects(jobject managerObject);
+    void InitWakeOnLanCluster(chip::EndpointId endpoint);
+
+private:
+    friend WakeOnLanManager & WakeOnLanMgr();
+
+    static WakeOnLanManager sInstance;
+    jobject mWakeOnLanManagerObject = nullptr;
+    jmethodID mGetMacMethod         = nullptr;
 };
+
+inline WakeOnLanManager & WakeOnLanMgr()
+{
+    return WakeOnLanManager::sInstance;
+}
