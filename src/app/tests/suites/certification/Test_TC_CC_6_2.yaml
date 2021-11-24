@@ -102,7 +102,7 @@ tests:
                 value: 0
               - name: "optionsOverride"
                 value: 0
-    
+
     - label: "Stop Color Temperature command"
       command: "MoveColorTemperature"
       arguments:
@@ -160,7 +160,7 @@ tests:
                 value: 0
               - name: "optionsOverride"
                 value: 0
-    
+
     - label: "Read ColorTemperature attribute from DUT several times"
       disabled: true
       command: "readAttribute"

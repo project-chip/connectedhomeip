@@ -73,14 +73,14 @@ tests:
                 value: 0
               - name: "optionsOverride"
                 value: 0
-    
+
     - label: "Read CurrentSaturation attribute from DUT several times"
       disabled: true
       command: "readAttribute"
       attribute: "current saturation"
       response:
           value: 0
-    
+
     - label: "Move saturation up command"
       command: "MoveSaturation"
       arguments:
@@ -93,7 +93,7 @@ tests:
                 value: 0
               - name: "optionsOverride"
                 value: 0
-    
+
     - label: "Read CurrentSaturation attribute from DUT"
       disabled: true
       command: "readAttribute"
@@ -133,7 +133,7 @@ tests:
                 value: 0
               - name: "optionsOverride"
                 value: 0
-    
+
     - label: "Read CurrentSaturation attribute from DUT several times"
       disabled: true
       command: "readAttribute"
