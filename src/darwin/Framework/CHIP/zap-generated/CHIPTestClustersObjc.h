@@ -639,6 +639,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Power Source Configuration
+ *
+ */
+@interface CHIPTestPowerSourceConfiguration : CHIPPowerSourceConfiguration
+
+- (void)writeAttributeSourcesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+@end
+
+/**
  * Cluster Pressure Measurement
  *
  */

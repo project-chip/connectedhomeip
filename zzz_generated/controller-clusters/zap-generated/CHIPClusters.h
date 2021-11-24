@@ -1874,6 +1874,17 @@ public:
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
 };
 
+class DLL_EXPORT PowerSourceConfigurationCluster : public ClusterBase
+{
+public:
+    PowerSourceConfigurationCluster() : ClusterBase(app::Clusters::PowerSourceConfiguration::Id) {}
+    ~PowerSourceConfigurationCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR ReadAttributeSources(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
 class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
 {
 public:

@@ -13352,6 +13352,30 @@ CHIP_ERROR PowerSourceCluster::ReportAttributeClusterRevision(Callback::Cancelab
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
+// PowerSourceConfiguration Cluster Commands
+// PowerSourceConfiguration Cluster Attributes
+CHIP_ERROR PowerSourceConfigurationCluster::ReadAttributeSources(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000000;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             PowerSourceConfigurationClusterSourcesListAttributeFilter);
+}
+
+CHIP_ERROR PowerSourceConfigurationCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                         Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000FFFD;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
 // PressureMeasurement Cluster Commands
 // PressureMeasurement Cluster Attributes
 CHIP_ERROR PressureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,

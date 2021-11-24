@@ -2635,6 +2635,19 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Power Source Configuration
+ *
+ */
+@interface CHIPPowerSourceConfiguration : CHIPCluster
+
+- (void)readAttributeSourcesWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
  * Cluster Pressure Measurement
  *
  */

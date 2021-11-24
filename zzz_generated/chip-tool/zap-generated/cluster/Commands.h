@@ -2543,6 +2543,15 @@ static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context
     command->SetCommandExitStatus(err);
 }
 
+static void OnPowerSourceConfigurationSourcesListAttributeResponse(void * context,
+                                                                   const chip::app::DataModel::DecodableList<uint8_t> & list)
+{
+    CHIP_ERROR err = LogValue("OnPowerSourceConfigurationSourcesListAttributeResponse", 0, list);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+}
+
 static void OnSoftwareDiagnosticsThreadMetricsListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
@@ -3924,6 +3933,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | OnOffSwitchConfiguration                                            | 0x0007 |
 | OperationalCredentials                                              | 0x003E |
 | PowerSource                                                         | 0x002F |
+| PowerSourceConfiguration                                            | 0x002E |
 | PressureMeasurement                                                 | 0x0403 |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | RelativeHumidityMeasurement                                         | 0x0405 |
@@ -30322,6 +30332,85 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster PowerSourceConfiguration                                    | 0x002E |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Sources                                                           | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute Sources
+ */
+class ReadPowerSourceConfigurationSources : public ModelCommand
+{
+public:
+    ReadPowerSourceConfigurationSources() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "sources");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceConfigurationSources()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSources(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<PowerSourceConfigurationSourcesListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<PowerSourceConfigurationSourcesListAttributeCallback>(
+            OnPowerSourceConfigurationSourcesListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadPowerSourceConfigurationClusterRevision : public ModelCommand
+{
+public:
+    ReadPowerSourceConfigurationClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceConfigurationClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*----------------------------------------------------------------------------*\
@@ -57429,6 +57518,17 @@ void registerClusterPowerSource(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterPowerSourceConfiguration(Commands & commands)
+{
+    const char * clusterName = "PowerSourceConfiguration";
+
+    commands_list clusterCommands = {
+        make_unique<ReadPowerSourceConfigurationSources>(),         //
+        make_unique<ReadPowerSourceConfigurationClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterPressureMeasurement(Commands & commands)
 {
     const char * clusterName = "PressureMeasurement";
@@ -58254,6 +58354,7 @@ void registerClusters(Commands & commands)
     registerClusterOnOffSwitchConfiguration(commands);
     registerClusterOperationalCredentials(commands);
     registerClusterPowerSource(commands);
+    registerClusterPowerSourceConfiguration(commands);
     registerClusterPressureMeasurement(commands);
     registerClusterPumpConfigurationAndControl(commands);
     registerClusterRelativeHumidityMeasurement(commands);
