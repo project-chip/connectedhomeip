@@ -21,12 +21,12 @@ declare_args() {
   # and will work even if competing mdns servers (including other chip apps)
   # run on the same machine.
   #
-  # Downside is that replies sent to a port other than 5353 are considered 
-  # LEGACY by mDNS and will include the query section in them (i.e. larger 
+  # Downside is that replies sent to a port other than 5353 are considered
+  # LEGACY by mDNS and will include the query section in them (i.e. larger
   # payloads) and clients need to allocate more resources for this (need one
   # more UDP socket and corresponding code for the unicast query sending)
   chip_use_ephemeral_port_for_mdns_unicast_query =
-        (current_os == "mac" || current_os == "linux" || current_os == "android")
+      current_os == "mac" || current_os == "linux" || current_os == "android"
 }
 
 config("config") {
@@ -38,7 +38,6 @@ config("config") {
     defines += [ "CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT=0" ]
   }
 }
-
 
 static_library("minimal_mdns") {
   sources = [
