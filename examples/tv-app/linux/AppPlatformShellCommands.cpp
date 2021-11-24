@@ -85,6 +85,7 @@ static CHIP_ERROR PrintAllCommands()
     streamer_t * sout = streamer_get();
     streamer_printf(sout, "  help                       Usage: app <subcommand>\r\n");
     streamer_printf(sout, "  add <vid>                  Add app with given vendor ID [1, 2, 9050]. Usage: app add 9050\r\n");
+    streamer_printf(sout, "  remove <vid>               Remove app with given vendor ID [1, 2, 9050]. Usage: app remove 9050\r\n");
     streamer_printf(sout,
                     "  setpin <vid> <pincode>     Set pincode for app with given vendor ID. Usage: app setpin 9050 34567890\r\n");
     streamer_printf(sout,
@@ -115,6 +116,21 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         chip::AppPlatform::GetLoadContentAppByVendorId(vid);
 
         ChipLogProgress(DeviceLayer, "added app");
+
+        return CHIP_NO_ERROR;
+    }
+    else if (strcmp(argv[0], "remove") == 0)
+    {
+        if (argc < 2)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+
+        uint16_t vid = (uint16_t) strtol(argv[1], &eptr, 10);
+        chip::AppPlatform::UnloadContentAppByVendorId(vid);
+
+        ChipLogProgress(DeviceLayer, "removed app");
 
         return CHIP_NO_ERROR;
     }

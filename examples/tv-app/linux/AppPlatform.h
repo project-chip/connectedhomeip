@@ -85,6 +85,7 @@ protected:
 };
 
 void SetupAppPlatform();
+void UnloadContentAppByVendorId(uint16_t vendorId);
 ContentApp * GetLoadContentAppByVendorId(uint16_t vendorId);
 ContentApp * GetContentAppByEndpointId(chip::EndpointId id);
 

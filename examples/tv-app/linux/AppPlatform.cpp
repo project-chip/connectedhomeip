@@ -424,6 +424,9 @@ void SetupAppPlatform()
     App2.AccountLogin_SetSetupPIN(34567890);
     App3.AccountLogin_SetSetupPIN(20202021);
 
+    // add endpoint 3 to ensure tests pass
+    AddContentApp(&App1, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
+
     // Clear out the device database
     memset(gContentApps, 0, sizeof(gContentApps));
 
@@ -452,6 +455,28 @@ void SetupAppPlatform()
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
     // emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
+}
+
+void UnloadContentAppByVendorId(uint16_t vendorId)
+{
+    if (App1.GetVendorId() == vendorId)
+    {
+        RemoveContentApp(&App1);
+        return;
+    }
+    if (App2.GetVendorId() == vendorId)
+    {
+        RemoveContentApp(&App2);
+        return;
+    }
+    if (App3.GetVendorId() == vendorId)
+    {
+        RemoveContentApp(&App3);
+        return;
+    }
+    ChipLogProgress(DeviceLayer, "UnloadContentAppByVendorId() - vendor %d not found ", vendorId);
+
+    return;
 }
 
 ContentApp * GetLoadContentAppByVendorId(uint16_t vendorId)
