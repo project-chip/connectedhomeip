@@ -181,7 +181,8 @@ exit:
 
 void Server::Shutdown()
 {
-    if (mState == ServerState::Disabled) return;
+    if (mState == ServerState::Disabled)
+        return;
 
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();

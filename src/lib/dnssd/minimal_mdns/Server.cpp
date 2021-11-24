@@ -128,7 +128,8 @@ ServerBase::~ServerBase()
 
 void ServerBase::Shutdown()
 {
-    if (!IsListening()) return;
+    if (!IsListening())
+        return;
 
     for (size_t i = 0; i < mEndpointCount; i++)
     {

@@ -132,11 +132,11 @@ private:
 
     enum class ServerState
     {
-        Disabled,        ///< The Server is inactive and disabled.
-        Enabled,         ///< The Server is active and enabled.
+        Disabled, ///< The Server is inactive and disabled.
+        Enabled,  ///< The Server is active and enabled.
     };
 
-    ServerState mState                        = ServerState::Disabled;
+    ServerState mState = ServerState::Disabled;
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
