@@ -56,10 +56,16 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
     }
     else
     {
-        ContentApp * app = chip::AppPlatform::GetLoadContentAppByVendorId(state->GetVendorId());
+        ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetLoadContentAppByVendorId(state->GetVendorId());
         if (app == nullptr)
         {
             streamer_printf(sout, "no app found for vendor id=%d \r\n", state->GetVendorId());
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+
+        if (app->GetAccountLogin() == nullptr)
+        {
+            streamer_printf(sout, "no AccountLogin cluster for app with vendor id=%d \r\n", state->GetVendorId());
             return CHIP_ERROR_BAD_REQUEST;
         }
 
@@ -67,7 +73,7 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
         Encoding::BytesToUppercaseHexString(state->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
                                             sizeof(rotatingIdString));
 
-        uint32_t pincode = app->AccountLogin_GetSetupPIN(rotatingIdString);
+        uint32_t pincode = app->GetAccountLogin()->GetSetupPIN(rotatingIdString);
         if (pincode == 0)
         {
             streamer_printf(sout, "udc no pin returned for vendor id=%d rotating ID=%s \r\n", state->GetVendorId(),
@@ -113,7 +119,7 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         char * eptr;
 
         uint16_t vid = (uint16_t) strtol(argv[1], &eptr, 10);
-        chip::AppPlatform::GetLoadContentAppByVendorId(vid);
+        chip::AppPlatform::AppPlatform::GetInstance().GetLoadContentAppByVendorId(vid);
 
         ChipLogProgress(DeviceLayer, "added app");
 
@@ -128,7 +134,7 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         char * eptr;
 
         uint16_t vid = (uint16_t) strtol(argv[1], &eptr, 10);
-        chip::AppPlatform::UnloadContentAppByVendorId(vid);
+        chip::AppPlatform::AppPlatform::GetInstance().UnloadContentAppByVendorId(vid);
 
         ChipLogProgress(DeviceLayer, "removed app");
 
@@ -144,13 +150,18 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
 
         uint16_t vid     = (uint16_t) strtol(argv[1], &eptr, 10);
         uint32_t pincode = (uint32_t) strtol(argv[2], &eptr, 10);
-        ContentApp * app = chip::AppPlatform::GetLoadContentAppByVendorId(vid);
+        ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetLoadContentAppByVendorId(vid);
         if (app == nullptr)
         {
             ChipLogProgress(DeviceLayer, "no app found for vendor id=%d ", vid);
             return CHIP_ERROR_BAD_REQUEST;
         }
-        app->AccountLogin_SetSetupPIN(pincode);
+        if (app->GetAccountLogin() == nullptr)
+        {
+            ChipLogProgress(DeviceLayer, "no AccountLogin cluster for app with vendor id=%d ", vid);
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+        app->GetAccountLogin()->SetSetupPIN(pincode);
 
         ChipLogProgress(DeviceLayer, "set pin success");
 

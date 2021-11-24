@@ -159,7 +159,7 @@ bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatu
 {
     ChipLogProgress(Zcl, "Sent an application status change request %d for endpoint %d", status, endpoint);
 
-    ContentApp * app = chip::AppPlatform::GetContentAppByEndpointId(endpoint);
+    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
     if (app == nullptr)
     {
         if (endpoint == 3)
@@ -170,7 +170,7 @@ bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatu
         ChipLogProgress(Zcl, "No app for endpoint %d", endpoint);
         return false;
     }
-    app->SetApplicationStatus(status);
+    app->GetApplicationBasic()->SetApplicationStatus(status);
 
     return true;
 }

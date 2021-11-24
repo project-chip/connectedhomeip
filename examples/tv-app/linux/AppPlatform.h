@@ -30,64 +30,49 @@
 
 #include <functional>
 
+#include "ContentApp.h"
+
 namespace chip {
 namespace AppPlatform {
 
-class ContentApp
+class DLL_EXPORT ContentAppFactory
 {
 public:
-    static const int kVendorNameSize         = 32;
-    static const int kApplicationNameSize    = 32;
-    static const int kApplicationVersionSize = 32;
-
-    ContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-               const char * szApplicationVersion);
-    virtual ~ContentApp() {}
-
-    inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
-    inline chip::EndpointId GetEndpointId() { return mEndpointId; };
-
-    // Start: App Basic Cluster
-    void SetVendorName(const char * szVendorName);
-    inline void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; };
-    void SetApplicationName(const char * szApplicationName);
-    inline void SetProductId(uint16_t productId) { mProductId = productId; };
-    inline void SetApplicationStatus(EmberAfApplicationBasicStatus applicationStatus) { mApplicationStatus = applicationStatus; };
-    void SetApplicationVersion(const char * szApplicationVersion);
-
-    inline const char * GetVendorName() { return mVendorName; };
-    inline uint16_t GetVendorId() { return mVendorId; };
-    inline const char * GetApplicationName() { return mApplicationName; };
-    inline uint16_t GetProductId() { return mProductId; };
-    inline EmberAfApplicationBasicStatus GetApplicationStatus() { return mApplicationStatus; };
-    inline const char * GetApplicationVersion() { return mApplicationVersion; };
-
-    // Start: App Login Cluster
-    inline void AccountLogin_SetSetupPIN(uint32_t setupPIN) { mAccountLogin_SetupPIN = setupPIN; };
-
-    uint32_t AccountLogin_GetSetupPIN(const char * tempAccountId);
-
-    bool AccountLogin_Login(const char * tempAccountId, uint32_t setupPin);
-
-protected:
-    chip::EndpointId mEndpointId = 0;
-
-    // Start: App Basic Cluster
-    char mVendorName[kVendorNameSize];
-    uint16_t mVendorId;
-    char mApplicationName[kApplicationNameSize];
-    uint16_t mProductId;
-    EmberAfApplicationBasicStatus mApplicationStatus = EMBER_ZCL_APPLICATION_BASIC_STATUS_STOPPED;
-    char mApplicationVersion[kApplicationVersionSize];
-
-    // Start: App Login Cluster
-    uint32_t mAccountLogin_SetupPIN;
+    virtual ~ContentAppFactory()                                     = default;
+    virtual ContentApp * LoadContentAppByVendorId(uint16_t vendorId) = 0;
 };
 
-void SetupAppPlatform();
-void UnloadContentAppByVendorId(uint16_t vendorId);
-ContentApp * GetLoadContentAppByVendorId(uint16_t vendorId);
-ContentApp * GetContentAppByEndpointId(chip::EndpointId id);
+class DLL_EXPORT AppPlatform
+{
+public:
+    static AppPlatform & GetInstance()
+    {
+        static AppPlatform instance;
+        return instance;
+    }
+
+    void SetupAppPlatform();
+
+    inline void SetContentAppFactory(ContentAppFactory * factory) { mContentAppFactory = factory; };
+
+    // add and remove apps from the platform.
+    // This will assign the app to an endpoint and make it accessible via Matter
+    int AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType);
+    int RemoveContentApp(ContentApp * app);
+
+    // load and unload by vendor id
+    void UnloadContentAppByVendorId(uint16_t vendorId);
+    ContentApp * GetLoadContentAppByVendorId(uint16_t vendorId);
+
+    // helpful method to get a Content App by endpoint in order to perform attribute or command ops
+    ContentApp * GetContentAppByEndpointId(chip::EndpointId id);
+
+protected:
+    ContentAppFactory * mContentAppFactory = nullptr;
+    EndpointId mCurrentEndpointId;
+    EndpointId mFirstDynamicEndpointId;
+    ContentApp * mContentApps[DYNAMIC_ENDPOINT_COUNT];
+};
 
 } // namespace AppPlatform
 } // namespace chip

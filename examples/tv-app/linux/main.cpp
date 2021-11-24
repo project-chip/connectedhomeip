@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "AppImpl.h"
 #include "AppMain.h"
 #include "AppPlatform.h"
 #include "AppPlatformShellCommands.h"
@@ -43,6 +44,7 @@
 using namespace chip;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
+using namespace chip::AppPlatform;
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 {
@@ -53,6 +55,8 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::AppPlatform::ContentAppFactoryImpl factory;
 
     // Init Keypad Input manager
     err = KeypadInputManager().Init();
@@ -88,7 +92,8 @@ int main(int argc, char * argv[])
 
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
 
-    chip::AppPlatform::SetupAppPlatform();
+    chip::AppPlatform::AppPlatform::GetInstance().SetupAppPlatform();
+    chip::AppPlatform::AppPlatform::GetInstance().SetContentAppFactory(&factory);
 
 #if defined(ENABLE_CHIP_SHELL)
     chip::Shell::RegisterAppPlatformCommands();
