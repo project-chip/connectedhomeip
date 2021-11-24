@@ -3687,6 +3687,19 @@ class ChipClusters:
                     "arg1": "int",
                 },
             },
+            0x0000000C: {
+                "commandId": 0x0000000C,
+                "commandName": "TestListNestedStructListArgumentRequest",
+                "args": {
+                    "a": "int",
+                    "b": "bool",
+                    "c": "",
+                    "d": "",
+                    "e": "int",
+                    "f": "bytes",
+                    "g": "int",
+                },
+            },
             0x00000009: {
                 "commandId": 0x00000009,
                 "commandName": "TestListStructArgumentRequest",
@@ -3699,6 +3712,28 @@ class ChipClusters:
                     "f": "int",
                     "g": "",
                     "h": "",
+                },
+            },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "TestNestedStructArgumentRequest",
+                "args": {
+                    "a": "int",
+                    "b": "bool",
+                    "c": "",
+                },
+            },
+            0x0000000B: {
+                "commandId": 0x0000000B,
+                "commandName": "TestNestedStructListArgumentRequest",
+                "args": {
+                    "a": "int",
+                    "b": "bool",
+                    "c": "",
+                    "d": "",
+                    "e": "int",
+                    "f": "bytes",
+                    "g": "int",
                 },
             },
             0x00000001: {

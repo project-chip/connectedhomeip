@@ -3271,9 +3271,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testListInt8UReverseRequestWithParams:(CHIPTestClusterClusterTestListInt8UReverseRequestParams *)params
                             completionHandler:(void (^)(CHIPTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler;
+- (void)testListNestedStructListArgumentRequestWithParams:
+            (CHIPTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
+                                        completionHandler:(void (^)(CHIPTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)testListStructArgumentRequestWithParams:(CHIPTestClusterClusterTestListStructArgumentRequestParams *)params
                               completionHandler:(void (^)(CHIPTestClusterClusterBooleanResponseParams * _Nullable data,
                                                     NSError * _Nullable error))completionHandler;
+- (void)testNestedStructArgumentRequestWithParams:(CHIPTestClusterClusterTestNestedStructArgumentRequestParams *)params
+                                completionHandler:(void (^)(CHIPTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                      NSError * _Nullable error))completionHandler;
+- (void)testNestedStructListArgumentRequestWithParams:(CHIPTestClusterClusterTestNestedStructListArgumentRequestParams *)params
+                                    completionHandler:(void (^)(CHIPTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                          NSError * _Nullable error))completionHandler;
 - (void)testNotHandledWithCompletionHandler:(StatusCompletion)completionHandler;
 - (void)testNullableOptionalRequestWithParams:(CHIPTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
                             completionHandler:(void (^)(CHIPTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,

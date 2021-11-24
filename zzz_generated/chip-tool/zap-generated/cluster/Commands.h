@@ -36302,7 +36302,10 @@ private:
 | * TestEnumsRequest                                                  |   0x0E |
 | * TestListInt8UArgumentRequest                                      |   0x0A |
 | * TestListInt8UReverseRequest                                       |   0x0D |
+| * TestListNestedStructListArgumentRequest                           |   0x0C |
 | * TestListStructArgumentRequest                                     |   0x09 |
+| * TestNestedStructArgumentRequest                                   |   0x08 |
+| * TestNestedStructListArgumentRequest                               |   0x0B |
 | * TestNotHandled                                                    |   0x01 |
 | * TestNullableOptionalRequest                                       |   0x0F |
 | * TestSpecific                                                      |   0x02 |
@@ -36499,6 +36502,30 @@ private:
 };
 
 /*
+ * Command TestListNestedStructListArgumentRequest
+ */
+class TestClusterTestListNestedStructListArgumentRequest : public ModelCommand
+{
+public:
+    TestClusterTestListNestedStructListArgumentRequest() : ModelCommand("test-list-nested-struct-list-argument-request")
+    {
+        // arg1 Array parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000C) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type mRequest;
+};
+
+/*
  * Command TestListStructArgumentRequest
  */
 class TestClusterTestListStructArgumentRequest : public ModelCommand
@@ -36520,6 +36547,54 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type mRequest;
+};
+
+/*
+ * Command TestNestedStructArgumentRequest
+ */
+class TestClusterTestNestedStructArgumentRequest : public ModelCommand
+{
+public:
+    TestClusterTestNestedStructArgumentRequest() : ModelCommand("test-nested-struct-argument-request")
+    {
+        // arg1 Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000008) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type mRequest;
+};
+
+/*
+ * Command TestNestedStructListArgumentRequest
+ */
+class TestClusterTestNestedStructListArgumentRequest : public ModelCommand
+{
+public:
+    TestClusterTestNestedStructListArgumentRequest() : ModelCommand("test-nested-struct-list-argument-request")
+    {
+        // arg1 Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000B) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type mRequest;
 };
 
 /*
@@ -54213,144 +54288,147 @@ void registerClusterTestCluster(Commands & commands)
     const char * clusterName = "TestCluster";
 
     commands_list clusterCommands = {
-        make_unique<TestClusterSimpleStructEchoRequest>(),             //
-        make_unique<TestClusterTest>(),                                //
-        make_unique<TestClusterTestAddArguments>(),                    //
-        make_unique<TestClusterTestEnumsRequest>(),                    //
-        make_unique<TestClusterTestListInt8UArgumentRequest>(),        //
-        make_unique<TestClusterTestListInt8UReverseRequest>(),         //
-        make_unique<TestClusterTestListStructArgumentRequest>(),       //
-        make_unique<TestClusterTestNotHandled>(),                      //
-        make_unique<TestClusterTestNullableOptionalRequest>(),         //
-        make_unique<TestClusterTestSpecific>(),                        //
-        make_unique<TestClusterTestStructArgumentRequest>(),           //
-        make_unique<TestClusterTestUnknownCommand>(),                  //
-        make_unique<ReadTestClusterBoolean>(),                         //
-        make_unique<WriteTestClusterBoolean>(),                        //
-        make_unique<ReportTestClusterBoolean>(),                       //
-        make_unique<ReadTestClusterBitmap8>(),                         //
-        make_unique<WriteTestClusterBitmap8>(),                        //
-        make_unique<ReportTestClusterBitmap8>(),                       //
-        make_unique<ReadTestClusterBitmap16>(),                        //
-        make_unique<WriteTestClusterBitmap16>(),                       //
-        make_unique<ReportTestClusterBitmap16>(),                      //
-        make_unique<ReadTestClusterBitmap32>(),                        //
-        make_unique<WriteTestClusterBitmap32>(),                       //
-        make_unique<ReportTestClusterBitmap32>(),                      //
-        make_unique<ReadTestClusterBitmap64>(),                        //
-        make_unique<WriteTestClusterBitmap64>(),                       //
-        make_unique<ReportTestClusterBitmap64>(),                      //
-        make_unique<ReadTestClusterInt8u>(),                           //
-        make_unique<WriteTestClusterInt8u>(),                          //
-        make_unique<ReportTestClusterInt8u>(),                         //
-        make_unique<ReadTestClusterInt16u>(),                          //
-        make_unique<WriteTestClusterInt16u>(),                         //
-        make_unique<ReportTestClusterInt16u>(),                        //
-        make_unique<ReadTestClusterInt32u>(),                          //
-        make_unique<WriteTestClusterInt32u>(),                         //
-        make_unique<ReportTestClusterInt32u>(),                        //
-        make_unique<ReadTestClusterInt64u>(),                          //
-        make_unique<WriteTestClusterInt64u>(),                         //
-        make_unique<ReportTestClusterInt64u>(),                        //
-        make_unique<ReadTestClusterInt8s>(),                           //
-        make_unique<WriteTestClusterInt8s>(),                          //
-        make_unique<ReportTestClusterInt8s>(),                         //
-        make_unique<ReadTestClusterInt16s>(),                          //
-        make_unique<WriteTestClusterInt16s>(),                         //
-        make_unique<ReportTestClusterInt16s>(),                        //
-        make_unique<ReadTestClusterInt32s>(),                          //
-        make_unique<WriteTestClusterInt32s>(),                         //
-        make_unique<ReportTestClusterInt32s>(),                        //
-        make_unique<ReadTestClusterInt64s>(),                          //
-        make_unique<WriteTestClusterInt64s>(),                         //
-        make_unique<ReportTestClusterInt64s>(),                        //
-        make_unique<ReadTestClusterEnum8>(),                           //
-        make_unique<WriteTestClusterEnum8>(),                          //
-        make_unique<ReportTestClusterEnum8>(),                         //
-        make_unique<ReadTestClusterEnum16>(),                          //
-        make_unique<WriteTestClusterEnum16>(),                         //
-        make_unique<ReportTestClusterEnum16>(),                        //
-        make_unique<ReadTestClusterOctetString>(),                     //
-        make_unique<WriteTestClusterOctetString>(),                    //
-        make_unique<ReportTestClusterOctetString>(),                   //
-        make_unique<ReadTestClusterListInt8u>(),                       //
-        make_unique<ReadTestClusterListOctetString>(),                 //
-        make_unique<ReadTestClusterListStructOctetString>(),           //
-        make_unique<ReadTestClusterLongOctetString>(),                 //
-        make_unique<WriteTestClusterLongOctetString>(),                //
-        make_unique<ReportTestClusterLongOctetString>(),               //
-        make_unique<ReadTestClusterCharString>(),                      //
-        make_unique<WriteTestClusterCharString>(),                     //
-        make_unique<ReportTestClusterCharString>(),                    //
-        make_unique<ReadTestClusterLongCharString>(),                  //
-        make_unique<WriteTestClusterLongCharString>(),                 //
-        make_unique<ReportTestClusterLongCharString>(),                //
-        make_unique<ReadTestClusterEpochUs>(),                         //
-        make_unique<WriteTestClusterEpochUs>(),                        //
-        make_unique<ReportTestClusterEpochUs>(),                       //
-        make_unique<ReadTestClusterEpochS>(),                          //
-        make_unique<WriteTestClusterEpochS>(),                         //
-        make_unique<ReportTestClusterEpochS>(),                        //
-        make_unique<ReadTestClusterVendorId>(),                        //
-        make_unique<WriteTestClusterVendorId>(),                       //
-        make_unique<ReportTestClusterVendorId>(),                      //
-        make_unique<ReadTestClusterListNullablesAndOptionalsStruct>(), //
-        make_unique<ReadTestClusterUnsupported>(),                     //
-        make_unique<WriteTestClusterUnsupported>(),                    //
-        make_unique<ReportTestClusterUnsupported>(),                   //
-        make_unique<ReadTestClusterNullableBoolean>(),                 //
-        make_unique<WriteTestClusterNullableBoolean>(),                //
-        make_unique<ReportTestClusterNullableBoolean>(),               //
-        make_unique<ReadTestClusterNullableBitmap8>(),                 //
-        make_unique<WriteTestClusterNullableBitmap8>(),                //
-        make_unique<ReportTestClusterNullableBitmap8>(),               //
-        make_unique<ReadTestClusterNullableBitmap16>(),                //
-        make_unique<WriteTestClusterNullableBitmap16>(),               //
-        make_unique<ReportTestClusterNullableBitmap16>(),              //
-        make_unique<ReadTestClusterNullableBitmap32>(),                //
-        make_unique<WriteTestClusterNullableBitmap32>(),               //
-        make_unique<ReportTestClusterNullableBitmap32>(),              //
-        make_unique<ReadTestClusterNullableBitmap64>(),                //
-        make_unique<WriteTestClusterNullableBitmap64>(),               //
-        make_unique<ReportTestClusterNullableBitmap64>(),              //
-        make_unique<ReadTestClusterNullableInt8u>(),                   //
-        make_unique<WriteTestClusterNullableInt8u>(),                  //
-        make_unique<ReportTestClusterNullableInt8u>(),                 //
-        make_unique<ReadTestClusterNullableInt16u>(),                  //
-        make_unique<WriteTestClusterNullableInt16u>(),                 //
-        make_unique<ReportTestClusterNullableInt16u>(),                //
-        make_unique<ReadTestClusterNullableInt32u>(),                  //
-        make_unique<WriteTestClusterNullableInt32u>(),                 //
-        make_unique<ReportTestClusterNullableInt32u>(),                //
-        make_unique<ReadTestClusterNullableInt64u>(),                  //
-        make_unique<WriteTestClusterNullableInt64u>(),                 //
-        make_unique<ReportTestClusterNullableInt64u>(),                //
-        make_unique<ReadTestClusterNullableInt8s>(),                   //
-        make_unique<WriteTestClusterNullableInt8s>(),                  //
-        make_unique<ReportTestClusterNullableInt8s>(),                 //
-        make_unique<ReadTestClusterNullableInt16s>(),                  //
-        make_unique<WriteTestClusterNullableInt16s>(),                 //
-        make_unique<ReportTestClusterNullableInt16s>(),                //
-        make_unique<ReadTestClusterNullableInt32s>(),                  //
-        make_unique<WriteTestClusterNullableInt32s>(),                 //
-        make_unique<ReportTestClusterNullableInt32s>(),                //
-        make_unique<ReadTestClusterNullableInt64s>(),                  //
-        make_unique<WriteTestClusterNullableInt64s>(),                 //
-        make_unique<ReportTestClusterNullableInt64s>(),                //
-        make_unique<ReadTestClusterNullableEnum8>(),                   //
-        make_unique<WriteTestClusterNullableEnum8>(),                  //
-        make_unique<ReportTestClusterNullableEnum8>(),                 //
-        make_unique<ReadTestClusterNullableEnum16>(),                  //
-        make_unique<WriteTestClusterNullableEnum16>(),                 //
-        make_unique<ReportTestClusterNullableEnum16>(),                //
-        make_unique<ReadTestClusterNullableOctetString>(),             //
-        make_unique<WriteTestClusterNullableOctetString>(),            //
-        make_unique<ReportTestClusterNullableOctetString>(),           //
-        make_unique<ReadTestClusterNullableCharString>(),              //
-        make_unique<WriteTestClusterNullableCharString>(),             //
-        make_unique<ReportTestClusterNullableCharString>(),            //
-        make_unique<ReadTestClusterClusterRevision>(),                 //
-        make_unique<ReportTestClusterClusterRevision>(),               //
+        make_unique<TestClusterSimpleStructEchoRequest>(),                 //
+        make_unique<TestClusterTest>(),                                    //
+        make_unique<TestClusterTestAddArguments>(),                        //
+        make_unique<TestClusterTestEnumsRequest>(),                        //
+        make_unique<TestClusterTestListInt8UArgumentRequest>(),            //
+        make_unique<TestClusterTestListInt8UReverseRequest>(),             //
+        make_unique<TestClusterTestListNestedStructListArgumentRequest>(), //
+        make_unique<TestClusterTestListStructArgumentRequest>(),           //
+        make_unique<TestClusterTestNestedStructArgumentRequest>(),         //
+        make_unique<TestClusterTestNestedStructListArgumentRequest>(),     //
+        make_unique<TestClusterTestNotHandled>(),                          //
+        make_unique<TestClusterTestNullableOptionalRequest>(),             //
+        make_unique<TestClusterTestSpecific>(),                            //
+        make_unique<TestClusterTestStructArgumentRequest>(),               //
+        make_unique<TestClusterTestUnknownCommand>(),                      //
+        make_unique<ReadTestClusterBoolean>(),                             //
+        make_unique<WriteTestClusterBoolean>(),                            //
+        make_unique<ReportTestClusterBoolean>(),                           //
+        make_unique<ReadTestClusterBitmap8>(),                             //
+        make_unique<WriteTestClusterBitmap8>(),                            //
+        make_unique<ReportTestClusterBitmap8>(),                           //
+        make_unique<ReadTestClusterBitmap16>(),                            //
+        make_unique<WriteTestClusterBitmap16>(),                           //
+        make_unique<ReportTestClusterBitmap16>(),                          //
+        make_unique<ReadTestClusterBitmap32>(),                            //
+        make_unique<WriteTestClusterBitmap32>(),                           //
+        make_unique<ReportTestClusterBitmap32>(),                          //
+        make_unique<ReadTestClusterBitmap64>(),                            //
+        make_unique<WriteTestClusterBitmap64>(),                           //
+        make_unique<ReportTestClusterBitmap64>(),                          //
+        make_unique<ReadTestClusterInt8u>(),                               //
+        make_unique<WriteTestClusterInt8u>(),                              //
+        make_unique<ReportTestClusterInt8u>(),                             //
+        make_unique<ReadTestClusterInt16u>(),                              //
+        make_unique<WriteTestClusterInt16u>(),                             //
+        make_unique<ReportTestClusterInt16u>(),                            //
+        make_unique<ReadTestClusterInt32u>(),                              //
+        make_unique<WriteTestClusterInt32u>(),                             //
+        make_unique<ReportTestClusterInt32u>(),                            //
+        make_unique<ReadTestClusterInt64u>(),                              //
+        make_unique<WriteTestClusterInt64u>(),                             //
+        make_unique<ReportTestClusterInt64u>(),                            //
+        make_unique<ReadTestClusterInt8s>(),                               //
+        make_unique<WriteTestClusterInt8s>(),                              //
+        make_unique<ReportTestClusterInt8s>(),                             //
+        make_unique<ReadTestClusterInt16s>(),                              //
+        make_unique<WriteTestClusterInt16s>(),                             //
+        make_unique<ReportTestClusterInt16s>(),                            //
+        make_unique<ReadTestClusterInt32s>(),                              //
+        make_unique<WriteTestClusterInt32s>(),                             //
+        make_unique<ReportTestClusterInt32s>(),                            //
+        make_unique<ReadTestClusterInt64s>(),                              //
+        make_unique<WriteTestClusterInt64s>(),                             //
+        make_unique<ReportTestClusterInt64s>(),                            //
+        make_unique<ReadTestClusterEnum8>(),                               //
+        make_unique<WriteTestClusterEnum8>(),                              //
+        make_unique<ReportTestClusterEnum8>(),                             //
+        make_unique<ReadTestClusterEnum16>(),                              //
+        make_unique<WriteTestClusterEnum16>(),                             //
+        make_unique<ReportTestClusterEnum16>(),                            //
+        make_unique<ReadTestClusterOctetString>(),                         //
+        make_unique<WriteTestClusterOctetString>(),                        //
+        make_unique<ReportTestClusterOctetString>(),                       //
+        make_unique<ReadTestClusterListInt8u>(),                           //
+        make_unique<ReadTestClusterListOctetString>(),                     //
+        make_unique<ReadTestClusterListStructOctetString>(),               //
+        make_unique<ReadTestClusterLongOctetString>(),                     //
+        make_unique<WriteTestClusterLongOctetString>(),                    //
+        make_unique<ReportTestClusterLongOctetString>(),                   //
+        make_unique<ReadTestClusterCharString>(),                          //
+        make_unique<WriteTestClusterCharString>(),                         //
+        make_unique<ReportTestClusterCharString>(),                        //
+        make_unique<ReadTestClusterLongCharString>(),                      //
+        make_unique<WriteTestClusterLongCharString>(),                     //
+        make_unique<ReportTestClusterLongCharString>(),                    //
+        make_unique<ReadTestClusterEpochUs>(),                             //
+        make_unique<WriteTestClusterEpochUs>(),                            //
+        make_unique<ReportTestClusterEpochUs>(),                           //
+        make_unique<ReadTestClusterEpochS>(),                              //
+        make_unique<WriteTestClusterEpochS>(),                             //
+        make_unique<ReportTestClusterEpochS>(),                            //
+        make_unique<ReadTestClusterVendorId>(),                            //
+        make_unique<WriteTestClusterVendorId>(),                           //
+        make_unique<ReportTestClusterVendorId>(),                          //
+        make_unique<ReadTestClusterListNullablesAndOptionalsStruct>(),     //
+        make_unique<ReadTestClusterUnsupported>(),                         //
+        make_unique<WriteTestClusterUnsupported>(),                        //
+        make_unique<ReportTestClusterUnsupported>(),                       //
+        make_unique<ReadTestClusterNullableBoolean>(),                     //
+        make_unique<WriteTestClusterNullableBoolean>(),                    //
+        make_unique<ReportTestClusterNullableBoolean>(),                   //
+        make_unique<ReadTestClusterNullableBitmap8>(),                     //
+        make_unique<WriteTestClusterNullableBitmap8>(),                    //
+        make_unique<ReportTestClusterNullableBitmap8>(),                   //
+        make_unique<ReadTestClusterNullableBitmap16>(),                    //
+        make_unique<WriteTestClusterNullableBitmap16>(),                   //
+        make_unique<ReportTestClusterNullableBitmap16>(),                  //
+        make_unique<ReadTestClusterNullableBitmap32>(),                    //
+        make_unique<WriteTestClusterNullableBitmap32>(),                   //
+        make_unique<ReportTestClusterNullableBitmap32>(),                  //
+        make_unique<ReadTestClusterNullableBitmap64>(),                    //
+        make_unique<WriteTestClusterNullableBitmap64>(),                   //
+        make_unique<ReportTestClusterNullableBitmap64>(),                  //
+        make_unique<ReadTestClusterNullableInt8u>(),                       //
+        make_unique<WriteTestClusterNullableInt8u>(),                      //
+        make_unique<ReportTestClusterNullableInt8u>(),                     //
+        make_unique<ReadTestClusterNullableInt16u>(),                      //
+        make_unique<WriteTestClusterNullableInt16u>(),                     //
+        make_unique<ReportTestClusterNullableInt16u>(),                    //
+        make_unique<ReadTestClusterNullableInt32u>(),                      //
+        make_unique<WriteTestClusterNullableInt32u>(),                     //
+        make_unique<ReportTestClusterNullableInt32u>(),                    //
+        make_unique<ReadTestClusterNullableInt64u>(),                      //
+        make_unique<WriteTestClusterNullableInt64u>(),                     //
+        make_unique<ReportTestClusterNullableInt64u>(),                    //
+        make_unique<ReadTestClusterNullableInt8s>(),                       //
+        make_unique<WriteTestClusterNullableInt8s>(),                      //
+        make_unique<ReportTestClusterNullableInt8s>(),                     //
+        make_unique<ReadTestClusterNullableInt16s>(),                      //
+        make_unique<WriteTestClusterNullableInt16s>(),                     //
+        make_unique<ReportTestClusterNullableInt16s>(),                    //
+        make_unique<ReadTestClusterNullableInt32s>(),                      //
+        make_unique<WriteTestClusterNullableInt32s>(),                     //
+        make_unique<ReportTestClusterNullableInt32s>(),                    //
+        make_unique<ReadTestClusterNullableInt64s>(),                      //
+        make_unique<WriteTestClusterNullableInt64s>(),                     //
+        make_unique<ReportTestClusterNullableInt64s>(),                    //
+        make_unique<ReadTestClusterNullableEnum8>(),                       //
+        make_unique<WriteTestClusterNullableEnum8>(),                      //
+        make_unique<ReportTestClusterNullableEnum8>(),                     //
+        make_unique<ReadTestClusterNullableEnum16>(),                      //
+        make_unique<WriteTestClusterNullableEnum16>(),                     //
+        make_unique<ReportTestClusterNullableEnum16>(),                    //
+        make_unique<ReadTestClusterNullableOctetString>(),                 //
+        make_unique<WriteTestClusterNullableOctetString>(),                //
+        make_unique<ReportTestClusterNullableOctetString>(),               //
+        make_unique<ReadTestClusterNullableCharString>(),                  //
+        make_unique<WriteTestClusterNullableCharString>(),                 //
+        make_unique<ReportTestClusterNullableCharString>(),                //
+        make_unique<ReadTestClusterClusterRevision>(),                     //
+        make_unique<ReportTestClusterClusterRevision>(),                   //
     };
 
     commands.Register(clusterName, clusterCommands);
