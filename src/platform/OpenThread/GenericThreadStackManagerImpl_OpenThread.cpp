@@ -940,7 +940,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
         err = encoder.EncodeList([this](const TagBoundEncoder & aEncoder) -> CHIP_ERROR {
             otRouterInfo routerInfo;
 
-#ifdef CHIP_DEVICE_CONFIG_THREAD_FTD
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
             uint8_t maxRouterId = otThreadGetMaxRouterId(mOTInst);
             CHIP_ERROR chipErr  = CHIP_ERROR_INCORRECT_STATE;
 
@@ -969,8 +969,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             return chipErr;
 
 #else // OPENTHREAD_MTD
-            otError otErr otThreadGetParentInfo(mOTInst, &routerInfo) ==
-                OT_ERROR_NONE VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+            otError otErr = otThreadGetParentInfo(mOTInst, &routerInfo);
+            ReturnErrorOnFailure(MapOpenThreadError(otErr));
 
             ThreadNetworkDiagnostics::Structs::RouteTable::Type routeTable;
 
