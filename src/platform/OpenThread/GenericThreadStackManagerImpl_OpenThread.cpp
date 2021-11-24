@@ -939,7 +939,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
         err = encoder.EncodeList([this](const TagBoundEncoder & aEncoder) -> CHIP_ERROR {
             otRouterInfo routerInfo;
+
+#ifdef CHIP_DEVICE_CONFIG_THREAD_FTD
             uint8_t maxRouterId = otThreadGetMaxRouterId(mOTInst);
+            CHIP_ERROR chipErr  = CHIP_ERROR_INCORRECT_STATE;
 
             for (uint8_t i = 0; i <= maxRouterId; i++)
             {
@@ -959,9 +962,32 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                     routeTable.linkEstablished = routerInfo.mLinkEstablished;
 
                     ReturnErrorOnFailure(aEncoder.Encode(routeTable));
+                    chipErr = CHIP_NO_ERROR;
                 }
             }
+
+            return chipErr;
+
+#else // OPENTHREAD_MTD
+            otError otErr otThreadGetParentInfo(mOTInst, &routerInfo) ==
+                OT_ERROR_NONE VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+
+            ThreadNetworkDiagnostics::Structs::RouteTable::Type routeTable;
+
+            routeTable.extAddress      = Encoding::BigEndian::Get64(routerInfo.mExtAddress.m8);
+            routeTable.rloc16          = routerInfo.mRloc16;
+            routeTable.routerId        = routerInfo.mRouterId;
+            routeTable.nextHop         = routerInfo.mNextHop;
+            routeTable.pathCost        = routerInfo.mPathCost;
+            routeTable.LQIIn           = routerInfo.mLinkQualityIn;
+            routeTable.LQIOut          = routerInfo.mLinkQualityOut;
+            routeTable.age             = routerInfo.mAge;
+            routeTable.allocated       = routerInfo.mAllocated;
+            routeTable.linkEstablished = routerInfo.mLinkEstablished;
+
+            ReturnErrorOnFailure(aEncoder.Encode(routeTable));
             return CHIP_NO_ERROR;
+#endif
         });
     }
     break;
