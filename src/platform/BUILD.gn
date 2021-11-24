@@ -53,7 +53,7 @@ if (chip_device_platform != "none") {
     # Enable including the additional data in the advertisement packets
     chip_enable_additional_data_advertising = true
 
-    # Enable adding rotating device id to the additional data.
+    # Enable adding optional rotating device id to the additional data.
     chip_enable_rotating_device_id = false
 
     # lock tracking: none/log/fatal or auto for a platform-dependent choice
