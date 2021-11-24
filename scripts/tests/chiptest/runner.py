@@ -47,10 +47,7 @@ class LogPipe(threading.Thread):
         self.start()
 
     def CapturedLogContains(self, txt: str):
-        for l in self.captured_logs:
-            if txt in l:
-                return True
-        return False
+        return any(txt in l for l in self.captured_logs)
 
     def fileno(self):
         """Return the write file descriptor of the pipe"""
