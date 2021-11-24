@@ -2735,6 +2735,23 @@ NS_ASSUME_NONNULL_BEGIN
                                responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeSpeedWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeLifetimeRunningHoursWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nonnull)value
+                                  completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeLifetimeRunningHoursWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLifetimeRunningHoursWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
+
+- (void)readAttributePowerWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributePowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributePowerWithMinInterval:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                               responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePowerWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
 - (void)readAttributeLifetimeEnergyConsumedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLifetimeEnergyConsumedWithMinInterval:(uint16_t)minInterval

@@ -728,6 +728,10 @@ typedef void (*CHIPPumpConfigurationAndControlClusterCapacityAttributeCallbackTy
     void *, chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo::DecodableArgType);
 typedef void (*CHIPPumpConfigurationAndControlClusterSpeedAttributeCallbackType)(
     void *, chip::app::Clusters::PumpConfigurationAndControl::Attributes::Speed::TypeInfo::DecodableArgType);
+typedef void (*CHIPPumpConfigurationAndControlClusterLifetimeRunningHoursAttributeCallbackType)(
+    void *, chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo::DecodableArgType);
+typedef void (*CHIPPumpConfigurationAndControlClusterPowerAttributeCallbackType)(
+    void *, chip::app::Clusters::PumpConfigurationAndControl::Attributes::Power::TypeInfo::DecodableArgType);
 typedef void (*CHIPPumpConfigurationAndControlClusterLifetimeEnergyConsumedAttributeCallbackType)(
     void *, chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo::DecodableArgType);
 typedef void (*CHIPPumpConfigurationAndControlClusterOperationModeAttributeCallbackType)(
