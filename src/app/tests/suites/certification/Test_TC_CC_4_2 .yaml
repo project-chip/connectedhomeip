@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name:
-    27.2.13. [TC-CC-6.2] Color Temperature Move functionality with server as DUT
+name: 27.2.6. [TC-CC-4.2] Saturation Move functionality with server as DUT
 
 config:
     cluster: "Color Control"
@@ -31,140 +30,134 @@ tests:
       response:
           value: 1
 
-    - label: "Read current color temprature"
+    - label:
+          "Check Saturation attribute value matched the value sent by the last
+          command"
       disabled: true
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "current saturation"
       response:
-          value: 100
+          value: 90
 
-    - label: "Move up color temperature command"
-      command: "MoveColorTemperature"
+    - label: "Move saturation up command"
+      command: "MoveSaturation"
       arguments:
           values:
               - name: "moveMode"
                 value: 1
               - name: "rate"
-                value: 10
-              - name: "colorTemperatureMinimum"
-                value: 1
-              - name: "colorTemperatureMaximum"
-                value: 255
+                value: 5
               - name: "optionsMask"
                 value: 0
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read ColorTemperature attribute from DUT several times"
+    - label:
+          "Check Saturation attribute value matched the value sent by the last
+          command"
       disabled: true
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "current saturation"
       response:
-          value: 0
+          value: -1
 
-    - label: "Move Down color temperature command"
-      command: "MoveColorTemperature"
+    - label: "Move saturation down command"
+      command: "MoveSaturation"
       arguments:
           values:
               - name: "moveMode"
                 value: 3
               - name: "rate"
-                value: 10
-              - name: "colorTemperatureMinimum"
-                value: 1
-              - name: "colorTemperatureMaximum"
-                value: 255
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label: "Read ColorTemperature attribute from DUT several times"
-      disabled: true
-      command: "readAttribute"
-      attribute: "color temperature"
-      response:
-          value: 0
-
-    - label: "Move Up color temperature command"
-      command: "MoveColorTemperature"
-      arguments:
-          values:
-              - name: "moveMode"
-                value: 1
-              - name: "rate"
-                value: 10
-              - name: "colorTemperatureMinimum"
-                value: 1
-              - name: "colorTemperatureMaximum"
-                value: 255
+                value: 5
               - name: "optionsMask"
                 value: 0
               - name: "optionsOverride"
                 value: 0
     
-    - label: "Stop Color Temperature command"
-      command: "MoveColorTemperature"
+    - label: "Read CurrentSaturation attribute from DUT several times"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          value: 0
+    
+    - label: "Move saturation up command"
+      command: "MoveSaturation"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 1
+              - name: "rate"
+                value: 5
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+    
+    - label: "Read CurrentSaturation attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          value: 0
+
+    - label: "Move saturation stop command"
+      command: "MoveSaturation"
       arguments:
           values:
               - name: "moveMode"
                 value: 0
               - name: "rate"
-                value: 10
-              - name: "colorTemperatureMinimum"
-                value: 1
-              - name: "colorTemperatureMaximum"
-                value: 255
+                value: 5
               - name: "optionsMask"
                 value: 0
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read ColorTemperature attribute from DUT several times"
+    - label: "Read CurrentSaturation attribute from DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "current saturation"
       response:
           value: 0
 
-    - label: "Move Down color temperature command"
-      command: "MoveColorTemperature"
+    - label: "Move saturation down command"
+      command: "MoveSaturation"
       arguments:
           values:
               - name: "moveMode"
                 value: 3
               - name: "rate"
-                value: 10
-              - name: "colorTemperatureMinimum"
-                value: 1
-              - name: "colorTemperatureMaximum"
-                value: 255
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label: "Stop Color Temperature command"
-      command: "MoveColorTemperature"
-      arguments:
-          values:
-              - name: "moveMode"
-                value: 0
-              - name: "rate"
-                value: 10
-              - name: "colorTemperatureMinimum"
-                value: 1
-              - name: "colorTemperatureMaximum"
-                value: 255
+                value: 5
               - name: "optionsMask"
                 value: 0
               - name: "optionsOverride"
                 value: 0
     
-    - label: "Read ColorTemperature attribute from DUT several times"
+    - label: "Read CurrentSaturation attribute from DUT several times"
       disabled: true
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "current saturation"
+      response:
+          value: 0
+
+    - label: "Move saturation stop command"
+      command: "MoveSaturation"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 5
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read CurrentSaturation attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current saturation"
       response:
           value: 0
 

@@ -19,38 +19,178 @@ config:
     endpoint: 1
 
 tests:
-    - label: "read the global attribute: ClusterRevision"
+    #issue #12190 as per spec default value is 3 but expecting 2
+    #refering default value of Water Content Measurement
+    - label: "Read the global attribute : ClusterRevision"
       disabled: true
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 1
+          value: 3
+
+    - label: "Read the global attribute constraints: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          constraints:
+              type: uint16
+              minValue: 1
+              maxValue: 3
 
     - label:
-          "write the default values to mandatory global attribute:
+          "Write the default values to mandatory global attribute:
           ClusterRevision"
       command: "writeAttribute"
       attribute: "ClusterRevision"
       arguments:
-          value: 1
+          value: 3
       response:
           error: 1
 
-    - label: "reads back global attribute: ClusterRevision"
+    - label: "Reads back global attribute: ClusterRevision"
       disabled: true
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 1
+          value: 3
 
-    - label: "read the optional global attribute: FeatureMap"
+    - label: "Read the global attribute: AttributeList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+
+    - label:
+          "Write the default values to mandatory global attribute: AttributeList"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "AttributeList"
+      arguments:
+          value: 0
+      response:
+          error: 1
+
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
+    - label: "Reads back mandatory global attribute: AttributeList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          value: 0
+
+    - label: "Read the global attribute: CommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "CommandList"
+      response:
+          constraints:
+              type: list
+
+    - label:
+          "Write the default values to mandatory global attribute: CommandList"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "CommandList"
+      arguments:
+          value: 0
+      response:
+          error: 1
+
+    - label: "Reads back mandatory global attribute: CommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "CommandList"
+      response:
+          value: 0
+
+    - label: "Read the global attribute: EventList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Write the default values to mandatory global attribute: EventList"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "EventList"
+      arguments:
+          value: 0
+      response:
+          error: 1
+
+    - label: "Reads back mandatory global attribute: EventList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: 0
+
+    - label: "Read the global attribute: ClientGeneratedCommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ClientGeneratedCommandList"
+      response:
+          constraints:
+              type: list
+
+    - label:
+          "Write the default values to mandatory global attribute:
+          ClientGeneratedCommandList"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "ClientGeneratedCommandList"
+      arguments:
+          value: 0
+      response:
+          error: 1
+
+    - label: "Reads back mandatory global attribute: ClientGeneratedCommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ClientGeneratedCommandList"
+      response:
+          value: 0
+
+    - label: "Read the global attribute: ServerGeneratedCommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ServerGeneratedCommandList"
+      response:
+          constraints:
+              type: list
+
+    - label:
+          "Write the default values to mandatory global attribute:
+          ServerGeneratedCommandList"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "ServerGeneratedCommandList"
+      arguments:
+          value: 0
+      response:
+          error: 1
+
+    - label: "Reads back mandatory global attribute: ServerGeneratedCommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ServerGeneratedCommandList"
+      response:
+          value: 0
+
+    - label: "Read the optional global attribute : FeatureMap"
       disabled: true
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 0
+          constraints:
+              type: map32
 
-    - label: "write the default values to optional global attribute: FeatureMap"
+    - label: "Write the default values to optional global attribute: FeatureMap"
       disabled: true
       command: "writeAttribute"
       attribute: "FeatureMap"
@@ -59,7 +199,7 @@ tests:
       response:
           error: 1
 
-    - label: "reads back optional global attribute: FeatureMap"
+    - label: "Reads back optional global attribute: FeatureMap"
       disabled: true
       command: "readAttribute"
       attribute: "FeatureMap"
