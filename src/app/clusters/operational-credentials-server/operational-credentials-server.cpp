@@ -55,8 +55,8 @@ using namespace chip::app::Clusters::OperationalCredentials;
 
 namespace {
 
-constexpr uint8_t kDACCertificate   = 1;
-constexpr uint8_t kPAICertificate   = 2;
+constexpr uint8_t kDACCertificate = 1;
+constexpr uint8_t kPAICertificate = 2;
 
 class OperationalCredentialsAttrAccess : public AttributeAccessInterface
 {
@@ -655,9 +655,9 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
         VerifyOrExit(csrLength <= Crypto::kMAX_CSR_Length, err = CHIP_ERROR_INTERNAL);
 
         // Encode the NOCSR elements with the CSR and Nonce
-        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrLength,        // CSR buffer
-                                                          CSRNonce.size(),  // CSR Nonce
-                                                          0u                // no vendor reserved data
+        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrLength,       // CSR buffer
+                                                          CSRNonce.size(), // CSR Nonce
+                                                          0u               // no vendor reserved data
         );
 
         VerifyOrExit(nocsrElements.Alloc(nocsrLengthEstimate), err = CHIP_ERROR_NO_MEMORY);
