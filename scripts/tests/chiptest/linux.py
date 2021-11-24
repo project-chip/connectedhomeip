@@ -110,14 +110,11 @@ def CreateNamespacesForAppTest():
     for i in range(100):  # wait at most 10 seconds
         output = subprocess.check_output(['ip', 'addr'])
         if b'tentative' not in output:
+            logging.info('No more tentative addresses')
             break
         time.sleep(0.1)
-
-    if b'tentative' in output:
-        logging.warn("Some addresses look to still be tentative")
     else:
-        logging.info('No more tentative addresses')
-
+        logging.warn("Some addresses look to still be tentative")
 
 def PrepareNamespacesForTestExecution(in_unshare: bool):
     if not in_unshare:
