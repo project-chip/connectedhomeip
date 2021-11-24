@@ -199,6 +199,7 @@ function setDefaultResponse(test)
   setDefault(test[kResponseName], kConstraintsName, defaultResponseConstraints);
 
   const hasResponseValue              = 'value' in test[kResponseName];
+  const hasResponseError              = 'error' in test[kResponseName];
   const hasResponseConstraints        = 'constraints' in test[kResponseName] && Object.keys(test[kResponseName].constraints).length;
   const hasResponseValueOrConstraints = hasResponseValue || hasResponseConstraints;
 
@@ -233,10 +234,10 @@ function setDefaultResponse(test)
     return;
   }
 
-  if (!hasResponseValueOrConstraints) {
+  if (!hasResponseValueOrConstraints && !hasResponseError) {
     console.log(test);
     console.log(test[kResponseName]);
-    const errorStr = 'Test does not have a "value" or a "constraints" defined.';
+    const errorStr = 'Test does not have a "value" or a "constraints" defined and is not expecting an error.';
     throwError(test, errorStr);
   }
 
