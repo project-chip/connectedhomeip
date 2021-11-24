@@ -268,6 +268,13 @@ void DeviceController::OnSessionReleased(SessionHandle session)
     mCASESessionManager->OnSessionReleased(session);
 }
 
+void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & session)
+{
+    VerifyOrReturn(mState == State::Initialized,
+                   ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called in incorrect state"));
+    UpdateDevice(session.GetPeerNodeId());
+}
+
 CHIP_ERROR DeviceController::InitializePairedDeviceList()
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
@@ -542,6 +549,7 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 
     params.systemState->SessionMgr()->RegisterCreationDelegate(*this);
     params.systemState->SessionMgr()->RegisterReleaseDelegate(*this);
+    params.systemState->SessionMgr()->RegisterRecoveryDelegate(*this);
 
     uint16_t nextKeyID = 0;
     uint16_t size      = sizeof(nextKeyID);
