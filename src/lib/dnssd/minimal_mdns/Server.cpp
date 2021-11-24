@@ -52,18 +52,35 @@ private:
     ServerBase * mServer;
 };
 
+/**
+ * Extracts the Listening UDP Endpoint from an underlying ServerBase::EndpointInfo
+ */
 class ListenSocketDelegate : public ServerBase::BroadcastSendDelegate
 {
 public:
     chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override { return info->listen_udp; }
 };
 
+/**
+ * Extracts the Querying UDP Endpoint from an underlying ServerBase::EndpointInfo
+ */
 class QuerySocketDelegate : public ServerBase::BroadcastSendDelegate
 {
 public:
     chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override { return info->query_udp; }
 };
 
+/**
+ * Validates that an endpoint belongs to a specific interface/ip address type before forwarding the
+ * endpoint accept logic to another BroadcastSendDelegate.
+ *
+ * Usage like:
+ *
+ * SomeDelegate *child = ....;
+ * InterfaceTypeValidateDelegate validator(interfaceId, IPAddressType::IPv6, child);
+ *
+ * UDPEndPoint *udp = validator.Accept(endpointInfo);
+ */
 class InterfaceTypeValidateDelegate : public ServerBase::BroadcastSendDelegate
 {
 public:
