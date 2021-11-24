@@ -289,8 +289,8 @@ limitations under the License.
             <description>Set a PIN Code into the lock.</description>
             <access op="invoke" role="administer" />
             <arg name="userId" type="INT16U" />
-            <arg name="userStatus" type="DlUserStatus" isNullable="true" />
-            <arg name="userType" type="DlUserType" isNullable="true" />
+            <arg name="userStatus" type="DlUserStatus" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
+            <arg name="userType" type="DlUserType" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
             <arg name="pin" type="OCTET_STRING" />
         </command>
         <!-- Conformance feature !USR & PIN - for now optional -->
@@ -343,7 +343,7 @@ limitations under the License.
         <command source="client" code="11" name="SetWeekDaySchedule" optional="true">
             <description>Set a weekly repeating schedule for a specified user.</description>
             <access op="invoke" role="administer" />
-            <arg name="weekdayIndex" type="INT8U" />
+            <arg name="weekDayIndex" type="INT8U" />
             <arg name="userIndex" type="INT16U" />
             <arg name="daysMask" type="DlDaysMaskMap" />
             <arg name="startHour" type="INT8U" />
@@ -355,14 +355,14 @@ limitations under the License.
         <command source="client" code="12" name="GetWeekDaySchedule" responseName="GetWeekDayScheduleResponse" optional="true">
             <description>Retrieve the specific weekly schedule for the specific user.</description>
             <access op="invoke" role="administer" />
-            <arg name="weekdayIndex" type="INT8U" />
+            <arg name="weekDayIndex" type="INT8U" />
             <arg name="userIndex" type="INT16U" />
         </command>
         <!-- Conformance feature SCH - for now optional -->
         <command source="server" code="12" name="GetWeekDayScheduleResponse" disableDefaultResponse="true" optional="true">
             <description>Returns the weekly repeating schedule data for the specified schedule index.</description>
             <access op="invoke" role="administer" />
-            <arg name="weekdayIndex" type="INT8U" />
+            <arg name="weekDayIndex" type="INT8U" />
             <arg name="userIndex" type="INT16U" />
             <arg name="status" type="DlStatus" />
             <arg name="daysMask" type="DlDaysMaskMap" presentIf="status == 0" />
@@ -375,7 +375,7 @@ limitations under the License.
         <command source="client" code="13" name="ClearWeekDaySchedule" optional="true">
             <description>Clear the specific weekly schedule or all weekly schedules for the specific user.</description>
             <access op="invoke" role="administer" />
-            <arg name="weekdayIndex" type="INT8U" />
+            <arg name="weekDayIndex" type="INT8U" />
             <arg name="userIndex" type="INT16U" />
         </command>
         <!-- Conformance feature SCH - for now optional -->
@@ -467,8 +467,8 @@ limitations under the License.
             <description>Set an ID for RFID access into the lock.</description>
             <access op="invoke" role="administer" />
             <arg name="userId" type="INT16U" />
-            <arg name="userStatus" type="DlUserStatus" isNullable="true" />
-            <arg name="userType" type="DlUserType" isNullable="true" />
+            <arg name="userStatus" type="DlUserStatus" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
+            <arg name="userType" type="DlUserType" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
             <arg name="rfidCode" type="OCTET_STRING" />
         </command>
         <!-- Conformance feature !USR & RID - for now optional -->
@@ -505,8 +505,8 @@ limitations under the License.
             <arg name="userIndex" type="INT16U" />
             <arg name="userName" type="CHAR_STRING" isNullable="true" />
             <arg name="userUniqueId" type="INT32U" isNullable="true" />
-            <arg name="userStatus" type="DlUserStatus" isNullable="true" />
-            <arg name="userType" type="DlUserType" isNullable="true" />
+            <arg name="userStatus" type="DlUserStatus" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
+            <arg name="userType" type="DlUserType" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
             <arg name="credentialRule" type="DlCredentialRule" isNullable="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
@@ -537,7 +537,7 @@ limitations under the License.
             <arg name="userIndex" type="INT16U" />
         </command>
         <!-- Conformance feature [NOT] - for now optional -->
-        <command source="server" code="32" name="OperatingEventNotification" disableDefaultResponse="true">
+        <command source="server" code="32" name="OperatingEventNotification" disableDefaultResponse="true" optional="true">
             <description>The door lock server sends out operation event notification when the event is triggered by the various event sources.</description>
             <arg name="operationEventSource" type="INT8U" />
             <arg name="operationEventCode" type="INT8U" />
@@ -547,7 +547,7 @@ limitations under the License.
             <arg name="data" type="CHAR_STRING" optional="true" />
         </command>
         <!-- Conformance feature [NOT] - for now optional -->
-        <command source="server" code="33" name="ProgrammingEventNotification" disableDefaultResponse="true">
+        <command source="server" code="33" name="ProgrammingEventNotification" disableDefaultResponse="true" optional="true">
             <description>The door lock server sends out a programming event notification whenever a programming event takes place on the door lock.</description>
             <arg name="programEventSource" type="INT8U" />
             <arg name="programEventCode" type="INT8U" />
@@ -767,9 +767,9 @@ limitations under the License.
 
     <enum name="DlUserStatus" type="ENUM8">
         <cluster code="0x0101" />
-        <item value="00" name="Available" />
-        <item value="01" name="OccupiedEnabled" />
-        <item value="03" name="OccupiedDisabled" />
+        <item value="0" name="Available" />
+        <item value="1" name="OccupiedEnabled" />
+        <item value="3" name="OccupiedDisabled" />
     </enum>
 
     <enum name="DlUserType" type="ENUM8">
