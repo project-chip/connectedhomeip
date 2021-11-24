@@ -1054,7 +1054,10 @@ void UDPEndPointImplSockets::CloseImpl()
 {
     if (mSocket != kInvalidSocketFd)
     {
-        static_cast<System::LayerSockets *>(Layer().SystemLayer())->StopWatchingSocket(&mWatch);
+        auto * layer = static_cast<System::LayerSockets *>(Layer().SystemLayer());
+        if (layer && layer->IsInitialized()) {
+            static_cast<System::LayerSockets *>(layer)->StopWatchingSocket(&mWatch);
+        }
         close(mSocket);
         mSocket = kInvalidSocketFd;
     }

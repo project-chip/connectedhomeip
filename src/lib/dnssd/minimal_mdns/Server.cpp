@@ -128,6 +128,8 @@ ServerBase::~ServerBase()
 
 void ServerBase::Shutdown()
 {
+    if (!IsListening()) return;
+
     for (size_t i = 0; i < mEndpointCount; i++)
     {
         if (mEndpoints[i].udp != nullptr)

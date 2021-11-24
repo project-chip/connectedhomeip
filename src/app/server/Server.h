@@ -130,6 +130,14 @@ private:
         CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
     };
 
+    enum class ServerState
+    {
+        Disabled,        ///< The Server is inactive and disabled.
+        Enabled,         ///< The Server is active and enabled.
+    };
+
+    ServerState mState                        = ServerState::Disabled;
+
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
