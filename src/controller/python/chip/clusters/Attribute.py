@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from typing import Type, Union, List, Any
 from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint32,  c_uint16, py_object
 
-from .ClusterObjects import ClusterAttributeDescriptor
+from .ClusterObjects import ClusterAttributeDescriptor, ClusterEventDescriptor
 import chip.exceptions
 import chip.interaction_model
 import chip.tlv
@@ -61,8 +61,43 @@ class AttributePath:
 
 
 @dataclass
+class EventHeader:
+    EndpointId: int = None
+    ClusterId: int = None
+    EventId: int = None
+
+    def __init__(self, EndpointId: int = None, Cluster=None, Event=None, ClusterId=None, EventId=None):
+        self.EndpointId = EndpointId
+        if Cluster is not None:
+            # Wildcard read for a specific cluster
+            if (Event is not None) or (ClusterId is not None) or (EventId is not None):
+                raise Warning(
+                    "EventId, ClusterId and AttributeId is ignored when Cluster is specified")
+            self.ClusterId = Cluster.id
+            return
+        if Event is not None:
+            if (ClusterId is not None) or (EventId is not None):
+                raise Warning(
+                    "ClusterId and AttributeId is ignored when Attribute is specified")
+            self.ClusterId = Event.cluster_id
+            self.EventId = Event.event_id
+            return
+        self.ClusterId = ClusterId
+        self.EventId = EventId
+
+    def __str__(self) -> str:
+        return f"{self.EndpointId}/{self.ClusterId}/{self.EventId}"
+
+
+@dataclass
 class AttributeStatus:
     Path: AttributePath
+    Status: Union[chip.interaction_model.Status, int]
+
+
+@dataclass
+class EventStatus:
+    Header: EventHeader
     Status: Union[chip.interaction_model.Status, int]
 
 
@@ -76,11 +111,18 @@ class AttributeDescriptorWithEndpoint:
 
 
 @dataclass
+class EventDescriptorWithEndpoint:
+    EndpointId: int
+    Event: ClusterEventDescriptor
+
+
+@dataclass
 class AttributeWriteRequest(AttributeDescriptorWithEndpoint):
     Data: Any
 
 
 AttributeReadRequest = AttributeDescriptorWithEndpoint
+EventReadRequest = EventDescriptorWithEndpoint
 
 
 @dataclass
@@ -88,7 +130,13 @@ class AttributeReadResult(AttributeStatus):
     Data: Any = None
 
 
+@dataclass
+class EventReadResult(EventStatus):
+    Data: Any = None
+
+
 _AttributeIndex = {}
+_EventIndex = {}
 
 
 def _BuildAttributeIndex():
@@ -112,6 +160,29 @@ def _BuildAttributeIndex():
 
                             _AttributeIndex[str(AttributePath(ClusterId=attribute.cluster_id, AttributeId=attribute.attribute_id))] = eval(
                                 'chip.clusters.Objects.' + clusterName + '.Attributes.' + attributeName)
+
+
+def _BuildEventIndex():
+    ''' Build internal event index for locating the corresponding cluster object by path in the future.
+    We do this because this operation will take a long time when there are lots of events, it takes about 300ms for a single query.
+    This is acceptable during init, but unacceptable when the server returns lots of events at the same time.
+    '''
+    for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
+        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+            for objName, subclass in inspect.getmembers(obj):
+                if inspect.isclass(subclass) and (('Events') in str(subclass)):
+                    for eventName, event in inspect.getmembers(subclass):
+                        if inspect.isclass(event):
+                            base_classes = inspect.getmro(event)
+
+                            # Only match on classes that extend the ClusterEventescriptor class
+                            matched = [
+                                value for value in base_classes if 'ClusterEventDescriptor' in str(value)]
+                            if (matched == []):
+                                continue
+
+                            _EventIndex[str(EventHeader(ClusterId=event.cluster_id, EventId=event.event_id))] = eval(
+                                'chip.clusters.Objects.' + clusterName + '.Events.' + eventName)
 
 
 class AsyncReadTransaction:
@@ -143,6 +214,25 @@ class AsyncReadTransaction:
     def handleAttributeData(self, path: AttributePath, status: int, data: bytes):
         self._event_loop.call_soon_threadsafe(
             self._handleAttributeData, path, status, data)
+
+    def _handleEventData(self, header: EventHeader, data: bytes):
+        try:
+            eventType = _EventIndex.get(str(EventHeader(
+                ClusterId=header.ClusterId, EventId=path.EventId)), None)
+            eventValue = None
+            if eventType is None:
+                eventValue = chip.tlv.TLVReader(data).get().get("Any", {})
+            else:
+                eventValue = eventType.FromTLV(data)
+
+            self._res.append(EventReadResult(
+                Event=header, Data=eventValue))
+        except Exception as ex:
+            logging.exception(ex)
+
+    def handleEventData(self, header: EventHeader, data: bytes):
+        self._event_loop.call_soon_threadsafe(
+            self._handleEventData, EventHeader, data)
 
     def _handleError(self, chipError: int):
         self._future.set_exception(
@@ -197,6 +287,8 @@ class AsyncWriteTransaction:
 
 _OnReadAttributeDataCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint32, c_uint32, c_uint16, c_void_p, c_size_t)
+_OnReadEventDataCallbackFunct = CFUNCTYPE(
+    None, py_object, c_uint16, c_uint32, c_uint32, c_void_p, c_size_t)
 _OnReadErrorCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32)
 _OnReadDoneCallbackFunct = CFUNCTYPE(
@@ -208,6 +300,13 @@ def _OnReadAttributeDataCallback(closure, endpoint: int, cluster: int, attribute
     dataBytes = ctypes.string_at(data, len)
     closure.handleAttributeData(AttributePath(
         EndpointId=endpoint, ClusterId=cluster, AttributeId=attribute), status, dataBytes[:])
+
+
+@_OnReadEventDataCallbackFunct
+def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: int, data, len):
+    dataBytes = ctypes.string_at(data, len)
+    closure.handleEventData(EventHeader(
+        EndpointId=endpoint, ClusterId=cluster, EventId=event), dataBytes[:])
 
 
 @_OnReadErrorCallbackFunct
@@ -309,11 +408,11 @@ def Init():
                    _OnWriteResponseCallbackFunct, _OnWriteErrorCallbackFunct, _OnWriteDoneCallbackFunct])
         handle.pychip_ReadClient_ReadAttributes.restype = c_uint32
         setter.Set('pychip_ReadClient_InitCallbacks', None, [
-                   _OnReadAttributeDataCallbackFunct, _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct])
+                   _OnReadAttributeDataCallbackFunct, _OnReadEventDataCallbackFunct, _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct])
 
     handle.pychip_WriteClient_InitCallbacks(
         _OnWriteResponseCallback, _OnWriteErrorCallback, _OnWriteDoneCallback)
     handle.pychip_ReadClient_InitCallbacks(
-        _OnReadAttributeDataCallback, _OnReadErrorCallback, _OnReadDoneCallback)
+        _OnReadAttributeDataCallback, _OnReadEventDataCallback, _OnReadErrorCallback, _OnReadDoneCallback)
 
     _BuildAttributeIndex()

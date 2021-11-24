@@ -52,10 +52,15 @@ using OnReadAttributeDataCallback = void (*)(PyObject * appContext, chip::Endpoi
                                              chip::AttributeId attributeId,
                                              std::underlying_type_t<Protocols::InteractionModel::Status> imstatus, uint8_t * data,
                                              uint32_t dataLen);
+using OnReadEventDataCallback     = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                         chip::EventId eventId,
+                                         std::underlying_type_t<Protocols::InteractionModel::Status> imstatus, uint8_t * data,
+                                         uint32_t dataLen);
 using OnReadErrorCallback         = void (*)(PyObject * appContext, uint32_t chiperror);
 using OnReadDoneCallback          = void (*)(PyObject * appContext);
 
 OnReadAttributeDataCallback gOnReadAttributeDataCallback = nullptr;
+OnReadEventDataCallback gOnReadEventDataCallback         = nullptr;
 OnReadErrorCallback gOnReadErrorCallback                 = nullptr;
 OnReadDoneCallback gOnReadDoneCallback                   = nullptr;
 
@@ -97,6 +102,38 @@ public:
 
         gOnReadAttributeDataCallback(mAppContext, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
                                      to_underlying(aStatus.mStatus), buffer, size);
+    }
+
+    void OnEventData(const ReadClient * apReadClient, const EventHeader & aEventHeader, TLV::TLVReader * apData,
+                     const StatusIB * apStatus) override
+    {
+        uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+        uint32_t size = 0;
+        // When the apData is nullptr, means we did not receive a valid event data from server, status will be some error
+        // status.
+        if (apData != nullptr)
+        {
+            // The TLVReader's read head is not pointing to the first element in the container instead of the container itself, use
+            // a TLVWriter to get a TLV with a normalized TLV buffer (Wrapped with a anonymous tag, no extra "end of container" tag
+            // at the end.)
+            TLV::TLVWriter writer;
+            writer.Init(buffer);
+            CHIP_ERROR err = writer.CopyElement(TLV::AnonymousTag, *apData);
+            if (err != CHIP_NO_ERROR)
+            {
+                this->OnError(apReadClient, err);
+                return;
+            }
+            size = writer.GetLengthWritten();
+        }
+
+        if (apData == nullptr && apStatus == nullptr)
+        {
+            err = CHIP_ERROR_INCORRECT_STATE;
+            this->OnError(apReadClient, err);
+        }
+
+        gOnReadEventDataCallback(mAppContext, aEventHeader.mEndpointId, aEventHeader.mClusterId, aEventHeader.mEventId, buffer, size);
     }
 
     void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override
@@ -167,9 +204,11 @@ void pychip_WriteClient_InitCallbacks(OnWriteResponseCallback onWriteResponseCal
 }
 
 void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttributeDataCallback,
-                                     OnReadErrorCallback onReadErrorCallback, OnReadDoneCallback onReadDoneCallback)
+                                     OnReadEventDataCallback onReadEventDataCallback, OnReadErrorCallback onReadErrorCallback,
+                                     OnReadDoneCallback onReadDoneCallback)
 {
     gOnReadAttributeDataCallback = onReadAttributeDataCallback;
+    gOnReadEventDataCallback     = onReadEventDataCallback;
     gOnReadErrorCallback         = onReadErrorCallback;
     gOnReadDoneCallback          = onReadDoneCallback;
 }
@@ -254,6 +293,53 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
         ReadPrepareParams params(session.Value());
         params.mpAttributePathParamsList    = readPaths.get();
         params.mAttributePathParamsListSize = n;
+
+        err = readClient->SendReadRequest(params);
+        if (err != CHIP_NO_ERROR)
+        {
+            readClient->Shutdown();
+        }
+    }
+
+    callback.release();
+
+exit:
+    va_end(args);
+    return err.AsInteger();
+}
+
+chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, DeviceProxy * device, size_t n, ...)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    std::unique_ptr<ReadClientCallback> callback = std::make_unique<ReadClientCallback>(appContext);
+
+    va_list args;
+    va_start(args, n);
+
+    std::unique_ptr<EventPathParams[]> readPaths(new EventPathParams[n]);
+
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            void * path = va_arg(args, void *);
+
+            python::EventPath pathObj;
+            memcpy(&pathObj, path, sizeof(python::EventPath));
+
+            readPaths[i] = EventPathParams(pathObj.endpointId, pathObj.clusterId, pathObj.eventId);
+        }
+    }
+
+    Optional<SessionHandle> session = device->GetSecureSession();
+    ReadClient * readClient;
+
+    VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NOT_CONNECTED);
+    {
+        app::InteractionModelEngine::GetInstance()->NewReadClient(&readClient, ReadClient::InteractionType::Read, callback.get());
+        ReadPrepareParams params(session.Value());
+        params.mpEventePathParamsList   = readPaths.get();
+        params.mEventPathParamsListSize = n;
 
         err = readClient->SendReadRequest(params);
         if (err != CHIP_NO_ERROR)

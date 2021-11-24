@@ -471,6 +471,72 @@ class ChipDeviceController(object):
             raise self._ChipStack.ErrorToException(res)
         return await future
 
+    async def ReadEvent(self, nodeid: int, events: typing.List[typing.Union[
+        None,  # Empty tuple, all wildcard
+        typing.Tuple[int],  # Endpoint
+        # Wildcard endpoint, Cluster id present
+        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+        # Wildcard endpoint, Cluster + Event present
+        typing.Tuple[typing.Type[ClusterObjects.ClusterEventDescriptor]],
+        # Wildcard event id
+        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
+        # Concrete path
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterEventDescriptor]]
+    ]]):
+        '''
+        Read a list of events from a target node
+
+        nodeId: Target's Node ID
+        events: A list of tuples of varying types depending on the type of read being requested:
+            ():                                         Endpoint = *,           Cluster = *,          Event = *
+            (Clusters.ClusterA):                        Endpoint = *,           Cluster = specific,   Event = *
+            (Clusters.ClusterA.EventA):                 Endpoint = *,           Cluster = specific,   Event = specific
+            (endpoint, Clusters.ClusterA):              Endpoint = specific,    Cluster = specific,   Event = *
+            (endpoint, Clusters.ClusterA.EventA):       Endpoint = specific,    Cluster = specific,   Event = specific
+
+        The cluster and events specified above are to be selected from the generated cluster objects.
+
+        NOTE: Only the last variant is currently supported.
+        '''
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = self.GetConnectedDeviceSync(nodeid)
+        events = []
+        for v in events:
+            endpoint = None
+            cluster = None
+            event = None
+            if v == () or v == ('*'):
+                # Wildcard
+                pass
+            elif len(v) == 1:
+                if v[0] is int:
+                    endpoint = v[0]
+                elif issubclass(v[0], ClusterObjects.Cluster):
+                    cluster = v[0]
+                elif issubclass(v[0], ClusterObjects.ClusterEventDescriptor):
+                    event = v[0]
+                else:
+                    raise ValueError("Unsupported Event Path")
+            elif len(v) == 2:
+                # endpoint + (cluster) event / endpoint + cluster
+                endpoint = v[0]
+                if issubclass(v[1], ClusterObjects.Cluster):
+                    cluster = v[1]
+                elif issubclass(v[1], ClusterEvent.ClusterEventDescriptor):
+                    event = v[1]
+                else:
+                    raise ValueError("Unsupported Event Path")
+            events.append(ClusterEvent.EventPath(
+                EndpointId=endpoint, Cluster=cluster, Event=event))
+        res = self._ChipStack.Call(
+            lambda: ClusterEvent.ReadEvents(future, eventLoop, device, events))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+        return await future
+
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         req = None
         try:
