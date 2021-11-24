@@ -1695,20 +1695,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace TimeSynchronization
 
-namespace BridgedDeviceBasicInformation {
-namespace Attributes {
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace BridgedDeviceBasicInformation
-
 namespace BridgedDeviceBasic {
 namespace Attributes {
 

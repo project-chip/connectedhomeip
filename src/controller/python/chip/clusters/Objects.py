@@ -9774,44 +9774,6 @@ class TimeSynchronization(Cluster):
 
 
 @dataclass
-class BridgedDeviceBasicInformation(Cluster):
-    id: typing.ClassVar[int] = 0x0039
-
-    class Attributes:
-        @dataclass
-        class FeatureMap(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0039
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0xFFFC
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class ClusterRevision(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0039
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0xFFFD
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-            value: 'uint' = None
-
-
-@dataclass
 class BridgedDeviceBasic(Cluster):
     id: typing.ClassVar[int] = 0x0039
 

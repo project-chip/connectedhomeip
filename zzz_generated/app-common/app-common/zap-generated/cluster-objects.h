@@ -11458,33 +11458,6 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace TimeSynchronization
-namespace BridgedDeviceBasicInformation {
-
-namespace Attributes {
-namespace FeatureMap {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-};
-} // namespace ClusterRevision
-} // namespace Attributes
-} // namespace BridgedDeviceBasicInformation
 namespace BridgedDeviceBasic {
 
 namespace Commands {
