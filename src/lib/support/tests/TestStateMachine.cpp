@@ -56,14 +56,14 @@ struct MockState
 
 struct BaseState
 {
-    void Enter() { mock.Enter(); }
-    void Exit() { mock.Exit(); }
-    void LogTransition(const char * previous) { mock.LogTransition(previous); }
+    void Enter() { mMock.Enter(); }
+    void Exit() { mMock.Exit(); }
+    void LogTransition(const char * previous) { mMock.LogTransition(previous); }
     const char * GetName() { return mName; }
 
     chip::StateMachine::Context<Event> & mCtx;
     const char * mName;
-    MockState & mock;
+    MockState & mMock;
 };
 
 struct State1 : public BaseState
