@@ -128,10 +128,13 @@ public:
     virtual CHIP_ERROR DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                                   chip::Inet::InterfaceId interface);
 
-    /// Send out a broadcast query. Will use an ephemeral port to receive replies
+    /// Send out a broadcast query, may use an ephemeral port to receive replies.
+    /// Ephemeral ports will make replies be marked as 'LEGACY' and replies will include a query secion.
     virtual CHIP_ERROR BroadcastUnicastQuery(chip::System::PacketBufferHandle && data, uint16_t port);
 
     /// Send a specific packet broadcast to a specific interface using a specific address type
+    /// May use an ephemeral port to receive replies.
+    /// Ephemeral ports will make replies be marked as 'LEGACY' and replies will include a query secion.
     virtual CHIP_ERROR BroadcastUnicastQuery(chip::System::PacketBufferHandle && data, uint16_t port,
                                              chip::Inet::InterfaceId interface, chip::Inet::IPAddressType addressType);
 
