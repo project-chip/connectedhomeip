@@ -369,13 +369,13 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreTotalOperationalHour
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetBootReasons(uint32_t & bootReasons)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetBootReason(uint32_t & bootReason)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreBootReasons(uint32_t bootReasons)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreBootReason(uint32_t bootReason)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

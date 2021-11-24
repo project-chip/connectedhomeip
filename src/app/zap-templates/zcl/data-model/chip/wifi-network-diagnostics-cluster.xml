@@ -82,4 +82,8 @@ limitations under the License.
       <field id="0" name="ConnectionStatus" type="WiFiConnectionStatus"/>
     </event>                  
   </cluster>
+  <bitmap name="WiFiNetworkDiagnosticsFeature" type="BITMAP32">
+    <field name="PacketCounts" mask="0x1"/>
+    <field name="ErrorCounts" mask="0x2"/>
+  </bitmap>  
 </configurator>

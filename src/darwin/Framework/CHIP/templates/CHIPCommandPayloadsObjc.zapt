@@ -6,16 +6,26 @@
 #import <Foundation/Foundation.h>
 #import <CHIP/CHIPStructsObjc.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 {{#zcl_clusters}}
 {{#zcl_commands}}
-@interface CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Payload : NSObject
+{{#zcl_command_arguments}}
+{{#first}}
+@interface CHIP{{asUpperCamelCase parent.parent.name}}Cluster{{asUpperCamelCase parent.name}}Params : NSObject
+{{/first}}
 {{! Override the getter name because some of our properties start with things
     like "new" or "init" }}
-{{#zcl_command_arguments}}
 @property (strong, nonatomic{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}};
-{{/zcl_command_arguments}}
+{{#last}}
+ - (instancetype)init;
 @end
+{{/last}}
+{{/zcl_command_arguments}}
 
 {{/zcl_commands}}
 {{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END
+
 #endif /* CHIP_COMMAND_PAYLOADS_H */

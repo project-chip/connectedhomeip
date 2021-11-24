@@ -500,6 +500,7 @@ private:
 {{/unless}}
 {{/if}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
 class Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
@@ -548,6 +549,7 @@ private:
     bool mWait;
 };
 
+{{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
@@ -574,7 +576,9 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{/unless}}
         {{/if}}
         {{#if isReportableAttribute}}
+        {{#unless isList}}
         make_unique<Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        {{/unless}}
         {{/if}}
         {{/chip_server_cluster_attributes}}
     };

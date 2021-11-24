@@ -14,23 +14,40 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
-
-#include <credentials/DeviceAttestationVerifier.h>
-
-namespace chip {
-namespace Credentials {
-namespace Examples {
 
 /**
- * @brief Get implementation of a sample DAC verifier to validate device
- *        attestation procedure.
- *
- * @returns a singleton DeviceAttestationVerifier that relies on no
- *          storage abstractions.
+ *    @file
+ *          Implements a getter and setter for a singleton DiagnosticDataProvider object.
  */
-DeviceAttestationVerifier * GetExampleDACVerifier();
 
-} // namespace Examples
-} // namespace Credentials
+#include <lib/support/CodeUtils.h>
+
+namespace chip {
+namespace DeviceLayer {
+
+class DiagnosticDataProvider;
+
+namespace {
+
+/** Singleton pointer to the DiagnosticDataProvider implementation.
+ */
+DiagnosticDataProvider * gInstance = nullptr;
+
+} // namespace
+
+DiagnosticDataProvider & GetDiagnosticDataProvider()
+{
+    VerifyOrDie(gInstance != nullptr);
+    return *gInstance;
+}
+
+void SetDiagnosticDataProvider(DiagnosticDataProvider * diagnosticDataProvider)
+{
+    if (diagnosticDataProvider != nullptr)
+    {
+        gInstance = diagnosticDataProvider;
+    }
+}
+
+} // namespace DeviceLayer
 } // namespace chip

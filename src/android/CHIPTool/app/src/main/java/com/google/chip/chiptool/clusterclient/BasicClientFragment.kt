@@ -18,12 +18,12 @@ import com.google.chip.chiptool.R
 import kotlinx.android.synthetic.main.basic_client_fragment.attributeNameSpinner
 import kotlinx.android.synthetic.main.basic_client_fragment.basicClusterCommandStatus
 import kotlinx.android.synthetic.main.basic_client_fragment.locationEd
-import kotlinx.android.synthetic.main.basic_client_fragment.userLabelEd
+import kotlinx.android.synthetic.main.basic_client_fragment.nodeLabelEd
 import kotlinx.android.synthetic.main.basic_client_fragment.view.attributeNameSpinner
 import kotlinx.android.synthetic.main.basic_client_fragment.view.readAttributeBtn
 import kotlinx.android.synthetic.main.basic_client_fragment.view.writeLocalConfigDisabledSwitch
 import kotlinx.android.synthetic.main.basic_client_fragment.view.writeLocationBtn
-import kotlinx.android.synthetic.main.basic_client_fragment.view.writeUserLabelBtn
+import kotlinx.android.synthetic.main.basic_client_fragment.view.writeNodeLabelBtn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -48,9 +48,9 @@ class BasicClientFragment : Fragment() {
       addressUpdateFragment =
         childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
-      writeUserLabelBtn.setOnClickListener { scope.launch {
-        sendWriteUserLabelAttribute()
-        userLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
+      writeNodeLabelBtn.setOnClickListener { scope.launch {
+        sendWriteNodeLabelAttribute()
+        nodeLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
       }}
       writeLocationBtn.setOnClickListener { scope.launch {
         sendWriteLocationAttribute()
@@ -111,7 +111,7 @@ class BasicClientFragment : Fragment() {
       getString(R.string.basic_cluster_vendor_id_text) -> sendReadVendorIDAttribute()
       getString(R.string.basic_cluster_product_name_text) -> sendReadProductNameAttribute()
       getString(R.string.basic_cluster_product_id_text) -> sendReadProductIDAttribute()
-      getString(R.string.basic_cluster_user_label_text) -> sendReadUserLabelAttribute()
+      getString(R.string.basic_cluster_node_label_text) -> sendReadNodeLabelAttribute()
       getString(R.string.basic_cluster_location_text) -> sendReadLocationAttribute()
       getString(R.string.basic_cluster_hardware_version_text) -> sendReadHardwareVersionAttribute()
       getString(R.string.basic_cluster_hardware_version_string_text) -> sendReadHardwareVersionStringAttribute()
@@ -134,7 +134,7 @@ class BasicClientFragment : Fragment() {
     ATTRIBUTES.add(getString(R.string.basic_cluster_vendor_id_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_product_name_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_product_id_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_user_label_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_node_label_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_location_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_hardware_version_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_hardware_version_string_text))
@@ -220,31 +220,31 @@ class BasicClientFragment : Fragment() {
     })
   }
 
-  private suspend fun sendReadUserLabelAttribute() {
-    getBasicClusterForDevice().readUserLabelAttribute(object : ChipClusters.CharStringAttributeCallback {
+  private suspend fun sendReadNodeLabelAttribute() {
+    getBasicClusterForDevice().readNodeLabelAttribute(object : ChipClusters.CharStringAttributeCallback {
       override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] UserLabel: $value")
-        showMessage("[Read Success] UserLabel: $value")
+        Log.i(TAG,"[Read Success] NodeLabel: $value")
+        showMessage("[Read Success] NodeLabel: $value")
       }
 
       override fun onError(ex: Exception) {
-        showMessage("Read UserLabel failure $ex")
-        Log.e(TAG, "Read UserLabel failure", ex)
+        showMessage("Read NodeLabel failure $ex")
+        Log.e(TAG, "Read NodeLabel failure", ex)
       }
     })
   }
 
-  private suspend fun sendWriteUserLabelAttribute() {
-    getBasicClusterForDevice().writeUserLabelAttribute(object : ChipClusters.DefaultClusterCallback {
+  private suspend fun sendWriteNodeLabelAttribute() {
+    getBasicClusterForDevice().writeNodeLabelAttribute(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
-        showMessage("Write UserLabel success")
+        showMessage("Write NodeLabel success")
       }
 
       override fun onError(ex: Exception) {
-        showMessage("Write UserLabel failure $ex")
-        Log.e(TAG, "Write UserLabel failure", ex)
+        showMessage("Write NodeLabel failure $ex")
+        Log.e(TAG, "Write NodeLabel failure", ex)
       }
-    }, userLabelEd.text.toString())
+    }, nodeLabelEd.text.toString())
   }
 
   private suspend fun sendReadLocationAttribute() {

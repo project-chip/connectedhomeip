@@ -62,7 +62,7 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 
 CHIP_ERROR
 Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
-                            const ConcreteAttributePath & aPath)
+                            const ConcreteReadAttributePath & aPath)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -100,13 +100,15 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
     SuccessOrExit(err = aReportDataBuilder.GetError());
 
     {
+        // TODO: Figure out how AttributePathExpandIterator should handle read
+        // vs write paths.
         ConcreteAttributePath readPath;
 
         // For each path included in the interested path of the read handler...
         for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
              apReadHandler->GetAttributePathExpandIterator()->Next())
         {
-            if (!apReadHandler->IsInitialReport())
+            if (!apReadHandler->IsPriming())
             {
                 bool concretePathDirty = false;
                 // TODO: Optimize this implementation by making the iterator only emit intersected paths.
@@ -129,7 +131,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
 
             TLV::TLVWriter attributeBackup;
             attributeReportIBs.Checkpoint(attributeBackup);
-            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, readPath);
+            ConcreteReadAttributePath pathForRetrieval(readPath);
+            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, pathForRetrieval);
             if (err != CHIP_NO_ERROR)
             {
                 // We met a error during writing reports, one common case is we are running out of buffer, rollback the
@@ -447,7 +450,15 @@ CHIP_ERROR Engine::SetDirty(ClusterInfo & aClusterInfo)
         // chunk for read interactions.
         if (handler.IsGeneratingReports() || handler.IsAwaitingReportResponse())
         {
-            handler.SetDirty();
+            for (auto clusterInfo = handler.GetAttributeClusterInfolist(); clusterInfo != nullptr;
+                 clusterInfo      = clusterInfo->mpNext)
+            {
+                if (aClusterInfo.IsAttributePathSupersetOf(*clusterInfo) || clusterInfo->IsAttributePathSupersetOf(aClusterInfo))
+                {
+                    handler.SetDirty();
+                    break;
+                }
+            }
         }
     }
     if (!InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(mpGlobalDirtySet, aClusterInfo) &&
@@ -468,20 +479,22 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     {
         return;
     }
+
+    bool intersected = false;
     for (auto clusterInfo = aReadHandler.GetAttributeClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
     {
-        bool intersected = false;
         for (auto path = mpGlobalDirtySet; path != nullptr; path = path->mpNext)
         {
             if (path->IsAttributePathSupersetOf(*clusterInfo) || clusterInfo->IsAttributePathSupersetOf(*path))
             {
                 intersected = true;
+                break;
             }
         }
-        if (!intersected)
-        {
-            aReadHandler.ClearDirty();
-        }
+    }
+    if (!intersected)
+    {
+        aReadHandler.ClearDirty();
     }
 }
 
@@ -504,8 +517,8 @@ void Engine::OnReportConfirm()
 }
 
 }; // namespace reporting
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip
 
 void __attribute__((weak)) MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
 void __attribute__((weak)) MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}

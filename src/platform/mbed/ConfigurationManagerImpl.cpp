@@ -36,6 +36,7 @@
 
 // mbed-os headers
 #include "platform/mbed_power_mgmt.h"
+#include <net_common.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -55,35 +56,33 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-    auto interface = WiFiInterface::get_default_instance();
-    if (interface)
+    auto net_if = get_mbed_net_if();
+    if (net_if == nullptr || net_if->wifiInterface() == nullptr)
     {
-        auto * mac_address = interface->get_mac_address();
-        if (mac_address)
+        ChipLogError(DeviceLayer, "Failed to extract the MAC address: WiFi interface not available");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    auto * mac_address = net_if->wifiInterface()->get_mac_address();
+    if (mac_address)
+    {
+        int last = -1;
+        int rc =
+            sscanf(mac_address, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx%n", buf + 5, buf + 4, buf + 3, buf + 2, buf + 1, buf + 0, &last);
+        if (rc != NSAPI_MAC_BYTES || last != (NSAPI_MAC_SIZE - 1))
         {
-            int last = -1;
-            int rc =
-                sscanf(mac_address, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx%n", buf + 5, buf + 4, buf + 3, buf + 2, buf + 1, buf + 0, &last);
-            if (rc != NSAPI_MAC_BYTES || last != (NSAPI_MAC_SIZE - 1))
-            {
-                ChipLogError(DeviceLayer, "Failed to extract the MAC address: %s, rc = %d, last = %d", mac_address, rc, last);
-                return CHIP_ERROR_INTERNAL;
-            }
-            else
-            {
-                ChipLogError(DeviceLayer, "Extract the MAC address: %s", mac_address);
-                return CHIP_NO_ERROR;
-            }
+            ChipLogError(DeviceLayer, "Failed to extract the MAC address: %s, rc = %d, last = %d", mac_address, rc, last);
+            return CHIP_ERROR_INTERNAL;
         }
         else
         {
-            ChipLogError(DeviceLayer, "Failed to extract the MAC address: nothing returned by the interface");
-            return CHIP_ERROR_INTERNAL;
+            ChipLogError(DeviceLayer, "Extract the MAC address: %s", mac_address);
+            return CHIP_NO_ERROR;
         }
     }
     else
     {
-        ChipLogError(DeviceLayer, "Failed to extract the MAC address: interface not available");
+        ChipLogError(DeviceLayer, "Failed to extract the MAC address: nothing returned by the interface");
         return CHIP_ERROR_INTERNAL;
     }
 }

@@ -110,7 +110,7 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     (void) apCommandObj;
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIB::Builder & aAttributeReport)
 {
     AttributeDataIB::Builder attributeData = aAttributeReport.CreateAttributeData();

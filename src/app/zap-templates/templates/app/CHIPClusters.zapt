@@ -41,8 +41,10 @@ public:
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_attributes}}
     {{#if isReportableAttribute}}
+    {{#unless isList}}
     CHIP_ERROR SubscribeAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onReportCallback);
+    {{/unless}}
     {{/if}}
     {{/chip_server_cluster_attributes}}
     {{#chip_cluster_commands}}

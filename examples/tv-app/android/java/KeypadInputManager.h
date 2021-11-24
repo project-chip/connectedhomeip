@@ -18,15 +18,25 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
-
+#include <app-common/zap-generated/af-structs.h>
+#include <jni.h>
 #include <lib/core/CHIPError.h>
-#include <string>
-#include <vector>
 
-class MediaInputManager
+class KeypadInputManager
 {
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR proxyGetInputList(chip::app::AttributeValueEncoder & aEncoder);
+    void InitializeWithObjects(jobject managerObject);
+    EmberAfKeypadInputStatus SendKey(EmberAfKeypadInputCecKeyCode keyCode);
+
+private:
+    friend KeypadInputManager & KeypadInputMgr();
+
+    static KeypadInputManager sInstance;
+    jobject mKeypadInputManagerObject = nullptr;
+    jmethodID mSendKeyMethod          = nullptr;
 };
+
+inline KeypadInputManager & KeypadInputMgr()
+{
+    return KeypadInputManager::sInstance;
+}

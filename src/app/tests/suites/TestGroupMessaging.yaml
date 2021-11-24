@@ -33,7 +33,6 @@ tests:
     - label: "Read back Attribute"
       command: "readAttribute"
       attribute: "location"
-      disabled: true
       response:
           value: "us"
 
@@ -41,13 +40,11 @@ tests:
       command: "writeAttribute"
       attribute: "location"
       groupId: "1234"
-      disabled: true
       arguments:
           value: ""
 
     - label: "Read back Attribute"
       command: "readAttribute"
       attribute: "location"
-      disabled: true
       response:
           value: ""

@@ -18,6 +18,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -60,8 +61,13 @@ enum class AttestationVerificationResult : uint16_t
     kCertificationDeclarationNoKeyId            = 600,
     kCertificationDeclarationNoCertificateFound = 601,
     kCertificationDeclarationInvalidSignature   = 602,
+    kCertificationDeclarationInvalidFormat      = 603,
+    kCertificationDeclarationInvalidVendorId    = 604,
+    kCertificationDeclarationInvalidProductId   = 605,
 
     kNoMemory = 700,
+
+    kInvalidArgument = 800,
 
     kNotImplemented = 0xFFFFU,
 
@@ -73,6 +79,24 @@ enum CertificateType : uint8_t
     kUnknown = 0,
     kDAC     = 1,
     kPAI     = 2,
+};
+
+struct DeviceInfoForAttestation
+{
+    // Vendor ID reported by device in Basic Information cluster
+    uint16_t vendorId = VendorId::NotSpecified;
+    // Product ID reported by device in Basic Information cluster
+    uint16_t productId = 0;
+    // Vendor ID from  DAC
+    uint16_t dacVendorId = VendorId::NotSpecified;
+    // Product ID from DAC
+    uint16_t dacProductId = 0;
+    // Vendor ID from PAI cert
+    uint16_t paiVendorId = VendorId::NotSpecified;
+    // Product ID from PAI cert (0 if absent)
+    uint16_t paiProductId = 0;
+    // Vendor ID from  PAA cert
+    uint16_t paaVendorId = VendorId::NotSpecified;
 };
 
 class DeviceAttestationVerifier
@@ -117,7 +141,19 @@ public:
     virtual AttestationVerificationResult ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
                                                                                     ByteSpan & certDeclBuffer) = 0;
 
-    // TODO: Validate Certification Declaration Payload
+    /**
+     * @brief Verify a CMS Signed Data Payload against the Basic Information Cluster and DAC/PAI's Vendor and Product IDs
+     *
+     * @param[in] certDeclBuffer   A ByteSpan with the Certification Declaration content.
+     * @param[in] firmwareInfo     A ByteSpan with the Firmware Information content.
+     * @param[in] deviceInfo
+     *
+     * @returns AttestationVerificationResult::kSuccess on success or another specific
+     *          value from AttestationVerificationResult enum on failure.
+     */
+    virtual AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
+                                                                                const ByteSpan & firmwareInfo,
+                                                                                const DeviceInfoForAttestation & deviceInfo) = 0;
 
     // TODO: Validate Firmware Information
 

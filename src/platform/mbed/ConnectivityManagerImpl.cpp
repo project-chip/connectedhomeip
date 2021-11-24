@@ -18,7 +18,7 @@
  */
 /* this file behaves like a config.h, comes first */
 
-#include "netsocket/WiFiInterface.h"
+#include <net_common.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
@@ -123,7 +123,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiAPIdleTimeout            = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
     mSecurityType                 = NSAPI_SECURITY_WPA_WPA2;
 
-    ::NetworkInterface * net_if = ::NetworkInterface::get_default_instance();
+    auto net_if = get_mbed_net_if();
     if (net_if == nullptr)
     {
         ChipLogError(DeviceLayer, "No network interface available");

@@ -159,4 +159,9 @@ limitations under the License.
             <arg name="debugText" type="CHAR_STRING"/>
         </command>
     </cluster>
+    <bitmap name="NetworkCommissioningFeature" type="BITMAP32">
+        <field name="WiFiNetworkInterface" mask="0x1"/>
+        <field name="ThreadNetworkInterface" mask="0x2"/>
+        <field name="EthernetNetworkInterface" mask="0x4"/>        
+    </bitmap>     
 </configurator>
