@@ -180,7 +180,7 @@ CHIPDevice * GetConnectedDevice()
 
 - (void)testSendClusterTest_TC_BI_1_1_000000_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute : ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -188,7 +188,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Read the global attribute : ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -205,7 +205,7 @@ CHIPDevice * GetConnectedDevice()
 - (void)testSendClusterTest_TC_BI_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -217,7 +217,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -227,7 +227,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_BI_1_1_000002_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -235,7 +235,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Reads back global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -704,7 +704,7 @@ CHIPDevice * GetConnectedDevice()
 
 - (void)testSendClusterTest_TC_BOOL_1_1_000000_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute : ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -712,7 +712,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Read the global attribute : ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -729,7 +729,7 @@ CHIPDevice * GetConnectedDevice()
 - (void)testSendClusterTest_TC_BOOL_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -741,7 +741,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -751,7 +751,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_BOOL_1_1_000002_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -759,7 +759,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Reads back global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -866,10 +866,38 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_CC_1_1_000000_WriteAttribute
+- (void)testSendClusterTest_TC_CC_1_1_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        {
+            id actualValue = value;
+            XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1);
+        }
+        {
+            id actualValue = value;
+            XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 5);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -877,11 +905,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:4U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:5U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -5786,6 +5814,60 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_CC_6_2_000003_MoveColorTemperature
 {
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Move Down color temperature command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterMoveColorTemperatureParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:3];
+    params.rate = [NSNumber numberWithUnsignedShort:10U];
+    params.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
+    params.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperatureWithParams:params
+                          completionHandler:^(NSError * _Nullable err) {
+                              NSLog(@"Move Down color temperature command Error: %@", err);
+
+                              XCTAssertEqual(err.code, 0);
+
+                              [expectation fulfill];
+                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_6_2_000004_MoveColorTemperature
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Move Up color temperature command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterMoveColorTemperatureParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:1];
+    params.rate = [NSNumber numberWithUnsignedShort:10U];
+    params.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
+    params.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperatureWithParams:params
+                          completionHandler:^(NSError * _Nullable err) {
+                              NSLog(@"Move Up color temperature command Error: %@", err);
+
+                              XCTAssertEqual(err.code, 0);
+
+                              [expectation fulfill];
+                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_6_2_000005_MoveColorTemperature
+{
     XCTestExpectation * expectation = [self expectationWithDescription:@"Stop Color Temperature command"];
 
     CHIPDevice * device = GetConnectedDevice();
@@ -5811,9 +5893,9 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_2_000004_MoveColorTemperature
+- (void)testSendClusterTest_TC_CC_6_2_000006_MoveColorTemperature
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Move down color temperature command"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Move Down color temperature command"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -5822,14 +5904,14 @@ CHIPDevice * GetConnectedDevice()
 
     __auto_type * params = [[CHIPColorControlClusterMoveColorTemperatureParams alloc] init];
     params.moveMode = [NSNumber numberWithUnsignedChar:3];
-    params.rate = [NSNumber numberWithUnsignedShort:20U];
+    params.rate = [NSNumber numberWithUnsignedShort:10U];
     params.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
     params.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveColorTemperatureWithParams:params
                           completionHandler:^(NSError * _Nullable err) {
-                              NSLog(@"Move down color temperature command Error: %@", err);
+                              NSLog(@"Move Down color temperature command Error: %@", err);
 
                               XCTAssertEqual(err.code, 0);
 
@@ -5838,7 +5920,34 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_2_000005_Off
+- (void)testSendClusterTest_TC_CC_6_2_000007_MoveColorTemperature
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Stop Color Temperature command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterMoveColorTemperatureParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:0];
+    params.rate = [NSNumber numberWithUnsignedShort:10U];
+    params.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
+    params.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperatureWithParams:params
+                          completionHandler:^(NSError * _Nullable err) {
+                              NSLog(@"Stop Color Temperature command Error: %@", err);
+
+                              XCTAssertEqual(err.code, 0);
+
+                              [expectation fulfill];
+                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_6_2_000008_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
 
@@ -5857,7 +5966,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_2_000006_ReadAttribute
+- (void)testSendClusterTest_TC_CC_6_2_000009_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
 
@@ -9059,7 +9168,7 @@ CHIPDevice * GetConnectedDevice()
 
 - (void)testSendClusterTest_TC_EMR_1_1_000000_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute : ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -9067,7 +9176,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Read the global attribute : ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -9084,7 +9193,7 @@ CHIPDevice * GetConnectedDevice()
 - (void)testSendClusterTest_TC_EMR_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -9092,11 +9201,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:1U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:3U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -9106,7 +9215,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_EMR_1_1_000002_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -9114,7 +9223,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Reads back global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -9129,10 +9238,38 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_FLW_1_1_000000_WriteAttribute
+- (void)testSendClusterTest_TC_FLW_1_1_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestFlowMeasurement * cluster = [[CHIPTestFlowMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        {
+            id actualValue = value;
+            XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1);
+        }
+        {
+            id actualValue = value;
+            XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 3);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_FLW_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -9140,11 +9277,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:2U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:3U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -9353,7 +9490,7 @@ CHIPDevice * GetConnectedDevice()
 
 - (void)testSendClusterTest_TC_ILL_1_1_000000_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -9363,7 +9500,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Read the global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -9390,7 +9527,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:1U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:2U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
@@ -9404,7 +9541,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_ILL_1_1_000002_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -9414,7 +9551,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Reads back global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -9429,7 +9566,35 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_LVL_1_1_000000_WriteAttribute
+- (void)testSendClusterTest_TC_LVL_1_1_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        {
+            id actualValue = value;
+            XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1);
+        }
+        {
+            id actualValue = value;
+            XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 5);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_LVL_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -9440,7 +9605,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:4U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:5U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
@@ -10338,20 +10503,42 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_MC_1_1_000000_WriteAttribute
+- (void)testSendClusterTest_TC_MC_1_1_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestMediaInput * cluster = [[CHIPTestMediaInput alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedShortValue], 1U);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_MC_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
-                                                                                                       endpoint:1
-                                                                                                          queue:queue];
+    CHIPTestMediaInput * cluster = [[CHIPTestMediaInput alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:1U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:3U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
@@ -10386,7 +10573,7 @@ CHIPDevice * GetConnectedDevice()
 
 - (void)testSendClusterTest_TC_OCC_1_1_000000_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -10394,13 +10581,17 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], 2U);
+            XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1);
+        }
+        {
+            id actualValue = value;
+            XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 3);
         }
 
         [expectation fulfill];
@@ -10411,7 +10602,7 @@ CHIPDevice * GetConnectedDevice()
 - (void)testSendClusterTest_TC_OCC_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -10419,11 +10610,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:2U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:3U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -10695,7 +10886,7 @@ CHIPDevice * GetConnectedDevice()
 
 - (void)testSendClusterTest_TC_OO_1_1_000000_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -10703,7 +10894,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Read the global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -10728,7 +10919,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:3U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:4U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
@@ -10742,7 +10933,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_OO_1_1_000002_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -10750,7 +10941,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Reads back global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -10766,7 +10957,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_OO_1_1_000003_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the optional global attribute: FeatureMap"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional global attribute : FeatureMap"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -10774,7 +10965,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"read the optional global attribute: FeatureMap Error: %@", err);
+        NSLog(@"Read the optional global attribute : FeatureMap Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -10791,7 +10982,7 @@ CHIPDevice * GetConnectedDevice()
 - (void)testSendClusterTest_TC_OO_1_1_000004_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to optional global attribute: FeatureMap"];
+        [self expectationWithDescription:@"Write the default values to optional global attribute: FeatureMap"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -10802,7 +10993,7 @@ CHIPDevice * GetConnectedDevice()
     featureMapArgument = [NSNumber numberWithUnsignedInt:0UL];
     [cluster writeAttributeFeatureMapWithValue:featureMapArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to optional global attribute: FeatureMap Error: %@", err);
+                                 NSLog(@"Write the default values to optional global attribute: FeatureMap Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -10812,7 +11003,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_OO_1_1_000005_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back optional global attribute: FeatureMap"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back optional global attribute: FeatureMap"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -10820,7 +11011,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"reads back optional global attribute: FeatureMap Error: %@", err);
+        NSLog(@"Reads back optional global attribute: FeatureMap Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -12431,30 +12622,6 @@ CHIPDevice * GetConnectedDevice()
 
 - (void)testSendClusterTest_TC_PRS_1_1_000000_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: ClusterRevision"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPressureMeasurement * cluster = [[CHIPTestPressureMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read the global attribute: ClusterRevision Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], 2U);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PRS_1_1_000001_ReadAttribute
-{
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
@@ -12467,12 +12634,21 @@ CHIPDevice * GetConnectedDevice()
 
         XCTAssertEqual(err.code, 0);
 
+        {
+            id actualValue = value;
+            XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1);
+        }
+        {
+            id actualValue = value;
+            XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 3);
+        }
+
         [expectation fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_PRS_1_1_000002_WriteAttribute
+- (void)testSendClusterTest_TC_PRS_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
@@ -12483,7 +12659,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:2U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:3U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
@@ -12492,30 +12668,6 @@ CHIPDevice * GetConnectedDevice()
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
                              }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PRS_1_1_000003_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back global attribute: ClusterRevision"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPressureMeasurement * cluster = [[CHIPTestPressureMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads back global attribute: ClusterRevision Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], 2U);
-        }
-
-        [expectation fulfill];
-    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -12718,10 +12870,40 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_PCC_1_1_000000_WriteAttribute
+- (void)testSendClusterTest_TC_PCC_1_1_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                       endpoint:1
+                                                                                                          queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        {
+            id actualValue = value;
+            XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1);
+        }
+        {
+            id actualValue = value;
+            XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 3);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_PCC_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -12735,11 +12917,87 @@ CHIPDevice * GetConnectedDevice()
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_PCC_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional global attribute : FeatureMap"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                       endpoint:1
+                                                                                                          queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the optional global attribute : FeatureMap Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_PCC_1_1_000003_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to optional global attribute: FeatureMap"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                       endpoint:1
+                                                                                                          queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id featureMapArgument;
+    featureMapArgument = [NSNumber numberWithUnsignedInt:0UL];
+    [cluster writeAttributeFeatureMapWithValue:featureMapArgument
+                             completionHandler:^(NSError * _Nullable err) {
+                                 NSLog(@"Write the default values to optional global attribute: FeatureMap Error: %@", err);
+
+                                 XCTAssertEqual(err.code, 1);
+                                 [expectation fulfill];
+                             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_PCC_1_1_000004_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back optional global attribute: FeatureMap"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                       endpoint:1
+                                                                                                          queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Reads back optional global attribute: FeatureMap Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+        }
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -13040,10 +13298,40 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_RH_1_1_000000_WriteAttribute
+- (void)testSendClusterTest_TC_RH_1_1_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
+                                                                                                       endpoint:1
+                                                                                                          queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        {
+            id actualValue = value;
+            XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1);
+        }
+        {
+            id actualValue = value;
+            XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 3);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_RH_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -13053,11 +13341,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:1U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:3U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -13159,7 +13447,7 @@ CHIPDevice * GetConnectedDevice()
 
 - (void)testSendClusterTest_TC_TM_1_1_000000_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -13169,13 +13457,17 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], 3U);
+            XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1);
+        }
+        {
+            id actualValue = value;
+            XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 4);
         }
 
         [expectation fulfill];
@@ -13186,7 +13478,7 @@ CHIPDevice * GetConnectedDevice()
 - (void)testSendClusterTest_TC_TM_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -13196,41 +13488,15 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:3U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:4U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
                              }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_TM_1_1_000002_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
-                                                                                             endpoint:1
-                                                                                                queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], 3U);
-        }
-
-        [expectation fulfill];
-    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -13300,10 +13566,38 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_TSTAT_1_1_000000_WriteAttribute
+- (void)testSendClusterTest_TC_TSTAT_1_1_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        {
+            id actualValue = value;
+            XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1);
+        }
+        {
+            id actualValue = value;
+            XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 5);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -13315,7 +13609,49 @@ CHIPDevice * GetConnectedDevice()
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+
+                                 XCTAssertEqual(err.code, 1);
+                                 [expectation fulfill];
+                             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Read the optional global attribute constraints: FeatureMap"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the optional global attribute constraints: FeatureMap Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_1_1_000003_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write the default values to optional global attribute: FeatureMap"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id featureMapArgument;
+    featureMapArgument = [NSNumber numberWithUnsignedInt:0UL];
+    [cluster writeAttributeFeatureMapWithValue:featureMapArgument
+                             completionHandler:^(NSError * _Nullable err) {
+                                 NSLog(@"Write the default values to optional global attribute: FeatureMap Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -16047,10 +16383,39 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_TSUIC_1_1_000000_WriteAttribute
+- (void)testSendClusterTest_TC_TSUIC_1_1_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostatUserInterfaceConfiguration * cluster =
+        [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        {
+            id actualValue = value;
+            XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1);
+        }
+        {
+            id actualValue = value;
+            XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 2);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSUIC_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16063,7 +16428,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -16666,7 +17031,7 @@ CHIPDevice * GetConnectedDevice()
 
 - (void)testSendClusterTest_TC_DIAGTH_1_1_000000_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute : ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16676,7 +17041,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Read the global attribute : ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -16693,7 +17058,7 @@ CHIPDevice * GetConnectedDevice()
 - (void)testSendClusterTest_TC_DIAGTH_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16707,7 +17072,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -16717,7 +17082,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_DIAGTH_1_1_000002_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16727,7 +17092,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Reads back global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
@@ -16744,7 +17109,7 @@ CHIPDevice * GetConnectedDevice()
 
 - (void)testSendClusterTest_TC_WNCV_1_1_000000_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"2: read the global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16752,17 +17117,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"2: read the global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Read the global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
         {
             id actualValue = value;
-            XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 5);
-        }
-        {
-            id actualValue = value;
-            XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 200);
+            XCTAssertEqual([actualValue unsignedShortValue], 5U);
         }
 
         [expectation fulfill];
@@ -16773,7 +17134,7 @@ CHIPDevice * GetConnectedDevice()
 - (void)testSendClusterTest_TC_WNCV_1_1_000001_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3a: write a value into the RO mandatory global attribute: ClusterRevision"];
+        [self expectationWithDescription:@"Write the default value to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16781,11 +17142,11 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:201U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:5U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"3a: write a value into the RO mandatory global attribute: ClusterRevision Error: %@", err);
+                                 NSLog(@"Write the default value to mandatory global attribute: ClusterRevision Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -16795,7 +17156,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_WNCV_1_1_000002_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"3b: reads back global attribute: ClusterRevision"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16803,13 +17164,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"3b: reads back global attribute: ClusterRevision Error: %@", err);
+        NSLog(@"Reads back global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
         {
             id actualValue = value;
-            XCTAssertNotEqual([actualValue unsignedShortValue], 201);
+            XCTAssertEqual([actualValue unsignedShortValue], 5U);
         }
 
         [expectation fulfill];
@@ -16819,7 +17180,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_WNCV_1_1_000003_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"2: read the global attribute: FeatureMap"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional global attribute : FeatureMap"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16827,13 +17188,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"2: read the global attribute: FeatureMap Error: %@", err);
+        NSLog(@"Read the optional global attribute : FeatureMap Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
         {
             id actualValue = value;
-            XCTAssertLessThanOrEqual([actualValue unsignedIntValue], 32768);
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
         }
 
         [expectation fulfill];
@@ -16844,7 +17205,7 @@ CHIPDevice * GetConnectedDevice()
 - (void)testSendClusterTest_TC_WNCV_1_1_000004_WriteAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3a: write the default value to optional global attribute: FeatureMap"];
+        [self expectationWithDescription:@"Write the default values to optional global attribute: FeatureMap"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16852,10 +17213,10 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id featureMapArgument;
-    featureMapArgument = [NSNumber numberWithUnsignedInt:32769UL];
+    featureMapArgument = [NSNumber numberWithUnsignedInt:0UL];
     [cluster writeAttributeFeatureMapWithValue:featureMapArgument
                              completionHandler:^(NSError * _Nullable err) {
-                                 NSLog(@"3a: write the default value to optional global attribute: FeatureMap Error: %@", err);
+                                 NSLog(@"Write the default values to optional global attribute: FeatureMap Error: %@", err);
 
                                  XCTAssertEqual(err.code, 1);
                                  [expectation fulfill];
@@ -16865,7 +17226,7 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_WNCV_1_1_000005_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"3b: reads back global attribute: FeatureMap"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back optional global attribute: FeatureMap"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -16873,13 +17234,13 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"3b: reads back global attribute: FeatureMap Error: %@", err);
+        NSLog(@"Reads back optional global attribute: FeatureMap Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
 
         {
             id actualValue = value;
-            XCTAssertNotEqual([actualValue unsignedIntValue], 32769);
+            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
         }
 
         [expectation fulfill];
