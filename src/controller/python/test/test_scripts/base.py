@@ -89,15 +89,23 @@ class TestResult:
                 f"{self.operationName}: expected status {expected}, got {self.result.status}")
         return self
 
-    def assertValueEqual(self, expected):
+    def assertAttributeValueEqual(self, expected):
         self.assertStatusEqual(0)
         if self.result is None:
             raise Exception(f"{self.operationName}: no result got")
-        if self.result.value != expected:
+        if self.result.value['Attributes'] != expected:
             raise Exception(
-                f"{self.operationName}: expected value {expected}, got {self.result.value}")
+                f"{self.operationName}: expected value {expected}, got {self.result.value['Attributes']}")
         return self
 
+    def assertEventValueEqual(self, expected):
+        self.assertStatusEqual(0)
+        if self.result is None:
+            raise Exception(f"{self.operationName}: no result got")
+        if self.result.value['Events'] != expected:
+            raise Exception(
+                f"{self.operationName}: expected value {expected}, got {self.result.value['Events']}")
+        return self
 
 class BaseTestHelper:
     def __init__(self, nodeid: int):
@@ -211,7 +219,7 @@ class BaseTestHelper:
                                                 endpoint=endpoint,
                                                 groupid=group)
             TestResult("Read attribute LevelControl.CurrentLevel",
-                       res).assertValueEqual(0)
+                       res).assertAttributeValueEqual(0)
 
             # Move to 255
             self.devCtrl.ZCLSend("LevelControl", "MoveToLevel", nodeid,
@@ -222,7 +230,7 @@ class BaseTestHelper:
                                                 endpoint=endpoint,
                                                 groupid=group)
             TestResult("Read attribute LevelControl.CurrentLevel",
-                       res).assertValueEqual(255)
+                       res).assertAttributeValueEqual(255)
 
             return True
         except Exception as ex:
@@ -264,7 +272,7 @@ class BaseTestHelper:
                                                     nodeid=nodeid,
                                                     endpoint=endpoint,
                                                     groupid=group)
-                TestResult(f"Read attribute {basic_attr}", res).assertValueEqual(
+                TestResult(f"Read attribute {basic_attr}", res).assertAttributeValueEqual(
                     expected_value)
             except Exception as ex:
                 failed_zcl[basic_attr] = str(ex)
@@ -306,7 +314,7 @@ class BaseTestHelper:
                         raise ex
                 res = self.devCtrl.ZCLReadAttribute(
                     cluster=req.cluster, attribute=req.attribute, nodeid=nodeid, endpoint=endpoint, groupid=group)
-                TestResult(f"Read attribute {req.cluster}.{req.attribute}", res).assertValueEqual(
+                TestResult(f"Read attribute {req.cluster}.{req.attribute}", res).assertAttributeValueEqual(
                     req.value)
             except Exception as ex:
                 failed_zcl.append(str(ex))
