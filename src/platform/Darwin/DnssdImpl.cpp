@@ -463,7 +463,7 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
     protocol = kDNSServiceProtocol_IPv6;
 #endif
 
-    if (interfaceId != static_cast<uint32_t>(-1))
+    if (interfaceId != kDNSServiceInterfaceIndexLocalOnly)
     {
         // -1 is the local only interface. If we're not on that interface, we need to get the address for the given hostname.
         err = DNSServiceGetAddrInfo(&sdRef, 0 /* flags */, interfaceId, protocol, hostname, OnGetAddrInfo, sdCtx);
