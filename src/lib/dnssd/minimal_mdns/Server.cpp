@@ -51,7 +51,7 @@ private:
 /**
  * Extracts the Listening UDP Endpoint from an underlying ServerBase::EndpointInfo
  */
-class ListenSocketDelegate : public ServerBase::BroadcastSendDelegate
+class ListenSocketPickerDelegate : public ServerBase::BroadcastSendDelegate
 {
 public:
     chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override { return info->listen_udp; }
@@ -60,7 +60,7 @@ public:
 /**
  * Extracts the Querying UDP Endpoint from an underlying ServerBase::EndpointInfo
  */
-class QuerySocketDelegate : public ServerBase::BroadcastSendDelegate
+class QuerySocketPickerDelegate : public ServerBase::BroadcastSendDelegate
 {
 public:
     chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override { return info->unicast_query_udp; }
@@ -73,15 +73,15 @@ public:
  * Usage like:
  *
  * SomeDelegate *child = ....;
- * InterfaceTypeValidateDelegate validator(interfaceId, IPAddressType::IPv6, child);
+ * InterfaceTypeFilterDelegate filter(interfaceId, IPAddressType::IPv6, child);
  *
- * UDPEndPoint *udp = validator.Accept(endpointInfo);
+ * UDPEndPoint *udp = filter.Accept(endpointInfo);
  */
-class InterfaceTypeValidateDelegate : public ServerBase::BroadcastSendDelegate
+class InterfaceTypeFilterDelegate : public ServerBase::BroadcastSendDelegate
 {
 public:
-    InterfaceTypeValidateDelegate(chip::Inet::InterfaceId interface, chip::Inet::IPAddressType type,
-                                  ServerBase::BroadcastSendDelegate * child) :
+    InterfaceTypeFilterDelegate(chip::Inet::InterfaceId interface, chip::Inet::IPAddressType type,
+                                ServerBase::BroadcastSendDelegate * child) :
         mInterface(interface),
         mAddressType(type), mChild(child)
     {}
@@ -297,32 +297,32 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, cons
 
 CHIP_ERROR ServerBase::BroadcastUnicastQuery(chip::System::PacketBufferHandle && data, uint16_t port)
 {
-    QuerySocketDelegate delegate;
-    return BroadcastImpl(std::move(data), port, &delegate);
+    QuerySocketPickerDelegate socketPicker;
+    return BroadcastImpl(std::move(data), port, &socketPicker);
 }
 
 CHIP_ERROR ServerBase::BroadcastUnicastQuery(chip::System::PacketBufferHandle && data, uint16_t port,
                                              chip::Inet::InterfaceId interface, chip::Inet::IPAddressType addressType)
 {
-    QuerySocketDelegate delegate;
-    InterfaceTypeValidateDelegate validator(interface, addressType, &delegate);
+    QuerySocketPickerDelegate socketPicker;
+    InterfaceTypeFilterDelegate filter(interface, addressType, &socketPicker);
 
-    return BroadcastImpl(std::move(data), port, &validator);
+    return BroadcastImpl(std::move(data), port, &filter);
 }
 
 CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface,
                                      chip::Inet::IPAddressType addressType)
 {
-    ListenSocketDelegate delegate;
-    InterfaceTypeValidateDelegate validator(interface, addressType, &delegate);
+    ListenSocketPickerDelegate socketPicker;
+    InterfaceTypeFilterDelegate filter(interface, addressType, &socketPicker);
 
-    return BroadcastImpl(std::move(data), port, &validator);
+    return BroadcastImpl(std::move(data), port, &filter);
 }
 
 CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port)
 {
-    ListenSocketDelegate delegate;
-    return BroadcastImpl(std::move(data), port, &delegate);
+    ListenSocketPickerDelegate socketPicker;
+    return BroadcastImpl(std::move(data), port, &socketPicker);
 }
 
 CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, uint16_t port, BroadcastSendDelegate * delegate)
