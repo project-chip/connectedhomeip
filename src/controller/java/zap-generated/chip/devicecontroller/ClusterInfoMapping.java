@@ -2469,6 +2469,32 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedSourcesAttributeCallback
+      implements ChipClusters.PowerSourceConfigurationCluster.SourcesAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Object> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo("valueList", "List<Integer>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedAddSceneResponseCallback
       implements ChipClusters.ScenesCluster.AddSceneResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -3420,6 +3446,11 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.PowerSourceCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("powerSource", powerSourceClusterInfo);
+    ClusterInfo powerSourceConfigurationClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.PowerSourceConfigurationCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("powerSourceConfiguration", powerSourceConfigurationClusterInfo);
     ClusterInfo pressureMeasurementClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.PressureMeasurementCluster(ptr, endpointId),
@@ -3560,6 +3591,9 @@ public class ClusterInfoMapping {
         .combineCommands(source.get("onOffSwitchConfiguration"));
     destination.get("operationalCredentials").combineCommands(source.get("operationalCredentials"));
     destination.get("powerSource").combineCommands(source.get("powerSource"));
+    destination
+        .get("powerSourceConfiguration")
+        .combineCommands(source.get("powerSourceConfiguration"));
     destination.get("pressureMeasurement").combineCommands(source.get("pressureMeasurement"));
     destination
         .get("pumpConfigurationAndControl")
@@ -7416,6 +7450,9 @@ public class ClusterInfoMapping {
     commandMap.put("operationalCredentials", operationalCredentialsClusterInteractionInfoMap);
     Map<String, InteractionInfo> powerSourceClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("powerSource", powerSourceClusterInteractionInfoMap);
+    Map<String, InteractionInfo> powerSourceConfigurationClusterInteractionInfoMap =
+        new LinkedHashMap<>();
+    commandMap.put("powerSourceConfiguration", powerSourceConfigurationClusterInteractionInfoMap);
     Map<String, InteractionInfo> pressureMeasurementClusterInteractionInfoMap =
         new LinkedHashMap<>();
     commandMap.put("pressureMeasurement", pressureMeasurementClusterInteractionInfoMap);

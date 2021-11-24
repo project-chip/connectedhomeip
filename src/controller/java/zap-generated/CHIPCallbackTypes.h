@@ -683,6 +683,11 @@ typedef void (*CHIPPowerSourceClusterFeatureMapAttributeCallbackType)(
 typedef void (*CHIPPowerSourceClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::PowerSource::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
+typedef void (*CHIPPowerSourceConfigurationClusterSourcesAttributeCallbackType)(
+    void *, const chip::app::Clusters::PowerSourceConfiguration::Attributes::Sources::TypeInfo::DecodableType &);
+typedef void (*CHIPPowerSourceConfigurationClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSourceConfiguration::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+
 typedef void (*CHIPPressureMeasurementClusterMeasuredValueAttributeCallbackType)(
     void *, chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::TypeInfo::DecodableArgType);
 typedef void (*CHIPPressureMeasurementClusterMinMeasuredValueAttributeCallbackType)(

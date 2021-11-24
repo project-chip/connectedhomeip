@@ -786,6 +786,26 @@ void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
 void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
         value)

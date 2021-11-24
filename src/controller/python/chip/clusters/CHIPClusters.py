@@ -2999,6 +2999,24 @@ class ChipClusters:
             },
         },
     }
+    _POWER_SOURCE_CONFIGURATION_CLUSTER_INFO = {
+        "clusterName": "PowerSourceConfiguration",
+        "clusterId": 0x0000002E,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Sources",
+                "attributeId": 0x00000000,
+                "type": "int",
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+            },
+        },
+    }
     _PRESSURE_MEASUREMENT_CLUSTER_INFO = {
         "clusterName": "PressureMeasurement",
         "clusterId": 0x00000403,
@@ -4899,6 +4917,7 @@ class ChipClusters:
         0x00000007: _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
         0x0000003E: _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
         0x0000002F: _POWER_SOURCE_CLUSTER_INFO,
+        0x0000002E: _POWER_SOURCE_CONFIGURATION_CLUSTER_INFO,
         0x00000403: _PRESSURE_MEASUREMENT_CLUSTER_INFO,
         0x00000200: _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         0x00000405: _RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_INFO,
@@ -4959,6 +4978,7 @@ class ChipClusters:
         "OnOffSwitchConfiguration": _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
         "OperationalCredentials": _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
         "PowerSource": _POWER_SOURCE_CLUSTER_INFO,
+        "PowerSourceConfiguration": _POWER_SOURCE_CONFIGURATION_CLUSTER_INFO,
         "PressureMeasurement": _PRESSURE_MEASUREMENT_CLUSTER_INFO,
         "PumpConfigurationAndControl": _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         "RelativeHumidityMeasurement": _RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_INFO,
@@ -6445,6 +6465,12 @@ class ChipClusters:
 
     def ClusterPowerSource_SubscribeAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_PowerSource_ClusterRevision(device, ZCLendpoint, minInterval, maxInterval)
+
+    def ClusterPowerSourceConfiguration_ReadAttributeSources(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PowerSourceConfiguration_Sources(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPowerSourceConfiguration_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PowerSourceConfiguration_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterPressureMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_MeasuredValue(device, ZCLendpoint, ZCLgroupid)
@@ -9724,6 +9750,15 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_PowerSource_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_PowerSource_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster PowerSourceConfiguration
+        # Cluster PowerSourceConfiguration ReadAttribute Sources
+        self._chipLib.chip_ime_ReadAttribute_PowerSourceConfiguration_Sources.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PowerSourceConfiguration_Sources.restype = ctypes.c_uint32
+        # Cluster PowerSourceConfiguration ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_PowerSourceConfiguration_ClusterRevision.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PowerSourceConfiguration_ClusterRevision.restype = ctypes.c_uint32
         # Cluster PressureMeasurement
         # Cluster PressureMeasurement ReadAttribute MeasuredValue
         self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_MeasuredValue.argtypes = [

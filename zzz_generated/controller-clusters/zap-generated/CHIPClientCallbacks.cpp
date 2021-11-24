@@ -627,6 +627,27 @@ void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(TLV::TLVReader * t
     cb->mCall(cb->mContext, list);
 }
 
+void PowerSourceConfigurationClusterSourcesListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<uint8_t> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<PowerSourceConfigurationSourcesListAttributeCallback> * cb =
+        Callback::Callback<PowerSourceConfigurationSourcesListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
 void SoftwareDiagnosticsClusterThreadMetricsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback)
 {

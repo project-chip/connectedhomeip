@@ -732,6 +732,16 @@ public:
                                              uint16_t value);
 };
 
+class DLL_EXPORT PowerSourceConfigurationClusterTest : public PowerSourceConfigurationCluster
+{
+public:
+    PowerSourceConfigurationClusterTest() : PowerSourceConfigurationCluster() {}
+    ~PowerSourceConfigurationClusterTest() {}
+
+    CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t value);
+};
+
 class DLL_EXPORT PressureMeasurementClusterTest : public PressureMeasurementCluster
 {
 public:

@@ -152,6 +152,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_POWER_SOURCE_CLUSTER_ID:
         emberAfPowerSourceClusterInitCallback(endpoint);
         break;
+    case ZCL_POWER_SOURCE_CONFIGURATION_CLUSTER_ID:
+        emberAfPowerSourceConfigurationClusterInitCallback(endpoint);
+        break;
     case ZCL_PRESSURE_MEASUREMENT_CLUSTER_ID:
         emberAfPressureMeasurementClusterInitCallback(endpoint);
         break;
@@ -407,6 +410,11 @@ void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(Endp
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfPowerSourceClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfPowerSourceConfigurationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

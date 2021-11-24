@@ -1213,6 +1213,50 @@ static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context
 chip::Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback> gPowerSourceActiveBatteryFaultsListAttributeCallback{
     OnPowerSourceActiveBatteryFaultsListAttributeResponse, nullptr
 };
+static void OnPowerSourceConfigurationSourcesListAttributeResponse(void * context,
+                                                                   const chip::app::DataModel::DecodableList<uint8_t> & list)
+{
+    size_t count   = 0;
+    CHIP_ERROR err = list.ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  [");
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+#if CHIP_PROGRESS_LOGGING
+        auto & entry = iter.GetValue();
+        ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
+#endif // CHIP_PROGRESS_LOGGING
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        if (gFailureResponseDelegate != nullptr)
+        {
+            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    if (count > 0)
+        ChipLogProgress(Zcl, "  ]");
+
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<PowerSourceConfigurationSourcesListAttributeCallback>
+    gPowerSourceConfigurationSourcesListAttributeCallback{ OnPowerSourceConfigurationSourcesListAttributeResponse, nullptr };
 static void OnSoftwareDiagnosticsThreadMetricsListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
@@ -7499,6 +7543,31 @@ chip::ChipError::StorageType chip_ime_SubscribeAttribute_PowerSource_ClusterRevi
 }
 
 // End of Cluster PowerSource
+// Cluster PowerSourceConfiguration
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSourceConfiguration_Sources(chip::DeviceProxy * device,
+                                                                                     chip::EndpointId ZCLendpointId,
+                                                                                     chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .ReadAttributeSources(gPowerSourceConfigurationSourcesListAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSourceConfiguration_ClusterRevision(chip::DeviceProxy * device,
+                                                                                             chip::EndpointId ZCLendpointId,
+                                                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+// End of Cluster PowerSourceConfiguration
 // Cluster PressureMeasurement
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_PressureMeasurement_MeasuredValue(chip::DeviceProxy * device,

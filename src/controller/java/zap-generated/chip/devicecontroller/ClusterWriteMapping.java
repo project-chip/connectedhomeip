@@ -685,6 +685,9 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("operationalCredentials", writeOperationalCredentialsInteractionInfo);
     Map<String, InteractionInfo> writePowerSourceInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("powerSource", writePowerSourceInteractionInfo);
+    Map<String, InteractionInfo> writePowerSourceConfigurationInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("powerSourceConfiguration", writePowerSourceConfigurationInteractionInfo);
     Map<String, InteractionInfo> writePressureMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("pressureMeasurement", writePressureMeasurementInteractionInfo);
     Map<String, InteractionInfo> writePumpConfigurationAndControlInteractionInfo =

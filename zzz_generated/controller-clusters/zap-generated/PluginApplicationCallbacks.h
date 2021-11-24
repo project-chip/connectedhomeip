@@ -63,6 +63,7 @@
     MatterOnOffSwitchConfigurationPluginClientInitCallback();                                                                      \
     MatterOperationalCredentialsPluginClientInitCallback();                                                                        \
     MatterPowerSourcePluginClientInitCallback();                                                                                   \
+    MatterPowerSourceConfigurationPluginClientInitCallback();                                                                      \
     MatterPressureMeasurementPluginClientInitCallback();                                                                           \
     MatterPumpConfigurationAndControlPluginClientInitCallback();                                                                   \
     MatterRelativeHumidityMeasurementPluginClientInitCallback();                                                                   \

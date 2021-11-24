@@ -185,6 +185,10 @@
 @property (readonly) chip::Controller::PowerSourceCluster cppCluster;
 @end
 
+@interface CHIPPowerSourceConfiguration ()
+@property (readonly) chip::Controller::PowerSourceConfigurationCluster cppCluster;
+@end
+
 @interface CHIPPressureMeasurement ()
 @property (readonly) chip::Controller::PressureMeasurementCluster cppCluster;
 @end

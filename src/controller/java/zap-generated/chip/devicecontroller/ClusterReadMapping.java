@@ -3270,6 +3270,36 @@ public class ClusterReadMapping {
     readPowerSourceInteractionInfo.put(
         "readClusterRevisionAttribute", readPowerSourceClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("powerSource", readPowerSourceInteractionInfo);
+    Map<String, InteractionInfo> readPowerSourceConfigurationInteractionInfo =
+        new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readPowerSourceConfigurationSourcesCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceConfigurationSourcesAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceConfigurationCluster) cluster)
+                  .readSourcesAttribute(
+                      (ChipClusters.PowerSourceConfigurationCluster.SourcesAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedSourcesAttributeCallback(),
+            readPowerSourceConfigurationSourcesCommandParams);
+    readPowerSourceConfigurationInteractionInfo.put(
+        "readSourcesAttribute", readPowerSourceConfigurationSourcesAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceConfigurationClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceConfigurationClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceConfigurationCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readPowerSourceConfigurationClusterRevisionCommandParams);
+    readPowerSourceConfigurationInteractionInfo.put(
+        "readClusterRevisionAttribute",
+        readPowerSourceConfigurationClusterRevisionAttributeInteractionInfo);
+    readAttributeMap.put("powerSourceConfiguration", readPowerSourceConfigurationInteractionInfo);
     Map<String, InteractionInfo> readPressureMeasurementInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readPressureMeasurementMeasuredValueCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

@@ -19456,6 +19456,15 @@ JNI_METHOD(void, PowerSourceCluster, reportClusterRevisionAttribute)(JNIEnv * en
 
     onReport.release();
 }
+JNI_METHOD(jlong, PowerSourceConfigurationCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    chip::DeviceLayer::StackLock lock;
+    PowerSourceConfigurationCluster * cppCluster = new PowerSourceConfigurationCluster();
+
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
 JNI_METHOD(jlong, PressureMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
