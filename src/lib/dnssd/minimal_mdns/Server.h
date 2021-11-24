@@ -94,7 +94,7 @@ public:
         virtual ~BroadcastSendDelegate() = default;
 
         /**
-         * Returns non;fnull UDPEndpoint IFF a broadcast should be performed for the given EndpointInfo
+         * Returns non-null UDPEndpoint IFF a broadcast should be performed for the given EndpointInfo
          */
         virtual chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) = 0;
     };
