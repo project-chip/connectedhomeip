@@ -648,9 +648,10 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
                        PrepareStatusReport(StatusCode::kLengthMismatch));
     }
 
-    mBlockEventData.Data   = blockMsg.Data;
-    mBlockEventData.Length = blockMsg.DataLength;
-    mBlockEventData.IsEof  = false;
+    mBlockEventData.Data         = blockMsg.Data;
+    mBlockEventData.Length       = blockMsg.DataLength;
+    mBlockEventData.IsEof        = false;
+    mBlockEventData.BlockCounter = blockMsg.BlockCounter;
 
     mPendingMsgHandle = std::move(msgData);
     mPendingOutput    = OutputEventType::kBlockReceived;
@@ -678,9 +679,10 @@ void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
     VerifyOrReturn(blockEOFMsg.BlockCounter == mLastQueryNum, PrepareStatusReport(StatusCode::kBadBlockCounter));
     VerifyOrReturn(blockEOFMsg.DataLength <= mTransferMaxBlockSize, PrepareStatusReport(StatusCode::kBadMessageContents));
 
-    mBlockEventData.Data   = blockEOFMsg.Data;
-    mBlockEventData.Length = blockEOFMsg.DataLength;
-    mBlockEventData.IsEof  = true;
+    mBlockEventData.Data         = blockEOFMsg.Data;
+    mBlockEventData.Length       = blockEOFMsg.DataLength;
+    mBlockEventData.IsEof        = true;
+    mBlockEventData.BlockCounter = blockEOFMsg.BlockCounter;
 
     mPendingMsgHandle = std::move(msgData);
     mPendingOutput    = OutputEventType::kBlockReceived;

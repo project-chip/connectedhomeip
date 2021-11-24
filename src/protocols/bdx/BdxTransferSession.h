@@ -77,9 +77,10 @@ public:
 
     struct BlockData
     {
-        const uint8_t * Data = nullptr;
-        size_t Length        = 0;
-        bool IsEof           = false;
+        const uint8_t * Data  = nullptr;
+        size_t Length         = 0;
+        bool IsEof            = false;
+        uint32_t BlockCounter = 0;
     };
 
     struct MessageTypeData
@@ -219,6 +220,17 @@ public:
      *                    is unable to handle this request.
      */
     CHIP_ERROR PrepareBlockQuery();
+
+    /**
+     * @brief
+     *   Prepare a BlockQueryWithSkip message. The Block counter will be populated automatically.
+     *
+     * @param bytesToSkip Number of bytes to seek skip
+     *
+     * @return CHIP_ERROR The result of the preparation of a BlockQueryWithSkip message. May also indicate if the TransferSession
+     * object is unable to handle this request.
+     */
+    CHIP_ERROR PrepareBlockQueryWithSkip(const uint64_t & bytesToSkip);
 
     /**
      * @brief
