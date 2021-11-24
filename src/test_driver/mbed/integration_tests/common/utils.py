@@ -271,3 +271,25 @@ def commissioning_wifi(devCtrl, ssid, password, nodeId):
         return err
 
     return err
+
+
+def resolve_device(devCtrl, nodeId):
+    """
+    Discover IP address and port of the device.
+    :param devCtrl: device controller instance
+    :param nodeId: value of node ID
+    :return: device IP address and port if successful, otherwise None
+    """
+    ret = None
+    try:
+        err = devCtrl.ResolveNode(int(nodeId))
+        if err == 0:
+            ret = devCtrl.GetAddressAndPort(int(nodeId))
+            if ret == None:
+                log.error("Get address and port failed")
+        else:
+            log.error("Resolve node failed [{}]".format(err))
+    except exceptions.ChipStackException as ex:
+        log.error("Resolve node failed {}".format(str(ex)))
+
+    return ret

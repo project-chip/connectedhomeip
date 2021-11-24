@@ -70,6 +70,19 @@ def test_wifi_provisioning(device, network):
     ret = device.wait_for_output("StationConnected")
     assert ret != None and len(ret) > 0
 
+    ret = device.wait_for_output("address set")
+    assert ret != None and len(ret) > 0
+
+    device_ip_address = ret[-1].partition("address set:")[2].strip()
+
+    ret = resolve_device(devCtrl, DEVICE_NODE_ID)
+    assert ret != None and len(ret) == 2
+
+    ip_address = ret[0]
+    port = ret[1]
+
+    assert device_ip_address == ip_address
+
     assert close_connection(devCtrl, DEVICE_NODE_ID)
     assert close_ble(devCtrl)
 
@@ -119,7 +132,6 @@ def test_light_ctrl(device):
         "Setting brightness level to {}".format(TEST_BRIGHTNESS_LEVEL), 20)
     assert ret != None and len(ret) > 0
 
-    assert close_connection(devCtrl, DEVICE_NODE_ID)
     assert close_ble(devCtrl)
 
 

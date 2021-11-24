@@ -24,8 +24,6 @@ from .device import Device
 from .serial_connection import SerialConnection
 from .serial_device import SerialDevice
 
-from .wlan_access_point import AccessPoint
-
 import logging
 log = logging.getLogger(__name__)
 
