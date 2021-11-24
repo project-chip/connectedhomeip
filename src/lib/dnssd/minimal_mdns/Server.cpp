@@ -26,10 +26,6 @@ namespace mdns {
 namespace Minimal {
 namespace {
 
-// Port number to use t o signal 'select random unused port' during UDP sockeg
-// binding.
-constexpr uint16_t kPickRandomBindPort = 0;
-
 class ShutdownOnError
 {
 public:
@@ -258,13 +254,12 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
             endpointIndex++;
         }
 
-        // Separate UDP endpoint for unicast queries:
+        // Separate UDP endpoint for unicast queries, bound to 0 (i.e. pick random ephemeral port)
         //   - helps in not having conflicts on port 5353, will receive unicast replies directly
         //   - has a *DRAWBACK* of unicast queries being considered LEGACY by mdns since they do
         //     not originate from 5353 and the answers will include a query section.
         ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->unicast_query_udp));
-        ReturnErrorOnFailure(
-            info->unicast_query_udp->Bind(addressType, chip::Inet::IPAddress::Any, kPickRandomBindPort, interfaceId));
+        ReturnErrorOnFailure(info->unicast_query_udp->Bind(addressType, chip::Inet::IPAddress::Any, 0, interfaceId));
         ReturnErrorOnFailure(info->unicast_query_udp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
     }
 
