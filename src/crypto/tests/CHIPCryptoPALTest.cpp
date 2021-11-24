@@ -1868,6 +1868,39 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
+static void TestX509_IssuingTimestampValidation(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+    using namespace ASN1;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ByteSpan root_cert;
+    err = GetTestCert(TestCert::kRoot01, TestCertLoadFlags::kDERForm, root_cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    ByteSpan ica_cert;
+    err = GetTestCert(TestCert::kICA01, TestCertLoadFlags::kDERForm, ica_cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    ByteSpan leaf_cert;
+    err = GetTestCert(TestCert::kNode01_01, TestCertLoadFlags::kDERForm, leaf_cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = IsCertificateTimestampValid(CertificateValidityType::kNotBefore, leaf_cert, ica_cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = IsCertificateTimestampValid(CertificateValidityType::kNotAfter, leaf_cert, ica_cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = IsCertificateTimestampValid(CertificateValidityType::kNotBefore, leaf_cert, root_cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = IsCertificateTimestampValid(CertificateValidityType::kNotAfter, leaf_cert, root_cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
 static void TestSKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 {
     using namespace TestCerts;
@@ -2111,6 +2144,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test x509 Certificate Extraction from PKCS7", TestX509_PKCS7Extraction),
 #endif // CHIP_CRYPTO_OPENSSL
     NL_TEST_DEF("Test x509 Certificate Chain Validation", TestX509_CertChainValidation),
+    NL_TEST_DEF("Test x509 Certificate Timestamp Validaton", TestX509_IssuingTimestampValidation),
     NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
     NL_TEST_DEF("Test Vendor ID Extraction from x509 Attestation Certificate", TestVID_x509Extraction),

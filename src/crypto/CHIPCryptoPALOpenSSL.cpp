@@ -1703,6 +1703,54 @@ exit:
     return err;
 }
 
+CHIP_ERROR IsCertificateTimestampValid(CertificateValidityType validityType, const ByteSpan & referenceCertificate,
+                                       const ByteSpan & toBeEvaluatedCertificate)
+{
+    CHIP_ERROR error                                = CHIP_NO_ERROR;
+    X509 * x509ReferenceCertificate                 = nullptr;
+    X509 * x509toBeEvaluatedCertificate             = nullptr;
+    const unsigned char * pReferenceCertificate     = referenceCertificate.data();
+    const unsigned char * pToBeEvaluatedCertificate = toBeEvaluatedCertificate.data();
+    ASN1_TIME * timeA                               = nullptr;
+    ASN1_TIME * timeB                               = nullptr;
+    int result                                      = 0;
+
+    VerifyOrReturnError(!referenceCertificate.empty() && !toBeEvaluatedCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    x509ReferenceCertificate = d2i_X509(NULL, &pReferenceCertificate, static_cast<long>(referenceCertificate.size()));
+    VerifyOrExit(x509ReferenceCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
+
+    x509toBeEvaluatedCertificate = d2i_X509(NULL, &pToBeEvaluatedCertificate, static_cast<long>(toBeEvaluatedCertificate.size()));
+    VerifyOrExit(x509toBeEvaluatedCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
+
+    switch (validityType)
+    {
+    case CertificateValidityType::kNotAfter:
+        timeB = X509_get_notAfter(x509ReferenceCertificate);
+        timeA = X509_get_notAfter(x509toBeEvaluatedCertificate);
+        break;
+    case CertificateValidityType::kNotBefore:
+        timeA = X509_get_notBefore(x509ReferenceCertificate);
+        timeB = X509_get_notBefore(x509toBeEvaluatedCertificate);
+        break;
+    default:
+        SuccessOrExit(error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    VerifyOrExit(timeA && timeB, error = CHIP_ERROR_INTERNAL);
+
+    result = ASN1_TIME_compare(timeA, timeB);
+    // check if tbeCertificate is valid before/during referenceCertificate's notBefore timestamp.
+    // check if tbeCertificate is valid after/during referenceCertificate's notAfter timestamp.
+    VerifyOrExit(result >= 0, error = CHIP_ERROR_CERT_EXPIRED);
+
+exit:
+    X509_free(x509ReferenceCertificate);
+    X509_free(x509toBeEvaluatedCertificate);
+
+    return error;
+}
+
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey)
 {
     CHIP_ERROR err                       = CHIP_NO_ERROR;

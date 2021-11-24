@@ -257,6 +257,14 @@ AttestationVerificationResult DefaultDACVerifier::VerifyAttestationInformation(c
     VerifyOrReturnError(GetProductAttestationAuthorityCert(akid, paa) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kPaaNotFound);
 
+    VerifyOrReturnError(IsCertificateTimestampValid(CertificateValidityType::kNotBefore, dacCertDerBuffer, paiCertDerBuffer) == CHIP_NO_ERROR &&
+                            IsCertificateTimestampValid(CertificateValidityType::kNotAfter, dacCertDerBuffer, paiCertDerBuffer) == CHIP_NO_ERROR,
+                        AttestationVerificationResult::kPaiExpired);
+
+    VerifyOrReturnError(IsCertificateTimestampValid(CertificateValidityType::kNotBefore, dacCertDerBuffer, paa) == CHIP_NO_ERROR &&
+                            IsCertificateTimestampValid(CertificateValidityType::kNotAfter, dacCertDerBuffer, paa) == CHIP_NO_ERROR,
+                        AttestationVerificationResult::kPaaExpired);
+
     VerifyOrReturnError(ValidateCertificateChain(paa.data(), paa.size(), paiCertDerBuffer.data(), paiCertDerBuffer.size(),
                                                  dacCertDerBuffer.data(), dacCertDerBuffer.size()) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kDacSignatureInvalid);

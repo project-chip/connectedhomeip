@@ -1205,6 +1205,15 @@ CHIP_ERROR GetNumberOfCertsFromPKCS7(const char * pkcs7, uint32_t * n_certs);
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen);
 
+enum class CertificateValidityType
+{
+    kNotBefore,
+    kNotAfter,
+};
+
+CHIP_ERROR IsCertificateTimestampValid(CertificateValidityType validityType, const ByteSpan & referenceCertificate,
+                                       const ByteSpan & toBeEvaluatedCertificate);
+
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey);
 
 /**

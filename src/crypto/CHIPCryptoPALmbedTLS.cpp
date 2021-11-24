@@ -1271,6 +1271,64 @@ exit:
     return error;
 }
 
+CHIP_ERROR IsCertificateTimestampValid(CertificateValidityType validityType, const ByteSpan & referenceCertificate,
+                                       const ByteSpan & toBeEvaluatedCertificate)
+{
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    mbedtls_x509_crt mbedReferenceCertificate;
+    mbedtls_x509_crt mbedToBeEvaluatedCertificate;
+    mbedtls_x509_time timeA;
+    mbedtls_x509_time timeB;
+    int result;
+
+    mbedtls_x509_crt_init(&mbedReferenceCertificate);
+    mbedtls_x509_crt_init(&mbedToBeEvaluatedCertificate);
+
+    result = mbedtls_x509_crt_parse(&mbedReferenceCertificate, Uint8::to_const_uchar(referenceCertificate.data()),
+                                    referenceCertificate.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_x509_crt_parse(&mbedToBeEvaluatedCertificate, Uint8::to_const_uchar(toBeEvaluatedCertificate.data()),
+                                    toBeEvaluatedCertificate.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    switch (validityType)
+    {
+    case CertificateValidityType::kNotAfter:
+        timeB = mbedReferenceCertificate.valid_to;
+        timeA = mbedToBeEvaluatedCertificate.valid_to;
+        break;
+    case CertificateValidityType::kNotBefore:
+        timeA = mbedReferenceCertificate.valid_from;
+        timeB = mbedToBeEvaluatedCertificate.valid_from;
+        break;
+    default:
+        SuccessOrExit(error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // if checking for CertificateValidityType::kNotAfter, parameters are inverted.
+    // check if tbeCertificate is valid before/during referenceCertificate's notBefore timestamp.
+    // check if tbeCertificate is valid after/during referenceCertificate's notAfter timestamp.
+    VerifyOrExit(timeA.year >= timeB.year && timeA.mon >= timeB.mon && timeA.day >= timeB.day && timeA.hour >= timeB.hour &&
+                     timeA.min >= timeB.min && timeA.sec >= timeB.sec,
+                 error = CHIP_ERROR_CERT_EXPIRED);
+
+exit:
+    _log_mbedTLS_error(result);
+    mbedtls_x509_crt_free(&mbedReferenceCertificate);
+    mbedtls_x509_crt_free(&mbedToBeEvaluatedCertificate);
+
+#else
+    (void) validityType;
+    (void) referenceCertificate;
+    (void) toBeEvaluatedCertificate;
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+
+    return error;
+}
+
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
