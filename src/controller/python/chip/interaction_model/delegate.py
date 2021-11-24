@@ -62,9 +62,23 @@ class AttributePath:
 
 
 @dataclass
+class EventPath:
+    nodeId: int
+    endpointId: int
+    clusterId: int
+    eventId: int
+
+
+@dataclass
 class AttributeReadResult:
     path: AttributePath
     status: int
+    value: 'typing.Any'
+
+
+@dataclass
+class EventReadResult:
+    path: EventPath
     value: 'typing.Any'
 
 
