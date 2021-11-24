@@ -67,7 +67,7 @@ public:
 class QuerySocketDelegate : public ServerBase::BroadcastSendDelegate
 {
 public:
-    chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override { return info->query_udp; }
+    chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override { return info->unicast_query_udp; }
 };
 
 /**
@@ -184,10 +184,10 @@ void ShutdownEndpoint(mdns::Minimal::ServerBase::EndpointInfo & aEndpoint)
         aEndpoint.listen_udp = nullptr;
     }
 
-    if (aEndpoint.query_udp != nullptr)
+    if (aEndpoint.unicast_query_udp != nullptr)
     {
-        aEndpoint.query_udp->Free();
-        aEndpoint.query_udp = nullptr;
+        aEndpoint.unicast_query_udp->Free();
+        aEndpoint.unicast_query_udp = nullptr;
     }
 }
 
@@ -258,9 +258,14 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
             endpointIndex++;
         }
 
-        ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->query_udp));
-        ReturnErrorOnFailure(info->query_udp->Bind(addressType, chip::Inet::IPAddress::Any, kPickRandomBindPort, interfaceId));
-        ReturnErrorOnFailure(info->query_udp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
+        // Separate UDP endpoint for unicast queries:
+        //   - helps in not having conflicts on port 5353, will receive unicast replies directly
+        //   - has a *DRAWBACK* of unicast queries being considered LEGACY by mdns since they do
+        //     not originate from 5353 and the answers will include a query section.
+        ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->unicast_query_udp));
+        ReturnErrorOnFailure(
+            info->unicast_query_udp->Bind(addressType, chip::Inet::IPAddress::Any, kPickRandomBindPort, interfaceId));
+        ReturnErrorOnFailure(info->unicast_query_udp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
     }
 
     return autoShutdown.ReturnSuccess();

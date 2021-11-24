@@ -79,8 +79,8 @@ public:
     {
         chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
         chip::Inet::IPAddressType addressType;
-        chip::Inet::UDPEndPoint * listen_udp = nullptr;
-        chip::Inet::UDPEndPoint * query_udp  = nullptr;
+        chip::Inet::UDPEndPoint * listen_udp        = nullptr;
+        chip::Inet::UDPEndPoint * unicast_query_udp = nullptr;
     };
 
     /**
@@ -103,8 +103,8 @@ public:
     {
         for (size_t i = 0; i < mEndpointCount; i++)
         {
-            mEndpoints[i].listen_udp = nullptr;
-            mEndpoints[i].query_udp  = nullptr;
+            mEndpoints[i].listen_udp        = nullptr;
+            mEndpoints[i].unicast_query_udp = nullptr;
         }
 
         BroadcastIpAddresses::GetIpv6Into(mIpv6BroadcastAddress);
