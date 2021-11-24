@@ -129,7 +129,7 @@ private:
     ByteSpan mAttestationData;
     bool mIsInitialized  = false;
     bool mIsAtFirstToken = false;
-    bool mIsDone = false;
+    bool mIsDone         = false;
     TLV::ContiguousBufferTLVReader mTlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 };
