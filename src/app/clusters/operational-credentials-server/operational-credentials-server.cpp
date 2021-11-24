@@ -656,7 +656,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
         // Encode the NOCSR elements with the CSR and Nonce
         nocsrLengthEstimate = TLV::EstimateStructOverhead(csrLength,          // CSR buffer
                                                           kExpectedNonceSize, // CSR Nonce
-                                                          0                   // no vendor reserved data
+                                                          0u                  // no vendor reserved data
         );
 
         VerifyOrExit(nocsrElements.Alloc(nocsrLengthEstimate), err = CHIP_ERROR_NO_MEMORY);

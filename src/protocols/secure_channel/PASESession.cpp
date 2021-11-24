@@ -356,7 +356,7 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
                                                            sizeof(uint16_t),            // initiatorSessionId
                                                            sizeof(uint16_t),            // passcodeId,
                                                            sizeof(uint8_t)              // hasPBKDFParameters
-                                                           /* TLV::TLV::EstimateStructOverhead(sizeof(uint16_t),
+                                                           /* TLV::EstimateStructOverhead(sizeof(uint16_t),
                                                               sizeof(uint16)_t), // initiatorMRPParams */
     );
     System::PacketBufferHandle req = System::PacketBufferHandle::New(max_msg_len);

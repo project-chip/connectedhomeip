@@ -631,7 +631,7 @@ CHIP_ERROR CASESession::SendSigma2()
 
     // Construct Sigma2 Msg
     size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
-                                                  msg_r2_signed_enc_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+                                                  msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     System::PacketBufferHandle msg_R2 = System::PacketBufferHandle::New(data_len);
     VerifyOrReturnError(!msg_R2.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -962,7 +962,7 @@ CHIP_ERROR CASESession::SendSigma3()
     SuccessOrExit(err);
 
     // Generate Sigma3 Msg
-    data_len = TLV::EstimateStructOverhead(CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + msg_r3_encrypted_len);
+    data_len = TLV::EstimateStructOverhead(CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, msg_r3_encrypted_len);
 
     msg_R3 = System::PacketBufferHandle::New(data_len);
     VerifyOrExit(!msg_R3.IsNull(), err = CHIP_ERROR_NO_MEMORY);
