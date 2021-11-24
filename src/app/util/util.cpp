@@ -307,6 +307,7 @@ void MatterFlowMeasurementPluginServerInitCallback() {}
 void MatterWakeOnLanPluginServerInitCallback() {}
 void MatterOnOffSwitchConfigurationPluginServerInitCallback() {}
 void MatterPowerSourcePluginServerInitCallback() {}
+void MatterPowerSourceConfigurationPluginServerInitCallback() {}
 void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}
 void MatterBridgedDeviceBasicInformationPluginServerInitCallback() {}
 
