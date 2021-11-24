@@ -397,6 +397,8 @@ public:
                                            bool value);
     CHIP_ERROR WriteAttributeTimeSinceReset(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                             uint64_t value);
+    CHIP_ERROR WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint32_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -848,6 +850,8 @@ public:
                                              uint64_t value);
     CHIP_ERROR WriteAttributeCurrentHeapHighWatermark(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint64_t value);
+    CHIP_ERROR WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint32_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };

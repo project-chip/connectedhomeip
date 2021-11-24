@@ -116,5 +116,67 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
     return err;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+{
+    securityType = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
+{
+    channelNumber = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
+{
+    rssi = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
+{
+    beaconLostCount = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
+{
+    currentMaxRate = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
+{
+    packetMulticastRxCount = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
+{
+    packetMulticastTxCount = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
+{
+    packetUnicastRxCount = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
+{
+    packetUnicastTxCount = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
+{
+    overrunCount = 0;
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 } // namespace DeviceLayer
 } // namespace chip

@@ -39,23 +39,37 @@ const PeerAddress * SessionHandle::GetPeerAddress(SessionManager * sessionManage
     return &GetUnauthenticatedSession()->GetPeerAddress();
 }
 
-CHIP_ERROR SessionHandle::GetMRPIntervals(SessionManager * sessionManager, uint32_t & mrpIdleInterval, uint32_t & mrpActiveInterval)
+const ReliableMessageProtocolConfig & SessionHandle::GetMRPConfig(SessionManager * sessionManager) const
 {
     if (IsSecure())
     {
         SecureSession * secureSession = sessionManager->GetSecureSession(*this);
         if (secureSession == nullptr)
         {
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            return gDefaultMRPConfig;
         }
-        secureSession->GetMRPIntervals(mrpIdleInterval, mrpActiveInterval);
-
-        return CHIP_NO_ERROR;
+        return secureSession->GetMRPConfig();
     }
+    else
+    {
+        return GetUnauthenticatedSession()->GetMRPConfig();
+    }
+}
 
-    GetUnauthenticatedSession()->GetMRPIntervals(mrpIdleInterval, mrpActiveInterval);
-
-    return CHIP_NO_ERROR;
+void SessionHandle::SetMRPConfig(SessionManager * sessionManager, const ReliableMessageProtocolConfig & config)
+{
+    if (IsSecure())
+    {
+        SecureSession * secureSession = sessionManager->GetSecureSession(*this);
+        if (secureSession != nullptr)
+        {
+            secureSession->SetMRPConfig(config);
+        }
+    }
+    else
+    {
+        return GetUnauthenticatedSession()->SetMRPConfig(config);
+    }
 }
 
 } // namespace chip

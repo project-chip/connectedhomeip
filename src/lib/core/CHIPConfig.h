@@ -2419,7 +2419,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *    The following definitions sets the maximum number of corresponding interaction model object pool size.
  *
  *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
- *      * #CHIP_IM_MAX_NUM_COMMAND_SENDER
  *      * #CHIP_IM_MAX_NUM_READ_HANDLER
  *      * #CHIP_IM_MAX_NUM_READ_CLIENT
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
@@ -2437,15 +2436,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_COMMAND_HANDLER
 #define CHIP_IM_MAX_NUM_COMMAND_HANDLER 4
-#endif
-
-/**
- * @def CHIP_IM_MAX_NUM_COMMAND_SENDER
- *
- * @brief Defines the maximum number of CommandSender, limits the number of active command transactions on client.
- */
-#ifndef CHIP_IM_MAX_NUM_COMMAND_SENDER
-#define CHIP_IM_MAX_NUM_COMMAND_SENDER 4
 #endif
 
 /**

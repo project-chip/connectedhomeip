@@ -17541,6 +17541,7 @@ private:
 | * OverrunCount                                                      | 0x0006 |
 | * CarrierDetect                                                     | 0x0007 |
 | * TimeSinceReset                                                    | 0x0008 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -18335,6 +18336,40 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadEthernetNetworkDiagnosticsFeatureMap : public ModelCommand
+{
+public:
+    ReadEthernetNetworkDiagnosticsFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadEthernetNetworkDiagnosticsFeatureMap()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0037) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -29557,6 +29592,8 @@ private:
 | * EffectiveControlMode                                              | 0x0012 |
 | * Capacity                                                          | 0x0013 |
 | * Speed                                                             | 0x0014 |
+| * LifetimeRunningHours                                              | 0x0015 |
+| * Power                                                             | 0x0016 |
 | * LifetimeEnergyConsumed                                            | 0x0017 |
 | * OperationMode                                                     | 0x0020 |
 | * ControlMode                                                       | 0x0021 |
@@ -31110,6 +31147,245 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute LifetimeRunningHours
+ */
+class ReadPumpConfigurationAndControlLifetimeRunningHours : public ModelCommand
+{
+public:
+    ReadPumpConfigurationAndControlLifetimeRunningHours() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "lifetime-running-hours");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPumpConfigurationAndControlLifetimeRunningHours()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeLifetimeRunningHours(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WritePumpConfigurationAndControlLifetimeRunningHours : public ModelCommand
+{
+public:
+    WritePumpConfigurationAndControlLifetimeRunningHours() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "lifetime-running-hours");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WritePumpConfigurationAndControlLifetimeRunningHours()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeLifetimeRunningHours(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint32_t mValue;
+};
+
+class ReportPumpConfigurationAndControlLifetimeRunningHours : public ModelCommand
+{
+public:
+    ReportPumpConfigurationAndControlLifetimeRunningHours() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "lifetime-running-hours");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportPumpConfigurationAndControlLifetimeRunningHours()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeLifetimeRunningHours(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeLifetimeRunningHours(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                              mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute Power
+ */
+class ReadPumpConfigurationAndControlPower : public ModelCommand
+{
+public:
+    ReadPumpConfigurationAndControlPower() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "power");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPumpConfigurationAndControlPower()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributePower(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WritePumpConfigurationAndControlPower : public ModelCommand
+{
+public:
+    WritePumpConfigurationAndControlPower() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "power");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WritePumpConfigurationAndControlPower()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributePower(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint32_t mValue;
+};
+
+class ReportPumpConfigurationAndControlPower : public ModelCommand
+{
+public:
+    ReportPumpConfigurationAndControlPower() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "power");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportPumpConfigurationAndControlPower()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributePower(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributePower(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -32865,6 +33141,7 @@ private:
 | * CurrentHeapFree                                                   | 0x0001 |
 | * CurrentHeapUsed                                                   | 0x0002 |
 | * CurrentHeapHighWatermark                                          | 0x0003 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -33179,6 +33456,40 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadSoftwareDiagnosticsFeatureMap : public ModelCommand
+{
+public:
+    ReadSoftwareDiagnosticsFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadSoftwareDiagnosticsFeatureMap()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0034) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SoftwareDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -51851,6 +52162,7 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands)
         make_unique<ReportEthernetNetworkDiagnosticsCarrierDetect>(),   //
         make_unique<ReadEthernetNetworkDiagnosticsTimeSinceReset>(),    //
         make_unique<ReportEthernetNetworkDiagnosticsTimeSinceReset>(),  //
+        make_unique<ReadEthernetNetworkDiagnosticsFeatureMap>(),        //
         make_unique<ReadEthernetNetworkDiagnosticsClusterRevision>(),   //
         make_unique<ReportEthernetNetworkDiagnosticsClusterRevision>(), //
     };
@@ -52390,6 +52702,12 @@ void registerClusterPumpConfigurationAndControl(Commands & commands)
         make_unique<ReportPumpConfigurationAndControlCapacity>(),               //
         make_unique<ReadPumpConfigurationAndControlSpeed>(),                    //
         make_unique<ReportPumpConfigurationAndControlSpeed>(),                  //
+        make_unique<ReadPumpConfigurationAndControlLifetimeRunningHours>(),     //
+        make_unique<WritePumpConfigurationAndControlLifetimeRunningHours>(),    //
+        make_unique<ReportPumpConfigurationAndControlLifetimeRunningHours>(),   //
+        make_unique<ReadPumpConfigurationAndControlPower>(),                    //
+        make_unique<WritePumpConfigurationAndControlPower>(),                   //
+        make_unique<ReportPumpConfigurationAndControlPower>(),                  //
         make_unique<ReadPumpConfigurationAndControlLifetimeEnergyConsumed>(),   //
         make_unique<ReportPumpConfigurationAndControlLifetimeEnergyConsumed>(), //
         make_unique<ReadPumpConfigurationAndControlOperationMode>(),            //
@@ -52468,6 +52786,7 @@ void registerClusterSoftwareDiagnostics(Commands & commands)
         make_unique<ReportSoftwareDiagnosticsCurrentHeapUsed>(),          //
         make_unique<ReadSoftwareDiagnosticsCurrentHeapHighWatermark>(),   //
         make_unique<ReportSoftwareDiagnosticsCurrentHeapHighWatermark>(), //
+        make_unique<ReadSoftwareDiagnosticsFeatureMap>(),                 //
         make_unique<ReadSoftwareDiagnosticsClusterRevision>(),            //
         make_unique<ReportSoftwareDiagnosticsClusterRevision>(),          //
     };

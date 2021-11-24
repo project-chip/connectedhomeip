@@ -53,6 +53,7 @@ chip_test_suite("tests") {
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
+    "TestNumericAttributeTraits.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
     "TestStatusResponseMessage.cpp",
