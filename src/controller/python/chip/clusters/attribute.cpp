@@ -49,15 +49,26 @@ struct __attribute__((packed)) AttributePath
     chip::AttributeId attributeId;
 };
 
+struct __attribute__((packed)) EventPath
+{
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+    chip::EventId eventId;
+};
+
 using OnReadAttributeDataCallback       = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                              chip::AttributeId attributeId,
                                              std::underlying_type_t<Protocols::InteractionModel::Status> imstatus, uint8_t * data,
                                              uint32_t dataLen);
+using OnReadEventDataCallback           = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                         chip::EventId eventId, chip::EventNumber eventNumber, uint8_t priority, uint64_t timestamp,
+                                         uint8_t timestampType, uint8_t * data, uint32_t dataLen);
 using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, uint64_t subscriptionId);
 using OnReadErrorCallback               = void (*)(PyObject * appContext, uint32_t chiperror);
 using OnReadDoneCallback                = void (*)(PyObject * appContext);
 
 OnReadAttributeDataCallback gOnReadAttributeDataCallback             = nullptr;
+OnReadEventDataCallback gOnReadEventDataCallback                     = nullptr;
 OnSubscriptionEstablishedCallback gOnSubscriptionEstablishedCallback = nullptr;
 OnReadErrorCallback gOnReadErrorCallback                             = nullptr;
 OnReadDoneCallback gOnReadDoneCallback                               = nullptr;
@@ -105,6 +116,40 @@ public:
     void OnSubscriptionEstablished(const ReadClient * apReadClient) override
     {
         gOnSubscriptionEstablishedCallback(mAppContext, apReadClient->GetSubscriptionId().ValueOr(0));
+    }
+
+    void OnEventData(const ReadClient * apReadClient, const EventHeader & aEventHeader, TLV::TLVReader * apData,
+                     const StatusIB * apStatus) override
+    {
+        uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+        uint32_t size  = 0;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        // When the apData is nullptr, means we did not receive a valid event data from server, status will be some error
+        // status.
+        if (apData != nullptr)
+        {
+            // The TLVReader's read head is not pointing to the first element in the container instead of the container itself, use
+            // a TLVWriter to get a TLV with a normalized TLV buffer (Wrapped with a anonymous tag, no extra "end of container" tag
+            // at the end.)
+            TLV::TLVWriter writer;
+            writer.Init(buffer);
+            err = writer.CopyElement(TLV::AnonymousTag, *apData);
+            if (err != CHIP_NO_ERROR)
+            {
+                this->OnError(apReadClient, err);
+                return;
+            }
+            size = writer.GetLengthWritten();
+        }
+        else
+        {
+            err = CHIP_ERROR_INCORRECT_STATE;
+            this->OnError(apReadClient, err);
+        }
+
+        gOnReadEventDataCallback(mAppContext, aEventHeader.mPath.mEndpointId, aEventHeader.mPath.mClusterId,
+                                 aEventHeader.mPath.mEventId, aEventHeader.mEventNumber, to_underlying(aEventHeader.mPriorityLevel),
+                                 aEventHeader.mTimestamp.mValue, to_underlying(aEventHeader.mTimestamp.mType), buffer, size);
     }
 
     void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override
@@ -175,10 +220,13 @@ void pychip_WriteClient_InitCallbacks(OnWriteResponseCallback onWriteResponseCal
 }
 
 void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttributeDataCallback,
+                                     OnReadEventDataCallback onReadEventDataCallback,
                                      OnSubscriptionEstablishedCallback onSubscriptionEstablishedCallback,
-                                     OnReadErrorCallback onReadErrorCallback, OnReadDoneCallback onReadDoneCallback)
+                                     OnReadErrorCallback onReadErrorCallback,
+                                     OnReadDoneCallback onReadDoneCallback)
 {
     gOnReadAttributeDataCallback       = onReadAttributeDataCallback;
+    gOnReadEventDataCallback           = onReadEventDataCallback;
     gOnSubscriptionEstablishedCallback = onSubscriptionEstablishedCallback;
     gOnReadErrorCallback               = onReadErrorCallback;
     gOnReadDoneCallback                = onReadDoneCallback;
@@ -267,6 +315,67 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
         ReadPrepareParams params(session.Value());
         params.mpAttributePathParamsList    = readPaths.get();
         params.mAttributePathParamsListSize = n;
+
+        if (isSubscription)
+        {
+            params.mMinIntervalFloorSeconds   = minInterval;
+            params.mMaxIntervalCeilingSeconds = maxInterval;
+
+            err = readClient->SendSubscribeRequest(params);
+        }
+        else
+        {
+            err = readClient->SendReadRequest(params);
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            readClient->Shutdown();
+        }
+    }
+
+    callback.release();
+
+exit:
+    va_end(args);
+    return err.AsInteger();
+}
+
+chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, DeviceProxy * device, bool isSubscription,
+                                                          uint32_t minInterval, uint32_t maxInterval, size_t n, ...)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    std::unique_ptr<ReadClientCallback> callback = std::make_unique<ReadClientCallback>(appContext);
+
+    va_list args;
+    va_start(args, n);
+
+    std::unique_ptr<EventPathParams[]> readPaths(new EventPathParams[n]);
+
+    {
+        for (size_t i = 0; i < n; i++)
+        {
+            void * path = va_arg(args, void *);
+
+            python::EventPath pathObj;
+            memcpy(&pathObj, path, sizeof(python::EventPath));
+
+            readPaths[i] = EventPathParams(pathObj.endpointId, pathObj.clusterId, pathObj.eventId);
+        }
+    }
+
+    Optional<SessionHandle> session = device->GetSecureSession();
+    ReadClient * readClient;
+
+    VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NOT_CONNECTED);
+    {
+        app::InteractionModelEngine::GetInstance()->NewReadClient(
+            &readClient, isSubscription ? ReadClient::InteractionType::Subscribe : ReadClient::InteractionType::Read,
+            callback.get());
+        ReadPrepareParams params(session.Value());
+        params.mpEventPathParamsList    = readPaths.get();
+        params.mEventPathParamsListSize = n;
 
         if (isSubscription)
         {

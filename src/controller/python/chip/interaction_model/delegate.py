@@ -60,6 +60,12 @@ class AttributePath:
     clusterId: int
     attributeId: int
 
+@dataclass
+class EventPath:
+    nodeId: int
+    endpointId: int
+    clusterId: int
+    eventId: int
 
 @dataclass
 class AttributeReadResult:
@@ -67,6 +73,10 @@ class AttributeReadResult:
     status: int
     value: 'typing.Any'
 
+@dataclass
+class EventReadResult:
+    path: EventPath
+    value: 'typing.Any'
 
 @dataclass
 class AttributeWriteResult:
