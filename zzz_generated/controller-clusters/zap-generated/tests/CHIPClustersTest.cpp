@@ -1183,6 +1183,16 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeTimeSinceReset(C
         chip::app::AttributePathParams(mEndpoint, mClusterId, EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
+CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
+                                                                           Callback::Cancelable * onFailureCallback, uint32_t value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, EthernetNetworkDiagnostics::Attributes::FeatureMap::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                                 Callback::Cancelable * onFailureCallback,
                                                                                 uint16_t value)
@@ -2435,6 +2445,16 @@ CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeCurrentHeapHighWatermar
     ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
         chip::app::AttributePathParams(mEndpoint, mClusterId, SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id),
         value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback, uint32_t value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, SoftwareDiagnostics::Attributes::FeatureMap::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,

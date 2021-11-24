@@ -798,65 +798,6 @@ void ConnectivityManagerImpl::DHCPProcess(void)
     xTaskCreate(DHCPProcessThread, "DHCPProcess", 4096 / sizeof(StackType_t), this, 1, NULL);
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiSecurityType(uint8_t & securityType)
-{
-    securityType = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiChannelNumber(uint16_t & channelNumber)
-{
-    channelNumber = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiRssi(int8_t & rssi)
-{
-    rssi = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
-{
-    beaconLostCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
-{
-    currentMaxRate = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
-{
-    packetMulticastRxCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
-{
-    packetMulticastTxCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
-{
-    packetUnicastRxCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
-{
-    packetUnicastTxCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiOverrunCount(uint64_t & overrunCount)
-{
-    overrunCount = 0;
-    return CHIP_NO_ERROR;
-}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace DeviceLayer

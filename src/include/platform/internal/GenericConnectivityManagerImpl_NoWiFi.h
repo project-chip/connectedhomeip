@@ -71,20 +71,6 @@ public:
     System::Clock::Timeout _GetWiFiAPIdleTimeout(void);
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
     CHIP_ERROR _GetAndLogWifiStatsCounters(void);
-    CHIP_ERROR _GetWiFiBssId(ByteSpan & value);
-    CHIP_ERROR _GetWiFiSecurityType(uint8_t & securityType);
-    CHIP_ERROR _GetWiFiVersion(uint8_t & wiFiVersion);
-    CHIP_ERROR _GetWiFiChannelNumber(uint16_t & channelNumber);
-    CHIP_ERROR _GetWiFiRssi(int8_t & rssi);
-    CHIP_ERROR _GetWiFiBeaconLostCount(uint32_t & beaconLostCount);
-    CHIP_ERROR _GetWiFiBeaconRxCount(uint32_t & beaconRxCount);
-    CHIP_ERROR _GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount);
-    CHIP_ERROR _GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount);
-    CHIP_ERROR _GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount);
-    CHIP_ERROR _GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount);
-    CHIP_ERROR _GetWiFiCurrentMaxRate(uint64_t & currentMaxRate);
-    CHIP_ERROR _GetWiFiOverrunCount(uint64_t & overrunCount);
-    CHIP_ERROR _ResetWiFiNetworkDiagnosticsCounts();
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
@@ -233,92 +219,6 @@ template <class ImplClass>
 inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPStateToStr(ConnectivityManager::WiFiAPState state)
 {
     return NULL;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiBssId(ByteSpan & value)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiSecurityType(uint8_t & securityType)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiVersion(uint8_t & wiFiVersion)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiChannelNumber(uint16_t & channelNumber)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiRssi(int8_t & rssi)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR
-GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR
-GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiOverrunCount(uint64_t & overrunCount)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_ResetWiFiNetworkDiagnosticsCounts()
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace Internal

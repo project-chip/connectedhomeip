@@ -1667,6 +1667,11 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -3140,6 +3145,20 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000015: {
+                "attributeName": "LifetimeRunningHours",
+                "attributeId": 0x00000015,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000016: {
+                "attributeName": "Power",
+                "attributeId": 0x00000016,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
             0x00000017: {
                 "attributeName": "LifetimeEnergyConsumed",
                 "attributeId": 0x00000017,
@@ -3357,6 +3376,11 @@ class ChipClusters:
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
@@ -5822,6 +5846,9 @@ class ChipClusters:
     def ClusterEthernetNetworkDiagnostics_SubscribeAttributeTimeSinceReset(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_EthernetNetworkDiagnostics_TimeSinceReset(device, ZCLendpoint, minInterval, maxInterval)
 
+    def ClusterEthernetNetworkDiagnostics_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FeatureMap(device, ZCLendpoint, ZCLgroupid)
+
     def ClusterEthernetNetworkDiagnostics_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -6551,6 +6578,18 @@ class ChipClusters:
     def ClusterPumpConfigurationAndControl_SubscribeAttributeSpeed(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Speed(device, ZCLendpoint, minInterval, maxInterval)
 
+    def ClusterPumpConfigurationAndControl_ReadAttributeLifetimeRunningHours(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeRunningHours(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_SubscribeAttributeLifetimeRunningHours(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_LifetimeRunningHours(device, ZCLendpoint, minInterval, maxInterval)
+
+    def ClusterPumpConfigurationAndControl_ReadAttributePower(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Power(device, ZCLendpoint, ZCLgroupid)
+
+    def ClusterPumpConfigurationAndControl_SubscribeAttributePower(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
+        return self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Power(device, ZCLendpoint, minInterval, maxInterval)
+
     def ClusterPumpConfigurationAndControl_ReadAttributeLifetimeEnergyConsumed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeEnergyConsumed(device, ZCLendpoint, ZCLgroupid)
 
@@ -6673,6 +6712,9 @@ class ChipClusters:
 
     def ClusterSoftwareDiagnostics_SubscribeAttributeCurrentHeapHighWatermark(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int):
         return self._chipLib.chip_ime_SubscribeAttribute_SoftwareDiagnostics_CurrentHeapHighWatermark(device, ZCLendpoint, minInterval, maxInterval)
+
+    def ClusterSoftwareDiagnostics_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_FeatureMap(device, ZCLendpoint, ZCLgroupid)
 
     def ClusterSoftwareDiagnostics_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
@@ -8860,6 +8902,10 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_EthernetNetworkDiagnostics_TimeSinceReset.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_EthernetNetworkDiagnostics_TimeSinceReset.restype = ctypes.c_uint32
+        # Cluster EthernetNetworkDiagnostics ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FeatureMap.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FeatureMap.restype = ctypes.c_uint32
         # Cluster EthernetNetworkDiagnostics ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -9856,6 +9902,22 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Speed.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Speed.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute LifetimeRunningHours
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeRunningHours.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeRunningHours.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl SubscribeAttribute LifetimeRunningHours
+        self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_LifetimeRunningHours.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_LifetimeRunningHours.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute Power
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Power.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Power.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl SubscribeAttribute Power
+        self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Power.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_SubscribeAttribute_PumpConfigurationAndControl_Power.restype = ctypes.c_uint32
         # Cluster PumpConfigurationAndControl ReadAttribute LifetimeEnergyConsumed
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_LifetimeEnergyConsumed.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -10023,6 +10085,10 @@ class ChipClusters:
         self._chipLib.chip_ime_SubscribeAttribute_SoftwareDiagnostics_CurrentHeapHighWatermark.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_SubscribeAttribute_SoftwareDiagnostics_CurrentHeapHighWatermark.restype = ctypes.c_uint32
+        # Cluster SoftwareDiagnostics ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_FeatureMap.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_FeatureMap.restype = ctypes.c_uint32
         # Cluster SoftwareDiagnostics ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_ClusterRevision.argtypes = [
             ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

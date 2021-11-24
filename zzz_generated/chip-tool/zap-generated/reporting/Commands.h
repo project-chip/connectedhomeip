@@ -274,6 +274,8 @@ public:
         delete onReportPumpConfigurationAndControlEffectiveControlModeCallback;
         delete onReportPumpConfigurationAndControlCapacityCallback;
         delete onReportPumpConfigurationAndControlSpeedCallback;
+        delete onReportPumpConfigurationAndControlLifetimeRunningHoursCallback;
+        delete onReportPumpConfigurationAndControlPowerCallback;
         delete onReportPumpConfigurationAndControlLifetimeEnergyConsumedCallback;
         delete onReportPumpConfigurationAndControlOperationModeCallback;
         delete onReportPumpConfigurationAndControlControlModeCallback;
@@ -1087,6 +1089,12 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0014,
                                        onReportPumpConfigurationAndControlSpeedCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0015,
+                                       onReportPumpConfigurationAndControlLifetimeRunningHoursCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0016,
+                                       onReportPumpConfigurationAndControlPowerCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0017,
                                        onReportPumpConfigurationAndControlLifetimeEnergyConsumedCallback->Cancel(),
                                        BasicAttributeFilter<Int32uAttributeCallback>);
@@ -2124,6 +2132,10 @@ private:
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlSpeedCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportPumpConfigurationAndControlLifetimeRunningHoursCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportPumpConfigurationAndControlPowerCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
     chip::Callback::Callback<Int32uAttributeCallback> * onReportPumpConfigurationAndControlLifetimeEnergyConsumedCallback =
         new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportPumpConfigurationAndControlOperationModeCallback =

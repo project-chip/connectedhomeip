@@ -34,9 +34,16 @@ using namespace chip::app::Clusters;
 {{#unless isWritableAttribute}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value responseHandler:(ResponseHandler)responseHandler
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
+      {{! For now, don't change the bridge API; instead just use an adapter
+          to invoke our completion handler. This is not great from a
+          type-safety perspective, of course. }}
+      ^(NSError * _Nullable error, id _Nullable ignored) {
+        completionHandler(error);
+      },
+      ^(Cancelable * success, Cancelable * failure) {
         ListFreer listFreer;
         using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
         TypeInfo::Type cppValue;
