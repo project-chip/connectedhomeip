@@ -23,7 +23,6 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceLayer.h>
 
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -40,7 +39,7 @@ static chip::Shell::Engine sShellServerSubcommands;
 static uint16_t sServerPortOperational = CHIP_PORT;
 static uint16_t sServerPortCommissioning = CHIP_UDC_PORT;
 
-CHIP_ERROR CmdAppServerHelp(int argc, char ** argv)
+static CHIP_ERROR CmdAppServerHelp(int argc, char ** argv)
 {
     sShellServerSubcommands.ForEachCommand(PrintCommandHelp, nullptr);
     return CHIP_NO_ERROR;
@@ -93,7 +92,7 @@ static CHIP_ERROR CmdAppServerUdcPort(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-static bool CmdAppServerSession(void *context, SessionHandle &session)
+static bool PrintServerSession(void *context, SessionHandle &session)
 {
     streamer_printf(streamer_get(),
         "session id=0x%04x peerSessionId=0x%04x peerNodeId=0x%016" PRIx64 " fabricIdx=%d\r\n",
@@ -106,7 +105,7 @@ static bool CmdAppServerSession(void *context, SessionHandle &session)
 
 static CHIP_ERROR CmdAppServerSessions(int argc, char ** argv)
 {
-    Server::GetInstance().GetSecureSessionManager().ForEachSessionHandle(nullptr, CmdAppServerSession);
+    Server::GetInstance().GetSecureSessionManager().ForEachSessionHandle(nullptr, PrintServerSession);
 
     return CHIP_NO_ERROR;
 }
@@ -134,7 +133,7 @@ static CHIP_ERROR CmdAppServer(int argc, char ** argv)
     return sShellServerSubcommands.ExecCommand(argc, argv);
 }
 
-void CmdAppServerAtExit()
+static void CmdAppServerAtExit()
 {
     CmdAppServerStop(0, nullptr);
 }
