@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Engine.h>

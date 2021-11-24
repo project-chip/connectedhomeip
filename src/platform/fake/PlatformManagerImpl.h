@@ -102,21 +102,6 @@ private:
     bool _TryLockChipStack() { return true; }
     void _UnlockChipStack() {}
 
-    CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
-    CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
-    CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
-    CHIP_ERROR _GetThreadMetrics(ThreadMetrics ** threadMetricsOut);
-    void _ReleaseThreadMetrics(ThreadMetrics * threadMetrics);
-
-    CHIP_ERROR _GetRebootCount(uint16_t & rebootCount);
-    CHIP_ERROR _GetUpTime(uint64_t & upTime);
-    CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR _GetBootReasons(uint8_t & bootReasons);
-
-    CHIP_ERROR _GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults);
-    CHIP_ERROR _GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults);
-    CHIP_ERROR _GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults);
-
     // ===== Members for internal use by the following friends.
 
     friend PlatformManager & PlatformMgr();

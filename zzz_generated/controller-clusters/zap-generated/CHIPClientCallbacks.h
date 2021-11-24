@@ -81,7 +81,7 @@ typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)
 typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallback)(void * context, uint8_t errorCode,
                                                                                chip::CharSpan debugText);
 typedef void (*GroupsClusterAddGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId);
-typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity, uint8_t groupCount,
+typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity,
                                                                 /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 typedef void (*GroupsClusterRemoveGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId);
 typedef void (*GroupsClusterViewGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId, chip::CharSpan groupName);

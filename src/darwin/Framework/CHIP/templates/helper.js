@@ -116,12 +116,15 @@ function asTestIndex(index)
   return index.toString().padStart(6, 0);
 }
 
-async function asObjectiveCClass(type, cluster, options)
+async function asObjectiveCClassHelper(type, cluster, options, mutable)
 {
   let pkgId    = await templateUtil.ensureZclPackageId(this);
   let isStruct = await zclHelper.isStruct(this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
-  if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
+  if ((this.isList || this.isArray || this.entryType || options.hash.forceList) && !options.hash.forceNotList) {
+    if (mutable) {
+      return 'NSMutableArray';
+    }
     return 'NSArray';
   }
 
@@ -140,6 +143,16 @@ async function asObjectiveCClass(type, cluster, options)
   return 'NSNumber';
 }
 
+async function asObjectiveCClass(type, cluster, options)
+{
+  return asObjectiveCClassHelper.call(this, type, cluster, options, false);
+}
+
+async function asObjectiveCMutableClass(type, cluster, options)
+{
+  return asObjectiveCClassHelper.call(this, type, cluster, options, true);
+}
+
 async function asObjectiveCType(type, cluster, options)
 {
   let typeStr = await asObjectiveCClass.call(this, type, cluster, options);
@@ -150,12 +163,6 @@ async function asObjectiveCType(type, cluster, options)
   }
 
   return typeStr;
-}
-
-async function arrayElementObjectiveCClass(type, cluster, options)
-{
-  options.hash.forceNotList = true;
-  return asObjectiveCClass.call(this, type, cluster, options);
 }
 
 function incrementDepth(depth)
@@ -188,6 +195,11 @@ function asGetterName(prop)
   return propName;
 }
 
+function commandHasRequiredField(command)
+{
+  return command.arguments.some(arg => !arg.isOptional);
+}
+
 //
 // Module exports
 //
@@ -197,8 +209,9 @@ exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
 exports.asTestIndex                  = asTestIndex;
 exports.asTestValue                  = asTestValue;
 exports.asObjectiveCClass            = asObjectiveCClass;
+exports.asObjectiveCMutableClass     = asObjectiveCMutableClass;
 exports.asObjectiveCType             = asObjectiveCType;
-exports.arrayElementObjectiveCClass  = arrayElementObjectiveCClass;
 exports.incrementDepth               = incrementDepth;
 exports.asStructPropertyName         = asStructPropertyName;
 exports.asGetterName                 = asGetterName;
+exports.commandHasRequiredField      = commandHasRequiredField;

@@ -34,6 +34,7 @@
 #include <nlunit-test.h>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
 using namespace chip::Logging;
@@ -57,11 +58,11 @@ static void TestConnectivityMgr_GetNetworkInterfaces(nlTestSuite * inSuite, void
 
     NetworkInterface * netifs = nullptr;
 
-    err = ConnectivityMgr().GetNetworkInterfaces(&netifs);
+    err = GetDiagnosticDataProvider().GetNetworkInterfaces(&netifs);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, netifs != nullptr);
 
-    ConnectivityMgr().ReleaseNetworkInterfaces(netifs);
+    GetDiagnosticDataProvider().ReleaseNetworkInterfaces(netifs);
 }
 
 /**

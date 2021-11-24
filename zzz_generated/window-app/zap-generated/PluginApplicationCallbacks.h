@@ -28,6 +28,7 @@
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
+    MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \

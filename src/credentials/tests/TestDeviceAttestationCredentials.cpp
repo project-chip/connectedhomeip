@@ -21,8 +21,8 @@
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <credentials/examples/DeviceAttestationVerifierExample.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
@@ -196,7 +196,7 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
     NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kNotImplemented);
 
     // Replace default verifier with example verifier
-    DeviceAttestationVerifier * example_dac_verifier = Examples::GetExampleDACVerifier();
+    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier();
     NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
     NL_TEST_ASSERT(inSuite, default_verifier != example_dac_verifier);
 
@@ -240,6 +240,9 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     // -> certification_type = 0
     // -> dac_origin_vendor_id is not present
     // -> dac_origin_product_id is not present
+    static constexpr CertificationElements sTestCMS_CertElements = { 1,    0xFFF1, { 0x8000 }, 1, 0x1234, "ZIG20141ZB330001-24",
+                                                                     0,    0,      0x2694,     0, 0,      0,
+                                                                     false };
     static constexpr uint8_t sTestCMS_CDContent[] = { 0x15, 0x24, 0x00, 0x01, 0x25, 0x01, 0xf1, 0xff, 0x36, 0x02, 0x05,
                                                       0x00, 0x80, 0x18, 0x25, 0x03, 0x34, 0x12, 0x2c, 0x04, 0x13, 0x5a,
                                                       0x49, 0x47, 0x32, 0x30, 0x31, 0x34, 0x31, 0x5a, 0x42, 0x33, 0x33,
@@ -249,7 +252,7 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Replace default verifier with example verifier
-    DeviceAttestationVerifier * example_dac_verifier = Examples::GetExampleDACVerifier();
+    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier();
     NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
 
     SetDeviceAttestationVerifier(example_dac_verifier);
@@ -278,6 +281,18 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
 
     NL_TEST_ASSERT(inSuite, cd_payload.data_equal(ByteSpan(sTestCMS_CDContent)));
+
+    DeviceInfoForAttestation deviceInfo{
+        .vendorId     = sTestCMS_CertElements.VendorId,
+        .productId    = sTestCMS_CertElements.ProductIds[0],
+        .dacVendorId  = sTestCMS_CertElements.VendorId,
+        .dacProductId = sTestCMS_CertElements.ProductIds[0],
+        .paiVendorId  = sTestCMS_CertElements.VendorId,
+        .paiProductId = sTestCMS_CertElements.ProductIds[0],
+        .paaVendorId  = sTestCMS_CertElements.VendorId,
+    };
+    attestation_result = default_verifier->ValidateCertificateDeclarationPayload(cd_payload, ByteSpan(), deviceInfo);
+    NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
 }
 
 /**

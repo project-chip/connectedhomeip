@@ -39,7 +39,16 @@ using namespace ::chip::app::Clusters::WindowCovering;
 void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    if (attributePath.mClusterId == Id)
+    if (attributePath.mClusterId == app::Clusters::Identify::Id)
+    {
+        ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
+                        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
+    }
+    else if (attributePath.mClusterId == Id)
+    {
+        ChipLogProgress(Zcl, "Window  cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mClusterId));
+    }
+    else
     {
         ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mClusterId));
     }

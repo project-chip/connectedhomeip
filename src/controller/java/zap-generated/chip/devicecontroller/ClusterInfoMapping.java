@@ -235,7 +235,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Integer> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo("valueList", "List<Integer>");
@@ -398,7 +398,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<byte[]> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo("valueList", "List<byte[]>");
@@ -424,7 +424,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Integer> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo("valueList", "List<Integer>");
@@ -477,7 +477,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Long> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
 
@@ -502,7 +502,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Long> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
 
@@ -527,7 +527,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Integer> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo("valueList", "List<Integer>");
@@ -1380,7 +1380,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Integer> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo("valueList", "List<Integer>");
@@ -1406,7 +1406,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Integer> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo("valueList", "List<Integer>");
@@ -1432,7 +1432,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Integer> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo("valueList", "List<Integer>");
@@ -1538,15 +1538,13 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer capacity, Integer groupCount
+    public void onSuccess(Integer capacity
         // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Java is not properly implemented yet
         ) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo capacityResponseValue = new CommandResponseInfo("capacity", "int");
       responseValues.put(capacityResponseValue, capacity);
-      CommandResponseInfo groupCountResponseValue = new CommandResponseInfo("groupCount", "int");
-      responseValues.put(groupCountResponseValue, groupCount);
       // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);
@@ -2430,7 +2428,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<byte[]> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo("valueList", "List<byte[]>");
@@ -2456,7 +2454,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Integer> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo("valueList", "List<Integer>");
@@ -2959,7 +2957,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Integer> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo("valueList", "List<Integer>");
@@ -2985,7 +2983,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<byte[]> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo("valueList", "List<byte[]>");
@@ -3187,7 +3185,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Integer> valueList) {
+    public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo("valueList", "List<Integer>");
@@ -3271,11 +3269,12 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.BridgedActionsCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("bridgedActions", bridgedActionsClusterInfo);
-    ClusterInfo bridgedDeviceBasicClusterInfo =
+    ClusterInfo bridgedDeviceBasicInformationClusterInfo =
         new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.BridgedDeviceBasicCluster(ptr, endpointId),
+            (ptr, endpointId) ->
+                new ChipClusters.BridgedDeviceBasicInformationCluster(ptr, endpointId),
             new HashMap<>());
-    clusterMap.put("bridgedDeviceBasic", bridgedDeviceBasicClusterInfo);
+    clusterMap.put("bridgedDeviceBasicInformation", bridgedDeviceBasicInformationClusterInfo);
     ClusterInfo colorControlClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.ColorControlCluster(ptr, endpointId),
@@ -3521,7 +3520,9 @@ public class ClusterInfoMapping {
     destination.get("binding").combineCommands(source.get("binding"));
     destination.get("booleanState").combineCommands(source.get("booleanState"));
     destination.get("bridgedActions").combineCommands(source.get("bridgedActions"));
-    destination.get("bridgedDeviceBasic").combineCommands(source.get("bridgedDeviceBasic"));
+    destination
+        .get("bridgedDeviceBasicInformation")
+        .combineCommands(source.get("bridgedDeviceBasicInformation"));
     destination.get("colorControl").combineCommands(source.get("colorControl"));
     destination.get("contentLauncher").combineCommands(source.get("contentLauncher"));
     destination.get("descriptor").combineCommands(source.get("descriptor"));
@@ -4307,9 +4308,10 @@ public class ClusterInfoMapping {
     bridgedActionsClusterInteractionInfoMap.put(
         "stopAction", bridgedActionsstopActionInteractionInfo);
     commandMap.put("bridgedActions", bridgedActionsClusterInteractionInfoMap);
-    Map<String, InteractionInfo> bridgedDeviceBasicClusterInteractionInfoMap =
+    Map<String, InteractionInfo> bridgedDeviceBasicInformationClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    commandMap.put("bridgedDeviceBasic", bridgedDeviceBasicClusterInteractionInfoMap);
+    commandMap.put(
+        "bridgedDeviceBasicInformation", bridgedDeviceBasicInformationClusterInteractionInfoMap);
     Map<String, InteractionInfo> colorControlClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> colorControlcolorLoopSetCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -5959,11 +5961,6 @@ public class ClusterInfoMapping {
         "addGroupIfIdentifying", groupsaddGroupIfIdentifyingInteractionInfo);
     Map<String, CommandParameterInfo> groupsgetGroupMembershipCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo groupsgetGroupMembershipgroupCountCommandParameterInfo =
-        new CommandParameterInfo("groupCount", int.class);
-    groupsgetGroupMembershipCommandParams.put(
-        "groupCount", groupsgetGroupMembershipgroupCountCommandParameterInfo);
-
     CommandParameterInfo groupsgetGroupMembershipgroupListCommandParameterInfo =
         new CommandParameterInfo("groupList", int.class);
     groupsgetGroupMembershipCommandParams.put(
@@ -5976,7 +5973,6 @@ public class ClusterInfoMapping {
               ((ChipClusters.GroupsCluster) cluster)
                   .getGroupMembership(
                       (ChipClusters.GroupsCluster.GetGroupMembershipResponseCallback) callback,
-                      (Integer) commandArguments.get("groupCount"),
                       (Integer) commandArguments.get("groupList"));
             },
             () -> new DelegatedGetGroupMembershipResponseCallback(),

@@ -383,14 +383,29 @@ class ChipDeviceController(object):
             future.set_exception(self._ChipStack.ErrorToException(res))
         return await future
 
-    async def WriteAttribute(self, nodeid: int, attributes):
+    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]]):
+        '''
+        Write a list of attributes on a target node.
+
+        nodeId: Target's Node ID
+        attributes: A list of tuples of type (endpoint, cluster-object):
+
+        E.g
+            (1, Clusters.TestCluster.Attributes.XYZAttribute('hello')) -- Write 'hello' to the XYZ attribute on the test cluster to endpoint 1
+        '''
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
         device = self.GetConnectedDeviceSync(nodeid)
+
+        attrs = []
+        for v in attributes:
+            attrs.append(ClusterAttribute.AttributeWriteRequest(
+                v[0], v[1], v[1].value))
+
         res = self._ChipStack.Call(
             lambda: ClusterAttribute.WriteAttributes(
-                future, eventLoop, device, attributes)
+                future, eventLoop, device, attrs)
         )
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
@@ -408,6 +423,22 @@ class ChipDeviceController(object):
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
     ]]):
+        '''
+        Read a list of attributes from a target node
+
+        nodeId: Target's Node ID
+        attributes: A list of tuples of varying types depending on the type of read being requested:
+            ():                                         Endpoint = *,           Cluster = *,          Attribute = *
+            (Clusters.ClusterA):                        Endpoint = *,           Cluster = specific,   Attribute = *
+            (Clusters.ClusterA.AttributeA):             Endpoint = *,           Cluster = specific,   Attribute = specific
+            (endpoint, Clusters.ClusterA):              Endpoint = specific,    Cluster = specific,   Attribute = *
+            (endpoint, Clusters.ClusterA.AttributeA):   Endpoint = specific,    Cluster = specific,   Attribute = specific
+
+        The cluster and attributes specified above are to be selected from the generated cluster objects.
+
+        NOTE: Only the last variant is currently supported.
+        '''
+
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
@@ -469,15 +500,15 @@ class ChipDeviceController(object):
         if blocking:
             return im.GetAttributeReadResponse(im.DEFAULT_ATTRIBUTEREAD_APPID)
 
-    def ZCLWriteAttribute(self, cluster, attribute, nodeid, endpoint, groupid, value, blocking=True):
+    def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, blocking=True):
         req = None
         try:
-            req = ClusterAttribute.AttributeWriteRequest(EndpointId=endpoint, Attribute=eval(
-                f"GeneratedObjects.{cluster}.Attributes.{attribute}"), Data=value)
+            req = eval(
+                f"GeneratedObjects.{cluster}.Attributes.{attribute}")(value)
         except:
             raise UnknownAttribute(cluster, attribute)
 
-        return asyncio.run(self.WriteAttribute(nodeid, [req]))
+        return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req)]))
 
     def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True):
         device = self.GetConnectedDeviceSync(nodeid)

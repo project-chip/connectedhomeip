@@ -370,6 +370,11 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
     }
 }
 
+FabricIndex CommandHandler::GetAccessingFabricIndex() const
+{
+    return mpExchangeCtx->GetSessionHandle().GetFabricIndex();
+}
+
 CommandHandler * CommandHandler::Handle::Get()
 {
     return (mMagic == InteractionModelEngine::GetInstance()->GetMagicNumber()) ? mpHandler : nullptr;

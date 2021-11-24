@@ -25,6 +25,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <platform/Ameba/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
 
@@ -58,6 +59,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     // Make sure the LwIP core lock has been initialized
     err = Internal::InitLwIPCoreLock();
@@ -84,7 +86,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
     uint64_t upTime = 0;
 
-    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
+    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
     {
         uint32_t totalOperationalHours = 0;
 
@@ -103,84 +105,6 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     }
 
     return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
-{
-    currentHeapFree = xPortGetFreeHeapSize();
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
-{
-    currentHeapUsed = xPortGetTotalHeapSize() - xPortGetFreeHeapSize();
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
-{
-    currentHeapHighWatermark = xPortGetTotalHeapSize() - xPortGetMinimumEverFreeHeapSize();
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
-{
-    uint32_t count = 0;
-
-    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        rebootCount = static_cast<uint16_t>(count);
-    }
-
-    return err;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
-{
-    System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
-
-    if (currentTime >= mStartTime)
-    {
-        upTime = std::chrono::duration_cast<System::Clock::Seconds64>(currentTime - mStartTime).count();
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_INVALID_TIME;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperationalHours)
-{
-    uint64_t upTime = 0;
-
-    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
-    {
-        uint32_t totalHours = 0;
-        if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    return CHIP_ERROR_INVALID_TIME;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
-{
-    uint32_t reason = 0;
-
-    CHIP_ERROR err = ConfigurationMgr().GetBootReasons(reason);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        bootReasons = static_cast<uint8_t>(reason);
-    }
-
-    return err;
 }
 
 } // namespace DeviceLayer

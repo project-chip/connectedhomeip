@@ -175,7 +175,7 @@ bool AttributePathExpandIterator::Next()
     }
 
     // Reset to default, invalid value.
-    mOutputPath = ConcreteAttributePath();
+    mOutputPath = ConcreteReadAttributePath();
     return false;
 }
 } // namespace app

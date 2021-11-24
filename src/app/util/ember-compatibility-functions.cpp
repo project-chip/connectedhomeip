@@ -33,6 +33,7 @@
 #include <app/util/attribute-table.h>
 #include <app/util/ember-compatibility-functions.h>
 #include <app/util/error-mapping.h>
+#include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -198,7 +199,7 @@ CHIP_ERROR attributeBufferToNumericTlvData(TLV::TLVWriter & writer, bool isNulla
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    return writer.Put(tag, static_cast<T>(value));
+    return NumericAttributeTraits<T>::Encode(writer, tag, value);
 }
 
 } // anonymous namespace
@@ -210,7 +211,29 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
     return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+namespace {
+CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIB::Builder & aAttributeReport,
+                             Protocols::InteractionModel::Status aStatus, const TLV::TLVWriter & aReportCheckpoint)
+{
+    aAttributeReport.Rollback(aReportCheckpoint);
+    AttributeStatusIB::Builder attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
+    AttributePathIB::Builder attributePathIBBuilder     = attributeStatusIBBuilder.CreatePath();
+    attributePathIBBuilder.Endpoint(aPath.mEndpointId)
+        .Cluster(aPath.mClusterId)
+        .Attribute(aPath.mAttributeId)
+        .EndOfAttributePathIB();
+    ReturnErrorOnFailure(attributePathIBBuilder.GetError());
+    StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
+    statusIBBuilder.EncodeStatusIB(StatusIB(aStatus));
+    ReturnErrorOnFailure(statusIBBuilder.GetError());
+    attributeStatusIBBuilder.EndOfAttributeStatusIB();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
+    return CHIP_NO_ERROR;
+}
+
+} // anonymous namespace
+
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIB::Builder & aAttributeReport)
 {
     ChipLogDetail(DataManagement,
@@ -234,6 +257,16 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
     if (attrOverride != nullptr)
     {
+        const EmberAfAttributeMetadata * attributeMetadata =
+            emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
+
+        if (attributeMetadata == nullptr)
+        {
+            // This attribute (or even this cluster) is not actually supported
+            // on this endpoint.
+            return SendFailureStatus(aPath, aAttributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, backup);
+        }
+
         // TODO: We should probably clone the writer and convert failures here
         // into status responses, unless our caller already does that.
         writer = attributeDataIBBuilder.GetWriter();
@@ -283,9 +316,33 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
             ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint16_t>(*writer, isNullable));
             break;
         }
+        case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
+        {
+            using IntType = OddSizedInteger<3, false>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
+            break;
+        }
         case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
         {
             ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint32_t>(*writer, isNullable));
+            break;
+        }
+        case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
+        {
+            using IntType = OddSizedInteger<5, false>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
+            break;
+        }
+        case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
+        {
+            using IntType = OddSizedInteger<6, false>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
+            break;
+        }
+        case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
+        {
+            using IntType = OddSizedInteger<7, false>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
             break;
         }
         case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
@@ -303,9 +360,33 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
             ReturnErrorOnFailure(attributeBufferToNumericTlvData<int16_t>(*writer, isNullable));
             break;
         }
+        case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
+        {
+            using IntType = OddSizedInteger<3, true>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
+            break;
+        }
         case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
         {
             ReturnErrorOnFailure(attributeBufferToNumericTlvData<int32_t>(*writer, isNullable));
+            break;
+        }
+        case ZCL_INT40S_ATTRIBUTE_TYPE: // Signed 40-bit integer
+        {
+            using IntType = OddSizedInteger<5, true>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
+            break;
+        }
+        case ZCL_INT48S_ATTRIBUTE_TYPE: // Signed 48-bit integer
+        {
+            using IntType = OddSizedInteger<6, true>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
+            break;
+        }
+        case ZCL_INT56S_ATTRIBUTE_TYPE: // Signed 56-bit integer
+        {
+            using IntType = OddSizedInteger<7, true>;
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
             break;
         }
         case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
@@ -433,19 +514,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     }
     else
     {
-        aAttributeReport.Rollback(backup);
-        attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
-        attributePathIBBuilder   = attributeStatusIBBuilder.CreatePath();
-        attributePathIBBuilder.Endpoint(aPath.mEndpointId)
-            .Cluster(aPath.mClusterId)
-            .Attribute(aPath.mAttributeId)
-            .EndOfAttributePathIB();
-        ReturnErrorOnFailure(attributePathIBBuilder.GetError());
-        StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
-        statusIBBuilder.EncodeStatusIB(StatusIB(imStatus));
-        ReturnErrorOnFailure(statusIBBuilder.GetError());
-        attributeStatusIBBuilder.EndOfAttributeStatusIB();
-        ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
+        ReturnErrorOnFailure(SendFailureStatus(aPath, aAttributeReport, imStatus, backup));
     }
     return CHIP_NO_ERROR;
 }
@@ -459,14 +528,14 @@ CHIP_ERROR numericTlvDataToAttributeBuffer(TLV::TLVReader & aReader, bool isNull
     static_assert(sizeof(value) <= sizeof(attributeData), "Value cannot fit into attribute data");
     if (isNullable && aReader.GetType() == TLV::kTLVType_Null)
     {
-        value = NumericAttributeTraits<T>::kNullValue;
+        NumericAttributeTraits<T>::SetNull(value);
     }
     else
     {
-        T val;
+        typename NumericAttributeTraits<T>::WorkingType val;
         ReturnErrorOnFailure(aReader.Get(val));
         VerifyOrReturnError(NumericAttributeTraits<T>::CanRepresentValue(isNullable, val), CHIP_ERROR_INVALID_ARGUMENT);
-        value = val;
+        NumericAttributeTraits<T>::WorkingToStorage(val, value);
     }
     dataLen = sizeof(value);
     memcpy(attributeData, &value, sizeof(value));
@@ -515,16 +584,56 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * metadata, TLV::TLVR
         return numericTlvDataToAttributeBuffer<uint8_t>(aReader, isNullable, dataLen);
     case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
         return numericTlvDataToAttributeBuffer<uint16_t>(aReader, isNullable, dataLen);
+    case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
+    {
+        using IntType = OddSizedInteger<3, false>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
     case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
         return numericTlvDataToAttributeBuffer<uint32_t>(aReader, isNullable, dataLen);
+    case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
+    {
+        using IntType = OddSizedInteger<5, false>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
+    case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
+    {
+        using IntType = OddSizedInteger<6, false>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
+    case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
+    {
+        using IntType = OddSizedInteger<7, false>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
     case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
         return numericTlvDataToAttributeBuffer<uint64_t>(aReader, isNullable, dataLen);
     case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
         return numericTlvDataToAttributeBuffer<int8_t>(aReader, isNullable, dataLen);
     case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
         return numericTlvDataToAttributeBuffer<int16_t>(aReader, isNullable, dataLen);
+    case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
+    {
+        using IntType = OddSizedInteger<3, true>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
     case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
         return numericTlvDataToAttributeBuffer<int32_t>(aReader, isNullable, dataLen);
+    case ZCL_INT40S_ATTRIBUTE_TYPE: // Signed 40-bit integer
+    {
+        using IntType = OddSizedInteger<5, true>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
+    case ZCL_INT48S_ATTRIBUTE_TYPE: // Signed 48-bit integer
+    {
+        using IntType = OddSizedInteger<6, true>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
+    case ZCL_INT56S_ATTRIBUTE_TYPE: // Signed 56-bit integer
+    {
+        using IntType = OddSizedInteger<7, true>;
+        return numericTlvDataToAttributeBuffer<IntType>(aReader, isNullable, dataLen);
+    }
     case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
         return numericTlvDataToAttributeBuffer<int64_t>(aReader, isNullable, dataLen);
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
@@ -542,53 +651,58 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * metadata, TLV::TLVR
 }
 } // namespace
 
-static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader,
-                                                                          WriteHandler * apWriteHandler)
+static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(const ConcreteAttributePath aPath,
+                                                                          const EmberAfAttributeMetadata * aMetadata,
+                                                                          TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    // Passing nullptr as buf to emberAfReadAttribute means we only need attribute type here, and ember will not do data read &
-    // copy in this case.
-    const EmberAfAttributeMetadata * attributeMetadata = emberAfLocateAttributeMetadata(
-        aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0);
-
-    if (attributeMetadata == nullptr)
-    {
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
-
     CHIP_ERROR preparationError = CHIP_NO_ERROR;
     uint16_t dataLen            = 0;
-    if ((preparationError = prepareWriteData(attributeMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
+    if ((preparationError = prepareWriteData(aMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(preparationError));
         return Protocols::InteractionModel::Status::InvalidValue;
     }
 
-    if (dataLen > attributeMetadata->size)
+    if (dataLen > aMetadata->size)
     {
         ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
         return Protocols::InteractionModel::Status::InvalidValue;
     }
 
-    return ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
-                                                                  aClusterInfo.mAttributeId, CLUSTER_MASK_SERVER, 0, attributeData,
-                                                                  attributeMetadata->attributeType));
+    return ToInteractionModelStatus(emberAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
+                                                                  CLUSTER_MASK_SERVER, 0, attributeData, aMetadata->attributeType));
 }
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
+    // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
+    // as the input argument.
     AttributePathParams attributePathParams;
     attributePathParams.mEndpointId  = aClusterInfo.mEndpointId;
     attributePathParams.mClusterId   = aClusterInfo.mClusterId;
     attributePathParams.mAttributeId = aClusterInfo.mAttributeId;
 
-    // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
-    // as the input argument.
+    // Named aPath for now to reduce the amount of code change that needs to
+    // happen when the above TODO is resolved.
+    ConcreteDataAttributePath aPath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
+
+    if (attributeMetadata == nullptr)
+    {
+        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedAttribute);
+    }
+
+    if (attributeMetadata->IsReadOnly())
+    {
+        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedWrite);
+    }
+
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
     if (attrOverride != nullptr)
     {
-        ConcreteAttributePath path(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
-        AttributeValueDecoder valueDecoder(aReader);
-        ReturnErrorOnFailure(attrOverride->Write(path, valueDecoder));
+        AttributeValueDecoder valueDecoder(aReader, apWriteHandler->GetAccessingFabricIndex());
+        ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
 
         if (valueDecoder.TriedDecode())
         {
@@ -596,7 +710,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
         }
     }
 
-    auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
+    auto imCode = WriteSingleClusterDataInternal(aPath, attributeMetadata, aReader, apWriteHandler);
     return apWriteHandler->AddStatus(attributePathParams, imCode);
 }
 

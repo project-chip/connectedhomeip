@@ -146,7 +146,7 @@ public:
             }
         }
     }
-    void OnAttributeData(const chip::app::ReadClient * apReadClient, const chip::app::ConcreteAttributePath & aPath,
+    void OnAttributeData(const chip::app::ReadClient * apReadClient, const chip::app::ConcreteDataAttributePath & aPath,
                          chip::TLV::TLVReader * aData, const chip::app::StatusIB & status) override
     {}
 
@@ -631,7 +631,7 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     gLastCommandResult = TestCommandResult::kSuccess;
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIB::Builder & aAttributeReport)
 {
     AttributeStatusIB::Builder attributeStatus = aAttributeReport.CreateAttributeStatus();

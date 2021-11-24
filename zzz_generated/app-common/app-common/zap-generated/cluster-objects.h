@@ -1249,8 +1249,7 @@ public:
 namespace GetGroupMembership {
 enum class Fields
 {
-    kGroupCount = 0,
-    kGroupList  = 1,
+    kGroupList = 0,
 };
 
 struct Type
@@ -1260,7 +1259,6 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembership::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t groupCount;
     DataModel::List<const uint16_t> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1274,7 +1272,6 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembership::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t groupCount;
     DataModel::DecodableList<uint16_t> groupList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1282,9 +1279,8 @@ public:
 namespace GetGroupMembershipResponse {
 enum class Fields
 {
-    kCapacity   = 0,
-    kGroupCount = 1,
-    kGroupList  = 2,
+    kCapacity  = 0,
+    kGroupList = 1,
 };
 
 struct Type
@@ -1295,7 +1291,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t capacity;
-    uint8_t groupCount;
     DataModel::List<const uint16_t> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1310,7 +1305,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
     uint8_t capacity;
-    uint8_t groupCount;
     DataModel::DecodableList<uint16_t> groupList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -5538,6 +5532,33 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace Descriptor
+namespace Acl {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Acl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Acl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace Acl
 namespace PollControl {
 
 namespace Commands {
@@ -5939,13 +5960,20 @@ public:
     uint16_t endpointListID;
     chip::CharSpan name;
     EndpointListTypeEnum type;
-    chip::ByteSpan endpoints;
+    DataModel::List<const chip::EndpointId> endpoints;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-using DecodableType = Type;
+struct DecodableType
+{
+public:
+    uint16_t endpointListID;
+    chip::CharSpan name;
+    EndpointListTypeEnum type;
+    DataModel::DecodableList<chip::EndpointId> endpoints;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
 
 } // namespace EndpointListStruct
 } // namespace Structs
@@ -6677,7 +6705,7 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductID::Id; }
 };
 } // namespace ProductID
-namespace UserLabel {
+namespace NodeLabel {
 struct TypeInfo
 {
     using Type             = chip::CharSpan;
@@ -6685,9 +6713,9 @@ struct TypeInfo
     using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NodeLabel::Id; }
 };
-} // namespace UserLabel
+} // namespace NodeLabel
 namespace Location {
 struct TypeInfo
 {
@@ -6820,6 +6848,17 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
 };
 } // namespace Reachable
+namespace UniqueID {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UniqueID::Id; }
+};
+} // namespace UniqueID
 namespace FeatureMap {
 struct TypeInfo
 {
@@ -7273,6 +7312,21 @@ namespace OtaSoftwareUpdateRequestor {
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for ChangeReasonEnum
+enum class ChangeReasonEnum : uint8_t
+{
+    kUnknown         = 0x00,
+    kSuccess         = 0x01,
+    kFailure         = 0x02,
+    kTimeOut         = 0x03,
+    kDelayByProvider = 0x04,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using ChangeReasonEnum                     = EmberAfChangeReasonEnum;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAAnnouncementReason
 enum class OTAAnnouncementReason : uint8_t
 {
@@ -7282,6 +7336,25 @@ enum class OTAAnnouncementReason : uint8_t
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OTAAnnouncementReason                = EmberAfOTAAnnouncementReason;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for UpdateStateEnum
+enum class UpdateStateEnum : uint8_t
+{
+    kUnknown              = 0x00,
+    kIdle                 = 0x01,
+    kQuerying             = 0x02,
+    kDelayedOnQuery       = 0x03,
+    kDownloading          = 0x04,
+    kApplying             = 0x05,
+    kDelayedOnApply       = 0x06,
+    kRollingBack          = 0x07,
+    kDelayedOnUserConsent = 0x08,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using UpdateStateEnum                      = EmberAfUpdateStateEnum;
 #endif
 
 namespace Commands {
@@ -7382,7 +7455,237 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace StateTransition {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kPreviousState         = 0,
+    kNewState              = 1,
+    kReason                = 2,
+    kTargetSoftwareVersion = 3,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    UpdateStateEnum previousState;
+    UpdateStateEnum newState;
+    ChangeReasonEnum reason;
+    uint32_t targetSoftwareVersion;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    UpdateStateEnum previousState;
+    UpdateStateEnum newState;
+    ChangeReasonEnum reason;
+    uint32_t targetSoftwareVersion;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace StateTransition
+namespace VersionApplied {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kSoftwareVersion = 0,
+    kProductID       = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    uint32_t softwareVersion;
+    uint16_t productID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    uint32_t softwareVersion;
+    uint16_t productID;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace VersionApplied
+namespace DownloadError {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000002;
+
+enum class Fields
+{
+    kSoftwareVersion = 0,
+    kBytesDownloaded = 1,
+    kProgressPercent = 2,
+    kPlatformCode    = 3,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    uint32_t softwareVersion;
+    uint64_t bytesDownloaded;
+    uint8_t progressPercent;
+    int64_t platformCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+
+    uint32_t softwareVersion;
+    uint64_t bytesDownloaded;
+    uint8_t progressPercent;
+    int64_t platformCode;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace DownloadError
+} // namespace Events
 } // namespace OtaSoftwareUpdateRequestor
+namespace LocalizationConfiguration {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace LocalizationConfiguration
+namespace LocalizationTimeFormat {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace LocalizationTimeFormat
+namespace LocalizationUnit {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace LocalizationUnit
+namespace PowerSourceConfiguration {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace PowerSourceConfiguration
 namespace PowerSource {
 
 namespace Attributes {
@@ -11128,6 +11431,60 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace EthernetNetworkDiagnostics
+namespace TimeSynchronization {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace TimeSynchronization
+namespace BridgedDeviceBasicInformation {
+
+namespace Attributes {
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace BridgedDeviceBasicInformation
 namespace BridgedDeviceBasic {
 
 namespace Commands {
@@ -11296,7 +11653,7 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
 };
 } // namespace ProductName
-namespace UserLabel {
+namespace NodeLabel {
 struct TypeInfo
 {
     using Type             = chip::CharSpan;
@@ -11304,9 +11661,9 @@ struct TypeInfo
     using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NodeLabel::Id; }
 };
-} // namespace UserLabel
+} // namespace NodeLabel
 namespace HardwareVersion {
 struct TypeInfo
 {
@@ -11417,6 +11774,17 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
 };
 } // namespace Reachable
+namespace UniqueID {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UniqueID::Id; }
+};
+} // namespace UniqueID
 namespace FeatureMap {
 struct TypeInfo
 {
@@ -11508,9 +11876,9 @@ namespace AdministratorCommissioning {
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
-    kSuccess      = 0x00,
-    kBusy         = 0x01,
-    kGeneralError = 0x02,
+    kBusy               = 0x01,
+    kPAKEParameterError = 0x02,
+    kWindowNotOpen      = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using StatusCode                           = EmberAfStatusCode;

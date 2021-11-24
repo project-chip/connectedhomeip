@@ -199,6 +199,7 @@ function setDefaultResponse(test)
   setDefault(test[kResponseName], kConstraintsName, defaultResponseConstraints);
 
   const hasResponseValue              = 'value' in test[kResponseName];
+  const hasResponseError              = 'error' in test[kResponseName];
   const hasResponseConstraints        = 'constraints' in test[kResponseName] && Object.keys(test[kResponseName].constraints).length;
   const hasResponseValueOrConstraints = hasResponseValue || hasResponseConstraints;
 
@@ -233,10 +234,10 @@ function setDefaultResponse(test)
     return;
   }
 
-  if (!hasResponseValueOrConstraints) {
+  if (!hasResponseValueOrConstraints && !hasResponseError) {
     console.log(test);
     console.log(test[kResponseName]);
-    const errorStr = 'Test does not have a "value" or a "constraints" defined.';
+    const errorStr = 'Test does not have a "value" or a "constraints" defined and is not expecting an error.';
     throwError(test, errorStr);
   }
 
@@ -436,11 +437,24 @@ function chip_tests_pics(options)
   return templateUtil.collectBlocks(PICS.getAll(), options, this);
 }
 
-function chip_tests(list, options)
+async function chip_tests(list, options)
 {
   const items = Array.isArray(list) ? list : list.split(',');
   const names = items.map(name => name.trim());
-  const tests = names.map(item => parse(item));
+  let tests   = names.map(item => parse(item));
+  tests       = await Promise.all(tests.map(async function(test) {
+    test.tests = await Promise.all(test.tests.map(async function(item) {
+      if (item.isCommand) {
+        let command        = await assertCommandOrAttribute(item);
+        item.commandObject = command;
+      } else if (item.isAttribute) {
+        let attr             = await assertCommandOrAttribute(item);
+        item.attributeObject = attr;
+      }
+      return item;
+    }));
+    return test;
+  }));
   return templateUtil.collectBlocks(tests, options, this);
 }
 

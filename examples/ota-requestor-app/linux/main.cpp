@@ -286,10 +286,7 @@ void SendQueryImageCommand(chip::NodeId peerNodeId = providerNodeId, chip::Fabri
     IPAddress ipAddr;
     IPAddress::FromString(ipAddress, ipAddr);
     PeerAddress addr = PeerAddress::UDP(ipAddr, CHIP_PORT);
-    uint32_t idleInterval;
-    uint32_t activeInterval;
-    operationalDeviceProxy->GetMRPIntervals(idleInterval, activeInterval);
-    operationalDeviceProxy->UpdateDeviceData(addr, idleInterval, activeInterval);
+    operationalDeviceProxy->UpdateDeviceData(addr, operationalDeviceProxy->GetMRPConfig());
 
     CHIP_ERROR err = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)

@@ -30,832 +30,1225 @@ void CHIPCommandSuccessCallbackBridge::OnSuccessFn(void * context, const chip::a
 
 void CHIPOctetStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::ByteSpan value)
 {
-    DispatchSuccess(context, @ { @"value" : [NSData dataWithBytes:value.data() length:value.size()] });
+    NSData * _Nonnull objCValue;
+    objCValue = [NSData dataWithBytes:value.data() length:value.size()];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOctetStringAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
+{
+    NSData * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSData dataWithBytes:value.Value().data() length:value.Value().size()];
+    }
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPCharStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::CharSpan value)
 {
-    DispatchSuccess(
-        context, @ { @"value" : [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding] });
+    NSString * _Nonnull objCValue;
+    objCValue = [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableCharStringAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
+{
+    NSString * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [[NSString alloc] initWithBytes:value.Value().data() length:value.Value().size() encoding:NSUTF8StringEncoding];
+    }
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPBooleanAttributeCallbackBridge::OnSuccessFn(void * context, bool value)
 {
-    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithBool:value] });
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithBool:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableBooleanAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<bool> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithBool:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt8uAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
-    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithUnsignedChar:value] });
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt8uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt8sAttributeCallbackBridge::OnSuccessFn(void * context, int8_t value)
 {
-    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithChar:value] });
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithChar:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt8sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int8_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithChar:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt16uAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
-    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithUnsignedShort:value] });
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedShort:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt16uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedShort:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt16sAttributeCallbackBridge::OnSuccessFn(void * context, int16_t value)
 {
-    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithShort:value] });
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithShort:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt16sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithShort:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt32uAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
-    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithUnsignedInt:value] });
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedInt:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt32uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedInt:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt32sAttributeCallbackBridge::OnSuccessFn(void * context, int32_t value)
 {
-    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithInt:value] });
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithInt:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt32sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int32_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithInt:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt64uAttributeCallbackBridge::OnSuccessFn(void * context, uint64_t value)
 {
-    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithUnsignedLongLong:value] });
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedLongLong:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt64uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedLongLong:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPInt64sAttributeCallbackBridge::OnSuccessFn(void * context, int64_t value)
 {
-    DispatchSuccess(context, @ { @"value" : [NSNumber numberWithLongLong:value] });
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithLongLong:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableInt64sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithLongLong:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPVendorIdAttributeCallbackBridge::OnSuccessFn(void * context, chip::VendorId value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedShort:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::VendorId> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedShort:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint16_t> & list)
+    void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedShort:entry]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"index" : [NSNumber numberWithUnsignedChar:entry.index],
-            @"outputType" : [NSNumber numberWithUnsignedChar:entry.outputType],
-            @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPAudioOutputClusterAudioOutputInfo * newElement_0;
+        newElement_0 = [CHIPAudioOutputClusterAudioOutputInfo new];
+        newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
+        newElement_0.outputType = [NSNumber numberWithUnsignedChar:entry_0.outputType];
+        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                     length:entry_0.name.size()
+                                                   encoding:NSUTF8StringEncoding];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"actionID" : [NSNumber numberWithUnsignedShort:entry.actionID],
-            @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
-            @"type" : [NSNumber numberWithUnsignedChar:entry.type],
-            @"endpointListID" : [NSNumber numberWithUnsignedShort:entry.endpointListID],
-            @"supportedCommands" : [NSNumber numberWithUnsignedShort:entry.supportedCommands],
-            @"status" : [NSNumber numberWithUnsignedChar:entry.status],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPBridgedActionsClusterActionStruct * newElement_0;
+        newElement_0 = [CHIPBridgedActionsClusterActionStruct new];
+        newElement_0.actionID = [NSNumber numberWithUnsignedShort:entry_0.actionID];
+        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                     length:entry_0.name.size()
+                                                   encoding:NSUTF8StringEncoding];
+        newElement_0.type = [NSNumber numberWithUnsignedChar:entry_0.type];
+        newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
+        newElement_0.supportedCommands = [NSNumber numberWithUnsignedShort:entry_0.supportedCommands];
+        newElement_0.status = [NSNumber numberWithUnsignedChar:entry_0.status];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
-        list)
+        value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"endpointListID" : [NSNumber numberWithUnsignedShort:entry.endpointListID],
-            @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
-            @"type" : [NSNumber numberWithUnsignedChar:entry.type],
-            @"endpoints" : [NSData dataWithBytes:entry.endpoints.data() length:entry.endpoints.size()],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPBridgedActionsClusterEndpointListStruct * newElement_0;
+        newElement_0 = [CHIPBridgedActionsClusterEndpointListStruct new];
+        newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
+        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                     length:entry_0.name.size()
+                                                   encoding:NSUTF8StringEncoding];
+        newElement_0.type = [NSNumber numberWithUnsignedChar:entry_0.type];
+        auto * array_NaN = [NSMutableArray new];
+        auto iter_NaN = entry_0.endpoints.begin();
+        while (iter_NaN.Next()) {
+            auto & entry_NaN = iter_NaN.GetValue();
+            NSNumber * newElement_NaN;
+            newElement_NaN = [NSNumber numberWithUnsignedShort:entry_NaN];
+            [array_NaN addObject:newElement_NaN];
+        }
+        if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+        }
+        newElement_0.endpoints = array_NaN;
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSData dataWithBytes:entry.data() length:entry.size()]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSData * newElement_0;
+        newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedChar:entry]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"type" : [NSNumber numberWithUnsignedInt:entry.type],
-            @"revision" : [NSNumber numberWithUnsignedShort:entry.revision],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPDescriptorClusterDeviceType * newElement_0;
+        newElement_0 = [CHIPDescriptorClusterDeviceType new];
+        newElement_0.type = [NSNumber numberWithUnsignedInt:entry_0.type];
+        newElement_0.revision = [NSNumber numberWithUnsignedShort:entry_0.revision];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedInt:entry]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedInt:entry]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedShort:entry]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"label" : [[NSString alloc] initWithBytes:entry.label.data() length:entry.label.size() encoding:NSUTF8StringEncoding],
-            @"value" : [[NSString alloc] initWithBytes:entry.value.data() length:entry.value.size() encoding:NSUTF8StringEncoding],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPFixedLabelClusterLabelStruct * newElement_0;
+        newElement_0 = [CHIPFixedLabelClusterLabelStruct new];
+        newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                      length:entry_0.label.size()
+                                                    encoding:NSUTF8StringEncoding];
+        newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
+                                                      length:entry_0.value.size()
+                                                    encoding:NSUTF8StringEncoding];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & list)
+        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"failSafeExpiryLengthMs" : [NSNumber numberWithUnsignedInt:entry.failSafeExpiryLengthMs],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPGeneralCommissioningClusterBasicCommissioningInfoType * newElement_0;
+        newElement_0 = [CHIPGeneralCommissioningClusterBasicCommissioningInfoType new];
+        newElement_0.failSafeExpiryLengthMs = [NSNumber numberWithUnsignedInt:entry_0.failSafeExpiryLengthMs];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & list)
+        chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
-            @"fabricConnected" : [NSNumber numberWithBool:entry.fabricConnected],
-            @"offPremiseServicesReachableIPv4" : [NSNumber numberWithBool:entry.offPremiseServicesReachableIPv4],
-            @"offPremiseServicesReachableIPv6" : [NSNumber numberWithBool:entry.offPremiseServicesReachableIPv6],
-            @"hardwareAddress" : [NSData dataWithBytes:entry.hardwareAddress.data() length:entry.hardwareAddress.size()],
-            @"type" : [NSNumber numberWithUnsignedChar:entry.type],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPGeneralDiagnosticsClusterNetworkInterfaceType * newElement_0;
+        newElement_0 = [CHIPGeneralDiagnosticsClusterNetworkInterfaceType new];
+        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                     length:entry_0.name.size()
+                                                   encoding:NSUTF8StringEncoding];
+        newElement_0.fabricConnected = [NSNumber numberWithBool:entry_0.fabricConnected];
+        newElement_0.offPremiseServicesReachableIPv4 = [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv4];
+        newElement_0.offPremiseServicesReachableIPv6 = [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6];
+        newElement_0.hardwareAddress = [NSData dataWithBytes:entry_0.hardwareAddress.data() length:entry_0.hardwareAddress.size()];
+        newElement_0.type = [NSNumber numberWithUnsignedChar:entry_0.type];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedChar:entry]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedChar:entry]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedChar:entry]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPGroupKeyManagementGroupsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"vendorId" : [NSNumber numberWithUnsignedShort:entry.vendorId],
-            @"vendorGroupId" : [NSNumber numberWithUnsignedShort:entry.vendorGroupId],
-            @"groupKeySetIndex" : [NSNumber numberWithUnsignedShort:entry.groupKeySetIndex],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPGroupKeyManagementClusterGroupState * newElement_0;
+        newElement_0 = [CHIPGroupKeyManagementClusterGroupState new];
+        newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
+        newElement_0.vendorGroupId = [NSNumber numberWithUnsignedShort:entry_0.vendorGroupId];
+        newElement_0.groupKeySetIndex = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetIndex];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"vendorId" : [NSNumber numberWithUnsignedShort:entry.vendorId],
-            @"groupKeyIndex" : [NSNumber numberWithUnsignedShort:entry.groupKeyIndex],
-            @"groupKeyRoot" : [NSData dataWithBytes:entry.groupKeyRoot.data() length:entry.groupKeyRoot.size()],
-            @"groupKeyEpochStartTime" : [NSNumber numberWithUnsignedLongLong:entry.groupKeyEpochStartTime],
-            @"groupKeySecurityPolicy" : [NSNumber numberWithUnsignedChar:entry.groupKeySecurityPolicy],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPGroupKeyManagementClusterGroupKey * newElement_0;
+        newElement_0 = [CHIPGroupKeyManagementClusterGroupKey new];
+        newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
+        newElement_0.groupKeyIndex = [NSNumber numberWithUnsignedShort:entry_0.groupKeyIndex];
+        newElement_0.groupKeyRoot = [NSData dataWithBytes:entry_0.groupKeyRoot.data() length:entry_0.groupKeyRoot.size()];
+        newElement_0.groupKeyEpochStartTime = [NSNumber numberWithUnsignedLongLong:entry_0.groupKeyEpochStartTime];
+        newElement_0.groupKeySecurityPolicy = [NSNumber numberWithUnsignedChar:entry_0.groupKeySecurityPolicy];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"index" : [NSNumber numberWithUnsignedChar:entry.index],
-            @"inputType" : [NSNumber numberWithUnsignedChar:entry.inputType],
-            @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
-            @"descriptionString" : [[NSString alloc] initWithBytes:entry.description.data()
-                                                            length:entry.description.size()
-                                                          encoding:NSUTF8StringEncoding],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPMediaInputClusterMediaInputInfo * newElement_0;
+        newElement_0 = [CHIPMediaInputClusterMediaInputInfo new];
+        newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
+        newElement_0.inputType = [NSNumber numberWithUnsignedChar:entry_0.inputType];
+        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                     length:entry_0.name.size()
+                                                   encoding:NSUTF8StringEncoding];
+        newElement_0.descriptionString = [[NSString alloc] initWithBytes:entry_0.description.data()
+                                                                  length:entry_0.description.size()
+                                                                encoding:NSUTF8StringEncoding];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"label" : [[NSString alloc] initWithBytes:entry.label.data() length:entry.label.size() encoding:NSUTF8StringEncoding],
-            @"mode" : [NSNumber numberWithUnsignedChar:entry.mode],
-            @"semanticTag" : [NSNumber numberWithUnsignedInt:entry.semanticTag],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPModeSelectClusterModeOptionStruct * newElement_0;
+        newElement_0 = [CHIPModeSelectClusterModeOptionStruct new];
+        newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                      length:entry_0.label.size()
+                                                    encoding:NSUTF8StringEncoding];
+        newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
+        newElement_0.semanticTag = [NSNumber numberWithUnsignedInt:entry_0.semanticTag];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list)
+        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"fabricIndex" : [NSNumber numberWithUnsignedChar:entry.fabricIndex],
-            @"rootPublicKey" : [NSData dataWithBytes:entry.rootPublicKey.data() length:entry.rootPublicKey.size()],
-            @"vendorId" : [NSNumber numberWithUnsignedShort:entry.vendorId],
-            @"fabricId" : [NSNumber numberWithUnsignedLongLong:entry.fabricId],
-            @"nodeId" : [NSNumber numberWithUnsignedLongLong:entry.nodeId],
-            @"label" : [[NSString alloc] initWithBytes:entry.label.data() length:entry.label.size() encoding:NSUTF8StringEncoding],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPOperationalCredentialsClusterFabricDescriptor * newElement_0;
+        newElement_0 = [CHIPOperationalCredentialsClusterFabricDescriptor new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.rootPublicKey = [NSData dataWithBytes:entry_0.rootPublicKey.data() length:entry_0.rootPublicKey.size()];
+        newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
+        newElement_0.fabricId = [NSNumber numberWithUnsignedLongLong:entry_0.fabricId];
+        newElement_0.nodeId = [NSNumber numberWithUnsignedLongLong:entry_0.nodeId];
+        newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                      length:entry_0.label.size()
+                                                    encoding:NSUTF8StringEncoding];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSData dataWithBytes:entry.data() length:entry.size()]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSData * newElement_0;
+        newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedChar:entry]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
-        list)
+        value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"id" : [NSNumber numberWithUnsignedLongLong:entry.id],
-            @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
-            @"stackFreeCurrent" : [NSNumber numberWithUnsignedInt:entry.stackFreeCurrent],
-            @"stackFreeMinimum" : [NSNumber numberWithUnsignedInt:entry.stackFreeMinimum],
-            @"stackSize" : [NSNumber numberWithUnsignedInt:entry.stackSize],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPSoftwareDiagnosticsClusterThreadMetrics * newElement_0;
+        newElement_0 = [CHIPSoftwareDiagnosticsClusterThreadMetrics new];
+        newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
+        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                     length:entry_0.name.size()
+                                                   encoding:NSUTF8StringEncoding];
+        newElement_0.stackFreeCurrent = [NSNumber numberWithUnsignedInt:entry_0.stackFreeCurrent];
+        newElement_0.stackFreeMinimum = [NSNumber numberWithUnsignedInt:entry_0.stackFreeMinimum];
+        newElement_0.stackSize = [NSNumber numberWithUnsignedInt:entry_0.stackSize];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"majorNumber" : [NSNumber numberWithUnsignedShort:entry.majorNumber],
-            @"minorNumber" : [NSNumber numberWithUnsignedShort:entry.minorNumber],
-            @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
-            @"callSign" : [[NSString alloc] initWithBytes:entry.callSign.data()
-                                                   length:entry.callSign.size()
-                                                 encoding:NSUTF8StringEncoding],
-            @"affiliateCallSign" : [[NSString alloc] initWithBytes:entry.affiliateCallSign.data()
-                                                            length:entry.affiliateCallSign.size()
-                                                          encoding:NSUTF8StringEncoding],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPTvChannelClusterTvChannelInfo * newElement_0;
+        newElement_0 = [CHIPTvChannelClusterTvChannelInfo new];
+        newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
+        newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
+        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                     length:entry_0.name.size()
+                                                   encoding:NSUTF8StringEncoding];
+        newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.data()
+                                                         length:entry_0.callSign.size()
+                                                       encoding:NSUTF8StringEncoding];
+        newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.data()
+                                                                  length:entry_0.affiliateCallSign.size()
+                                                                encoding:NSUTF8StringEncoding];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & list)
+        chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"identifier" : [NSNumber numberWithUnsignedChar:entry.identifier],
-            @"name" : [[NSString alloc] initWithBytes:entry.name.data() length:entry.name.size() encoding:NSUTF8StringEncoding],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPTargetNavigatorClusterNavigateTargetTargetInfo * newElement_0;
+        newElement_0 = [CHIPTargetNavigatorClusterNavigateTargetTargetInfo new];
+        newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
+        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                     length:entry_0.name.size()
+                                                   encoding:NSUTF8StringEncoding];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPTestClusterListInt8uListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedChar:entry]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPTestClusterListOctetStringListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSData dataWithBytes:entry.data() length:entry.size()]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSData * newElement_0;
+        newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+        value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"fabricIndex" : [NSNumber numberWithUnsignedLongLong:entry.fabricIndex],
-            @"operationalCert" : [NSData dataWithBytes:entry.operationalCert.data() length:entry.operationalCert.size()],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPTestClusterClusterTestListStructOctet * newElement_0;
+        newElement_0 = [CHIPTestClusterClusterTestListStructOctet new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedLongLong:entry_0.fabricIndex];
+        newElement_0.operationalCert = [NSData dataWithBytes:entry_0.operationalCert.data() length:entry_0.operationalCert.size()];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list)
+        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {}];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPTestClusterClusterNullablesAndOptionalsStruct * newElement_0;
+        newElement_0 = [CHIPTestClusterClusterNullablesAndOptionalsStruct new];
+        if (entry_0.nullableInt.IsNull()) {
+            newElement_0.nullableInt = nil;
+        } else {
+            newElement_0.nullableInt = [NSNumber numberWithUnsignedShort:entry_0.nullableInt.Value()];
+        }
+        if (entry_0.optionalInt.HasValue()) {
+            newElement_0.optionalInt = [NSNumber numberWithUnsignedShort:entry_0.optionalInt.Value()];
+        } else {
+            newElement_0.optionalInt = nil;
+        }
+        if (entry_0.nullableOptionalInt.HasValue()) {
+            if (entry_0.nullableOptionalInt.Value().IsNull()) {
+                newElement_0.nullableOptionalInt = nil;
+            } else {
+                newElement_0.nullableOptionalInt = [NSNumber numberWithUnsignedShort:entry_0.nullableOptionalInt.Value().Value()];
+            }
+        } else {
+            newElement_0.nullableOptionalInt = nil;
+        }
+        if (entry_0.nullableString.IsNull()) {
+            newElement_0.nullableString = nil;
+        } else {
+            newElement_0.nullableString = [[NSString alloc] initWithBytes:entry_0.nullableString.Value().data()
+                                                                   length:entry_0.nullableString.Value().size()
+                                                                 encoding:NSUTF8StringEncoding];
+        }
+        if (entry_0.optionalString.HasValue()) {
+            newElement_0.optionalString = [[NSString alloc] initWithBytes:entry_0.optionalString.Value().data()
+                                                                   length:entry_0.optionalString.Value().size()
+                                                                 encoding:NSUTF8StringEncoding];
+        } else {
+            newElement_0.optionalString = nil;
+        }
+        if (entry_0.nullableOptionalString.HasValue()) {
+            if (entry_0.nullableOptionalString.Value().IsNull()) {
+                newElement_0.nullableOptionalString = nil;
+            } else {
+                newElement_0.nullableOptionalString =
+                    [[NSString alloc] initWithBytes:entry_0.nullableOptionalString.Value().Value().data()
+                                             length:entry_0.nullableOptionalString.Value().Value().size()
+                                           encoding:NSUTF8StringEncoding];
+            }
+        } else {
+            newElement_0.nullableOptionalString = nil;
+        }
+        if (entry_0.nullableStruct.IsNull()) {
+            newElement_0.nullableStruct = nil;
+        } else {
+            newElement_0.nullableStruct = [CHIPTestClusterClusterSimpleStruct new];
+            newElement_0.nullableStruct.a = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().a];
+            newElement_0.nullableStruct.b = [NSNumber numberWithBool:entry_0.nullableStruct.Value().b];
+            newElement_0.nullableStruct.c = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().c];
+            newElement_0.nullableStruct.d = [NSData dataWithBytes:entry_0.nullableStruct.Value().d.data()
+                                                           length:entry_0.nullableStruct.Value().d.size()];
+            newElement_0.nullableStruct.e = [[NSString alloc] initWithBytes:entry_0.nullableStruct.Value().e.data()
+                                                                     length:entry_0.nullableStruct.Value().e.size()
+                                                                   encoding:NSUTF8StringEncoding];
+            newElement_0.nullableStruct.f = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().f.Raw()];
+        }
+        if (entry_0.optionalStruct.HasValue()) {
+            newElement_0.optionalStruct = [CHIPTestClusterClusterSimpleStruct new];
+            newElement_0.optionalStruct.a = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().a];
+            newElement_0.optionalStruct.b = [NSNumber numberWithBool:entry_0.optionalStruct.Value().b];
+            newElement_0.optionalStruct.c = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().c];
+            newElement_0.optionalStruct.d = [NSData dataWithBytes:entry_0.optionalStruct.Value().d.data()
+                                                           length:entry_0.optionalStruct.Value().d.size()];
+            newElement_0.optionalStruct.e = [[NSString alloc] initWithBytes:entry_0.optionalStruct.Value().e.data()
+                                                                     length:entry_0.optionalStruct.Value().e.size()
+                                                                   encoding:NSUTF8StringEncoding];
+            newElement_0.optionalStruct.f = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().f.Raw()];
+        } else {
+            newElement_0.optionalStruct = nil;
+        }
+        if (entry_0.nullableOptionalStruct.HasValue()) {
+            if (entry_0.nullableOptionalStruct.Value().IsNull()) {
+                newElement_0.nullableOptionalStruct = nil;
+            } else {
+                newElement_0.nullableOptionalStruct = [CHIPTestClusterClusterSimpleStruct new];
+                newElement_0.nullableOptionalStruct.a =
+                    [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().a];
+                newElement_0.nullableOptionalStruct.b = [NSNumber numberWithBool:entry_0.nullableOptionalStruct.Value().Value().b];
+                newElement_0.nullableOptionalStruct.c =
+                    [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().c];
+                newElement_0.nullableOptionalStruct.d =
+                    [NSData dataWithBytes:entry_0.nullableOptionalStruct.Value().Value().d.data()
+                                   length:entry_0.nullableOptionalStruct.Value().Value().d.size()];
+                newElement_0.nullableOptionalStruct.e =
+                    [[NSString alloc] initWithBytes:entry_0.nullableOptionalStruct.Value().Value().e.data()
+                                             length:entry_0.nullableOptionalStruct.Value().Value().e.size()
+                                           encoding:NSUTF8StringEncoding];
+                newElement_0.nullableOptionalStruct.f =
+                    [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f.Raw()];
+            }
+        } else {
+            newElement_0.nullableOptionalStruct = nil;
+        }
+        if (entry_0.nullableList.IsNull()) {
+            newElement_0.nullableList = nil;
+        } else {
+            auto * array_NaN = [NSMutableArray new];
+            auto iter_NaN = entry_0.nullableList.Value().begin();
+            while (iter_NaN.Next()) {
+                auto & entry_NaN = iter_NaN.GetValue();
+                NSNumber * newElement_NaN;
+                newElement_NaN = [NSNumber numberWithUnsignedChar:entry_NaN];
+                [array_NaN addObject:newElement_NaN];
+            }
+            if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+            }
+            newElement_0.nullableList = array_NaN;
+        }
+        if (entry_0.optionalList.HasValue()) {
+            auto * array_NaN = [NSMutableArray new];
+            auto iter_NaN = entry_0.optionalList.Value().begin();
+            while (iter_NaN.Next()) {
+                auto & entry_NaN = iter_NaN.GetValue();
+                NSNumber * newElement_NaN;
+                newElement_NaN = [NSNumber numberWithUnsignedChar:entry_NaN];
+                [array_NaN addObject:newElement_NaN];
+            }
+            if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+            }
+            newElement_0.optionalList = array_NaN;
+        } else {
+            newElement_0.optionalList = nil;
+        }
+        if (entry_0.nullableOptionalList.HasValue()) {
+            if (entry_0.nullableOptionalList.Value().IsNull()) {
+                newElement_0.nullableOptionalList = nil;
+            } else {
+                auto * array_NaN = [NSMutableArray new];
+                auto iter_NaN = entry_0.nullableOptionalList.Value().Value().begin();
+                while (iter_NaN.Next()) {
+                    auto & entry_NaN = iter_NaN.GetValue();
+                    NSNumber * newElement_NaN;
+                    newElement_NaN = [NSNumber numberWithUnsignedChar:entry_NaN];
+                    [array_NaN addObject:newElement_NaN];
+                }
+                if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+                }
+                newElement_0.nullableOptionalList = array_NaN;
+            }
+        } else {
+            newElement_0.nullableOptionalList = nil;
+        }
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & list)
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"extAddress" : [NSNumber numberWithUnsignedLongLong:entry.extAddress],
-            @"age" : [NSNumber numberWithUnsignedInt:entry.age],
-            @"rloc16" : [NSNumber numberWithUnsignedShort:entry.rloc16],
-            @"linkFrameCounter" : [NSNumber numberWithUnsignedInt:entry.linkFrameCounter],
-            @"mleFrameCounter" : [NSNumber numberWithUnsignedInt:entry.mleFrameCounter],
-            @"lqi" : [NSNumber numberWithUnsignedChar:entry.lqi],
-            @"averageRssi" : [NSNumber numberWithChar:entry.averageRssi],
-            @"lastRssi" : [NSNumber numberWithChar:entry.lastRssi],
-            @"frameErrorRate" : [NSNumber numberWithUnsignedChar:entry.frameErrorRate],
-            @"messageErrorRate" : [NSNumber numberWithUnsignedChar:entry.messageErrorRate],
-            @"rxOnWhenIdle" : [NSNumber numberWithBool:entry.rxOnWhenIdle],
-            @"fullThreadDevice" : [NSNumber numberWithBool:entry.fullThreadDevice],
-            @"fullNetworkData" : [NSNumber numberWithBool:entry.fullNetworkData],
-            @"isChild" : [NSNumber numberWithBool:entry.isChild],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPThreadNetworkDiagnosticsClusterNeighborTable * newElement_0;
+        newElement_0 = [CHIPThreadNetworkDiagnosticsClusterNeighborTable new];
+        newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
+        newElement_0.age = [NSNumber numberWithUnsignedInt:entry_0.age];
+        newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
+        newElement_0.linkFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.linkFrameCounter];
+        newElement_0.mleFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.mleFrameCounter];
+        newElement_0.lqi = [NSNumber numberWithUnsignedChar:entry_0.lqi];
+        newElement_0.averageRssi = [NSNumber numberWithChar:entry_0.averageRssi];
+        newElement_0.lastRssi = [NSNumber numberWithChar:entry_0.lastRssi];
+        newElement_0.frameErrorRate = [NSNumber numberWithUnsignedChar:entry_0.frameErrorRate];
+        newElement_0.messageErrorRate = [NSNumber numberWithUnsignedChar:entry_0.messageErrorRate];
+        newElement_0.rxOnWhenIdle = [NSNumber numberWithBool:entry_0.rxOnWhenIdle];
+        newElement_0.fullThreadDevice = [NSNumber numberWithBool:entry_0.fullThreadDevice];
+        newElement_0.fullNetworkData = [NSNumber numberWithBool:entry_0.fullNetworkData];
+        newElement_0.isChild = [NSNumber numberWithBool:entry_0.isChild];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
-        list)
+        value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"extAddress" : [NSNumber numberWithUnsignedLongLong:entry.extAddress],
-            @"rloc16" : [NSNumber numberWithUnsignedShort:entry.rloc16],
-            @"routerId" : [NSNumber numberWithUnsignedChar:entry.routerId],
-            @"nextHop" : [NSNumber numberWithUnsignedChar:entry.nextHop],
-            @"pathCost" : [NSNumber numberWithUnsignedChar:entry.pathCost],
-            @"lqiIn" : [NSNumber numberWithUnsignedChar:entry.LQIIn],
-            @"lqiOut" : [NSNumber numberWithUnsignedChar:entry.LQIOut],
-            @"age" : [NSNumber numberWithUnsignedChar:entry.age],
-            @"allocated" : [NSNumber numberWithBool:entry.allocated],
-            @"linkEstablished" : [NSNumber numberWithBool:entry.linkEstablished],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPThreadNetworkDiagnosticsClusterRouteTable * newElement_0;
+        newElement_0 = [CHIPThreadNetworkDiagnosticsClusterRouteTable new];
+        newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
+        newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
+        newElement_0.routerId = [NSNumber numberWithUnsignedChar:entry_0.routerId];
+        newElement_0.nextHop = [NSNumber numberWithUnsignedChar:entry_0.nextHop];
+        newElement_0.pathCost = [NSNumber numberWithUnsignedChar:entry_0.pathCost];
+        newElement_0.lqiIn = [NSNumber numberWithUnsignedChar:entry_0.LQIIn];
+        newElement_0.lqiOut = [NSNumber numberWithUnsignedChar:entry_0.LQIOut];
+        newElement_0.age = [NSNumber numberWithUnsignedChar:entry_0.age];
+        newElement_0.allocated = [NSNumber numberWithBool:entry_0.allocated];
+        newElement_0.linkEstablished = [NSNumber numberWithBool:entry_0.linkEstablished];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & list)
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"rotationTime" : [NSNumber numberWithUnsignedShort:entry.rotationTime],
-            @"flags" : [NSNumber numberWithUnsignedShort:entry.flags],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_0;
+        newElement_0 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
+        newElement_0.rotationTime = [NSNumber numberWithUnsignedShort:entry_0.rotationTime];
+        newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & list)
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:@ {
-            @"activeTimestampPresent" : [NSNumber numberWithBool:entry.activeTimestampPresent],
-            @"pendingTimestampPresent" : [NSNumber numberWithBool:entry.pendingTimestampPresent],
-            @"masterKeyPresent" : [NSNumber numberWithBool:entry.masterKeyPresent],
-            @"networkNamePresent" : [NSNumber numberWithBool:entry.networkNamePresent],
-            @"extendedPanIdPresent" : [NSNumber numberWithBool:entry.extendedPanIdPresent],
-            @"meshLocalPrefixPresent" : [NSNumber numberWithBool:entry.meshLocalPrefixPresent],
-            @"delayPresent" : [NSNumber numberWithBool:entry.delayPresent],
-            @"panIdPresent" : [NSNumber numberWithBool:entry.panIdPresent],
-            @"channelPresent" : [NSNumber numberWithBool:entry.channelPresent],
-            @"pskcPresent" : [NSNumber numberWithBool:entry.pskcPresent],
-            @"securityPolicyPresent" : [NSNumber numberWithBool:entry.securityPolicyPresent],
-            @"channelMaskPresent" : [NSNumber numberWithBool:entry.channelMaskPresent],
-        }];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * newElement_0;
+        newElement_0 = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
+        newElement_0.activeTimestampPresent = [NSNumber numberWithBool:entry_0.activeTimestampPresent];
+        newElement_0.pendingTimestampPresent = [NSNumber numberWithBool:entry_0.pendingTimestampPresent];
+        newElement_0.masterKeyPresent = [NSNumber numberWithBool:entry_0.masterKeyPresent];
+        newElement_0.networkNamePresent = [NSNumber numberWithBool:entry_0.networkNamePresent];
+        newElement_0.extendedPanIdPresent = [NSNumber numberWithBool:entry_0.extendedPanIdPresent];
+        newElement_0.meshLocalPrefixPresent = [NSNumber numberWithBool:entry_0.meshLocalPrefixPresent];
+        newElement_0.delayPresent = [NSNumber numberWithBool:entry_0.delayPresent];
+        newElement_0.panIdPresent = [NSNumber numberWithBool:entry_0.panIdPresent];
+        newElement_0.channelPresent = [NSNumber numberWithBool:entry_0.channelPresent];
+        newElement_0.pskcPresent = [NSNumber numberWithBool:entry_0.pskcPresent];
+        newElement_0.securityPolicyPresent = [NSNumber numberWithBool:entry_0.securityPolicyPresent];
+        newElement_0.channelMaskPresent = [NSNumber numberWithBool:entry_0.channelMaskPresent];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
 {
-    id array = [[NSMutableArray alloc] init];
-    auto iter = list.begin();
-    while (iter.Next()) {
-        auto & entry = iter.GetValue();
-        (void) entry; // All our types below might be unsupported
-        [array addObject:[NSNumber numberWithUnsignedChar:entry]];
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+        [array_0 addObject:newElement_0];
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR) {
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
         OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    DispatchSuccess(context, @ { @"value" : array });
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
 };
 
 void CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPAccountLoginClusterGetSetupPINResponseParams new];
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.setupPIN.data() length:data.setupPIN.size() encoding:NSUTF8StringEncoding];
-        response[@"setupPIN"] = value;
+        response.setupPIN = value;
     }
     DispatchSuccess(context, response);
 };
@@ -863,16 +1256,16 @@ void CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
 void CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPApplicationLauncherClusterLaunchAppResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-        response[@"data"] = value;
+        response.data = value;
     }
     DispatchSuccess(context, response);
 };
@@ -880,16 +1273,16 @@ void CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge::OnSuccessFn(
 void CHIPContentLauncherClusterLaunchContentResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPContentLauncherClusterLaunchContentResponseParams new];
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-        response[@"data"] = value;
+        response.data = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.contentLaunchStatus];
-        response[@"contentLaunchStatus"] = value;
+        response.contentLaunchStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -897,16 +1290,16 @@ void CHIPContentLauncherClusterLaunchContentResponseCallbackBridge::OnSuccessFn(
 void CHIPContentLauncherClusterLaunchURLResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPContentLauncherClusterLaunchURLResponseParams new];
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-        response[@"data"] = value;
+        response.data = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.contentLaunchStatus];
-        response[@"contentLaunchStatus"] = value;
+        response.contentLaunchStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -914,26 +1307,26 @@ void CHIPContentLauncherClusterLaunchURLResponseCallbackBridge::OnSuccessFn(
 void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDiagnosticLogsClusterRetrieveLogsResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSData * value;
         value = [NSData dataWithBytes:data.content.data() length:data.content.size()];
-        response[@"content"] = value;
+        response.content = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedInt:data.timeStamp];
-        response[@"timeStamp"] = value;
+        response.timeStamp = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedInt:data.timeSinceBoot];
-        response[@"timeSinceBoot"] = value;
+        response.timeSinceBoot = value;
     }
     DispatchSuccess(context, response);
 };
@@ -941,11 +1334,11 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterClearAllPinsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterClearAllPinsResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -953,11 +1346,11 @@ void CHIPDoorLockClusterClearAllPinsResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterClearAllRfidsResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -965,11 +1358,11 @@ void CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterClearHolidayScheduleResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -977,11 +1370,11 @@ void CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterClearPinResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::ClearPinResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterClearPinResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -989,11 +1382,11 @@ void CHIPDoorLockClusterClearPinResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterClearRfidResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterClearRfidResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1001,11 +1394,11 @@ void CHIPDoorLockClusterClearRfidResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterClearWeekdayScheduleResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1013,11 +1406,11 @@ void CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterClearYeardayScheduleResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1025,31 +1418,31 @@ void CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterGetHolidayScheduleResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.scheduleId];
-        response[@"scheduleId"] = value;
+        response.scheduleId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedInt:data.localStartTime];
-        response[@"localStartTime"] = value;
+        response.localStartTime = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedInt:data.localEndTime];
-        response[@"localEndTime"] = value;
+        response.localEndTime = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.operatingModeDuringHoliday];
-        response[@"operatingModeDuringHoliday"] = value;
+        response.operatingModeDuringHoliday = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1057,41 +1450,41 @@ void CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterGetLogRecordResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterGetLogRecordResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.logEntryId];
-        response[@"logEntryId"] = value;
+        response.logEntryId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedInt:data.timestamp];
-        response[@"timestamp"] = value;
+        response.timestamp = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.eventType];
-        response[@"eventType"] = value;
+        response.eventType = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.source];
-        response[@"source"] = value;
+        response.source = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.eventIdOrAlarmCode];
-        response[@"eventIdOrAlarmCode"] = value;
+        response.eventIdOrAlarmCode = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.userId];
-        response[@"userId"] = value;
+        response.userId = value;
     }
     {
-        id value;
+        NSData * value;
         value = [NSData dataWithBytes:data.pin.data() length:data.pin.size()];
-        response[@"pin"] = value;
+        response.pin = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1099,26 +1492,26 @@ void CHIPDoorLockClusterGetLogRecordResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterGetPinResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetPinResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterGetPinResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.userId];
-        response[@"userId"] = value;
+        response.userId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.userStatus];
-        response[@"userStatus"] = value;
+        response.userStatus = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.userType];
-        response[@"userType"] = value;
+        response.userType = value;
     }
     {
-        id value;
+        NSData * value;
         value = [NSData dataWithBytes:data.pin.data() length:data.pin.size()];
-        response[@"pin"] = value;
+        response.pin = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1126,26 +1519,26 @@ void CHIPDoorLockClusterGetPinResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterGetRfidResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetRfidResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterGetRfidResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.userId];
-        response[@"userId"] = value;
+        response.userId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.userStatus];
-        response[@"userStatus"] = value;
+        response.userStatus = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.userType];
-        response[@"userType"] = value;
+        response.userType = value;
     }
     {
-        id value;
+        NSData * value;
         value = [NSData dataWithBytes:data.rfid.data() length:data.rfid.size()];
-        response[@"rfid"] = value;
+        response.rfid = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1153,16 +1546,16 @@ void CHIPDoorLockClusterGetRfidResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterGetUserTypeResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterGetUserTypeResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.userId];
-        response[@"userId"] = value;
+        response.userId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.userType];
-        response[@"userType"] = value;
+        response.userType = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1170,46 +1563,46 @@ void CHIPDoorLockClusterGetUserTypeResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterGetWeekdayScheduleResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.scheduleId];
-        response[@"scheduleId"] = value;
+        response.scheduleId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.userId];
-        response[@"userId"] = value;
+        response.userId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.daysMask];
-        response[@"daysMask"] = value;
+        response.daysMask = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.startHour];
-        response[@"startHour"] = value;
+        response.startHour = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.startMinute];
-        response[@"startMinute"] = value;
+        response.startMinute = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.endHour];
-        response[@"endHour"] = value;
+        response.endHour = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.endMinute];
-        response[@"endMinute"] = value;
+        response.endMinute = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1217,31 +1610,31 @@ void CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterGetYeardayScheduleResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.scheduleId];
-        response[@"scheduleId"] = value;
+        response.scheduleId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.userId];
-        response[@"userId"] = value;
+        response.userId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedInt:data.localStartTime];
-        response[@"localStartTime"] = value;
+        response.localStartTime = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedInt:data.localEndTime];
-        response[@"localEndTime"] = value;
+        response.localEndTime = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1249,11 +1642,11 @@ void CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterLockDoorResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::LockDoorResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterLockDoorResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1261,11 +1654,11 @@ void CHIPDoorLockClusterLockDoorResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterSetHolidayScheduleResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1273,11 +1666,11 @@ void CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterSetPinResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::SetPinResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterSetPinResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1285,11 +1678,11 @@ void CHIPDoorLockClusterSetPinResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterSetRfidResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::SetRfidResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterSetRfidResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1297,11 +1690,11 @@ void CHIPDoorLockClusterSetRfidResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterSetUserTypeResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterSetUserTypeResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1309,11 +1702,11 @@ void CHIPDoorLockClusterSetUserTypeResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterSetWeekdayScheduleResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1321,11 +1714,11 @@ void CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterSetYeardayScheduleResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1333,11 +1726,11 @@ void CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterUnlockDoorResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterUnlockDoorResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1345,11 +1738,11 @@ void CHIPDoorLockClusterUnlockDoorResponseCallbackBridge::OnSuccessFn(
 void CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPDoorLockClusterUnlockWithTimeoutResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1357,16 +1750,16 @@ void CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge::OnSuccessFn(
 void CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPGeneralCommissioningClusterArmFailSafeResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response[@"errorCode"] = value;
+        response.errorCode = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response[@"debugText"] = value;
+        response.debugText = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1374,16 +1767,16 @@ void CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge::OnSuccess
 void CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPGeneralCommissioningClusterCommissioningCompleteResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response[@"errorCode"] = value;
+        response.errorCode = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response[@"debugText"] = value;
+        response.debugText = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1391,16 +1784,16 @@ void CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge:
 void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response[@"errorCode"] = value;
+        response.errorCode = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response[@"debugText"] = value;
+        response.debugText = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1408,16 +1801,16 @@ void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::O
 void CHIPGroupsClusterAddGroupResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPGroupsClusterAddGroupResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response[@"groupId"] = value;
+        response.groupId = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1425,32 +1818,28 @@ void CHIPGroupsClusterAddGroupResponseCallbackBridge::OnSuccessFn(
 void CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPGroupsClusterGetGroupMembershipResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.capacity];
-        response[@"capacity"] = value;
+        response.capacity = value;
     }
     {
-        id value;
-        value = [NSNumber numberWithUnsignedChar:data.groupCount];
-        response[@"groupCount"] = value;
-    }
-    {
-        id value;
-        value = [[NSMutableArray alloc] init];
-        auto iter = data.groupList.begin();
-        while (iter.Next()) {
-            auto & entry = iter.GetValue();
-            auto * newElement = [[NSNumber alloc] init];
-            newElement = [NSNumber numberWithUnsignedShort:entry];
-            [value addObject:newElement];
+        NSMutableArray * value;
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = data.groupList.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+            [array_0 addObject:newElement_0];
         }
-        if (iter.GetStatus() != CHIP_NO_ERROR) {
+        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
             OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
             return;
         }
-        response[@"groupList"] = value;
+        value = array_0;
+        response.groupList = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1458,16 +1847,16 @@ void CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
 void CHIPGroupsClusterRemoveGroupResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPGroupsClusterRemoveGroupResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response[@"groupId"] = value;
+        response.groupId = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1475,21 +1864,21 @@ void CHIPGroupsClusterRemoveGroupResponseCallbackBridge::OnSuccessFn(
 void CHIPGroupsClusterViewGroupResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPGroupsClusterViewGroupResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response[@"groupId"] = value;
+        response.groupId = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.groupName.data() length:data.groupName.size() encoding:NSUTF8StringEncoding];
-        response[@"groupName"] = value;
+        response.groupName = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1497,11 +1886,11 @@ void CHIPGroupsClusterViewGroupResponseCallbackBridge::OnSuccessFn(
 void CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPIdentifyClusterIdentifyQueryResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.timeout];
-        response[@"timeout"] = value;
+        response.timeout = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1509,11 +1898,11 @@ void CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge::OnSuccessFn(
 void CHIPKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPKeypadInputClusterSendKeyResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1521,11 +1910,11 @@ void CHIPKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
 void CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPMediaPlaybackClusterMediaFastForwardResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
-        response[@"mediaPlaybackStatus"] = value;
+        response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1533,11 +1922,11 @@ void CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackBridge::OnSuccessFn
 void CHIPMediaPlaybackClusterMediaNextResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPMediaPlaybackClusterMediaNextResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
-        response[@"mediaPlaybackStatus"] = value;
+        response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1545,11 +1934,11 @@ void CHIPMediaPlaybackClusterMediaNextResponseCallbackBridge::OnSuccessFn(
 void CHIPMediaPlaybackClusterMediaPauseResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPMediaPlaybackClusterMediaPauseResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
-        response[@"mediaPlaybackStatus"] = value;
+        response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1557,11 +1946,11 @@ void CHIPMediaPlaybackClusterMediaPauseResponseCallbackBridge::OnSuccessFn(
 void CHIPMediaPlaybackClusterMediaPlayResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPMediaPlaybackClusterMediaPlayResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
-        response[@"mediaPlaybackStatus"] = value;
+        response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1569,11 +1958,11 @@ void CHIPMediaPlaybackClusterMediaPlayResponseCallbackBridge::OnSuccessFn(
 void CHIPMediaPlaybackClusterMediaPreviousResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPMediaPlaybackClusterMediaPreviousResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
-        response[@"mediaPlaybackStatus"] = value;
+        response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1581,11 +1970,11 @@ void CHIPMediaPlaybackClusterMediaPreviousResponseCallbackBridge::OnSuccessFn(
 void CHIPMediaPlaybackClusterMediaRewindResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPMediaPlaybackClusterMediaRewindResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
-        response[@"mediaPlaybackStatus"] = value;
+        response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1593,11 +1982,11 @@ void CHIPMediaPlaybackClusterMediaRewindResponseCallbackBridge::OnSuccessFn(
 void CHIPMediaPlaybackClusterMediaSeekResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPMediaPlaybackClusterMediaSeekResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
-        response[@"mediaPlaybackStatus"] = value;
+        response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1605,11 +1994,11 @@ void CHIPMediaPlaybackClusterMediaSeekResponseCallbackBridge::OnSuccessFn(
 void CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPMediaPlaybackClusterMediaSkipBackwardResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
-        response[@"mediaPlaybackStatus"] = value;
+        response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1617,11 +2006,11 @@ void CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackBridge::OnSuccessF
 void CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPMediaPlaybackClusterMediaSkipForwardResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
-        response[@"mediaPlaybackStatus"] = value;
+        response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1629,11 +2018,11 @@ void CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackBridge::OnSuccessFn
 void CHIPMediaPlaybackClusterMediaStartOverResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPMediaPlaybackClusterMediaStartOverResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
-        response[@"mediaPlaybackStatus"] = value;
+        response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1641,11 +2030,11 @@ void CHIPMediaPlaybackClusterMediaStartOverResponseCallbackBridge::OnSuccessFn(
 void CHIPMediaPlaybackClusterMediaStopResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPMediaPlaybackClusterMediaStopResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
-        response[@"mediaPlaybackStatus"] = value;
+        response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1653,16 +2042,16 @@ void CHIPMediaPlaybackClusterMediaStopResponseCallbackBridge::OnSuccessFn(
 void CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPNetworkCommissioningClusterAddThreadNetworkResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response[@"errorCode"] = value;
+        response.errorCode = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response[@"debugText"] = value;
+        response.debugText = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1670,16 +2059,16 @@ void CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge::OnSu
 void CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPNetworkCommissioningClusterAddWiFiNetworkResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response[@"errorCode"] = value;
+        response.errorCode = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response[@"debugText"] = value;
+        response.debugText = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1687,16 +2076,16 @@ void CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge::OnSucc
 void CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPNetworkCommissioningClusterDisableNetworkResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response[@"errorCode"] = value;
+        response.errorCode = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response[@"debugText"] = value;
+        response.debugText = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1704,16 +2093,16 @@ void CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge::OnSucc
 void CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPNetworkCommissioningClusterEnableNetworkResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response[@"errorCode"] = value;
+        response.errorCode = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response[@"debugText"] = value;
+        response.debugText = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1721,16 +2110,16 @@ void CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge::OnSucce
 void CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPNetworkCommissioningClusterRemoveNetworkResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response[@"errorCode"] = value;
+        response.errorCode = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response[@"debugText"] = value;
+        response.debugText = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1738,53 +2127,57 @@ void CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge::OnSucce
 void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPNetworkCommissioningClusterScanNetworksResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response[@"errorCode"] = value;
+        response.errorCode = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response[@"debugText"] = value;
+        response.debugText = value;
     }
     {
-        id value;
-        value = [[NSMutableArray alloc] init];
-        auto iter = data.wifiScanResults.begin();
-        while (iter.Next()) {
-            auto & entry = iter.GetValue();
-            auto * newElement = [[CHIPNetworkCommissioningClusterWiFiInterfaceScanResult alloc] init];
-            newElement.security = [NSNumber numberWithUnsignedChar:entry.security];
-            newElement.ssid = [NSData dataWithBytes:entry.ssid.data() length:entry.ssid.size()];
-            newElement.bssid = [NSData dataWithBytes:entry.bssid.data() length:entry.bssid.size()];
-            newElement.channel = [NSNumber numberWithUnsignedChar:entry.channel];
-            newElement.frequencyBand = [NSNumber numberWithUnsignedInt:entry.frequencyBand];
-            [value addObject:newElement];
+        NSMutableArray * value;
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = data.wifiScanResults.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            CHIPNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_0;
+            newElement_0 = [CHIPNetworkCommissioningClusterWiFiInterfaceScanResult new];
+            newElement_0.security = [NSNumber numberWithUnsignedChar:entry_0.security];
+            newElement_0.ssid = [NSData dataWithBytes:entry_0.ssid.data() length:entry_0.ssid.size()];
+            newElement_0.bssid = [NSData dataWithBytes:entry_0.bssid.data() length:entry_0.bssid.size()];
+            newElement_0.channel = [NSNumber numberWithUnsignedChar:entry_0.channel];
+            newElement_0.frequencyBand = [NSNumber numberWithUnsignedInt:entry_0.frequencyBand];
+            [array_0 addObject:newElement_0];
         }
-        if (iter.GetStatus() != CHIP_NO_ERROR) {
+        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
             OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
             return;
         }
-        response[@"wifiScanResults"] = value;
+        value = array_0;
+        response.wifiScanResults = value;
     }
     {
-        id value;
-        value = [[NSMutableArray alloc] init];
-        auto iter = data.threadScanResults.begin();
-        while (iter.Next()) {
-            auto & entry = iter.GetValue();
-            auto * newElement = [[CHIPNetworkCommissioningClusterThreadInterfaceScanResult alloc] init];
-            newElement.discoveryResponse = [NSData dataWithBytes:entry.discoveryResponse.data()
-                                                          length:entry.discoveryResponse.size()];
-            [value addObject:newElement];
+        NSMutableArray * value;
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = data.threadScanResults.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            CHIPNetworkCommissioningClusterThreadInterfaceScanResult * newElement_0;
+            newElement_0 = [CHIPNetworkCommissioningClusterThreadInterfaceScanResult new];
+            newElement_0.discoveryResponse = [NSData dataWithBytes:entry_0.discoveryResponse.data()
+                                                            length:entry_0.discoveryResponse.size()];
+            [array_0 addObject:newElement_0];
         }
-        if (iter.GetStatus() != CHIP_NO_ERROR) {
+        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
             OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
             return;
         }
-        response[@"threadScanResults"] = value;
+        value = array_0;
+        response.threadScanResults = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1792,16 +2185,16 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
 void CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response[@"errorCode"] = value;
+        response.errorCode = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response[@"debugText"] = value;
+        response.debugText = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1809,16 +2202,16 @@ void CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge::O
 void CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response[@"errorCode"] = value;
+        response.errorCode = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response[@"debugText"] = value;
+        response.debugText = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1826,16 +2219,16 @@ void CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge::OnS
 void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.action];
-        response[@"action"] = value;
+        response.action = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedInt:data.delayedActionTime];
-        response[@"delayedActionTime"] = value;
+        response.delayedActionTime = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1843,78 +2236,78 @@ void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSu
 void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         if (data.delayedActionTime.HasValue()) {
             value = [NSNumber numberWithUnsignedInt:data.delayedActionTime.Value()];
         } else {
-            value = [NSNull null];
+            value = nil;
         }
-        response[@"delayedActionTime"] = value;
+        response.delayedActionTime = value;
     }
     {
-        id value;
+        NSString * value;
         if (data.imageURI.HasValue()) {
             value = [[NSString alloc] initWithBytes:data.imageURI.Value().data()
                                              length:data.imageURI.Value().size()
                                            encoding:NSUTF8StringEncoding];
         } else {
-            value = [NSNull null];
+            value = nil;
         }
-        response[@"imageURI"] = value;
+        response.imageURI = value;
     }
     {
-        id value;
+        NSNumber * value;
         if (data.softwareVersion.HasValue()) {
             value = [NSNumber numberWithUnsignedInt:data.softwareVersion.Value()];
         } else {
-            value = [NSNull null];
+            value = nil;
         }
-        response[@"softwareVersion"] = value;
+        response.softwareVersion = value;
     }
     {
-        id value;
+        NSString * value;
         if (data.softwareVersionString.HasValue()) {
             value = [[NSString alloc] initWithBytes:data.softwareVersionString.Value().data()
                                              length:data.softwareVersionString.Value().size()
                                            encoding:NSUTF8StringEncoding];
         } else {
-            value = [NSNull null];
+            value = nil;
         }
-        response[@"softwareVersionString"] = value;
+        response.softwareVersionString = value;
     }
     {
-        id value;
+        NSData * value;
         if (data.updateToken.HasValue()) {
             value = [NSData dataWithBytes:data.updateToken.Value().data() length:data.updateToken.Value().size()];
         } else {
-            value = [NSNull null];
+            value = nil;
         }
-        response[@"updateToken"] = value;
+        response.updateToken = value;
     }
     {
-        id value;
+        NSNumber * value;
         if (data.userConsentNeeded.HasValue()) {
             value = [NSNumber numberWithBool:data.userConsentNeeded.Value()];
         } else {
-            value = [NSNull null];
+            value = nil;
         }
-        response[@"userConsentNeeded"] = value;
+        response.userConsentNeeded = value;
     }
     {
-        id value;
+        NSData * value;
         if (data.metadataForRequestor.HasValue()) {
             value = [NSData dataWithBytes:data.metadataForRequestor.Value().data() length:data.metadataForRequestor.Value().size()];
         } else {
-            value = [NSNull null];
+            value = nil;
         }
-        response[@"metadataForRequestor"] = value;
+        response.metadataForRequestor = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1922,16 +2315,16 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuc
 void CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPOperationalCredentialsClusterAttestationResponseParams new];
     {
-        id value;
+        NSData * value;
         value = [NSData dataWithBytes:data.attestationElements.data() length:data.attestationElements.size()];
-        response[@"attestationElements"] = value;
+        response.attestationElements = value;
     }
     {
-        id value;
+        NSData * value;
         value = [NSData dataWithBytes:data.signature.data() length:data.signature.size()];
-        response[@"signature"] = value;
+        response.signature = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1939,11 +2332,11 @@ void CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge::OnSucce
 void CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPOperationalCredentialsClusterCertificateChainResponseParams new];
     {
-        id value;
+        NSData * value;
         value = [NSData dataWithBytes:data.certificate.data() length:data.certificate.size()];
-        response[@"certificate"] = value;
+        response.certificate = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1951,21 +2344,21 @@ void CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge::On
 void CHIPOperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPOperationalCredentialsClusterNOCResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.statusCode];
-        response[@"statusCode"] = value;
+        response.statusCode = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.fabricIndex];
-        response[@"fabricIndex"] = value;
+        response.fabricIndex = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response[@"debugText"] = value;
+        response.debugText = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1973,16 +2366,16 @@ void CHIPOperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
 void CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPOperationalCredentialsClusterOpCSRResponseParams new];
     {
-        id value;
+        NSData * value;
         value = [NSData dataWithBytes:data.NOCSRElements.data() length:data.NOCSRElements.size()];
-        response[@"nocsrElements"] = value;
+        response.nocsrElements = value;
     }
     {
-        id value;
+        NSData * value;
         value = [NSData dataWithBytes:data.attestationSignature.data() length:data.attestationSignature.size()];
-        response[@"attestationSignature"] = value;
+        response.attestationSignature = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1990,21 +2383,21 @@ void CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge::OnSuccessFn(
 void CHIPScenesClusterAddSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPScenesClusterAddSceneResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response[@"groupId"] = value;
+        response.groupId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.sceneId];
-        response[@"sceneId"] = value;
+        response.sceneId = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2012,42 +2405,43 @@ void CHIPScenesClusterAddSceneResponseCallbackBridge::OnSuccessFn(
 void CHIPScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPScenesClusterGetSceneMembershipResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.capacity];
-        response[@"capacity"] = value;
+        response.capacity = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response[@"groupId"] = value;
+        response.groupId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.sceneCount];
-        response[@"sceneCount"] = value;
+        response.sceneCount = value;
     }
     {
-        id value;
-        value = [[NSMutableArray alloc] init];
-        auto iter = data.sceneList.begin();
-        while (iter.Next()) {
-            auto & entry = iter.GetValue();
-            auto * newElement = [[NSNumber alloc] init];
-            newElement = [NSNumber numberWithUnsignedChar:entry];
-            [value addObject:newElement];
+        NSMutableArray * value;
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = data.sceneList.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+            [array_0 addObject:newElement_0];
         }
-        if (iter.GetStatus() != CHIP_NO_ERROR) {
+        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
             OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
             return;
         }
-        response[@"sceneList"] = value;
+        value = array_0;
+        response.sceneList = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2055,16 +2449,16 @@ void CHIPScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(
 void CHIPScenesClusterRemoveAllScenesResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPScenesClusterRemoveAllScenesResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response[@"groupId"] = value;
+        response.groupId = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2072,21 +2466,21 @@ void CHIPScenesClusterRemoveAllScenesResponseCallbackBridge::OnSuccessFn(
 void CHIPScenesClusterRemoveSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPScenesClusterRemoveSceneResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response[@"groupId"] = value;
+        response.groupId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.sceneId];
-        response[@"sceneId"] = value;
+        response.sceneId = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2094,21 +2488,21 @@ void CHIPScenesClusterRemoveSceneResponseCallbackBridge::OnSuccessFn(
 void CHIPScenesClusterStoreSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPScenesClusterStoreSceneResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response[@"groupId"] = value;
+        response.groupId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.sceneId];
-        response[@"sceneId"] = value;
+        response.sceneId = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2116,49 +2510,51 @@ void CHIPScenesClusterStoreSceneResponseCallbackBridge::OnSuccessFn(
 void CHIPScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPScenesClusterViewSceneResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response[@"groupId"] = value;
+        response.groupId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.sceneId];
-        response[@"sceneId"] = value;
+        response.sceneId = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.transitionTime];
-        response[@"transitionTime"] = value;
+        response.transitionTime = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.sceneName.data() length:data.sceneName.size() encoding:NSUTF8StringEncoding];
-        response[@"sceneName"] = value;
+        response.sceneName = value;
     }
     {
-        id value;
-        value = [[NSMutableArray alloc] init];
-        auto iter = data.extensionFieldSets.begin();
-        while (iter.Next()) {
-            auto & entry = iter.GetValue();
-            auto * newElement = [[CHIPScenesClusterSceneExtensionFieldSet alloc] init];
-            newElement.clusterId = [NSNumber numberWithUnsignedInt:entry.clusterId];
-            newElement.length = [NSNumber numberWithUnsignedChar:entry.length];
-            newElement.value = [NSNumber numberWithUnsignedChar:entry.value];
-            [value addObject:newElement];
+        NSMutableArray * value;
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = data.extensionFieldSets.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            CHIPScenesClusterSceneExtensionFieldSet * newElement_0;
+            newElement_0 = [CHIPScenesClusterSceneExtensionFieldSet new];
+            newElement_0.clusterId = [NSNumber numberWithUnsignedInt:entry_0.clusterId];
+            newElement_0.length = [NSNumber numberWithUnsignedChar:entry_0.length];
+            newElement_0.value = [NSNumber numberWithUnsignedChar:entry_0.value];
+            [array_0 addObject:newElement_0];
         }
-        if (iter.GetStatus() != CHIP_NO_ERROR) {
+        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
             OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
             return;
         }
-        response[@"extensionFieldSets"] = value;
+        value = array_0;
+        response.extensionFieldSets = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2166,37 +2562,39 @@ void CHIPScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
 void CHIPTvChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPTvChannelClusterChangeChannelResponseParams new];
     {
-        id value;
-        value = [[NSMutableArray alloc] init];
-        auto iter = data.channelMatch.begin();
-        while (iter.Next()) {
-            auto & entry = iter.GetValue();
-            auto * newElement = [[CHIPTvChannelClusterTvChannelInfo alloc] init];
-            newElement.majorNumber = [NSNumber numberWithUnsignedShort:entry.majorNumber];
-            newElement.minorNumber = [NSNumber numberWithUnsignedShort:entry.minorNumber];
-            newElement.name = [[NSString alloc] initWithBytes:entry.name.data()
-                                                       length:entry.name.size()
-                                                     encoding:NSUTF8StringEncoding];
-            newElement.callSign = [[NSString alloc] initWithBytes:entry.callSign.data()
-                                                           length:entry.callSign.size()
-                                                         encoding:NSUTF8StringEncoding];
-            newElement.affiliateCallSign = [[NSString alloc] initWithBytes:entry.affiliateCallSign.data()
-                                                                    length:entry.affiliateCallSign.size()
-                                                                  encoding:NSUTF8StringEncoding];
-            [value addObject:newElement];
+        NSMutableArray * value;
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = data.channelMatch.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            CHIPTvChannelClusterTvChannelInfo * newElement_0;
+            newElement_0 = [CHIPTvChannelClusterTvChannelInfo new];
+            newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
+            newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
+            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                         length:entry_0.name.size()
+                                                       encoding:NSUTF8StringEncoding];
+            newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.data()
+                                                             length:entry_0.callSign.size()
+                                                           encoding:NSUTF8StringEncoding];
+            newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.data()
+                                                                      length:entry_0.affiliateCallSign.size()
+                                                                    encoding:NSUTF8StringEncoding];
+            [array_0 addObject:newElement_0];
         }
-        if (iter.GetStatus() != CHIP_NO_ERROR) {
+        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
             OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
             return;
         }
-        response[@"channelMatch"] = value;
+        value = array_0;
+        response.channelMatch = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.errorType];
-        response[@"errorType"] = value;
+        response.errorType = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2204,16 +2602,16 @@ void CHIPTvChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
 void CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPTargetNavigatorClusterNavigateTargetResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.status];
-        response[@"status"] = value;
+        response.status = value;
     }
     {
-        id value;
+        NSString * value;
         value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-        response[@"data"] = value;
+        response.data = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2221,11 +2619,11 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn
 void CHIPTestClusterClusterBooleanResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPTestClusterClusterBooleanResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithBool:data.value];
-        response[@"value"] = value;
+        response.value = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2233,11 +2631,11 @@ void CHIPTestClusterClusterBooleanResponseCallbackBridge::OnSuccessFn(
 void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPTestClusterClusterTestAddArgumentsResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.returnValue];
-        response[@"returnValue"] = value;
+        response.returnValue = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2245,16 +2643,16 @@ void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(
 void CHIPTestClusterClusterTestEnumsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPTestClusterClusterTestEnumsResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.arg1];
-        response[@"arg1"] = value;
+        response.arg1 = value;
     }
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.arg2];
-        response[@"arg2"] = value;
+        response.arg2 = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2262,22 +2660,23 @@ void CHIPTestClusterClusterTestEnumsResponseCallbackBridge::OnSuccessFn(
 void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPTestClusterClusterTestListInt8UReverseResponseParams new];
     {
-        id value;
-        value = [[NSMutableArray alloc] init];
-        auto iter = data.arg1.begin();
-        while (iter.Next()) {
-            auto & entry = iter.GetValue();
-            auto * newElement = [[NSNumber alloc] init];
-            newElement = [NSNumber numberWithUnsignedChar:entry];
-            [value addObject:newElement];
+        NSMutableArray * value;
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = data.arg1.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+            [array_0 addObject:newElement_0];
         }
-        if (iter.GetStatus() != CHIP_NO_ERROR) {
+        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
             OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
             return;
         }
-        response[@"arg1"] = value;
+        value = array_0;
+        response.arg1 = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2285,42 +2684,42 @@ void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccess
 void CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPTestClusterClusterTestNullableOptionalResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithBool:data.wasPresent];
-        response[@"wasPresent"] = value;
+        response.wasPresent = value;
     }
     {
-        id value;
+        NSNumber * value;
         if (data.wasNull.HasValue()) {
             value = [NSNumber numberWithBool:data.wasNull.Value()];
         } else {
-            value = [NSNull null];
+            value = nil;
         }
-        response[@"wasNull"] = value;
+        response.wasNull = value;
     }
     {
-        id value;
+        NSNumber * value;
         if (data.value.HasValue()) {
             value = [NSNumber numberWithUnsignedChar:data.value.Value()];
         } else {
-            value = [NSNull null];
+            value = nil;
         }
-        response[@"value"] = value;
+        response.value = value;
     }
     {
-        id value;
+        NSNumber * value;
         if (data.originalValue.HasValue()) {
             if (data.originalValue.Value().IsNull()) {
-                value = [NSNull null];
+                value = nil;
             } else {
                 value = [NSNumber numberWithUnsignedChar:data.originalValue.Value().Value()];
             }
         } else {
-            value = [NSNull null];
+            value = nil;
         }
-        response[@"originalValue"] = value;
+        response.originalValue = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2328,11 +2727,11 @@ void CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge::OnSuccess
 void CHIPTestClusterClusterTestSpecificResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data)
 {
-    NSMutableDictionary * response = [[NSMutableDictionary alloc] init];
+    auto * response = [CHIPTestClusterClusterTestSpecificResponseParams new];
     {
-        id value;
+        NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:data.returnValue];
-        response[@"returnValue"] = value;
+        response.returnValue = value;
     }
     DispatchSuccess(context, response);
 };

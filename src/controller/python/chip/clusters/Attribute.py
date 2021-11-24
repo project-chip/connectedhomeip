@@ -99,13 +99,19 @@ def _BuildAttributeIndex():
     for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
         if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
             for objName, subclass in inspect.getmembers(obj):
-                if inspect.isclass(subclass) and (('Attribute') in str(subclass)):
+                if inspect.isclass(subclass) and (('Attributes') in str(subclass)):
                     for attributeName, attribute in inspect.getmembers(subclass):
                         if inspect.isclass(attribute):
-                            for name, field in inspect.getmembers(attribute):
-                                if ('__dataclass_fields__' in name):
-                                    _AttributeIndex[str(AttributePath(ClusterId=field['cluster_id'].default, AttributeId=field['attribute_id'].default))] = eval(
-                                        'chip.clusters.Objects.' + clusterName + '.Attributes.' + attributeName)
+                            base_classes = inspect.getmro(attribute)
+
+                            # Only match on classes that extend the ClusterAttributeDescriptor class
+                            matched = [
+                                value for value in base_classes if 'ClusterAttributeDescriptor' in str(value)]
+                            if (matched == []):
+                                continue
+
+                            _AttributeIndex[str(AttributePath(ClusterId=attribute.cluster_id, AttributeId=attribute.attribute_id))] = eval(
+                                'chip.clusters.Objects.' + clusterName + '.Attributes.' + attributeName)
 
 
 class AsyncReadTransaction:
@@ -128,6 +134,7 @@ class AsyncReadTransaction:
                 attributeValue = chip.tlv.TLVReader(data).get().get("Any", {})
             else:
                 attributeValue = attributeType.FromTLV(data)
+
             self._res.append(AttributeReadResult(
                 Path=path, Status=imStatus, Data=attributeValue))
         except Exception as ex:
@@ -189,7 +196,7 @@ class AsyncWriteTransaction:
 
 
 _OnReadAttributeDataCallbackFunct = CFUNCTYPE(
-    None, py_object, c_uint16, c_uint32, c_uint32, c_uint16, c_char_p, c_size_t)
+    None, py_object, c_uint16, c_uint32, c_uint32, c_uint16, c_void_p, c_size_t)
 _OnReadErrorCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32)
 _OnReadDoneCallbackFunct = CFUNCTYPE(

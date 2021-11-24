@@ -84,10 +84,4 @@ extern "C" void app_main()
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    // Run the UI Loop
-    while (true)
-    {
-        vTaskDelay(50 / portTICK_PERIOD_MS);
-    }
 }

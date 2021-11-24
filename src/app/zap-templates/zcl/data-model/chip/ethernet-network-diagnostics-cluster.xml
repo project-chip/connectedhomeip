@@ -48,4 +48,8 @@ limitations under the License.
       <description>Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0</description>
     </command>           
   </cluster>
+  <bitmap name="EthernetNetworkDiagnosticsFeature" type="BITMAP32">
+    <field name="PacketCounts" mask="0x1"/>
+    <field name="ErrorCounts" mask="0x2"/>
+  </bitmap>  
 </configurator>

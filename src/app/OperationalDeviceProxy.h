@@ -119,8 +119,7 @@ public:
     {
         mDeviceAddress = ToPeerAddress(nodeResolutionData);
 
-        mMrpIdleInterval   = nodeResolutionData.GetMrpRetryIntervalIdle().ValueOr(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL);
-        mMrpActiveInterval = nodeResolutionData.GetMrpRetryIntervalActive().ValueOr(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
+        mMRPConfig = nodeResolutionData.GetMRPConfig();
 
         if (mState == State::NeedsAddress)
         {
@@ -141,7 +140,7 @@ public:
      *   Since the device settings might have been moved from RAM to the persistent storage, the function
      *   will load the device settings first, before making the changes.
      */
-    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, uint32_t mrpIdleInterval, uint32_t mrpActiveInterval);
+    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
 
     PeerId GetPeerId() const { return mPeerId; }
 

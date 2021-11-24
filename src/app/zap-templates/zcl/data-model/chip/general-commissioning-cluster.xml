@@ -74,4 +74,10 @@ limitations under the License.
       <arg name="debugText" type="CHAR_STRING"/>
     </command>               
   </cluster>
+  <bitmap name="GeneralCommissioningFeature" type="BITMAP32">
+    <field name="GeneralCommissioning" mask="0x1"/>
+    <field name="WiFiNetworkInterface" mask="0x2"/>
+    <field name="ThreadNetworkInterface" mask="0x4"/>
+    <field name="EthernetNetworkInterface" mask="0x8"/>        
+  </bitmap>  
 </configurator>

@@ -25,14 +25,14 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
-#include <platform/ConnectivityManager.h>
+#include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EthernetNetworkDiagnostics;
 using namespace chip::app::Clusters::EthernetNetworkDiagnostics::Attributes;
-using chip::DeviceLayer::ConnectivityManager;
+using chip::DeviceLayer::DiagnosticDataProvider;
 
 namespace {
 
@@ -42,19 +42,19 @@ public:
     // Register for the EthernetNetworkDiagnostics cluster on all endpoints.
     EthernetDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), EthernetNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     template <typename T>
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &), AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), AttributeValueEncoder & aEncoder);
 };
 
 template <typename T>
-CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &),
+CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
                                                          AttributeValueEncoder & aEncoder)
 {
     T data;
-    CHIP_ERROR err = (DeviceLayer::ConnectivityMgr().*getter)(data);
+    CHIP_ERROR err = (DeviceLayer::GetDiagnosticDataProvider().*getter)(data);
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
         data = 0;
@@ -69,7 +69,7 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (Connectivit
 
 EthernetDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR EthernetDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR EthernetDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != EthernetNetworkDiagnostics::Id)
     {
@@ -80,31 +80,31 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPat
     switch (aPath.mAttributeId)
     {
     case PHYRate::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetEthPHYRate, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetEthPHYRate, aEncoder);
     }
     case FullDuplex::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetEthFullDuplex, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetEthFullDuplex, aEncoder);
     }
     case CarrierDetect::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetEthCarrierDetect, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetEthCarrierDetect, aEncoder);
     }
     case TimeSinceReset::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetEthTimeSinceReset, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetEthTimeSinceReset, aEncoder);
     }
     case PacketRxCount::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetEthPacketRxCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetEthPacketRxCount, aEncoder);
     }
     case PacketTxCount::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetEthPacketTxCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetEthPacketTxCount, aEncoder);
     }
     case TxErrCount::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetEthTxErrCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetEthTxErrCount, aEncoder);
     }
     case CollisionCount::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetEthCollisionCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetEthCollisionCount, aEncoder);
     }
     case OverrunCount::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetEthOverrunCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetEthOverrunCount, aEncoder);
     }
     default: {
         break;
@@ -121,7 +121,7 @@ bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(app::CommandHan
     EndpointId endpoint  = commandPath.mEndpointId;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    VerifyOrExit(DeviceLayer::ConnectivityMgr().ResetEthNetworkDiagnosticsCounts() == CHIP_NO_ERROR,
+    VerifyOrExit(DeviceLayer::GetDiagnosticDataProvider().ResetEthNetworkDiagnosticsCounts() == CHIP_NO_ERROR,
                  status = EMBER_ZCL_STATUS_FAILURE);
 
     status = EthernetNetworkDiagnostics::Attributes::PacketRxCount::Set(endpoint, 0);

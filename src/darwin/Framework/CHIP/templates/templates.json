@@ -39,6 +39,14 @@
         {
             "name": "check_test_value",
             "path": "partials/check_test_value.zapt"
+        },
+        {
+            "name": "init_struct_member",
+            "path": "partials/init_struct_member.zapt"
+        },
+        {
+            "name": "command_completion_type",
+            "path": "partials/command_completion_type.zapt"
         }
     ],
     "templates": [

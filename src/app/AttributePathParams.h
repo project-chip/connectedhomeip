@@ -41,6 +41,10 @@ struct AttributePathParams
         AttributePathParams(aEndpointId, aClusterId, aAttributeId, ClusterInfo::kInvalidListIndex)
     {}
 
+    AttributePathParams(ClusterId aClusterId, AttributeId aAttributeId) :
+        AttributePathParams(kInvalidEndpointId, aClusterId, aAttributeId, ClusterInfo::kInvalidListIndex)
+    {}
+
     AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListIndex aListIndex) :
         mEndpointId(aEndpointId), mClusterId(aClusterId), mAttributeId(aAttributeId), mListIndex(aListIndex)
     {}
@@ -52,6 +56,7 @@ struct AttributePathParams
     bool HasWildcard() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
 
     /**
+     * SPEC 8.9.2.2
      * Check that the path meets some basic constraints of an attribute path: If list index is not wildcard, then field id must not
      * be wildcard. This does not verify that the attribute being targeted is actually of list type when the list index is not
      * wildcard.

@@ -56,9 +56,9 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Query User Label"
+    - label: "Query Node Label"
       command: "readAttribute"
-      attribute: "UserLabel"
+      attribute: "NodeLabel"
       response:
           constraints:
               type: string
@@ -171,3 +171,12 @@ tests:
       response:
           constraints:
               type: boolean
+
+    - label: "Query UniqueID"
+      command: "readAttribute"
+      attribute: "UniqueID"
+      optional: true
+      response:
+          constraints:
+              type: string
+              maxLength: 32
