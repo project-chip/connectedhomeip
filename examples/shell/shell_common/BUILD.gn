@@ -57,21 +57,20 @@ static_library("shell_common") {
   }
 
   if (chip_enable_app_server) {
-    sources += [ "cmd_server.cpp", ]
+    sources += [ "cmd_server.cpp" ]
 
     import("${chip_root}/src/app/chip_data_model.gni")
 
     sources += [
-      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     ]
 
     include_dirs =
-      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+        [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
 
-    public_deps += [
-      "${chip_root}/examples/all-clusters-app/all-clusters-common",
-    ]
+    public_deps +=
+        [ "${chip_root}/examples/all-clusters-app/all-clusters-common" ]
   }
 
   public_configs = [ ":shell_common_config" ]
