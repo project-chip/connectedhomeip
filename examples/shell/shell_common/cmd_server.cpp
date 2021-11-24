@@ -40,7 +40,6 @@ static chip::Shell::Engine sShellServerSubcommands;
 static uint16_t sServerPortOperational = CHIP_PORT;
 static uint16_t sServerPortCommissioning = CHIP_UDC_PORT;
 
-
 CHIP_ERROR CmdAppServerHelp(int argc, char ** argv)
 {
     sShellServerSubcommands.ForEachCommand(PrintCommandHelp, nullptr);
@@ -135,9 +134,13 @@ static CHIP_ERROR CmdAppServer(int argc, char ** argv)
     return sShellServerSubcommands.ExecCommand(argc, argv);
 }
 
+void CmdAppServerAtExit()
+{
+    CmdAppServerStop(0, nullptr);
+}
+
 void cmd_app_server_init()
 {
-
     static const shell_command_t sServerComand = { &CmdAppServer, "server",
                                                    "Manage the ZCL application server. Usage: server [help|start|stop]"};
 
@@ -151,10 +154,11 @@ void cmd_app_server_init()
         { &CmdAppServerExchanges, "exchanges", "Manage active exchanges on the server." },
     };
 
+    std::atexit(CmdAppServerAtExit);
+
     // Register `config` subcommands with the local shell dispatcher.
     sShellServerSubcommands.RegisterCommands(sServerSubCommands, ArraySize(sServerSubCommands));
 
     // Register the root `config` command with the top-level shell.
     Engine::Root().RegisterCommands(&sServerComand, 1);
-    return;
 }
