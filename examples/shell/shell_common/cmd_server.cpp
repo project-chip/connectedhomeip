@@ -124,7 +124,7 @@ static CHIP_ERROR CmdAppServer(int argc, char ** argv)
     case 0:
         return CmdAppServerHelp(argc, argv);
     case 1:
-        if ((strcmp(argv[0], "help") == 0) || 
+        if ((strcmp(argv[0], "help") == 0) ||
             (strcmp(argv[0], "-h") == 0))
         {
             return CmdAppServerHelp(argc, argv);
