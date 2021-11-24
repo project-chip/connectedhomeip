@@ -795,10 +795,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ResetThreadNetworkDia
 {
     // Based on the spec, only OverrunCount should be resetted.
     mOverrunCount = 0;
-    // Reset MAC counters
-    // otLinkResetCounters(mOTInst);
-    // otThreadResetMleCounters(mOTInst);
-    // otThreadResetIp6Counters(mOTInst);
 }
 /*
  * @brief Get runtime value from the thread network based on the given attribute ID.
