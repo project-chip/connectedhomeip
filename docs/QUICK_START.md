@@ -2,8 +2,8 @@
 
 ## Demo Overview
 
-The Matter reference implementation contains support for a number examples and
-platforms.
+The Matter reference implementation contains support for a number of examples
+and platforms.
 
 ## Wi-Fi Nodes
 
