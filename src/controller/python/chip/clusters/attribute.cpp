@@ -133,7 +133,8 @@ public:
             this->OnError(apReadClient, err);
         }
 
-        gOnReadEventDataCallback(mAppContext, aEventHeader.mEndpointId, aEventHeader.mClusterId, aEventHeader.mEventId, buffer, size);
+        gOnReadEventDataCallback(mAppContext, aEventHeader.mEndpointId, aEventHeader.mClusterId, aEventHeader.mEventId, buffer,
+                                 size);
     }
 
     void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override
