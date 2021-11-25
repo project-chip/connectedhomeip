@@ -11841,6 +11841,245 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace SwitchLatched {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kNewPosition = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t newPosition;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t newPosition;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SwitchLatched
+namespace InitialPress {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kNewPosition = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t newPosition;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t newPosition;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace InitialPress
+namespace LongPress {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000002;
+
+enum class Fields
+{
+    kNewPosition = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t newPosition;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t newPosition;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace LongPress
+namespace ShortRelease {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000003;
+
+enum class Fields
+{
+    kPreviousPosition = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t previousPosition;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t previousPosition;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ShortRelease
+namespace LongRelease {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000004;
+
+enum class Fields
+{
+    kPreviousPosition = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t previousPosition;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t previousPosition;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace LongRelease
+namespace MultiPressOngoing {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000005;
+
+enum class Fields
+{
+    kNewPosition                   = 0,
+    kCurrentNumberOfPressesCounted = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t newPosition;
+    uint8_t currentNumberOfPressesCounted;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t newPosition;
+    uint8_t currentNumberOfPressesCounted;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace MultiPressOngoing
+namespace MultiPressComplete {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000006;
+
+enum class Fields
+{
+    kNewPosition                 = 0,
+    kTotalNumberOfPressesCounted = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t newPosition;
+    uint8_t totalNumberOfPressesCounted;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+
+    uint8_t newPosition;
+    uint8_t totalNumberOfPressesCounted;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace MultiPressComplete
+} // namespace Events
 } // namespace Switch
 namespace AdministratorCommissioning {
 // Need to convert consumers to using the new enum classes, so we
