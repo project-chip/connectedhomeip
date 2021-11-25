@@ -59,10 +59,22 @@ class {{filename}}: public TestCommand
 
     {{#*inline "failureCallback"}}mOnFailureCallback_{{index}}{{/inline}}
     {{#*inline "successCallback"}}mOnSuccessCallback_{{index}}{{/inline}}
+    
+    {{#if isGroupCommand}}
+    {{#*inline "doneCallback"}}mOnDoneCallback_{{index}}{{/inline}}
+    {{/if}}
+
     {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
     {{#*inline "successResponse"}}OnSuccessCallback_{{index}}{{/inline}}
+
+    {{#*inline "doneResponse"}}OnDoneCallback_{{index}}{{/inline}}
+
     {{#*inline "successArguments"}}void * context{{#chip_tests_item_response_parameters}}, {{zapTypeToDecodableClusterObjectType type ns=parent.cluster isArgument=true}} {{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
     {{#*inline "failureArguments"}}void * context, uint8_t status{{/inline}}
+
+    {{#if isGroupCommand}}
+    {{#*inline "doneArguments"}}void * context{{/inline}}
+    {{/if}}
 
     {{#chip_tests_items}}
     {{#unless (isTestOnlyCluster cluster)}}
@@ -88,6 +100,15 @@ class {{filename}}: public TestCommand
     {
         (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(chip::to_underlying(status));
     }
+
+    {{#if isGroupCommand}}
+    static void {{>doneResponse}}(void * context)
+    {
+        (static_cast<{{filename}} *>(context))->OnDoneResponse_{{index}}();
+
+    }
+    {{/if}}
+
     {{else if isReadAttribute}}
     static void {{>failureResponse}}(void * context, EmberAfStatus status)
     {
@@ -141,8 +162,11 @@ class {{filename}}: public TestCommand
     {{else}}
     {{#*inline "failureResponse"}}OnFailureResponse_{{index}}{{/inline}}
     {{#*inline "successResponse"}}OnSuccessResponse_{{index}}{{/inline}}
+    {{#*inline "doneResponse"}}OnDoneResponse_{{index}}{{/inline}}
+
     {{#*inline "failureArguments"}}uint8_t status{{/inline}}
     {{#*inline "successArguments"}}{{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{zapTypeToDecodableClusterObjectType type ns=parent.cluster isArgument=true}} {{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
+    {{#*inline "doneArguments"}}{{/inline}}
 
     CHIP_ERROR {{>testCommand}}()
     {
@@ -185,7 +209,8 @@ class {{filename}}: public TestCommand
         {{#if isWriteAttribute}}
           {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
           {{#*inline "successResponse"}}OnSuccessCallback_{{index}}{{/inline}}
-          {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>successResponse}}, {{>failureResponse}}){{#if async}}){{/if}};
+          {{#*inline "doneResponse"}}OnDoneCallback_{{index}}{{/inline}}
+          {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>successResponse}}, {{>failureResponse}}{{#if isGroupCommand}}, {{>doneResponse}}{{/if}}){{#if async}}){{/if}};
         {{else if isReadAttribute}}
           {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
           {{#*inline "successResponse"}}OnSuccessCallback_{{index}}{{/inline}}
@@ -247,6 +272,13 @@ class {{filename}}: public TestCommand
         {{#unless async}}NextTest();{{/unless}}
         {{/if}}
     }
+
+    {{#if isGroupCommand}}
+    void {{>doneResponse}}({{>doneArguments}})
+    {
+      NextTest();
+    }
+    {{/if}}
 
     {{/if}}
     {{/chip_tests_items}}

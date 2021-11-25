@@ -43517,6 +43517,8 @@ private:
         (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_0(chip::to_underlying(status));
     }
 
+    static void OnDoneCallback_0(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_0(); }
+
     static void OnSuccessCallback_0(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_0(); }
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
@@ -43533,6 +43535,8 @@ private:
     {
         (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
+
+    static void OnDoneCallback_2(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_2(); }
 
     static void OnSuccessCallback_2(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_2(); }
 
@@ -43560,12 +43564,14 @@ private:
         locationArgument = chip::Span<const char>("usgarbage: not in length on purpose", 2);
 
         return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_0, OnFailureCallback_0);
+            locationArgument, this, OnSuccessCallback_0, OnFailureCallback_0, OnDoneCallback_0);
     }
 
     void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_0() { NextTest(); }
+
+    void OnDoneResponse_0() { NextTest(); }
 
     CHIP_ERROR TestReadBackAttribute_1()
     {
@@ -43596,12 +43602,14 @@ private:
         locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
         return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+            locationArgument, this, OnSuccessCallback_2, OnFailureCallback_2, OnDoneCallback_2);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_2() { NextTest(); }
+
+    void OnDoneResponse_2() { NextTest(); }
 
     CHIP_ERROR TestReadBackAttribute_3()
     {
