@@ -120,7 +120,7 @@ bool emberAfContentLauncherClusterLaunchURLCallback(
     ContentLaunchBrandingInformation brandingInformation;
 
     CHIP_ERROR err = ContentLauncherMgr().LaunchUrl(contentUrl, displayString, brandingInformation);
-    
+
     if (err != CHIP_NO_ERROR)
     {
         return false;
@@ -362,7 +362,7 @@ CHIP_ERROR ContentLauncherManager::SendResponse(JNIEnv * env, jobject resp, chip
 }
 
 CHIP_ERROR ContentLauncherManager::SendResponse(EmberAfContentLaunchStatus status, const char* data, size_t length ,chip::CommandId commandId)
-{   
+{
     //todo: send struct response once it is supported
     // emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_CONTENT_LAUNCH_CLUSTER_ID,
     //                           commandId, "uS", status, data, length);

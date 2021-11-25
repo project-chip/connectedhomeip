@@ -170,7 +170,7 @@ CHIP_ERROR MediaPlaybackManager::GetAttribute(chip::app::AttributeValueEncoder &
         {
             case ZCL_MEDIA_PLAYBACK_PLAYBACK_SPEED_ATTRIBUTE_ID:
             {
-                // TODO: Convert to single once it is supported 
+                // TODO: Convert to single once it is supported
                 // float speed = static_cast<float>(jAttributeValue) / 10000.0f;
                 err = aEncoder.Encode(static_cast<uint64_t>(jAttributeValue));
                 break;
