@@ -51,7 +51,7 @@ limitations under the License.
 
   <struct name="ExtensionEntry">
     <cluster code="0x001F"/>
-    <item fieldId="0" name="FabricIndex" type="INT8U"/>
+    <item fieldId="0" name="FabricIndex" type="fabric-idx"/>
     <item fieldId="1" name="Data" type="OCTET_STRING" length="254"/>
   </struct>
 
