@@ -279,6 +279,8 @@ if (CONFIG_CHIP_PW_RPC)
     chip_gn_arg_bool  ("chip_build_pw_rpc_lighting_proto"     CONFIG_CHIP_PW_RPC_LIGHTING_PROTO)
     chip_gn_arg_bool  ("chip_build_pw_rpc_locking_proto"      CONFIG_CHIP_PW_RPC_LOCKING_PROTO)
 endif(CONFIG_CHIP_PW_RPC)
+chip_gn_arg_bool  ("chip_enable_ota_requestor"            CONFIG_CHIP_OTA_REQUESTOR)
+
 
 file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
 

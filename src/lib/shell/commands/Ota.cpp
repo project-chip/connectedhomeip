@@ -19,10 +19,28 @@
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <lib/support/logging/CHIPLogging.h>
+<<<<<<< HEAD
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 #include <platform/OTARequestorDriver.h>
 #include <platform/OTARequestorInterface.h>
+=======
+#include <messaging/ExchangeMgr.h>
+#include <protocols/bdx/BdxMessages.h>
+#include <protocols/bdx/BdxTransferSession.h>
+
+// TODO: Use common software update layer to store the image
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#include "DFUManager_nrfconnect.h"
+#elif CHIP_DEVICE_LAYER_TARGET_MBED
+#include "DFUManager_mbed.h"
+#endif
+
+#if CHIP_DEVICE_LAYER_TARGET_ESP32
+#include "DFUManager_esp32.h"
+#endif
+#include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
+>>>>>>> Add OTA requestor app draft
 
 using namespace chip::DeviceLayer;
 
