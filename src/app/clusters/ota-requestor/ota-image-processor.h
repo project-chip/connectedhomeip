@@ -23,6 +23,25 @@
 
 #pragma once
 
+#include <lib/support/Span.h>
+
+// Action parameter type for the OnBlockProcessed()
+enum class NextActionType : uint8_t
+{
+    kGetNext,
+    kSkipBytes,
+    kEnd
+};
+
+struct DownloadAction
+{
+    NextActionType Action;
+    chip::Optional<uint32_t> BytesToSkip;
+}
+
+typedef void (*OnDownloadPrepared)(void * context);
+typedef void (*OnBlockProcessed)(void * context, DownloadAction action);
+
 // This is a platform-agnostic interface for processing downloaded
 // chunks of OTA image data (data could be raw image data meant for flash or
 // metadata). Each platform should provide an implementation of this
@@ -31,10 +50,10 @@ class OTAImageProcessorDriver
 {
 public:
     // Open file, find block of space in persistent memory, or allocate a buffer, etc.
-    virtual CHIP_ERROR PrepareDownload() = 0;
+    virtual CHIP_ERROR PrepareDownload(chip::Callback::Callback<OnDownloadPrepared> * callback) = 0;
 
     // Must not be a blocking call to support cases that require IO to elements such as // external peripherals/radios
-    virtual CHIP_ERROR ProcessBlock(ByteSpan & data) = 0;
+    virtual CHIP_ERROR ProcessBlock(ByteSpan & data, chip::Callback::Callback<OnBlockProcessed> * callback) = 0;
 
     // Close file, close persistent storage, etc
     virtual CHIP_ERROR Finalize() = 0;
