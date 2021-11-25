@@ -41,8 +41,8 @@
             "path": "partials/command_callback_responses.zapt"
         },
         {
-            "name": "command_arguments",
-            "path": "partials/command_arguments.zapt"
+            "name": "java_type_for_argument",
+            "path": "partials/java_type_for_argument.zapt"
         }
     ],
     "templates": [

@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,23 +15,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <credentials/DeviceAttestationVerifier.h>
+#include <app/util/af-types.h>
+#include <jni.h>
+#include <lib/core/CHIPError.h>
 
-namespace chip {
-namespace Credentials {
-namespace Examples {
+class WakeOnLanManager
+{
+public:
+    void InitializeWithObjects(jobject managerObject);
+    void InitWakeOnLanCluster(chip::EndpointId endpoint);
 
-/**
- * @brief Get implementation of a sample DAC verifier to validate device
- *        attestation procedure.
- *
- * @returns a singleton DeviceAttestationVerifier that relies on no
- *          storage abstractions.
- */
-DeviceAttestationVerifier * GetExampleDACVerifier();
+private:
+    friend WakeOnLanManager & WakeOnLanMgr();
 
-} // namespace Examples
-} // namespace Credentials
-} // namespace chip
+    static WakeOnLanManager sInstance;
+    jobject mWakeOnLanManagerObject = nullptr;
+    jmethodID mGetMacMethod         = nullptr;
+};
+
+inline WakeOnLanManager & WakeOnLanMgr()
+{
+    return WakeOnLanManager::sInstance;
+}

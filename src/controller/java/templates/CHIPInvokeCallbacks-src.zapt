@@ -61,11 +61,11 @@ void CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callbac
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#chip_cluster_response_arguments}}{{#if isArray}}{{else if isOptional}}Ljava/util/Optional;{{else if (isOctetString type)}}[B{{else if (isShortString type)}}Ljava/lang/String;{{else}}{{asJniSignature type true}}{{/if}}{{/chip_cluster_response_arguments}})V", &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#chip_cluster_response_arguments}}{{#if isArray}}{{else if isOptional}}Ljava/util/Optional;{{else if (isOctetString type)}}[B{{else if (isCharString type)}}Ljava/lang/String;{{else}}{{asJniSignature type true}}{{/if}}{{/chip_cluster_response_arguments}})V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     {{#chip_cluster_response_arguments}}
-    {{>decode_value}}
+    {{>decode_value source=(concat "dataResponse." (asLowerCamelCase name)) target=(asSymbol label)}}
     {{/chip_cluster_response_arguments}}
 
     env->CallVoidMethod(javaCallbackRef, javaMethod{{#chip_cluster_response_arguments}}, {{asSymbol label}}{{/chip_cluster_response_arguments}});

@@ -53,8 +53,8 @@ if (chip_device_platform != "none") {
     # Enable including the additional data in the advertisement packets
     chip_enable_additional_data_advertising = true
 
-    # Enable adding rotating device id to the additional data.
-    chip_enable_rotating_device_id = true
+    # Enable adding optional rotating device id to the additional data.
+    chip_enable_rotating_device_id = false
 
     # lock tracking: none/log/fatal or auto for a platform-dependent choice
     chip_stack_lock_tracking = "auto"
@@ -113,6 +113,10 @@ if (chip_device_platform != "none") {
 
     if (chip_enable_nfc) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_NFC=1" ]
+    }
+
+    if (chip_enable_ota_requestor) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR=1" ]
     }
 
     if (chip_device_project_config_include != "") {

@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
@@ -16,17 +15,23 @@
  *    limitations under the License.
  */
 
-#pragma once
+/**
+ *    @file
+ *      This file defines the configuration parameters that are required
+ *      for the CHIP Reliable Messaging Protocol.
+ *
+ */
 
-#include <app/AttributeAccessInterface.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 
-#include <lib/core/CHIPError.h>
-#include <string>
-#include <vector>
+#include <system/SystemClock.h>
 
-class MediaInputManager
-{
-public:
-    CHIP_ERROR Init();
-    CHIP_ERROR proxyGetInputList(chip::app::AttributeValueEncoder & aEncoder);
-};
+namespace chip {
+
+using namespace System::Clock::Literals;
+
+const ReliableMessageProtocolConfig
+    gDefaultMRPConfig(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
+                      CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT);
+
+} // namespace chip

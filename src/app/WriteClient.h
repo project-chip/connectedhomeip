@@ -174,7 +174,6 @@ private:
     void MoveToState(const State aTargetState);
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB);
-    CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams, AttributeDataIB::Builder aAttributeDataIB);
     void ClearExistingExchangeContext();
     const char * GetStateStr() const;
     void ClearState();

@@ -75,7 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull endpointListID;
 @property (strong, nonatomic) NSString * _Nonnull name;
 @property (strong, nonatomic) NSNumber * _Nonnull type;
-@property (strong, nonatomic) NSData * _Nonnull endpoints;
+@property (strong, nonatomic) NSArray * _Nonnull endpoints;
 - (instancetype)init;
 @end
 

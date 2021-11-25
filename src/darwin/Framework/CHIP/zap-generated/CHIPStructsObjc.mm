@@ -132,7 +132,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _type = @(0);
 
-        _endpoints = [NSData data];
+        _endpoints = [NSArray array];
     }
     return self;
 }

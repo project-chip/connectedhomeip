@@ -103,7 +103,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEnco
     CHIP_ERROR err = CHIP_NO_ERROR;
     DeviceLayer::NetworkInterface * netifs;
 
-    if (ConnectivityMgr().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
+    if (DeviceLayer::GetDiagnosticDataProvider().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
     {
         err = aEncoder.EncodeList([&netifs](const TagBoundEncoder & encoder) -> CHIP_ERROR {
             for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
@@ -114,7 +114,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEnco
             return CHIP_NO_ERROR;
         });
 
-        ConnectivityMgr().ReleaseNetworkInterfaces(netifs);
+        DeviceLayer::GetDiagnosticDataProvider().ReleaseNetworkInterfaces(netifs);
     }
     else
     {
@@ -209,6 +209,69 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
                                                            GeneralDiagnostics::Attributes::RebootCount::Id);
                     MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
                                                            GeneralDiagnostics::Attributes::BootReasons::Id);
+                }
+            }
+        }
+    }
+
+    // Get called when the Node detects a hardware fault has been raised.
+    void OnHardwareFaultsDetected() override
+    {
+        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnHardwareFaultsDetected");
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
+                }
+            }
+        }
+    }
+
+    // Get called when the Node detects a radio fault has been raised.
+    void OnRadioFaultsDetected() override
+    {
+        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnHardwareFaultsDetected");
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
+                }
+            }
+        }
+    }
+
+    // Get called when the Node detects a network fault has been raised.
+    void OnNetworkFaultsDetected() override
+    {
+        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnHardwareFaultsDetected");
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
                 }
             }
         }

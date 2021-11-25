@@ -96,7 +96,14 @@ protected:
     {
         if (current == expected)
         {
-            Exit(std::string(itemName) + " value == notValue: " + std::to_string(current) + " == " + std::to_string(expected));
+            if (std::is_same<T, const chip::Span<const uint8_t>>::value || std::is_same<T, const chip::Span<const char>>::value)
+            {
+                Exit(std::string(itemName) + " value == notValue");
+            }
+            else
+            {
+                Exit(std::string(itemName) + " value == notValue: " + std::to_string(current) + " == " + std::to_string(expected));
+            }
             return false;
         }
 

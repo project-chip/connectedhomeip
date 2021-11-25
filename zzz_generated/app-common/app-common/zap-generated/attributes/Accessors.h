@@ -361,6 +361,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
 } // namespace HighTempThreshold
 
+namespace LowTempDwellTripPoint {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int24u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace LowTempDwellTripPoint
+
+namespace HighTempDwellTripPoint {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int24u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace HighTempDwellTripPoint
+
 } // namespace Attributes
 } // namespace DeviceTemperatureConfiguration
 
@@ -826,10 +836,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ProductID
 
-namespace UserLabel {
+namespace NodeLabel {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace UserLabel
+} // namespace NodeLabel
 
 namespace Location {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
@@ -890,6 +900,11 @@ namespace Reachable {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace Reachable
+
+namespace UniqueID {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace UniqueID
 
 } // namespace Attributes
 } // namespace Basic
@@ -1118,8 +1133,8 @@ namespace ThreadNetworkDiagnostics {
 namespace Attributes {
 
 namespace Channel {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Channel
 
 namespace RoutingRole {
@@ -1550,10 +1565,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // ch
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ProductName
 
-namespace UserLabel {
+namespace NodeLabel {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace UserLabel
+} // namespace NodeLabel
 
 namespace HardwareVersion {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
@@ -1586,7 +1601,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace PartNumber
 
 namespace ProductURL {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // long_char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ProductURL
 
@@ -1604,6 +1619,11 @@ namespace Reachable {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace Reachable
+
+namespace UniqueID {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace UniqueID
 
 } // namespace Attributes
 } // namespace BridgedDeviceBasic
@@ -2234,6 +2254,16 @@ namespace Speed {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Speed
+
+namespace LifetimeRunningHours {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int24u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace LifetimeRunningHours
+
+namespace Power {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int24u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace Power
 
 namespace LifetimeEnergyConsumed {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
@@ -2891,10 +2921,25 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // ch
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace LampManufacturer
 
+namespace LampRatedHours {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int24u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace LampRatedHours
+
+namespace LampBurnHours {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int24u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace LampBurnHours
+
 namespace LampAlarmMode {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace LampAlarmMode
+
+namespace LampBurnHoursTripPoint {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int24u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace LampBurnHoursTripPoint
 
 } // namespace Attributes
 } // namespace BallastConfiguration
@@ -4377,6 +4422,11 @@ EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<chip::Cha
 namespace ApplianceIdentification {
 namespace Attributes {
 
+namespace BasicIdentification {
+EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int56u
+EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+} // namespace BasicIdentification
+
 namespace CompanyName {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
@@ -4487,6 +4537,16 @@ namespace Pod {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace Pod
+
+namespace AvailablePower {
+EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value); // int24s
+EmberAfStatus Set(chip::EndpointId endpoint, int32_t value);
+} // namespace AvailablePower
+
+namespace PowerThreshold {
+EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value); // int24s
+EmberAfStatus Set(chip::EndpointId endpoint, int32_t value);
+} // namespace PowerThreshold
 
 } // namespace Attributes
 } // namespace MeterIdentification

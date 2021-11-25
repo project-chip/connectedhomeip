@@ -21,7 +21,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation CHIPIdentifyClusterIdentifyPayload
+@implementation CHIPIdentifyClusterIdentifyParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIdentifyClusterIdentifyQueryResponsePayload
+@implementation CHIPIdentifyClusterIdentifyQueryResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -43,16 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIdentifyClusterIdentifyQueryPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPIdentifyClusterTriggerEffectPayload
+@implementation CHIPIdentifyClusterTriggerEffectParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -65,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupsClusterAddGroupPayload
+@implementation CHIPGroupsClusterAddGroupParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -78,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupsClusterAddGroupResponsePayload
+@implementation CHIPGroupsClusterAddGroupResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -91,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupsClusterViewGroupPayload
+@implementation CHIPGroupsClusterViewGroupParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -102,7 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupsClusterViewGroupResponsePayload
+@implementation CHIPGroupsClusterViewGroupResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -117,7 +108,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupsClusterGetGroupMembershipPayload
+@implementation CHIPGroupsClusterGetGroupMembershipParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -128,7 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupsClusterGetGroupMembershipResponsePayload
+@implementation CHIPGroupsClusterGetGroupMembershipResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -141,7 +132,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupsClusterRemoveGroupPayload
+@implementation CHIPGroupsClusterRemoveGroupParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -152,7 +143,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupsClusterRemoveGroupResponsePayload
+@implementation CHIPGroupsClusterRemoveGroupResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -165,16 +156,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupsClusterRemoveAllGroupsPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPGroupsClusterAddGroupIfIdentifyingPayload
+@implementation CHIPGroupsClusterAddGroupIfIdentifyingParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -187,7 +169,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterAddScenePayload
+@implementation CHIPScenesClusterAddSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -206,7 +188,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterAddSceneResponsePayload
+@implementation CHIPScenesClusterAddSceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -221,7 +203,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterViewScenePayload
+@implementation CHIPScenesClusterViewSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -234,7 +216,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterViewSceneResponsePayload
+@implementation CHIPScenesClusterViewSceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -255,7 +237,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterRemoveScenePayload
+@implementation CHIPScenesClusterRemoveSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -268,7 +250,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterRemoveSceneResponsePayload
+@implementation CHIPScenesClusterRemoveSceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -283,7 +265,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterRemoveAllScenesPayload
+@implementation CHIPScenesClusterRemoveAllScenesParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -294,7 +276,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterRemoveAllScenesResponsePayload
+@implementation CHIPScenesClusterRemoveAllScenesResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -307,7 +289,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterStoreScenePayload
+@implementation CHIPScenesClusterStoreSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -320,7 +302,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterStoreSceneResponsePayload
+@implementation CHIPScenesClusterStoreSceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -335,7 +317,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterRecallScenePayload
+@implementation CHIPScenesClusterRecallSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -350,7 +332,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterGetSceneMembershipPayload
+@implementation CHIPScenesClusterGetSceneMembershipParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -361,7 +343,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterGetSceneMembershipResponsePayload
+@implementation CHIPScenesClusterGetSceneMembershipResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -380,7 +362,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterEnhancedAddScenePayload
+@implementation CHIPScenesClusterEnhancedAddSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -399,7 +381,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterEnhancedAddSceneResponsePayload
+@implementation CHIPScenesClusterEnhancedAddSceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -414,7 +396,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterEnhancedViewScenePayload
+@implementation CHIPScenesClusterEnhancedViewSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -427,7 +409,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterEnhancedViewSceneResponsePayload
+@implementation CHIPScenesClusterEnhancedViewSceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -448,7 +430,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterCopyScenePayload
+@implementation CHIPScenesClusterCopySceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -467,7 +449,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterCopySceneResponsePayload
+@implementation CHIPScenesClusterCopySceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -482,79 +464,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOnOffClusterOffPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOnOffClusterSampleMfgSpecificOffWithTransitionPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOnOffClusterOnPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOnOffClusterSampleMfgSpecificOnWithTransitionPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOnOffClusterSampleMfgSpecificOnWithTransition2Payload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOnOffClusterTogglePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOnOffClusterSampleMfgSpecificToggleWithTransitionPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOnOffClusterSampleMfgSpecificToggleWithTransition2Payload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOnOffClusterOffWithEffectPayload
+@implementation CHIPOnOffClusterOffWithEffectParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -567,16 +477,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOnOffClusterOnWithRecallGlobalScenePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOnOffClusterOnWithTimedOffPayload
+@implementation CHIPOnOffClusterOnWithTimedOffParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -591,7 +492,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPLevelControlClusterMoveToLevelPayload
+@implementation CHIPLevelControlClusterMoveToLevelParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -608,7 +509,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPLevelControlClusterMovePayload
+@implementation CHIPLevelControlClusterMoveParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -625,7 +526,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPLevelControlClusterStepPayload
+@implementation CHIPLevelControlClusterStepParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -644,7 +545,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPLevelControlClusterStopPayload
+@implementation CHIPLevelControlClusterStopParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -657,7 +558,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPLevelControlClusterMoveToLevelWithOnOffPayload
+@implementation CHIPLevelControlClusterMoveToLevelWithOnOffParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -670,7 +571,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPLevelControlClusterMoveWithOnOffPayload
+@implementation CHIPLevelControlClusterMoveWithOnOffParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -683,7 +584,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPLevelControlClusterStepWithOnOffPayload
+@implementation CHIPLevelControlClusterStepWithOnOffParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -698,16 +599,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPLevelControlClusterStopWithOnOffPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPAlarmsClusterResetAlarmPayload
+@implementation CHIPAlarmsClusterResetAlarmParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -720,7 +612,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAlarmsClusterAlarmPayload
+@implementation CHIPAlarmsClusterAlarmParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -733,16 +625,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAlarmsClusterResetAllAlarmsPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPAlarmsClusterGetAlarmResponsePayload
+@implementation CHIPAlarmsClusterGetAlarmResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -759,25 +642,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAlarmsClusterGetAlarmPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPAlarmsClusterResetAlarmLogPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPPowerProfileClusterPowerProfileRequestPayload
+@implementation CHIPPowerProfileClusterPowerProfileRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -788,7 +653,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterPowerProfileNotificationPayload
+@implementation CHIPPowerProfileClusterPowerProfileNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -805,16 +670,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterPowerProfileStateRequestPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPPowerProfileClusterPowerProfileResponsePayload
+@implementation CHIPPowerProfileClusterPowerProfileResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -831,7 +687,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterGetPowerProfilePriceResponsePayload
+@implementation CHIPPowerProfileClusterGetPowerProfilePriceResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -848,7 +704,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterPowerProfileStateResponsePayload
+@implementation CHIPPowerProfileClusterPowerProfileStateResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -861,7 +717,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterGetOverallSchedulePriceResponsePayload
+@implementation CHIPPowerProfileClusterGetOverallSchedulePriceResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -876,7 +732,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterGetPowerProfilePricePayload
+@implementation CHIPPowerProfileClusterGetPowerProfilePriceParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -887,7 +743,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterEnergyPhasesScheduleNotificationPayload
+@implementation CHIPPowerProfileClusterEnergyPhasesScheduleNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -902,7 +758,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterPowerProfilesStateNotificationPayload
+@implementation CHIPPowerProfileClusterPowerProfilesStateNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -915,7 +771,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterEnergyPhasesScheduleResponsePayload
+@implementation CHIPPowerProfileClusterEnergyPhasesScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -930,16 +786,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterGetOverallSchedulePricePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsRequestPayload
+@implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -950,7 +797,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterEnergyPhasesScheduleRequestPayload
+@implementation CHIPPowerProfileClusterEnergyPhasesScheduleRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -961,7 +808,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateRequestPayload
+@implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -972,7 +819,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateResponsePayload
+@implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -987,7 +834,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterGetPowerProfilePriceExtendedResponsePayload
+@implementation CHIPPowerProfileClusterGetPowerProfilePriceExtendedResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1004,7 +851,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateNotificationPayload
+@implementation CHIPPowerProfileClusterEnergyPhasesScheduleStateNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1019,7 +866,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsNotificationPayload
+@implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1034,7 +881,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsResponsePayload
+@implementation CHIPPowerProfileClusterPowerProfileScheduleConstraintsResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1049,7 +896,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPowerProfileClusterGetPowerProfilePriceExtendedPayload
+@implementation CHIPPowerProfileClusterGetPowerProfilePriceExtendedParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1064,7 +911,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceControlClusterExecutionOfACommandPayload
+@implementation CHIPApplianceControlClusterExecutionOfACommandParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1075,7 +922,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceControlClusterSignalStateResponsePayload
+@implementation CHIPApplianceControlClusterSignalStateResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1090,16 +937,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceControlClusterSignalStatePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPApplianceControlClusterSignalStateNotificationPayload
+@implementation CHIPApplianceControlClusterSignalStateNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1114,7 +952,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceControlClusterWriteFunctionsPayload
+@implementation CHIPApplianceControlClusterWriteFunctionsParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1129,25 +967,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceControlClusterOverloadPauseResumePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPApplianceControlClusterOverloadPausePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPApplianceControlClusterOverloadWarningPayload
+@implementation CHIPApplianceControlClusterOverloadWarningParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1158,16 +978,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPollControlClusterCheckInPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPPollControlClusterCheckInResponsePayload
+@implementation CHIPPollControlClusterCheckInResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1180,16 +991,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPollControlClusterFastPollStopPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPPollControlClusterSetLongPollIntervalPayload
+@implementation CHIPPollControlClusterSetLongPollIntervalParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1200,7 +1002,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPPollControlClusterSetShortPollIntervalPayload
+@implementation CHIPPollControlClusterSetShortPollIntervalParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1211,7 +1013,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBridgedActionsClusterInstantActionPayload
+@implementation CHIPBridgedActionsClusterInstantActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1224,7 +1026,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBridgedActionsClusterInstantActionWithTransitionPayload
+@implementation CHIPBridgedActionsClusterInstantActionWithTransitionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1239,7 +1041,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBridgedActionsClusterStartActionPayload
+@implementation CHIPBridgedActionsClusterStartActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1252,48 +1054,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBridgedActionsClusterStartActionWithDurationPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _actionID = @(0);
-
-        _invokeID = nil;
-
-        _duration = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBridgedActionsClusterStopActionPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _actionID = @(0);
-
-        _invokeID = nil;
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBridgedActionsClusterPauseActionPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _actionID = @(0);
-
-        _invokeID = nil;
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBridgedActionsClusterPauseActionWithDurationPayload
+@implementation CHIPBridgedActionsClusterStartActionWithDurationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1308,7 +1069,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBridgedActionsClusterResumeActionPayload
+@implementation CHIPBridgedActionsClusterStopActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1321,7 +1082,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBridgedActionsClusterEnableActionPayload
+@implementation CHIPBridgedActionsClusterPauseActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1334,35 +1095,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBridgedActionsClusterEnableActionWithDurationPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _actionID = @(0);
-
-        _invokeID = nil;
-
-        _duration = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBridgedActionsClusterDisableActionPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _actionID = @(0);
-
-        _invokeID = nil;
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBridgedActionsClusterDisableActionWithDurationPayload
+@implementation CHIPBridgedActionsClusterPauseActionWithDurationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1377,43 +1110,76 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBasicClusterStartUpPayload
+@implementation CHIPBridgedActionsClusterResumeActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
     }
     return self;
 }
 @end
 
-@implementation CHIPBasicClusterMfgSpecificPingPayload
+@implementation CHIPBridgedActionsClusterEnableActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
     }
     return self;
 }
 @end
 
-@implementation CHIPBasicClusterShutDownPayload
+@implementation CHIPBridgedActionsClusterEnableActionWithDurationParams
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+
+        _duration = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPBasicClusterLeavePayload
+@implementation CHIPBridgedActionsClusterDisableActionParams
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
     }
     return self;
 }
 @end
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterQueryImagePayload
+@implementation CHIPBridgedActionsClusterDisableActionWithDurationParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = nil;
+
+        _duration = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1438,7 +1204,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestPayload
+@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1451,7 +1217,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedPayload
+@implementation CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1464,7 +1230,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageResponsePayload
+@implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1489,7 +1255,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponsePayload
+@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1502,7 +1268,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderPayload
+@implementation CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1519,7 +1285,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGeneralCommissioningClusterArmFailSafePayload
+@implementation CHIPGeneralCommissioningClusterArmFailSafeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1534,7 +1300,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGeneralCommissioningClusterArmFailSafeResponsePayload
+@implementation CHIPGeneralCommissioningClusterArmFailSafeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1547,7 +1313,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGeneralCommissioningClusterSetRegulatoryConfigPayload
+@implementation CHIPGeneralCommissioningClusterSetRegulatoryConfigParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1564,7 +1330,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGeneralCommissioningClusterSetRegulatoryConfigResponsePayload
+@implementation CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1577,16 +1343,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGeneralCommissioningClusterCommissioningCompletePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPGeneralCommissioningClusterCommissioningCompleteResponsePayload
+@implementation CHIPGeneralCommissioningClusterCommissioningCompleteResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1599,7 +1356,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterScanNetworksPayload
+@implementation CHIPNetworkCommissioningClusterScanNetworksParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1614,7 +1371,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterScanNetworksResponsePayload
+@implementation CHIPNetworkCommissioningClusterScanNetworksResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1631,7 +1388,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterAddWiFiNetworkPayload
+@implementation CHIPNetworkCommissioningClusterAddWiFiNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1648,7 +1405,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterAddWiFiNetworkResponsePayload
+@implementation CHIPNetworkCommissioningClusterAddWiFiNetworkResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1661,7 +1418,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterUpdateWiFiNetworkPayload
+@implementation CHIPNetworkCommissioningClusterUpdateWiFiNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1678,7 +1435,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponsePayload
+@implementation CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1691,7 +1448,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterAddThreadNetworkPayload
+@implementation CHIPNetworkCommissioningClusterAddThreadNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1706,7 +1463,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterAddThreadNetworkResponsePayload
+@implementation CHIPNetworkCommissioningClusterAddThreadNetworkResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1719,7 +1476,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterUpdateThreadNetworkPayload
+@implementation CHIPNetworkCommissioningClusterUpdateThreadNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1734,7 +1491,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterUpdateThreadNetworkResponsePayload
+@implementation CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1747,7 +1504,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterRemoveNetworkPayload
+@implementation CHIPNetworkCommissioningClusterRemoveNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1762,7 +1519,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterRemoveNetworkResponsePayload
+@implementation CHIPNetworkCommissioningClusterRemoveNetworkResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1775,7 +1532,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterEnableNetworkPayload
+@implementation CHIPNetworkCommissioningClusterEnableNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1790,7 +1547,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterEnableNetworkResponsePayload
+@implementation CHIPNetworkCommissioningClusterEnableNetworkResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1803,7 +1560,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterDisableNetworkPayload
+@implementation CHIPNetworkCommissioningClusterDisableNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1818,7 +1575,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterDisableNetworkResponsePayload
+@implementation CHIPNetworkCommissioningClusterDisableNetworkResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1831,7 +1588,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDiagnosticLogsClusterRetrieveLogsRequestPayload
+@implementation CHIPDiagnosticLogsClusterRetrieveLogsRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1846,7 +1603,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDiagnosticLogsClusterRetrieveLogsResponsePayload
+@implementation CHIPDiagnosticLogsClusterRetrieveLogsResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1863,79 +1620,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPSoftwareDiagnosticsClusterResetWatermarksPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPThreadNetworkDiagnosticsClusterResetCountsPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPWiFiNetworkDiagnosticsClusterResetCountsPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPEthernetNetworkDiagnosticsClusterResetCountsPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBridgedDeviceBasicClusterStartUpPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBridgedDeviceBasicClusterShutDownPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBridgedDeviceBasicClusterLeavePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBridgedDeviceBasicClusterReachableChangedPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPAdministratorCommissioningClusterOpenCommissioningWindowPayload
+@implementation CHIPAdministratorCommissioningClusterOpenCommissioningWindowParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1956,7 +1641,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAdministratorCommissioningClusterOpenBasicCommissioningWindowPayload
+@implementation CHIPAdministratorCommissioningClusterOpenBasicCommissioningWindowParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1967,16 +1652,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAdministratorCommissioningClusterRevokeCommissioningPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOperationalCredentialsClusterAttestationRequestPayload
+@implementation CHIPOperationalCredentialsClusterAttestationRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1987,7 +1663,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterAttestationResponsePayload
+@implementation CHIPOperationalCredentialsClusterAttestationResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2000,7 +1676,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterCertificateChainRequestPayload
+@implementation CHIPOperationalCredentialsClusterCertificateChainRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2011,7 +1687,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterCertificateChainResponsePayload
+@implementation CHIPOperationalCredentialsClusterCertificateChainResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2022,7 +1698,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterOpCSRRequestPayload
+@implementation CHIPOperationalCredentialsClusterOpCSRRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2033,7 +1709,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterOpCSRResponsePayload
+@implementation CHIPOperationalCredentialsClusterOpCSRResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2046,7 +1722,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterAddNOCPayload
+@implementation CHIPOperationalCredentialsClusterAddNOCParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2065,7 +1741,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterUpdateNOCPayload
+@implementation CHIPOperationalCredentialsClusterUpdateNOCParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2078,7 +1754,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterNOCResponsePayload
+@implementation CHIPOperationalCredentialsClusterNOCResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2093,7 +1769,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterUpdateFabricLabelPayload
+@implementation CHIPOperationalCredentialsClusterUpdateFabricLabelParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2104,7 +1780,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterRemoveFabricPayload
+@implementation CHIPOperationalCredentialsClusterRemoveFabricParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2115,7 +1791,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterAddTrustedRootCertificatePayload
+@implementation CHIPOperationalCredentialsClusterAddTrustedRootCertificateParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2126,7 +1802,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterRemoveTrustedRootCertificatePayload
+@implementation CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2137,7 +1813,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPModeSelectClusterChangeToModePayload
+@implementation CHIPModeSelectClusterChangeToModeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2148,7 +1824,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterLockDoorPayload
+@implementation CHIPDoorLockClusterLockDoorParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2159,7 +1835,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterLockDoorResponsePayload
+@implementation CHIPDoorLockClusterLockDoorResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2170,7 +1846,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterUnlockDoorPayload
+@implementation CHIPDoorLockClusterUnlockDoorParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2181,7 +1857,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterUnlockDoorResponsePayload
+@implementation CHIPDoorLockClusterUnlockDoorResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2192,7 +1868,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterTogglePayload
+@implementation CHIPDoorLockClusterToggleParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2203,7 +1879,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterToggleResponsePayload
+@implementation CHIPDoorLockClusterToggleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2214,7 +1890,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterUnlockWithTimeoutPayload
+@implementation CHIPDoorLockClusterUnlockWithTimeoutParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2227,7 +1903,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterUnlockWithTimeoutResponsePayload
+@implementation CHIPDoorLockClusterUnlockWithTimeoutResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2238,7 +1914,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetLogRecordPayload
+@implementation CHIPDoorLockClusterGetLogRecordParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2249,7 +1925,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetLogRecordResponsePayload
+@implementation CHIPDoorLockClusterGetLogRecordResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2272,7 +1948,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetPinPayload
+@implementation CHIPDoorLockClusterSetPinParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2289,7 +1965,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetPinResponsePayload
+@implementation CHIPDoorLockClusterSetPinResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2300,7 +1976,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetPinPayload
+@implementation CHIPDoorLockClusterGetPinParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2311,7 +1987,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetPinResponsePayload
+@implementation CHIPDoorLockClusterGetPinResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2328,7 +2004,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearPinPayload
+@implementation CHIPDoorLockClusterClearPinParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2339,7 +2015,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearPinResponsePayload
+@implementation CHIPDoorLockClusterClearPinResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2350,16 +2026,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearAllPinsPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterClearAllPinsResponsePayload
+@implementation CHIPDoorLockClusterClearAllPinsResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2370,7 +2037,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetUserStatusPayload
+@implementation CHIPDoorLockClusterSetUserStatusParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2383,7 +2050,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetUserStatusResponsePayload
+@implementation CHIPDoorLockClusterSetUserStatusResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2394,7 +2061,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetUserStatusPayload
+@implementation CHIPDoorLockClusterGetUserStatusParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2405,7 +2072,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetUserStatusResponsePayload
+@implementation CHIPDoorLockClusterGetUserStatusResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2418,7 +2085,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetWeekdaySchedulePayload
+@implementation CHIPDoorLockClusterSetWeekdayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2441,7 +2108,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetWeekdayScheduleResponsePayload
+@implementation CHIPDoorLockClusterSetWeekdayScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2452,7 +2119,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetWeekdaySchedulePayload
+@implementation CHIPDoorLockClusterGetWeekdayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2465,7 +2132,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetWeekdayScheduleResponsePayload
+@implementation CHIPDoorLockClusterGetWeekdayScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2490,7 +2157,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearWeekdaySchedulePayload
+@implementation CHIPDoorLockClusterClearWeekdayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2503,7 +2170,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearWeekdayScheduleResponsePayload
+@implementation CHIPDoorLockClusterClearWeekdayScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2514,7 +2181,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetYeardaySchedulePayload
+@implementation CHIPDoorLockClusterSetYeardayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2531,7 +2198,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetYeardayScheduleResponsePayload
+@implementation CHIPDoorLockClusterSetYeardayScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2542,7 +2209,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetYeardaySchedulePayload
+@implementation CHIPDoorLockClusterGetYeardayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2555,7 +2222,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetYeardayScheduleResponsePayload
+@implementation CHIPDoorLockClusterGetYeardayScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2574,7 +2241,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearYeardaySchedulePayload
+@implementation CHIPDoorLockClusterClearYeardayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2587,7 +2254,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearYeardayScheduleResponsePayload
+@implementation CHIPDoorLockClusterClearYeardayScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2598,53 +2265,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetHolidaySchedulePayload
+@implementation CHIPDoorLockClusterSetHolidayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _scheduleId = @(0);
-
-        _localStartTime = @(0);
-
-        _localEndTime = @(0);
-
-        _operatingModeDuringHoliday = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterSetHolidayScheduleResponsePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterGetHolidaySchedulePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _scheduleId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterGetHolidayScheduleResponsePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _scheduleId = @(0);
-
-        _status = @(0);
 
         _localStartTime = @(0);
 
@@ -2656,18 +2282,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearHolidaySchedulePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _scheduleId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterClearHolidayScheduleResponsePayload
+@implementation CHIPDoorLockClusterSetHolidayScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2678,7 +2293,59 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetUserTypePayload
+@implementation CHIPDoorLockClusterGetHolidayScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetHolidayScheduleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+
+        _status = @(0);
+
+        _localStartTime = @(0);
+
+        _localEndTime = @(0);
+
+        _operatingModeDuringHoliday = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearHolidayScheduleParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearHolidayScheduleResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetUserTypeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2691,7 +2358,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetUserTypeResponsePayload
+@implementation CHIPDoorLockClusterSetUserTypeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2702,7 +2369,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetUserTypePayload
+@implementation CHIPDoorLockClusterGetUserTypeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2713,7 +2380,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetUserTypeResponsePayload
+@implementation CHIPDoorLockClusterGetUserTypeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2726,7 +2393,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetRfidPayload
+@implementation CHIPDoorLockClusterSetRfidParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2743,7 +2410,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetRfidResponsePayload
+@implementation CHIPDoorLockClusterSetRfidResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2754,7 +2421,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetRfidPayload
+@implementation CHIPDoorLockClusterGetRfidParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2765,7 +2432,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetRfidResponsePayload
+@implementation CHIPDoorLockClusterGetRfidResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2782,7 +2449,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearRfidPayload
+@implementation CHIPDoorLockClusterClearRfidParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2793,7 +2460,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearRfidResponsePayload
+@implementation CHIPDoorLockClusterClearRfidResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2804,16 +2471,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearAllRfidsPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterClearAllRfidsResponsePayload
+@implementation CHIPDoorLockClusterClearAllRfidsResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2824,7 +2482,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterOperationEventNotificationPayload
+@implementation CHIPDoorLockClusterOperationEventNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2845,7 +2503,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterProgrammingEventNotificationPayload
+@implementation CHIPDoorLockClusterProgrammingEventNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2870,34 +2528,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPWindowCoveringClusterUpOrOpenPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPWindowCoveringClusterDownOrClosePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPWindowCoveringClusterStopMotionPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPWindowCoveringClusterGoToLiftValuePayload
+@implementation CHIPWindowCoveringClusterGoToLiftValueParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2908,7 +2539,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPWindowCoveringClusterGoToLiftPercentagePayload
+@implementation CHIPWindowCoveringClusterGoToLiftPercentageParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2921,7 +2552,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPWindowCoveringClusterGoToTiltValuePayload
+@implementation CHIPWindowCoveringClusterGoToTiltValueParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2932,7 +2563,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPWindowCoveringClusterGoToTiltPercentagePayload
+@implementation CHIPWindowCoveringClusterGoToTiltPercentageParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2945,7 +2576,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBarrierControlClusterBarrierControlGoToPercentPayload
+@implementation CHIPBarrierControlClusterBarrierControlGoToPercentParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2956,16 +2587,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBarrierControlClusterBarrierControlStopPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPThermostatClusterSetpointRaiseLowerPayload
+@implementation CHIPThermostatClusterSetpointRaiseLowerParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2978,7 +2600,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterCurrentWeeklySchedulePayload
+@implementation CHIPThermostatClusterCurrentWeeklyScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2995,7 +2617,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterSetWeeklySchedulePayload
+@implementation CHIPThermostatClusterSetWeeklyScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3012,7 +2634,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterRelayStatusLogPayload
+@implementation CHIPThermostatClusterRelayStatusLogParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3033,7 +2655,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterGetWeeklySchedulePayload
+@implementation CHIPThermostatClusterGetWeeklyScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3046,25 +2668,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterClearWeeklySchedulePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPThermostatClusterGetRelayStatusLogPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPColorControlClusterMoveToHuePayload
+@implementation CHIPColorControlClusterMoveToHueParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3083,7 +2687,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterMoveHuePayload
+@implementation CHIPColorControlClusterMoveHueParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3100,7 +2704,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterStepHuePayload
+@implementation CHIPColorControlClusterStepHueParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3119,7 +2723,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterMoveToSaturationPayload
+@implementation CHIPColorControlClusterMoveToSaturationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3136,7 +2740,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterMoveSaturationPayload
+@implementation CHIPColorControlClusterMoveSaturationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3153,7 +2757,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterStepSaturationPayload
+@implementation CHIPColorControlClusterStepSaturationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3172,7 +2776,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterMoveToHueAndSaturationPayload
+@implementation CHIPColorControlClusterMoveToHueAndSaturationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3191,7 +2795,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterMoveToColorPayload
+@implementation CHIPColorControlClusterMoveToColorParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3210,7 +2814,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterMoveColorPayload
+@implementation CHIPColorControlClusterMoveColorParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3227,7 +2831,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterStepColorPayload
+@implementation CHIPColorControlClusterStepColorParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3246,7 +2850,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterMoveToColorTemperaturePayload
+@implementation CHIPColorControlClusterMoveToColorTemperatureParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3263,7 +2867,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterEnhancedMoveToHuePayload
+@implementation CHIPColorControlClusterEnhancedMoveToHueParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3282,7 +2886,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterEnhancedMoveHuePayload
+@implementation CHIPColorControlClusterEnhancedMoveHueParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3299,7 +2903,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterEnhancedStepHuePayload
+@implementation CHIPColorControlClusterEnhancedStepHueParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3318,7 +2922,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterEnhancedMoveToHueAndSaturationPayload
+@implementation CHIPColorControlClusterEnhancedMoveToHueAndSaturationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3337,7 +2941,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterColorLoopSetPayload
+@implementation CHIPColorControlClusterColorLoopSetParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3360,7 +2964,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterStopMoveStepPayload
+@implementation CHIPColorControlClusterStopMoveStepParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3373,7 +2977,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterMoveColorTemperaturePayload
+@implementation CHIPColorControlClusterMoveColorTemperatureParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3394,7 +2998,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPColorControlClusterStepColorTemperaturePayload
+@implementation CHIPColorControlClusterStepColorTemperatureParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3417,7 +3021,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasZoneClusterZoneEnrollResponsePayload
+@implementation CHIPIasZoneClusterZoneEnrollResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3430,7 +3034,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasZoneClusterZoneStatusChangeNotificationPayload
+@implementation CHIPIasZoneClusterZoneStatusChangeNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3447,16 +3051,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasZoneClusterInitiateNormalOperationModePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPIasZoneClusterZoneEnrollRequestPayload
+@implementation CHIPIasZoneClusterZoneEnrollRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3469,7 +3064,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasZoneClusterInitiateTestModePayload
+@implementation CHIPIasZoneClusterInitiateTestModeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3482,25 +3077,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasZoneClusterInitiateNormalOperationModeResponsePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPIasZoneClusterInitiateTestModeResponsePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPIasAceClusterArmPayload
+@implementation CHIPIasAceClusterArmParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3515,7 +3092,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasAceClusterArmResponsePayload
+@implementation CHIPIasAceClusterArmResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3526,7 +3103,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasAceClusterBypassPayload
+@implementation CHIPIasAceClusterBypassParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3541,7 +3118,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasAceClusterGetZoneIdMapResponsePayload
+@implementation CHIPIasAceClusterGetZoneIdMapResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3582,16 +3159,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasAceClusterEmergencyPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPIasAceClusterGetZoneInformationResponsePayload
+@implementation CHIPIasAceClusterGetZoneInformationResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3608,16 +3176,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasAceClusterFirePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPIasAceClusterZoneStatusChangedPayload
+@implementation CHIPIasAceClusterZoneStatusChangedParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3634,16 +3193,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasAceClusterPanicPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPIasAceClusterPanelStatusChangedPayload
+@implementation CHIPIasAceClusterPanelStatusChangedParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3660,16 +3210,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasAceClusterGetZoneIdMapPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPIasAceClusterGetPanelStatusResponsePayload
+@implementation CHIPIasAceClusterGetPanelStatusResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3686,7 +3227,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasAceClusterGetZoneInformationPayload
+@implementation CHIPIasAceClusterGetZoneInformationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3697,7 +3238,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasAceClusterSetBypassedZoneListPayload
+@implementation CHIPIasAceClusterSetBypassedZoneListParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3710,16 +3251,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasAceClusterGetPanelStatusPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPIasAceClusterBypassResponsePayload
+@implementation CHIPIasAceClusterBypassResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3732,16 +3264,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasAceClusterGetBypassedZoneListPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPIasAceClusterGetZoneStatusResponsePayload
+@implementation CHIPIasAceClusterGetZoneStatusResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3756,7 +3279,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasAceClusterGetZoneStatusPayload
+@implementation CHIPIasAceClusterGetZoneStatusParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3773,7 +3296,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasWdClusterStartWarningPayload
+@implementation CHIPIasWdClusterStartWarningParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3790,7 +3313,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPIasWdClusterSquawkPayload
+@implementation CHIPIasWdClusterSquawkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3801,7 +3324,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelPayload
+@implementation CHIPTvChannelClusterChangeChannelParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3812,7 +3335,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelResponsePayload
+@implementation CHIPTvChannelClusterChangeChannelResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3825,7 +3348,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelByNumberPayload
+@implementation CHIPTvChannelClusterChangeChannelByNumberParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3838,7 +3361,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterSkipChannelPayload
+@implementation CHIPTvChannelClusterSkipChannelParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3849,7 +3372,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTargetNavigatorClusterNavigateTargetPayload
+@implementation CHIPTargetNavigatorClusterNavigateTargetParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3862,7 +3385,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTargetNavigatorClusterNavigateTargetResponsePayload
+@implementation CHIPTargetNavigatorClusterNavigateTargetResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3875,16 +3398,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaPlayPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaPlayResponsePayload
+@implementation CHIPMediaPlaybackClusterMediaPlayResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3895,16 +3409,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaPausePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaPauseResponsePayload
+@implementation CHIPMediaPlaybackClusterMediaPauseResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3915,16 +3420,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaStopPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaStopResponsePayload
+@implementation CHIPMediaPlaybackClusterMediaStopResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3935,16 +3431,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaStartOverPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaStartOverResponsePayload
+@implementation CHIPMediaPlaybackClusterMediaStartOverResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3955,16 +3442,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaPreviousPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaPreviousResponsePayload
+@implementation CHIPMediaPlaybackClusterMediaPreviousResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3975,16 +3453,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaNextPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaNextResponsePayload
+@implementation CHIPMediaPlaybackClusterMediaNextResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3995,16 +3464,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaRewindPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaRewindResponsePayload
+@implementation CHIPMediaPlaybackClusterMediaRewindResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4015,16 +3475,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaFastForwardPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaFastForwardResponsePayload
+@implementation CHIPMediaPlaybackClusterMediaFastForwardResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4035,7 +3486,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSkipForwardPayload
+@implementation CHIPMediaPlaybackClusterMediaSkipForwardParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4046,7 +3497,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSkipForwardResponsePayload
+@implementation CHIPMediaPlaybackClusterMediaSkipForwardResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4057,7 +3508,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSkipBackwardPayload
+@implementation CHIPMediaPlaybackClusterMediaSkipBackwardParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4068,7 +3519,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSkipBackwardResponsePayload
+@implementation CHIPMediaPlaybackClusterMediaSkipBackwardResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4079,7 +3530,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSeekPayload
+@implementation CHIPMediaPlaybackClusterMediaSeekParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4090,7 +3541,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSeekResponsePayload
+@implementation CHIPMediaPlaybackClusterMediaSeekResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4101,7 +3552,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaInputClusterSelectInputPayload
+@implementation CHIPMediaInputClusterSelectInputParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4112,25 +3563,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaInputClusterShowInputStatusPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaInputClusterHideInputStatusPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaInputClusterRenameInputPayload
+@implementation CHIPMediaInputClusterRenameInputParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4143,16 +3576,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPLowPowerClusterSleepPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPKeypadInputClusterSendKeyPayload
+@implementation CHIPKeypadInputClusterSendKeyParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4163,7 +3587,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPKeypadInputClusterSendKeyResponsePayload
+@implementation CHIPKeypadInputClusterSendKeyResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4174,7 +3598,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterLaunchContentPayload
+@implementation CHIPContentLauncherClusterLaunchContentParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4187,7 +3611,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterLaunchContentResponsePayload
+@implementation CHIPContentLauncherClusterLaunchContentResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4200,7 +3624,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterLaunchURLPayload
+@implementation CHIPContentLauncherClusterLaunchURLParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4213,7 +3637,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterLaunchURLResponsePayload
+@implementation CHIPContentLauncherClusterLaunchURLResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4226,7 +3650,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAudioOutputClusterSelectOutputPayload
+@implementation CHIPAudioOutputClusterSelectOutputParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4237,7 +3661,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAudioOutputClusterRenameOutputPayload
+@implementation CHIPAudioOutputClusterRenameOutputParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4250,7 +3674,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterLaunchAppPayload
+@implementation CHIPApplicationLauncherClusterLaunchAppParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4265,7 +3689,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterLaunchAppResponsePayload
+@implementation CHIPApplicationLauncherClusterLaunchAppResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4278,7 +3702,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationBasicClusterChangeStatusPayload
+@implementation CHIPApplicationBasicClusterChangeStatusParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4289,7 +3713,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAccountLoginClusterGetSetupPINPayload
+@implementation CHIPAccountLoginClusterGetSetupPINParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4300,7 +3724,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAccountLoginClusterGetSetupPINResponsePayload
+@implementation CHIPAccountLoginClusterGetSetupPINResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4311,7 +3735,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAccountLoginClusterLoginPayload
+@implementation CHIPAccountLoginClusterLoginParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4324,16 +3748,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPTestClusterClusterTestSpecificResponsePayload
+@implementation CHIPTestClusterClusterTestSpecificResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4344,16 +3759,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestNotHandledPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPTestClusterClusterTestAddArgumentsResponsePayload
+@implementation CHIPTestClusterClusterTestAddArgumentsResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4364,16 +3770,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestSpecificPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPTestClusterClusterTestSimpleArgumentResponsePayload
+@implementation CHIPTestClusterClusterTestSimpleArgumentResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4384,16 +3781,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestUnknownCommandPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPTestClusterClusterTestStructArrayArgumentResponsePayload
+@implementation CHIPTestClusterClusterTestStructArrayArgumentResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4414,7 +3802,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestAddArgumentsPayload
+@implementation CHIPTestClusterClusterTestAddArgumentsParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4427,7 +3815,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestListInt8UReverseResponsePayload
+@implementation CHIPTestClusterClusterTestListInt8UReverseResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4438,7 +3826,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestSimpleArgumentRequestPayload
+@implementation CHIPTestClusterClusterTestSimpleArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4449,7 +3837,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestEnumsResponsePayload
+@implementation CHIPTestClusterClusterTestEnumsResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4462,7 +3850,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestStructArrayArgumentRequestPayload
+@implementation CHIPTestClusterClusterTestStructArrayArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4483,7 +3871,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestNullableOptionalResponsePayload
+@implementation CHIPTestClusterClusterTestNullableOptionalResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4500,7 +3888,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestStructArgumentRequestPayload
+@implementation CHIPTestClusterClusterTestStructArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4511,7 +3899,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestComplexNullableOptionalResponsePayload
+@implementation CHIPTestClusterClusterTestComplexNullableOptionalResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4576,7 +3964,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestNestedStructArgumentRequestPayload
+@implementation CHIPTestClusterClusterTestNestedStructArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4587,7 +3975,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterBooleanResponsePayload
+@implementation CHIPTestClusterClusterBooleanResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4598,7 +3986,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestListStructArgumentRequestPayload
+@implementation CHIPTestClusterClusterTestListStructArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4609,7 +3997,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestListInt8UArgumentRequestPayload
+@implementation CHIPTestClusterClusterTestListInt8UArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4620,7 +4008,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestNestedStructListArgumentRequestPayload
+@implementation CHIPTestClusterClusterTestNestedStructListArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4631,7 +4019,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestListNestedStructListArgumentRequestPayload
+@implementation CHIPTestClusterClusterTestListNestedStructListArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4642,7 +4030,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestListInt8UReverseRequestPayload
+@implementation CHIPTestClusterClusterTestListInt8UReverseRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4653,7 +4041,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestEnumsRequestPayload
+@implementation CHIPTestClusterClusterTestEnumsRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4666,7 +4054,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestNullableOptionalRequestPayload
+@implementation CHIPTestClusterClusterTestNullableOptionalRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4677,7 +4065,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTestClusterClusterTestComplexNullableOptionalRequestPayload
+@implementation CHIPTestClusterClusterTestComplexNullableOptionalRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4710,7 +4098,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMessagingClusterDisplayMessagePayload
+@implementation CHIPMessagingClusterDisplayMessageParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4731,16 +4119,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMessagingClusterGetLastMessagePayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMessagingClusterCancelMessagePayload
+@implementation CHIPMessagingClusterCancelMessageParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4753,7 +4132,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMessagingClusterMessageConfirmationPayload
+@implementation CHIPMessagingClusterMessageConfirmationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4770,7 +4149,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMessagingClusterDisplayProtectedMessagePayload
+@implementation CHIPMessagingClusterDisplayProtectedMessageParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4791,7 +4170,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMessagingClusterGetMessageCancellationPayload
+@implementation CHIPMessagingClusterGetMessageCancellationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4802,7 +4181,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMessagingClusterCancelAllMessagesPayload
+@implementation CHIPMessagingClusterCancelAllMessagesParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4813,16 +4192,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceEventsAndAlertClusterGetAlertsPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPApplianceEventsAndAlertClusterGetAlertsResponsePayload
+@implementation CHIPApplianceEventsAndAlertClusterGetAlertsResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4835,7 +4205,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceEventsAndAlertClusterAlertsNotificationPayload
+@implementation CHIPApplianceEventsAndAlertClusterAlertsNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4848,7 +4218,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceEventsAndAlertClusterEventsNotificationPayload
+@implementation CHIPApplianceEventsAndAlertClusterEventsNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4861,7 +4231,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceStatisticsClusterLogNotificationPayload
+@implementation CHIPApplianceStatisticsClusterLogNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4878,7 +4248,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceStatisticsClusterLogRequestPayload
+@implementation CHIPApplianceStatisticsClusterLogRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4889,7 +4259,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceStatisticsClusterLogResponsePayload
+@implementation CHIPApplianceStatisticsClusterLogResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4906,16 +4276,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceStatisticsClusterLogQueueRequestPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPApplianceStatisticsClusterLogQueueResponsePayload
+@implementation CHIPApplianceStatisticsClusterLogQueueResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4928,7 +4289,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplianceStatisticsClusterStatisticsAvailablePayload
+@implementation CHIPApplianceStatisticsClusterStatisticsAvailableParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4941,7 +4302,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandPayload
+@implementation CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4958,16 +4319,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPElectricalMeasurementClusterGetProfileInfoCommandPayload
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-@end
-
-@implementation CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandPayload
+@implementation CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4988,7 +4340,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPElectricalMeasurementClusterGetMeasurementProfileCommandPayload
+@implementation CHIPElectricalMeasurementClusterGetMeasurementProfileCommandParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -5003,7 +4355,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBindingClusterBindPayload
+@implementation CHIPBindingClusterBindParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -5020,7 +4372,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBindingClusterUnbindPayload
+@implementation CHIPBindingClusterUnbindParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -5037,7 +4389,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPSampleMfgSpecificClusterClusterCommandOnePayload
+@implementation CHIPSampleMfgSpecificClusterClusterCommandOneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -5048,7 +4400,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPSampleMfgSpecificCluster2ClusterCommandTwoPayload
+@implementation CHIPSampleMfgSpecificCluster2ClusterCommandTwoParams
 - (instancetype)init
 {
     if (self = [super init]) {

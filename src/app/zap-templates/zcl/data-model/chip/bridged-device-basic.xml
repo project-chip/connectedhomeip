@@ -26,22 +26,22 @@ limitations under the License.
         <server tick="false" init="false">true</server>
         <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-        <attribute side="server" code="0x0001" define="VENDOR_NAME" type="CHAR_STRING" length="32" writable="false" default="" optional="true">VendorName</attribute>
-        <attribute side="server" code="0x0002" define="VENDOR_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">VendorID</attribute>
-        <attribute side="server" code="0x0003" define="PRODUCT_NAME" type="CHAR_STRING" length="32" writable="false" default="" optional="true">ProductName</attribute>
-        <attribute side="server" code="0x0005" define="USER_LABEL" type="CHAR_STRING" length="32" writable="true" default="" optional="true">UserLabel</attribute>
-        <attribute side="server" code="0x0007" define="HARDWARE_VERSION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x00" optional="true">HardwareVersion</attribute>
-        <attribute side="server" code="0x0008" define="HARDWARE_VERSION_STRING" type="CHAR_STRING" length="64" writable="false" default="" optional="true">HardwareVersionString</attribute>
-        <attribute side="server" code="0x0009" define="SOFTWARE_VERSION" type="INT32U" min="0x0000" max="0xFFFF" writable="false" default="0x00" optional="true">SoftwareVersion</attribute>
-        <attribute side="server" code="0x000A" define="SOFTWARE_VERSION_STRING" type="CHAR_STRING" length="64" writable="false" default="" optional="true">SoftwareVersionString</attribute>
-        <attribute side="server" code="0x000B" define="MANUFACTURING_DATE" type="CHAR_STRING" length="16" writable="false" default="" optional="true">ManufacturingDate</attribute>
-        <!-- TODO The actual length is not defined in the spec. But the current implementation expect a length -->
-        <attribute side="server" code="0x000C" define="PART_NUMBER" type="CHAR_STRING" length="254" writable="false" optional="true">PartNumber</attribute>
-        <!-- TODO The spec says the length is 256 ASCII characters. But the current implementation does not support values bigger than 254 -->
-        <attribute side="server" code="0x000D" define="PRODUCT_URL" type="CHAR_STRING" length="254" writable="false" optional="true">ProductURL</attribute>
-        <attribute side="server" code="0x000E" define="PRODUCT_LABEL" type="CHAR_STRING" length="64" writable="false" default="" optional="true">ProductLabel</attribute>
-        <attribute side="server" code="0x000F" define="SERIAL_NUMBER" type="CHAR_STRING" length="32" writable="false" default="" optional="true">SerialNumber</attribute>
-        <attribute side="server" code="0x0011" define="REACHABLE" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">Reachable</attribute>
+        <attribute side="server" code="1"  define="VENDOR_NAME"               type="char_string"               length="32"                              optional="true">VendorName</attribute>
+        <attribute side="server" code="2"  define="VENDOR_ID"                 type="int16u"                                                             optional="true">VendorID</attribute>
+        <attribute side="server" code="3"  define="PRODUCT_NAME"              type="char_string"               length="32"                              optional="true">ProductName</attribute>
+        <attribute side="server" code="5"  define="NODE_LABEL"                type="char_string"               length="32"  default=""  writable="true" optional="true">NodeLabel</attribute>
+        <attribute side="server" code="7"  define="HARDWARE_VERSION"          type="int16u"                                 default="0"                 optional="true">HardwareVersion</attribute>
+        <attribute side="server" code="8"  define="HARDWARE_VERSION_STRING"   type="char_string" minLength="1" length="64"                              optional="true">HardwareVersionString</attribute>
+        <attribute side="server" code="9"  define="SOFTWARE_VERSION"          type="int32u"                                 default="0"                 optional="true">SoftwareVersion</attribute>
+        <attribute side="server" code="10" define="SOFTWARE_VERSION_STRING"   type="char_string" minLength="1" length="64"                              optional="true">SoftwareVersionString</attribute>
+        <attribute side="server" code="11" define="MANUFACTURING_DATE"        type="char_string" minLength="8" length="16"                              optional="true">ManufacturingDate</attribute>
+        <attribute side="server" code="12" define="PART_NUMBER"               type="char_string"               length="32"                              optional="true">PartNumber</attribute>
+        <attribute side="server" code="13" define="PRODUCT_URL"               type="long_char_string"          length="256"                             optional="true">ProductURL</attribute>
+        <attribute side="server" code="14" define="PRODUCT_LABEL"             type="char_string"               length="64"                              optional="true">ProductLabel</attribute>
+        <attribute side="server" code="15" define="SERIAL_NUMBER"             type="char_string"               length="32"                              optional="true">SerialNumber</attribute>
+        <attribute side="server" code="17" define="REACHABLE"                 type="boolean"                                default="1"                                >Reachable</attribute>
+        <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                              optional="true">UniqueID</attribute>
+
         <command source="server" code="0x00" name="StartUp" optional="true">
         <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
         </command>
@@ -54,5 +54,6 @@ limitations under the License.
         <command source="server" code="0x03" name="ReachableChanged" optional="false">
         <description>The Leave event SHOULD be emitted by a Node when the Reachable attribute changes.</description>
         </command>
+
     </cluster>
 </configurator>
