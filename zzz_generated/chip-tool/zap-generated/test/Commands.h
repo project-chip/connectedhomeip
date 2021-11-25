@@ -24991,7 +24991,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 2));
 =======
-        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 5U));
+    VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 5U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -25061,9 +25061,9 @@ private:
         return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
             occupiedCoolingSetpointArgument, this, OnSuccessCallback_44, OnFailureCallback_44);
 =======
-        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 5U));
+    VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 5U));
 
-        NextTest();
+    NextTest();
 >>>>>>> cda0cb69ce (Update generated content)
     }
 
@@ -25101,9 +25101,9 @@ private:
         return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
             occupiedHeatingSetpointArgument, this, OnSuccessCallback_46, OnFailureCallback_46);
 =======
-        VerifyOrReturn(CheckValue<uint32_t>("featureMap", featureMap, 0UL));
+    VerifyOrReturn(CheckValue<uint32_t>("featureMap", featureMap, 0UL));
 
-        NextTest();
+    NextTest();
 >>>>>>> cda0cb69ce (Update generated content)
     }
 
@@ -25141,9 +25141,9 @@ private:
         return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
             occupiedHeatingSetpointArgument, this, OnSuccessCallback_48, OnFailureCallback_48);
 =======
-        VerifyOrReturn(CheckValue<uint32_t>("featureMap", featureMap, 0UL));
+    VerifyOrReturn(CheckValue<uint32_t>("featureMap", featureMap, 0UL));
 
-        NextTest();
+    NextTest();
 >>>>>>> cda0cb69ce (Update generated content)
     }
 
@@ -34003,11 +34003,11 @@ private:
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
 =======
-    void OnSuccessResponse_17(uint16_t bitmap16)
-    {
-        VerifyOrReturn(CheckValue<uint16_t>("bitmap16", bitmap16, 65535U));
+        void OnSuccessResponse_17(uint16_t bitmap16)
+        {
+            VerifyOrReturn(CheckValue<uint16_t>("bitmap16", bitmap16, 65535U));
 
-        NextTest();
+            NextTest();
 >>>>>>> cda0cb69ce (Update generated content)
     }
 
@@ -34050,12 +34050,12 @@ private:
             (static_cast<TestCluster *>(context))->OnSuccessResponse_2(data.returnValue);
         };
 =======
-    void OnSuccessResponse_19(uint16_t bitmap16)
-    {
-        VerifyOrReturn(CheckValue<uint16_t>("bitmap16", bitmap16, 0U));
+            void OnSuccessResponse_19(uint16_t bitmap16)
+            {
+                VerifyOrReturn(CheckValue<uint16_t>("bitmap16", bitmap16, 0U));
 
-        NextTest();
-    }
+                NextTest();
+            }
 >>>>>>> cda0cb69ce (Update generated content)
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -34073,7 +34073,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint8_t>("returnValue", returnValue, 7));
 =======
-        VerifyOrReturn(CheckValue<uint32_t>("bitmap32", bitmap32, 0UL));
+            VerifyOrReturn(CheckValue<uint32_t>("bitmap32", bitmap32, 0UL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34107,7 +34107,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint8_t>("returnValue", returnValue, 20));
 =======
-        VerifyOrReturn(CheckValue<uint32_t>("bitmap32", bitmap32, 4294967295UL));
+            VerifyOrReturn(CheckValue<uint32_t>("bitmap32", bitmap32, 4294967295UL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34139,12 +34139,12 @@ private:
 <<<<<<< HEAD
     void OnSuccessResponse_4(uint8_t returnValue) { ThrowSuccessResponse(); }
 =======
-    void OnSuccessResponse_24(uint32_t bitmap32)
-    {
-        VerifyOrReturn(CheckValue<uint32_t>("bitmap32", bitmap32, 0UL));
+        void OnSuccessResponse_24(uint32_t bitmap32)
+        {
+            VerifyOrReturn(CheckValue<uint32_t>("bitmap32", bitmap32, 0UL));
 
-        NextTest();
-    }
+            NextTest();
+        }
 >>>>>>> cda0cb69ce (Update generated content)
 
     CHIP_ERROR TestReadAttributeBooleanDefaultValue_5()
@@ -34164,7 +34164,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<bool>("boolean", boolean, 0));
 =======
-        VerifyOrReturn(CheckValue<uint64_t>("bitmap64", bitmap64, 0ULL));
+            VerifyOrReturn(CheckValue<uint64_t>("bitmap64", bitmap64, 0ULL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34204,7 +34204,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<bool>("boolean", boolean, 1));
 =======
-        VerifyOrReturn(CheckValue<uint64_t>("bitmap64", bitmap64, 18446744073709551615ULL));
+            VerifyOrReturn(CheckValue<uint64_t>("bitmap64", bitmap64, 18446744073709551615ULL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34244,7 +34244,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<bool>("boolean", boolean, 0));
 =======
-        VerifyOrReturn(CheckValue<uint64_t>("bitmap64", bitmap64, 0ULL));
+            VerifyOrReturn(CheckValue<uint64_t>("bitmap64", bitmap64, 0ULL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34267,7 +34267,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint8_t>("bitmap8", bitmap8, 0));
 =======
-        VerifyOrReturn(CheckValue<uint8_t>("int8u", int8u, 0));
+            VerifyOrReturn(CheckValue<uint8_t>("int8u", int8u, 0));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34307,7 +34307,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint8_t>("bitmap8", bitmap8, 255));
 =======
-        VerifyOrReturn(CheckValue<uint8_t>("int8u", int8u, 255));
+            VerifyOrReturn(CheckValue<uint8_t>("int8u", int8u, 255));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34347,7 +34347,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint8_t>("bitmap8", bitmap8, 0));
 =======
-        VerifyOrReturn(CheckValue<uint8_t>("int8u", int8u, 0));
+            VerifyOrReturn(CheckValue<uint8_t>("int8u", int8u, 0));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34370,7 +34370,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint16_t>("bitmap16", bitmap16, 0U));
 =======
-        VerifyOrReturn(CheckValue<uint16_t>("int16u", int16u, 0U));
+            VerifyOrReturn(CheckValue<uint16_t>("int16u", int16u, 0U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34410,7 +34410,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint16_t>("bitmap16", bitmap16, 65535U));
 =======
-        VerifyOrReturn(CheckValue<uint16_t>("int16u", int16u, 65535U));
+            VerifyOrReturn(CheckValue<uint16_t>("int16u", int16u, 65535U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34450,7 +34450,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint16_t>("bitmap16", bitmap16, 0U));
 =======
-        VerifyOrReturn(CheckValue<uint16_t>("int16u", int16u, 0U));
+            VerifyOrReturn(CheckValue<uint16_t>("int16u", int16u, 0U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34473,7 +34473,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint32_t>("bitmap32", bitmap32, 0UL));
 =======
-        VerifyOrReturn(CheckValue<uint32_t>("int32u", int32u, 0UL));
+            VerifyOrReturn(CheckValue<uint32_t>("int32u", int32u, 0UL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34513,7 +34513,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint32_t>("bitmap32", bitmap32, 4294967295UL));
 =======
-        VerifyOrReturn(CheckValue<uint32_t>("int32u", int32u, 4294967295UL));
+            VerifyOrReturn(CheckValue<uint32_t>("int32u", int32u, 4294967295UL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34553,7 +34553,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint32_t>("bitmap32", bitmap32, 0UL));
 =======
-        VerifyOrReturn(CheckValue<uint32_t>("int32u", int32u, 0UL));
+            VerifyOrReturn(CheckValue<uint32_t>("int32u", int32u, 0UL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34576,7 +34576,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint64_t>("bitmap64", bitmap64, 0ULL));
 =======
-        VerifyOrReturn(CheckValue<uint64_t>("int64u", int64u, 0ULL));
+            VerifyOrReturn(CheckValue<uint64_t>("int64u", int64u, 0ULL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34616,7 +34616,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint64_t>("bitmap64", bitmap64, 18446744073709551615ULL));
 =======
-        VerifyOrReturn(CheckValue<uint64_t>("int64u", int64u, 18446744073709551615ULL));
+            VerifyOrReturn(CheckValue<uint64_t>("int64u", int64u, 18446744073709551615ULL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34640,12 +34640,12 @@ private:
 <<<<<<< HEAD
     void OnSuccessResponse_28() { NextTest(); }
 =======
-    void OnSuccessResponse_49(uint64_t int64u)
-    {
-        VerifyOrReturn(CheckValue<uint64_t>("int64u", int64u, 0ULL));
+        void OnSuccessResponse_49(uint64_t int64u)
+        {
+            VerifyOrReturn(CheckValue<uint64_t>("int64u", int64u, 0ULL));
 
-        NextTest();
-    }
+            NextTest();
+        }
 >>>>>>> cda0cb69ce (Update generated content)
 
     CHIP_ERROR TestReadAttributeBitmap64MinValue_29()
@@ -34665,7 +34665,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint64_t>("bitmap64", bitmap64, 0ULL));
 =======
-        VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, 0));
+            VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, 0));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34688,7 +34688,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint8_t>("int8u", int8u, 0));
 =======
-        VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, 127));
+            VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, 127));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34728,7 +34728,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint8_t>("int8u", int8u, 255));
 =======
-        VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, -128));
+            VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, -128));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34768,7 +34768,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint8_t>("int8u", int8u, 0));
 =======
-        VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, 0));
+            VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, 0));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34791,7 +34791,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint16_t>("int16u", int16u, 0U));
 =======
-        VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, 0));
+            VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, 0));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34831,7 +34831,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint16_t>("int16u", int16u, 65535U));
 =======
-        VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, 32767));
+            VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, 32767));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34871,7 +34871,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint16_t>("int16u", int16u, 0U));
 =======
-        VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, -32768));
+            VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, -32768));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34913,12 +34913,12 @@ private:
 <<<<<<< HEAD
     void OnSuccessResponse_41() { NextTest(); }
 =======
-    void OnSuccessResponse_63(int16_t int16s)
-    {
-        VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, 0));
+        void OnSuccessResponse_63(int16_t int16s)
+        {
+            VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, 0));
 
-        NextTest();
-    }
+            NextTest();
+        }
 >>>>>>> cda0cb69ce (Update generated content)
 
     CHIP_ERROR TestReadAttributeInt32uMaxValue_42()
@@ -34938,7 +34938,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint32_t>("int32u", int32u, 4294967295UL));
 =======
-        VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, 0L));
+            VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, 0L));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -34978,7 +34978,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint32_t>("int32u", int32u, 0UL));
 =======
-        VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, 2147483647L));
+            VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, 2147483647L));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35001,7 +35001,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint64_t>("int64u", int64u, 0ULL));
 =======
-        VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, -2147483648L));
+            VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, -2147483648L));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35041,7 +35041,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint64_t>("int64u", int64u, 18446744073709551615ULL));
 =======
-        VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, 0L));
+            VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, 0L));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35065,12 +35065,12 @@ private:
 <<<<<<< HEAD
     void OnSuccessResponse_48() { NextTest(); }
 =======
-    void OnSuccessResponse_71(int64_t int64s)
-    {
-        VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, 0LL));
+        void OnSuccessResponse_71(int64_t int64s)
+        {
+            VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, 0LL));
 
-        NextTest();
-    }
+            NextTest();
+        }
 >>>>>>> cda0cb69ce (Update generated content)
 
     CHIP_ERROR TestReadAttributeInt64uMinValue_49()
@@ -35108,7 +35108,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, 0));
 =======
-        VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, 9223372036854775807LL));
+            VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, 9223372036854775807LL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35148,7 +35148,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, 127));
 =======
-        VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, -9223372036854775807LL));
+            VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, -9223372036854775807LL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35172,12 +35172,12 @@ private:
 <<<<<<< HEAD
     void OnSuccessResponse_53() { NextTest(); }
 =======
-    void OnSuccessResponse_77(int64_t int64s)
-    {
-        VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, 0LL));
+        void OnSuccessResponse_77(int64_t int64s)
+        {
+            VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, 0LL));
 
-        NextTest();
-    }
+            NextTest();
+        }
 >>>>>>> cda0cb69ce (Update generated content)
 
     CHIP_ERROR TestReadAttributeInt8sMinValue_54()
@@ -35197,7 +35197,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, -128));
 =======
-        VerifyOrReturn(CheckValue<uint8_t>("enum8", enum8, 0));
+            VerifyOrReturn(CheckValue<uint8_t>("enum8", enum8, 0));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35237,7 +35237,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int8_t>("int8s", int8s, 0));
 =======
-        VerifyOrReturn(CheckValue<uint8_t>("enum8", enum8, 255));
+            VerifyOrReturn(CheckValue<uint8_t>("enum8", enum8, 255));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35279,12 +35279,12 @@ private:
 <<<<<<< HEAD
     void OnSuccessResponse_58() { NextTest(); }
 =======
-    void OnSuccessResponse_82(uint8_t enum8)
-    {
-        VerifyOrReturn(CheckValue<uint8_t>("enum8", enum8, 0));
+        void OnSuccessResponse_82(uint8_t enum8)
+        {
+            VerifyOrReturn(CheckValue<uint8_t>("enum8", enum8, 0));
 
-        NextTest();
-    }
+            NextTest();
+        }
 >>>>>>> cda0cb69ce (Update generated content)
 
     CHIP_ERROR TestReadAttributeInt16sMaxValue_59()
@@ -35304,7 +35304,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, 32767));
 =======
-        VerifyOrReturn(CheckValue<uint16_t>("enum16", enum16, 0U));
+            VerifyOrReturn(CheckValue<uint16_t>("enum16", enum16, 0U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35344,7 +35344,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, -32768));
 =======
-        VerifyOrReturn(CheckValue<uint16_t>("enum16", enum16, 65535U));
+            VerifyOrReturn(CheckValue<uint16_t>("enum16", enum16, 65535U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35384,7 +35384,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int16_t>("int16s", int16s, 0));
 =======
-        VerifyOrReturn(CheckValue<uint16_t>("enum16", enum16, 0U));
+            VerifyOrReturn(CheckValue<uint16_t>("enum16", enum16, 0U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35407,7 +35407,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, 0L));
 =======
-        VerifyOrReturn(CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
+            VerifyOrReturn(CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35447,8 +35447,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, 2147483647L));
 =======
-        VerifyOrReturn(
-            CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("Tes\x00ti\x00ng"), 9)));
+            VerifyOrReturn(
+                CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("Tes\x00ti\x00ng"), 9)));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35488,8 +35488,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, -2147483648L));
 =======
-        VerifyOrReturn(
-            CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), 9)));
+            VerifyOrReturn(
+                CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), 9)));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35529,8 +35529,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int32_t>("int32s", int32s, 0L));
 =======
-        VerifyOrReturn(
-            CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), 9)));
+            VerifyOrReturn(
+                CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), 9)));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35553,7 +35553,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, 0LL));
 =======
-        VerifyOrReturn(CheckValueAsString("longOctetString", longOctetString, chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
+            VerifyOrReturn(
+                CheckValueAsString("longOctetString", longOctetString, chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35593,14 +35594,15 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, 9223372036854775807LL));
 =======
-        VerifyOrReturn(CheckValueAsString(
-            "longOctetString", longOctetString,
-            chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                    "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                    "11111111111111111111111111111111111111111111111111111111111111111111111111111111"),
-                300)));
+            VerifyOrReturn(CheckValueAsString(
+                "longOctetString", longOctetString,
+                chip::ByteSpan(chip::Uint8::from_const_char(
+                                   "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                                   "111111111111111"
+                                   "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                                   "111111111111111"
+                                   "11111111111111111111111111111111111111111111111111111111111111111111111111111111"),
+                               300)));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35640,7 +35642,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<int64_t>("int64s", int64s, -9223372036854775807LL));
 =======
-        VerifyOrReturn(CheckValueAsString("charString", charString, chip::CharSpan("", 0)));
+            VerifyOrReturn(CheckValueAsString("charString", charString, chip::CharSpan("", 0)));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35698,7 +35700,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint8_t>("enum8", enum8, 0));
 =======
-        VerifyOrReturn(CheckValueAsString("longCharString", longCharString, chip::CharSpan("", 0)));
+            VerifyOrReturn(CheckValueAsString("longCharString", longCharString, chip::CharSpan("", 0)));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35738,12 +35740,13 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint8_t>("enum8", enum8, 255));
 =======
-        VerifyOrReturn(CheckValueAsString(
-            "longCharString", longCharString,
-            chip::CharSpan("☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-                           "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-                           "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉",
-                           300)));
+            VerifyOrReturn(CheckValueAsString(
+                "longCharString", longCharString,
+                chip::CharSpan(
+                    "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+                    "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+                    "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉",
+                    300)));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35801,7 +35804,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint16_t>("enum16", enum16, 0U));
 =======
-        VerifyOrReturn(CheckValue<uint64_t>("epochUs", epochUs, 0ULL));
+            VerifyOrReturn(CheckValue<uint64_t>("epochUs", epochUs, 0ULL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35841,7 +35844,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint16_t>("enum16", enum16, 65535U));
 =======
-        VerifyOrReturn(CheckValue<uint64_t>("epochUs", epochUs, 18446744073709551615ULL));
+            VerifyOrReturn(CheckValue<uint64_t>("epochUs", epochUs, 18446744073709551615ULL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35881,7 +35884,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValue<uint16_t>("enum16", enum16, 0U));
 =======
-        VerifyOrReturn(CheckValue<uint64_t>("epochUs", epochUs, 0ULL));
+            VerifyOrReturn(CheckValue<uint64_t>("epochUs", epochUs, 0ULL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35904,7 +35907,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
 =======
-        VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 0UL));
+            VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 0UL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35945,7 +35948,7 @@ private:
         VerifyOrReturn(
             CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("Tes\x00ti\x00ng"), 9)));
 =======
-        VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 4294967295UL));
+            VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 4294967295UL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -35986,7 +35989,7 @@ private:
         VerifyOrReturn(
             CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), 9)));
 =======
-        VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 0UL));
+            VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 0UL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -36028,7 +36031,7 @@ private:
         VerifyOrReturn(
             CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), 9)));
 =======
-        VerifyOrReturn(CheckValue<bool>("unsupported", unsupported, 0));
+            VerifyOrReturn(CheckValue<bool>("unsupported", unsupported, 0));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -36115,7 +36118,7 @@ private:
                     "11111111111111111111111111111111111111111111111111111111111111111111111111111111"),
                 300)));
 =======
-        VerifyOrReturn(CheckValue<chip::VendorId>("vendorId", vendorId, 0U));
+            VerifyOrReturn(CheckValue<chip::VendorId>("vendorId", vendorId, 0U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -36155,7 +36158,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueAsString("charString", charString, chip::CharSpan("", 0)));
 =======
-        VerifyOrReturn(CheckValue<chip::VendorId>("vendorId", vendorId, 17U));
+            VerifyOrReturn(CheckValue<chip::VendorId>("vendorId", vendorId, 17U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -36541,9 +36544,9 @@ private:
     {
         VerifyOrReturn(CheckValue<uint32_t>("epochS", epochS, 0UL));
 =======
-        VerifyOrReturn(CheckValuePresent("originalValue", originalValue));
-        VerifyOrReturn(CheckValueNonNull("originalValue.Value()", originalValue.Value()));
-        VerifyOrReturn(CheckValue<uint8_t>("originalValue.Value().Value()", originalValue.Value().Value(), 5));
+    VerifyOrReturn(CheckValuePresent("originalValue", originalValue));
+    VerifyOrReturn(CheckValueNonNull("originalValue.Value()", originalValue.Value()));
+    VerifyOrReturn(CheckValue<uint8_t>("originalValue.Value().Value()", originalValue.Value().Value(), 5));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -37750,13 +37753,13 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableBitmap64", nullableBitmap64));
         VerifyOrReturn(CheckValue<uint64_t>("nullableBitmap64.Value()", nullableBitmap64.Value(), 18446744073709551614ULL));
 =======
-        VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, true));
+    VerifyOrReturn(CheckValue<bool>("wasPresent", wasPresent, true));
 
-        VerifyOrReturn(CheckValuePresent("wasNull", wasNull));
-        VerifyOrReturn(CheckValue<bool>("wasNull.Value()", wasNull.Value(), true));
+    VerifyOrReturn(CheckValuePresent("wasNull", wasNull));
+    VerifyOrReturn(CheckValue<bool>("wasNull.Value()", wasNull.Value(), true));
 
-        VerifyOrReturn(CheckValuePresent("originalValue", originalValue));
-        VerifyOrReturn(CheckValueNull("originalValue.Value()", originalValue.Value()));
+    VerifyOrReturn(CheckValuePresent("originalValue", originalValue));
+    VerifyOrReturn(CheckValueNull("originalValue.Value()", originalValue.Value()));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -37796,24 +37799,27 @@ private:
     {
         VerifyOrReturn(CheckValueNull("nullableBitmap64", nullableBitmap64));
 =======
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_2,
-                                                                                                        OnFailureCallback_2);
-    }
+    return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_2,
+                                                                                                    OnFailureCallback_2);
+}
 
-    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+void OnFailureResponse_2(uint8_t status)
+{
+    ThrowFailureResponse();
+}
 
-    void OnSuccessResponse_2(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
-    {
-        auto iter = listInt8u.begin();
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 0));
-        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[0]", iter.GetValue(), 1));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 1));
-        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[1]", iter.GetValue(), 2));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 2));
-        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[2]", iter.GetValue(), 3));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 3));
-        VerifyOrReturn(CheckValue<uint8_t>("listInt8u[3]", iter.GetValue(), 4));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(listInt8u)>("listInt8u", iter, 4));
+void OnSuccessResponse_2(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+{
+    auto iter = listInt8u.begin();
+    VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 0));
+    VerifyOrReturn(CheckValue<uint8_t>("listInt8u[0]", iter.GetValue(), 1));
+    VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 1));
+    VerifyOrReturn(CheckValue<uint8_t>("listInt8u[1]", iter.GetValue(), 2));
+    VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 2));
+    VerifyOrReturn(CheckValue<uint8_t>("listInt8u[2]", iter.GetValue(), 3));
+    VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 3));
+    VerifyOrReturn(CheckValue<uint8_t>("listInt8u[3]", iter.GetValue(), 4));
+    VerifyOrReturn(CheckNoMoreListItems<decltype(listInt8u)>("listInt8u", iter, 4));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -37854,20 +37860,20 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt8u", nullableInt8u));
         VerifyOrReturn(CheckValue<uint8_t>("nullableInt8u.Value()", nullableInt8u.Value(), 254));
 =======
-        auto iter = listOctetString.begin();
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 0));
-        VerifyOrReturn(
-            CheckValueAsString("listOctetString[0]", iter.GetValue(), chip::ByteSpan(chip::Uint8::from_const_char("Test0"), 5)));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 1));
-        VerifyOrReturn(
-            CheckValueAsString("listOctetString[1]", iter.GetValue(), chip::ByteSpan(chip::Uint8::from_const_char("Test1"), 5)));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 2));
-        VerifyOrReturn(
-            CheckValueAsString("listOctetString[2]", iter.GetValue(), chip::ByteSpan(chip::Uint8::from_const_char("Test2"), 5)));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 3));
-        VerifyOrReturn(
-            CheckValueAsString("listOctetString[3]", iter.GetValue(), chip::ByteSpan(chip::Uint8::from_const_char("Test3"), 5)));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(listOctetString)>("listOctetString", iter, 4));
+    auto iter = listOctetString.begin();
+    VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 0));
+    VerifyOrReturn(
+        CheckValueAsString("listOctetString[0]", iter.GetValue(), chip::ByteSpan(chip::Uint8::from_const_char("Test0"), 5)));
+    VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 1));
+    VerifyOrReturn(
+        CheckValueAsString("listOctetString[1]", iter.GetValue(), chip::ByteSpan(chip::Uint8::from_const_char("Test1"), 5)));
+    VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 2));
+    VerifyOrReturn(
+        CheckValueAsString("listOctetString[2]", iter.GetValue(), chip::ByteSpan(chip::Uint8::from_const_char("Test2"), 5)));
+    VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 3));
+    VerifyOrReturn(
+        CheckValueAsString("listOctetString[3]", iter.GetValue(), chip::ByteSpan(chip::Uint8::from_const_char("Test3"), 5)));
+    VerifyOrReturn(CheckNoMoreListItems<decltype(listOctetString)>("listOctetString", iter, 4));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -37908,24 +37914,24 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt8u", nullableInt8u));
         VerifyOrReturn(CheckValue<uint8_t>("nullableInt8u.Value()", nullableInt8u.Value(), 254));
 =======
-        auto iter = listStructOctetString.begin();
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 0));
-        VerifyOrReturn(CheckValue<>("listStructOctetString[0].fabricIndex", iter.GetValue().fabricIndex, 0ULL));
-        VerifyOrReturn(CheckValueAsString("listStructOctetString[0].operationalCert", iter.GetValue().operationalCert,
-                                          chip::ByteSpan(chip::Uint8::from_const_char("Test0"), 5)));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 1));
-        VerifyOrReturn(CheckValue<>("listStructOctetString[1].fabricIndex", iter.GetValue().fabricIndex, 1ULL));
-        VerifyOrReturn(CheckValueAsString("listStructOctetString[1].operationalCert", iter.GetValue().operationalCert,
-                                          chip::ByteSpan(chip::Uint8::from_const_char("Test1"), 5)));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 2));
-        VerifyOrReturn(CheckValue<>("listStructOctetString[2].fabricIndex", iter.GetValue().fabricIndex, 2ULL));
-        VerifyOrReturn(CheckValueAsString("listStructOctetString[2].operationalCert", iter.GetValue().operationalCert,
-                                          chip::ByteSpan(chip::Uint8::from_const_char("Test2"), 5)));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 3));
-        VerifyOrReturn(CheckValue<>("listStructOctetString[3].fabricIndex", iter.GetValue().fabricIndex, 3ULL));
-        VerifyOrReturn(CheckValueAsString("listStructOctetString[3].operationalCert", iter.GetValue().operationalCert,
-                                          chip::ByteSpan(chip::Uint8::from_const_char("Test3"), 5)));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(listStructOctetString)>("listStructOctetString", iter, 4));
+    auto iter = listStructOctetString.begin();
+    VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 0));
+    VerifyOrReturn(CheckValue<>("listStructOctetString[0].fabricIndex", iter.GetValue().fabricIndex, 0ULL));
+    VerifyOrReturn(CheckValueAsString("listStructOctetString[0].operationalCert", iter.GetValue().operationalCert,
+                                      chip::ByteSpan(chip::Uint8::from_const_char("Test0"), 5)));
+    VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 1));
+    VerifyOrReturn(CheckValue<>("listStructOctetString[1].fabricIndex", iter.GetValue().fabricIndex, 1ULL));
+    VerifyOrReturn(CheckValueAsString("listStructOctetString[1].operationalCert", iter.GetValue().operationalCert,
+                                      chip::ByteSpan(chip::Uint8::from_const_char("Test1"), 5)));
+    VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 2));
+    VerifyOrReturn(CheckValue<>("listStructOctetString[2].fabricIndex", iter.GetValue().fabricIndex, 2ULL));
+    VerifyOrReturn(CheckValueAsString("listStructOctetString[2].operationalCert", iter.GetValue().operationalCert,
+                                      chip::ByteSpan(chip::Uint8::from_const_char("Test2"), 5)));
+    VerifyOrReturn(CheckNextListItemDecodes<decltype(listStructOctetString)>("listStructOctetString", iter, 3));
+    VerifyOrReturn(CheckValue<>("listStructOctetString[3].fabricIndex", iter.GetValue().fabricIndex, 3ULL));
+    VerifyOrReturn(CheckValueAsString("listStructOctetString[3].operationalCert", iter.GetValue().operationalCert,
+                                      chip::ByteSpan(chip::Uint8::from_const_char("Test3"), 5)));
+    VerifyOrReturn(CheckNoMoreListItems<decltype(listStructOctetString)>("listStructOctetString", iter, 4));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -37965,7 +37971,7 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueNull("nullableInt8u", nullableInt8u));
 =======
-        VerifyOrReturn(CheckValueNull("nullableBoolean", nullableBoolean));
+    VerifyOrReturn(CheckValueNull("nullableBoolean", nullableBoolean));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38006,8 +38012,8 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt16u", nullableInt16u));
         VerifyOrReturn(CheckValue<uint16_t>("nullableInt16u.Value()", nullableInt16u.Value(), 65534U));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableBoolean", nullableBoolean));
-        VerifyOrReturn(CheckValue<bool>("nullableBoolean.Value()", nullableBoolean.Value(), true));
+    VerifyOrReturn(CheckValueNonNull("nullableBoolean", nullableBoolean));
+    VerifyOrReturn(CheckValue<bool>("nullableBoolean.Value()", nullableBoolean.Value(), true));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38048,8 +38054,8 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt16u", nullableInt16u));
         VerifyOrReturn(CheckValue<uint16_t>("nullableInt16u.Value()", nullableInt16u.Value(), 65534U));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap8", nullableBitmap8));
-        VerifyOrReturn(CheckValue<uint8_t>("nullableBitmap8.Value()", nullableBitmap8.Value(), 254));
+    VerifyOrReturn(CheckValueNonNull("nullableBitmap8", nullableBitmap8));
+    VerifyOrReturn(CheckValue<uint8_t>("nullableBitmap8.Value()", nullableBitmap8.Value(), 254));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38089,8 +38095,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueNull("nullableInt16u", nullableInt16u));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap8", nullableBitmap8));
-        VerifyOrReturn(CheckValue<uint8_t>("nullableBitmap8.Value()", nullableBitmap8.Value(), 254));
+    VerifyOrReturn(CheckValueNonNull("nullableBitmap8", nullableBitmap8));
+    VerifyOrReturn(CheckValue<uint8_t>("nullableBitmap8.Value()", nullableBitmap8.Value(), 254));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38131,7 +38137,7 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt32u", nullableInt32u));
         VerifyOrReturn(CheckValue<uint32_t>("nullableInt32u.Value()", nullableInt32u.Value(), 4294967294UL));
 =======
-        VerifyOrReturn(CheckValueNull("nullableBitmap8", nullableBitmap8));
+    VerifyOrReturn(CheckValueNull("nullableBitmap8", nullableBitmap8));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38172,8 +38178,8 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt32u", nullableInt32u));
         VerifyOrReturn(CheckValue<uint32_t>("nullableInt32u.Value()", nullableInt32u.Value(), 4294967294UL));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap16", nullableBitmap16));
-        VerifyOrReturn(CheckValue<uint16_t>("nullableBitmap16.Value()", nullableBitmap16.Value(), 65534U));
+    VerifyOrReturn(CheckValueNonNull("nullableBitmap16", nullableBitmap16));
+    VerifyOrReturn(CheckValue<uint16_t>("nullableBitmap16.Value()", nullableBitmap16.Value(), 65534U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38213,8 +38219,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueNull("nullableInt32u", nullableInt32u));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap16", nullableBitmap16));
-        VerifyOrReturn(CheckValue<uint16_t>("nullableBitmap16.Value()", nullableBitmap16.Value(), 65534U));
+    VerifyOrReturn(CheckValueNonNull("nullableBitmap16", nullableBitmap16));
+    VerifyOrReturn(CheckValue<uint16_t>("nullableBitmap16.Value()", nullableBitmap16.Value(), 65534U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38255,7 +38261,7 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt64u", nullableInt64u));
         VerifyOrReturn(CheckValue<uint64_t>("nullableInt64u.Value()", nullableInt64u.Value(), 18446744073709551614ULL));
 =======
-        VerifyOrReturn(CheckValueNull("nullableBitmap16", nullableBitmap16));
+    VerifyOrReturn(CheckValueNull("nullableBitmap16", nullableBitmap16));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38296,8 +38302,8 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt64u", nullableInt64u));
         VerifyOrReturn(CheckValue<uint64_t>("nullableInt64u.Value()", nullableInt64u.Value(), 18446744073709551614ULL));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap32", nullableBitmap32));
-        VerifyOrReturn(CheckValue<uint32_t>("nullableBitmap32.Value()", nullableBitmap32.Value(), 4294967294UL));
+    VerifyOrReturn(CheckValueNonNull("nullableBitmap32", nullableBitmap32));
+    VerifyOrReturn(CheckValue<uint32_t>("nullableBitmap32.Value()", nullableBitmap32.Value(), 4294967294UL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38337,8 +38343,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueNull("nullableInt64u", nullableInt64u));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap32", nullableBitmap32));
-        VerifyOrReturn(CheckValue<uint32_t>("nullableBitmap32.Value()", nullableBitmap32.Value(), 4294967294UL));
+    VerifyOrReturn(CheckValueNonNull("nullableBitmap32", nullableBitmap32));
+    VerifyOrReturn(CheckValue<uint32_t>("nullableBitmap32.Value()", nullableBitmap32.Value(), 4294967294UL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38379,7 +38385,7 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt8s", nullableInt8s));
         VerifyOrReturn(CheckValue<int8_t>("nullableInt8s.Value()", nullableInt8s.Value(), -127));
 =======
-        VerifyOrReturn(CheckValueNull("nullableBitmap32", nullableBitmap32));
+    VerifyOrReturn(CheckValueNull("nullableBitmap32", nullableBitmap32));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38420,8 +38426,8 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt8s", nullableInt8s));
         VerifyOrReturn(CheckValue<int8_t>("nullableInt8s.Value()", nullableInt8s.Value(), -127));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap64", nullableBitmap64));
-        VerifyOrReturn(CheckValue<uint64_t>("nullableBitmap64.Value()", nullableBitmap64.Value(), 18446744073709551614ULL));
+    VerifyOrReturn(CheckValueNonNull("nullableBitmap64", nullableBitmap64));
+    VerifyOrReturn(CheckValue<uint64_t>("nullableBitmap64.Value()", nullableBitmap64.Value(), 18446744073709551614ULL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38461,8 +38467,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueNull("nullableInt8s", nullableInt8s));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap64", nullableBitmap64));
-        VerifyOrReturn(CheckValue<uint64_t>("nullableBitmap64.Value()", nullableBitmap64.Value(), 18446744073709551614ULL));
+    VerifyOrReturn(CheckValueNonNull("nullableBitmap64", nullableBitmap64));
+    VerifyOrReturn(CheckValue<uint64_t>("nullableBitmap64.Value()", nullableBitmap64.Value(), 18446744073709551614ULL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38503,7 +38509,7 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt16s", nullableInt16s));
         VerifyOrReturn(CheckValue<int16_t>("nullableInt16s.Value()", nullableInt16s.Value(), -32767));
 =======
-        VerifyOrReturn(CheckValueNull("nullableBitmap64", nullableBitmap64));
+    VerifyOrReturn(CheckValueNull("nullableBitmap64", nullableBitmap64));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38544,8 +38550,8 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt16s", nullableInt16s));
         VerifyOrReturn(CheckValue<int16_t>("nullableInt16s.Value()", nullableInt16s.Value(), -32767));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableInt8u", nullableInt8u));
-        VerifyOrReturn(CheckValue<uint8_t>("nullableInt8u.Value()", nullableInt8u.Value(), 254));
+    VerifyOrReturn(CheckValueNonNull("nullableInt8u", nullableInt8u));
+    VerifyOrReturn(CheckValue<uint8_t>("nullableInt8u.Value()", nullableInt8u.Value(), 254));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38585,8 +38591,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueNull("nullableInt16s", nullableInt16s));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableInt8u", nullableInt8u));
-        VerifyOrReturn(CheckValue<uint8_t>("nullableInt8u.Value()", nullableInt8u.Value(), 254));
+    VerifyOrReturn(CheckValueNonNull("nullableInt8u", nullableInt8u));
+    VerifyOrReturn(CheckValue<uint8_t>("nullableInt8u.Value()", nullableInt8u.Value(), 254));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38627,7 +38633,7 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt32s", nullableInt32s));
         VerifyOrReturn(CheckValue<int32_t>("nullableInt32s.Value()", nullableInt32s.Value(), -2147483647L));
 =======
-        VerifyOrReturn(CheckValueNull("nullableInt8u", nullableInt8u));
+    VerifyOrReturn(CheckValueNull("nullableInt8u", nullableInt8u));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38668,8 +38674,8 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt32s", nullableInt32s));
         VerifyOrReturn(CheckValue<int32_t>("nullableInt32s.Value()", nullableInt32s.Value(), -2147483647L));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableInt16u", nullableInt16u));
-        VerifyOrReturn(CheckValue<uint16_t>("nullableInt16u.Value()", nullableInt16u.Value(), 65534U));
+    VerifyOrReturn(CheckValueNonNull("nullableInt16u", nullableInt16u));
+    VerifyOrReturn(CheckValue<uint16_t>("nullableInt16u.Value()", nullableInt16u.Value(), 65534U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38709,8 +38715,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueNull("nullableInt32s", nullableInt32s));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableInt16u", nullableInt16u));
-        VerifyOrReturn(CheckValue<uint16_t>("nullableInt16u.Value()", nullableInt16u.Value(), 65534U));
+    VerifyOrReturn(CheckValueNonNull("nullableInt16u", nullableInt16u));
+    VerifyOrReturn(CheckValue<uint16_t>("nullableInt16u.Value()", nullableInt16u.Value(), 65534U));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38751,7 +38757,7 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt64s", nullableInt64s));
         VerifyOrReturn(CheckValue<int64_t>("nullableInt64s.Value()", nullableInt64s.Value(), -9223372036854775807LL));
 =======
-        VerifyOrReturn(CheckValueNull("nullableInt16u", nullableInt16u));
+    VerifyOrReturn(CheckValueNull("nullableInt16u", nullableInt16u));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38792,8 +38798,8 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableInt64s", nullableInt64s));
         VerifyOrReturn(CheckValue<int64_t>("nullableInt64s.Value()", nullableInt64s.Value(), -9223372036854775807LL));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableInt32u", nullableInt32u));
-        VerifyOrReturn(CheckValue<uint32_t>("nullableInt32u.Value()", nullableInt32u.Value(), 4294967294UL));
+    VerifyOrReturn(CheckValueNonNull("nullableInt32u", nullableInt32u));
+    VerifyOrReturn(CheckValue<uint32_t>("nullableInt32u.Value()", nullableInt32u.Value(), 4294967294UL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38833,8 +38839,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueNull("nullableInt64s", nullableInt64s));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableInt32u", nullableInt32u));
-        VerifyOrReturn(CheckValue<uint32_t>("nullableInt32u.Value()", nullableInt32u.Value(), 4294967294UL));
+    VerifyOrReturn(CheckValueNonNull("nullableInt32u", nullableInt32u));
+    VerifyOrReturn(CheckValue<uint32_t>("nullableInt32u.Value()", nullableInt32u.Value(), 4294967294UL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38875,7 +38881,7 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableEnum8", nullableEnum8));
         VerifyOrReturn(CheckValue<uint8_t>("nullableEnum8.Value()", nullableEnum8.Value(), 254));
 =======
-        VerifyOrReturn(CheckValueNull("nullableInt32u", nullableInt32u));
+    VerifyOrReturn(CheckValueNull("nullableInt32u", nullableInt32u));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38916,8 +38922,8 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableEnum8", nullableEnum8));
         VerifyOrReturn(CheckValue<uint8_t>("nullableEnum8.Value()", nullableEnum8.Value(), 254));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableInt64u", nullableInt64u));
-        VerifyOrReturn(CheckValue<uint64_t>("nullableInt64u.Value()", nullableInt64u.Value(), 18446744073709551614ULL));
+    VerifyOrReturn(CheckValueNonNull("nullableInt64u", nullableInt64u));
+    VerifyOrReturn(CheckValue<uint64_t>("nullableInt64u.Value()", nullableInt64u.Value(), 18446744073709551614ULL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38957,8 +38963,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueNull("nullableEnum8", nullableEnum8));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableInt64u", nullableInt64u));
-        VerifyOrReturn(CheckValue<uint64_t>("nullableInt64u.Value()", nullableInt64u.Value(), 18446744073709551614ULL));
+    VerifyOrReturn(CheckValueNonNull("nullableInt64u", nullableInt64u));
+    VerifyOrReturn(CheckValue<uint64_t>("nullableInt64u.Value()", nullableInt64u.Value(), 18446744073709551614ULL));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -38999,7 +39005,7 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableEnum16", nullableEnum16));
         VerifyOrReturn(CheckValue<uint16_t>("nullableEnum16.Value()", nullableEnum16.Value(), 65534U));
 =======
-        VerifyOrReturn(CheckValueNull("nullableInt64u", nullableInt64u));
+    VerifyOrReturn(CheckValueNull("nullableInt64u", nullableInt64u));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -39035,15 +39041,18 @@ private:
 <<<<<<< HEAD
     void OnFailureResponse_227(uint8_t status) { ThrowFailureResponse(); }
 =======
-    void OnFailureResponse_60(uint8_t status) { ThrowFailureResponse(); }
+void OnFailureResponse_60(uint8_t status)
+{
+    ThrowFailureResponse();
+}
 
-    void OnSuccessResponse_60(const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
-    {
-        VerifyOrReturn(CheckValueNonNull("nullableInt8s", nullableInt8s));
-        VerifyOrReturn(CheckValue<int8_t>("nullableInt8s.Value()", nullableInt8s.Value(), -127));
+void OnSuccessResponse_60(const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
+{
+    VerifyOrReturn(CheckValueNonNull("nullableInt8s", nullableInt8s));
+    VerifyOrReturn(CheckValue<int8_t>("nullableInt8s.Value()", nullableInt8s.Value(), -127));
 
-        NextTest();
-    }
+    NextTest();
+}
 >>>>>>> cda0cb69ce (Update generated content)
 
     void OnSuccessResponse_227(const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
@@ -39071,13 +39080,13 @@ private:
 <<<<<<< HEAD
     void OnSuccessResponse_228() { NextTest(); }
 =======
-    void OnSuccessResponse_62(const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
-    {
-        VerifyOrReturn(CheckValueNonNull("nullableInt8s", nullableInt8s));
-        VerifyOrReturn(CheckValue<int8_t>("nullableInt8s.Value()", nullableInt8s.Value(), -127));
+void OnSuccessResponse_62(const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
+{
+    VerifyOrReturn(CheckValueNonNull("nullableInt8s", nullableInt8s));
+    VerifyOrReturn(CheckValue<int8_t>("nullableInt8s.Value()", nullableInt8s.Value(), -127));
 
-        NextTest();
-    }
+    NextTest();
+}
 >>>>>>> cda0cb69ce (Update generated content)
 
     CHIP_ERROR TestReadAttributeNullableEnum16NullValue_229()
@@ -39117,7 +39126,7 @@ private:
         VerifyOrReturn(CheckValueAsString("nullableOctetString.Value()", nullableOctetString.Value(),
                                           chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
 =======
-        VerifyOrReturn(CheckValueNull("nullableInt8s", nullableInt8s));
+    VerifyOrReturn(CheckValueNull("nullableInt8s", nullableInt8s));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -39160,8 +39169,8 @@ private:
         VerifyOrReturn(CheckValueAsString("nullableOctetString.Value()", nullableOctetString.Value(),
                                           chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), 9)));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableInt16s", nullableInt16s));
-        VerifyOrReturn(CheckValue<int16_t>("nullableInt16s.Value()", nullableInt16s.Value(), -32767));
+    VerifyOrReturn(CheckValueNonNull("nullableInt16s", nullableInt16s));
+    VerifyOrReturn(CheckValue<int16_t>("nullableInt16s.Value()", nullableInt16s.Value(), -32767));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -39201,8 +39210,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueNull("nullableOctetString", nullableOctetString));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableInt16s", nullableInt16s));
-        VerifyOrReturn(CheckValue<int16_t>("nullableInt16s.Value()", nullableInt16s.Value(), -32767));
+    VerifyOrReturn(CheckValueNonNull("nullableInt16s", nullableInt16s));
+    VerifyOrReturn(CheckValue<int16_t>("nullableInt16s.Value()", nullableInt16s.Value(), -32767));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -39245,7 +39254,7 @@ private:
         VerifyOrReturn(CheckValueAsString("nullableOctetString.Value()", nullableOctetString.Value(),
                                           chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
 =======
-        VerifyOrReturn(CheckValueNull("nullableInt16s", nullableInt16s));
+    VerifyOrReturn(CheckValueNull("nullableInt16s", nullableInt16s));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -39288,13 +39297,13 @@ private:
 <<<<<<< HEAD
     void OnSuccessResponse_238() { NextTest(); }
 =======
-    void OnSuccessResponse_72(const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
-    {
-        VerifyOrReturn(CheckValueNonNull("nullableInt32s", nullableInt32s));
-        VerifyOrReturn(CheckValue<int32_t>("nullableInt32s.Value()", nullableInt32s.Value(), -2147483647L));
+void OnSuccessResponse_72(const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
+{
+    VerifyOrReturn(CheckValueNonNull("nullableInt32s", nullableInt32s));
+    VerifyOrReturn(CheckValue<int32_t>("nullableInt32s.Value()", nullableInt32s.Value(), -2147483647L));
 
-        NextTest();
-    }
+    NextTest();
+}
 >>>>>>> cda0cb69ce (Update generated content)
 
     CHIP_ERROR TestWriteAttributeNullableCharStringValueTooLong_239()
@@ -39331,8 +39340,8 @@ private:
 <<<<<<< HEAD
         VerifyOrReturn(CheckValueNull("nullableCharString", nullableCharString));
 =======
-        VerifyOrReturn(CheckValueNonNull("nullableInt32s", nullableInt32s));
-        VerifyOrReturn(CheckValue<int32_t>("nullableInt32s.Value()", nullableInt32s.Value(), -2147483647L));
+    VerifyOrReturn(CheckValueNonNull("nullableInt32s", nullableInt32s));
+    VerifyOrReturn(CheckValue<int32_t>("nullableInt32s.Value()", nullableInt32s.Value(), -2147483647L));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -39373,7 +39382,7 @@ private:
         VerifyOrReturn(CheckValueNonNull("nullableCharString", nullableCharString));
         VerifyOrReturn(CheckValueAsString("nullableCharString.Value()", nullableCharString.Value(), chip::CharSpan("", 0)));
 =======
-        VerifyOrReturn(CheckValueNull("nullableInt32s", nullableInt32s));
+    VerifyOrReturn(CheckValueNull("nullableInt32s", nullableInt32s));
 
 >>>>>>> cda0cb69ce (Update generated content)
         NextTest();
@@ -39751,6 +39760,7 @@ public:
     }
 
 <<<<<<< HEAD
+
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
@@ -39816,11 +39826,11 @@ public:
             SetCommandExitStatus(err);
         }
 =======
-    void OnSuccessResponse_94(const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
-    {
-        VerifyOrReturn(CheckValueNull("nullableEnum16", nullableEnum16));
+        void OnSuccessResponse_94(const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
+        {
+            VerifyOrReturn(CheckValueNull("nullableEnum16", nullableEnum16));
 
-        NextTest();
+            NextTest();
 >>>>>>> cda0cb69ce (Update generated content)
     }
 
@@ -42054,7 +42064,7 @@ private:
     CHIP_ERROR TestSendTestAddArgumentsCommand_0()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
 
         RequestType request;
         request.arg1 = 3;
@@ -42085,7 +42095,7 @@ private:
     CHIP_ERROR TestSendTestAddArgumentsCommand_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
 
         RequestType request;
         request.arg1 = 3;
@@ -42115,7 +42125,7 @@ private:
     CHIP_ERROR TestSendTestAddArgumentsCommand_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
+        using RequestType = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
 
         RequestType request;
         request.arg1 = 3;
