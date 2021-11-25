@@ -42,7 +42,7 @@ limitations under the License.
 
   <struct name="AccessControlEntry">
     <cluster code="0x001F"/>
-    <item fieldId="0" name="FabricIndex" type="INT8U"/>
+    <item fieldId="0" name="FabricIndex" type="fabric-idx"/>
     <item fieldId="1" name="Privilege" type="Privilege"/>
     <item fieldId="2" name="AuthMode" type="AuthMode"/>
     <item fieldId="3" name="Subjects" type="INT64U" isNullable="true" array="true"/>
