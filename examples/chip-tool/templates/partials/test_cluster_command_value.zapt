@@ -39,7 +39,7 @@
       {{#if_is_bitmap type}}
       static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{definedValue}});
       {{else}}
-      {{definedValue}}{{asTypeLiteralSuffix type}};
+      {{asTypeLiteralSuffix definedValue type}};
       {{/if_is_bitmap}}
     {{/if_chip_enum}}
   {{/if_is_struct}}

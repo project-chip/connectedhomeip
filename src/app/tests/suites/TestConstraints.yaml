@@ -47,3 +47,9 @@ tests:
       response:
           constraints:
               notValue: 6
+
+    - label: "Write attribute INT32U Value Back to Default Value"
+      command: "writeAttribute"
+      attribute: "int32u"
+      arguments:
+          value: 0
