@@ -31,7 +31,7 @@
     VerifyOrReturn(CheckValue
       {{~#if (isOctetString type)}}AsString("{{label}}", {{actual}}, chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral expected}}"), {{expected.length}}))
       {{else if (isCharString type)}}AsString("{{label}}", {{actual}}, chip::CharSpan("{{expected}}", {{expected.length}}))
-      {{else}}<{{chipType}}>("{{label}}", {{actual}}, {{asTypeLiteralSuffix expected type}})
+      {{else}}("{{label}}", {{actual}}, {{asTypedLiteral expected type}})
       {{/if}}
     );
   {{/if_is_struct}}

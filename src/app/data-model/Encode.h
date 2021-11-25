@@ -37,6 +37,12 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
     return writer.Put(tag, x);
 }
 
+template <typename X, typename std::enable_if_t<std::is_floating_point<X>::value, int> = 0>
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
+{
+    return writer.Put(tag, x);
+}
+
 template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 {
