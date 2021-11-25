@@ -54,7 +54,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'OTA_PROVIDER_CLUSTER': ['ota-provider'],
     'OTA_REQUESTOR_CLUSTER': [],
     'POWER_SOURCE_CLUSTER': [],
-    'POWER_SOURCE_CONFIGURATION_CLUSTER': [],
+    'POWER_SOURCE_CONFIGURATION_CLUSTER': ['power-source-configuration-server'],
     'PRESSURE_MEASUREMENT_CLUSTER': [],
     'PUMP_CONFIG_CONTROL_CLUSTER': ['pump-configuration-and-control-server'],
     'RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER': [],
