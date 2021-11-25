@@ -45,16 +45,16 @@ public:
         if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::TvChannelList::Id)
         {
             return TvChannelMgr().getTvChannelList(aEncoder);
-        } 
-        else if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::TvChannelLineup::Id) 
+        }
+        else if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::TvChannelLineup::Id)
         {
             return TvChannelMgr().getTvChannelLineup(aEncoder);
-        } 
-        else if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::CurrentTvChannel::Id) 
+        }
+        else if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::CurrentTvChannel::Id)
         {
             return TvChannelMgr().getCurrentTvChannel(aEncoder);
         }
-        
+
         return CHIP_NO_ERROR;
     }
 };
@@ -87,7 +87,7 @@ TvChannelInfo tvChannelClusterChangeChannel(std::string match)
 
 bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)
 {
-    return TvChannelMgr().changeChannelByNumber(majorNumber, minorNumber); 
+    return TvChannelMgr().changeChannelByNumber(majorNumber, minorNumber);
 }
 
 bool tvChannelClusterSkipChannel(uint16_t count)
@@ -260,7 +260,7 @@ CHIP_ERROR TvChannelManager::getTvChannelLineup(chip::app::AttributeValueEncoder
         channelLineupInfo.lineupInfoType = static_cast<app::Clusters::TvChannel::TvChannelLineupInfoType>(jlineupInfoType);
 
         ReturnErrorOnFailure(aEncoder.Encode(channelLineupInfo));
-    
+
         return CHIP_NO_ERROR;
     }
 
@@ -284,7 +284,7 @@ CHIP_ERROR TvChannelManager::getCurrentTvChannel(chip::app::AttributeValueEncode
 
     {
         chip::app::Clusters::TvChannel::Structs::TvChannelInfo::Type channelInfo;
-        
+
             jobject channelInfoObject = env->CallObjectMethod(mTvChannelManagerObject, mGetCurrentChannelMethod);
             jclass channelClass = env->GetObjectClass(channelInfoObject);
 
@@ -345,7 +345,7 @@ TvChannelInfo TvChannelManager::ChangeChannelByMatch(std::string name)
     VerifyOrExit( mTvChannelManagerObject != nullptr, ChipLogError(Zcl, "mTvChannelManagerObject null"));
     VerifyOrExit( mChangeChannelMethod != nullptr, ChipLogError(Zcl, "mChangeChannelMethod null"));
     VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
-    
+
     {
         UtfString jniname(env, name.c_str());
         env->ExceptionClear();

@@ -70,8 +70,8 @@ public interface MediaPlaybackManager {
     /** Start playback of the media backward in case the media is currently playing in the forward direction or is not playing. */
     int REQUEST_REWIND = 6;
 
-    /** 
-     * Start playback of the media in the forward direction in case the media is currently playing in the backward direction or is not playing. 
+    /**
+     * Start playback of the media in the forward direction in case the media is currently playing in the backward direction or is not playing.
      * If the playback is already happening in the forward direction receipt of this command SHALL increase the speed of the media playback.
      * Different "fast-forward" speeds MAY be be reflected on the media playback device based upon the number of sequential calls to this function and the capability of the device.
      */
@@ -100,8 +100,8 @@ public interface MediaPlaybackManager {
      */
     long getAttributes(int attributesId);
 
-    /** 
-     * Request for cmd in REQUEST_XXX, the paramters for request is defined in REQUEST_XXX 
+    /**
+     * Request for cmd in REQUEST_XXX, the paramters for request is defined in REQUEST_XXX
      *
      * @param parameter The means of parameter is defined in RESPONSE_STATUS_XXX or meaningless if not defined.
      * @return the response status defined in RESPONSE_STATUS_XXX
