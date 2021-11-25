@@ -102,32 +102,47 @@ Clock::Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
     return Clock::Milliseconds64((FreeRTOSTicksSinceBoot() * kMillisecondsPerSecond) / configTICK_RATE_HZ);
 }
 
-Error ClockImpl::GetClock_RealTime(uint64_t & aCurTime)
+uint64_t GetClock_Monotonic(void)
+{
+    return (FreeRTOSTicksSinceBoot() * kMicrosecondsPerSecond) / configTICK_RATE_HZ;
+}
+
+uint64_t GetClock_MonotonicMS(void)
+{
+    return (FreeRTOSTicksSinceBoot() * kMillisecondsPerSecond) / configTICK_RATE_HZ;
+}
+
+uint64_t GetClock_MonotonicHiRes(void)
+{
+    return GetClock_Monotonic();
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
 {
     if (sBootTimeUS == 0)
     {
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    aCurTime = sBootTimeUS + GetClock_Monotonic();
+    aCurTime = Clock::Microseconds64(sBootTimeUS + GetClock_Monotonic());
     return CHIP_NO_ERROR;
 }
 
-Error ClockImpl::GetClock_RealTimeMS(uint64_t & aCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
 {
     if (sBootTimeUS == 0)
     {
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    aCurTime = (sBootTimeUS + GetClock_Monotonic()) / 1000;
+    aCurTime = Clock::Milliseconds64((sBootTimeUS + GetClock_Monotonic()) / 1000);
     return CHIP_NO_ERROR;
 }
 
-Error ClockImpl::SetClock_RealTime(uint64_t aNewCurTime)
+CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
 {
     uint64_t timeSinceBootUS = GetClock_Monotonic();
-    if (newCurTime > timeSinceBootUS)
+    if (aNewCurTime.count() > timeSinceBootUS)
     {
-        sBootTimeUS = aNewCurTime - timeSinceBootUS;
+        sBootTimeUS = aNewCurTime.count() - timeSinceBootUS;
     }
     else
     {

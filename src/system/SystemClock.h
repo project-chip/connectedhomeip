@@ -217,7 +217,7 @@ public:
      * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
      *                                      If the platform is incapable of tracking real time.
      */
-    virtual CHIP_ERROR GetClock_RealTime(uint64_t & aCurTime) = 0;
+    virtual CHIP_ERROR GetClock_RealTime(Microseconds64 & aCurTime) = 0;
 
     /**
      * @brief
@@ -242,7 +242,7 @@ public:
      * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
      *                                      If the platform is incapable of tracking real time.
      */
-    virtual CHIP_ERROR GetClock_RealTimeMS(uint64_t & aCurTime) = 0;
+    virtual CHIP_ERROR GetClock_RealTimeMS(Milliseconds64 & aCurTime) = 0;
 
     /**
      * @brief
@@ -278,7 +278,7 @@ public:
      *                                      If the calling application does not have the privilege to set the
      *                                      current time.
      */
-    virtual CHIP_ERROR SetClock_RealTime(uint64_t aNewCurTime) = 0;
+    virtual CHIP_ERROR SetClock_RealTime(Microseconds64 aNewCurTime) = 0;
 };
 
 // Currently we have a single implementation class, ClockImpl, whose members are implemented in build-specific files.
@@ -288,9 +288,9 @@ public:
     ~ClockImpl() = default;
     Microseconds64 GetMonotonicMicroseconds64() override;
     Milliseconds64 GetMonotonicMilliseconds64() override;
-    CHIP_ERROR GetClock_RealTime(uint64_t & aCurTime) override;
-    CHIP_ERROR GetClock_RealTimeMS(uint64_t & aCurTime) override;
-    CHIP_ERROR SetClock_RealTime(uint64_t aNewCurTime) override;
+    CHIP_ERROR GetClock_RealTime(Microseconds64 & aCurTime) override;
+    CHIP_ERROR GetClock_RealTimeMS(Milliseconds64 & aCurTime) override;
+    CHIP_ERROR SetClock_RealTime(Microseconds64 aNewCurTime) override;
 };
 
 namespace Internal {

@@ -117,9 +117,9 @@ struct Timestamp
     Timestamp(Type aType) : mType(aType) { mValue = 0; }
     Timestamp(Type aType, uint64_t aValue) : mType(aType), mValue(aValue) {}
     Timestamp(System::Clock::Timestamp aValue) : mType(Type::kSystem), mValue(aValue.count()) {}
-    static Timestamp Epoch(uint64_t aValue)
+    static Timestamp Epoch(System::Clock::Timestamp aValue)
     {
-        Timestamp timestamp(Type::kEpoch, aValue);
+        Timestamp timestamp(Type::kEpoch, aValue.count());
         return timestamp;
     }
     static Timestamp System(System::Clock::Timestamp aValue)
