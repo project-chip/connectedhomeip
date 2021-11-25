@@ -802,7 +802,7 @@ void ConnectivityManagerImpl::DHCPProcess(void)
 CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
-    NetworkInterface * head  = NULL;
+    NetworkInterface * head = NULL;
     struct ifaddrs * ifaddr = nullptr;
 
     if (xnetif == NULL)
@@ -867,7 +867,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBssid(ByteSpan & value)
     {
         err = CHIP_NO_ERROR;
         ChipLogProgress(DeviceLayer, "%02x,%02x,%02x,%02x,%02x,%02x\n", ameba_bssid[0], ameba_bssid[1], ameba_bssid[2],
-                        ameba_bssid[3],ameba_bssid[4],ameba_bssid[5]);
+                        ameba_bssid[3], ameba_bssid[4], ameba_bssid[5]);
     }
 
     value = ameba_bssid;
