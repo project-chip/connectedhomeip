@@ -133,7 +133,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     Dnssd::Resolver::Instance().Init(params.systemState->InetLayer());
-    Dnssd::Resolver::Instance().SetResolverDelegate(this);
+    Dnssd::Resolver::Instance().RegisterResolverDelegate(this);
     RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -234,7 +234,7 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemState = nullptr;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    Dnssd::Resolver::Instance().SetResolverDelegate(nullptr);
+    Dnssd::Resolver::Instance().UnregisterResolverDelegate(this);
     mDeviceAddressUpdateDelegate = nullptr;
     mDeviceDiscoveryDelegate     = nullptr;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -1519,9 +1519,11 @@ void BasicFailure(void * context, uint8_t status)
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
+    VerifyOrReturn(mState == State::Initialized);
+    VerifyOrReturn(GetCompressedFabricId() == nodeData.mPeerId.GetCompressedFabricId());
+
     ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID 0x" ChipLogFormatX64,
                     ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
-    VerifyOrReturn(mState == State::Initialized);
 
     if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == nodeData.mPeerId.GetNodeId())
     {
@@ -1540,6 +1542,9 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
 
 void DeviceCommissioner::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
 {
+    VerifyOrReturn(mState == State::Initialized);
+    VerifyOrReturn(GetCompressedFabricId() == peer.GetCompressedFabricId());
+
     if (mDeviceBeingCommissioned != nullptr)
     {
         CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;

@@ -222,7 +222,7 @@ CHIP_ERROR DnsHandler(int argc, char ** argv)
     }
 
     Dnssd::Resolver::Instance().Init(&DeviceLayer::InetLayer());
-    Dnssd::Resolver::Instance().SetResolverDelegate(&sDnsShellResolverDelegate);
+    Dnssd::Resolver::Instance().RegisterResolverDelegate(&sDnsShellResolverDelegate);
 
     return sShellDnsSubcommands.ExecCommand(argc, argv);
 }

@@ -344,7 +344,8 @@ public:
     ///// Resolver implementation
     CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) override;
     void Shutdown() override;
-    void SetResolverDelegate(ResolverDelegate * delegate) override { mDelegate = delegate; }
+    void RegisterResolverDelegate(ResolverDelegate * delegate) override { mDelegate = delegate; }
+    void UnregisterResolverDelegate(ResolverDelegate * delegate) override { mDelegate = nullptr; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;

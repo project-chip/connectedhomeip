@@ -268,10 +268,14 @@ public:
     virtual void Shutdown() = 0;
 
     /**
-     * Registers a resolver delegate. If nullptr is passed, the previously registered delegate
-     * is unregistered.
+     * Registers a resolver delegate.
      */
-    virtual void SetResolverDelegate(ResolverDelegate * delegate) = 0;
+    virtual void RegisterResolverDelegate(ResolverDelegate * delegate) = 0;
+
+    /**
+     * Unregisters a resolver delegate.
+     */
+    virtual void UnregisterResolverDelegate(ResolverDelegate * delegate) = 0;
 
     /**
      * Requests resolution of the given operational node service.

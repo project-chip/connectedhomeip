@@ -48,7 +48,8 @@ public:
     CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
 
     // Members that implement Resolver interface.
-    void SetResolverDelegate(ResolverDelegate * delegate) override { mResolverDelegate = delegate; }
+    void RegisterResolverDelegate(ResolverDelegate * delegate) override;
+    void UnregisterResolverDelegate(ResolverDelegate * delegate) override;
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
@@ -83,8 +84,8 @@ private:
     bool mIsCommissionerPublishing       = false;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
 
-    bool mDnssdInitialized               = false;
-    ResolverDelegate * mResolverDelegate = nullptr;
+    bool mDnssdInitialized                                                         = false;
+    ResolverDelegate * mResolverDelegates[CHIP_CONFIG_MDNS_MAX_RESOLVER_DELEGATES] = {};
 
     static DiscoveryImplPlatform sManager;
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0

@@ -459,6 +459,30 @@ CHIP_ERROR DiscoveryImplPlatform::FinalizeServiceUpdate()
     return ChipDnssdFinalizeServiceUpdate();
 }
 
+void DiscoveryImplPlatform::RegisterResolverDelegate(ResolverDelegate * delegate)
+{
+    for (auto & resolverDelegate : mResolverDelegates)
+    {
+        if (resolverDelegate == nullptr || resolverDelegate == delegate)
+        {
+            resolverDelegate = delegate;
+            break;
+        }
+    }
+}
+
+void DiscoveryImplPlatform::UnregisterResolverDelegate(ResolverDelegate * delegate)
+{
+    for (auto & resolverDelegate : mResolverDelegates)
+    {
+        if (resolverDelegate == delegate)
+        {
+            resolverDelegate = nullptr;
+            break;
+        }
+    }
+}
+
 CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     ReturnErrorOnFailure(InitImpl());
@@ -468,7 +492,13 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
     ResolvedNodeData nodeData;
     if (sDnssdCache.Lookup(peerId, nodeData) == CHIP_NO_ERROR)
     {
-        mResolverDelegate->OnNodeIdResolved(nodeData);
+        for (auto & resolverDelegate : mResolverDelegates)
+        {
+            if (resolverDelegate != nullptr)
+            {
+                resolverDelegate->OnNodeIdResolved(nodeData);
+            }
+        }
         return CHIP_NO_ERROR;
     }
 #endif
@@ -524,7 +554,13 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, DnssdService * res
         ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
         FillNodeDataFromTxt(key, val, data);
     }
-    mgr->mResolverDelegate->OnNodeDiscoveryComplete(data);
+    for (auto & resolverDelegate : mgr->mResolverDelegates)
+    {
+        if (resolverDelegate != nullptr)
+        {
+            resolverDelegate->OnNodeDiscoveryComplete(data);
+        }
+    }
 }
 
 CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter)
@@ -551,22 +587,29 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
 {
     DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
 
-    if (mgr->mResolverDelegate == nullptr)
-    {
-        return;
-    }
-
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
-        mgr->mResolverDelegate->OnNodeIdResolutionFailed(PeerId(), error);
+        for (auto & resolverDelegate : mgr->mResolverDelegates)
+        {
+            if (resolverDelegate != nullptr)
+            {
+                resolverDelegate->OnNodeIdResolutionFailed(PeerId(), error);
+            }
+        }
         return;
     }
 
     if (result == nullptr)
     {
         ChipLogError(Discovery, "Node ID resolve not found");
-        mgr->mResolverDelegate->OnNodeIdResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID);
+        for (auto & resolverDelegate : mgr->mResolverDelegates)
+        {
+            if (resolverDelegate != nullptr)
+            {
+                resolverDelegate->OnNodeIdResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID);
+            }
+        }
         return;
     }
 
@@ -576,7 +619,13 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
-        mgr->mResolverDelegate->OnNodeIdResolutionFailed(PeerId(), error);
+        for (auto & resolverDelegate : mgr->mResolverDelegates)
+        {
+            if (resolverDelegate != nullptr)
+            {
+                resolverDelegate->OnNodeIdResolutionFailed(PeerId(), error);
+            }
+        }
         return;
     }
 
@@ -607,7 +656,13 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
         ChipLogError(Discovery, "DnssdCache insert failed with %s", chip::ErrorStr(error));
     }
 #endif
-    mgr->mResolverDelegate->OnNodeIdResolved(nodeData);
+    for (auto & resolverDelegate : mgr->mResolverDelegates)
+    {
+        if (resolverDelegate != nullptr)
+        {
+            resolverDelegate->OnNodeIdResolved(nodeData);
+        }
+    }
 }
 
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()

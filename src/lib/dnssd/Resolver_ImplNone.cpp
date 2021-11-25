@@ -28,7 +28,8 @@ class NoneResolver : public Resolver
 public:
     CHIP_ERROR Init(chip::Inet::InetLayer *) override { return CHIP_NO_ERROR; }
     void Shutdown() override {}
-    void SetResolverDelegate(ResolverDelegate *) override {}
+    void RegisterResolverDelegate(ResolverDelegate *) override {}
+    void UnregisterResolverDelegate(ResolverDelegate *) override {}
 
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override
     {

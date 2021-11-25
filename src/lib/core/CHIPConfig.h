@@ -2401,6 +2401,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MDNS_MAX_RESOLVER_DELEGATES
+ *
+ * @brief
+ *      Define the maximum number of delegates that will be informed of node address resolution.
+ */
+#ifndef CHIP_CONFIG_MDNS_MAX_RESOLVER_DELEGATES
+#define CHIP_CONFIG_MDNS_MAX_RESOLVER_DELEGATES 4
+#endif
+
+/**
  * @def CHIP_CONFIG_MDNS_CACHE_SIZE
  *
  * @brief
@@ -2412,6 +2422,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MDNS_CACHE_SIZE
 #define CHIP_CONFIG_MDNS_CACHE_SIZE 20
 #endif
+
 /**
  *  @name Interaction Model object pool configuration.
  *

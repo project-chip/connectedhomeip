@@ -69,7 +69,7 @@ CHIP_ERROR AbstractDnssdDiscoveryController::SetUpNodeDiscovery()
 #if CONFIG_DEVICE_LAYER
     ReturnErrorOnFailure(mResolver->Init(&DeviceLayer::InetLayer()));
 #endif
-    mResolver->SetResolverDelegate(this);
+    mResolver->RegisterResolverDelegate(this);
 
     auto discoveredNodes = GetDiscoveredNodes();
     for (auto & discoveredNode : discoveredNodes)
