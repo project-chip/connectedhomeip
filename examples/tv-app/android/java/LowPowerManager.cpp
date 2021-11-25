@@ -18,11 +18,10 @@
 
 #include "LowPowerManager.h"
 #include <lib/support/CHIPJNIError.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/CodeUtils.h>
-
 
 using namespace chip;
 
@@ -38,7 +37,7 @@ void LowPowerManager::InitializeWithObjects(jobject managerObject)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for LowPowerManager"));
 
-    mLowPowerManagerObject  = env->NewGlobalRef(managerObject);
+    mLowPowerManagerObject = env->NewGlobalRef(managerObject);
     VerifyOrReturn(mLowPowerManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef LowPowerManager"));
 
     jclass LowPowerManagerClass = env->GetObjectClass(managerObject);
@@ -55,7 +54,7 @@ void LowPowerManager::InitializeWithObjects(jobject managerObject)
 bool LowPowerManager::Sleep()
 {
     jboolean ret = JNI_FALSE;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received LowPowerManager::Sleep");
     VerifyOrExit(mLowPowerManagerObject != nullptr, ChipLogError(Zcl, "mLowPowerManagerObject null"));
