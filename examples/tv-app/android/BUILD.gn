@@ -34,8 +34,6 @@ shared_library("jni") {
     "include/audio-output/AudioOutputManager.h",
     "include/cluster-change-attribute.cpp",
     "include/cluster-init.cpp",
-    "include/content-launcher/ContentLauncherManager.cpp",
-    "include/content-launcher/ContentLauncherManager.h",
     "include/endpoint-configuration/EndpointConfigurationStorage.cpp",
     "include/endpoint-configuration/EndpointConfigurationStorage.h",
     "include/low-power/LowPowerManager.cpp",
@@ -53,6 +51,8 @@ shared_library("jni") {
     "java/TVApp-JNI.cpp",
     "java/WakeOnLanManager.cpp",
     "java/WakeOnLanManager.h",
+    "java/ContentLauncherManager.h",
+    "java/ContentLauncherManager.cpp",
   ]
 
   deps = [
@@ -91,6 +91,11 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/TvApp.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/ContentLaunchBrandingInformation.java",
+    "java/src/com/tcl/chip/tvapp/ContentLaunchManager.java",
+    "java/src/com/tcl/chip/tvapp/ContentLaunchManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/ContentLaunchResponse.java",
+    "java/src/com/tcl/chip/tvapp/ContentLaunchSearchParameter.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

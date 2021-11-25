@@ -26,6 +26,8 @@ public class TvApp {
 
   public native void setMediaInputManager(MediaInputManager manager);
 
+  public native void setContentLaunchManager(ContentLaunchManager manager);
+
   static {
     System.loadLibrary("TvApp");
   }
