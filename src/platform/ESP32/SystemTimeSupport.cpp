@@ -84,7 +84,8 @@ CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
-    aCurTime = Clock::Milliseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000));
+    aCurTime =
+        Clock::Milliseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000));
     return CHIP_NO_ERROR;
 }
 
