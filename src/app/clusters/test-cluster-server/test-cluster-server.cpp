@@ -293,7 +293,7 @@ bool emberAfTestClusterClusterTestAddArgumentsCallback(CommandHandler * apComman
 {
     if (commandData.arg1 > UINT8_MAX - commandData.arg2)
     {
-        return emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+        return emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
     }
 
     TestAddArgumentsResponse::Type responseData;

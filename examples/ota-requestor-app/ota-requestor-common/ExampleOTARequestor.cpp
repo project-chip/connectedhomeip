@@ -70,14 +70,14 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
     auto & providerLocation   = commandData.providerLocation;
     auto & announcementReason = commandData.announcementReason;
 
-    if (commandObj == nullptr || commandObj->GetExchangeContext() == nullptr)
+    if (commandObj == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "Cannot access ExchangeContext for FabricIndex");
-        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+        ChipLogError(SoftwareUpdate, "Cannot access get FabricIndex");
+        return EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
 
     mProviderNodeId      = providerLocation;
-    mProviderFabricIndex = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
+    mProviderFabricIndex = commandObj->GetAccessingFabricIndex();
 
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
     ChipLogDetail(SoftwareUpdate, "  FabricIndex: %" PRIu8, mProviderFabricIndex);
@@ -103,7 +103,7 @@ EmberAfStatus ExampleOTARequestor::HandleAnnounceOTAProvider(
         break;
     default:
         ChipLogError(SoftwareUpdate, "Unexpected announcementReason: %" PRIu8, static_cast<uint8_t>(announcementReason));
-        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+        return EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
 
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(msToStart), StartDelayTimerHandler, this);
